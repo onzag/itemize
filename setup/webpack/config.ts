@@ -1,3 +1,9 @@
+/**
+ * Contains the standard webpack config
+ * as a string
+ * @packageDocumentation
+ */
+
 export default `const path = require('path');
 const webpack = require("webpack");
 const fs = require("fs");

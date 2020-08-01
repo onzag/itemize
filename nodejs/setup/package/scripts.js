@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * These scripts are injected to the package json
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     "install": "tsc",

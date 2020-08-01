@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * Setups the configuration basically modifies the configuration in place
+ * this setup is supposed to build
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,12 +17,19 @@ const redis_1 = require("./redis");
 const db_1 = require("./db");
 const fs_1 = __importDefault(require("fs"));
 const fsAsync = fs_1.default.promises;
+/**
+ * the configuration setup step that builds the config files themselves
+ * @param arg the config it's supposed to modify
+ */
 async function configSetup(arg) {
     console.log(colors_1.default.bgGreen("CONFIGURATION SETUP"));
+    // we need our package json information
     const packageJSON = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
+    // and we build our new configuration
     const newArg = {
         ...arg,
     };
+    // if we have already setup
     if (newArg.standardConfig &&
         newArg.sensitiveConfigDevelopment &&
         newArg.sensitiveConfigProduction &&
@@ -25,28 +38,31 @@ async function configSetup(arg) {
         newArg.dbConfigDevelopment &&
         newArg.dbConfigProduction &&
         !(await read_1.confirm("Would you like to setup the configuration files?"))) {
+        // we ask and confirm for it
         return arg;
     }
     if (!newArg.standardConfig ||
         await read_1.confirm("Would you like to modify the standard configuration?")) {
-        console.log(colors_1.default.yellow("Could not find standard configuration file"));
         newArg.standardConfig = await standard_1.standardConfigSetup(newArg.standardConfig, packageJSON);
     }
     if (!newArg.sensitiveConfigDevelopment ||
         await read_1.confirm("Would you like to modify the sensitive development configuration?")) {
-        newArg.sensitiveConfigDevelopment = await sensitive_1.sensitiveConfigSetup("development", newArg.sensitiveConfigDevelopment, null, packageJSON);
+        // basically there's nothing as a reference for our development configuration
+        newArg.sensitiveConfigDevelopment = await sensitive_1.sensitiveConfigSetup("development", newArg.sensitiveConfigDevelopment, null);
     }
     if (!newArg.sensitiveConfigProduction ||
         await read_1.confirm("Would you like to modify the sensitive production configuration?")) {
-        newArg.sensitiveConfigProduction = await sensitive_1.sensitiveConfigSetup("production", newArg.sensitiveConfigProduction, newArg.sensitiveConfigDevelopment, packageJSON);
+        // but we can use our development configuration as reference for production
+        newArg.sensitiveConfigProduction = await sensitive_1.sensitiveConfigSetup("production", newArg.sensitiveConfigProduction, newArg.sensitiveConfigDevelopment);
     }
     if (!newArg.redisConfigDevelopment ||
         await read_1.confirm("Would you like to modify the redis development configuration?")) {
-        newArg.redisConfigDevelopment = await redis_1.redisConfigSetup("development", newArg.redisConfigDevelopment, null, packageJSON);
+        // same with redis
+        newArg.redisConfigDevelopment = await redis_1.redisConfigSetup("development", newArg.redisConfigDevelopment, null);
     }
     if (!newArg.redisConfigProduction ||
         await read_1.confirm("Would you like to modify the redis production configuration?")) {
-        newArg.redisConfigProduction = await redis_1.redisConfigSetup("production", newArg.redisConfigProduction, newArg.redisConfigDevelopment, packageJSON);
+        newArg.redisConfigProduction = await redis_1.redisConfigSetup("production", newArg.redisConfigProduction, newArg.redisConfigDevelopment);
     }
     if (!newArg.dbConfigDevelopment ||
         await read_1.confirm("Would you like to modify the posrgreSQL development configuration?")) {

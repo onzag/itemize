@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Setups the tslint with the default itemize configuration
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     extends: ["tslint:recommended", "tslint-react"],

@@ -1,3 +1,7 @@
+/**
+ * These scripts are injected to the package json
+ * @packageDocumentation
+ */
 declare const _default: {
     install: string;
     tsc: string;

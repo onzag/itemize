@@ -21,6 +21,10 @@ const webpack_1 = __importDefault(require("./webpack"));
 const src_1 = __importDefault(require("./src"));
 const typescript_1 = __importDefault(require("./typescript"));
 const fsAsync = fs_1.default.promises;
+/**
+ * All the steps in the order that they are meant
+ * to be executed
+ */
 const stepsInOrder = [
     {
         fn: config_1.default,
@@ -55,6 +59,11 @@ const stepsInOrder = [
         name: "src",
     }
 ];
+/**
+ * Runs the setup, check out the main.ts function to see
+ * how this is meant to be called
+ * @param onlyNames the names that are supposed to be called
+ */
 async function setup(...onlyNames) {
     console.log(colors_1.default.bgGreen("INITIALIZING SETUP"));
     await ensureConfigDirectory();
@@ -89,7 +98,11 @@ async function setup(...onlyNames) {
     await writeConfigFile("redis.production.sensitive.json", arg.redisConfigProduction, redisConfigProduction);
 }
 exports.default = setup;
+/**
+ * Ensures that the configuration directory exists
+ */
 async function ensureConfigDirectory() {
+    // so we check it
     let exists = true;
     try {
         await fsAsync.access("config", fs_1.default.constants.F_OK);
@@ -101,6 +114,9 @@ async function ensureConfigDirectory() {
         // let the error be free
         await fsAsync.mkdir("config");
     }
+    // also we add the .gitignore file for this
+    // configuration directory to ensure that sensitive config
+    // does not leak
     let gitignoreExists = true;
     try {
         await fsAsync.access(path_1.default.join("config", ".gitignore"), fs_1.default.constants.F_OK);
@@ -114,6 +130,11 @@ async function ensureConfigDirectory() {
     }
 }
 exports.ensureConfigDirectory = ensureConfigDirectory;
+/**
+ * Reads a config file
+ * @param fileName the filename we are reading
+ * @returns the parsed content, or otherwise null if it doesn't exist
+ */
 async function readConfigFile(fileName) {
     let exists = true;
     try {
@@ -130,6 +151,14 @@ async function readConfigFile(fileName) {
     return JSON.parse(content);
 }
 exports.readConfigFile = readConfigFile;
+/**
+ * writes a configuration file only if it differs from what is currently written
+ * according to the last arg
+ *
+ * @param fileName the filename we are writting
+ * @param data the data we are writting
+ * @param original the original data, to check it against for differences
+ */
 async function writeConfigFile(fileName, data, original) {
     if (!deep_equal_1.default(data, original)) {
         console.log("emiting " + colors_1.default.green(path_1.default.join("config", fileName)));

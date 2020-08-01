@@ -5,7 +5,6 @@ export async function redisConfigSetup(
   version: string,
   currentConfig: IRedisConfigRawJSONDataType,
   referenceConfig: IRedisConfigRawJSONDataType,
-  packageJSON: any,
 ): Promise<IRedisConfigRawJSONDataType> {
   const extractDataRedis: IConfigRequestExtractPoint[] = [
     {

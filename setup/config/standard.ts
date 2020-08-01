@@ -1,7 +1,17 @@
+/**
+ * Allows to set up a standard configuration information
+ * @packageDocumentation
+ */
+
 import { IConfigRawJSONDataType } from "../../config";
 import { configRequest } from "../read";
 import { countries, currencies } from "../../imported-resources";
 
+/**
+ * Allows to set up a standard configuration information
+ * @param currentConfig the current configuration
+ * @param packageJSON the current package.json file content (parsed)
+ */
 export async function standardConfigSetup(
   currentConfig: IConfigRawJSONDataType,
   packageJSON: any,

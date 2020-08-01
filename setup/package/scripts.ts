@@ -1,3 +1,8 @@
+/**
+ * These scripts are injected to the package json
+ * @packageDocumentation
+ */
+
 export default {
   "install": "tsc",
   "tsc": "tsc",

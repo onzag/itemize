@@ -1,7 +1,16 @@
 "use strict";
+/**
+ * Allows to set up a standard configuration information
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = require("../read");
 const imported_resources_1 = require("../../imported-resources");
+/**
+ * Allows to set up a standard configuration information
+ * @param currentConfig the current configuration
+ * @param packageJSON the current package.json file content (parsed)
+ */
 async function standardConfigSetup(currentConfig, packageJSON) {
     const newConfig = await read_1.configRequest(currentConfig, "Standard configuration", [
         {

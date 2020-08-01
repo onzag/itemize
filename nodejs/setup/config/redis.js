@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = require("../read");
-async function redisConfigSetup(version, currentConfig, referenceConfig, packageJSON) {
+async function redisConfigSetup(version, currentConfig, referenceConfig) {
     const extractDataRedis = [
         {
             variableName: "host",

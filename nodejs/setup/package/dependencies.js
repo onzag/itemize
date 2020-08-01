@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the standard dependencies that the parent project
+ * should have, these are either peers or used straight on
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     // builder typescript that is ran after npm install

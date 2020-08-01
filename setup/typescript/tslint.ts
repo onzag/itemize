@@ -1,3 +1,8 @@
+/**
+ * Setups the tslint with the default itemize configuration
+ * @packageDocumentation
+ */
+
 export default {
   extends: ["tslint:recommended", "tslint-react"],
   rules: {

@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Setups typescript and the tsc compiler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,8 +12,14 @@ const fs_1 = __importDefault(require("fs"));
 const fsAsync = fs_1.default.promises;
 const tsconfig_1 = __importDefault(require("./tsconfig"));
 const tslint_1 = __importDefault(require("./tslint"));
+/**
+ * runs the typescript setup part
+ * @param arg the setup arg
+ * @returns the same arg
+ */
 async function typescriptSetup(arg) {
     console.log(colors_1.default.bgGreen("TYPESCRIPT SETUP"));
+    // first we need to ensure our tsconfig.json file
     let tsconfigExists = true;
     try {
         await fsAsync.access("tsconfig.json", fs_1.default.constants.F_OK);
@@ -17,10 +27,12 @@ async function typescriptSetup(arg) {
     catch (e) {
         tsconfigExists = false;
     }
+    // if it doesn't exist we use the value from our tsconfig.ts source
     if (!tsconfigExists) {
         console.log("emiting " + colors_1.default.green("tsconfig.json"));
         await fsAsync.writeFile("tsconfig.json", JSON.stringify(tsconfig_1.default, null, 2));
     }
+    // same for tslint
     let tslintExists = true;
     try {
         await fsAsync.access("tslint.json", fs_1.default.constants.F_OK);
@@ -28,10 +40,12 @@ async function typescriptSetup(arg) {
     catch (e) {
         tslintExists = false;
     }
+    // an we emit such
     if (!tslintExists) {
         console.log("emiting " + colors_1.default.green("tslint.json"));
         await fsAsync.writeFile("tslint.json", JSON.stringify(tslint_1.default, null, 2));
     }
+    // return the same arg, unmodified
     return arg;
 }
 exports.default = typescriptSetup;

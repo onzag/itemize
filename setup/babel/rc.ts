@@ -1,3 +1,8 @@
+/**
+ * Contains the standard file for babel.config.json
+ * @packageDocumentation
+ */
+
 export default {
   presets: [
     "@babel/react",

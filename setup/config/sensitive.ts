@@ -1,7 +1,21 @@
+/**
+ * Allows to set up a sensitive configuration information
+ * @packageDocumentation
+ */
+
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { configRequest } from "../read";
 
+/**
+ * A list of characters
+ * @ignore
+ */
 const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/**
+ * generates a random alphanumeric token
+ * @param length the size of the token
+ */
 function genToken(length: number) {
   var result = "";
   for (var i = length; i > 0; --i) {
@@ -10,11 +24,16 @@ function genToken(length: number) {
   return result;
 }
 
+/**
+ * Allows for setting up the senstive configuration
+ * @param version development of production
+ * @param currentConfig the currently stored config
+ * @param referenceConfig the reference configuration to use values against
+ */
 export async function sensitiveConfigSetup(
   version: string,
   currentConfig: ISensitiveConfigRawJSONDataType,
   referenceConfig: ISensitiveConfigRawJSONDataType,
-  packageJSON: any,
 ): Promise<ISensitiveConfigRawJSONDataType> {
   const newConfig = await configRequest(
     currentConfig || referenceConfig,

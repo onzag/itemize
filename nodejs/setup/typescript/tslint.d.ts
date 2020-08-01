@@ -1,3 +1,7 @@
+/**
+ * Setups the tslint with the default itemize configuration
+ * @packageDocumentation
+ */
 declare const _default: {
     extends: string[];
     rules: {

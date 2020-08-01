@@ -1,3 +1,9 @@
+/**
+ * Contains the dev dependencies that the parent project
+ * should have, these are for building the project with webpack
+ * @packageDocumentation
+ */
+
 export default {
   // builder babel and presets
   "@babel/core": "^7.9.0",

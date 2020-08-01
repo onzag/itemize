@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the dev dependencies that the parent project
+ * should have, these are for building the project with webpack
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     // builder babel and presets

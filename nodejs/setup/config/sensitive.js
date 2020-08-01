@@ -1,7 +1,19 @@
 "use strict";
+/**
+ * Allows to set up a sensitive configuration information
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = require("../read");
+/**
+ * A list of characters
+ * @ignore
+ */
 const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/**
+ * generates a random alphanumeric token
+ * @param length the size of the token
+ */
 function genToken(length) {
     var result = "";
     for (var i = length; i > 0; --i) {
@@ -10,7 +22,13 @@ function genToken(length) {
     ;
     return result;
 }
-async function sensitiveConfigSetup(version, currentConfig, referenceConfig, packageJSON) {
+/**
+ * Allows for setting up the senstive configuration
+ * @param version development of production
+ * @param currentConfig the currently stored config
+ * @param referenceConfig the reference configuration to use values against
+ */
+async function sensitiveConfigSetup(version, currentConfig, referenceConfig) {
     const newConfig = await read_1.configRequest(currentConfig || referenceConfig, "Sensitive configuration (" + version + ")", [
         {
             variableName: "ipStackAccessKey",

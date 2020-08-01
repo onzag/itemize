@@ -1,3 +1,9 @@
+/**
+ * Contains the standard dependencies that the parent project
+ * should have, these are either peers or used straight on
+ * @packageDocumentation
+ */
+
 export default {
   // builder typescript that is ran after npm install
   "typescript": "^3.8.3",

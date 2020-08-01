@@ -19,6 +19,10 @@ import srcSetup from "./src";
 import typescriptSetup from "./typescript";
 const fsAsync = fs.promises;
 
+/**
+ * Contains all the configuration file information in a single
+ * area for utility reasons
+ */
 export interface ISetupConfigType {
   standardConfig: IConfigRawJSONDataType;
   sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType;
@@ -29,11 +33,26 @@ export interface ISetupConfigType {
   redisConfigProduction: IRedisConfigRawJSONDataType;
 }
 
+/**
+ * every step is comprised of
+ */
 interface IStepType {
+  /**
+   * a function that is going to run that takes
+   * @param arg an arg that is this config
+   * @returns these same arg, as it has modified it
+   */
   fn: (arg: ISetupConfigType) => Promise<ISetupConfigType>,
+  /**
+   * The name of this step
+   */
   name: string,
 }
 
+/**
+ * All the steps in the order that they are meant
+ * to be executed
+ */
 const stepsInOrder: IStepType[] = [
   {
     fn: configSetup,
@@ -69,6 +88,11 @@ const stepsInOrder: IStepType[] = [
   }
 ];
 
+/**
+ * Runs the setup, check out the main.ts function to see
+ * how this is meant to be called
+ * @param onlyNames the names that are supposed to be called
+ */
 export default async function setup(...onlyNames: string[]) {
   console.log(colors.bgGreen("INITIALIZING SETUP"));
   await ensureConfigDirectory();
@@ -107,7 +131,11 @@ export default async function setup(...onlyNames: string[]) {
   await writeConfigFile("redis.production.sensitive.json", arg.redisConfigProduction, redisConfigProduction);
 }
 
+/**
+ * Ensures that the configuration directory exists
+ */
 export async function ensureConfigDirectory() {
+  // so we check it
   let exists = true;
   try {
     await fsAsync.access("config", fs.constants.F_OK);
@@ -119,6 +147,9 @@ export async function ensureConfigDirectory() {
     await fsAsync.mkdir("config");
   }
 
+  // also we add the .gitignore file for this
+  // configuration directory to ensure that sensitive config
+  // does not leak
   let gitignoreExists = true;
   try {
     await fsAsync.access(path.join("config", ".gitignore"), fs.constants.F_OK);
@@ -131,6 +162,11 @@ export async function ensureConfigDirectory() {
   }
 }
 
+/**
+ * Reads a config file
+ * @param fileName the filename we are reading
+ * @returns the parsed content, or otherwise null if it doesn't exist
+ */
 export async function readConfigFile(fileName: string) {
   let exists = true;
   try {
@@ -149,6 +185,14 @@ export async function readConfigFile(fileName: string) {
   return JSON.parse(content);
 }
 
+/**
+ * writes a configuration file only if it differs from what is currently written
+ * according to the last arg
+ * 
+ * @param fileName the filename we are writting
+ * @param data the data we are writting
+ * @param original the original data, to check it against for differences
+ */
 export async function writeConfigFile(fileName: string, data: any, original: any) {
   if (!equals(data, original)) {
     console.log("emiting " + colors.green(path.join("config", fileName)));

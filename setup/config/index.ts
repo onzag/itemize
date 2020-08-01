@@ -1,3 +1,10 @@
+/**
+ * Setups the configuration basically modifies the configuration in place
+ * this setup is supposed to build
+ * 
+ * @packageDocumentation
+ */
+
 import colors from "colors";
 import { ISetupConfigType } from "..";
 import { standardConfigSetup } from "./standard";
@@ -8,15 +15,22 @@ import { dbConfigSetup } from "./db";
 import fs from "fs";
 const fsAsync = fs.promises;
 
+/**
+ * the configuration setup step that builds the config files themselves
+ * @param arg the config it's supposed to modify
+ */
 export default async function configSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("CONFIGURATION SETUP"));
 
+  // we need our package json information
   const packageJSON = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
 
+  // and we build our new configuration
   const newArg: ISetupConfigType = {
     ...arg,
   }
 
+  // if we have already setup
   if (
     newArg.standardConfig &&
     newArg.sensitiveConfigDevelopment &&
@@ -27,6 +41,7 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     newArg.dbConfigProduction &&
     !(await confirm("Would you like to setup the configuration files?"))
   ) {
+    // we ask and confirm for it
     return arg;
   }
 
@@ -34,7 +49,6 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     !newArg.standardConfig ||
     await confirm("Would you like to modify the standard configuration?")
   ) {
-    console.log(colors.yellow("Could not find standard configuration file"));
     newArg.standardConfig = await standardConfigSetup(newArg.standardConfig, packageJSON);
   }
 
@@ -42,11 +56,11 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     !newArg.sensitiveConfigDevelopment ||
     await confirm("Would you like to modify the sensitive development configuration?")
   ) {
+    // basically there's nothing as a reference for our development configuration
     newArg.sensitiveConfigDevelopment = await sensitiveConfigSetup(
       "development",
       newArg.sensitiveConfigDevelopment,
       null,
-      packageJSON,
     );
   }
 
@@ -54,11 +68,11 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     !newArg.sensitiveConfigProduction ||
     await confirm("Would you like to modify the sensitive production configuration?")
   ) {
+    // but we can use our development configuration as reference for production
     newArg.sensitiveConfigProduction = await sensitiveConfigSetup(
       "production",
       newArg.sensitiveConfigProduction,
       newArg.sensitiveConfigDevelopment,
-      packageJSON,
     );
   }
 
@@ -66,11 +80,11 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
     !newArg.redisConfigDevelopment ||
     await confirm("Would you like to modify the redis development configuration?")
   ) {
+    // same with redis
     newArg.redisConfigDevelopment = await redisConfigSetup(
       "development",
       newArg.redisConfigDevelopment,
       null,
-      packageJSON,
     );
   }
 
@@ -82,7 +96,6 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       "production",
       newArg.redisConfigProduction,
       newArg.redisConfigDevelopment,
-      packageJSON,
     );
   }
 

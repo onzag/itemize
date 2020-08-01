@@ -1,3 +1,8 @@
+/**
+ * This file generates some basic source so that the prokect works
+ * out of the box
+ */
+
 import colors from "colors";
 import fs from "fs";
 const fsAsync = fs.promises;
@@ -6,51 +11,80 @@ import { confirm, fieldRequest } from "../read";
 import path from "path";
 import { IConfigRawJSONDataType } from "../../config";
 
+/**
+ * User preferences for this code
+ */
 interface IOptionsForProcessingCode {
+  /**
+   * use spaces
+   */
   useSpaces: boolean,
+  /**
+   * if true which size these spaces should have
+   */
   spacesSize: number,
+  /**
+   * And whether they want a next line on {
+   */
   nextLineOnBrackets: boolean,
 };
 
+/**
+ * This function copies an entire directory into the target
+ * @param config the configuration we are working with
+ * @param options the code options
+ * @param sourcePath the path we are copying
+ * @param targetPath the path we are targeting 
+ */
 async function copyAndProcessDirectoryLevelFor(
   config: IConfigRawJSONDataType,
   options: IOptionsForProcessingCode,
-  pathname: string,
-  constructedPath: string,
+  sourcePath: string,
+  targetPath: string,
 ) {
-  const filesInDirectory = await fsAsync.readdir(pathname);
+  // so now we get each file there
+  const filesInDirectory = await fsAsync.readdir(sourcePath);
 
   // for every file in the directory
   await Promise.all(filesInDirectory.map(async (fileNameInDirectory) => {
     // let's get the path name
-    const currentTotalFilePathName = path.join(pathname, fileNameInDirectory);
+    const currentTotalFilePathName = path.join(sourcePath, fileNameInDirectory);
 
     // and let's check what type it is
     const stat = await fsAsync.lstat(currentTotalFilePathName);
     // if we have a directory
     if (stat.isDirectory()) {
       // build the folder for that directory
-      await fsAsync.mkdir(path.join(constructedPath, fileNameInDirectory));
+      await fsAsync.mkdir(path.join(targetPath, fileNameInDirectory));
   
       // and copy that directory level as well
       return copyAndProcessDirectoryLevelFor(
         config,
         options,
         currentTotalFilePathName,
-        path.join(constructedPath, fileNameInDirectory),
+        path.join(targetPath, fileNameInDirectory),
       );
     }
 
-    // so we get the content of the file
+    // so we get the content of the file, for code and js files
+    // we are asked to use utf8 encoding
     const readAsUtf8 = currentTotalFilePathName.endsWith(".code") ||
       currentTotalFilePathName.endsWith(".js");
+    // and the final filename we are going to use, by default the same
     let finalFileName: string = fileNameInDirectory;
+    // and the utf8 read content
     let utf8Content: string;
 
+    // if we are reading as utf8
     if (readAsUtf8) {
+      // and we can read such content
       utf8Content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+
+      // now if we are using a code files
       if (currentTotalFilePathName.endsWith(".code")) {
+        // we can apply these options to format the code
         if (options.nextLineOnBrackets) {
+          // and keep replacing the utf8 content to match these options
           utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, (match, digit) => {
             const digitInQuestion = parseInt(digit);
             let finalStr = "\n";
@@ -65,19 +99,25 @@ async function copyAndProcessDirectoryLevelFor(
         } else {
           utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, " {");
         }
+
+        // and we remove the code ending
         finalFileName = fileNameInDirectory.replace(".code", "");
       } else if (currentTotalFilePathName.endsWith(".js")) {
+        // similar to js in the case of js we execute, we pass both config
+        // and options inside the context
         utf8Content = Function("config", "options", utf8Content)(config, options);
         finalFileName = fileNameInDirectory.replace(".js", "");
       }
 
+      // and if we use spaces
       if (options.useSpaces) {
+        // our code always uses tabs
         utf8Content = utf8Content.replace(/\t/g, " ".repeat(options.spacesSize));
       }
     }
 
     // let's export the file in the directory
-    const exportedFileName = path.join(constructedPath, finalFileName);
+    const exportedFileName = path.join(targetPath, finalFileName);
     // and emit it
     console.log("emiting " + colors.green(exportedFileName));
     await (utf8Content ?

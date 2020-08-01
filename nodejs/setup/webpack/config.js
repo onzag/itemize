@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the standard webpack config
+ * as a string
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = `const path = require('path');
 const webpack = require("webpack");

@@ -1,3 +1,8 @@
+/**
+ * Contains the dev dependencies that the parent project
+ * should have, these are for building the project with webpack
+ * @packageDocumentation
+ */
 declare const _default: {
     "@babel/core": string;
     "@babel/plugin-proposal-class-properties": string;

@@ -31,7 +31,6 @@ RUN rm -f .npmrc
 FROM node:alpine
 
 ENV NODE_ENV development
-# ENV NODE_ENV staging
 # ENV NODE_ENV production
 
 ENV PORT 8000

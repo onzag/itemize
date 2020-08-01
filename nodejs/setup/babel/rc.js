@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the standard file for babel.config.json
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     presets: [
