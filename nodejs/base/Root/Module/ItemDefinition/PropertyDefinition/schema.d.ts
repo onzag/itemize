@@ -47,7 +47,9 @@ declare const _default: {
         };
         values: {
             type: string;
-            items: {};
+            items: {
+                type: string[];
+            };
         };
         nullable: {
             type: string;

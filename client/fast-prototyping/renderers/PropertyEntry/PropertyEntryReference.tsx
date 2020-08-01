@@ -1,3 +1,10 @@
+/**
+ * This file provides a fast prototyping renderer for the reference type, which is basically
+ * an integer but acts differently
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import {
   WithStyles,
@@ -18,9 +25,18 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntryReferenceRendererProps) {
   return !props.currentValid;
 }
+
+/**
+ * The styles for the reference
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -183,10 +199,15 @@ export const style = createStyles({
   },
 });
 
-
+/**
+ * The props for the reference entry with styles
+ */
 interface IPropertyEntryReferenceRendererWithStylesProps extends IPropertyEntryReferenceRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * The actual class for the reference renderer
+ */
 class ActualPropertyEntryReferenceRenderer
   extends React.Component<IPropertyEntryReferenceRendererWithStylesProps> {
 
@@ -212,18 +233,33 @@ class ActualPropertyEntryReferenceRenderer
     }
   }
 
+  /**
+   * caches the mouse down event to prevent it from doing
+   * anything
+   * @param e the mouse event
+   */
   public catchToggleMouseDownEvent(e: React.MouseEvent) {
     e.preventDefault();
   }
 
+  /**
+   * The change event but by the raw text field
+   * @param e the change event
+   */
   public onChangeByHTMLEvent(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) {
     this.onChange(e);
   }
 
+  /**
+   * the change event that triggers in the autosuggest mode
+   * or by default, if not autosuggest override given
+   * @param e the event
+   * @param autosuggestOverride autosuggest override
+   */
   public onChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
     autosuggestOverride?: Autosuggest.ChangeEvent,
   ) {
     let value: string = null;
@@ -235,17 +271,27 @@ class ActualPropertyEntryReferenceRenderer
       value = e.target.value.toString();
     }
 
+    // similarly to location
     if (value !== this.props.currentStrValue) {
+      // we call the change of search
       this.props.onChangeSearch(value);
     }
   }
 
+  /**
+   * The event on key down for the text field
+   * @param e the event itself
+   */
   public onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (this.props.args.onEnter && e.keyCode === 13) {
       this.props.args.onEnter();      
     }
   }
 
+  /**
+   * Render the basic text field for the reference
+   * @param textFieldProps the text field props
+   */
   public renderBasicTextField(textFieldProps?: any) {
     const inputMode = "text";
 
@@ -386,6 +432,10 @@ class ActualPropertyEntryReferenceRenderer
     );
   }
 
+  /**
+   * renders the autosuggest container for the reference
+   * @param options the autosuggest options
+   */
   public renderAutosuggestContainer(
     options: Autosuggest.RenderSuggestionsContainerParams,
   ) {
@@ -401,6 +451,11 @@ class ActualPropertyEntryReferenceRenderer
     );
   }
 
+  /**
+   * Render the autosuggest suggestion for the reference
+   * @param suggestion the suggestion itself
+   * @param params the params to use
+   */
   public renderAutosuggestSuggestion(
     suggestion: IPropertyEntryReferenceOption,
     params: Autosuggest.RenderSuggestionParams,
@@ -435,6 +490,10 @@ class ActualPropertyEntryReferenceRenderer
     );
   }
 
+  /**
+   * Provides the suggestion value
+   * @param suggestion the suggestion itself
+   */
   public getSuggestionValue(
     suggestion: IPropertyEntryReferenceOption,
   ) {
@@ -443,10 +502,17 @@ class ActualPropertyEntryReferenceRenderer
     return suggestion.text;
   }
 
+  /**
+   * When the suggestion fetch is triggered
+   * @param arg the arg
+   */
   public onSuggestionsFetchRequested(arg: {value: string}) {
     this.props.onChangeSearch(arg.value);
   }
 
+  /**
+   * render function
+   */
   public render() {
     return (
       <Autosuggest
@@ -483,5 +549,15 @@ class ActualPropertyEntryReferenceRenderer
   }
 }
 
+/**
+ * The renderer for the reference type, which basically allows to select an integer
+ * for a given reference that represents an item definition somewhere else, the reference
+ * type is very powerful and can do tasks of autocomplete and linking
+ * 
+ * Supported args:
+ * 
+ * - descriptionAsAlert: displays the description if exists as alert rather than the standard
+ * - onEnter: A function that triggers when the enter key is pressed
+ */
 const PropertyEntryReferenceRenderer = withStyles(style)(ActualPropertyEntryReferenceRenderer);
 export default PropertyEntryReferenceRenderer;

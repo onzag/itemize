@@ -1,3 +1,9 @@
+/**
+ * Contains the entry for the location type
+ * 
+ * @packageDocumentation
+ */
+
 import "../../../internal/theme/leaflet.scss";
 
 import React from "react";
@@ -17,16 +23,30 @@ import {
   SwapHorizIcon,
   TextField,
 } from "../../mui-core";
+import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
+import { capitalize } from "../../../../util";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 
+// we import the react-leaflet types, however note
+// how we are not using them at all, this is because
+// we are not using these as they don't support SSR at all
+// and we need to do a dynamic import
 import { Map, TileLayer, Marker } from "react-leaflet";
+
+// we only use these types to define these C prefixed types
 let CMap: typeof Map;
 let CTileLayer: typeof TileLayer;
 let CMarker: typeof Marker;
+// and l is for leaflet
 let L: any;
+
+// so this needs to run in everything but the server side
+// so basically we run this like this
 if (typeof document !== "undefined") {
+  // this is where we do the dynamic imports
   const LL = require("react-leaflet");
   CMap = LL.Map;
   CTileLayer = LL.TileLayer;
@@ -44,19 +64,25 @@ if (typeof document !== "undefined") {
 }
 // import L, { LeafletMouseEvent } from "leaflet";
 
-import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
-import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
-import { capitalize } from "../../../../util";
-
+// these are the standard zooms supported
 export const ZOOMS = {
   "LARGE": 16,
   "MEDIUM": 14,
   "SMALL": 4,
 };
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntryLocationRendererProps) {
   return !props.currentValid || (props.activeSearchResults && props.activeSearchResults.length === 0);
 }
+
+/**
+ * The styles for the location entry
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -225,18 +251,45 @@ export const style = createStyles({
   },
 });
 
+/**
+ * The props with location entry renderer
+ */
 interface IPropertyEntryLocationRendererWithStylesProps extends IPropertyEntryLocationRendererProps, WithStyles<typeof style> {
 
 }
 
+/**
+ * The state for the location entry renderer
+ */
 interface IPropertyEntryLocationRendererState {
+  /**
+   * Whether the map is ready, by default this is false, specially
+   * since this doesn't work in SSR
+   */
   readyToMap: boolean;
 }
 
-class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component<IPropertyEntryLocationRendererWithStylesProps, IPropertyEntryLocationRendererState> {
+/**
+ * The actual property entry location renderer
+ */
+class ActualPropertyEntryLocationRendererWithStylesClass extends
+  React.Component<IPropertyEntryLocationRendererWithStylesProps, IPropertyEntryLocationRendererState> {
+
+  /**
+   * The input ref for the location
+   */
   private inputRef: HTMLInputElement;
+  /**
+   * a boolean to prevent a search query change, this is because
+   * the way react autosuggest works that will trigger a change event
+   * at the same time one suggestion is clicked
+   */
   private preventNextSearchQueryChange: boolean = false;
 
+  /**
+   * The contructor for the location entry renderer
+   * @param props the props
+   */
   constructor(props: IPropertyEntryLocationRendererWithStylesProps) {
     super(props);
 
@@ -254,7 +307,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     this.onKeyPress = this.onKeyPress.bind(this);
     this.onChangeBySuggestion = this.onChangeBySuggestion.bind(this);
   }
+
   public componentDidMount() {
+    // when we have mounte we set the reay to map flag to true
     this.setState({
       readyToMap: true,
     });
@@ -262,8 +317,17 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       this.inputRef.focus();
     }
   }
+
   // public setLocationManually(e: LeafletMouseEvent) {
+  /**
+   * Trigger the location manually on a click event to the map
+   * itself
+   * @param e a LeafletMouseEvent
+   */
   public setLocationManually(e: any) {
+    // we call the manual pick function with the LeafletMouseEvent
+    // functionality, note that we have to use the any because Leaflet
+    // can't be loaded in the SSR
     this.props.onManualPick({
       lat: e.latlng.lat,
       lng: e.latlng.lng,
@@ -271,7 +335,14 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       atxt: null,
       id: null,
     }, true);
+    // we just passed true to mantain viewport, this means that the viewport
+    // won't change
   }
+
+  /**
+   * Triggers on the keypress in the search field
+   * @param e a keyboard event
+   */
   public onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
     // basically we want to trigger swap or search on enter
     if (e.key === "Enter") {
@@ -284,6 +355,11 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       }
     }
   }
+
+  /**
+   * Triggers when we have clicked a suggestion
+   * @param suggestion the suggestion we have clicked
+   */
   public onChangeBySuggestion(suggestion: IPropertyDefinitionSupportedLocationType) {
     // react autosuggest triggers a search query change when the value is set by selection
     // however we don't want this to happen, both of them get triggered at the same time
@@ -291,42 +367,89 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
     if (suggestion.txt !== this.props.searchQuery) {
       this.preventNextSearchQueryChange = true;
     }
+    // we do not mantain the viewport, we want to flyby there
     this.props.onChangeBySuggestion(suggestion, false);
   }
+
+  /**
+   * Triggers when the search query itself changes
+   * and not a suggestion is selected
+   * @param e the change event
+   */
   public onSearchQueryChange(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
+    // so if we have prevented this change
     if (this.preventNextSearchQueryChange) {
+      // we set the flag to false, and return
       this.preventNextSearchQueryChange = false;
       return;
     }
+
+    // we call the search query change, and we ask not to load
+    // suggestions for this one
     this.props.onSearchQueryChange(e.target.value, true);
   }
+
+  /**
+   * react autosuggest manually decides when it needs to load suggestions
+   * @param arg the value it wants to load
+   */
   public onSuggestionsFetchRequested(arg: {value: string}) {
+    // and this is where we use search query change that loads suggestions
     this.props.onSearchQueryChange(arg.value);
   }
+
+  /**
+   * Renders the suggestion body
+   * @param textFieldProps the text field props given by react autosuggest
+   */
   public renderBody(textFieldProps?: any) {
+    // the viewport zoom can be either an arbitrary number or MEDIUM, SMALL, and LARGE which
+    // should be translated to an arbitrary number for you and the library you support
+    // for the purposes of leaflet and react-leaflet we have these translations or otherwise
+    // we will use the viewport number itself, as we manually set it
     const viewport = ZOOMS[this.props.viewport.zoom] ? {
       center: this.props.viewport.center,
       zoom: ZOOMS[this.props.viewport.zoom],
     } : this.props.viewport;
 
+    // these are the applied text props for
+    // the class names
     let appliedTextFieldProps: any = {
       className: this.props.classes.entry,
     };
+    // the icon we will use for the seach, yes we use two
+    // one for the initial search and another for swapping
     let iconSearch: React.ReactNode;
-    let fn: () => void = null;
+    let onClickFn: () => void = null;
+
+    // so if we have active search results, these are automatically
+    // given by the handler
     if (this.props.activeSearchResults) {
+      // and if we have a next search result, the next search result
+      // circular represents the next element of the array or the first if it's the last
+      // aka it's circular
       if (this.props.nextSearchResultCircular) {
-        fn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
+        // then the function for click changes via the search result to the next search result
+        // circular, and the false means that it should indeed change the viewport
+        onClickFn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
+        // and the icon is the swap icon
         iconSearch = <SwapHorizIcon />;
+        // it would be possible to have a next, prev button as there is prevSearchResultCircular as well
       } else {
+        // otherwise if we just have one search result, then the icon is the same
+        // but the click does nothing
         iconSearch = <SearchIcon />;
       }
     } else {
-      fn = this.props.onSearch.bind(null, false);
+      // otherwise if there's no active search the button
+      // will trigger a search, it will also mantain the viewport
+      onClickFn = this.props.onSearch.bind(null, false);
       iconSearch = <SearchIcon />;
     }
+
+    // now we can build these props
     let appliedInputProps: any = {
       endAdornment: (
         <InputAdornment position="end">
@@ -334,13 +457,15 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
             tabIndex={-1}
             disabled={this.props.disabled}
             classes={{root: this.props.classes.iconButton}}
-            onClick={fn}
+            onClick={onClickFn}
           >
             {iconSearch}
           </IconButton>
         </InputAdornment>
       ),
     };
+
+    // and add the text field props from the autosuggest
     if (textFieldProps) {
       const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
       appliedTextFieldProps = other;
@@ -353,6 +478,9 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       };
     }
 
+    // this is the icon for restore or clear if required
+    // or otherwise use the provided icon as the user
+    // asked
     let icon: React.ReactNode;
     if (this.props.canRestore) {
       if (this.props.currentAppliedValue) {
@@ -364,6 +492,11 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       icon = this.props.icon;
     }
 
+    // and now we can build the map
+    // if we are ready to map, using the C prefixed
+    // maps that are only available in the client side
+    // the onViewportChange handler function is fairly compatible
+    // with react-leaftlet
     const map = this.state.readyToMap ? (
       <CMap
         viewport={viewport}
@@ -390,6 +523,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       </CMap>
     ) : null;
 
+    // the description as alert arg possibility
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     return (
       <div className={this.props.classes.container}>
@@ -469,12 +603,25 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       </div>
     );
   }
+
+  /**
+   * For a given suggestion gives the value that is supposed to assign to the
+   * text field
+   * @param suggestion the suggestion
+   * @returns basically the title of the suggestion
+   */
   public getSuggestionValue(
     suggestion: IPropertyDefinitionSupportedLocationType,
   ) {
     // just return the title
     return suggestion.txt;
   }
+
+  /**
+   * Specifies how the container of the autosuggest component is to be rendered
+   * @param options the autosuggest options
+   * @returns a react element
+   */
   public renderAutosuggestContainer(
     options: Autosuggest.RenderSuggestionsContainerParams,
   ) {
@@ -488,10 +635,18 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       </Paper>
     );
   }
+
+  /**
+   * Specifies how a single suggestion inside the autosuggest container
+   * is supposed to be rendered
+   * @param suggestion the suggestion to be renderer
+   * @param params the autosuggest suggestion params
+   */
   public renderAutosuggestSuggestion(
     suggestion: IPropertyDefinitionSupportedLocationType,
     params: Autosuggest.RenderSuggestionParams,
   ) {
+    // we use this to highlight
     const matches = match(suggestion.txt, params.query);
     const parts = parse(suggestion.txt, matches);
 
@@ -523,6 +678,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
       </MenuItem>
     );
   }
+
+  /**
+   * The actual render function
+   */
   public render() {
     return (
       <Autosuggest
@@ -560,5 +719,12 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends React.Component
   }
 }
 
+/**
+ * The property entry location renderer, which renders a map that allows to select a location
+ * 
+ * Supported args:
+ * 
+ * - descriptionAsAlert: displays the description if exists as alert rather than the standard
+ */
 const PropertyEntryLocationRenderer = withStyles(style)(ActualPropertyEntryLocationRendererWithStylesClass);
 export default PropertyEntryLocationRenderer;

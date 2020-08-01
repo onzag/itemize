@@ -1,23 +1,41 @@
 "use strict";
+/**
+ * Contains the property view text renderer, another large
+ * thing used for text/plain or text/html text, but not unsubtyped
+ * text
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const util_1 = require("../../../../util");
-// The current intersection observer
+/**
+ * The current intersection observer
+ */
 let io;
-// old school listenrs that use the scroll of the document, these are listeners that should
-// trigger every scroll, they return false onse they are done, true if they should reset
+/**
+ * old school listenrs that use the scroll of the document, these are listeners that should
+ * trigger every scroll, they return false onse they are done, true if they should reset
+ */
 let oldSchoolListeners = [];
-// triggers all the old school listeners
+/**
+ * triggers all the old school listeners
+ */
 const triggerOldSchoolListeners = () => {
     oldSchoolListeners = oldSchoolListeners.filter((l) => l());
 };
-// this is the main old school listener that listens to the scroll event
-// it's unset at first just like the io
+/**
+ * this is the main old school listener that listens to the scroll event
+ * it's unset at first just like the io
+ */
 let primaryOldSchoolListener;
-// restores the element info making the item virtually loaded
+/**
+ * restores the element info making the item virtually loaded
+ * @param target the target to restore
+ */
 function restoreElementInfo(target) {
     if (!target.dataset.propertySet) {
         return;
@@ -35,7 +53,10 @@ function restoreElementInfo(target) {
         target.dataset[propertyInDataSet] = "";
     });
 }
-// checks whether a component is in view, this is for the old school mode
+/**
+ * checks whether a component is in view, this is for the old school mode
+ * @param elem the element to check if it's in view
+ */
 function componentIsInView(elem) {
     const bounding = elem.getBoundingClientRect();
     return (bounding.top >= 0 &&
@@ -43,6 +64,12 @@ function componentIsInView(elem) {
         bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
         bounding.right <= (window.innerWidth || document.documentElement.clientWidth));
 }
+/**
+ * Preopares an element for lazy loading
+ * will restore its former structure, if it knows that it supports the loading=lazy property
+ * @param element the element to prepare for lazy load
+ * @param propertySet the properties to move, from dataset to the main
+ */
 function lazyLoaderPrepare(element, propertySet) {
     // first we add the property set information that we will use
     element.dataset.propertySet = propertySet.map((s) => s.join(",")).join(";");
@@ -101,7 +128,14 @@ function lazyloaderExecute(element) {
         }
     }
 }
+/**
+ * The rich text viewer used to view only types of text/html
+ */
 class PropertyViewRichTextViewer extends react_1.default.Component {
+    /**
+     * The builder for the rich text viewer in text/html
+     * @param props the props
+     */
     constructor(props) {
         super(props);
         this.divref = react_1.default.createRef();
@@ -110,57 +144,100 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
             html: this.getHTML(props.children),
         };
     }
+    /**
+     * For a given html it will provide the brand new html
+     * that is going to be rendered instead for the inner html
+     * @param html
+     */
     getHTML(html) {
+        // with no html it's null
         if (!html) {
             return null;
         }
+        // otherwse let's check we first assign it to the cheap div
+        // note that this content has already been sanitized by the sanitizer
+        // in the handler and now follows the text specs
         this.cheapdiv.innerHTML = html;
+        // so first we get all the images
         this.cheapdiv.querySelectorAll("img").forEach((img) => {
+            // yes the src can be a blob, if the image hasn't been uploaded
+            // yet, this is a valid protocol, and since it's local, lazyloading
+            // preparations make no sense
             if (!img.src.startsWith("blob:")) {
+                // this will wrap our image, for SEO purposes as well as to
+                // have a click to it
+                const a = util_1.DOMWindow.document.createElement("a");
+                a.href = img.src;
+                a.title = img.alt || "";
+                // we move all these attributes to the dataset
                 img.dataset.srcset = img.srcset;
                 img.removeAttribute("srcset");
                 img.dataset.src = img.src;
                 img.removeAttribute("src");
                 img.dataset.sizes = img.sizes;
                 img.removeAttribute("sizes");
+                // now we replace the img with the a link
+                img.parentNode.replaceChild(a, img);
+                // and add the image inside the a link
+                a.appendChild(img);
             }
         });
+        // we do the same with iframes
         this.cheapdiv.querySelectorAll("iframe").forEach((iframe) => {
             if (!iframe.src.startsWith("blob:")) {
                 iframe.dataset.src = iframe.src;
                 iframe.removeAttribute("src");
             }
         });
+        // and return the fresh inner html
         return this.cheapdiv.innerHTML;
     }
+    /**
+     * Prepares the lazy loader, runs on mounting or changing
+     */
     prepareLazyLoader() {
+        // we do it for each image
         this.divref.current.querySelectorAll("img").forEach((img) => {
             if (img.dataset.src) {
                 lazyLoaderPrepare(img, [["sizes", "sizes"], ["srcset", "srcset"], ["src", "src"]]);
             }
         });
+        // and each iframe
         this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
             if (iframe.dataset.src) {
                 lazyLoaderPrepare(iframe, [["src", "src"]]);
             }
         });
     }
+    /**
+     * updates the html
+     * @param html the html to update for
+     */
     updateHTML(html) {
         this.setState({
             html: this.getHTML(html),
         });
     }
+    /**
+     * Attach the events that are required for lazyloading
+     */
     attachEvents() {
+        // first we get all the images
         this.divref.current.querySelectorAll("img").forEach((img) => {
+            // this dataset will only exist if loading!=lazy as otherwise the information
+            // would have been restored during preparation
             if (img.dataset.src) {
+                // so we would execute our lazyloader on the image if we know it needs such
                 lazyloaderExecute(img);
             }
         });
+        // the same can be said about iframe
         this.divref.current.querySelectorAll("iframe").forEach((iframe) => {
             if (iframe.dataset.src) {
                 lazyloaderExecute(iframe);
             }
         });
+        // about files, it's a bit different, we just want to add the click event to it
         this.divref.current.querySelectorAll(".file").forEach((file) => {
             const container = file.querySelector(".file-container");
             const title = file.querySelector(".file-title");
@@ -170,13 +247,20 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 }
             });
         });
+        // and now we trigger our old school listeners to it, since the images can be in view already
+        // if there are no old school listeners this function will do nothing as none is listening
         triggerOldSchoolListeners();
     }
     componentDidMount() {
+        // we prepare all the lazy loader stuff which might make our things
+        // go with loading=lazy
         this.prepareLazyLoader();
+        // and attach the events for the stuff
         this.attachEvents();
     }
     componentDidUpdate() {
+        // on any update we do the same as we only really update when the html changes
+        // any other updates are denied
         this.prepareLazyLoader();
         this.attachEvents();
     }
@@ -184,6 +268,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
         if (nextProps.children !== this.props.children) {
             this.updateHTML(nextProps.children);
         }
+        // see only when the html changes
         return this.state.html !== nextState.html;
     }
     render() {
@@ -191,6 +276,16 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
     }
 }
 exports.PropertyViewRichTextViewer = PropertyViewRichTextViewer;
+/**
+ * The property view text renderer
+ *
+ * supported args:
+ * - NullComponent: a react component to use rather than the default if the value is null
+ * - nullComponentArgs: an object to pass as props to the null component
+ *
+ * @param props the props passed by the handler
+ * @returns a react element
+ */
 function PropertyViewTextRenderer(props) {
     if (props.args.NullComponent && props.currentValue === null) {
         const NullComponent = props.args.NullComponent;

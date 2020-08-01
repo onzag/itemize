@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * This file represents the renderer context for the fast prototyping mechanism it
+ * contains all the components that take form for the renderer context for fast prototyping
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

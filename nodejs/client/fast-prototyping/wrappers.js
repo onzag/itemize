@@ -2,6 +2,7 @@
 /**
  * Contains the fast prototyping wrappers for usage
  * with the itemize application in the fast prototyping mode
+ *
  * @packageDocumentation
  */
 var __importStar = (this && this.__importStar) || function (mod) {

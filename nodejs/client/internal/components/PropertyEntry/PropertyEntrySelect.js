@@ -46,11 +46,13 @@ class PropertyEntrySelect extends react_1.default.Component {
         }));
         const currentValue = this.props.state.value;
         const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+        const type = this.props.property.getType();
+        const isNumeric = ["number", "integer", "year"].includes(type);
         const nullValue = isNullable ? {
             value: null,
             i18nValue: i18nData.null_value,
         } : null;
-        const currentI18nValue = i18nData.values[this.props.state.value] || currentValue;
+        const currentI18nValue = i18nData.values[currentValue.toString()] || currentValue.toString();
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             propertyId: this.props.property.getId(),
@@ -62,6 +64,7 @@ class PropertyEntrySelect extends react_1.default.Component {
             icon: this.props.icon,
             values,
             isNullable,
+            isNumeric,
             nullValue,
             currentAppliedValue: this.props.state.stateAppliedValue,
             currentValue,

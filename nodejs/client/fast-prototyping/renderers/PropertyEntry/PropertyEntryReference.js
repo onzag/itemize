@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * This file provides a fast prototyping renderer for the reference type, which is basically
+ * an integer but acts differently
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,9 +14,17 @@ const index_1 = require("../../mui-core/index");
 const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * The styles for the reference
+ */
 exports.style = index_1.createStyles({
     entry: {
         width: "100%",
@@ -150,6 +164,9 @@ exports.style = index_1.createStyles({
         lineHeight: "0.75rem",
     },
 });
+/**
+ * The actual class for the reference renderer
+ */
 class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -168,12 +185,27 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             this.inputRef.focus();
         }
     }
+    /**
+     * caches the mouse down event to prevent it from doing
+     * anything
+     * @param e the mouse event
+     */
     catchToggleMouseDownEvent(e) {
         e.preventDefault();
     }
+    /**
+     * The change event but by the raw text field
+     * @param e the change event
+     */
     onChangeByHTMLEvent(e) {
         this.onChange(e);
     }
+    /**
+     * the change event that triggers in the autosuggest mode
+     * or by default, if not autosuggest override given
+     * @param e the event
+     * @param autosuggestOverride autosuggest override
+     */
     onChange(e, autosuggestOverride) {
         let value = null;
         // the autosuggest override has priority
@@ -183,15 +215,25 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
         else {
             value = e.target.value.toString();
         }
+        // similarly to location
         if (value !== this.props.currentStrValue) {
+            // we call the change of search
             this.props.onChangeSearch(value);
         }
     }
+    /**
+     * The event on key down for the text field
+     * @param e the event itself
+     */
     onKeyDown(e) {
         if (this.props.args.onEnter && e.keyCode === 13) {
             this.props.args.onEnter();
         }
     }
+    /**
+     * Render the basic text field for the reference
+     * @param textFieldProps the text field props
+     */
     renderBasicTextField(textFieldProps) {
         const inputMode = "text";
         // these are the inputProps of the small input
@@ -275,11 +317,20 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
                 }, inputProps: inputProps, disabled: this.props.disabled, variant: "filled" }, appliedTextFieldProps)),
             react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason)));
     }
+    /**
+     * renders the autosuggest container for the reference
+     * @param options the autosuggest options
+     */
     renderAutosuggestContainer(options) {
         // returns the autosuggest container that contains the stuff
         // handled by react autossugest
         return (react_1.default.createElement(index_1.Paper, Object.assign({}, options.containerProps, { square: true }), options.children));
     }
+    /**
+     * Render the autosuggest suggestion for the reference
+     * @param suggestion the suggestion itself
+     * @param params the params to use
+     */
     renderAutosuggestSuggestion(suggestion, params) {
         // returns a specific suggestion
         const matches = match_1.default(suggestion.text, params.query);
@@ -287,14 +338,25 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
         return (react_1.default.createElement(index_1.MenuItem, { className: this.props.classes.autosuggestMenuItem, selected: params.isHighlighted, component: "div", onClick: this.props.onSelect.bind(this, suggestion) },
             react_1.default.createElement("div", { className: this.props.classes.autosuggestMenuItemMainText }, parts.map((part, index) => part.highlight ? (react_1.default.createElement("span", { key: index, style: { fontWeight: 500 } }, part.text)) : (react_1.default.createElement("strong", { key: index, style: { fontWeight: 300 } }, part.text))))));
     }
+    /**
+     * Provides the suggestion value
+     * @param suggestion the suggestion itself
+     */
     getSuggestionValue(suggestion) {
         // just return the suggestion value as it will want to
         // be set in the input, we localize it if deemed necessary
         return suggestion.text;
     }
+    /**
+     * When the suggestion fetch is triggered
+     * @param arg the arg
+     */
     onSuggestionsFetchRequested(arg) {
         this.props.onChangeSearch(arg.value);
     }
+    /**
+     * render function
+     */
     render() {
         return (react_1.default.createElement(react_autosuggest_1.default, { renderInputComponent: this.renderBasicTextField, renderSuggestionsContainer: this.renderAutosuggestContainer, renderSuggestion: this.renderAutosuggestSuggestion, getSuggestionValue: this.getSuggestionValue, onSuggestionsFetchRequested: this.onSuggestionsFetchRequested, onSuggestionsClearRequested: this.props.onCancel, suggestions: this.props.currentOptions, theme: {
                 container: this.props.classes.autosuggestContainer,
@@ -318,5 +380,15 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             } }));
     }
 }
+/**
+ * The renderer for the reference type, which basically allows to select an integer
+ * for a given reference that represents an item definition somewhere else, the reference
+ * type is very powerful and can do tasks of autocomplete and linking
+ *
+ * Supported args:
+ *
+ * - descriptionAsAlert: displays the description if exists as alert rather than the standard
+ * - onEnter: A function that triggers when the enter key is pressed
+ */
 const PropertyEntryReferenceRenderer = index_1.withStyles(exports.style)(ActualPropertyEntryReferenceRenderer);
 exports.default = PropertyEntryReferenceRenderer;

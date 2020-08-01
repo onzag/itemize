@@ -702,6 +702,10 @@ class ActualPropertyEntryFieldRenderer
  * The entry field renderer, as a class, because it's fairly complicated, this renderer handles basic
  * types that are displayed as a single line text, this includes some numeric types, and even some complex types
  * such as unit and currency, this is because unlike other types their primary use is just writting something
+ * 
+ * Supported args
+ * - descriptionAsAlert: the description as alert rather than the standard
+ * - onEnter: A function that triggers when the enter key is pressed
  */
 const PropertyEntryFieldRenderer = withStyles(style)(ActualPropertyEntryFieldRenderer);
 export default PropertyEntryFieldRenderer;

@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the property view location renderer
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
 const PropertyEntryLocation_1 = require("../PropertyEntry/PropertyEntryLocation");
+// this logic is similar to the entry
+// it has to do with SSR not supporting
+// any of these
 let CMap;
 let CTileLayer;
 let CMarker;
@@ -25,6 +33,9 @@ if (typeof document !== "undefined") {
         shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
     });
 }
+/**
+ * The location map styles
+ */
 const locationMapStyles = mui_core_1.createStyles({
     container: {
         width: "100%",
@@ -62,6 +73,9 @@ const locationMapStyles = mui_core_1.createStyles({
         },
     }
 });
+/**
+ * The actual location map
+ */
 class ActualPropertyViewLocationMap extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -103,6 +117,17 @@ class ActualPropertyViewLocationMap extends react_1.default.Component {
     }
 }
 const PropertyViewLocationMap = mui_core_1.withStyles(locationMapStyles)(ActualPropertyViewLocationMap);
+/**
+ * Provides a renderer to view location
+ *
+ * supported args:
+ * - NullComponent: a react component to use rather than the default if the value is null
+ * - nullComponentArgs: an object to pass as props to the null component
+ * - hideMap: whether to hide the map
+ *
+ * @param props the props for the location renderer
+ * @returns a react element
+ */
 function PropertyViewLocationRenderer(props) {
     if (props.currentValue === null && props.args.NullComponent && !props.args.nullComponentInMap) {
         const NullComponent = props.args.NullComponent;

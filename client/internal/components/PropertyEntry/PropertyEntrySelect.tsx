@@ -2,16 +2,17 @@ import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 
-export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendererProps<string> {
+export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendererProps<string | number> {
   values: Array<{
     i18nValue: string;
-    value: string;
+    value: string | number;
   }>;
   nullValue: {
     i18nValue: string;
-    value: string;
+    value: string | number;
   };
   isNullable: boolean;
+  isNumeric: boolean;
   currentI18nValue: string;
 }
 
@@ -60,17 +61,21 @@ export default class PropertyEntrySelect
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const values = this.props.property.getSpecificValidValues().map((v: string) => ({
+    const values = this.props.property.getSpecificValidValues().map((v: string | number) => ({
       i18nValue: i18nData.values[v] || v,
       value: v,
     }));
-    const currentValue = this.props.state.value as string;
+    const currentValue = this.props.state.value as string | number;
     const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+
+    const type = this.props.property.getType();
+    const isNumeric = ["number", "integer", "year"].includes(type);
+
     const nullValue = isNullable ? {
-      value: null as string,
+      value: null as any,
       i18nValue: i18nData.null_value,
     } : null;
-    const currentI18nValue = i18nData.values[this.props.state.value as string] || currentValue;
+    const currentI18nValue = i18nData.values[currentValue.toString()] || currentValue.toString();
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntrySelectRendererProps = {
@@ -85,9 +90,10 @@ export default class PropertyEntrySelect
 
       values,
       isNullable,
+      isNumeric,
       nullValue,
 
-      currentAppliedValue: this.props.state.stateAppliedValue as string,
+      currentAppliedValue: this.props.state.stateAppliedValue as string | number,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,

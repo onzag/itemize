@@ -1,13 +1,29 @@
 "use strict";
+/**
+ * Contains the select entry field renderer for fast prototyping
+ *
+ * The select entry field renderer is used for types, number, integer and string when
+ * they have defined values
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * The styles for the select
+ */
 exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
@@ -71,6 +87,9 @@ exports.style = mui_core_1.createStyles({
         right: "46px",
     },
 });
+/**
+ * The actual renderer class
+ */
 class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -78,10 +97,20 @@ class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
     }
     onChange(e) {
         const textualValue = e.target.value;
-        this.props.onChange(textualValue || null, null);
+        // because the value can't be null, we need to set it like this
+        if (this.props.isNumeric) {
+            if (!textualValue) {
+                this.props.onChange(null, null);
+            }
+            else {
+                this.props.onChange(parseFloat(textualValue) || null, null);
+            }
+        }
+        else {
+            this.props.onChange(textualValue || null, null);
+        }
     }
     render() {
-        // let's avoid restoration to null values in these
         // build the icon
         let icon = null;
         if (this.props.canRestore) {
@@ -126,5 +155,13 @@ class ActualPropertyEntrySelectRenderer extends react_1.default.Component {
             react_1.default.createElement("div", { className: this.props.classes.errorMessage }, this.props.currentInvalidReason)));
     }
 }
+/**
+ * The property entry select is the renderer used when the property has specific valid values
+ * these valid values are only supported as either string or number, so only types string, text,
+ * integer, year and number are truly supported for this
+ *
+ * Supported renderer args:
+ * - descriptionAsAlert: displays the description if exists as alert rather than the standard
+ */
 const PropertyEntrySelectRenderer = mui_core_1.withStyles(exports.style)(ActualPropertyEntrySelectRenderer);
 exports.default = PropertyEntrySelectRenderer;

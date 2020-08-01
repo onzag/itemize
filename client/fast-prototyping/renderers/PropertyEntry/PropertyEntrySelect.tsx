@@ -1,3 +1,12 @@
+/**
+ * Contains the select entry field renderer for fast prototyping
+ * 
+ * The select entry field renderer is used for types, number, integer and string when
+ * they have defined values
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import {
   MenuItem,
@@ -17,9 +26,18 @@ import {
 } from "../../mui-core";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
 
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
 }
+
+/**
+ * The styles for the select
+ */
 export const style = createStyles({
   entry: {
     width: "100%",
@@ -84,10 +102,15 @@ export const style = createStyles({
   },
 });
 
-
+/** 
+ * The props for the select
+ */
 interface IPropertyEntrySelectRendererWithStylesProps extends IPropertyEntrySelectRendererProps, WithStyles<typeof style> {
 }
 
+/**
+ * The actual renderer class
+ */
 class ActualPropertyEntrySelectRenderer
   extends React.Component<IPropertyEntrySelectRendererWithStylesProps> {
 
@@ -101,12 +124,19 @@ class ActualPropertyEntrySelectRenderer
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
     const textualValue = e.target.value;
-    this.props.onChange(textualValue || null, null);
+    // because the value can't be null, we need to set it like this
+    if (this.props.isNumeric) {
+      if (!textualValue) {
+        this.props.onChange(null, null);
+      } else {
+        this.props.onChange(parseFloat(textualValue) || null, null);
+      }
+    } else {
+      this.props.onChange(textualValue || null, null);
+    }
   }
 
   public render() {
-
-    // let's avoid restoration to null values in these
     // build the icon
     let icon: React.ReactNode = null;
     if (this.props.canRestore) {
@@ -211,5 +241,13 @@ class ActualPropertyEntrySelectRenderer
   }
 }
 
+/**
+ * The property entry select is the renderer used when the property has specific valid values
+ * these valid values are only supported as either string or number, so only types string, text,
+ * integer, year and number are truly supported for this
+ * 
+ * Supported renderer args:
+ * - descriptionAsAlert: displays the description if exists as alert rather than the standard
+ */
 const PropertyEntrySelectRenderer = withStyles(style)(ActualPropertyEntrySelectRenderer);
 export default PropertyEntrySelectRenderer;

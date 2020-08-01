@@ -65,7 +65,9 @@ exports.default = {
         },
         values: {
             type: "array",
-            items: {},
+            items: {
+                type: ["number", "string"],
+            },
         },
         nullable: {
             type: "boolean",

@@ -1,9 +1,18 @@
+/**
+ * Contains the property view location renderer
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { IPropertyViewLocationRendererProps } from "../../../internal/components/PropertyView/PropertyViewLocation";
 import { createStyles, withStyles, WithStyles, IconButton, GpsFixedIcon } from "../../mui-core";
 import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
 
+// this logic is similar to the entry
+// it has to do with SSR not supporting
+// any of these
 let CMap: typeof Map;
 let CTileLayer: typeof TileLayer;
 let CMarker: typeof Marker;
@@ -25,6 +34,9 @@ if (typeof document !== "undefined") {
   });
 }
 
+/**
+ * The location map styles
+ */
 const locationMapStyles = createStyles({
   container: {
     width: "100%",
@@ -63,13 +75,22 @@ const locationMapStyles = createStyles({
   }
 });
 
+/**
+ * The actual props with the injection of the handler
+ */
 interface ActualPropertyViewLocationMapProps extends WithStyles<typeof locationMapStyles>, IPropertyViewLocationRendererProps {
 }
 
+/**
+ * We need this boolean to do a double pass
+ */
 interface PropertyViewLocationMapState {
   readyToMap: boolean;
 }
 
+/**
+ * The actual location map
+ */
 class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLocationMapProps, PropertyViewLocationMapState> {
   constructor(props: ActualPropertyViewLocationMapProps) {
     super(props);
@@ -133,6 +154,17 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
 
 const PropertyViewLocationMap = withStyles(locationMapStyles)(ActualPropertyViewLocationMap);
 
+/**
+ * Provides a renderer to view location
+ * 
+ * supported args:
+ * - NullComponent: a react component to use rather than the default if the value is null
+ * - nullComponentArgs: an object to pass as props to the null component
+ * - hideMap: whether to hide the map
+ * 
+ * @param props the props for the location renderer
+ * @returns a react element
+ */
 export default function PropertyViewLocationRenderer(props: IPropertyViewLocationRendererProps) {
   if (props.currentValue === null && props.args.NullComponent && !props.args.nullComponentInMap) {
     const NullComponent = props.args.NullComponent;

@@ -1,4 +1,14 @@
 "use strict";
+/**
+ * The behemoth that the entry fast prototyping is for the text type since text
+ * types can be fairly complex, this renderer uses quill, quill also doesn't support SSR
+ * so it must be double passed
+ *
+ * This renderer is used for text/plain and text/html, aka rich text, but not with
+ * any other non-subtype text, it will use the field instead
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,11 +23,16 @@ const pretty_bytes_1 = __importDefault(require("pretty-bytes"));
 const react_textarea_autosize_1 = __importDefault(require("react-textarea-autosize"));
 const util_2 = require("../../components/util");
 let ReactQuill;
+// and because SSR is not supported we only import
+// when the document is there
 if (typeof document !== "undefined") {
     ReactQuill = require("@onzag/react-quill");
 }
 else {
+    // this is a dead function that does absolutely nothing
     const dead = () => null;
+    // and we define a bad version of react quill
+    // so that blots and embeds work just fine in SSR
     ReactQuill = {
         Quill: {
             import: dead,
@@ -25,29 +40,50 @@ else {
         }
     };
 }
+/**
+ * So we define these
+ */
 const BlockEmbed = ReactQuill.Quill.import("blots/block/embed");
 const Embed = ReactQuill.Quill.import("blots/embed");
 const Delta = ReactQuill.Quill.import("delta");
+/**
+ * This is the image blot
+ */
 class ItemizeImageBlot extends BlockEmbed {
+    /**
+     * now for it to be created
+     * @param value the image blot value
+     */
     static create(value) {
         if (value === null) {
             return null;
         }
+        // all this process folows the text-specs.md file
+        // first we get this information from it in order
+        // to build a ratio
         const width = value.srcWidth;
         const height = value.srcHeight;
         const ratio = height / width;
         const percentage = ratio * 100;
+        // create a main container
         const mainContainer = super.create();
         mainContainer.className = "image";
+        // a parent container that contains the image
         const parentContainer = document.createElement("div");
         parentContainer.className = "image-container";
         mainContainer.appendChild(parentContainer);
+        // and a child container for it
         const childContainer = document.createElement("div");
+        // we calculate the image pad here according to the given image, while this
+        // might come itself, we always calculate it here in the blot
+        // as this can be an addition
         childContainer.className = "image-pad";
         childContainer.setAttribute("style", "padding-bottom: " + percentage + "%");
         parentContainer.appendChild(childContainer);
+        // then the image
         const img = document.createElement("img");
         childContainer.appendChild(img);
+        // and set all the attributes
         img.setAttribute("alt", value.alt || "");
         img.dataset.srcHeight = value.srcHeight.toString();
         img.dataset.srcId = value.srcId;
@@ -55,13 +91,20 @@ class ItemizeImageBlot extends BlockEmbed {
         img.setAttribute("sizes", value.sizes || "");
         img.setAttribute("src", value.src || "");
         img.setAttribute("srcset", value.srcSet || "");
+        // return the main
         return mainContainer;
     }
+    /**
+     * How to stract the value of an image
+     */
     static value(node) {
+        // first we need to check everything is fine
         const img = node.querySelector("img");
         if (!img) {
             return null;
         }
+        // and extract the info according to the specs
+        // the spec says srcset sizes and src will be stripped but can be available
         return {
             alt: img.getAttribute("alt") || null,
             src: img.getAttribute("src"),
@@ -73,32 +116,46 @@ class ItemizeImageBlot extends BlockEmbed {
         };
     }
 }
+// set these, according to the spec an image is defined
+// by the class image inside a div
 ItemizeImageBlot.blotName = "itemizeimage";
 ItemizeImageBlot.className = "image";
 ItemizeImageBlot.tagName = "div";
+// and register such thing
 ReactQuill.Quill.register(ItemizeImageBlot);
+/**
+ * The video blot
+ * Follows the same spec to build the structure but this time
+ * for videos
+ */
 class ItemizeVideoBlot extends BlockEmbed {
     static create(value) {
         if (value === null) {
             return null;
         }
+        // make the main container with the right class
         const mainContainer = super.create();
         mainContainer.className = "video";
+        // add the parent
         const parentContainer = document.createElement("div");
         parentContainer.className = "video-container";
         mainContainer.appendChild(parentContainer);
+        // and set the iframe
         const iframe = document.createElement("iframe");
         parentContainer.appendChild(iframe);
+        // with the props as defined by the spec
         iframe.allowFullscreen = true;
         iframe.dataset.videoOrigin = value.origin;
         iframe.dataset.videoSrc = value.src;
         iframe.frameBorder = "0";
+        // and set the source according to the origin
         if (value.origin === "youtube") {
             iframe.src = `https://youtube.com/embed/${value.src}?rel=0`;
         }
         else {
             iframe.src = `https://player.vimeo.com/video/${value.src}?title=0&byline=0&portrait=0&badge=0`;
         }
+        // and return the main container
         return mainContainer;
     }
     static value(node) {
@@ -112,10 +169,16 @@ class ItemizeVideoBlot extends BlockEmbed {
         };
     }
 }
+// Set these according to the spec
 ItemizeVideoBlot.blotName = "itemizevideo";
 ItemizeVideoBlot.className = "video";
 ItemizeVideoBlot.tagName = "div";
+// and register as such
 ReactQuill.Quill.register(ItemizeVideoBlot);
+/**
+ * And this is the file blot in question
+ * note how it is a default Embed and not a block one
+ */
 class ItemizeFileBlot extends Embed {
     static create(value) {
         if (value === null) {
@@ -130,6 +193,7 @@ class ItemizeFileBlot extends Embed {
         const parentContainer = document.createElement("span");
         parentContainer.className = "file-container";
         mainContainer.appendChild(parentContainer);
+        // add the click listener to open the file
         parentContainer.addEventListener("click", () => {
             if (value.src) {
                 window.open(value.src, value.name || "_blank");
@@ -172,9 +236,17 @@ ItemizeFileBlot.blotName = "itemizefile";
 ItemizeFileBlot.className = "file";
 ItemizeFileBlot.tagName = "span";
 ReactQuill.Quill.register(ItemizeFileBlot);
+/**
+ * A simple helper function that says when it should show invalid
+ * @param props the renderer props
+ * @returns a boolean on whether is invalid
+ */
 function shouldShowInvalid(props) {
     return !props.currentValid;
 }
+/**
+ * The styles for the text entry
+ */
 exports.style = mui_core_1.createStyles({
     entry: {
         width: "100%",
@@ -321,14 +393,45 @@ function RichTextEditorToolbar(props) {
             (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, onClick: props.onToggleRawMode },
                 react_1.default.createElement(mui_core_1.CodeIcon, null))) : null));
 }
-const CACHED_FORMATS_RICH = ["bold", "italic", "underline", "header", "blockquote", "list", "itemizeimage", "itemizevideo", "itemizefile"];
+/**
+ * The list of formats the renderer supports
+ * cached in order to avoid creating a new array every time
+ */
+const CACHED_FORMATS_RICH = [
+    "bold",
+    "italic",
+    "underline",
+    "header",
+    "blockquote",
+    "list",
+    // these are the blots
+    "itemizeimage",
+    "itemizevideo",
+    "itemizefile",
+];
 // const CACHED_CLIPBOARD_MATCHERS: ReactQuill.ClipboardMatcher[] = [
+/**
+ * The list of clipboard machers the thing supports, cached to avoid a new array every time
+ */
 const CACHED_CLIPBOARD_MATCHERS = [
+    // due to SSR we check for Node, however this means that for Node.ELEMENT_NODE, basically everything we want to collapse to plain text
     [typeof Node !== "undefined" ? Node.ELEMENT_NODE : null, collapseToPlainTextMatcher],
 ];
+/**
+ * This is the collapse to plain text clipboard matcher function
+ * @param node the node we want to collapse
+ * @returns a quill delta
+ */
 function collapseToPlainTextMatcher(node) {
+    // this is referred on how to make the thing only paste plain text
+    // the reason is that we want to prevent copying and pasting from other text fields
+    // that have a different media property because it is rather impossible
+    // to access its file and place it here, and as such this pasting is forbidden
     return new Delta().insert(node.textContent);
 }
+/**
+ * The class that does the magic
+ */
 class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
     constructor(props) {
         super(props);
@@ -672,5 +775,10 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             fileLoadErrorDialog));
     }
 }
+/**
+ * The property entry text renderer, note that this renderer isn't used only for rich text
+ * but rather for any text type that is either plain or html, a text without a subtype
+ * will use the same as field
+ */
 const PropertyEntryTextRenderer = mui_core_1.withStyles(exports.style)(ActualPropertyEntryTextRenderer);
 exports.default = PropertyEntryTextRenderer;

@@ -65,7 +65,7 @@ function textSQLIn(arg) {
             // as well as iframe content
             // and they might not be cleaned in the client side during setting since values tend to be fairly hot during
             // retrival, so they are cleaned here as well
-            FORBID_ATTR: ["sizes", "srcset", "src", "data-src"],
+            FORBID_ATTR: ["sizes", "srcset", "src", "data-src", "loading"],
         });
     }
     // now we set the value

@@ -1,9 +1,25 @@
 "use strict";
+/**
+ * The property view boolean renderer a rather straightforward renderer
+ *
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
+/**
+ * The fast prototyping property view boolean renderer, basically used
+ * the standard main i18n attributes to say yes, no or unspecified
+ *
+ * supported args:
+ * - NullComponent: a react component to render instead of the default when the value is null
+ * - nullComponentArgs: an object to pass as props to the null component
+ *
+ * @param props the property view boolean renderer props given by the handler
+ * @returns a react element
+ */
 function PropertyViewBooleanRenderer(props) {
     let i18nLabel = null;
     if (props.currentValue === null) {
