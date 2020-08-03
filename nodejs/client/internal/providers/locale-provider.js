@@ -16,7 +16,8 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
 exports.LocaleContext = react_1.default.createContext(null);
 /**
  * The locale provider creates a context that serves the locale information
- * down the components
+ * down the components, should be placed inside the app as the locale is
+ * dynamic and controlled by the app, on top of the main
  */
 class LocaleProvider extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {

@@ -1,3 +1,11 @@
+/**
+ * This is the cache worker itself, the cache worker allows to store
+ * queries to singular item definition values as well as it allows
+ * to store searched in owner or parented search mode and perform
+ * emulated searches within it
+ * @packageDocumentation
+ */
+
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
@@ -11,31 +19,92 @@ import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 
-// a cache match
+/**
+ * A cache match for a standard query, basically
+ * contains the value it got with the fields it requested
+ * the value can be null yet it requested many fields, the fields
+ * can also be null to match any field, a null, null combo is common for
+ * deleted or not found values; the fields can have a mismatch
+ * since the value can be blocked
+ */
 export interface ICacheMatchType {
+  /**
+   * The value of the match
+   */
   value: IGQLValue;
+  /**
+   * The fields that can be requested for that value
+   */
   fields: IGQLRequestFields;
 }
 
+/**
+ * The cached search result is what comes from the cached search
+ * once a search has been performed, it emulates a search done
+ * in the server side; the cache worker creates this
+ */
 export interface ICachedSearchResult {
+  /**
+   * The graphql value that it emulates from the server side
+   */
   gqlValue: IGQLEndpointValue;
+  /**
+   * Whether the data might be stale, as in old data that needs
+   * to be rechecked an update
+   */
   dataMightBeStale: boolean;
+  /**
+   * Of all the records stored for that search, what was the last time
+   * we fetch a record for it, this is a nanodate type
+   */
   lastRecordDate: string;
 }
 
+/**
+ * This is the cached search itself as a list of matches, but not the value
+ * themselves, this is possibly a limited list, and it's always 0 offset
+ * (or it should be) ordered by time of adding (the default)
+ */
 export interface ISearchMatchType {
+  /**
+   * The fields that were requested and should be contained
+   * in each one of these search matches
+   */
   fields: IGQLRequestFields;
+  /**
+   * The value as a list of search records
+   */
   value: IGQLSearchRecord[];
+  /**
+   * Whether all the records in that list have been preloaded
+   * as matched on the cache itself
+   */
   allResultsPreloaded: boolean;
+  /**
+   * The last record date of that records list
+   */
   lastRecordDate: string;
+  /**
+   * The limit we limited ourselves to, the list can however
+   * be larger than the limit as it might grow by events
+   */
   limit: number;
 }
 
+/**
+ * The cache indexed db database schema
+ */
 export interface ICacheDB extends DBSchema {
+  /**
+   * Contains all the GET queries
+   */
   queries: {
     key: string;
     value: ICacheMatchType;
   };
+  /**
+   * Contains all searches, either owned or parented
+   */
   searches: {
     key: string;
     value: ISearchMatchType;
@@ -88,17 +157,41 @@ export default class CacheWorker {
    */
   private blockedCallback: (state: boolean) => void;
 
+  /**
+   * A promise that is resolved once the indexed db
+   * has been setup, this doesn't say whether it was succesful
+   * or it failed
+   */
   private waitForSetupPromise: Promise<void>;
+  /**
+   * The resolve function that calls once the resolve has
+   * been set
+   */
   private waitForSetupPromiseResolve: () => void;
+  /**
+   * Whether the promise has been resolved as a boolean
+   */
   private resolved: boolean = false;
 
+  /**
+   * Constructs a new cache worker
+   */
   public constructor() {
+    // we build the promise for wait for setup
     this.waitForSetupPromise = new Promise((resolve) => {
+      // and now we can set this variable as our resolve function
       this.waitForSetupPromiseResolve = () => {
+        // if we are not resolved yet
         if (!this.resolved) {
+          // we set our resolved to true
           this.resolved = true;
+          // and resolve
           resolve();
         }
+
+        // the reason we did it like that is because this function
+        // might be called a couple of times accidentally due to
+        // how indexed db works
       };
     });
   }
@@ -134,6 +227,10 @@ export default class CacheWorker {
           } catch (err) {
             console.warn(err);
           }
+
+          // if we managed it here, we must not be blocked
+          // maybe we were blocked before so we set the blocked
+          // callback to false
           this.isCurrentlyBlocked = false;
           if (this.blockedCallback) {
             this.blockedCallback(false);
@@ -143,17 +240,22 @@ export default class CacheWorker {
         },
         blocked: () => {
           console.log("BLOCKED");
+
+          // if we managed it here, we are blocked
           this.isCurrentlyBlocked = true;
           if (this.blockedCallback) {
             this.blockedCallback(true);
           }
         },
         terminated: () => {
+          // maybe no support to indexed db who knows
           console.log("TERMINATED");
           this.db = null;
         }
       });
 
+
+      // now we can set our db
       this.db = await dbPromise;
 
       // due to a bug in the indexed db implementation
@@ -162,34 +264,36 @@ export default class CacheWorker {
       // in order to be able to display the proper notification
       // because, well, bugs... not a single event will be called
       // so this is the only possible recourse
-      (async () => {
-        // for that we set a timeout
-        const timeout = setTimeout(() => {
-          // if it takes longer than that, we consider
-          // it blocked
-          this.isCurrentlyBlocked = true;
-          if (this.blockedCallback) {
-            this.blockedCallback(true);
-          }
-        }, 300);
 
-        // and so we wait for the indexeddb
-        await dbPromise;
-        // clear the timeout and hopefully it will make it before
-        clearTimeout(timeout);
-        // if it is blocked then we set it as unblocked
-        if (this.isCurrentlyBlocked) {
-          this.isCurrentlyBlocked = false;
-          if (this.blockedCallback) {
-            this.blockedCallback(false);
-          }
+      // for that we set a timeout
+      const timeout = setTimeout(() => {
+        // if it takes longer than that, we consider
+        // it blocked
+        this.isCurrentlyBlocked = true;
+        if (this.blockedCallback) {
+          this.blockedCallback(true);
         }
+      }, 300);
 
-        this.waitForSetupPromiseResolve();
-      })();
+      // and so we wait for the indexeddb
+      await dbPromise;
+      // clear the timeout and hopefully it will make it before
+      clearTimeout(timeout);
+      // if it is blocked then we set it as unblocked
+      if (this.isCurrentlyBlocked) {
+        this.isCurrentlyBlocked = false;
+        if (this.blockedCallback) {
+          this.blockedCallback(false);
+        }
+      }
+
+      // now we can resolve this promise
+      this.waitForSetupPromiseResolve();
+
     } catch (err) {
+      // if we cached an error during all that
       console.log(err);
-      dbPromise = null;
+      // we consider it resolved, even if this.db will never be a thing
       this.waitForSetupPromiseResolve();
     }
 
@@ -320,6 +424,13 @@ export default class CacheWorker {
     return true;
   }
 
+  /**
+   * Deletes a cached value for a GET request
+   * @param queryName the query name of the item definition
+   * @param id the id to use
+   * @param version the version (or null)
+   * @returns a boolean whether we succeed or not
+   */
   public async deleteCachedValue(
     queryName: string,
     id: number,
@@ -327,6 +438,7 @@ export default class CacheWorker {
   ): Promise<boolean> {
     console.log("REQUESTED TO DELETE", queryName, id, version);
 
+    // so we wait for the setup, just in case
     await this.waitForSetupPromise;
 
     // if we don't have it
@@ -335,8 +447,10 @@ export default class CacheWorker {
       return false;
     }
 
+    // now we can see the identifier of our query
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
+    // and now we try this
     try {
       await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
     } catch (err) {
@@ -347,6 +461,17 @@ export default class CacheWorker {
     return true;
   }
 
+  /**
+   * Merges a cached value of an item definition with another if possible
+   * it will perform a total override if the last_modified value do not match
+   * as it doesn't know what else has changed, it can only truly merge
+   * if the signature of time is equal
+   * @param queryName the query we are merging for
+   * @param id the id
+   * @param version the version (or null)
+   * @param partialValue the partial value we are merging
+   * @param partialFields the partial fields
+   */
   public async mergeCachedValue(
     queryName: string,
     id: number,
@@ -356,12 +481,18 @@ export default class CacheWorker {
   ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
+    // so we get the current value
     const currentValue = await this.getCachedValue(queryName, id, version);
+
+    // if there's no current value
+    // or the value is null (aka not_found value)
+    // or the time signature does not match
     if (
       !currentValue ||
       !currentValue.value ||
       partialValue.last_modified !== currentValue.value.last_modified
     ) {
+      // we perform an override
       return await this.setCachedValue(
         queryName,
         id,
@@ -371,6 +502,7 @@ export default class CacheWorker {
         true,
       );
     } else {
+      // otherwise we can merge
       const mergedFields = deepMerge(
         partialFields,
         currentValue.fields,
@@ -379,6 +511,7 @@ export default class CacheWorker {
         partialValue,
         currentValue.value,
       );
+      // like this
       return await this.setCachedValue(
         queryName,
         id,
@@ -397,7 +530,8 @@ export default class CacheWorker {
    * @param queryName the query name that is necessary to match against
    * @param id the id of the item definition instance
    * @param version the version of the item definition instance
-   * @param requestedFields the requested fields from graphql
+   * @param requestedFields the requested fields from graphql, optional the function
+   * will only return if it contains all those requested fields
    */
   public async getCachedValue(
     queryName: string,
@@ -448,6 +582,18 @@ export default class CacheWorker {
     return null;
   }
 
+  /**
+   * Updates a cached search records list by pushing a new record
+   * to the list in front
+   * @param searchQueryName the search query to update
+   * @param createdByIfKnown the created by (used for by-owner)
+   * @param parentTypeIfKnown the parent type (user for by-parent)
+   * @param parentIdIfKnown the parent id (user for by-parent)
+   * @param parentVersionIfKnown the parent version, or null (user for by-parent)
+   * @param newRecords the new records to be added
+   * @param newLastRecordDate the new last record date of the added records
+   * @param cachePolicy the cache policy that we are working with
+   */
   public async addRecordsToCachedSearch(
     searchQueryName: string,
     createdByIfKnown: number,
@@ -489,12 +635,26 @@ export default class CacheWorker {
     return true;
   }
 
+  /**
+   * Runs a search in the cache inside indexeddb rather than using
+   * the server
+   * @param searchQueryName the search query we are running
+   * @param searchArgs the search arguments that would be passed to the server
+   * that needs to be accounted for
+   * @param getListQueryName the get list query name (either for module or item definition)
+   * @param getListTokenArg the get list token
+   * @param getListLangArg the get list arg
+   * @param getListRequestedFields the requested fields for the get list process
+   * @param cachePolicy the cache policy used
+   * @param maxGetListResultsAtOnce how many results at once you can get for the batching
+   * for when preloading every record in the list in the client side
+   */
   public async runCachedSearch(
     searchQueryName: string,
     searchArgs: IGQLArgs,
     getListQueryName: string,
-    getListTokenArgs: string,
-    getListLangArgs: string,
+    getListTokenArg: string,
+    getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent",
     maxGetListResultsAtOnce: number,
@@ -635,7 +795,8 @@ export default class CacheWorker {
             };
           } catch (err) {
             // It comes here if it finds data corruption during the search and it should
-            // be handled accordingly by the refetcher
+            // be handled accordingly by the refetcher which is under all this
+            // after the next catch
             // note how we are suppressing this one error
           }
         }
@@ -719,8 +880,8 @@ export default class CacheWorker {
     // now we need to load all those batches into graphql queries
     const processedBatches = await Promise.all(batches.map(async (batch) => {
       const args: IGQLArgs = {
-        token: getListTokenArgs,
-        language: getListLangArgs,
+        token: getListTokenArg,
+        language: getListLangArg,
         records: batch,
       };
       if (searchArgs.created_by) {

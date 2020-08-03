@@ -1,3 +1,8 @@
+/**
+ * This is the main service worker file
+ * @packageDocumentation
+ */
+
 // We don't import corejs in our service worker as we do not really use
 // any of that overall, we only need the regenerator runtime
 import "regenerator-runtime/runtime";

@@ -1,3 +1,8 @@
+/**
+ * Contains the filtering and ordering function to perform actual searches
+ * @packageDocumentation
+ */
+
 import { IGQLSearchRecord } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
@@ -20,18 +25,36 @@ export class DataCorruptionError extends Error {
   }
 }
 
-
+/**
+ * Given a bunch of search records it will perform
+ * the ordering and filtering of such records to return
+ * them in place, as such it needs to read from the indexeddb
+ * cache, this is a heavy process
+ * @param rootProxy the root proxy we need to extract the functionality
+ * for ordering and checking equality
+ * @param db the database object
+ * @param searchRecords the search records we got
+ * @param searchArgs the search arguments (that would be sent to the server) an we need
+ * to emulate for
+ */
 export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
-  searchResults: IGQLSearchRecord[],
+  searchRecords: IGQLSearchRecord[],
   searchArgs: any,
 ): Promise<IGQLSearchRecord[]> {
-  let newSearchResults: IGQLSearchRecordChecked[] = (await Promise.all(
-    searchResults.map(async (result) => {
+
+  // so now we get the new records with a promise where we read a bunch of stuff
+  let newSearchRecords: IGQLSearchRecordChecked[] = (await Promise.all(
+    // for that we map our current records
+    searchRecords.map(async (result) => {
       try {
+        // and we need to read these values
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
+
+        // so no value, this is odd as this is considered data corruption because before coming
+        // here all search records must have been ensured
         if (!value) {
           // This means data corruption, we cancel everything, data is corrupted
           throw new DataCorruptionError("Search function was executed with missing value for " + queryIdentifier);
@@ -55,6 +78,7 @@ export async function search(
     }),
   )).filter((r) => !!r);
 
+  // so now we got to order by
   const orderBy: IOrderByRuleType = searchArgs.orderBy;
   const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
     return {
@@ -65,9 +89,11 @@ export async function search(
     }
   }).sort((a, b) => a.priority - b.priority);
 
+  // and then after that, we need to apply the sorted on these records
   orderBySorted.forEach((sortRule) => {
+    // for the nanodate based checks
     if (sortRule.property === "created_at" || sortRule.property === "edited_at") {
-      newSearchResults = newSearchResults.sort((a, b) => {
+      newSearchRecords = newSearchRecords.sort((a, b) => {
         // remember if there's no value.DATA or the item is null or whatever
         // it would have never gotten here
         const aValue = a.value.DATA[sortRule.property];
@@ -91,21 +117,30 @@ export async function search(
           return 1;
         }
       });
+
+      // we are done
       return;
     }
 
-    newSearchResults = newSearchResults.sort((a, b) => {
+    // for the remaining orer by rules
+    newSearchRecords = newSearchRecords.sort((a, b) => {
       // remember if there's no value.DATA or the item is null or whatever
       // it would have never gotten here
       const aValue = a.value.DATA[sortRule.property];
       const bValue = b.value.DATA[sortRule.property];
 
-      const itemDefinition = rootProxy.registry[a.searchResult.type] as ItemDefinition;
+      // we need our registry
+      const itemDefinition = rootProxy.registry[a.searchRecord.type] as ItemDefinition;
       const property = itemDefinition.getPropertyDefinitionFor(sortRule.property, true);
       const description = property.getPropertyDefinitionDescription();
+
+      // no rule, can't do anything
       if (!description.localOrderBy) {
         return 0;
       }
+
+      // otherwise we return this, we are
+      // using or local order by function for it
       return description.localOrderBy(
         {
           direction: sortRule.direction,
@@ -121,18 +156,39 @@ export async function search(
     });
   });
 
-  return newSearchResults.map((r) => r.searchResult);
+  // and now we can send only the 
+  return newSearchRecords.map((r) => r.searchRecord);
 }
 
+/**
+ * A helper interface for records that have been checked
+ */
 interface IGQLSearchRecordChecked {
+  /**
+   * whether should record should be included
+   */
   shouldBeIncluded: boolean;
+  /**
+   * The value of the record (aka its searchResult)
+   */
   value: any;
-  searchResult: IGQLSearchRecord;
+  /**
+   * The search record itself
+   */
+  searchRecord: IGQLSearchRecord;
 }
 
+/**
+ * Performs the check of a single search record to see if it passes
+ * the filtering rules that the client is assigning to it
+ * @param rootProxy the root proxy
+ * @param searchRecord the search record itself
+ * @param value the value we received for such record
+ * @param searchArgs the search arguments
+ */
 async function checkOne(
   rootProxy: Root,
-  searchResult: IGQLSearchRecord,
+  searchRecord: IGQLSearchRecord,
   value: any,
   searchArgs: any,
 ): Promise<IGQLSearchRecordChecked> {
@@ -150,7 +206,7 @@ async function checkOne(
   // otherwise if it passed that, let's check more specifically
   if (shouldBeIncluded) {
     // let's get the item definition this search is about
-    const itemDefinition = rootProxy.registry[searchResult.type] as ItemDefinition;
+    const itemDefinition = rootProxy.registry[searchRecord.type] as ItemDefinition;
     // now we check every single property using the local search
     shouldBeIncluded = itemDefinition.getAllPropertyDefinitionsAndExtensions().every((pd) => {
       if (!pd.isSearchable()) {
@@ -212,6 +268,6 @@ async function checkOne(
   return {
     shouldBeIncluded,
     value,
-    searchResult,
+    searchRecord,
   };
 }

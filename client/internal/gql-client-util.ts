@@ -1,3 +1,10 @@
+/**
+ * Contains utilities for building a grapqhl client to interact
+ * with the server, this is meant only for the javascript context
+ * itself as it performs a lot of storing, checking and so on
+ * @packageDocumentation
+ */
+
 import {
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
@@ -269,6 +276,14 @@ export function getFieldsAndArgs(
   return {requestFields, argumentsForQuery};
 }
 
+/**
+ * Provies the querying args for a given list of args
+ * @param args the list of args
+ * @param token the token we are using
+ * @param language the language
+ * @param id the id we are requesting for
+ * @param version the version we are requesting for (optional)
+ */
 function getQueryArgsFor(
   args: IGQLArgs,
   token: string,
@@ -295,6 +310,15 @@ function getQueryArgsFor(
   return newArgs;
 }
 
+/**
+ * Stores and combines a value
+ * @param itemDefinition the item definition we are working in
+ * @param id the id
+ * @param version the version or null
+ * @param value the value, unflattened we are working with
+ * @param fields the fields, unflattened we are working with
+ * @param cacheStore whether we should cache store the output
+ */
 function storeAndCombineStorageValuesFor(
   itemDefinition: ItemDefinition,
   id: number,
@@ -366,6 +390,24 @@ function storeAndCombineStorageValuesFor(
   }
 }
 
+/**
+ * Runs a get query for a given item definition and its args
+ * @param arg the arg to use
+ * @param arg.args the args to request the server with, normaly just {}
+ * @param arg.fields the fields we are requesting
+ * @param arg.returnMemoryCachedValues whether to return values that are cached
+ * in memory
+ * @param arg.returnWorkerCachedValues whether to return values that are in the cache worker
+ * @param arg.returnWorkerCachedValuesIfNoInternet optimally it will request the internet but if it
+ * can't connect it will request the worker instead
+ * @param arg.itemDefinition the item definition we are requesting for
+ * @param arg.id the id we are requesting for
+ * @param arg.version the version we are requesting for
+ * @param arg.language the language we are using for it, used for dictionary purposes
+ * @param arg.token the token we are using
+ * @param arg.cacheStore whether to store the results in the cache
+ * @returns a promise with a bunch of information
+ */
 export async function runGetQueryFor(
   arg: {
     args: IGQLArgs,
@@ -510,6 +552,20 @@ export async function runGetQueryFor(
   }
 }
 
+/**
+ * 
+ * @param arg the information for the delete query
+ * @param arg.args the args for the delete query, might contain
+ * policy information
+ * @param arg.itemDefinition the item definition we want to run a delete query for
+ * @param arg.id the id we want to delete for
+ * @param arg.version the version that we are deleting for (or null)
+ * @param arg.token the token to use
+ * @param arg.language the language to use, for dictionary purposes
+ * @param arg.listenerUUID the listener uuid to send with
+ * @param arg.cacheStore whether to cache store the deleted information
+ * @returns a promise with an error on whether it succeed or not
+ */
 export async function runDeleteQueryFor(
   arg: {
     args: IGQLArgs,
@@ -524,6 +580,7 @@ export async function runDeleteQueryFor(
 ): Promise<{
   error: EndpointErrorType,
 }> {
+  // the query name for the delete
   const queryName = PREFIX_DELETE + arg.itemDefinition.getQualifiedPathName();
   const args = getQueryArgsFor(
     arg.args,
@@ -534,6 +591,7 @@ export async function runDeleteQueryFor(
   );
   args.listener_uuid = arg.listenerUUID;
 
+  // build the mutation
   const query = buildGqlMutation({
     name: queryName,
     args,
@@ -570,6 +628,25 @@ export async function runDeleteQueryFor(
   }
 }
 
+/**
+ * Runs an add query for a given item definition
+ * @param arg the arg information
+ * @param arg.args the graphql args for the add query that contains the information
+ * for the stuff we want to add, contains the values, as well as the policies
+ * @param arg.fields the fields we want to retrieve as a result of our addition
+ * @param arg.itemDefinition the item definition we are adding for
+ * @param arg.token the token we are using for the addition process
+ * @param arg.language the langauge to use for dictionary purposes
+ * @param arg.listenerUUID the listener uuid to inform for changes
+ * @param arg.cacheStore whether to store the results of the addition process as a get query
+ * @param arg.forId a for id is used along forVersion to create a new version for the given id
+ * @param arg.forVersion a for version is used to start versioning the query element
+ * @param arg.containerId the container id to use for storage, should be calculated by the client
+ * as long as it's valid the server comply; the container id should depend on the location of
+ * the user
+ * @returns a promise with an error, the fields that can be used to retrieve the same value in a get
+ * query, and the value that was retrieved
+ */
 export async function runAddQueryFor(
   arg: {
     args: IGQLArgs,
@@ -653,6 +730,20 @@ export async function runAddQueryFor(
   }
 }
 
+/**
+ * Runs an edit query for a given item definition
+ * @param arg the arg with the get query information
+ * @param arg.args the arg to use the edition for, these contain the new property values
+ * as well as any policies that are deemed necessary
+ * @param arg.fields the fields to request from the edit query
+ * @param arg.itemDefinition the item definition we are editing
+ * @param arg.token the token for validation
+ * @param arg.langauge the language used, for dictionary purposes
+ * @param arg.id the id we are editing
+ * @param arg.version the version we are editing, or null
+ * @param arg.listenerUUID the listener uuid we are using
+ * @param arg.cacheStore whether to store the result of this edition in our cache
+ */
 export async function runEditQueryFor(
   arg: {
     args: IGQLArgs,
@@ -670,6 +761,7 @@ export async function runEditQueryFor(
   value: IGQLValue,
   getQueryFields: IGQLRequestFields,
 }> {
+  // so we do this
   const queryName = PREFIX_EDIT + arg.itemDefinition.getQualifiedPathName();
   const args = getQueryArgsFor(
     arg.args,
@@ -729,6 +821,12 @@ export async function runEditQueryFor(
   }
 }
 
+/**
+ * The orer by rule uses enums rather than the standard
+ * form in the order by rule type, so it's transformed
+ * to its proper enums
+ * @param orderBy the order by rule
+ */
 function convertOrderByRule(orderBy: IOrderByRuleType) {
   const result = {};
   Object.keys(orderBy).forEach((property) => {
@@ -742,6 +840,44 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
   return result;
 }
 
+/**
+ * Runs the surprisingly complex search query
+ * @param arg the arg for the search operation
+ * @param arg.args the search args, contains our search options for the properties
+ * such as EXACT_property_id and things like that
+ * @param arg.fields the fields we want to request for the result, not the record,
+ * these fields are used either for cache policied by-owner or by-parent searches,
+ * as well as traditional mode, but they are not used in other circumstances
+ * @param arg.itemDefinition the item definition we are running a search query for
+ * it should be an extensions instance if we are doing it for a module
+ * @param arg.orderBy an order by rule
+ * @param arg.createdBy in order to filter by creator, should be present
+ * if cachePolicy is by-owner otherwise null
+ * @param arg.parentedBy in order to filter by parenting, should be present
+ * if cachePolicy is by-parent otherwise null
+ * @param arg.traditional a traditional search, doesn't support any cache policy
+ * @param arg.limit the limit to limit by, this should be less or equal to the limit
+ * that you can get search results (for traditional) or search records (for standard)
+ * @param arg.offset the offset to start with, if using a cache policy this must be 0 or otherwise
+ * it will cause inconsistencies
+ * @param arg.token the token to run the search query for
+ * @param arg.language the language for dictionary purposes
+ * @param arg.versionFilter an optional filter to filter by a given version so only
+ * items matching a version appear
+ * @param searchCacheOptions the search cache options used and required for by-owner
+ * and by-parent searches
+ * @param searchCacheOptions.remoteListener the remote listener object
+ * @param searchCacheOptions.onSearchUpdated the function to trigger once the cache policy
+ * has indicated records have been added
+ * @param searchCacheOptions.preventStaleFeeback when a search query is re-ran data might
+ * be considered stale, but we might not want to run a feedback request for this search, this
+ * happens when the search upated gets called, an then it will re-run the search, since there was
+ * a window of time, dataMightBeStale is true, and it might ask feedback, for something it just
+ * modified, this variable can always be false for 100% consistency
+ * @returns a promise with the error, results (for traditional), the records, the count
+ * which might me larger than the number of records, however the record length should
+ * be equal to the limit, and the offset given
+ */
 export async function runSearchQueryFor(
   arg: {
     args: IGQLArgs,

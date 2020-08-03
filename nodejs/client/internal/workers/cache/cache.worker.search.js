@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the filtering and ordering function to perform actual searches
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const cache_worker_1 = require("./cache.worker");
 const constants_1 = require("../../../../constants");
@@ -15,11 +19,29 @@ class DataCorruptionError extends Error {
     }
 }
 exports.DataCorruptionError = DataCorruptionError;
-async function search(rootProxy, db, searchResults, searchArgs) {
-    let newSearchResults = (await Promise.all(searchResults.map(async (result) => {
+/**
+ * Given a bunch of search records it will perform
+ * the ordering and filtering of such records to return
+ * them in place, as such it needs to read from the indexeddb
+ * cache, this is a heavy process
+ * @param rootProxy the root proxy we need to extract the functionality
+ * for ordering and checking equality
+ * @param db the database object
+ * @param searchRecords the search records we got
+ * @param searchArgs the search arguments (that would be sent to the server) an we need
+ * to emulate for
+ */
+async function search(rootProxy, db, searchRecords, searchArgs) {
+    // so now we get the new records with a promise where we read a bunch of stuff
+    let newSearchRecords = (await Promise.all(
+    // for that we map our current records
+    searchRecords.map(async (result) => {
         try {
+            // and we need to read these values
             const queryIdentifier = `${constants_1.PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
             const value = await db.get(cache_worker_1.QUERIES_TABLE_NAME, queryIdentifier);
+            // so no value, this is odd as this is considered data corruption because before coming
+            // here all search records must have been ensured
             if (!value) {
                 // This means data corruption, we cancel everything, data is corrupted
                 throw new DataCorruptionError("Search function was executed with missing value for " + queryIdentifier);
@@ -44,6 +66,7 @@ async function search(rootProxy, db, searchResults, searchArgs) {
             return null;
         }
     }))).filter((r) => !!r);
+    // so now we got to order by
     const orderBy = searchArgs.orderBy;
     const orderBySorted = Object.keys(orderBy).map((orderByProperty) => {
         return {
@@ -53,9 +76,11 @@ async function search(rootProxy, db, searchResults, searchArgs) {
             direction: orderBy[orderByProperty].direction,
         };
     }).sort((a, b) => a.priority - b.priority);
+    // and then after that, we need to apply the sorted on these records
     orderBySorted.forEach((sortRule) => {
+        // for the nanodate based checks
         if (sortRule.property === "created_at" || sortRule.property === "edited_at") {
-            newSearchResults = newSearchResults.sort((a, b) => {
+            newSearchRecords = newSearchRecords.sort((a, b) => {
                 // remember if there's no value.DATA or the item is null or whatever
                 // it would have never gotten here
                 const aValue = a.value.DATA[sortRule.property];
@@ -79,19 +104,25 @@ async function search(rootProxy, db, searchResults, searchArgs) {
                     return 1;
                 }
             });
+            // we are done
             return;
         }
-        newSearchResults = newSearchResults.sort((a, b) => {
+        // for the remaining orer by rules
+        newSearchRecords = newSearchRecords.sort((a, b) => {
             // remember if there's no value.DATA or the item is null or whatever
             // it would have never gotten here
             const aValue = a.value.DATA[sortRule.property];
             const bValue = b.value.DATA[sortRule.property];
-            const itemDefinition = rootProxy.registry[a.searchResult.type];
+            // we need our registry
+            const itemDefinition = rootProxy.registry[a.searchRecord.type];
             const property = itemDefinition.getPropertyDefinitionFor(sortRule.property, true);
             const description = property.getPropertyDefinitionDescription();
+            // no rule, can't do anything
             if (!description.localOrderBy) {
                 return 0;
             }
+            // otherwise we return this, we are
+            // using or local order by function for it
             return description.localOrderBy({
                 direction: sortRule.direction,
                 nulls: sortRule.nulls,
@@ -104,10 +135,19 @@ async function search(rootProxy, db, searchResults, searchArgs) {
             });
         });
     });
-    return newSearchResults.map((r) => r.searchResult);
+    // and now we can send only the 
+    return newSearchRecords.map((r) => r.searchRecord);
 }
 exports.search = search;
-async function checkOne(rootProxy, searchResult, value, searchArgs) {
+/**
+ * Performs the check of a single search record to see if it passes
+ * the filtering rules that the client is assigning to it
+ * @param rootProxy the root proxy
+ * @param searchRecord the search record itself
+ * @param value the value we received for such record
+ * @param searchArgs the search arguments
+ */
+async function checkOne(rootProxy, searchRecord, value, searchArgs) {
     // so by default we included
     let shouldBeIncluded = true;
     // if there is no value, aka the item has been deleted
@@ -121,7 +161,7 @@ async function checkOne(rootProxy, searchResult, value, searchArgs) {
     // otherwise if it passed that, let's check more specifically
     if (shouldBeIncluded) {
         // let's get the item definition this search is about
-        const itemDefinition = rootProxy.registry[searchResult.type];
+        const itemDefinition = rootProxy.registry[searchRecord.type];
         // now we check every single property using the local search
         shouldBeIncluded = itemDefinition.getAllPropertyDefinitionsAndExtensions().every((pd) => {
             if (!pd.isSearchable()) {
@@ -181,6 +221,6 @@ async function checkOne(rootProxy, searchResult, value, searchArgs) {
     return {
         shouldBeIncluded,
         value,
-        searchResult,
+        searchRecord,
     };
 }

@@ -1,3 +1,9 @@
+/**
+ * This is the include callout warning handler that handles how the include callout warning
+ * is supposed to be shown
+ * @packageDocumentation
+ */
+
 import React from "react";
 import Include, { IIncludeState, IncludeExclusionState } from "../../../../base/Root/Module/ItemDefinition/Include";
 import { ILocaleContextType, LocaleContext } from "../../providers/locale-provider";
@@ -5,16 +11,45 @@ import { RendererContext } from "../../../providers/renderer";
 import equals from "deep-equal";
 import { IRendererProps } from "../../renderer";
 
-interface IIncludeCalloutWarningProps {
+/**
+ * The include callout warning handler props that will generate
+ * a handler in order to make it up for the include callout
+ * warning
+ */
+interface IIncludeCalloutWarningHandlerProps {
+  /**
+   * The include in question
+   */
   include: Include;
+  /**
+   * The state of the include
+   */
   state: IIncludeState;
-  renderer?: React.ComponentType<IIncludeCalloutWarningRendererProps>
+  /**
+   * The renderer to use rather than the default
+   */
+  renderer?: React.ComponentType<IIncludeCalloutWarningRendererProps>;
+  /**
+   * the renderer args to use
+   */
   rendererArgs?: object;
 }
 
-interface IActualIncludeCalloutWarningProps extends IIncludeCalloutWarningProps {
+/**
+ * The actual properties with some context information
+ */
+interface IActualIncludeCalloutWarningHandlerProps extends IIncludeCalloutWarningHandlerProps {
+  /**
+   * The locale context
+   */
   locale: ILocaleContextType;
+  /**
+   * The renderer is now non-optional
+   */
   renderer: React.ComponentType<IIncludeCalloutWarningRendererProps>;
+  /**
+   * The renderer args is non-optional as well
+   */
   rendererArgs: object;
 }
 
@@ -23,8 +58,8 @@ export interface IIncludeCalloutWarningRendererProps extends IRendererProps {
   active: boolean;
 }
 
-class ActualIncludeCalloutWarning extends React.Component<IActualIncludeCalloutWarningProps> {
-  public shouldComponentUpdate(nextProps: IActualIncludeCalloutWarningProps) {
+class ActualIncludeCalloutHandlerWarning extends React.Component<IActualIncludeCalloutWarningHandlerProps> {
+  public shouldComponentUpdate(nextProps: IActualIncludeCalloutWarningHandlerProps) {
     return nextProps.locale.language !== this.props.locale.language ||
       nextProps.locale.rtl !== this.props.locale.rtl ||
       nextProps.include !== this.props.include ||
@@ -48,13 +83,13 @@ class ActualIncludeCalloutWarning extends React.Component<IActualIncludeCalloutW
   }
 }
 
-export default function IncludeCalloutWarning(props: IIncludeCalloutWarningProps) {
+export default function IncludeCalloutWarning(props: IIncludeCalloutWarningHandlerProps) {
   // Build the context and render sending the right props
   if (props.renderer) {
     return (     
       <LocaleContext.Consumer>
         {
-          (locale) => <ActualIncludeCalloutWarning
+          (locale) => <ActualIncludeCalloutHandlerWarning
             {...props} locale={locale}
             renderer={props.renderer}
             rendererArgs={props.rendererArgs || {}}
@@ -69,7 +104,7 @@ export default function IncludeCalloutWarning(props: IIncludeCalloutWarningProps
         (renderers) =>
           <LocaleContext.Consumer>
             {
-              (locale) => <ActualIncludeCalloutWarning
+              (locale) => <ActualIncludeCalloutHandlerWarning
                 {...props}
                 locale={locale}
                 renderer={renderers.IncludeCalloutWarning}

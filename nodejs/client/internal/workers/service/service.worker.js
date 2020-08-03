@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * This is the main service worker file
+ * @packageDocumentation
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 // We don't import corejs in our service worker as we do not really use
 // any of that overall, we only need the regenerator runtime

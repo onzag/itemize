@@ -86,7 +86,8 @@ interface ILocaleProviderProps {
 
 /**
  * The locale provider creates a context that serves the locale information
- * down the components
+ * down the components, should be placed inside the app as the locale is
+ * dynamic and controlled by the app, on top of the main
  */
 export class LocaleProvider extends React.Component<ILocaleProviderProps> {
   public shouldComponentUpdate(nextProps: ILocaleProviderProps) {

@@ -164,15 +164,41 @@ export class RemoteListener {
    * An uuid to randomly identify this listener
    */
   private uuid: string = uuid.v4();
+  /**
+   * Whether it's currently offline
+   */
   private offline: boolean = true;
+  /**
+   * whether the identifying token has been set
+   */
   private hasSetToken: boolean = false;
+  /**
+   * The token that has been set
+   */
   private token: string = null;
+  /**
+   * Whether it's ready to attach events
+   */
   private isReady: boolean = false;
+  /**
+   * The function to trigger on logout
+   * this comes from the current active token provider
+   */
   private logout: () => void;
+  /**
+   * The time when this instance was instantiated
+   */
   private setupTime: number;
-
+  /**
+   * Triggered when the currency factors should be rechecked, the application
+   * sets this function
+   */
   private currencyFactorsHandler: () => void;
 
+  /**
+   * Instantiates a new remote listener
+   * @param root the root we are using for it
+   */
   constructor(root: Root) {
     this.onConnect = this.onConnect.bind(this);
     this.onChangeListened = this.onChangeListened.bind(this);
@@ -183,6 +209,7 @@ export class RemoteListener {
     this.onKicked = this.onKicked.bind(this);
     this.setCurrencyFactorsHandler = this.setCurrencyFactorsHandler.bind(this);
     this.triggerCurrencyFactorsHandler = this.triggerCurrencyFactorsHandler.bind(this);
+    this.consumeDelayedFeedbacks = this.consumeDelayedFeedbacks.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -191,9 +218,9 @@ export class RemoteListener {
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
-
     this.setupTime = (new Date()).getTime();
 
+    // setup the io to the client
     this.socket = io(`${location.protocol}//${location.host}`);
     this.socket.on("connect", this.onConnect);
     this.socket.on("disconnect", this.onDisconnect);
@@ -205,30 +232,42 @@ export class RemoteListener {
     this.socket.on(ERROR_EVENT, this.onError);
     this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
   }
+
+  /**
+   * Triggers the currency factor hanlder
+   * this function is expected to recheck the currency factors
+   * as they might have changed
+   */
   public triggerCurrencyFactorsHandler() {
     this.currencyFactorsHandler();
   }
+
+  /**
+   * Sets the currency factor handling function, this should be
+   * done immediately after initialization
+   * @param handler the handler itself
+   */
   public setCurrencyFactorsHandler(handler: () => void) {
     this.currencyFactorsHandler = handler;
   }
+
+  /**
+   * Sets the logout handler, the logout is triggered
+   * if the user has been kicked by a logout all event
+   * @param logout the logout handler
+   */
   public setLogoutHandler(logout: () => void) {
     this.logout = logout;
   }
-  public onKicked() {
-    // it would indeed be very weird if logout wasn't ready
-    // but we still check
-    this.logout && this.logout();
-  }
-  public onError(event: IErrorEvent) {
-    console.error(
-      event.message,
-    );
-    if (console.table) {
-      console.table(event.request);
-    } else {
-      console.error(event.request);
-    }
-  }
+
+  /**
+   * Called when the token changes an allows for
+   * identification as well as re-identification
+   * 
+   * Makes the app ready
+   * 
+   * @param token the new token to use
+   */
   public async setToken(token: string) {
     // token might be null so we use this flag
     this.hasSetToken = true;
@@ -245,8 +284,104 @@ export class RemoteListener {
       this.isReady = true;
     }
   }
-  public onBuildnumberListened(build: IBuildNumberEvent) {
-    this.lastRecievedBuildNumber = build.buildnumber;
+
+  /**
+   * Provides the remote listener uuid
+   */
+  public getUUID() {
+    return this.uuid;
+  }
+
+  /**
+   * Specifies whether the remote listener is offline
+   * which also defines whether the app itself is offline
+   */
+  public isOffline() {
+    return this.offline;
+  }
+
+  /**
+   * Adds a listener for when the app updates (aka buildnumber mismatch)
+   * @param listener the listener to add
+   */
+  public addAppUpdatedListener(listener: () => void) {
+    this.appUpdatedListeners.push(listener);
+  }
+
+  /**
+   * Removes a listener for when the app updates (aka buildnumber mismatch)
+   * @param listener the listener to remove
+   */
+  public removeAppUpdatedListener(listener: () => void) {
+    const index = this.appUpdatedListeners.indexOf(listener);
+    if (index !== -1) {
+      this.appUpdatedListeners.splice(index, 1);
+    }
+  }
+
+  /**
+   * Checks whether the app is uppdated compared to what we are running right now
+   */
+  public isAppUpdated() {
+    return this.lastRecievedBuildNumber !== (window as any).BUILD_NUMBER;
+  }
+
+  /**
+   * Adds a listener for when the app online status changes
+   * @param listener the listener to add
+   */
+  public addConnectStatusListener(listener: () => void) {
+    this.connectionListeners.push(listener);
+  }
+
+  /**
+   * Removes a listener for when the app online status changes
+   * @param listener the listener to remove
+   */
+  public removeConnectStatusListener(listener: () => void) {
+    const index = this.connectionListeners.indexOf(listener);
+    if (index !== -1) {
+      this.connectionListeners.splice(index, 1);
+    }
+  }
+
+  /**
+   * Triggers when the current user has been kicked
+   * by a logout all event
+   */
+  public onKicked() {
+    // it would indeed be very weird if logout wasn't ready
+    // but we still check
+    this.logout && this.logout();
+  }
+
+  /**
+   * Triggers when the listener recieves
+   * a remote error event
+   * @param event the error event
+   */
+  public onError(event: IErrorEvent) {
+    console.error(
+      event.message,
+    );
+
+    // we log the request that caused
+    // the error
+    if (console.table) {
+      console.table(event.request);
+    } else {
+      console.error(event.request);
+    }
+  }
+
+  /**
+   * Triggers when receiving the buildnumber event that specifies
+   * the buildnumber that the server is running in; this event
+   * triggers just on connection, as well as on update
+   * @param event the buildnumber event
+   */
+  public onBuildnumberListened(event: IBuildNumberEvent) {
+    this.lastRecievedBuildNumber = event.buildnumber;
     if (this.isAppUpdated()) {
       // this will trigger the service worker to realize the app has
       // updated if any service worker is active
@@ -260,59 +395,55 @@ export class RemoteListener {
       this.appUpdatedListeners.forEach((l) => l());
     }
   }
-  public getUUID() {
-    return this.uuid;
-  }
-  public isOffline() {
-    return this.offline;
-  }
-  public addAppUpdatedListener(listener: () => void) {
-    this.appUpdatedListeners.push(listener);
-  }
-  public removeAppUpdatedListener(listener: () => void) {
-    const index = this.appUpdatedListeners.indexOf(listener);
-    if (index !== -1) {
-      this.appUpdatedListeners.splice(index, 1);
-    }
-  }
-  public isAppUpdated() {
-    return this.lastRecievedBuildNumber !== (window as any).BUILD_NUMBER;
-  }
-  public addConnectStatusListener(listener: () => void) {
-    this.connectionListeners.push(listener);
-  }
-  public removeConnectStatusListener(listener: () => void) {
-    const index = this.connectionListeners.indexOf(listener);
-    if (index !== -1) {
-      this.connectionListeners.splice(index, 1);
-    }
-  }
+
+  /**
+   * Adds an item definition listener for when the item definition value changes
+   * so that a reload can be called
+   * @param parentInstance the parent instance (this will be the item-definition provider that uses it)
+   * @param itemDefinitionQualifiedPathName the qualifie path name of the item definition
+   * @param forId for which id
+   * @param forVersion for which version (null allowed)
+   */
   public addItemDefinitionListenerFor(
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
     forId: number,
     forVersion: string,
   ) {
+    // first we build this qualified identifier that will act as key
     const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
+
+    // now we check if we already have a listener for that
     if (this.listeners[qualifiedIdentifier]) {
+      // if we do, then we got to check that we are not re-adding this instance
       if (!this.listeners[qualifiedIdentifier].parentInstances.includes(parentInstance)) {
+        // and we add it, just to keep track
         this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       }
       return;
     }
 
+    // now the request
     const request: IRegisterRequest = {
       itemDefinition: itemDefinitionQualifiedPathName,
       id: forId,
       version: forVersion,
     };
+    // and the listener that is added for it
     this.listeners[qualifiedIdentifier] = {
       request,
       parentInstances: [parentInstance],
     };
 
+    // and then the event is attached if possible (aka online)
     this.attachItemDefinitionListenerFor(request);
   }
+
+  /**
+   * If online will attach an item definition listener for a given
+   * item definition using a register request
+   * @param request the request to register for
+   */
   public async attachItemDefinitionListenerFor(request: IRegisterRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
@@ -325,6 +456,172 @@ export class RemoteListener {
       }
     }
   }
+
+  /**
+   * Remove an item definition listener for a given parent instance
+   * @param parentInstance the parent instance
+   * @param itemDefinitionQualifiedPathName the item definition pathname to stop listening for
+   * @param forId the id
+   * @param forVersion the version (or null)
+   */
+  public removeItemDefinitionListenerFor(
+    parentInstance: any,
+    itemDefinitionQualifiedPathName: string,
+    forId: number,
+    forVersion: string,
+  ) {
+    // so we build the same identifier
+    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
+    // and we check if we have a listener for it
+    const listenerValue = this.listeners[qualifiedID];
+
+    // if we do
+    if (listenerValue) {
+      // we build a new listener with the parent instance removed for the list
+      const newListenerValue = {
+        ...listenerValue,
+        parentInstances: listenerValue.parentInstances.filter((i) => i !== parentInstance),
+      };
+
+      // if we have no parent instances left
+      if (newListenerValue.parentInstances.length === 0) {
+        // delete the listener
+        delete this.listeners[qualifiedID];
+        // and if we are connected
+        if (this.socket.connected) {
+          // we can launch the unregister request
+          const request: IUnregisterRequest = {
+            id: forId,
+            version: forVersion,
+            itemDefinition: itemDefinitionQualifiedPathName,
+          };
+          this.socket.emit(
+            UNREGISTER_REQUEST,
+            request,
+          );
+        }
+
+      // ohterwise
+      } else {
+        // we assign the new listener value
+        this.listeners[qualifiedID] = newListenerValue;
+      }
+    }
+  }
+
+  /**
+   * request feedback for an item definitition to check if the value
+   * hasn't somehow changed since it was last checked
+   * @param request the feedback request
+   * @param immediate whether to fullfill it immediately
+   */
+  public async requestFeedbackFor(
+    request: IFeedbackRequest,
+    immediate?: boolean,
+  ) {
+    // if we have an immediate request
+    if (immediate) {
+      // we check if we are connected
+      if (this.socket.connected) {
+        // check our identification
+        await this.onIdentificationDone();
+        // check if connected again
+        if (this.socket.connected) {
+          // and then emit it
+          this.socket.emit(
+            FEEDBACK_REQUEST,
+            request,
+          );
+        }
+      }
+    
+    // otherwise we will add to the delayed feedback list
+    } else if (
+      this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
+    ) {
+      this.delayedFeedbacks.push(request);
+      setTimeout(this.consumeDelayedFeedbacks, 70);
+    }
+  }
+
+  /**
+   * Consumes the delayed feedbacks that might exist
+   */
+  private async consumeDelayedFeedbacks() {
+    // avoid if there are no delayed feedbacks
+    // there might not be any since the timeout can
+    // be added a couple of times
+    if (!this.delayedFeedbacks.length) {
+      return;
+    }
+
+    // we wait if not ready
+    if (this.socket.connected) {
+      await this.onIdentificationDone();
+    }
+
+    // the reason we use delayed feedbacks is for efficiency, while we don't
+    // use this for owned searches, but sometimes a same feedback would be requested twice
+    this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
+      // and yet we recheck, as we need to be connected even as we emit
+      if (this.socket.connected) {
+        this.socket.emit(
+          FEEDBACK_REQUEST,
+          df,
+        );
+      }
+
+      return false;
+    });
+  }
+
+  /**
+   * Adds a listener for an owned search
+   * @param itemDefinitionOrModuleQualifiedPathName the item definition or module we are listening for search changes
+   * @param createdBy the creator that triggers this
+   * @param lastKnownRecordDate the last known record added date
+   * @param callback a callback to trigger when the listener matches
+   */
+  public addOwnedSearchListenerFor(
+    itemDefinitionOrModuleQualifiedPathName: string,
+    createdBy: number,
+    lastKnownRecordDate: string,
+    callback: () => any,
+  ) {
+    // so we build our qualified identifier as well
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
+    // if we have any in our owned search listener list
+    if (this.ownedSearchListeners[qualifiedIdentifier]) {
+      // and if this callback is not included yet
+      // this can actually hit here very often since every time that a search gets called
+      // in gql and it has a cache policy, it will attempt to add a listener
+      // and the same listener might have already been added before
+      if (!this.ownedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+        // so we push the callback
+        this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      }
+      return;
+    }
+
+    // we now build the request
+    const request: IOwnedSearchRegisterRequest = {
+      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+      createdBy,
+    };
+    this.ownedSearchListeners[qualifiedIdentifier] = {
+      request,
+      callbacks: [callback],
+      lastKnownRecordDate,
+    };
+
+    // and attach the owner listener if possible
+    this.attachOwnedSearchListenerFor(request);
+  }
+
+  /**
+   * Attaches if possible the owned search listener for a cached by owner search type
+   * @param request the request to use
+   */
   public async attachOwnedSearchListenerFor(request: IOwnedSearchRegisterRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
@@ -337,19 +634,59 @@ export class RemoteListener {
       }
     }
   }
-  public async attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
-    if (this.socket.connected) {
-      await this.onIdentificationDone();
 
-      // check if still connected after a possible await
-      if (this.socket.connected) {
-        this.socket.emit(
-          PARENTED_SEARCH_REGISTER_REQUEST,
-          request,
-        );
+  /**
+   * Removes an owned search listener
+   * @param callback the callback that we are removing for
+   * @param itemDefinitionOrModuleQualifiedPathName the item definition or module path name
+   * @param createdBy the created by user namespace
+   */
+  public removeOwnedSearchListenerFor(
+    callback: () => any,
+    itemDefinitionOrModuleQualifiedPathName: string,
+    createdBy: number,
+  ) {
+    // first we build the qualified identifier
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
+    // and then check what we got for the listener value
+    const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
+    // if we have one
+    if (listenerValue) {
+      // we remove such callback from the list
+      const newListenerValue = {
+        ...listenerValue,
+        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
+      };
+
+      // if we got no callbacks remaining
+      if (newListenerValue.callbacks.length === 0) {
+        // then we can delete the listener
+        delete this.ownedSearchListeners[qualifiedIdentifier];
+        // and if we are connected
+        if (this.socket.connected) {
+          // we can perform the unregister request
+          const request: IOwnedSearchUnregisterRequest = {
+            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+            createdBy,
+          };
+          this.socket.emit(
+            OWNED_SEARCH_UNREGISTER_REQUEST,
+            request,
+          );
+        }
+
+      // otherwise
+      } else {
+        // just upate the value
+        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
       }
     }
   }
+
+  /**
+   * Requests feedback for an owned search, if possible
+   * @param request the feedback request
+   */
   public async requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
@@ -363,6 +700,136 @@ export class RemoteListener {
       }
     }
   }
+
+  /**
+   * Adds a parented search listener for a cached search via parenting
+   * @param itemDefinitionOrModuleQualifiedPathName the item definition or module that it refers to
+   * @param parentType the parent type (aka it's item definition qualified name)
+   * @param parentId the parent id
+   * @param parentVersion the parent version (or null)
+   * @param lastKnownRecordDate the last known record date this listener knows of its stored values
+   * @param callback the callback to trigger for
+   */
+  public addParentedSearchListenerFor(
+    itemDefinitionOrModuleQualifiedPathName: string,
+    parentType: string,
+    parentId: number,
+    parentVersion: string,
+    lastKnownRecordDate: string,
+    callback: () => any,
+  ) {
+    // so we build the id for the parent type
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
+      parentType + "." + parentId + "." + (parentVersion || "");
+
+    // and we check if we already have some listener registered for it
+    if (this.parentedSearchListeners[qualifiedIdentifier]) {
+      // if we did, now we need to check if our callback hasn't been added yet,
+      // same reason as before, since every time the search is executed it will
+      // attempt to add the callback
+      if (!this.parentedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+        // and if it's not there we add it
+        this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+      }
+      return;
+    }
+
+    // we build the request for it
+    const request: IParentedSearchRegisterRequest = {
+      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+      parentType,
+      parentId,
+      parentVersion,
+    };
+    this.parentedSearchListeners[qualifiedIdentifier] = {
+      request,
+      callbacks: [callback],
+      lastKnownRecordDate,
+    };
+
+    // and attempt to attach it
+    this.attachParentedSearchListenerFor(request);
+  }
+
+  /**
+   * Attaches the parented seach listener if possible
+   * as in the app is online
+   * @param request the request to attach
+   */
+  public async attachParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
+    if (this.socket.connected) {
+      await this.onIdentificationDone();
+
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.socket.emit(
+          PARENTED_SEARCH_REGISTER_REQUEST,
+          request,
+        );
+      }
+    }
+  }
+  
+  /**
+   * Removes a parented search feedback listener and its given callback
+   * that is related to
+   * @param callback the callback function
+   * @param itemDefinitionOrModuleQualifiedPathName the item definition or module it's related to
+   * @param parentType parent type (item definition qualified name) information
+   * @param parentId parent id
+   * @param parentVersion parent version (or null)
+   */
+  public removeParentedSearchListenerFor(
+    callback: () => any,
+    itemDefinitionOrModuleQualifiedPathName: string,
+    parentType: string,
+    parentId: number,
+    parentVersion: string,
+  ) {
+    // first we get the identifier
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName +
+      "." + parentType + "." + parentId + "." + (parentVersion || "");
+    // an the listener value
+    const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
+    // we ensure we have one already
+    if (listenerValue) {
+      // and then we remove the callback from it for a new value
+      const newListenerValue = {
+        ...listenerValue,
+        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
+      };
+
+      // if then we got no callbacks left
+      if (newListenerValue.callbacks.length === 0) {
+        // we can delete the listener
+        delete this.ownedSearchListeners[qualifiedIdentifier];
+        // and if we are connected
+        if (this.socket.connected) {
+          // we can unregister the listener
+          const request: IParentedSearchUnregisterRequest = {
+            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+            parentId,
+            parentType,
+            parentVersion,
+          };
+          this.socket.emit(
+            PARENTED_SEARCH_UNREGISTER_REQUEST,
+            request,
+          );
+        }
+
+      // otherwise if there are callbacks left
+      } else {
+        // we just update the value with the new callbacks
+        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
+      }
+    }
+  }
+
+  /**
+   * Requests feedback for a parented seach, if possible
+   * @param request the request to trigger
+   */
   public async requestParentedSearchFeedbackFor(request: IParentedSearchFeedbackRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
@@ -376,185 +843,25 @@ export class RemoteListener {
       }
     }
   }
-  public addOwnedSearchListenerFor(
-    itemDefinitionOrModuleQualifiedPathName: string,
-    createdBy: number,
-    lastKnownRecordDate: string,
-    callback: () => any,
-  ) {
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
-    if (this.ownedSearchListeners[qualifiedIdentifier]) {
-      if (!this.ownedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
-        this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
-      }
-      return;
-    }
 
-    const request: IOwnedSearchRegisterRequest = {
-      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
-      createdBy,
-    };
-    this.ownedSearchListeners[qualifiedIdentifier] = {
-      request,
-      callbacks: [callback],
-      lastKnownRecordDate,
-    };
-
-    this.attachOwnedSearchListenerFor(request);
-  }
-  public addParentedSearchListenerFor(
-    itemDefinitionOrModuleQualifiedPathName: string,
-    parentType: string,
-    parentId: number,
-    parentVersion: string,
-    lastKnownRecordDate: string,
-    callback: () => any,
-  ) {
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
-      parentType + "." + parentId + "." + (parentVersion || "");
-    if (this.parentedSearchListeners[qualifiedIdentifier]) {
-      if (!this.parentedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
-        this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
-      }
-      return;
-    }
-
-    const request: IParentedSearchRegisterRequest = {
-      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
-      parentType,
-      parentId,
-      parentVersion,
-    };
-    this.parentedSearchListeners[qualifiedIdentifier] = {
-      request,
-      callbacks: [callback],
-      lastKnownRecordDate,
-    };
-
-    this.attachParentedSearchListenerFor(request);
-  }
-  public async requestFeedbackFor(
-    request: IFeedbackRequest,
-    immediate?: boolean,
-  ) {
-    if (immediate) {
-      if (this.socket.connected) {
-        await this.onIdentificationDone();
-        if (this.socket.connected) {
-          this.socket.emit(
-            FEEDBACK_REQUEST,
-            request,
-          );
-        }
-      }
-    } else if (
-      this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
-    ) {
-      this.delayedFeedbacks.push(request);
-
-      setTimeout(this.consumeDelayedFeedbacks.bind(this, request), 70);
-    }
-  }
-  public removeItemDefinitionListenerFor(
-    parentInstance: any,
-    itemDefinitionQualifiedPathName: string,
-    forId: number,
-    forVersion: string,
-  ) {
-    const qualifiedID = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
-    const listenerValue = this.listeners[qualifiedID];
-    if (listenerValue) {
-      const newListenerValue = {
-        ...listenerValue,
-        parentInstances: listenerValue.parentInstances.filter((i) => i !== parentInstance),
-      };
-      if (newListenerValue.parentInstances.length === 0) {
-        delete this.listeners[qualifiedID];
-        if (this.socket.connected) {
-          const request: IUnregisterRequest = {
-            id: forId,
-            version: forVersion,
-            itemDefinition: itemDefinitionQualifiedPathName,
-          };
-          this.socket.emit(
-            UNREGISTER_REQUEST,
-            request,
-          );
-        }
-      } else {
-        this.listeners[qualifiedID] = newListenerValue;
-      }
-    }
-  }
-  public removeOwnedSearchListenerFor(
-    callback: () => any,
-    itemDefinitionOrModuleQualifiedPathName: string,
-    createdBy: number,
-  ) {
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
-    const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
-    if (listenerValue) {
-      const newListenerValue = {
-        ...listenerValue,
-        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
-      };
-      if (newListenerValue.callbacks.length === 0) {
-        delete this.ownedSearchListeners[qualifiedIdentifier];
-        if (this.socket.connected) {
-          const request: IOwnedSearchUnregisterRequest = {
-            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
-            createdBy,
-          };
-          this.socket.emit(
-            OWNED_SEARCH_UNREGISTER_REQUEST,
-            request,
-          );
-        }
-      } else {
-        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
-      }
-    }
-  }
-  public removeParentedSearchListenerFor(
-    callback: () => any,
-    itemDefinitionOrModuleQualifiedPathName: string,
-    parentType: string,
-    parentId: number,
-    parentVersion: string,
-  ) {
-    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName +
-      "." + parentType + "." + parentId + "." + (parentVersion || "");
-    const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
-    if (listenerValue) {
-      const newListenerValue = {
-        ...listenerValue,
-        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
-      };
-      if (newListenerValue.callbacks.length === 0) {
-        delete this.ownedSearchListeners[qualifiedIdentifier];
-        if (this.socket.connected) {
-          const request: IParentedSearchUnregisterRequest = {
-            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
-            parentId,
-            parentType,
-            parentVersion,
-          };
-          this.socket.emit(
-            PARENTED_SEARCH_UNREGISTER_REQUEST,
-            request,
-          );
-        }
-      } else {
-        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
-      }
-    }
-  }
+  /**
+   * Triggers on a changed or a feedback event
+   * @param event the event itself
+   */
   private onChangeListened(
     event: IChangedFeedbackEvent,
   ) {
+    // first we need to see what item definition we matched
     const itemDefinition: ItemDefinition = this.root.registry[event.itemDefinition] as ItemDefinition;
+    // and let's get the applied value for it we currently have
     const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id, event.version);
+
+    // so if we have one
     if (appliedGQLValue) {
+
+      // so if the event is a modified type
+      // or a created type or it's a feedback that gives
+      // a last modified that doesn't match our applied value
       if (
         event.type === "modified" || event.type === "created" ||
         (
@@ -562,10 +869,18 @@ export class RemoteListener {
           event.lastModified !== appliedGQLValue.flattenedValue.last_modified
         )
       ) {
+        // we request a reload
         itemDefinition.triggerListeners("reload", event.id, event.version);
+
+      // otherwise it was deleted
       } else if (event.type === "not_found") {
+
+        // we clean the value
         itemDefinition.cleanValueFor(event.id, event.version);
+
+        // and if we got a cache worker
         if (CacheWorkerInstance.isSupported) {
+          // we do the delete
           CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
             event.id,
             event.version,
@@ -575,13 +890,27 @@ export class RemoteListener {
             PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
           );
         }
+
+        // and trigger the change for it
         itemDefinition.triggerListeners("change", event.id, event.version);
       }
+
+    // otherwise if we don't have one an it's either the modified event
+    // for that the thing has been modified, it has been created, or last modified, basically
+    // anything but not found
     } else if (event.type === "modified" || event.type === "created" || event.type === "last_modified") {
+      // we ask fora reload for any possible stray item definition provider around
       itemDefinition.triggerListeners("reload", event.id, event.version);
+
+    // and now for not found
     } else if (event.type === "not_found") {
+      // we wnat to clean the value
       itemDefinition.cleanValueFor(event.id, event.version);
+
+      // and if we got a cache worker
       if (CacheWorkerInstance.isSupported) {
+        // we are going to do this to upate such it gets deleted
+        // if it exists there
         CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
           event.id,
           event.version,
@@ -591,36 +920,112 @@ export class RemoteListener {
           PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
         );
       }
+
+      // and now we trigger the change event, no need for reload, since it's null
+      // ths might mean something got deleted
       itemDefinition.triggerListeners("change", event.id, event.version);
     }
   }
-  private async consumeDelayedFeedbacks(anSpecificRequest?: IFeedbackRequest) {
-    // we wait if not ready
-    if (this.socket.connected) {
-      await this.onIdentificationDone();
-    }
 
-    // the reason we use delayed feedbacks is for efficiency, while we don't
-    // use this for owned searches, but sometimes a same feedback would be requested twice
-    this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
-      if (
-        !anSpecificRequest ||
-        (anSpecificRequest.id === df.id && anSpecificRequest.itemDefinition === df.itemDefinition)
-      ) {
-        // and yet we recheck, as we need to be connected even as we emit
-        if (this.socket.connected) {
-          this.socket.emit(
-            FEEDBACK_REQUEST,
-            df,
-          );
+  /**
+   * Triggers once the server indicates that values have been added to a search
+   * result that is cached by owner
+   * @param event the owned search event
+   */
+  private async onRecordsAddedToOwnedSearch(
+    event: IOwnedSearchRecordsAddedEvent,
+  ) {
+    // so first we want to get our owned listener for it
+    const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
+
+    // we still ensure that it exists, even when it should
+    if (ownedListener) {
+      // so we updated the lastKnownRecordDate
+      ownedListener.lastKnownRecordDate = event.newLastRecordDate;
+
+      // and if our cache worker is supported
+      if (CacheWorkerInstance.isSupported) {
+        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
+        let itemDefinition: ItemDefinition;
+        if (itemDefinitionOrModule instanceof ItemDefinition) {
+          itemDefinition = itemDefinitionOrModule;
+        } else {
+          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
         }
 
-        return false;
+        // we are going to request it to add the new records that our event
+        // comes loaded with the new records that were added to it
+        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          event.createdBy,
+          null,
+          null,
+          null,
+          event.newRecords,
+          event.newLastRecordDate,
+          "by-owner",
+        );
       }
 
-      return true;
-    });
+      // now we trigger the callbacks that should re-perform the cached
+      // search, and since all records should have been added, the new search
+      // should show the new results
+      ownedListener.callbacks.forEach((c) => c());
+    }
   }
+
+  /**
+   * Triggers once the server indicates that values have been added to a search
+   * result that is cached by parent
+   * @param event the parent search records added event
+   */
+  private async onRecordsAddedToParentedSearch(
+    event: IParentedSearchRecordsAddedEvent,
+  ) {
+    // build the listener id
+    const parentedListener = this.parentedSearchListeners[
+      event.qualifiedPathName + "." + event.parentType + "." +
+      event.parentId + "." + (event.parentVersion || "")
+    ];
+
+    // and we still check it if exists
+    if (parentedListener) {
+      // do the same as in the owned version
+      parentedListener.lastKnownRecordDate = event.newLastRecordDate;
+
+      // and equally we try to add these records
+      if (CacheWorkerInstance.isSupported) {
+        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
+        let itemDefinition: ItemDefinition;
+        if (itemDefinitionOrModule instanceof ItemDefinition) {
+          itemDefinition = itemDefinitionOrModule;
+        } else {
+          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
+        }
+        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          null,
+          event.parentType,
+          event.parentId,
+          event.parentVersion,
+          event.newRecords,
+          event.newLastRecordDate,
+          "by-parent",
+        );
+      }
+
+      // now we trigger the callbacks that should re-perform the cached
+      // search, and since all records should have been added, the new search
+      // should show the new results
+      parentedListener.callbacks.forEach((c) => c());
+    }
+  }
+
+  /**
+   * returns a promise (or immediately) for when the identification
+   * process to identify with the websocket is done
+   * @returns void or a void promise for when it's done
+   */
   private onIdentificationDone() {
     if (this.offline) {
       return;
@@ -638,6 +1043,10 @@ export class RemoteListener {
       this.socket.on(IDENTIFIED_EVENT, doneListener);
     });
   }
+
+  /**
+   * Triggers once the websocket connects
+   */
   private async onConnect() {
     this.offline = false;
 
@@ -675,6 +1084,10 @@ export class RemoteListener {
     this.isReady = true;
     this.connectionListeners.forEach((l) => l());
   }
+
+  /**
+   * Reattachs the detached requests
+   */
   private attachDetacchedRequests() {
     // so we get the current time and calculate the difference
     // from when this remote listener was initially setup
@@ -735,65 +1148,10 @@ export class RemoteListener {
       this.triggerCurrencyFactorsHandler();
     }
   }
-  private async onRecordsAddedToOwnedSearch(
-    event: IOwnedSearchRecordsAddedEvent,
-  ) {
-    const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
-    if (ownedListener) {
-      ownedListener.lastKnownRecordDate = event.newLastRecordDate;
-      if (CacheWorkerInstance.isSupported) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-          event.createdBy,
-          null,
-          null,
-          null,
-          event.newRecords,
-          event.newLastRecordDate,
-          "by-owner",
-        );
-      }
-      ownedListener.callbacks.forEach((c) => c());
-    }
-  }
-  private async onRecordsAddedToParentedSearch(
-    event: IParentedSearchRecordsAddedEvent,
-  ) {
-    const parentedListener = this.parentedSearchListeners[
-      event.qualifiedPathName + "." + event.parentType + "." +
-      event.parentId + "." + (event.parentVersion || "")
-    ];
-    if (parentedListener) {
-      parentedListener.lastKnownRecordDate = event.newLastRecordDate;
-      if (CacheWorkerInstance.isSupported) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-          null,
-          event.parentType,
-          event.parentId,
-          event.parentVersion,
-          event.newRecords,
-          event.newLastRecordDate,
-          "by-parent",
-        );
-      }
-      parentedListener.callbacks.forEach((c) => c());
-    }
-  }
+
+  /**
+   * Triggers when losing connection
+   */
   private onDisconnect() {
     this.offline = true;
     this.isReady = false;
