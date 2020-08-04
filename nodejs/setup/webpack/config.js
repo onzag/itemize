@@ -18,14 +18,23 @@ const mode = isDevelopment ? "development" : "production";
 const config = fs.readFileSync("./config/index.json", "utf-8");
 
 const plugins = [
+  // minifying CSS
   new MiniCssExtractPlugin({
     filename: "[name]." + mode + ".css",
     chunkFilename: "[name]." + mode + ".css"
   }),
+
+  // ignore locales and moment locales files in the build, they are imported
+  // dinamically and take too much space otherwise
   new webpack.IgnorePlugin(/^\\.\\/locale$/, /moment$/),
+
+  // define the variable config for injecting the configuration
   new webpack.DefinePlugin({
     CONFIG: JSON.stringify(config),
   }),
+
+  // worker generator plugin to share information between
+  // the worker and the standard build
   new WorkerInjectorGeneratorPlugin({
     name: "cache-worker.injector." + mode + ".js",
     importScripts: [
@@ -36,6 +45,7 @@ const plugins = [
   }),
 ]
 
+// bundle analyze if requested
 if (process.env.BUNDLE_ANALYZE) {
   plugins.push(new BundleAnalyzerPlugin());
 }
@@ -56,16 +66,24 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks(chunk) {
+        // service worker is self contained
+        // and should not depend on other chunks
         return chunk.name !== "service-worker";
       },
       cacheGroups: {
+        // node modules goes to the vendor chunk
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
           chunks(chunk) {
+            // except for cache-worker that should have all its node
+            // modules within itself because it only truly uses comlink
+            // and idb library, which are not used in the standard app
+            // so it doesn't need vendors
             return chunk.name !== "cache-worker" && chunk.name !== "service-worker";
           },
         },
+        // commons is for the itemize base
         commons: {
           name: 'commons',
           minChunks: 2,
@@ -75,6 +93,9 @@ module.exports = {
   },
   module: {
     rules: [
+      // do not load streams, because of polyfill functionality
+      // and since we use readable-stream on the server side
+      // the client tries to load these
       {
         test: /stream-browserify/,
         use: "null-loader"
@@ -83,30 +104,52 @@ module.exports = {
         test: /readable-stream/,
         use: "null-loader"
       },
+
+      // we do not need graphql in the client side either
       {
         test: /graphql/,
         use: "null-loader"
       },
+
+      // jsdom is unnecessary
       {
         test: /jsdom\\/lib\\/api\.js/,
         use: "null-loader"
       },
+
+      // knex is for database usage so it should not
+      // be bundled
       {
         test: /knex/,
         use: "null-loader"
       },
+
+      // node-fetch is fetch for node, it isn't
+      // even a polyfill, it's just that we use this library
+      // to run fetch requests standalone when creating custom
+      // clients
       {
         test: /node\\-fetch\\/lib\\/index\\.js/,
         use: "null-loader"
       },
+
+      // form data is a well for these custom clients and it's
+      // unnecessary in the browsers, it's used for creating
+      // custom form data for upstream
       {
         test: /form_data\\.js/,
         use: "null-loader"
       },
+
+      // bcrypt is used in the server side for hot validating passwords
+      // but it's unecessary in the client side, in fact
+      // it wouldn't even work
       {
         test: /bcrypt\\.js/,
         use: "null-loader"
       },
+
+      // SQL handling files are unecessary as well
       {
         test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\.ts/,
         use: "null-loader"
@@ -115,6 +158,8 @@ module.exports = {
         test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\/[a-zA-Z0-9_-]+\\.ts/,
         use: "null-loader"
       },
+
+      // and these are the classical loaders
       {
         test: /\\.tsx?$/,
         use: {

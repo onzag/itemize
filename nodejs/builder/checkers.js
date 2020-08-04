@@ -27,6 +27,7 @@ const ItemDefinition_1 = __importDefault(require("../base/Root/Module/ItemDefini
 const PropertyDefinition_1 = __importStar(require("../base/Root/Module/ItemDefinition/PropertyDefinition"));
 const search_interfaces_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces");
 const Module_1 = __importDefault(require("../base/Root/Module"));
+const schema_checks_1 = require("./schema-checks");
 /**
  * Checks a conditional rule set so that it is valid and contains valid
  * includes and rules
@@ -602,9 +603,13 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
             }
             else if (rawData.specialProperties &&
                 rawData.specialProperties[property.name] &&
-                property.type !== "any" &&
-                typeof rawData.specialProperties[property.name] !== property.type) {
-                throw new Error_1.default(`Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`, traceback.newTraceToBit("specialProperties").newTraceToBit(property.name));
+                property.type !== "any") {
+                if (property.type !== "property-set" && typeof rawData.specialProperties[property.name] !== property.type) {
+                    throw new Error_1.default(`Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`, traceback.newTraceToBit("specialProperties").newTraceToBit(property.name));
+                }
+                else if (property.type === "property-set") {
+                    schema_checks_1.ajvCheck(schema_checks_1.checkSpecialPropertyValueSetSchemaValidate, rawData.specialProperties[property.name], traceback.newTraceToBit("specialProperties").newTraceToBit(property.name));
+                }
             }
         });
     }

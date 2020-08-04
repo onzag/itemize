@@ -8,6 +8,7 @@ import fs from "fs";
 const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import config from "./config";
+import { confirm } from "../read";
 
 /**
  * Runs the webpack setup step that builds the webpack config
@@ -20,8 +21,9 @@ export default async function webpackSetup(arg: ISetupConfigType): Promise<ISetu
 
   // basically we just check for the file
   let exists = true;
+  let content: string = null;
   try {
-    await fsAsync.access("webpack.config.js", fs.constants.F_OK);
+    content = await fsAsync.readFile("webpack.config.js", "utf-8");
   } catch (e) {
     exists = false;
   }
@@ -30,6 +32,12 @@ export default async function webpackSetup(arg: ISetupConfigType): Promise<ISetu
   if (!exists) {
     console.log("emiting " + colors.green("webpack.config.js"));
     await fsAsync.writeFile("webpack.config.js", config);
+  } else if (content !== config)  {
+    if (await confirm("Webpack config is non-standard, would you like to emit the default?")) {
+      console.log("emiting " + colors.green("webpack.config.js"));
+      await fsAsync.writeFile("webpack.config.js", config);
+      await fsAsync.writeFile("webpack.config.old.js", content);
+    }
   }
 
   // return the same arg

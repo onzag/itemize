@@ -6,6 +6,37 @@
  */
 
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
+
+/**
+ * This represents the special property value
+ * for use with property set
+ */
+export const SpecialPropertyValueSetSchema = {
+  type: "object",
+  additionalProperties: {
+    type: "object",
+    oneOf: [
+      {
+        properties: {
+          property: {
+            type: "string",
+            pattern: "^[a-z_]+$",
+          },
+        },
+        required: ["property"],
+        additionalProperties: false,
+      },
+      {
+        properties: {
+          exactValue: {},
+        },
+        required: ["exactValue"],
+        additionalProperties: false,
+      },
+    ],
+  }
+}
+
 /**
  * The schema for the definition
  * ```

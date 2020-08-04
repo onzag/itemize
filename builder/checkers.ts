@@ -38,7 +38,7 @@ import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Incl
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import Module from "../base/Root/Module";
-import { raw } from "express";
+import { ajvCheck, checkSpecialPropertyValueSetSchemaValidate } from "./schema-checks";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -929,13 +929,20 @@ export function checkPropertyDefinition(
       } else if (
         rawData.specialProperties &&
         rawData.specialProperties[property.name] &&
-        property.type !== "any" &&
-        typeof rawData.specialProperties[property.name] !== property.type
+        property.type !== "any"
       ) {
-        throw new CheckUpError(
-          `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
-          traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
-        );
+        if (property.type !== "property-set" && typeof rawData.specialProperties[property.name] !== property.type) {
+          throw new CheckUpError(
+            `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
+            traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+          );
+        } else if (property.type === "property-set") {
+          ajvCheck(
+            checkSpecialPropertyValueSetSchemaValidate,
+            rawData.specialProperties[property.name],
+            traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+          );
+        }
       }
     });
   }

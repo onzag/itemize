@@ -8,6 +8,7 @@ import fs from "fs";
 const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import ignores from "./ignores";
+import { confirm } from "../read";
 
 /**
  * Will simply setup git
@@ -19,14 +20,21 @@ export default async function gitSetup(arg: ISetupConfigType): Promise<ISetupCon
 
   // we write both gitignore if it doesn't exist
   let exists = true;
+  let content: string = null;
   try {
-    await fsAsync.access(".gitignore", fs.constants.F_OK);
+    content = await fsAsync.readFile(".gitignore", "utf-8");
   } catch (e) {
     exists = false;
   }
   if (!exists) {
     console.log("emiting " + colors.green(".gitignore"));
     await fsAsync.writeFile(".gitignore", ignores.join("\n"));
+  } else if (content !== ignores.join("\n")) {
+    if (await confirm("gitignore file is non-standard, would you like to emit the default?")) {
+      console.log("emiting " + colors.green(".gitignore"));
+      await fsAsync.writeFile(".gitignore", ignores.join("\n"));
+      await fsAsync.writeFile(".gitignore.old", content);
+    }
   }
 
   // retun the same arg

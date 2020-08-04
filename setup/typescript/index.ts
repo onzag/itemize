@@ -9,6 +9,7 @@ const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import tsconfig from "./tsconfig";
 import tslint from "./tslint";
+import { confirm } from "../read";
 
 /**
  * runs the typescript setup part
@@ -20,15 +21,23 @@ export default async function typescriptSetup(arg: ISetupConfigType): Promise<IS
 
   // first we need to ensure our tsconfig.json file
   let tsconfigExists = true;
+  let tsconfigContent: string = null;
   try {
-    await fsAsync.access("tsconfig.json", fs.constants.F_OK);
+    tsconfigContent = await fsAsync.readFile("tsconfig.json", "utf-8");
   } catch (e) {
     tsconfigExists = false;
   }
   // if it doesn't exist we use the value from our tsconfig.ts source
+  const newContent = JSON.stringify(tsconfig, null, 2);
   if (!tsconfigExists) {
     console.log("emiting " + colors.green("tsconfig.json"));
-    await fsAsync.writeFile("tsconfig.json", JSON.stringify(tsconfig, null, 2));
+    await fsAsync.writeFile("tsconfig.json", newContent);
+  } else if (tsconfigContent !== newContent) {
+    if (await confirm("tsconfig is non-standard, would you like to emit the default?")) {
+      console.log("emiting " + colors.green("tsconfig.json"));
+      await fsAsync.writeFile("tsconfig.json", newContent);
+      await fsAsync.writeFile("tsconfig.old.json", tsconfigContent);
+    }
   }
 
   // same for tslint

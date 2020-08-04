@@ -9,6 +9,7 @@ import fs from "fs";
 const fsAsync = fs.promises;
 import { ISetupConfigType } from "..";
 import rc from "./rc";
+import { confirm } from "../read";
 
 /**
  * Runs the babel setup step
@@ -18,16 +19,25 @@ export default async function babelSetup(arg: ISetupConfigType): Promise<ISetupC
   console.log(colors.bgGreen("BABEL SETUP"));
 
   let exists = true;
+  let content: string = null;
   try {
-    await fsAsync.access("babel.config.json", fs.constants.F_OK);
+    content = await fsAsync.readFile("babel.config.json", "utf-8");
   } catch (e) {
     exists = false;
   }
 
+  const newContent = JSON.stringify(rc, null, 2);
+
   // we basically add babel.config.json if it doesn't exist
   if (!exists) {
     console.log("emiting " + colors.green("babel.config.json"));
-    await fsAsync.writeFile("babel.config.json", JSON.stringify(rc, null, 2));
+    await fsAsync.writeFile("babel.config.json", newContent);
+  } else if (content !== newContent) {
+    if (await confirm("babel config file is non-standard, would you like to emit the default?")) {
+      console.log("emiting " + colors.green("babel.config.json"));
+      await fsAsync.writeFile("babel.config.json", newContent);
+      await fsAsync.writeFile("babel.config.old.json", content);
+    }
   }
 
   // return what we did to the config, nothing

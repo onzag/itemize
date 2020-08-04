@@ -14,6 +14,7 @@ const schema_1 = __importDefault(require("../base/Root/schema"));
 const schema_2 = __importDefault(require("../base/Root/Module/ItemDefinition/schema"));
 const schema_3 = __importDefault(require("../base/Root/Module/schema"));
 const Error_1 = __importDefault(require("./Error"));
+const schema_4 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/schema");
 require("source-map-support/register");
 const config_1 = require("../config");
 const ajv = new ajv_1.default();
@@ -34,6 +35,7 @@ exports.checkPropertyDefinitionArraySchemaValidate = ajv.compile({
         $ref: "ItemDefinition#/definitions/PropertyDefinition",
     },
 });
+exports.checkSpecialPropertyValueSetSchemaValidate = ajv.compile(schema_4.SpecialPropertyValueSetSchema);
 /**
  * Checks a module
  */

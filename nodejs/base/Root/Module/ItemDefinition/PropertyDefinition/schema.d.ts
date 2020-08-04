@@ -4,6 +4,34 @@
  *
  * @packageDocumentation
  */
+/**
+ * This represents the special property value
+ * for use with property set
+ */
+export declare const SpecialPropertyValueSetSchema: {
+    type: string;
+    additionalProperties: {
+        type: string;
+        oneOf: ({
+            properties: {
+                property: {
+                    type: string;
+                    pattern: string;
+                };
+                exactValue?: undefined;
+            };
+            required: string[];
+            additionalProperties: boolean;
+        } | {
+            properties: {
+                exactValue: {};
+                property?: undefined;
+            };
+            required: string[];
+            additionalProperties: boolean;
+        })[];
+    };
+};
 declare const _default: {
     $id: string;
     type: string;

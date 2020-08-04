@@ -128,7 +128,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     },
     {
       name: "referencedFilteringPropertySet",
-      type: "any",
+      type: "property-set",
     },
     {
       name: "referencedFilterByLanguage",

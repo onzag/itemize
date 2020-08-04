@@ -19,6 +19,7 @@ export declare const checkItemDefinitionSchemaValidate: Ajv.ValidateFunction;
  * Checks a property definition array schema
  */
 export declare const checkPropertyDefinitionArraySchemaValidate: Ajv.ValidateFunction;
+export declare const checkSpecialPropertyValueSetSchemaValidate: Ajv.ValidateFunction;
 /**
  * Checks a module
  */

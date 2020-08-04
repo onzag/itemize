@@ -11,6 +11,7 @@ import ItemDefinitionSchema from "../base/Root/Module/ItemDefinition/schema";
 import ModuleSchema from "../base/Root/Module/schema";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
+import { SpecialPropertyValueSetSchema } from "../base/Root/Module/ItemDefinition/PropertyDefinition/schema";
 import "source-map-support/register";
 import { rawSensitiveConfigSchema, rawConfigSchema,
   rawDBConfigSchema, rawRedisConfigSchema } from "../config";
@@ -39,6 +40,9 @@ export const checkPropertyDefinitionArraySchemaValidate =
       $ref: "ItemDefinition#/definitions/PropertyDefinition",
     },
   });
+
+export const checkSpecialPropertyValueSetSchemaValidate =
+  ajv.compile(SpecialPropertyValueSetSchema);
 
 /**
  * Checks a module
