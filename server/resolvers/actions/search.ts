@@ -13,6 +13,7 @@ import {
   retrieveSince,
   checkLimit,
   checkLimiters,
+  defaultTriggerForbiddenFunction,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -163,6 +164,24 @@ export async function searchModule(
       requestedFieldsInMod,
       true,
     );
+  }
+
+  const pathOfThisModule = mod.getPath().join("/");
+  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+
+  if (moduleTrigger) {
+    await moduleTrigger({
+      appData,
+      module: mod,
+      itemDefinition: null,
+      args: resolverArgs.args,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      forbid: defaultTriggerForbiddenFunction,
+    });
   }
 
   // now we build the search query, the search query only matches an id
@@ -406,6 +425,32 @@ export async function searchItemDefinition(
       requestedFieldsInIdef,
       true,
     );
+  }
+
+  const pathOfThisModule = mod.getPath().join("/");
+  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+  const idefTrigger = appData.triggers.itemDefinition.search[pathOfThisIdef];
+
+  if (moduleTrigger || idefTrigger) {
+    const args = {
+      appData,
+      module: mod,
+      itemDefinition,
+      args: resolverArgs.args,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      forbid: defaultTriggerForbiddenFunction,
+    };
+    if (moduleTrigger) {
+      await moduleTrigger(args);
+    }
+    if (idefTrigger) {
+      await idefTrigger(args);
+    }
   }
 
   // now we build the search query

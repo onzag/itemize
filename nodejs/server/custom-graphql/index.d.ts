@@ -4,6 +4,8 @@ export interface IReferredTokenStructure {
     onBehalfOf?: number;
     withRole: string;
     expiresIn?: string;
+    customData?: any;
+    isRealUser?: boolean;
     error?: string;
 }
 export interface ICustomTokenGQLQueryDefinition {

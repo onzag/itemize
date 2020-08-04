@@ -26,7 +26,8 @@ const cache_1 = require("./cache");
 const graphql_upload_1 = require("graphql-upload");
 const custom_graphql_1 = require("./custom-graphql");
 const mode_1 = require("./mode");
-const triggers_1 = require("./user/triggers");
+const triggers_1 = require("./resolvers/triggers");
+const triggers_2 = require("./user/triggers");
 const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
 const rest_2 = require("./user/rest");
@@ -563,12 +564,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             redisLocalSub,
             cache,
             buildnumber,
-            triggers: {
-                module: {},
-                itemDefinition: {},
-                ...triggers_1.customUserTriggers,
-                ...custom.customTriggers,
-            },
+            triggers: triggers_1.mergeTriggerRegistries(triggers_2.customUserTriggers, custom.customTriggers),
             ipStack,
             here,
             mailgun,

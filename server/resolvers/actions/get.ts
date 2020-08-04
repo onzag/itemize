@@ -24,7 +24,7 @@ import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
 import { IGQLSearchRecord } from "../../../gql-querier";
-import { TriggerActions } from "../triggers";
+import { IOTriggerActions } from "../triggers";
 
 export async function getItemDefinition(
   appData: IAppDataType,
@@ -149,8 +149,8 @@ export async function getItemDefinition(
   const mod = itemDefinition.getParentModule();
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
-  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let toReturnToUser: any = valueToProvide.toReturnToUser;
 
@@ -162,12 +162,13 @@ export async function getItemDefinition(
       value: valueToProvide.convertedValue,
       update: null,
       extraArgs: resolverArgs.args,
-      action: TriggerActions.GET,
+      action: IOTriggerActions.GET,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerForbiddenFunction,
     });
@@ -181,12 +182,13 @@ export async function getItemDefinition(
       value: valueToProvide.convertedValue,
       update: null,
       extraArgs: resolverArgs.args,
-      action: TriggerActions.GET,
+      action: IOTriggerActions.GET,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerForbiddenFunction,
     });

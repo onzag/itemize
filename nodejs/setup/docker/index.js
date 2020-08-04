@@ -81,7 +81,7 @@ async function dockerSetup(arg) {
             await fsAsync.writeFile(fileToConfim, newContent);
         }
         else if (suchContent !== newContent) {
-            if (await read_1.confirm(filesToConfirm + " is non-standard, would you like to emit the default?")) {
+            if (await read_1.confirm(fileToConfim + " is non-standard, would you like to emit the default?")) {
                 console.log("emiting " + colors_1.default.green(fileToConfim));
                 await fsAsync.writeFile(fileToConfim, newContent);
                 const parsed = path_1.default.parse(fileToConfim);

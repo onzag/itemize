@@ -17,7 +17,7 @@ import { ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-import { TriggerActions } from "../triggers";
+import { IOTriggerActions } from "../triggers";
 import { IGQLValue } from "../../../gql-querier";
 
 export async function deleteItemDefinition(
@@ -137,8 +137,8 @@ export async function deleteItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
-  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let currentWholeValueAsGQL: IGQLValue;
 
@@ -163,12 +163,13 @@ export async function deleteItemDefinition(
         value: currentWholeValueAsGQL,
         update: null,
         extraArgs: resolverArgs.args,
-        action: TriggerActions.DELETE,
+        action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -183,12 +184,13 @@ export async function deleteItemDefinition(
         value: currentWholeValueAsGQL,
         update: null,
         extraArgs: resolverArgs.args,
-        action: TriggerActions.DELETE,
+        action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -213,12 +215,13 @@ export async function deleteItemDefinition(
       value: currentWholeValueAsGQL,
       update: null,
       extraArgs: resolverArgs.args,
-      action: TriggerActions.DELETED,
+      action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });
@@ -234,12 +237,13 @@ export async function deleteItemDefinition(
       value: currentWholeValueAsGQL,
       update: null,
       extraArgs: resolverArgs.args,
-      action: TriggerActions.DELETED,
+      action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });

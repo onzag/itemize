@@ -26,7 +26,7 @@ import { EndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IGQLArgs } from "../../../gql-querier";
-import { TriggerActions } from "../triggers";
+import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 
 export async function editItemDefinition(
@@ -234,8 +234,8 @@ export async function editItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
-  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let extraArgs: IGQLArgs;
 
@@ -264,12 +264,13 @@ export async function editItemDefinition(
         value: currentWholeValueAsGQL,
         update: gqlValueToConvert,
         extraArgs,
-        action: TriggerActions.EDIT,
+        action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -289,12 +290,13 @@ export async function editItemDefinition(
         value: currentWholeValueAsGQL,
         update: gqlValueToConvert,
         extraArgs,
-        action: TriggerActions.EDIT,
+        action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as number,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -327,12 +329,13 @@ export async function editItemDefinition(
       value: currentWholeValueAsGQL,
       update: gqlValueToConvert,
       extraArgs,
-      action: TriggerActions.EDITED,
+      action: IOTriggerActions.EDITED,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });
@@ -347,12 +350,13 @@ export async function editItemDefinition(
       value: currentWholeValueAsGQL,
       update: gqlValueToConvert,
       extraArgs,
-      action: TriggerActions.EDITED,
+      action: IOTriggerActions.EDITED,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });

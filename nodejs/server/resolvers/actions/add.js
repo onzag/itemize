@@ -183,8 +183,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
     const pathOfThisModule = mod.getPath().join("/");
     // and extract the triggers from the registry
-    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
-    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
     let itemDefinitionSpecificArgs = null;
     let extraArgs = null;
     // if we got any of them convert
@@ -205,12 +205,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 value: null,
                 update: gqlValueToConvert,
                 extraArgs,
-                action: triggers_1.TriggerActions.CREATE,
+                action: triggers_1.IOTriggerActions.CREATE,
                 id: null,
                 version: null,
                 user: {
                     role: tokenData.role,
                     id: tokenData.id,
+                    customData: tokenData.customData,
                 },
                 forbid: basic_1.defaultTriggerForbiddenFunction,
             });
@@ -230,12 +231,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 value: null,
                 update: gqlValueToConvert,
                 extraArgs,
-                action: triggers_1.TriggerActions.CREATE,
+                action: triggers_1.IOTriggerActions.CREATE,
                 id: null,
                 version: null,
                 user: {
                     role: tokenData.role,
                     id: tokenData.id,
+                    customData: tokenData.customData,
                 },
                 forbid: basic_1.defaultTriggerForbiddenFunction,
             });
@@ -272,12 +274,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             value: null,
             update: gqlValueToConvert,
             extraArgs,
-            action: triggers_1.TriggerActions.CREATED,
+            action: triggers_1.IOTriggerActions.CREATED,
             id: value.id,
             version: value.version,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
@@ -290,12 +293,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             value: null,
             update: gqlValueToConvert,
             extraArgs,
-            action: triggers_1.TriggerActions.CREATED,
+            action: triggers_1.IOTriggerActions.CREATED,
             id: value.id,
             version: value.version,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });

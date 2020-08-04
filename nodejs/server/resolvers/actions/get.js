@@ -84,8 +84,8 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     const mod = itemDefinition.getParentModule();
     const pathOfThisModule = mod.getPath().join("/");
     // and extract the triggers from the registry
-    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
-    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
     let toReturnToUser = valueToProvide.toReturnToUser;
     if (moduleTrigger) {
         await moduleTrigger({
@@ -95,12 +95,13 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
             value: valueToProvide.convertedValue,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.TriggerActions.GET,
+            action: triggers_1.IOTriggerActions.GET,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerForbiddenFunction,
         });
@@ -113,12 +114,13 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
             value: valueToProvide.convertedValue,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.TriggerActions.GET,
+            action: triggers_1.IOTriggerActions.GET,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerForbiddenFunction,
         });

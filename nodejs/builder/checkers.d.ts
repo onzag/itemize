@@ -82,6 +82,20 @@ export declare function checkI18nCustomConsistency(rawData: IRawJSONI18NDataType
  */
 export declare function checkModule(rawRootData: IRootRawJSONDataType, rawData: IModuleRawJSONDataType, traceback: Traceback): void;
 /**
+ * Check the item definition for the user type to what
+ * itemize expects and needs from it
+ * @param rawData the raw user item definition
+ * @param traceback the traceback for it
+ */
+export declare function checkUserItem(rawData: IItemDefinitionRawJSONDataType, traceback: Traceback): void;
+/**
+ * Checks the user module for consistance to what the itemize
+ * app expects from it
+ * @param rawData the raw user module
+ * @param traceback traceback for it
+ */
+export declare function checkUsersModule(rawData: IModuleRawJSONDataType, traceback: Traceback): void;
+/**
  * Checks the entire root of the itemize schema
  * @param rawData the root
  */

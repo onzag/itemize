@@ -94,8 +94,8 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
     const pathOfThisModule = mod.getPath().join("/");
     // and extract the triggers from the registry
-    const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef];
-    const moduleTrigger = appData.triggers.module[pathOfThisModule];
+    const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+    const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
     let currentWholeValueAsGQL;
     // if we got any of them
     if (itemDefinitionTrigger || moduleTrigger) {
@@ -110,12 +110,13 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                 value: currentWholeValueAsGQL,
                 update: null,
                 extraArgs: resolverArgs.args,
-                action: triggers_1.TriggerActions.DELETE,
+                action: triggers_1.IOTriggerActions.DELETE,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
                 user: {
                     role: tokenData.role,
                     id: tokenData.id,
+                    customData: tokenData.customData,
                 },
                 forbid: basic_1.defaultTriggerForbiddenFunction,
             });
@@ -130,12 +131,13 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
                 value: currentWholeValueAsGQL,
                 update: null,
                 extraArgs: resolverArgs.args,
-                action: triggers_1.TriggerActions.DELETE,
+                action: triggers_1.IOTriggerActions.DELETE,
                 id: resolverArgs.args.id,
                 version: resolverArgs.args.version || null,
                 user: {
                     role: tokenData.role,
                     id: tokenData.id,
+                    customData: tokenData.customData,
                 },
                 forbid: basic_1.defaultTriggerForbiddenFunction,
             });
@@ -151,12 +153,13 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             value: currentWholeValueAsGQL,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.TriggerActions.DELETED,
+            action: triggers_1.IOTriggerActions.DELETED,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
@@ -171,12 +174,13 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             value: currentWholeValueAsGQL,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.TriggerActions.DELETED,
+            action: triggers_1.IOTriggerActions.DELETED,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
                 role: tokenData.role,
                 id: tokenData.id,
+                customData: tokenData.customData,
             },
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });

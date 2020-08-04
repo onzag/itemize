@@ -799,6 +799,139 @@ function checkModule(rawRootData, rawData, traceback) {
 }
 exports.checkModule = checkModule;
 /**
+ * Minimal properties that are required
+ * for an itemize app to function for the user type
+ */
+const minUserNecessaryProperties = [
+    {
+        id: "username",
+        type: "string",
+        subtype: "identifier",
+        unique: true,
+        nonCaseSensitiveUnique: true,
+    },
+    {
+        id: "app_language",
+        type: "string",
+        subtype: "language",
+    },
+    {
+        id: "app_country",
+        type: "string",
+        subtype: "country",
+    },
+    {
+        id: "app_currency",
+        type: "string",
+        subtype: "currency",
+    },
+    {
+        id: "password",
+        type: "password",
+        disableRetrieval: true,
+        readRoleAccess: (v) => {
+            if (Array.isArray(v) && v.length === 0) {
+                return null;
+            }
+            return "Empty Array";
+        },
+    },
+    {
+        id: "role",
+        type: "string",
+        nullable: true,
+        default: (v) => {
+            if (typeof v === "string") {
+                return null;
+            }
+            return "Some string value";
+        },
+        coerceNullsIntoDefault: true
+    },
+    {
+        id: "session_id",
+        type: "integer",
+        disableRetrieval: true,
+        searchable: false,
+        default: 0,
+        nullable: true,
+        hidden: true,
+        coerceNullsIntoDefault: true
+    },
+];
+/**
+ * Check the item definition for the user type to what
+ * itemize expects and needs from it
+ * @param rawData the raw user item definition
+ * @param traceback the traceback for it
+ */
+function checkUserItem(rawData, traceback) {
+    // so first we make it point to our own file where this module
+    // is located
+    const actualTraceback = traceback.newTraceToLocation(rawData.location);
+    // setup the pointers
+    actualTraceback.setupPointers(rawData.pointers, rawData.raw);
+    // we need properties
+    if (!rawData.properties || !rawData.properties.length) {
+        throw new Error_1.default("User item definition must include properties", actualTraceback);
+    }
+    // now we enter a loop in our necessary minimal properties
+    minUserNecessaryProperties.forEach((minP) => {
+        // and we need to get the index in the schema itself
+        const actualPVIndex = rawData.properties.findIndex((p) => p.id === minP.id);
+        // if we didn't find such necessary property
+        if (actualPVIndex === -1) {
+            throw new Error_1.default("User item definition must include property for " + minP.id, actualTraceback.newTraceToBit("properties"));
+        }
+        // now we get the value
+        const actualPV = rawData.properties[actualPVIndex];
+        // and we loop into the attributes of the property
+        Object.keys(minP).forEach((attr) => {
+            // and this is the actual value in the schema
+            const actualPVAttrValue = actualPV[attr];
+            // and the comparator, which can be either a value or a function
+            const comparator = minP[attr];
+            // now if the actual value is undefined
+            if (typeof actualPVAttrValue === "undefined") {
+                // we complain about that
+                throw new Error_1.default("Property attribute for " + attr + " is missing", actualTraceback.newTraceToBit("properties").newTraceToBit(actualPVIndex));
+            }
+            // now we need to get what is the expected value we are supposed to
+            // get if this doesn't match, so we check, for functions
+            // that is the return value, it means it's invalid
+            // otherwise just the same value of the comparator as an exact value
+            // if it doesn't match
+            const expectedValueFromComparator = typeof comparator === "function" ?
+                comparator(actualPVAttrValue) :
+                (actualPVAttrValue !== comparator ? comparator : null);
+            // so if we get an expected value, we complain
+            if (expectedValueFromComparator) {
+                throw new Error_1.default("Property attribute for " + attr + " is invalid expected: " + JSON.stringify(expectedValueFromComparator), actualTraceback.newTraceToBit("properties").newTraceToBit(actualPVIndex).newTraceToBit(attr));
+            }
+        });
+    });
+}
+exports.checkUserItem = checkUserItem;
+/**
+ * Checks the user module for consistance to what the itemize
+ * app expects from it
+ * @param rawData the raw user module
+ * @param traceback traceback for it
+ */
+function checkUsersModule(rawData, traceback) {
+    // so first we make it point to our own file where this module
+    // is located
+    const actualTraceback = traceback.newTraceToLocation(rawData.location);
+    // setup the pointers
+    actualTraceback.setupPointers(rawData.pointers, rawData.raw);
+    const userIdefIndex = rawData.children.findIndex((idef) => idef.name === "user" && idef.type === "item");
+    if (userIdefIndex === -1) {
+        throw new Error_1.default("User module must include the user item definition", actualTraceback.newTraceToBit("children"));
+    }
+    checkUserItem(rawData.children[userIdefIndex], actualTraceback.newTraceToBit("children").newTraceToBit(userIdefIndex));
+}
+exports.checkUsersModule = checkUsersModule;
+/**
  * Checks the entire root of the itemize schema
  * @param rawData the root
  */
@@ -812,6 +945,11 @@ function checkRoot(rawData) {
             // all children in the root are modules
             checkModule(rawData, mod, traceback.newTraceToBit("children").newTraceToBit(index));
         });
+        const usersModuleIndex = rawData.children.findIndex((mod) => mod.name === "users");
+        if (usersModuleIndex === -1) {
+            throw new Error_1.default("Root must include the users module", traceback.newTraceToBit("children"));
+        }
+        checkUsersModule(rawData.children[usersModuleIndex], traceback.newTraceToBit("children").newTraceToBit(usersModuleIndex));
     }
 }
 exports.checkRoot = checkRoot;

@@ -23,7 +23,7 @@ import { graphqlUploadExpress } from "graphql-upload";
 import { buildCustomTokenQueries, ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { getMode } from "./mode";
-import { ITriggerRegistry } from "./resolvers/triggers";
+import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
 import { setupIPStack, IPStack } from "./services/ipstack";
 import { setupMailgun } from "./services/mailgun";
@@ -793,6 +793,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: configuring app data build",
     );
+
     const appData: IAppDataType = {
       root,
       rootPool: retrieveRootPool(root.rawData),
@@ -813,13 +814,10 @@ export async function initializeServer(
       redisLocalSub,
       cache,
       buildnumber,
-      triggers: {
-        module: {},
-        itemDefinition: {},
-
-        ...customUserTriggers,
-        ...custom.customTriggers,
-      },
+      triggers: mergeTriggerRegistries(
+        customUserTriggers,
+        custom.customTriggers,
+      ),
       ipStack,
       here,
       mailgun,

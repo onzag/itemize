@@ -9,6 +9,8 @@ export interface IReferredTokenStructure {
   onBehalfOf?: number;
   withRole: string;
   expiresIn?: string;
+  customData?: any;
+  isRealUser?: boolean;
   error?: string;
 }
 
@@ -55,10 +57,27 @@ export function buildCustomTokenQueries(
           options.expiresIn = value.expiresIn;
         }
 
-        const token = await jwtSign({
+        const dataToSign: any = {
           role: value.withRole,
           id: value.onBehalfOf || null,
-        }, appData.sensitiveConfig.jwtKey, options);
+          custom: true,
+        };
+
+        if (value.customData) {
+          dataToSign.customData = value.customData;
+        }
+
+        if (value.isRealUser) {
+          dataToSign.isRealUser = true;
+
+          const sqlResult = await appData.cache.requestValue(
+            ["MOD_users__IDEF_user", "MOD_users"], value.onBehalfOf, null,
+          );
+
+          dataToSign.sessionId = sqlResult.sessionId;
+        }
+
+        const token = await jwtSign(dataToSign, appData.sensitiveConfig.jwtKey, options);
 
         return {
           token,

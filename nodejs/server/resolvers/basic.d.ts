@@ -8,9 +8,12 @@ import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import Knex from "knex";
 export interface IServerSideTokenDataType {
-    id: number;
     role: string;
-    sessionId: number;
+    id: number;
+    sessionId?: number;
+    custom?: boolean;
+    isRealUser?: boolean;
+    customData?: any;
 }
 export declare function defaultTriggerForbiddenFunction(message: string): void;
 export declare function defaultTriggerInvalidForbiddenFunction(message: string): void;

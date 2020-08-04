@@ -46,9 +46,14 @@ async function validateTokenAndGetData(appData, token) {
         let throwErr = false;
         try {
             result = await token_1.jwtVerify(token, appData.sensitiveConfig.jwtKey);
-            throwErr = (typeof result.id !== "number" ||
-                typeof result.role !== "string" ||
-                typeof result.sessionId !== "number");
+            if (!result.custom || result.isRealUser) {
+                throwErr = (typeof result.id !== "number" ||
+                    typeof result.role !== "string" ||
+                    typeof result.sessionId !== "number");
+            }
+            else {
+                throwErr = typeof result.role !== "string";
+            }
         }
         catch (err) {
             throwErr = true;
@@ -428,7 +433,7 @@ exports.validateContainerIdIsReal = validateContainerIdIsReal;
  * @param tokenData the token data obtained and parsed
  */
 async function validateTokenIsntBlocked(cache, tokenData) {
-    if (tokenData.id) {
+    if (tokenData.id && (!tokenData.custom || tokenData.isRealUser)) {
         let sqlResult;
         try {
             sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null);

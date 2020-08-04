@@ -32,14 +32,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const moduleTable = userModule.getQualifiedPathName();
 
   const usernameProperty = userIdef.getPropertyDefinitionFor("username", false);
-  const emailProperty = userIdef.getPropertyDefinitionFor("email", false);
-  const eValidatedProperty = userIdef.getPropertyDefinitionFor("e_validated", false);
+  const emailProperty = userIdef.hasPropertyDefinitionFor("email", false) &&
+    userIdef.getPropertyDefinitionFor("email", false);
+  const eValidatedProperty = userIdef.hasPropertyDefinitionFor("e_validated", false) &&
+    userIdef.getPropertyDefinitionFor("e_validated", false);
   const passwordProperty = userIdef.getPropertyDefinitionFor("password", false);
 
   const userNamePropertyDescription = usernameProperty.getPropertyDefinitionDescription();
   const passwordPropertyDescription = passwordProperty.getPropertyDefinitionDescription();
-  const emailPropertyDescription = emailProperty.getPropertyDefinitionDescription();
-  const eValidatedPropertyDescription = eValidatedProperty.getPropertyDefinitionDescription();
+  const emailPropertyDescription = emailProperty && emailProperty.getPropertyDefinitionDescription();
+  const eValidatedPropertyDescription = eValidatedProperty && eValidatedProperty.getPropertyDefinitionDescription();
 
   const setPromisified = promisify(appData.redisGlobal.set).bind(appData.redisGlobal);
   const expirePromisified = promisify(appData.redisGlobal.expire).bind(appData.redisGlobal);
@@ -159,6 +161,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                   property: usernameProperty,
                 }))
                 .orWhere((innerSuqueryBuilder) => {
+                  // cannot search by email if these properties are missing
+                  if (!emailProperty || !eValidatedProperty) {
+                    return null;
+                  }
                   // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
                   // another invalidated email that other user has and has a chance to login as them
                   // you might wonder why not avoid them to set the
@@ -284,6 +290,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         if (!appData.mailgun) {
           throw new EndpointError({
             message: "Mailgun is not available",
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+          });
+        } else if (!emailProperty || !eValidatedProperty) {
+          throw new EndpointError({
+            message: "email and e_validated are not available, as such sending validation emails is not available",
             code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         }
@@ -504,6 +515,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         if (!appData.mailgun) {
           throw new EndpointError({
             message: "Mailgun is not available",
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+          });
+        } else if (!emailProperty || !eValidatedProperty) {
+          throw new EndpointError({
+            message: "email and e_validated are not available, as such password recovery is not available",
             code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         }

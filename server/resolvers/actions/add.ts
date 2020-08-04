@@ -29,7 +29,7 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
 import { IGQLArgs } from "../../../gql-querier";
-import { TriggerActions } from "../triggers";
+import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 
 export async function addItemDefinition(
@@ -284,8 +284,8 @@ export async function addItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition[pathOfThisIdef]
-  const moduleTrigger = appData.triggers.module[pathOfThisModule];
+  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let itemDefinitionSpecificArgs: IGQLArgs = null;
   let extraArgs: IGQLArgs = null;
@@ -312,12 +312,13 @@ export async function addItemDefinition(
         value: null,
         update: gqlValueToConvert,
         extraArgs,
-        action: TriggerActions.CREATE,
+        action: IOTriggerActions.CREATE,
         id: null,
         version: null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -337,12 +338,13 @@ export async function addItemDefinition(
         value: null,
         update: gqlValueToConvert,
         extraArgs,
-        action: TriggerActions.CREATE,
+        action: IOTriggerActions.CREATE,
         id: null,
         version: null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
+          customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
       });
@@ -406,12 +408,13 @@ export async function addItemDefinition(
       value: null,
       update: gqlValueToConvert,
       extraArgs,
-      action: TriggerActions.CREATED,
+      action: IOTriggerActions.CREATED,
       id: value.id,
       version: value.version,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });
@@ -424,12 +427,13 @@ export async function addItemDefinition(
       value: null,
       update: gqlValueToConvert,
       extraArgs,
-      action: TriggerActions.CREATED,
+      action: IOTriggerActions.CREATED,
       id: value.id,
       version: value.version,
       user: {
         role: tokenData.role,
         id: tokenData.id,
+        customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
     });

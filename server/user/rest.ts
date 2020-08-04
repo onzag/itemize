@@ -8,11 +8,16 @@ export function userRestServices(appData: IAppDataType) {
   const userModule = appData.root.getModuleFor(["users"]);
   const userIdef = userModule.getItemDefinitionFor(["user"]);
 
+  const hasEmailProperty = userIdef.hasPropertyDefinitionFor("email", false);
+  const hasEvalidatedProperty = userIdef.hasPropertyDefinitionFor("e_validated", false);
+
   const userTable = userIdef.getQualifiedPathName();
 
   const router = Router();
   router.get("/validate-email", async (req, res) => {
-    if (!req.query.token) {
+    if (!hasEmailProperty || !hasEvalidatedProperty) {
+      res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
+    } else if (!req.query.token) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
     }
 

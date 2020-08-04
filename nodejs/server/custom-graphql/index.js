@@ -30,10 +30,20 @@ function buildCustomTokenQueries(appData, customTokens) {
                 if (value.expiresIn) {
                     options.expiresIn = value.expiresIn;
                 }
-                const token = await token_1.jwtSign({
+                const dataToSign = {
                     role: value.withRole,
                     id: value.onBehalfOf || null,
-                }, appData.sensitiveConfig.jwtKey, options);
+                    custom: true,
+                };
+                if (value.customData) {
+                    dataToSign.customData = value.customData;
+                }
+                if (value.isRealUser) {
+                    dataToSign.isRealUser = true;
+                    const sqlResult = await appData.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], value.onBehalfOf, null);
+                    dataToSign.sessionId = sqlResult.sessionId;
+                }
+                const token = await token_1.jwtSign(dataToSign, appData.sensitiveConfig.jwtKey, options);
                 return {
                     token,
                     id: value.onBehalfOf || null,

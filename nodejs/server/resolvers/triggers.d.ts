@@ -2,7 +2,7 @@ import { IGQLValue, IGQLArgs } from "../../gql-querier";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
-export declare enum TriggerActions {
+export declare enum IOTriggerActions {
     CREATE = 0,
     CREATED = 1,
     EDIT = 2,
@@ -11,27 +11,48 @@ export declare enum TriggerActions {
     DELETED = 5,
     GET = 6
 }
-export interface TriggerArgType {
+export interface IOTriggerArgType {
     appData: IAppDataType;
     value: IGQLValue;
     update: IGQLArgs;
     extraArgs: IGQLArgs;
     itemDefinition: ItemDefinition;
     module: Module;
-    action: TriggerActions;
+    action: IOTriggerActions;
     id: number;
     version: string;
     user: {
         role: string;
         id: number;
+        customData: any;
     };
     forbid: (message: string) => void;
 }
-export declare type TriggerType = (arg: TriggerArgType) => IGQLValue | Promise<IGQLValue>;
+export interface ISearchTriggerArgType {
+    appData: IAppDataType;
+    itemDefinition: ItemDefinition;
+    module: Module;
+    args: IGQLArgs;
+    user: {
+        role: string;
+        id: number;
+        customData: any;
+    };
+    forbid: (message: string) => void;
+}
+export declare type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue>;
+export declare type SearchTriggerType = (arg: ISearchTriggerArgType) => void | Promise<void>;
 export interface IBaseTriggerRegistry {
-    [path: string]: TriggerType;
+    io?: {
+        [path: string]: IOTriggerType;
+    };
+    search?: {
+        [path: string]: SearchTriggerType;
+    };
 }
 export interface ITriggerRegistry {
     module?: IBaseTriggerRegistry;
     itemDefinition?: IBaseTriggerRegistry;
 }
+export declare function fixPaths<T>(src: T): T;
+export declare function mergeTriggerRegistries(...triggers: ITriggerRegistry[]): ITriggerRegistry;

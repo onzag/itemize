@@ -100,6 +100,22 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
         }
         mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
     }
+    const pathOfThisModule = mod.getPath().join("/");
+    const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+    if (moduleTrigger) {
+        await moduleTrigger({
+            appData,
+            module: mod,
+            itemDefinition: null,
+            args: resolverArgs.args,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+            },
+            forbid: basic_1.defaultTriggerForbiddenFunction,
+        });
+    }
     // now we build the search query, the search query only matches an id
     // note how we remove blocked_at
     const queryModel = appData.knex.table(mod.getQualifiedPathName())
@@ -250,6 +266,30 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             fieldsToRequest.push("blocked_at");
         }
         itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInIdef, true);
+    }
+    const pathOfThisModule = mod.getPath().join("/");
+    const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+    const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+    const idefTrigger = appData.triggers.itemDefinition.search[pathOfThisIdef];
+    if (moduleTrigger || idefTrigger) {
+        const args = {
+            appData,
+            module: mod,
+            itemDefinition,
+            args: resolverArgs.args,
+            user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+            },
+            forbid: basic_1.defaultTriggerForbiddenFunction,
+        };
+        if (moduleTrigger) {
+            await moduleTrigger(args);
+        }
+        if (idefTrigger) {
+            await idefTrigger(args);
+        }
     }
     // now we build the search query
     const queryModel = appData.knex.table(selfTable)

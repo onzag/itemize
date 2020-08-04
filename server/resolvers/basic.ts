@@ -24,9 +24,17 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import Knex from "knex";
 
 export interface IServerSideTokenDataType {
-  id: number;
+  // role always present
   role: string;
-  sessionId: number;
+
+  // id and session id, present or not
+  id: number;
+  sessionId?: number;
+
+  // custom token data that might exist
+  custom?: boolean;
+  isRealUser?: boolean;
+  customData?: any;
 }
 
 export function defaultTriggerForbiddenFunction(message: string) {
@@ -63,11 +71,15 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     let throwErr = false;
     try {
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
-      throwErr = (
-        typeof result.id !== "number" ||
-        typeof result.role !== "string" ||
-        typeof result.sessionId !== "number"
-      );
+      if (!result.custom || result.isRealUser) {
+        throwErr = (
+          typeof result.id !== "number" ||
+          typeof result.role !== "string" ||
+          typeof result.sessionId !== "number"
+        );
+      } else {
+        throwErr = typeof result.role !== "string";
+      }
     } catch (err) {
       throwErr = true;
     }
@@ -517,7 +529,7 @@ export async function validateTokenIsntBlocked(
   cache: Cache,
   tokenData: IServerSideTokenDataType,
 ) {
-  if (tokenData.id) {
+  if (tokenData.id && (!tokenData.custom || tokenData.isRealUser)) {
     let sqlResult: ISQLTableRowValue;
     
     try {
