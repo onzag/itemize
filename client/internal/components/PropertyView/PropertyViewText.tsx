@@ -1,3 +1,9 @@
+/**
+ * Contains the property view text handler as well as some other
+ * functionality that is used for handling text
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import { DOMPurify, fileURLAbsoluter } from "../../../../util";
@@ -7,32 +13,69 @@ import { PropertyDefinitionSupportedFilesType, IPropertyDefinitionSupportedSingl
 import { imageSrcSetRetriever } from "../../../components/util";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
+/**
+ * The property view renderer props as it requires the properties
+ * note that this renderer is only used for html and plain, but not for the default
+ * null subtype
+ */
 export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedTextType> {
+  /**
+   * Whether it is rich text, as in its subtype is html
+   */
   isRichText: boolean;
-  subtype: null | "html" | "plain";
+  /**
+   * Whether it is type html or plain
+   */
+  subtype: "html" | "plain";
 }
 
+/**
+ * Sanitazation standard configuraton
+ */
 export const PROPERTY_VIEW_SANITIZE_CONFIG = {
+  // iframes are allowed, no sources are expected from the server side anyway
   ADD_TAGS: ["iframe"],
+  // but src are still allowed here for a simple reason, as they are defined by the post processing hook
   ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "src", "spellcheck", "contenteditable"],
+  // and these can be blob so we must allow them
   ALLOW_UNKNOWN_PROTOCOLS: true,
 };
 
+/**
+ * The list of allowed classes for text as defined by the text-specs
+ * this will prevent users from class injection
+ */
 export const ALLOWED_CLASSES = [
   "image", "image-container", "image-pad", "video", "video-container",
   "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
 ]
 
+/**
+ * The list of allowed prefixes
+ */
 export const ALLOWED_CLASSES_PREFIXES = [
   "rich-text--",
 ];
 
+/**
+ * clean all attributes in a html element
+ * @param node the node to clean for
+ */
 function cleanAllAttribs(node: HTMLElement) {
   Array.prototype.slice.call(node.attributes).forEach((attr: any) => {
     node.removeAttribute(attr.name);
   });
 }
 
+/**
+ * The postprocessing hook that cleans the
+ * @param relatedProperty 
+ * @param currentFiles 
+ * @param supportsImages 
+ * @param supportsVideos 
+ * @param supportsFiles 
+ * @param node 
+ */
 export function propertyViewPostProcessingHook(
   relatedProperty: PropertyDefinition,
   currentFiles: IPropertyDefinitionSupportedSingleFilesType[],

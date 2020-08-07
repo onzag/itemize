@@ -211,7 +211,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       )
     }
     return (
-      <span className="file" onClick={this.props.openFile.bind(null, this.props.currentValue)}>
+      <span className="file" onClick={this.props.openFile}>
         <span className="file-container">
           <span className="file-icon">
             <span className="file-extension">{this.props.extension}</span>

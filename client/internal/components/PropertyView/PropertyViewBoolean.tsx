@@ -1,14 +1,34 @@
+/**
+ * Contains the handler for the boolean type
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { capitalize } from "../../../../util";
 
+/**
+ * The renderer props for the boolean type which also include
+ */
 export interface IPropertyViewBooleanRendererProps extends IPropertyViewRendererProps<boolean> {
+  /**
+   * Yes, in the user language
+   */
   i18nYes: string;
+  /**
+   * No in the user language
+   */
   i18nNo: string;
+  /**
+   * unspecified in the user language
+   */
   i18nUnspecified: string;
 }
 
+/**
+ * The property view boolean handler
+ */
 export class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>> {
   constructor(props: IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>) {
     super(props);

@@ -1,3 +1,8 @@
+/**
+ * Contains the property view file handler
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IPropertyViewRendererProps, IPropertyViewHandlerProps } from ".";
 import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
@@ -7,12 +12,32 @@ import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { fileURLAbsoluter, mimeTypeToExtension } from "../../../../util";
 
+/**
+ * The property view renderer props that every property renderer
+ * for file contains
+ */
 export interface IPropertyViewFileRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedFileType> {
+  /**
+   * whether the file is a supported image
+   */
   isSupportedImage: boolean;
+  /**
+   * If it's a supported image, the source set
+   * that is attached to that image
+   */
   imageSrcSet: string;
+  /**
+   * The size of the file in a human readable form
+   */
   prettySize: string;
+  /**
+   * The extension of that file
+   */
   extension: string;
-  openFile: (value: PropertyDefinitionSupportedFileType) => void;
+  /**
+   * open the current file
+   */
+  openFile: () => void;
 }
 
 export default class PropertyViewFile
@@ -22,7 +47,6 @@ export default class PropertyViewFile
   public shouldComponentUpdate(
     nextProps: IPropertyViewHandlerProps<IPropertyViewFileRendererProps>,
   ) {
-    // This is optimized to only update for the thing it uses
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||
       (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
@@ -34,9 +58,12 @@ export default class PropertyViewFile
       !!this.props.rtl !== !!nextProps.rtl ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
-  public openFile(
-    value: PropertyDefinitionSupportedFileType,
-  ) {
+  public openFile() {
+    const value = (
+      this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue :
+        this.props.state.value
+      ) as PropertyDefinitionSupportedFileType;
     window.open(value.url, value.name);
   }
   public render() {
