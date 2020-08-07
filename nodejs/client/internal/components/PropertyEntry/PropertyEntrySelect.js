@@ -1,10 +1,17 @@
 "use strict";
+/**
+ * The entry select renderer for specific valid values
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
+/**
+ * The select handler
+ */
 class PropertyEntrySelect extends react_1.default.Component {
     constructor(props) {
         super(props);

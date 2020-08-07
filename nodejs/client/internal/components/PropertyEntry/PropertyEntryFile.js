@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the entry file handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,6 +14,9 @@ const uuid_1 = __importDefault(require("uuid"));
 const pretty_bytes_1 = __importDefault(require("pretty-bytes"));
 const util_1 = require("../../../../util");
 const util_2 = require("../../../components/util");
+/**
+ * This is the property entry file class
+ */
 class PropertyEntryFile extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -17,7 +24,6 @@ class PropertyEntryFile extends react_1.default.Component {
         this.ownedObjectURLPool = {};
         this.state = {
             rejectedValue: null,
-            rejected: false,
             rejectedReason: null,
         };
         // the functions are binded
@@ -42,7 +48,7 @@ class PropertyEntryFile extends react_1.default.Component {
             nextProps.i18n !== this.props.i18n ||
             nextProps.icon !== this.props.icon ||
             nextProps.renderer !== this.props.renderer ||
-            this.state.rejected !== nextState.rejected ||
+            !deep_equal_1.default(this.state, nextState) ||
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
     componentWillUnmount() {
@@ -51,7 +57,30 @@ class PropertyEntryFile extends react_1.default.Component {
             URL.revokeObjectURL(this.ownedObjectURLPool[id]);
         });
     }
-    openFile(value) {
+    /**
+     * Provides the current value, either the actual value
+     * or the rejected value
+     * @returns a PropertyDefinitionSupportedFileType
+     */
+    getCurrentValue() {
+        let currentValue = this.state.rejectedValue ||
+            this.props.state.value;
+        if (currentValue &&
+            currentValue.url.indexOf("blob:") !== 0) {
+            if (this.ownedObjectURLPool[currentValue.id]) {
+                currentValue = {
+                    ...currentValue,
+                    url: this.ownedObjectURLPool[currentValue.id],
+                };
+            }
+            else {
+                currentValue = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
+            }
+        }
+        return currentValue;
+    }
+    openFile() {
+        const value = this.getCurrentValue();
         window.open(value.url, value.name);
     }
     onSetFile(file) {
@@ -73,7 +102,6 @@ class PropertyEntryFile extends react_1.default.Component {
         // check if it's images we are accepting
         if (!util_1.checkFileInAccepts(value.type, accept)) {
             this.setState({
-                rejected: true,
                 rejectedValue: value,
                 rejectedReason: this.props.i18n[this.props.language][(isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type")],
             });
@@ -82,7 +110,6 @@ class PropertyEntryFile extends react_1.default.Component {
         else if (value.size > constants_1.MAX_FILE_SIZE) {
             const prettySize = pretty_bytes_1.default(constants_1.MAX_FILE_SIZE);
             this.setState({
-                rejected: true,
                 rejectedValue: value,
                 rejectedReason: util_1.localeReplacer(this.props.i18n[this.props.language][(isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big")], prettySize),
             });
@@ -90,12 +117,11 @@ class PropertyEntryFile extends react_1.default.Component {
         }
         else {
             this.setState({
-                rejected: false,
                 rejectedValue: null,
                 rejectedReason: null,
             });
         }
-        if (isExpectingImages) {
+        if (isExpectingImages || value.type.startsWith("image")) {
             const img = new Image();
             img.onload = () => {
                 const dimensions = this.props.property.getSpecialProperty("dimensions") || "";
@@ -105,7 +131,6 @@ class PropertyEntryFile extends react_1.default.Component {
             };
             img.onerror = () => {
                 this.setState({
-                    rejected: true,
                     rejectedValue: value,
                     rejectedReason: this.props.i18n[this.props.language]["image_uploader_invalid_type"],
                 });
@@ -137,20 +162,7 @@ class PropertyEntryFile extends react_1.default.Component {
             i18nData.error && i18nData.error[invalidReason]) {
             i18nInvalidReason = i18nData.error[invalidReason];
         }
-        let currentValue = this.state.rejectedValue ||
-            this.props.state.value;
-        if (currentValue &&
-            currentValue.url.indexOf("blob:") !== 0) {
-            if (this.ownedObjectURLPool[currentValue.id]) {
-                currentValue = {
-                    ...currentValue,
-                    url: this.ownedObjectURLPool[currentValue.id],
-                };
-            }
-            else {
-                currentValue = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
-            }
-        }
+        const currentValue = this.getCurrentValue();
         const imageSizes = isSupportedImage ? util_2.imageSizeRetriever(currentValue, this.props.property) : null;
         const imageSrcSet = isSupportedImage ? util_2.imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
         const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
@@ -200,7 +212,7 @@ class PropertyEntryFile extends react_1.default.Component {
             genericActivePlaceholder,
             genericDeleteLabel,
             genericSelectLabel,
-            rejected: this.state.rejected,
+            rejected: !!this.state.rejectedReason,
             rejectedReason: this.state.rejectedReason,
             isSupportedImage,
             imageSrcSet,

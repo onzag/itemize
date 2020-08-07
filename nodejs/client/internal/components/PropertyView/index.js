@@ -52,6 +52,7 @@ const handlerRegistry = {
         renderer: "PropertyViewCurrency",
         handler: PropertyViewCurrency_1.PropertyViewCurrency,
     },
+    // TODO
     unit: null,
     password: {
         renderer: "PropertyViewSimple",
@@ -82,6 +83,7 @@ const handlerRegistry = {
         handler: PropertyViewFile_1.default,
         includeConfig: true,
     },
+    // TODO
     files: null,
 };
 function RawBasePropertyView(props) {

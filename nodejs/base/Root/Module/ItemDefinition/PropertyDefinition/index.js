@@ -339,6 +339,12 @@ class PropertyDefinition {
                 count = value.toString().length;
             }
             else {
+                // special check for large values in raw mode
+                // should be a large enough value to avoid this
+                // and avoid being spammed with empty tags
+                if (value.toString().length > constants_1.MAX_RAW_TEXT_LENGTH) {
+                    return PropertyInvalidReason.TOO_LARGE;
+                }
                 if (typeof window !== "undefined" && typeof window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
                     count = window[constants_1.LAST_RICH_TEXT_CHANGE_LENGTH];
                 }

@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the field handler for field types
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,12 +13,28 @@ const util_1 = require("../../../../util");
 const constants_1 = require("../../../../constants");
 const imported_resources_1 = require("../../../../imported-resources");
 const convert_units_1 = __importDefault(require("convert-units"));
+/**
+ * An enum which is useful for numeric types
+ */
 var NumericType;
 (function (NumericType) {
+    /**
+     * For currency, unit and number
+     */
     NumericType[NumericType["FLOAT"] = 0] = "FLOAT";
+    /**
+     * For year, integer
+     */
     NumericType[NumericType["INTEGER"] = 1] = "INTEGER";
+    /**
+     * Not a number, for textual types
+     */
     NumericType[NumericType["NAN"] = 2] = "NAN";
 })(NumericType = exports.NumericType || (exports.NumericType = {}));
+/**
+ * Provides the numeric type of a given type
+ * @param type the type we are using, number, currency, unit, etc...
+ */
 function getNumericType(type) {
     if (type === "number" || type === "currency" || type === "unit") {
         return NumericType.FLOAT;
@@ -25,6 +45,14 @@ function getNumericType(type) {
     return NumericType.NAN;
 }
 exports.getNumericType = getNumericType;
+/**
+ * Given a value, either a raw string or an obeject with a value property that is
+ * either a number or a string formatted for the given language
+ * @param numericType the numeric type as specified above
+ * @param numberSeparator the numeric separator used for this locale
+ * @param value either a raw string, a number, or an object that contains a value property that is any of that
+ * @returns a string
+ */
 function formatValueAsString(numericType, numberSeparator, value) {
     const actualValue = value === null || typeof value === "undefined" ? value : (typeof value.value !== "undefined" ? value.value : value);
     if (actualValue === null) {
@@ -36,56 +64,85 @@ function formatValueAsString(numericType, numberSeparator, value) {
     return actualValue.toString();
 }
 ;
+/**
+ * The property entry field handler
+ */
 class PropertyEntryField extends react_1.default.Component {
     constructor(props) {
         super(props);
-        this.onChangeByNumber = this.onChangeByNumber.bind(this);
+        this.onChangeByTextualValue = this.onChangeByTextualValue.bind(this);
         this.unitToNode = this.unitToNode.bind(this);
         this.onChangeUnit = this.onChangeUnit.bind(this);
         this.onChangeCurrency = this.onChangeCurrency.bind(this);
         this.getCurrentCurrency = this.getCurrentCurrency.bind(this);
         this.getCurrentUnit = this.getCurrentUnit.bind(this);
     }
+    /**
+     * This is the unit to node function that is passed that convets the
+     * unit code into something more legible and meant for interaction
+     * @param unit the unit code
+     * @returns a react element
+     */
     unitToNode(unit) {
+        // for liters
         if (unit === "l") {
+            // we just return big liter
             return react_1.default.createElement("span", null, "L");
+            // for mililiters, deciliters, kiloliters, etc...
         }
         else if (unit === "ml" || unit === "cl" || unit === "dl" || unit === "kl") {
             return react_1.default.createElement("span", null,
                 unit[0],
                 "L");
+            // degrees, celcius, farenheit, kelvin, and whatever R degrees are
         }
         else if (unit === "C" || unit === "K" || unit === "F" || unit === "R") {
             return react_1.default.createElement("span", null,
                 "\u00B0",
                 unit);
         }
+        // otherwise we are going to take the numbers and make them superstring
+        // works for things like m3 and the like
         return (react_1.default.createElement("span", null, unit.split(/(\d+)/).filter((m) => !!m).map((m, i) => isNaN(m) ?
             react_1.default.createElement("span", { key: i }, m) : react_1.default.createElement("sup", { key: i }, m))));
     }
     componentDidMount() {
+        // we take the initial prefill, which only truly exists for the unit type
         const initialPrefill = this.props.property.getSpecialProperty("initialPrefill");
+        // and if we have one
         if (typeof initialPrefill !== "undefined" &&
             initialPrefill !== null &&
             !this.props.state.value) {
-            this.onChangeByNumber(initialPrefill.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator));
+            // we call this function
+            this.onChangeByTextualValue(initialPrefill.toString().replace(".", this.props.i18n[this.props.language].number_decimal_separator));
         }
     }
     componentDidUpdate(prevProps) {
+        // so if our currency changes, and we are talking about currency, and we have
+        // a value for such currency, this happens when the user used
+        // some selector to change his standard currency
         if (prevProps.currency.code !== this.props.currency.code &&
             this.props.property.getType() === "currency" &&
             this.props.state.value) {
+            // we change the code to fit this new currency, we dont run
+            // conversions
             this.props.onChange({
                 value: this.props.state.value.value,
                 currency: this.props.currency.code,
             }, this.props.state.internalValue);
+            // otherwise if our country code changed
         }
         else if (prevProps.country.code !== this.props.country.code &&
             this.props.property.getType() === "unit" &&
             (this.props.state.value || this.props.state.internalValue)) {
+            // yes we literally just check for USA, makes no sense
+            // to use an special imperial check when only USA uses imperial
+            // like come on...
             const wasImperial = prevProps.country.code === "US";
             const isImperial = this.props.country.code === "US";
+            // So if our imperial usage has changed
             if (wasImperial !== isImperial) {
+                // we change to the new appropiate
                 if (!isImperial) {
                     const metricUnit = this.props.property.getSpecialProperty("unit");
                     this.onChangeUnit(metricUnit);
@@ -116,18 +173,30 @@ class PropertyEntryField extends react_1.default.Component {
             nextProps.renderer !== this.props.renderer ||
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
+    /**
+     * Changes the unit to a new unit
+     * @param newUnit the new unit code
+     */
     onChangeUnit(newUnit) {
+        // if we have no value currently to change
+        // for
         if (!this.props.state.value) {
+            // we just update the unit
             this.props.onChange(this.props.state.value, {
                 ...this.props.state.internalValue,
                 unit: newUnit,
             });
             return;
         }
+        // otherwise we get the current value
         const value = this.props.state.value.value;
+        // and the old unit
         const oldUnit = this.props.state.value.unit;
+        // now we need the max decimal count for this thing
         const maxDecimalCount = this.props.property.getMaxDecimalCount() || constants_1.MAX_DECIMAL_COUNT;
+        // and we convert the thing from the old unit to the new unit
         const valueInNewUnit = parseFloat(convert_units_1.default(value).from(oldUnit).to(newUnit).toFixed(maxDecimalCount));
+        // and we run the onchange function
         this.props.onChange({
             ...this.props.state.value,
             unit: newUnit,
@@ -137,8 +206,13 @@ class PropertyEntryField extends react_1.default.Component {
             unit: newUnit,
         });
     }
+    /**
+     * Change the currency code
+     * @param code the code
+     */
     onChangeCurrency(code) {
         const value = this.props.state.value;
+        // no current value, we just change the code
         if (!value) {
             this.props.onChange(value, {
                 ...this.props.state.internalValue,
@@ -146,8 +220,11 @@ class PropertyEntryField extends react_1.default.Component {
             });
             return;
         }
+        // otherwise we just get the current value as string
         const valueStr = typeof value.value === "number" && !isNaN(value.value) ? value.value.toString() : "";
+        // as well as the internal value since we do no conversions
         const internalValue = this.props.state.internalValue && this.props.state.internalValue.value;
+        // and now we call on change with this
         this.props.onChange({
             ...value,
             currency: code,
@@ -156,29 +233,66 @@ class PropertyEntryField extends react_1.default.Component {
             currency: code,
         });
     }
+    /**
+     * Provides the information about the current unit, regardless on whether
+     * we have internal data for it or not
+     * @returns an array where, 0 is currentUnit by state, 1 is the standard metric unit code to use
+     * 2 is the imperial unit to use, and 3 is whether the user prefers imperial
+     */
     getCurrentUnit() {
+        // yet another USA shenanigan
         const prefersImperial = this.props.country.code === "US";
+        // now we get the imperial and metric unit
         const imperialUnit = this.props.property.getSpecialProperty("imperialUnit");
         const standardUnit = this.props.property.getSpecialProperty("unit");
+        // and we specify what we want to use
         const usedUnit = prefersImperial ? imperialUnit : standardUnit;
+        // so the current unit, if we have a value, then it's the unit specified
+        // by the value, otherwise it's the one in our internal value, otherwise
+        // it's the standard unit for this user
         const currentUnit = (this.props.state.value ?
             this.props.state.value.unit :
             (this.props.state.internalValue && this.props.state.internalValue.unit)) || usedUnit;
+        // return that info
         return [currentUnit, standardUnit, imperialUnit, prefersImperial];
     }
+    /**
+     * Provides information about the currency currency
+     * @returns an array where, 0 is the current currency and 1 is the default currency
+     * according to what we have selected in our localization options
+     */
     getCurrentCurrency() {
+        // so we do it similarly to unit
         const countrySelectedCurrency = this.props.currency.code;
         const currentCurrency = (this.props.state.value ?
             this.props.state.value.currency :
             (this.props.state.internalValue && this.props.state.internalValue.currency)) || countrySelectedCurrency;
         return [currentCurrency, countrySelectedCurrency];
     }
-    onChangeByNumber(textualValue) {
+    /**
+     * Given a textual value, updates regardless on the type
+     * it is, and controls the internal value based on that
+     * @param textualValue the textual value used in the field
+     */
+    onChangeByTextualValue(textualValue) {
         // let's get the type and the base type
         const type = this.props.property.getType();
         const numericType = getNumericType(type);
+        // if it's not a number
+        if (numericType === NumericType.NAN) {
+            // easy, we just change
+            this.props.onChange(textualValue, null);
+            return;
+        }
+        // now we are in number place, let's see
+        // the textual value, we check the trimmed
+        // these meant basically null
         if (textualValue.trim() === "") {
+            // so we do the null changes
             if (type === "unit") {
+                // for unit we get the current unit
+                // and the new value is null, note
+                // how the value in the internal is the string given
                 const [newUnit] = this.getCurrentUnit();
                 this.props.onChange(null, {
                     unit: newUnit,
@@ -186,6 +300,7 @@ class PropertyEntryField extends react_1.default.Component {
                 });
             }
             else if (type === "currency") {
+                // same for currency
                 const [newCurrency] = this.getCurrentCurrency();
                 this.props.onChange(null, {
                     currency: newCurrency,
@@ -193,8 +308,11 @@ class PropertyEntryField extends react_1.default.Component {
                 });
             }
             else {
+                // otherwise for integer, number, year and whatnot
+                // just pass this textual value as it is
                 this.props.onChange(null, textualValue);
             }
+            // and we are done
             return;
         }
         // like if we have a float
@@ -203,7 +321,8 @@ class PropertyEntryField extends react_1.default.Component {
         if (numericType === NumericType.FLOAT) {
             // get the separator escaped
             const escapedNumberSeparator = util_1.escapeStringRegexp(this.props.i18n[this.props.language].number_decimal_separator);
-            // and replace it for the standard separator
+            // and replace it for the standard separator, given
+            // that it can be written in the comma form
             normalizedTextualValueAsString = textualValue.replace(new RegExp(escapedNumberSeparator, "g"), ".");
             // we set the numeric value from the normalized by parsing it
             // NaN is a possibility
@@ -216,6 +335,11 @@ class PropertyEntryField extends react_1.default.Component {
             numericValue = parseInt(textualValue, 10);
             normalizedTextualValueAsString = textualValue;
         }
+        // so if we have a numeric value, which is the actual number
+        // that somehow didn't parse from the textual value; OR the normalized
+        // value is nan, eg. "6,666A" -> "6.666A" -> 6.666 it will parse to the number
+        // given that logic but "6,666A" is not really a number because it has an A to it
+        // so we check both
         if (isNaN(numericValue) ||
             // buggy typescript definition which doesn't expect strings
             // need to cast to any
@@ -229,6 +353,7 @@ class PropertyEntryField extends react_1.default.Component {
                 });
             }
             else if (type === "currency") {
+                // same for curency
                 const [newCurrency] = this.getCurrentCurrency();
                 this.props.onChange(NaN, {
                     currency: newCurrency,
@@ -315,10 +440,10 @@ class PropertyEntryField extends react_1.default.Component {
         const subtype = this.props.property.getSubtype();
         let currency = null;
         let currencyFormat = null;
-        let currencyArrData = null;
+        let currencyAvailable = null;
         let currencyI18n = null;
         if (type === "currency") {
-            currencyArrData = imported_resources_1.arrCurrencies;
+            currencyAvailable = imported_resources_1.arrCurrencies;
             const [currencCurrency] = this.getCurrentCurrency();
             currency = imported_resources_1.currencies[currencCurrency];
             currencyFormat = this.props.i18n[this.props.language].currency_format;
@@ -351,13 +476,18 @@ class PropertyEntryField extends react_1.default.Component {
                 imperial: this.props.i18n[this.props.language].unit_dialog_imperial,
             };
         }
-        const currentInternalStrOnlyValue = (type === "unit" || type === "currency") && this.props.state.internalValue ?
+        let currentTextualValue = (type === "unit" || type === "currency") && this.props.state.internalValue ?
             this.props.state.internalValue.value : this.props.state.internalValue;
-        let currentStrOnlyValue = (type === "unit" || type === "currency") && this.props.state.value ?
-            this.props.state.value.value.toString() : (this.props.state.value && this.props.state.value.toString());
+        if (!currentTextualValue) {
+            currentTextualValue = (type === "unit" || type === "currency") && this.props.state.value ?
+                this.props.state.value.value.toString() : (this.props.state.value && this.props.state.value.toString());
+        }
+        if (!currentTextualValue) {
+            currentTextualValue = "";
+        }
         const numericType = getNumericType(type);
         if (numericType === NumericType.FLOAT) {
-            currentStrOnlyValue = formatValueAsString(numericType, this.props.i18n[this.props.language].number_decimal_separator, currentStrOnlyValue);
+            currentTextualValue = formatValueAsString(numericType, this.props.i18n[this.props.language].number_decimal_separator, currentTextualValue);
         }
         const RendererElement = this.props.renderer;
         const rendererArgs = {
@@ -376,18 +506,17 @@ class PropertyEntryField extends react_1.default.Component {
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
-            currentInternalStrOnlyValue,
-            currentStrOnlyValue,
+            currentTextualValue,
             canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
             disabled: this.props.state.enforced,
             autoFocus: this.props.autoFocus || false,
             onChange: this.props.onChange,
-            onChangeByNumber: this.onChangeByNumber,
+            onChangeByTextualValue: this.onChangeByTextualValue,
             onChangeCurrency: this.onChangeCurrency,
             onRestore: this.props.onRestore,
             currency,
             currencyFormat: currencyFormat,
-            currencyArrData: currencyArrData,
+            currencyAvailable: currencyAvailable,
             currencyI18n,
             isNumericType: type === "currency" || type === "unit" || type === "number" || type === "integer" || type === "year",
             unitPrefersImperial,

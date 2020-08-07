@@ -1,20 +1,36 @@
 "use strict";
+/**
+ * Contains the boolean handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
+/**
+ * The property entry boolean handler
+ */
 class PropertyEntryBoolean extends react_1.default.Component {
     constructor(props) {
         super(props);
         this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     }
+    /**
+     * Instead of passing the raw on restore function we hijack the function
+     * in order to restore conditionally, the reason is that restoring to null
+     * might be bad if null is a non default value, and we want to restore to false
+     */
     onRestoreHijacked() {
-        if (this.props.state.stateAppliedValue !== null) {
+        // so we check if we have a ternary, ternaries accept null values
+        const isTernary = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
+        // so if we have a ternary or our reset value isn't null
+        if (isTernary || this.props.state.stateAppliedValue !== null) {
             this.props.onRestore();
         }
         else {
+            // otherwise we go into false
             this.props.onChange(false, null);
         }
     }

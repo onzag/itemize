@@ -1,3 +1,8 @@
+/**
+ * Contains the entry file handler
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
@@ -8,35 +13,128 @@ import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 
+/**
+ * This is the entry file renderer props that every renderer for a files type will recieve.
+ * please do not use onChange with the file renderer, as it's odd, use onSetFile instead
+ * 
+ * You might want to check text-specs.md for consistency on displaying files, but it is not
+ * required to display as text-specs.md specifies
+ */
 export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFileType> {
+  /**
+   * The accept string, use it in your input type
+   */
   accept: string;
+  /**
+   * Whether we are expecting images and only images, this correlates
+   * to accept
+   */
   isExpectingImages: boolean;
+  /**
+   * A placeholder to show when the file field is active, normally
+   * it'll contains something on the drop files here
+   */
   genericActivePlaceholder: string;
+  /**
+   * A label to show for a button or the likes for the file to be
+   * deleted
+   */
   genericDeleteLabel: string;
+  /**
+   * A label to show for a button or the likes for the file to be
+   * selected
+   */
   genericSelectLabel: string;
+  /**
+   * Specifies whether the current value is of a supported image type, this
+   * is independent of the isExpectingImages or accept; as a generic file
+   * can be of the image type and the user might have specified an image for it
+   * even if the file could have been any type
+   */
   isSupportedImage: boolean;
+  /**
+   * A boolean that specifies whether the current value is actually a rejected
+   * value that was not accepted by the filtering functions, either because of size
+   * or whatnot, when rejected is true, the true property has a value of null
+   */
   rejected: boolean;
+  /**
+   * A localized reason on why the rejected status is active
+   */
   rejectedReason: string;
+  /**
+   * A source set for the image type that exists if isSupportedImage is true
+   */
   imageSrcSet: string;
+  /**
+   * The image sizes that exist if isSupportedImage is true for the current value
+   */
   imageSizes: IImageSizes;
+  /**
+   * A human readable form of the current size of the file, or null if no file
+   */
   prettySize: string;
+  /**
+   * The extension for this file, it has nothing to do with the name; it's more
+   * used for display purposes
+   */
   extension: string;
+  /**
+   * Once you have got hold of a file use this function and pass it so
+   * properties can be calculated, do not use onChange, use this function
+   * instead
+   * 
+   * If the property is image uploader type, or if the file is on itself
+   * an image it will ensure to give it metadata
+   */
   onSetFile: (file: File) => void;
+  /**
+   * A function to clear the file
+   */
   onRemoveFile: () => void;
-  openFile: (value: PropertyDefinitionSupportedFileType) => void;
+  /**
+   * A function to open the current file
+   */
+  openFile: () => void;
 }
 
+/**
+ * The property entry file contains an state for the rejected file
+ * if such a file was rejected
+ */
 interface IPropertyEntryFileState {
+  /**
+   * The rejected file value
+   */
   rejectedValue: PropertyDefinitionSupportedFileType;
-  rejected: boolean;
+  /**
+   * The reason why it was rejected
+   */
   rejectedReason: string;
 }
 
+/**
+ * This is the property entry file class
+ */
 export default class PropertyEntryFile
   extends React.Component<
   IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
   IPropertyEntryFileState
   > {
+
+  /**
+   * Owned object urls that creates blob urls
+   * for the given files, it is cleared on dismount; this means
+   * that any urls used that are temporary blobs will only
+   * be available as long as the entry is active, as such
+   * views will update, using the given url, and other entries
+   * will keep themselves in sync, however once the entry is done
+   * the values aren't available anymore, even if the state
+   * still specifies a blob url because it hasn't been changed
+   * 
+   * Submitting will still work just fine, because the src still
+   * points to a file
+   */
   private ownedObjectURLPool: {[key: string]: string};
 
   constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>) {
@@ -47,7 +145,6 @@ export default class PropertyEntryFile
 
     this.state = {
       rejectedValue: null,
-      rejected: false,
       rejectedReason: null,
     };
 
@@ -76,7 +173,7 @@ export default class PropertyEntryFile
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      this.state.rejected !== nextState.rejected ||
+      !equals(this.state, nextState) ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public componentWillUnmount() {
@@ -85,11 +182,47 @@ export default class PropertyEntryFile
       URL.revokeObjectURL(this.ownedObjectURLPool[id]);
     });
   }
-  public openFile(
-    value: PropertyDefinitionSupportedFileType,
-  ) {
+
+  /**
+   * Provides the current value, either the actual value
+   * or the rejected value
+   * @returns a PropertyDefinitionSupportedFileType
+   */
+  private getCurrentValue() {
+    let currentValue = this.state.rejectedValue ||
+      this.props.state.value as PropertyDefinitionSupportedFileType;
+
+    if (
+      currentValue &&
+      currentValue.url.indexOf("blob:") !== 0
+    ) {
+      if (this.ownedObjectURLPool[currentValue.id]) {
+        currentValue = {
+          ...currentValue,
+          url: this.ownedObjectURLPool[currentValue.id],
+        };
+      } else {
+        currentValue = fileURLAbsoluter(
+          this.props.config.containersHostnamePrefixes,
+          currentValue,
+          this.props.itemDefinition,
+          this.props.forId,
+          this.props.forVersion,
+          this.props.containerId,
+          this.props.include,
+          this.props.property,
+        );
+      }
+    }
+
+    return currentValue;
+  }
+
+  public openFile() {
+    const value = this.getCurrentValue();
     window.open(value.url, value.name);
   }
+
   public onSetFile(file: File) {
     // when a drop is accepted, let's check, if it's a single file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
@@ -114,7 +247,6 @@ export default class PropertyEntryFile
     // check if it's images we are accepting
     if (!checkFileInAccepts(value.type, accept)) {
       this.setState({
-        rejected: true,
         rejectedValue: value,
         rejectedReason: this.props.i18n[this.props.language]
           [(isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type")],
@@ -123,7 +255,6 @@ export default class PropertyEntryFile
     } else if (value.size > MAX_FILE_SIZE) {
       const prettySize = prettyBytes(MAX_FILE_SIZE);
       this.setState({
-        rejected: true,
         rejectedValue: value,
         rejectedReason: localeReplacer(
           this.props.i18n[this.props.language]
@@ -134,13 +265,12 @@ export default class PropertyEntryFile
       return;
     } else {
       this.setState({
-        rejected: false,
         rejectedValue: null,
         rejectedReason: null,
       })
     }
 
-    if (isExpectingImages) {
+    if (isExpectingImages || value.type.startsWith("image")) {
       const img = new Image();
       img.onload = () => {
         const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
@@ -153,7 +283,6 @@ export default class PropertyEntryFile
       }
       img.onerror = () => {
         this.setState({
-          rejected: true,
           rejectedValue: value,
           rejectedReason: this.props.i18n[this.props.language]["image_uploader_invalid_type"],
         });
@@ -194,32 +323,7 @@ export default class PropertyEntryFile
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    let currentValue = this.state.rejectedValue ||
-      this.props.state.value as PropertyDefinitionSupportedFileType;
-
-    if (
-      currentValue &&
-      currentValue.url.indexOf("blob:") !== 0
-    ) {
-      if (this.ownedObjectURLPool[currentValue.id]) {
-        currentValue = {
-          ...currentValue,
-          url: this.ownedObjectURLPool[currentValue.id],
-        };
-      } else {
-        currentValue = fileURLAbsoluter(
-          this.props.config.containersHostnamePrefixes,
-          currentValue,
-          this.props.itemDefinition,
-          this.props.forId,
-          this.props.forVersion,
-          this.props.containerId,
-          this.props.include,
-          this.props.property,
-        );
-      }
-    }
-
+    const currentValue = this.getCurrentValue();
     const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, this.props.property) : null;
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
 
@@ -284,7 +388,7 @@ export default class PropertyEntryFile
       genericDeleteLabel,
       genericSelectLabel,
 
-      rejected: this.state.rejected,
+      rejected: !!this.state.rejectedReason,
       rejectedReason: this.state.rejectedReason,
 
       isSupportedImage,

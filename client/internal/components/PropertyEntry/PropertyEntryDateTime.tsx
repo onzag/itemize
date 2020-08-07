@@ -30,6 +30,12 @@ function getValue(internalValue: any, actualValue: string, type: string) {
 }
 
 interface IPropertyEntryDateTimeState {
+  /**
+   * TODO this is done along with onChangeByMoment in order to avoid
+   * having invalid dates as they are being set by the renderer here, that's a problem
+   * of the renderer not of the handler, this logic should be moved to the renderer
+   * and not be here, DO THIS only when necessary
+   */
   value: any;
 }
 

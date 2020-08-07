@@ -515,7 +515,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             e.stopPropagation();
             // only support single image paste
             const file = clipboardData.files[0];
-            const data = await this.props.onInsertImage(file);
+            const data = await this.props.onInsertFile(file, true);
             // image failed to load
             if (!data) {
                 return;
@@ -652,19 +652,19 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         quill.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         this.closeVideoRequesting();
     }
-    onFileLoad(e) {
+    async onFileLoad(e) {
         const file = e.target.files[0];
         e.target.value = "";
-        const fileData = this.props.onInsertFile(file);
-        const prettySize = pretty_bytes_1.default(fileData.size);
-        const expectedExtension = util_1.mimeTypeToExtension(fileData.type);
+        const fileData = await this.props.onInsertFile(file);
+        const prettySize = pretty_bytes_1.default(fileData.result.size);
+        const expectedExtension = util_1.mimeTypeToExtension(fileData.result.type);
         const quill = this.quillRef.current.getEditor();
         const range = quill.getSelection(true);
         try {
             quill.insertEmbed(range.index, "itemizefile", {
-                srcId: fileData.id,
-                src: fileData.url,
-                name: fileData.name,
+                srcId: fileData.result.id,
+                src: fileData.result.url,
+                name: fileData.result.name,
                 extension: expectedExtension,
                 size: prettySize,
             }, ReactQuill.Quill.sources.USER);
@@ -680,7 +680,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             alt = prompt("Please write an alt for your image:", "") || null;
         }
         try {
-            const data = await this.props.onInsertImage(file);
+            const data = await this.props.onInsertFile(file, true);
             const quill = this.quillRef.current.getEditor();
             const range = quill.getSelection(true);
             quill.insertEmbed(range.index, "itemizeimage", {

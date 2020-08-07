@@ -14,7 +14,6 @@ import {
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
-  MAX_RAW_TEXT_LENGTH,
   CLASSIC_BASE_I18N,
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
@@ -121,12 +120,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
     if (typeof s !== "string") {
       return PropertyInvalidReason.INVALID_VALUE;
-
-    // NOTE how the html text lengh is not checked, even when it is possible
-    // this is a raw check for the total character count otherwise we could get spammed
-    // with empty tags, should be large enough not to bother
-    } else if (s.length > MAX_RAW_TEXT_LENGTH) {
-      return PropertyInvalidReason.TOO_LARGE;
     }
 
     return null;

@@ -174,7 +174,7 @@ const PropertyEntryFileRenderer = mui_core_1.withStyles(exports.style)((props) =
             if (props.currentValue) {
                 const mainFileClassName = "file" +
                     (props.rejected ? " rejected" : "");
-                displayContent = (react_1.default.createElement("div", { className: mainFileClassName, onClick: props.openFile.bind(null, props.currentValue) },
+                displayContent = (react_1.default.createElement("div", { className: mainFileClassName, onClick: props.openFile },
                     react_1.default.createElement("div", { className: "file-container" },
                         props.isSupportedImage ? (react_1.default.createElement("img", { srcSet: props.imageSrcSet, sizes: "100px", src: props.currentValue.url, className: "thumbnail" })) : (react_1.default.createElement("div", { className: "file-icon" },
                             react_1.default.createElement("span", { className: "file-extension" }, props.extension))),

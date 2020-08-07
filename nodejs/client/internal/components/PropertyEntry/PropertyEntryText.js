@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * The gargantuan entry text handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,6 +14,9 @@ const util_1 = require("../../../../util");
 const PropertyViewText_1 = require("../PropertyView/PropertyViewText");
 const constants_1 = require("../../../../constants");
 const pretty_bytes_1 = __importDefault(require("pretty-bytes"));
+/**
+ * The property entry text handler class
+ */
 class PropertyEntryText extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -18,7 +25,6 @@ class PropertyEntryText extends react_1.default.Component {
         };
         this.internalFileCache = {};
         this.onInsertFile = this.onInsertFile.bind(this);
-        this.onInsertImage = this.onInsertImage.bind(this);
         this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
         this.onChangeHijacked = this.onChangeHijacked.bind(this);
         this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
@@ -36,11 +42,20 @@ class PropertyEntryText extends react_1.default.Component {
             }
         });
     }
+    /**
+     * Called during initial setup
+     * @param props the props we are using
+     */
     cacheMediaPropertyInProps(props) {
+        // we get the media property name
         const mediaPropertyName = props.property.getSpecialProperty("mediaProperty");
+        // so if we have such as a media property
         if (mediaPropertyName) {
+            // we are going to find and get it
             this.cachedMediaProperty = props.itemDefinition.getPropertyDefinitionFor(mediaPropertyName, true);
+            // process the accepts
             this.cachedMediaPropertyAcceptsFiles = util_1.processAccepts(this.cachedMediaProperty.getSpecialProperty("accept"), !!this.cachedMediaProperty.getSpecialProperty("imageUploader"));
+            // and then see what images we support from these accepts
             this.cachedMediaPropertyAcceptsImages = this.cachedMediaPropertyAcceptsFiles === "*" ?
                 constants_1.FILE_SUPPORTED_IMAGE_TYPES.join(",") :
                 this.cachedMediaPropertyAcceptsFiles.split(",").filter((accepting) => {
@@ -48,11 +63,19 @@ class PropertyEntryText extends react_1.default.Component {
                 }).join(",");
         }
     }
+    /**
+     * Ran during mount of updates, caches the files that are in the media property
+     */
     cacheCurrentFiles() {
+        // so we get the media property
         const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty");
+        // if we have one
         if (relatedPropertyName) {
+            // we will get such media property
             const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
+            // and the current value for it
             const currentValue = relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
+            // if we have one, we will loop and store such files
             if (currentValue) {
                 currentValue.forEach((v) => {
                     this.internalFileCache[v.id] = v;
@@ -61,7 +84,10 @@ class PropertyEntryText extends react_1.default.Component {
         }
     }
     componentDidMount() {
+        // so if we are in rich text
         if (this.props.property.isRichText()) {
+            // we cache the current files, if there are any and if
+            // we even support media property
             this.cacheCurrentFiles();
         }
     }
@@ -75,6 +101,16 @@ class PropertyEntryText extends react_1.default.Component {
             this.cacheCurrentFiles();
         }
     }
+    /**
+     * the change event but hijacked so we can see
+     * if we need to remove things from the media property
+     *
+     * This hijack only applies itself if there's a media property
+     * so it makes sense
+     *
+     * @param value the value
+     * @param internalValue the internal value
+     */
     onChangeHijacked(value, internalValue) {
         // so first we try to read the html content in this fast and dirty way
         const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9]+)\"/g;
@@ -89,7 +125,7 @@ class PropertyEntryText extends react_1.default.Component {
                 idsGathered.push(id);
                 // we call the sync function to restore the file
                 // into the current value of the property if necessary
-                this.onSyncFile(id);
+                this.onRestoreLostFile(id);
             }
         } while (match);
         // now we need to find the ones that have been deleted and are currently not loaded
@@ -108,13 +144,24 @@ class PropertyEntryText extends react_1.default.Component {
         }
         this.props.onChange(value, internalValue);
     }
+    /**
+     * The restore but hijacked, also only if there's
+     * a media property; basically will do the standard
+     * restoration, but also restore its related media property
+     */
     onRestoreHijacked() {
         const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty");
         const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
         relatedProperty.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
+        // don't need to trigger listeners as this will do it by itself
         this.props.onRestore();
     }
-    onSyncFile(fileId) {
+    /**
+     * Function that triggers when a file that had been removed, needs to be restored
+     * such as done by an undo ctrl+z event
+     * @param fileId the file to be restored
+     */
+    onRestoreLostFile(fileId) {
         const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty");
         const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
         const currentValue = relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
@@ -127,6 +174,11 @@ class PropertyEntryText extends react_1.default.Component {
             this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
         }
     }
+    /**
+     * Function that triggers once a file has been requested to be removed
+     * it remains however in the cache itself
+     * @param fileId the file id
+     */
     onRemoveFile(fileId) {
         const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty");
         const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
@@ -139,77 +191,37 @@ class PropertyEntryText extends react_1.default.Component {
         }
     }
     /**
-     * Insers an image based on a file into the correlated file field and performs
-     * the required checks
-     * @param file the file to insert
-     * @returns a promise, note that this promise can fail if the file itself fails and provide a generic error
-     */
-    async onInsertImage(file) {
-        return new Promise((resolve, reject) => {
-            const fileInserted = this.onInsertFile(file, true);
-            const tempURL = fileInserted.url;
-            const img = new Image();
-            img.onload = () => {
-                const dimensions = this.props.property.getSpecialProperty("dimensions") || "";
-                const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
-                this.setMetadata(fileInserted, img.width + "x" + img.height + ";" + dimensionNames.join(","));
-                resolve({
-                    result: fileInserted,
-                    width: img.width,
-                    height: img.height,
-                });
-            };
-            img.onerror = () => {
-                this.onRemoveFile(fileInserted.id);
-                this.setState({
-                    lastLoadedFileError: "image_uploader_invalid_type",
-                });
-                reject(new Error("Invalid Image"));
-            };
-            img.src = tempURL;
-        });
-    }
-    setMetadata(file, metadata) {
-        const currentValue = this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
-        if (currentValue) {
-            const index = currentValue.findIndex((f) => f.id === file.id);
-            if (index !== -1) {
-                const newValue = [...currentValue];
-                newValue[index] = { ...currentValue[index] };
-                newValue[index].metadata = metadata;
-                this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
-                this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
-            }
-        }
-    }
-    /**
      * Inserts a file in the media property
      * @param file the file to insert
-     * @param validateAgainstImages whether the errors and check given will be for image types
+     * @param isExpectingImage whether the errors and check given will be for image types
      */
-    onInsertFile(file, validateAgainstImages) {
-        // we do this generic check to test whether the file is an image, even when
-        // the file check will do its own check
-        if (validateAgainstImages && !util_1.checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
+    async onInsertFile(file, isExpectingImage) {
+        // So now if we are expecting image we check against images
+        if (isExpectingImage && !util_1.checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
             this.setState({
                 lastLoadedFileError: "image_uploader_invalid_type",
             });
-            throw new Error("Invalid image type");
+            return null;
+            // otherwise in the generic files
         }
-        else if (!validateAgainstImages && !util_1.checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsFiles)) {
+        else if (!isExpectingImage && !util_1.checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsFiles)) {
             this.setState({
                 lastLoadedFileError: "file_uploader_invalid_type",
             });
-            throw new Error("Invalid file type");
+            return null;
         }
+        // and for the file size
         if (file.size > constants_1.MAX_FILE_SIZE) {
             this.setState({
-                lastLoadedFileError: validateAgainstImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
+                lastLoadedFileError: isExpectingImage ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
             });
-            throw new Error("Size of image/file too large");
+            return null;
         }
+        // now we need a temporary url
         const tempURL = URL.createObjectURL(file);
+        // our random id for the file
         const id = "FILE" + uuid_1.default.v4().replace(/-/g, "");
+        // and this is our file, no metadata yet
         const addedFile = {
             name: file.name,
             type: file.type,
@@ -219,14 +231,66 @@ class PropertyEntryText extends react_1.default.Component {
             src: file,
             metadata: null,
         };
+        // this is the default final value
+        let finalValue = {
+            result: addedFile,
+            width: null,
+            height: null,
+            isImage: false,
+        };
+        // however if we are expecting images or the file to add is an image,
+        // we need the image metadata
+        if (isExpectingImage || addedFile.type.startsWith("image")) {
+            // the final value is now a new final value that comes from this logic
+            finalValue = await new Promise(async (resolve) => {
+                // so we create an image
+                const img = new Image();
+                // on load
+                img.onload = () => {
+                    // we build the metadata
+                    const dimensions = this.props.property.getSpecialProperty("dimensions") || "";
+                    const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+                    addedFile.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
+                    // and resolve
+                    resolve({
+                        result: addedFile,
+                        width: img.width,
+                        height: img.height,
+                        isImage: true,
+                    });
+                };
+                img.onerror = () => {
+                    // on error we set the last loaded error
+                    this.setState({
+                        lastLoadedFileError: "image_uploader_invalid_type",
+                    });
+                    // revoke the url
+                    URL.revokeObjectURL(tempURL);
+                    // and resolve to null
+                    resolve(null);
+                };
+                // and this is assigned the url of the image
+                img.src = tempURL;
+            });
+            // if our final value is null
+            if (finalValue === null) {
+                // it's doomed
+                return null;
+            }
+        }
+        // now we get the current value of the media property
         const currentValue = this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
+        // and add the new file
         const newValue = currentValue !== null ?
             [...currentValue] : [];
         newValue.push(addedFile);
+        // add this to the cache
         this.internalFileCache[id] = addedFile;
+        // and now we can set the value for the cached media property
         this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
         this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
-        return addedFile;
+        // the chicken is done
+        return finalValue;
     }
     shouldComponentUpdate(nextProps) {
         if (nextProps.property !== this.props.property) {
@@ -265,8 +329,11 @@ class PropertyEntryText extends react_1.default.Component {
         const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
         const i18nInLanguage = this.props.i18n[this.props.language];
         let currentValue = this.props.state.value;
-        if (supportsMedia && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
-            const currentFiles = this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
+        // we only want to purify values that haven't been manually set by the user, other
+        // than that we can trust the value, it'd be a waste
+        if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
+            const currentFiles = this.cachedMediaProperty &&
+                this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);
             util_1.DOMPurify.addHook("afterSanitizeElements", PropertyViewText_1.propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
             currentValue = util_1.DOMPurify.sanitize(currentValue, PropertyViewText_1.PROPERTY_VIEW_SANITIZE_CONFIG);
             util_1.DOMPurify.removeAllHooks();
@@ -347,7 +414,6 @@ class PropertyEntryText extends react_1.default.Component {
             onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,
             onRestore: supportsMedia ? this.onRestoreHijacked : this.props.onRestore,
             onInsertFile: this.onInsertFile,
-            onInsertImage: this.onInsertImage,
         };
         return react_1.default.createElement(RendererElement, Object.assign({}, rendererArgs));
     }

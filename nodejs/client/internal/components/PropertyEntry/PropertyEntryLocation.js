@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * The location handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,12 +11,28 @@ const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const util_1 = require("../../../../util");
 const PropertyViewLocation_1 = require("../PropertyView/PropertyViewLocation");
+/**
+ * The viewpoer zoom sizes, implement as you wish, but these zooms
+ * are considered and should be handled by your implementation
+ */
 var IViewportZoomEnumType;
 (function (IViewportZoomEnumType) {
+    /**
+     * Should mean the most zoomed out, show an country
+     */
     IViewportZoomEnumType["SMALL"] = "SMALL";
+    /**
+     * A default zoom status
+     */
     IViewportZoomEnumType["MEDIUM"] = "MEDIUM";
+    /**
+     * Zoomed in the most, show an address
+     */
     IViewportZoomEnumType["LARGE"] = "LARGE";
 })(IViewportZoomEnumType = exports.IViewportZoomEnumType || (exports.IViewportZoomEnumType = {}));
+/**
+ * The property entry location class
+ */
 class PropertyEntryLocation extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -61,13 +81,20 @@ class PropertyEntryLocation extends react_1.default.Component {
     componentDidUpdate(prevProps) {
         const oldValue = prevProps.state.value;
         const newValue = this.props.state.value;
+        // so we check our new value and check if they are not equal
         if (newValue && !deep_equal_1.default(newValue, oldValue)) {
+            // and now let's see if we are centered to our old value, as in we are locked to it
             let isCenteredToOldValue = false;
+            // that depends on if we have an old value at all
             if (oldValue) {
+                // we do this cheap check that allows for wiggle room
                 const oldCenter = [oldValue.lat, oldValue.lng];
                 isCenteredToOldValue = PropertyViewLocation_1.isCenterBasicallyEquals(this.state.viewport.center, oldCenter);
             }
+            // and then if we are centered to it or if we didn't have an old value we
+            // are going to fly to it
             if (isCenteredToOldValue || !oldValue) {
+                // we try to keep the zoom
                 this.setState({
                     viewport: {
                         center: [newValue.lat, newValue.lng],
@@ -75,10 +102,18 @@ class PropertyEntryLocation extends react_1.default.Component {
                     },
                 });
             }
+            // this allows realtime centered tracking, say we have a location marker that is centered
+            // to our location not only the value will update but we will keep track of it, so we are basically
+            // following the element
         }
     }
+    /**
+     * Hijacking the on restore function
+     */
     onRestoreHijacked() {
+        // because we need to clear the search results
         this.clearSearchResults();
+        // before running the actual restoration
         this.props.onRestore();
     }
     onViewportChange(viewport) {
@@ -86,10 +121,19 @@ class PropertyEntryLocation extends react_1.default.Component {
             viewport,
         });
     }
+    /**
+     * Actuall what triggers
+     * @param searchQuery the search query we are using
+     * @param updateIdentifier the identifier of this, to ensure
+     * that if two changes happened at once, only the last one wil trigger
+     */
     async onSearchQueryChangeActual(searchQuery, updateIdentifier) {
+        // so we get these for reference
         const countryLatitude = this.props.country.latitude;
         const countryLongitude = this.props.country.longitude;
+        // and our separator
         const sep = this.props.i18n[this.props.language].word_separator;
+        // now the final results based on this
         let finalResults;
         try {
             finalResults = await fetch(`/rest/util/location-autocomplete?lat=${countryLatitude}&lng=${countryLongitude}` +
@@ -98,21 +142,35 @@ class PropertyEntryLocation extends react_1.default.Component {
         catch (err) {
             finalResults = [];
         }
+        // and if our update identifier matches
         if (updateIdentifier === this.autocompleteTakingPlace) {
+            // we store these to avoid retriggering the same suggestion
             this.lastSuggestionsValue = finalResults;
             this.lastSuggestionsValueQ = searchQuery;
+            // we set such suggestions
             this.setState({
                 suggestions: finalResults,
             });
         }
     }
+    /**
+     * Triggers when the search query changes, this is the literal
+     * function that is fed to the renderer
+     * @param searchQuery the search query the renderer gives
+     * @param dontAutoloadSuggestions and whether we should not autoload suggestions
+     */
     onSearchQueryChange(searchQuery, dontAutoloadSuggestions) {
+        // same value, do nothing
         if (this.props.state.internalValue === searchQuery ||
             this.props.state.value && this.props.state.value.txt === searchQuery) {
             return;
         }
+        // clear search result because we have changed it
         this.clearSearchResults();
+        // clear a current value because now it doesn't match and
+        // we are doing a new search
         this.props.onChange(null, searchQuery);
+        // and we do this depending
         if (dontAutoloadSuggestions) {
             return;
         }
@@ -141,16 +199,38 @@ class PropertyEntryLocation extends react_1.default.Component {
                 setTimeout(this.onSearchQueryChangeActual.bind(this, searchQuery, updateIdentifier), 300);
         }
     }
+    /**
+     * Fed to the renderer to change by suggestion
+     * @param suggestion the suggestion we are using
+     * @param mantainViewport whether to mantain the viewport
+     */
     onChangeBySuggestion(suggestion, mantainViewport) {
+        // we just call the manual pick function, given
+        // the suggestion is a complete value it won't request
+        // geocode
         this.onManualPick(suggestion, mantainViewport);
     }
+    /**
+     * Fed to the renderer in order to run a search
+     * @param mantainViewport whether to mantain the viewport
+     */
     async onSearch(mantainViewport) {
+        // but what are we searching for, we get the value
+        // for it, what is it in our text field?
         const valueToSearch = this.props.state.internalValue ||
             (this.props.state.value && this.props.state.value.txt);
+        // clear suggestions, we don't need them
         this.clearSuggestions();
+        // and we clear the current value
         this.props.onChange(null, valueToSearch);
+        // if we have nothing to search for
         if (!valueToSearch) {
+            // we don't run a search we clear it instead
+            this.clearSearchResults();
+            // nothing happens
             return null;
+            // if we are searching the entire same thing, aka
+            // smashing search on the same value
         }
         else if (this.lastSearchValueQ === valueToSearch) {
             this.setState({
@@ -216,12 +296,18 @@ class PropertyEntryLocation extends react_1.default.Component {
         }
         return finalResults;
     }
+    /**
+     * Fed to the renderer to change by search result
+     * @param searchResult the search result in question
+     * @param mantainViewport whether to mantain the viewport
+     */
     onChangeBySearchResult(searchResult, mantainViewport) {
         // swap the location for the search result
         // to another one of the answers
         if (!this.state.searchResults) {
             return;
         }
+        // get the index for it
         const index = this.state.searchResults.findIndex((sr) => sr.lng === searchResult.lng && sr.lat === searchResult.lat);
         if (index === -1) {
             return;
@@ -254,6 +340,10 @@ class PropertyEntryLocation extends react_1.default.Component {
             suggestions: [],
         });
     }
+    /**
+     * run the geocode for incomplete values
+     * @param value
+     */
     async geocode(value) {
         let updatedResult;
         // so this is the update identifier for this update

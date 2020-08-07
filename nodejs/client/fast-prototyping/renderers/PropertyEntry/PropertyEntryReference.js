@@ -216,7 +216,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             value = e.target.value.toString();
         }
         // similarly to location
-        if (value !== this.props.currentStrValue) {
+        if (value !== this.props.currentTextualValue) {
             // we call the change of search
             this.props.onChangeSearch(value);
         }
@@ -302,7 +302,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             this.props.description && !descriptionAsAlert ?
                 react_1.default.createElement(index_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
-            react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: "text", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentStrValue || "", onChange: this.onChangeByHTMLEvent, onKeyDown: this.onKeyDown, InputProps: {
+            react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: "text", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentTextualValue, onChange: this.onChangeByHTMLEvent, onKeyDown: this.onKeyDown, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",

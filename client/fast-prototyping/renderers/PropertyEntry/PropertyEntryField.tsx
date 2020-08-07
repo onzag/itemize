@@ -312,7 +312,7 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
       <DialogTitle id="currency-dialog-title">{props.currencyI18n.title}</DialogTitle>
       <div>
         <List>
-          {props.currencyArrData.map((currency) => (
+          {props.currencyAvailable.map((currency) => (
             <ListItem
               selected={currency.code === props.currency.code}
               button={true}
@@ -354,9 +354,7 @@ class ActualPropertyEntryFieldRenderer
 
     this.toggleVisible = this.toggleVisible.bind(this);
     this.catchToggleMouseDownEvent = this.catchToggleMouseDownEvent.bind(this);
-    this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.renderBasicTextField = this.renderBasicTextField.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
     this.openDialog = this.openDialog.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -410,20 +408,6 @@ class ActualPropertyEntryFieldRenderer
     }
   }
 
-  public render() {
-    // if (this.props.autocompleteMode) {
-    //   return this.renderAutosuggestField();
-    // }
-
-    return this.renderBasicTextField();
-  }
-
-  public onChangeByHTMLEvent(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) {
-    this.onChange(e);
-  }
-
   public onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
@@ -431,14 +415,7 @@ class ActualPropertyEntryFieldRenderer
     // numeric value, texual value is always set but
     // numeric value is only set for numbers
     const value: string = e.target.value.toString();
-    const internalValue: string = value;
-
-    if (this.props.isNumericType) {
-      this.props.onChangeByNumber(value);
-      return;
-    }
-
-    this.props.onChange(value, internalValue);
+    this.props.onChangeByTextualValue(value);
   }
 
   public openDialog() {
@@ -459,7 +436,7 @@ class ActualPropertyEntryFieldRenderer
     }
   }
 
-  public renderBasicTextField(textFieldProps?: any) {
+  public render() {
     // set the input mode, this is for mobile,
     // basically according to our input we need
     // different keys
@@ -482,40 +459,6 @@ class ActualPropertyEntryFieldRenderer
         this.inputRef = node;
       },
     };
-
-    // if there are textFieldProps
-    if (textFieldProps) {
-      // we need to extract the ref setting
-      const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
-      // set all the other properties as applied to the TextField
-      appliedTextFieldProps = other;
-
-      // and we need to setup the ref setting and rescue our function
-      // so that we can have the ref too for the Input
-      appliedInputProps = {
-        inputRef: (node: HTMLInputElement) => {
-          ref(node);
-          inputRef(node);
-
-          this.inputRef = node;
-        },
-      };
-
-      // if we have a className, it will inevitably override our class name
-      // but we need ours too, so let's merge it in the TextField
-      if (appliedTextFieldProps.className) {
-        appliedTextFieldProps.className += " " + this.props.classes.entry;
-      }
-
-      // if there are small inputProps, they will override our inputProps,
-      // of the input mode and autocomplete html, so we need to merge them
-      if (appliedTextFieldProps.inputProps) {
-        appliedTextFieldProps.inputProps = {
-          ...inputProps,
-          ...appliedTextFieldProps.inputProps,
-        };
-      }
-    }
 
     // if the type is a password
     if (this.props.type === "password") {
@@ -661,12 +604,8 @@ class ActualPropertyEntryFieldRenderer
           className={this.props.classes.entry}
           label={this.props.label}
           placeholder={this.props.placeholder}
-          value={
-            this.props.currentInternalStrOnlyValue ||
-            this.props.currentStrOnlyValue ||
-            ""
-          }
-          onChange={this.onChangeByHTMLEvent}
+          value={this.props.currentTextualValue}
+          onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           InputProps={{
             classes: {

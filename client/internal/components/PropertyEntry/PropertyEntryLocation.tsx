@@ -1,3 +1,8 @@
+/**
+ * The location handler
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
@@ -5,64 +10,213 @@ import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/
 import { capitalize, localeReplacer } from "../../../../util";
 import { isCenterBasicallyEquals } from "../PropertyView/PropertyViewLocation";
 
+/**
+ * The viewpoer zoom sizes, implement as you wish, but these zooms
+ * are considered and should be handled by your implementation
+ */
 export enum IViewportZoomEnumType {
+  /**
+   * Should mean the most zoomed out, show an country
+   */
   SMALL = "SMALL",
+  /**
+   * A default zoom status
+   */
   MEDIUM = "MEDIUM",
+  /**
+   * Zoomed in the most, show an address
+   */
   LARGE = "LARGE",
 }
 
-// the viewport for the map
+/**
+ * This is your viewport object, it contains a center
+ * and a zoom; this viewport object is meant to work
+ * nicely with leaflet but it's not limited to it, however
+ * it won't work out of the box as you still need the conversions
+ * for the zooms
+ */
 export interface IViewport {
+  /**
+   * The center in the lat, lng form
+   */
   center: [number, number];
+  /**
+   * The zoom, either one of our default types or as you manually
+   * change an user defined custom number
+   */
   zoom: IViewportZoomEnumType | number;
 }
 
+/**
+ * The location renderer props, just like other special renderers do not use the onChange raw function, as the functionality
+ * is too complex for it and this handler will handle internal states for you
+ */
 export interface IPropertyEntryLocationRendererProps extends IPropertyEntryRendererProps<IPropertyDefinitionSupportedLocationType> {
+  /**
+   * Trigger when the viewport changes, so a new viewport is provided
+   */
   onViewportChange: (viewport: IViewport) => void;
+
+  /**
+   * Trigger when the search query changes
+   * @param searchQuery the search query that is specified
+   * @param dontAutoloadSuggestions avoid automatically loading suggestions
+   * for this change, if your implementation has an specific time when to load
+   * suggestions, call this function again with false for this value then
+   */
   onSearchQueryChange: (
     searchQuery: string,
     dontAutoloadSuggestions?: boolean,
   ) => void;
+
+  /**
+   * Trigger when the search button or the sorts is pressed
+   * search will use the search query but will perform a deep search instead
+   * suggestions are not the same as search results
+   * @param mantainViewport by default the search will move the viewport
+   * to the first search result, with mantainViewport the viewport won't move
+   * @returns a promise with the results
+   */
   onSearch: (
     mantainViewport?: boolean,
   ) => Promise<IPropertyDefinitionSupportedLocationType[]>;
+
+  /**
+   * Picks a search result and assigns it as the current value
+   * @param searchResult the search result to use
+   * @param mantainViewport by default choosing a search result will move
+   * the viewport to that search location, by passing this as true
+   * you will prevent that
+   */
   onChangeBySearchResult: (
     searchResult: IPropertyDefinitionSupportedLocationType,
     mantainViewport?: boolean,
   ) => void;
+
+  /**
+   * Picks a suggestion and assigns it as the current value, choosing
+   * a suggestion is similar from a search result, so do not mix them
+   * up; if a search result is beng used, use the search change function
+   * as that will update the list of search results and marked locations
+   * @param searchSuggestion the search suggestion
+   * @param mantainViewport by default choosing a suggestion will move
+   * the viewport to that search location, by passing this as true
+   * you will prevent that
+   */
   onChangeBySuggestion: (
     searchSuggestion: IPropertyDefinitionSupportedLocationType,
     mantainViewport?: boolean,
   ) => void;
+
+  /**
+   * Clear all the suggestions
+   */
   clearSuggestions: () => void;
+
+  /**
+   * Clear all the suggestions
+   */
   clearSearchResults: () => void;
+
+  /**
+   * Manually choose a value, this function is rather special
+   * on the mechanism that it uses, given that it will try to autocomplete
+   * incomplete picks
+   * @param value the value of that we want to manually pick
+   * @param value.id an id that we are manually picking for, this is an uuid
+   * if you don't pass an id, it will request a geocode in order to get an id
+   * pass null to request a geocode
+   * @param value.txt the standard text form we are picking for, you should
+   * always pass a value for it
+   * @param value.atxt an alternative (not specified by the user) value, if you
+   * don't specify one, pass null to it to request a geocode
+   * @param value.lng the longitude, required
+   * @param value.lat the latitude, required
+   * @param mantainViewport by default doing a manual pick will fly to that
+   * location, pass true to this to prevent that
+   */
   onManualPick: (
     value: IPropertyDefinitionSupportedLocationType,
     mantainViewport?: boolean,
   ) => void;
 
+  /**
+   * A label to show when the search yielded no results
+   */
   noResultsLabel: string;
+  /**
+   * The current localized lable of the current result, will
+   * say something like, "result 1 out of 29"; in the user's language
+   */
   resultOutOfLabel: string;
 
+  /**
+   * The current viewport
+   */
   viewport: IViewport;
+  /**
+   * The current search suggestions, an array and always an array
+   */
   searchSuggestions: IPropertyDefinitionSupportedLocationType[];
+  /**
+   * The current active search results, an array, but if a search
+   * is not taking place, the value is null
+   */
   activeSearchResults: IPropertyDefinitionSupportedLocationType[];
+  /**
+   * The next search result from the active search result list,
+   * null if no next
+   */
   nextSearchResult: IPropertyDefinitionSupportedLocationType;
+  /**
+   * The next search result, but circular, aka, it will
+   * loop back to the first one; null if search results is empty
+   */
   nextSearchResultCircular: IPropertyDefinitionSupportedLocationType;
+  /**
+   * The next search result from the active search result list,
+   * null if no prev
+   */
   prevSearchResult: IPropertyDefinitionSupportedLocationType;
+  /**
+   * The prev search result, but circular, aka, it will
+   * loop back to the first one; null if search results is empty
+   */
   prevSearchResultCircular: IPropertyDefinitionSupportedLocationType;
+  /**
+   * The search query we are searching or suggesting for, and/or
+   * what is currently visible, use this as the value for your
+   * field, ignore currentValue
+   */
   searchQuery: string;
 }
 
-// location state, sadly it needs a lot in the state
-// department
+/**
+ * The location state
+ */
 interface IPropertyEntryLocationState {
+  /**
+   * Represent the current suggestions we have
+   */
   suggestions: IPropertyDefinitionSupportedLocationType[];
+  /**
+   * The current viewport for the map
+   */
   viewport: IViewport;
+  /**
+   * Current search results, or null, if no current search
+   */
   searchResults: IPropertyDefinitionSupportedLocationType[];
+  /**
+   * And the index of the current search result if we have chosen one from it
+   */
   searchCurrentlyMarkedValue: number;
 }
 
+/**
+ * The property entry location class
+ */
 export default class PropertyEntryLocation
   extends React.Component<
     IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>,
@@ -141,14 +295,22 @@ export default class PropertyEntryLocation
     const oldValue = prevProps.state.value as IPropertyDefinitionSupportedLocationType;
     const newValue = this.props.state.value as IPropertyDefinitionSupportedLocationType;
 
+    // so we check our new value and check if they are not equal
     if (newValue && !equals(newValue, oldValue)) {
+      // and now let's see if we are centered to our old value, as in we are locked to it
       let isCenteredToOldValue = false;
+
+      // that depends on if we have an old value at all
       if (oldValue) {
+        // we do this cheap check that allows for wiggle room
         const oldCenter = [oldValue.lat, oldValue.lng] as [number, number];
         isCenteredToOldValue = isCenterBasicallyEquals(this.state.viewport.center, oldCenter);
       }
 
+      // and then if we are centered to it or if we didn't have an old value we
+      // are going to fly to it
       if (isCenteredToOldValue || !oldValue) {
+        // we try to keep the zoom
         this.setState({
           viewport: {
             center: [newValue.lat, newValue.lng],
@@ -156,11 +318,20 @@ export default class PropertyEntryLocation
           },
         });
       }
+
+      // this allows realtime centered tracking, say we have a location marker that is centered
+      // to our location not only the value will update but we will keep track of it, so we are basically
+      // following the element
     }
   }
 
+  /**
+   * Hijacking the on restore function
+   */
   public onRestoreHijacked() {
+    // because we need to clear the search results
     this.clearSearchResults();
+    // before running the actual restoration
     this.props.onRestore();
   }
 
@@ -172,14 +343,24 @@ export default class PropertyEntryLocation
     });
   }
 
+  /**
+   * Actuall what triggers
+   * @param searchQuery the search query we are using
+   * @param updateIdentifier the identifier of this, to ensure
+   * that if two changes happened at once, only the last one wil trigger
+   */
   public async onSearchQueryChangeActual(
     searchQuery: string,
     updateIdentifier: number,
   ) {
+    // so we get these for reference
     const countryLatitude = this.props.country.latitude;
     const countryLongitude = this.props.country.longitude;
+
+    // and our separator
     const sep = this.props.i18n[this.props.language].word_separator;
 
+    // now the final results based on this
     let finalResults: IPropertyDefinitionSupportedLocationType[];
     try {
       finalResults = await fetch(
@@ -190,19 +371,30 @@ export default class PropertyEntryLocation
       finalResults = [];
     }
 
+    // and if our update identifier matches
     if (updateIdentifier === this.autocompleteTakingPlace) {
+      // we store these to avoid retriggering the same suggestion
       this.lastSuggestionsValue = finalResults;
       this.lastSuggestionsValueQ = searchQuery;
+
+      // we set such suggestions
       this.setState({
         suggestions: finalResults,
       });
     }
   }
 
+  /**
+   * Triggers when the search query changes, this is the literal
+   * function that is fed to the renderer
+   * @param searchQuery the search query the renderer gives
+   * @param dontAutoloadSuggestions and whether we should not autoload suggestions
+   */
   public onSearchQueryChange(
     searchQuery: string,
     dontAutoloadSuggestions?: boolean,
   ) {
+    // same value, do nothing
     if (
       this.props.state.internalValue === searchQuery ||
       this.props.state.value && (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt === searchQuery
@@ -210,13 +402,17 @@ export default class PropertyEntryLocation
       return;
     }
 
+    // clear search result because we have changed it
     this.clearSearchResults();
 
+    // clear a current value because now it doesn't match and
+    // we are doing a new search
     this.props.onChange(
       null,
       searchQuery,
     );
 
+    // and we do this depending
     if (dontAutoloadSuggestions) {
       return;
     } else if (!searchQuery.trim()) {
@@ -247,29 +443,52 @@ export default class PropertyEntryLocation
     }
   }
 
+  /**
+   * Fed to the renderer to change by suggestion
+   * @param suggestion the suggestion we are using
+   * @param mantainViewport whether to mantain the viewport
+   */
   public onChangeBySuggestion(
     suggestion: IPropertyDefinitionSupportedLocationType,
     mantainViewport?: boolean,
   ) {
+    // we just call the manual pick function, given
+    // the suggestion is a complete value it won't request
+    // geocode
     this.onManualPick(suggestion, mantainViewport);
   }
 
+  /**
+   * Fed to the renderer in order to run a search
+   * @param mantainViewport whether to mantain the viewport
+   */
   public async onSearch(
     mantainViewport?: boolean,
   ) {
+    // but what are we searching for, we get the value
+    // for it, what is it in our text field?
     const valueToSearch = 
       this.props.state.internalValue ||
       (this.props.state.value && (this.props.state.value as IPropertyDefinitionSupportedLocationType).txt);
 
+    // clear suggestions, we don't need them
     this.clearSuggestions();
 
+    // and we clear the current value
     this.props.onChange(
       null,
       valueToSearch,
     );
 
+    // if we have nothing to search for
     if (!valueToSearch) {
+      // we don't run a search we clear it instead
+      this.clearSearchResults();
+      // nothing happens
       return null;
+
+    // if we are searching the entire same thing, aka
+    // smashing search on the same value
     } else if (this.lastSearchValueQ === valueToSearch) {
       this.setState({
         searchResults: this.lastSearchValue,
@@ -277,6 +496,7 @@ export default class PropertyEntryLocation
       });
       return this.lastSearchValue;
     }
+
     // basically making a search request, we use the
     // internal value for this, as well as the country
     // latitude and longitude of the locale data
@@ -344,17 +564,22 @@ export default class PropertyEntryLocation
     return finalResults;
   }
 
+  /**
+   * Fed to the renderer to change by search result
+   * @param searchResult the search result in question
+   * @param mantainViewport whether to mantain the viewport
+   */
   public onChangeBySearchResult(
     searchResult: IPropertyDefinitionSupportedLocationType,
     mantainViewport?: boolean,
   ) {
     // swap the location for the search result
     // to another one of the answers
-
     if (!this.state.searchResults) {
       return;
     }
 
+    // get the index for it
     const index = this.state.searchResults.findIndex((sr) => sr.lng === searchResult.lng && sr.lat === searchResult.lat);
     if (index === -1) {
       return;
@@ -394,6 +619,10 @@ export default class PropertyEntryLocation
     });
   }
 
+  /**
+   * run the geocode for incomplete values
+   * @param value 
+   */
   public async geocode(value: IPropertyDefinitionSupportedLocationType) {
     let updatedResult: IPropertyDefinitionSupportedLocationType;
     // so this is the update identifier for this update

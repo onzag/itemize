@@ -272,7 +272,7 @@ class ActualPropertyEntryReferenceRenderer
     }
 
     // similarly to location
-    if (value !== this.props.currentStrValue) {
+    if (value !== this.props.currentTextualValue) {
       // we call the change of search
       this.props.onChangeSearch(value);
     }
@@ -403,7 +403,7 @@ class ActualPropertyEntryReferenceRenderer
           className={this.props.classes.entry}
           label={this.props.label}
           placeholder={this.props.placeholder}
-          value={this.props.currentStrValue || ""}
+          value={this.props.currentTextualValue}
           onChange={this.onChangeByHTMLEvent}
           onKeyDown={this.onKeyDown}
           InputProps={{

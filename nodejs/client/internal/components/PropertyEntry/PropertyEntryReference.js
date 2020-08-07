@@ -366,7 +366,7 @@ class PropertyEntryReference extends react_1.default.Component {
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
-            currentStrValue: this.props.state.internalValue || this.getSSRFoundValue(this.props.state.value, filterByLanguage ? this.props.language : null) || "",
+            currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(this.props.state.value, filterByLanguage ? this.props.language : null) || "",
             currentValueIsFullfilled: !!this.props.state.value,
             currentOptions: this.state.currentOptions,
             currentSearchError: this.state.currentSearchError,

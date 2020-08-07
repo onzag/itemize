@@ -758,7 +758,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
       // only support single image paste
       const file = clipboardData.files[0];
-      const data = await this.props.onInsertImage(file);
+      const data = await this.props.onInsertFile(file, true);
 
       // image failed to load
       if (!data) {
@@ -910,23 +910,23 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     this.closeVideoRequesting();
   }
-  public onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+  public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
     e.target.value = "";
 
-    const fileData = this.props.onInsertFile(file);
+    const fileData = await this.props.onInsertFile(file);
 
-    const prettySize = prettyBytes(fileData.size);
-    const expectedExtension = mimeTypeToExtension(fileData.type);
+    const prettySize = prettyBytes(fileData.result.size);
+    const expectedExtension = mimeTypeToExtension(fileData.result.type);
   
     const quill = this.quillRef.current.getEditor();
     const range = quill.getSelection(true);
 
     try {
       quill.insertEmbed(range.index, "itemizefile", {
-        srcId: fileData.id,
-        src: fileData.url,
-        name: fileData.name,
+        srcId: fileData.result.id,
+        src: fileData.result.url,
+        name: fileData.result.name,
         extension: expectedExtension,
         size: prettySize,
       }, (ReactQuill.Quill as any).sources.USER);
@@ -942,7 +942,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       alt = prompt("Please write an alt for your image:", "") || null;
     }
     try {
-      const data = await this.props.onInsertImage(file);
+      const data = await this.props.onInsertFile(file, true);
     
       const quill = this.quillRef.current.getEditor();
       const range = quill.getSelection(true);

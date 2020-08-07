@@ -54,5 +54,4 @@ export interface ITriggerRegistry {
     module?: IBaseTriggerRegistry;
     itemDefinition?: IBaseTriggerRegistry;
 }
-export declare function fixPaths<T>(src: T): T;
 export declare function mergeTriggerRegistries(...triggers: ITriggerRegistry[]): ITriggerRegistry;

@@ -213,7 +213,7 @@ Feel free to implement your own custom components but be wary of the sanitizer, 
  - data-src
  - loading
 
-Attributes as well as anything that it considers harmful; this should be done in the renderer, a good approach to creating
+As well as anything that it considers harmful; this should be done in the renderer, a good approach to creating
 feature rich components could be to use something such as `<div class="mycustomcomponent" data-info="SOME_JSON"></div>"` and
 you might implement it differently in the view renderer vs the entry renderer, eg. the entry renderer just display a black box
 whereas the view renderer displays a rich component.

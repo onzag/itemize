@@ -17,6 +17,7 @@ import {
   GUEST_METAROLE,
   UNSPECIFIED_OWNER,
   LAST_RICH_TEXT_CHANGE_LENGTH,
+  MAX_RAW_TEXT_LENGTH,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -671,6 +672,13 @@ export default class PropertyDefinition {
         // if it's not rich text we just count the characters
         count = value.toString().length;
       } else {
+        // special check for large values in raw mode
+        // should be a large enough value to avoid this
+        // and avoid being spammed with empty tags
+        if (value.toString().length > MAX_RAW_TEXT_LENGTH) {
+          return PropertyInvalidReason.TOO_LARGE;
+        }
+
         if (typeof window !== "undefined" && typeof (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] !== "undefined") {
           count = (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH];
         } else {

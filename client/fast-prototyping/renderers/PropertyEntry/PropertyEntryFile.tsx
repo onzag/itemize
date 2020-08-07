@@ -219,7 +219,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
             displayContent = (
               <div
                 className={mainFileClassName}
-                onClick={props.openFile.bind(null, props.currentValue)}
+                onClick={props.openFile}
               >
                 <div className="file-container">
                   {

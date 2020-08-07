@@ -11,7 +11,7 @@ export interface IReferrencedPropertySet {
     [propertyId: string]: PropertyDefinitionValueType;
 }
 export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
-    currentStrValue: string;
+    currentTextualValue: string;
     currentValueIsFullfilled: boolean;
     currentOptions: IPropertyEntryReferenceOption[];
     currentFindError: EndpointErrorType;

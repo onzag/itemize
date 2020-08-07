@@ -171,7 +171,7 @@ function SelectCurrencyDialog(props) {
         }, open: props.open, onClose: props.onClose, "aria-labelledby": "currency-dialog-title", fullScreen: props.fullScreen },
         react_1.default.createElement(index_1.DialogTitle, { id: "currency-dialog-title" }, props.currencyI18n.title),
         react_1.default.createElement("div", null,
-            react_1.default.createElement(index_1.List, null, props.currencyArrData.map((currency) => (react_1.default.createElement(index_1.ListItem, { selected: currency.code === props.currency.code, button: true, onClick: closeAndChangeCurrency.bind(null, currency.code), key: currency.code },
+            react_1.default.createElement(index_1.List, null, props.currencyAvailable.map((currency) => (react_1.default.createElement(index_1.ListItem, { selected: currency.code === props.currency.code, button: true, onClick: closeAndChangeCurrency.bind(null, currency.code), key: currency.code },
                 react_1.default.createElement(index_1.ListItemText, { primary: currency.symbol + " - " + currency.code }))))))));
 }
 /**
@@ -192,9 +192,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
         };
         this.toggleVisible = this.toggleVisible.bind(this);
         this.catchToggleMouseDownEvent = this.catchToggleMouseDownEvent.bind(this);
-        this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.renderBasicTextField = this.renderBasicTextField.bind(this);
         this.closeDialog = this.closeDialog.bind(this);
         this.openDialog = this.openDialog.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
@@ -236,26 +234,12 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             this.inputRefSelectionStart = this.inputRef.selectionStart;
         }
     }
-    render() {
-        // if (this.props.autocompleteMode) {
-        //   return this.renderAutosuggestField();
-        // }
-        return this.renderBasicTextField();
-    }
-    onChangeByHTMLEvent(e) {
-        this.onChange(e);
-    }
     onChange(e) {
         // the change has two values, a textual value, and a
         // numeric value, texual value is always set but
         // numeric value is only set for numbers
         const value = e.target.value.toString();
-        const internalValue = value;
-        if (this.props.isNumericType) {
-            this.props.onChangeByNumber(value);
-            return;
-        }
-        this.props.onChange(value, internalValue);
+        this.props.onChangeByTextualValue(value);
     }
     openDialog() {
         this.setState({
@@ -272,7 +256,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             this.props.args.onEnter();
         }
     }
-    renderBasicTextField(textFieldProps) {
+    render() {
         // set the input mode, this is for mobile,
         // basically according to our input we need
         // different keys
@@ -293,35 +277,6 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
                 this.inputRef = node;
             },
         };
-        // if there are textFieldProps
-        if (textFieldProps) {
-            // we need to extract the ref setting
-            const { inputRef = () => { return; }, ref, ...other } = textFieldProps;
-            // set all the other properties as applied to the TextField
-            appliedTextFieldProps = other;
-            // and we need to setup the ref setting and rescue our function
-            // so that we can have the ref too for the Input
-            appliedInputProps = {
-                inputRef: (node) => {
-                    ref(node);
-                    inputRef(node);
-                    this.inputRef = node;
-                },
-            };
-            // if we have a className, it will inevitably override our class name
-            // but we need ours too, so let's merge it in the TextField
-            if (appliedTextFieldProps.className) {
-                appliedTextFieldProps.className += " " + this.props.classes.entry;
-            }
-            // if there are small inputProps, they will override our inputProps,
-            // of the input mode and autocomplete html, so we need to merge them
-            if (appliedTextFieldProps.inputProps) {
-                appliedTextFieldProps.inputProps = {
-                    ...inputProps,
-                    ...appliedTextFieldProps.inputProps,
-                };
-            }
-        }
         // if the type is a password
         if (this.props.type === "password") {
             // set the end addornment for the show and hide button
@@ -369,9 +324,7 @@ class ActualPropertyEntryFieldRenderer extends react_1.default.Component {
             this.props.description && !descriptionAsAlert ?
                 react_1.default.createElement(index_1.Typography, { variant: "caption", className: this.props.classes.description }, this.props.description) :
                 null,
-            react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: this.state.visible ? "text" : "password", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentInternalStrOnlyValue ||
-                    this.props.currentStrOnlyValue ||
-                    "", onChange: this.onChangeByHTMLEvent, onKeyDown: this.onKeyDown, InputProps: {
+            react_1.default.createElement(index_1.TextField, Object.assign({ fullWidth: true, type: this.state.visible ? "text" : "password", className: this.props.classes.entry, label: this.props.label, placeholder: this.props.placeholder, value: this.props.currentTextualValue, onChange: this.onChange, onKeyDown: this.onKeyDown, InputProps: {
                     classes: {
                         root: this.props.classes.fieldInput,
                         focused: "focused",

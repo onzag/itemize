@@ -18,7 +18,7 @@ export interface IReferrencedPropertySet {
 }
 
 export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
-  currentStrValue: string;
+  currentTextualValue: string;
   currentValueIsFullfilled: boolean;
   currentOptions: IPropertyEntryReferenceOption[];
   currentFindError: EndpointErrorType;
@@ -501,7 +501,7 @@ export default class PropertyEntryReference
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
-      currentStrValue: this.props.state.internalValue || this.getSSRFoundValue(
+      currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(
         this.props.state.value as number,
         filterByLanguage ? this.props.language : null,
       ) || "",

@@ -24,7 +24,40 @@ function fixPaths(src) {
     });
     return output;
 }
-exports.fixPaths = fixPaths;
+function mergeIOTriggers(triggerA, triggerB) {
+    if (!triggerA) {
+        return triggerB;
+    }
+    else if (!triggerB) {
+        return triggerA;
+    }
+    const mergedTrigger = async (arg) => {
+        const originalUpdateResult = await triggerA(arg);
+        if (originalUpdateResult) {
+            return await triggerB({
+                ...arg,
+                update: originalUpdateResult,
+            });
+        }
+        else {
+            return await triggerB(arg);
+        }
+    };
+    return mergedTrigger;
+}
+function mergeSearchTriggers(triggerA, triggerB) {
+    if (!triggerA) {
+        return triggerB;
+    }
+    else if (!triggerB) {
+        return triggerA;
+    }
+    const mergedTrigger = async (arg) => {
+        await triggerA(arg);
+        await triggerB(arg);
+    };
+    return mergedTrigger;
+}
 function mergeTriggerRegistries(...triggers) {
     const final = {
         itemDefinition: {
@@ -41,18 +74,30 @@ function mergeTriggerRegistries(...triggers) {
         const modTrigger = t.module;
         if (iTrigger) {
             if (iTrigger.io) {
-                Object.assign(final.itemDefinition.io, fixPaths(iTrigger.io));
+                const fixed = fixPaths(iTrigger.io);
+                Object.keys(fixed).forEach((path) => {
+                    final.itemDefinition.io[path] = mergeIOTriggers(final.itemDefinition.io[path], fixed[path]);
+                });
             }
             if (iTrigger.search) {
-                Object.assign(final.itemDefinition.search, fixPaths(iTrigger.search));
+                const fixed = fixPaths(iTrigger.search);
+                Object.keys(fixed).forEach((path) => {
+                    final.itemDefinition.search[path] = mergeSearchTriggers(final.itemDefinition.search[path], fixed[path]);
+                });
             }
         }
         if (modTrigger) {
             if (modTrigger.io) {
-                Object.assign(final.module.io, fixPaths(modTrigger.io));
+                const fixed = fixPaths(modTrigger.io);
+                Object.keys(fixed).forEach((path) => {
+                    final.module.io[path] = mergeIOTriggers(final.module.io[path], fixed[path]);
+                });
             }
             if (modTrigger.search) {
-                Object.assign(final.module.search, fixPaths(modTrigger.search));
+                const fixed = fixPaths(modTrigger.search);
+                Object.keys(fixed).forEach((path) => {
+                    final.module.search[path] = mergeSearchTriggers(final.module.search[path], fixed[path]);
+                });
             }
         }
     });
