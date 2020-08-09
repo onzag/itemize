@@ -31,8 +31,9 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
     }>;
     /**
      * the signup dialog component, a custom one might be passed via the navbar config
+     * if no signup dialog is given no signup will be available
      */
-    SignupDialog: React.ComponentType<{
+    SignupDialog?: React.ComponentType<{
         open: boolean;
         onClose: () => void;
         onLoginRequest: () => void;

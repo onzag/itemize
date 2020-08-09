@@ -71,8 +71,9 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
   LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
   /**
    * The Signup dialog component, required, after all that's what all this navbar is for, check signup-dialog.tsx dialog for a default
+   * if not given a signup dialog then no signup will be available
    */
-  SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  SignupDialog?: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
   /**
    * The Recover dialog component, required, after all that's what all this navbar is for, check recover-dialog.tsx for a default
    */

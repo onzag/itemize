@@ -95,7 +95,7 @@ exports.Buttons = mui_core_1.withStyles(buttonsStyles)((props) => {
                         react_1.default.createElement(language_picker_1.LanguagePicker, { className: props.classes.languageButton, shrinkingDisplay: true, shrinkingDisplayStandardClassName: props.classes.standardLanguageButtonLabel, shrinkingDisplayShrunkClassName: props.classes.shrunkLanguageButtonLabel }) :
                         null,
                     react_1.default.createElement(LoginDialog, { open: state.loginDialogOpen, onClose: closeLoginDialog, onSignupRequest: openSignupDialog, onRecoverRequest: openRecoverDialog }),
-                    react_1.default.createElement(SignupDialog, { open: state.signupDialogOpen, onClose: closeSignupDialog, onLoginRequest: openLoginDialog }),
+                    SignupDialog ? react_1.default.createElement(SignupDialog, { open: state.signupDialogOpen, onClose: closeSignupDialog, onLoginRequest: openLoginDialog }) : null,
                     react_1.default.createElement(RecoverDialog, { open: state.recoverDialogOpen, onClose: closeRecoverDialog, onLoginRequest: openLoginDialog }));
             }
             else if (status === "LOGGED_IN") {

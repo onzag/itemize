@@ -1,12 +1,9 @@
 import React from "react";
 
-import { Navbar } from "@onzag/itemize/client/fast-prototyping/components/navbar";
-import { IMenuEntry } from "@onzag/itemize/client/fast-prototyping/components/navbar/menu";
 import Route from "@onzag/itemize/client/components/navigation/Route";
 
-import { LoginDialog } from "@onzag/itemize/client/fast-prototyping/components/login-dialog";
-import { SignupDialog } from "@onzag/itemize/client/fast-prototyping/components/signup-dialog";
-import { RecoverDialog } from "@onzag/itemize/client/fast-prototyping/components/recover-dialog";
+import { Navbar } from "@onzag/itemize/client/fast-prototyping/components/navbar";
+import { IMenuEntry } from "@onzag/itemize/client/fast-prototyping/components/navbar/menu";
 import { ImportantDevicesIcon, HomeIcon, LibraryBooksIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 
 import { Frontpage } from "./pages/frontpage";
@@ -22,6 +19,9 @@ import { CMS } from "./pages/cms";
 
 import { Avatar } from "./components/avatar";
 import { Footer } from "./components/footer";
+import { LoginDialog } from "./components/login-dialog";
+import { SignupDialog } from "./components/signup-dialog";
+import { RecoverDialog } from "./components/recover-dialog";
 
 // Remember that when adding fast prototyping components they might demand
 // localization data, if you get an error named

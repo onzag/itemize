@@ -54,8 +54,9 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
   LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>;
   /**
    * the signup dialog component, a custom one might be passed via the navbar config
+   * if no signup dialog is given no signup will be available
    */
-  SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
+  SignupDialog?: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
   /**
    * The recover password component a custom one might be passed via the navbar config
    */
@@ -143,11 +144,11 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
                     onSignupRequest={openSignupDialog}
                     onRecoverRequest={openRecoverDialog}
                   />
-                  <SignupDialog
+                  {SignupDialog ? <SignupDialog
                     open={state.signupDialogOpen}
                     onClose={closeSignupDialog}
                     onLoginRequest={openLoginDialog}
-                  />
+                  /> : null}
                   <RecoverDialog
                     open={state.recoverDialogOpen}
                     onClose={closeRecoverDialog}
