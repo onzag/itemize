@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the property view file handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -12,7 +16,6 @@ const util_2 = require("../../../../util");
 class PropertyViewFile extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
         // This is optimized to only update for the thing it uses
-        // This is optimized to only update for the thing it uses
         return this.props.useAppliedValue !== nextProps.useAppliedValue ||
             (!this.props.useAppliedValue && !deep_equal_1.default(this.props.state.value, nextProps.state.value)) ||
             (this.props.useAppliedValue && !deep_equal_1.default(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
@@ -23,7 +26,10 @@ class PropertyViewFile extends react_1.default.Component {
             !!this.props.rtl !== !!nextProps.rtl ||
             !deep_equal_1.default(this.props.rendererArgs, nextProps.rendererArgs);
     }
-    openFile(value) {
+    openFile() {
+        const value = (this.props.useAppliedValue ?
+            this.props.state.stateAppliedValue :
+            this.props.state.value);
         window.open(value.url, value.name);
     }
     render() {

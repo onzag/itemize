@@ -60,44 +60,6 @@ const navbarStyles = (theme) => mui_core_1.createStyles({
     }
 });
 /**
- * The default admin entries
- */
-const defaultMenuAdminEntries = [
-    {
-        path: "/cms",
-        icon: react_1.default.createElement(mui_core_1.ImportantDevicesIcon, null),
-        module: "cms",
-        role: "ADMIN",
-        i18nProps: {
-            id: "name",
-            capitalize: true,
-        },
-    },
-];
-/**
- * The default menu entries
- */
-const defaultMenuEntries = [
-    {
-        path: "/",
-        icon: react_1.default.createElement(mui_core_1.HomeIcon, null),
-        i18nProps: {
-            id: "home",
-            capitalize: true,
-        },
-    },
-    {
-        path: "/news",
-        icon: react_1.default.createElement(mui_core_1.LibraryBooksIcon, null),
-        module: "cms",
-        idef: "article",
-        i18nProps: {
-            id: "news",
-            capitalize: true,
-        },
-    },
-];
-/**
  * The navbar fast prototyping component, contains more than just a navbar, it has extra
  * functionality into it, such as outdated information, a blocking backdrop, etc...
  * might be disabled by request
@@ -120,19 +82,11 @@ exports.Navbar = mui_core_1.withStyles(navbarStyles)((props) => {
                         react_1.default.createElement(outdated_text_1.OutdatedText, { onClick: setIsOutdatedDialogAllowedToBeOpen.bind(this, true) }))),
                 react_1.default.createElement("div", { className: props.classes.container },
                     react_1.default.createElement(UserDataRetriever_1.default, null, (user) => react_1.default.createElement(module_1.ModuleProvider, { module: "users" },
-                        react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", forId: user.id, disableExternalChecks: true, assumeOwnership: true, properties: [
-                                "username",
-                                "app_country",
-                                "email",
-                                "e_validated",
-                                "profile_picture",
-                                "address",
-                                "role",
-                            ], longTermCaching: true, markForDestructionOnLogout: true },
-                            react_1.default.createElement(buttons_1.Buttons, { excludeLanguagePicker: props.excludeLanguagePicker, LoginDialog: props.LoginDialog, SignupDialog: props.SignupDialog, RecoverDialog: props.RecoverDialog }),
+                        react_1.default.createElement(item_definition_1.ItemDefinitionProvider, { itemDefinition: "user", forId: user.id, disableExternalChecks: true, assumeOwnership: true, properties: props.avatarContextProperties, longTermCaching: true, markForDestructionOnLogout: true },
+                            react_1.default.createElement(buttons_1.Buttons, { excludeLanguagePicker: props.excludeLanguagePicker, LoginDialog: props.LoginDialog, SignupDialog: props.SignupDialog, RecoverDialog: props.RecoverDialog, AvatarComponent: props.AvatarComponent, avatarProps: props.avatarProps }),
                             react_1.default.createElement(external_dialogs_1.ExternalDialogs, null))))))),
         react_1.default.createElement("div", { className: props.classes.appBarSpacer }),
         react_1.default.createElement(blocking_backdrop_1.BlockingBackdrop, { exclude: props.excludeBlockingBackdrop }),
         react_1.default.createElement(outdated_dialog_1.OutdatedDialog, { isOpenIfOutdated: isOutdatedDialogAllowedToBeOpen, onClose: setIsOutdatedDialogAllowedToBeOpen.bind(this, false) }),
-        react_1.default.createElement(menu_1.Menu, { isOpen: isMenuOpen, onClose: setMenuOpen.bind(this, false), onOpen: setMenuOpen.bind(this, true), adminEntries: props.menuAdminEntries || defaultMenuAdminEntries, entries: props.menuEntries || defaultMenuEntries })));
+        react_1.default.createElement(menu_1.Menu, { isOpen: isMenuOpen, onClose: setMenuOpen.bind(this, false), onOpen: setMenuOpen.bind(this, true), adminEntries: props.menuAdminEntries, entries: props.menuEntries })));
 });

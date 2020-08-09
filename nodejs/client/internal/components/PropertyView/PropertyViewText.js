@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the property view text handler as well as some other
+ * functionality that is used for handling text
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,23 +12,54 @@ const react_1 = __importDefault(require("react"));
 const util_1 = require("../../../../util");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const util_2 = require("../../../components/util");
+/**
+ * Sanitazation standard configuraton
+ */
 exports.PROPERTY_VIEW_SANITIZE_CONFIG = {
+    // iframes are allowed, no sources are expected from the server side anyway
     ADD_TAGS: ["iframe"],
+    // but src are still allowed here for a simple reason, as they are defined by the post processing hook
     ADD_ATTR: ["frameborder", "allow", "allowfullscreen", "scrolling", "src", "spellcheck", "contenteditable"],
+    // and these can be blob so we must allow them
     ALLOW_UNKNOWN_PROTOCOLS: true,
 };
+/**
+ * The list of allowed classes for text as defined by the text-specs
+ * this will prevent users from class injection
+ */
 exports.ALLOWED_CLASSES = [
     "image", "image-container", "image-pad", "video", "video-container",
     "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
 ];
+/**
+ * The list of allowed prefixes
+ */
 exports.ALLOWED_CLASSES_PREFIXES = [
     "rich-text--",
 ];
+/**
+ * clean all attributes in a html element
+ * @param node the node to clean for
+ */
 function cleanAllAttribs(node) {
     Array.prototype.slice.call(node.attributes).forEach((attr) => {
         node.removeAttribute(attr.name);
     });
 }
+/**
+ * The postprocessing hook that cleans and sets the attributes
+ * right for the rich text in order to follow the standards
+ * given by the text-specs.md file
+ *
+ * @param relatedProperty the property we are used as media property
+ * @param currentFiles the current files
+ * @param supportsImages whether we are supporting images
+ * @param supportsVideos whether we are supporting videos
+ * @param supportsFiles whether we are supporting files
+ * @param node the given node in question we are currently processing, this is a recursive
+ * function after all
+ * @returns a node
+ */
 function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsImages, supportsVideos, supportsFiles, node) {
     if (node.tagName === "IFRAME") {
         if (supportsVideos) {
@@ -145,6 +181,9 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
     return node;
 }
 exports.propertyViewPostProcessingHook = propertyViewPostProcessingHook;
+/**
+ * The property view text class
+ */
 class PropertyViewText extends react_1.default.Component {
     constructor(props) {
         super(props);

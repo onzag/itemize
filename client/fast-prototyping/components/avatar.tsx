@@ -9,7 +9,6 @@ import { Avatar as MAvatar, Badge, RootRef, withStyles,
   WithStyles, createStyles, Alert, BrokenImageIcon, AddAPhotoIcon} from "../mui-core";
 import { countries } from "../../../imported-resources";
 import Link from "../../components/navigation/Link";
-import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import { imageSizeRetriever, cacheableQSLoader } from "../../components/util";
 import { IPropertyEntryFileRendererProps } from "../../internal/components/PropertyEntry/PropertyEntryFile";
@@ -160,35 +159,18 @@ const avatarStyles = createStyles({
 });
 
 /**
- * The function that allows to retrieve the profile url on wherever
- * the profile is located via a given id
- */
-type profileURLFn = (id: number) => string;
-
-/**
  * The properties for the avatar
  */
 interface IAvatarProps extends WithStyles<typeof avatarStyles> {
-  /**
-   * hides the flag in the avatar, this makes it not to need app_country
-   * in the context
-   */
-  hideFlag?: boolean;
   /**
    * size small, medium or large changes how it displays
    */
   size: "small" | "medium" | "large";
   /**
-   * shows warnings as a badge in the profile image
-   * if show warnings is true then it will need, email, e_validated and address
-   * in the context
-   */
-  showWarnings?: boolean;
-  /**
    * the profile url for the user, can be a string or a function; if not provided the avatar
    * will not have a redirection attached to it
    */
-  profileURL?: string | profileURLFn;
+  profileURL?: string;
   /**
    * Whether to cache the image that is displayed, normally uses the small image unless it's in large
    * mode, that will be cached
@@ -204,10 +186,32 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
    */
   linkClassName?: string;
   /**
-   * Special user roles, makes the display a bit different, if not specified, any user that is not USER
-   * will be a special user, otherwise only the ones in this list
+   * The id of the user currently logged, it is used
+   * for 
    */
-  specialUserRoles?: string[];
+  id: number;
+  /**
+   * The username of this user
+   */
+  userNameValue: string;
+  /**
+   * Will give it a ring around the user to make it realize
+   * that it a special kind of user
+   */
+  isSpecialUser?: boolean;
+  /**
+   * The profile picture file for this user, if given
+   * will display a profile image
+   */
+  profilePictureValue?: PropertyDefinitionSupportedFileType;
+  /**
+   * If provided will display a flag with the profile image itself
+   */
+  countryCode?: string;
+  /**
+   * Adds warnings to the image
+   */
+  warningCount?: number;
 }
 
 /**
@@ -264,73 +268,18 @@ class SimpleAvatar extends React.PureComponent<SimpleAvatarProps> {
 }
 
 /**
- * The avatar content props
- */
-interface AvatarContentProps extends IAvatarProps {
-  /**
-   * The id of the user currently logged
-   */
-  id: number;
-  /**
-   * The role of the user currently logged
-   */
-  role: string;
-  /**
-   * The username of this user
-   */
-  userNameValue: string;
-  /**
-   * The profile picture file for this user
-   */
-  profilePictureValue: PropertyDefinitionSupportedFileType;
-  /**
-   * whether warning are at all supported as in the properties
-   * necessaries were included
-   */
-  supportsWarnings: boolean;
-  /**
-   * whether an email is missing
-   */
-  hasWarningForMissingEmail: boolean;
-  /**
-   * whether an email has not been electronically validated
-   * e_validated
-   */
-  hasWarningForNotValidEmail: boolean;
-  /**
-   * whether there's no address specified
-   */
-  hasAnotherWarningForMissingAddress: boolean;
-}
-
-/**
  * The avatar content will do complex logic in order
  * to display the avatar of a given user in an efficient way
  */
-class AvatarContent extends React.PureComponent<AvatarContentProps> {
+class ActualAvatar extends React.PureComponent<IAvatarProps> {
   public render() {
     // so we assign a random color based on the user id
     const numberColorClassName = this.props.id ? this.props.classes["randomColor" + (this.props.id % 10)] : "";
-    
-    // now whether it's an special user
-    const isSpecialUser = this.props.specialUserRoles ?
-      this.props.specialUserRoles.includes(this.props.role) : this.props.role !== "USER";
 
     // now the flag logic
-    const flag = this.props.hideFlag ? null : (
-      <Reader id="app_country">
-        {
-          (appCountryValue: string) => {
-            let countryEmoji = null;
-            if (appCountryValue && countries[appCountryValue]) {
-              countryEmoji = countries[appCountryValue].emoji;
-            }
-
-            return <div className={this.props.classes.flag}>{countryEmoji}</div>;
-          }
-        }
-      </Reader>
-    )
+    const flag = this.props.countryCode && countries[this.props.countryCode] ? (
+      <div className={this.props.classes.flag}>{countries[this.props.countryCode].emoji}</div>
+    ) : null;
 
     // and now we get the image sources from the image size retriever, only the standard
     // sources as we pass no property definition to it
@@ -347,7 +296,7 @@ class AvatarContent extends React.PureComponent<AvatarContentProps> {
           imgSrc={this.props.cacheImage ? cacheableQSLoader(imageSrc) : imageSrc}
           size={this.props.size}
           numberColorClassName={numberColorClassName}
-          isSpecialUser={isSpecialUser}
+          isSpecialUser={this.props.isSpecialUser}
           userNameValue={this.props.userNameValue}
           classes={this.props.classes}
         />
@@ -360,24 +309,23 @@ class AvatarContent extends React.PureComponent<AvatarContentProps> {
     const avatar = this.props.profileURL ? (
       <Link
         className={this.props.linkClassName}
-        to={typeof this.props.profileURL === "string" ? this.props.profileURL : this.props.profileURL(this.props.id)}
+        to={this.props.profileURL}
       >
         {content}
       </Link>
     ) : content;
 
     // so now for warnings
-    if (this.props.showWarnings && this.props.supportsWarnings) {
-      let warningCount = 0;
-      if (this.props.hasWarningForMissingEmail || this.props.hasWarningForNotValidEmail) {
-        warningCount++;
-      }
-      if (this.props.hasAnotherWarningForMissingAddress) {
-        warningCount++;
-      }
-      return <Badge badgeContent={warningCount} color="secondary" classes={{ badge: this.props.classes.avatarBadge }}>
-        {avatar}
-      </Badge>
+    if (this.props.warningCount) {
+      return (
+        <Badge
+          badgeContent={this.props.warningCount > 99 ? "99+" : this.props.warningCount}
+          color="secondary"
+          classes={{ badge: this.props.classes.avatarBadge }}
+        >
+          {avatar}
+        </Badge>
+      );
     } else {
       // no warnings, return as it is
       return avatar;
@@ -386,105 +334,11 @@ class AvatarContent extends React.PureComponent<AvatarContentProps> {
 }
 
 /**
- * The avatar will display a nice avatar profile image for the given user in the given context
- * it should be in an item definition provider for that specific user and contain the following properties
- * 
- * - profile_picture
- * - role
- * - username
- * - app_country
- * 
- * if hideFlag is true then app_country is not necessary
- * 
- * if showWarnings is true then the following properties are also necessary
- * 
- * - email
- * - e_validated
- * - address
- * 
- * showWarnings is basically only useful for when displaying own currently logged user information in
- * the navbar or somewhere else where this is relevant
- * 
- * @param props the avatar props
- * @returns a react component
+ * Will display an avatar for a given user, this fast prototyping
+ * component makes no assumptions and as such you will have to implement
+ * your own wrapper around it to make your own avatar type
  */
-export const Avatar = withStyles(avatarStyles)((props: IAvatarProps) => {
-  // so this is the standard logic
-  return (
-    <Reader id="id">
-      {(id: number) => (
-        <Reader id="profile_picture">
-          {(profilePictureValue: PropertyDefinitionSupportedFileType) => (
-            <Reader id="role">
-              {(role: string) => (
-                <Reader id="username">
-                  {
-                    (userNameValue: string) => {
-                      if (!props.showWarnings) {
-                        return (
-                          <AvatarContent
-                            {...props}
-                            id={id}
-                            role={role}
-                            userNameValue={userNameValue}
-                            profilePictureValue={profilePictureValue}
-                            supportsWarnings={false}
-                            hasWarningForMissingEmail={false}
-                            hasWarningForNotValidEmail={false}
-                            hasAnotherWarningForMissingAddress={false}
-                            classes={props.classes}
-                          />
-                        );
-                      }
-    
-                      return (
-                        <Reader id="email">
-                          {(email: string, emailState: IPropertyDefinitionState) => (
-                            <Reader id="e_validated">
-                              {(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
-                                <Reader id="address">
-                                  {(address, addressState) => {
-                                    // now we check for these warnings
-                                    const hasWarningForMissingEmail = !(emailState && emailState.stateAppliedValue);
-                                    const hasWarningForNotValidEmail = !(eValidatedState && eValidatedState.stateAppliedValue);
-                                    const hasAnotherWarningForMissingAddress = !(addressState && addressState.stateAppliedValue);
-                                    // and if we have to display them at all
-                                    const supportsWarnings = emailState && eValidatedState && addressState && props.showWarnings && (
-                                      hasWarningForMissingEmail || hasWarningForNotValidEmail || hasAnotherWarningForMissingAddress
-                                    );
-
-                                    return (
-                                      <AvatarContent
-                                        {...props}
-                                        id={id}
-                                        role={role}
-                                        userNameValue={userNameValue}
-                                        profilePictureValue={profilePictureValue}
-                                        supportsWarnings={supportsWarnings}
-                                        hasWarningForMissingEmail={hasWarningForMissingEmail}
-                                        hasWarningForNotValidEmail={hasWarningForNotValidEmail}
-                                        hasAnotherWarningForMissingAddress={hasAnotherWarningForMissingAddress}
-                                        classes={props.classes}
-                                      />
-                                    );
-                                  }}
-                                </Reader> 
-                              )}
-                            </Reader>
-                          )}
-                        </Reader>
-                      )
-                    }
-                  }
-                </Reader>
-              )}
-            </Reader>
-          )}
-        </Reader>
-      )}
-    </Reader>
-  );
-});
+export const Avatar = withStyles(avatarStyles)(ActualAvatar);
 
 /**
  * The avatar renderer uses the same property entry file renderer props with the same

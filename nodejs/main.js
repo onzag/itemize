@@ -27,6 +27,7 @@ const actionRegistry = {
         description: "run the initial setup, you can run this utility over again to re-setup",
         usage: "itemize setup (step)",
         needsArgs: 0,
+        arbitraryArgs: true,
     },
     "get-deployable": {
         fn: getdeployable_1.default,
@@ -66,7 +67,9 @@ const actionRegistry = {
     // so if our action is registered
     if (actionRegistry[action]) {
         // if we are tasked with getting specific help, or if the amount of args we need do not match
-        if (wantsSpecificHelp || actionRegistry[action].needsArgs !== remainingArgs.length) {
+        if (wantsSpecificHelp ||
+            (actionRegistry[action].needsArgs !== remainingArgs.length &&
+                !actionRegistry[action].arbitraryArgs)) {
             // we show the specific usage
             console.log(actionRegistry[action].description);
             console.log("usage: " + colors_1.default.yellow(actionRegistry[action].usage));

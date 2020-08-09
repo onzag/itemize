@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Contains the property view main handler that handles all
+ * the property view variants and setups the renderers
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,6 +24,9 @@ const PropertyViewReference_1 = __importDefault(require("./PropertyViewReference
 const ssr_provider_1 = require("../../../../client/internal/providers/ssr-provider");
 const token_provider_1 = require("../../../../client/internal/providers/token-provider");
 ;
+/**
+ * The handler registry
+ */
 const handlerRegistry = {
     string: {
         renderer: "PropertyViewSimple",
@@ -47,6 +55,10 @@ const handlerRegistry = {
         renderer: "PropertyViewText",
         handler: PropertyViewText_1.default,
         includeConfig: true,
+        defaultSubhandler: {
+            renderer: "PropertyViewSimple",
+            handler: PropertyViewSimple_1.PropertyViewSimple,
+        }
     },
     currency: {
         renderer: "PropertyViewCurrency",
@@ -86,6 +98,15 @@ const handlerRegistry = {
     // TODO
     files: null,
 };
+/**
+ * A raw property view that uses the simple view
+ * by default in order to build a view for a raw property, raw properties
+ * such as created_at edited_at type and so on, which do not have entries
+ * nor property definitions
+ *
+ * @param props the props
+ * @returns areact element
+ */
 function RawBasePropertyView(props) {
     // Build the context and render sending the right props
     return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {

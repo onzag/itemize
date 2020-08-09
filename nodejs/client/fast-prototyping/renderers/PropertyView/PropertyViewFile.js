@@ -172,7 +172,7 @@ class PropertyViewFileRenderer extends react_1.default.Component {
             return (react_1.default.createElement("a", { href: this.props.currentValue.url, title: this.props.currentValue.name },
                 react_1.default.createElement("img", { ref: this.refImg, srcSet: !this.state.loaded ? null : this.props.imageSrcSet, sizes: imageSizes, "data-src": this.props.currentValue.url, src: !this.state.loaded ? null : this.props.currentValue.url, className: imageClassName, loading: this.props.args.lazyLoad ? "lazy" : null, alt: this.props.currentValue.name })));
         }
-        return (react_1.default.createElement("span", { className: "file", onClick: this.props.openFile.bind(null, this.props.currentValue) },
+        return (react_1.default.createElement("span", { className: "file", onClick: this.props.openFile },
             react_1.default.createElement("span", { className: "file-container" },
                 react_1.default.createElement("span", { className: "file-icon" },
                     react_1.default.createElement("span", { className: "file-extension" }, this.props.extension)),

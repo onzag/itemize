@@ -7,7 +7,6 @@
 import React from "react";
 import { Button, Theme, createStyles, WithStyles, withStyles } from "../../mui-core";
 import { LanguagePicker } from "../language-picker";
-import { Avatar } from "../avatar";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import { IfLogStatus } from "../../../components/login/IfLogStatus";
 import I18nRead from "../../../components/localization/I18nRead";
@@ -52,15 +51,23 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
   /**
    * The login dialog component, a custom one might be passed via the navbar config
    */
-  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
+  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>;
   /**
    * the signup dialog component, a custom one might be passed via the navbar config
    */
-  SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  SignupDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
   /**
    * The recover password component a custom one might be passed via the navbar config
    */
-  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
+  /**
+   * Component for avatar
+   */
+  AvatarComponent: React.ComponentType<any>;
+  /**
+   * avatarProps
+   */
+  avatarProps: any;
 }
 
 /**
@@ -148,12 +155,9 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
                   />
                 </React.Fragment>;
               } else if (status === "LOGGED_IN") {
+                const Avatar = props.AvatarComponent; 
                 return <Avatar
-                  fullWidth={true}
-                  showWarnings={true}
-                  profileURL="my-profile"
-                  cacheImage={true}
-                  size="small"
+                  {...props.avatarProps}
                 />;
               }
             }}

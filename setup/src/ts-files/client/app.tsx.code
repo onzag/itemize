@@ -1,24 +1,27 @@
 import React from "react";
 
 import { Navbar } from "@onzag/itemize/client/fast-prototyping/components/navbar";
+import { IMenuEntry } from "@onzag/itemize/client/fast-prototyping/components/navbar/menu";
 import Route from "@onzag/itemize/client/components/navigation/Route";
-import { Footer } from "@onzag/itemize/client/fast-prototyping/components/footer";
 
 import { LoginDialog } from "@onzag/itemize/client/fast-prototyping/components/login-dialog";
 import { SignupDialog } from "@onzag/itemize/client/fast-prototyping/components/signup-dialog";
 import { RecoverDialog } from "@onzag/itemize/client/fast-prototyping/components/recover-dialog";
-import { MyProfile } from "@onzag/itemize/client/fast-prototyping/pages/my-profile";
-import { Profile } from "@onzag/itemize/client/fast-prototyping/pages/profile";
-import { ChangePassword } from "@onzag/itemize/client/fast-prototyping/pages/change-password";
-import { Preferences } from "@onzag/itemize/client/fast-prototyping/pages/preferences";
-import { PrivacyPolicy } from "@onzag/itemize/client/fast-prototyping/pages/privacy-policy";
-import { TermsAndConditions } from "@onzag/itemize/client/fast-prototyping/pages/terms-and-conditions";
-import { Contact } from "@onzag/itemize/client/fast-prototyping/pages/contact";
-import { ResetPassword } from "@onzag/itemize/client/fast-prototyping/pages/reset-password";
-import { Frontpage } from "@onzag/itemize/client/fast-prototyping/pages/frontpage";
-import { News } from "@onzag/itemize/client/fast-prototyping/pages/news";
+import { ImportantDevicesIcon, HomeIcon, LibraryBooksIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 
-import { CMS } from "@onzag/itemize/client/fast-prototyping/pages/cms";
+import { Frontpage } from "./pages/frontpage";
+import { Contact } from "./pages/contact";
+import { PrivacyPolicy } from "./pages/privacy-policy";
+import { TermsAndConditions } from "./pages/terms-and-conditions";
+import { ResetPassword } from "./pages/reset-password";
+import { Profile } from "./pages/profile";
+import { MyProfile } from "./pages/my-profile";
+import { ChangePassword } from "./pages/change-password";
+import { News } from "./pages/news";
+import { CMS } from "./pages/cms";
+
+import { Avatar } from "./components/avatar";
+import { Footer } from "./components/footer";
 
 // Remember that when adding fast prototyping components they might demand
 // localization data, if you get an error named
@@ -32,25 +35,86 @@ import { CMS } from "@onzag/itemize/client/fast-prototyping/pages/cms";
 // in development mode with the service worker set up as `bypass for network`
 // it should work out of the box after a refresh
 
+/**
+ * The default admin entries
+ */
+export const MENU_ADMIN_ENTRIES: IMenuEntry[] = [
+	{
+		path: "/cms",
+		icon: <ImportantDevicesIcon/>,
+		module: "cms",
+		role: "ADMIN",
+		i18nProps: {
+			id: "name",
+			capitalize: true,
+		},
+	},
+];
+
+/**
+ * The default menu entries
+ */
+export const MENU_ENTRIES: IMenuEntry[] = [
+	{
+		path: "/",
+		icon: <HomeIcon />,
+		i18nProps: {
+			id: "home",
+			capitalize: true,
+		},
+	},
+	{
+		path: "/news",
+		icon: <LibraryBooksIcon />,
+		module: "cms",
+		idef: "article",
+		i18nProps: {
+			id: "news",
+			capitalize: true,
+		},
+	},
+];
+
 export default function App()<0>{
 	return (
 		<>
-			<Navbar LoginDialog={LoginDialog} SignupDialog={SignupDialog} RecoverDialog={RecoverDialog}/>
+			<Navbar
+				LoginDialog={LoginDialog}
+				SignupDialog={SignupDialog}
+				RecoverDialog={RecoverDialog}
+				menuEntries={MENU_ENTRIES}
+				menuAdminEntries={MENU_ADMIN_ENTRIES}
+				avatarContextProperties={
+					[
+						"username",
+						"app_country",
+						"email",
+						"e_validated",
+						"role",
+						"address",
+						"profile_picture",
+					]
+				}
+				AvatarComponent={Avatar}
+				avatarProps={{
+					cacheImage: true,
+				}}
+			/>
 
 			<Route path="/" exact={true} component={Frontpage}/>
 
-			<Route path="/my-profile" component={MyProfile}/>
-			<Route path="/change-password" component={ChangePassword}/>
 			<Route path="/profile/:id" component={Profile}/>
-			<Route path="/preferences" component={Preferences}/>
-			<Route path="/privacy-policy" component={PrivacyPolicy}/>
-			<Route path="/terms-and-conditions" component={TermsAndConditions}/>
-			<Route path="/contact" component={Contact}/>
+			<Route path="/my-profile" component={MyProfile}/>
+			<Route path="/news" component={News}/>
+
 			<Route path="/reset-password" component={ResetPassword}/>
+			<Route path="/change-password" component={ChangePassword}/>
 
 			<Route path="/cms" component={CMS}/>
 
-			<Route path="/news" component={News}/>
+			<Route path="/privacy-policy" component={PrivacyPolicy}/>
+			<Route path="/terms-and-conditions" component={TermsAndConditions}/>
+			<Route path="/contact" component={Contact}/>
 
 			<Footer/>
 		</>

@@ -20,7 +20,7 @@ export declare function request(options: read.Options): Promise<{
  * strarray is an array of string
  * strobject is an object with strings in it
  */
-declare type FieldRequestType = "strarray" | "string" | "integer" | "strobject";
+declare type FieldRequestType = "strarray" | "string" | "integer" | "boolean" | "strobject";
 /**
  * This function allows us to request one of the field types
  * @param type the type we are requesting

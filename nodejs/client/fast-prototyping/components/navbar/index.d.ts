@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { WithStyles, Theme } from "../../mui-core";
-import { MenuEntry } from "./menu";
+import { IMenuEntry } from "./menu";
 /**
  * the navbar styles generator
  * @param theme the mui theme
@@ -56,12 +56,24 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
      * it uses the MenuEntry form array for it, by default it includes only the CMS for ADMIN role
      * if you have removed the CMS then you need to remove this or this would cause an error
      */
-    menuAdminEntries?: MenuEntry[];
+    menuAdminEntries: IMenuEntry[];
     /**
      * the menu entries themselves, basic and available for all roles specified in the role list or not
      * fully modifiable, by default will contain the home, and news, more to come
      */
-    menuEntries?: MenuEntry[];
+    menuEntries: IMenuEntry[];
+    /**
+     * Extra properties in context, username, app_country, email, e_validated
+     */
+    avatarContextProperties: string[];
+    /**
+     * Component for avatar
+     */
+    AvatarComponent: React.ComponentType<any>;
+    /**
+     * avatar props
+     */
+    avatarProps: any;
 }
 /**
  * The navbar fast prototyping component, contains more than just a navbar, it has extra
@@ -71,5 +83,5 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
  * @param props the navbar props
  * @returns a react component
  */
-export declare const Navbar: React.ComponentType<Pick<INavbarProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog" | "excludeBlockingBackdrop" | "menuAdminEntries" | "menuEntries"> & import("@material-ui/styles").StyledComponentProps<"title" | "container" | "appBarSpacer" | "titleTypography" | "titleMargin">>;
+export declare const Navbar: React.ComponentType<Pick<INavbarProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog" | "AvatarComponent" | "avatarProps" | "excludeBlockingBackdrop" | "menuAdminEntries" | "menuEntries" | "avatarContextProperties"> & import("@material-ui/styles").StyledComponentProps<"title" | "container" | "appBarSpacer" | "titleTypography" | "titleMargin">>;
 export {};

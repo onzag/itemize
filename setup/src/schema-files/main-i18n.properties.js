@@ -571,6 +571,6 @@ return config.supportedLanguages.map((language) => {
   } else if (ALL[unregionalizedName]) {
     return ALL[unregionalizedName].replace("[" + unregionalizedName + "]", "[" + language + "]");
   } else {
-    return ALL.en.replace("[en]", "[" + language + "]");
+    return ALL.en.replace("[en]", "[" + language + "]").replace("name = english", "name = " + language);
   }
 }).join("\n\n");

@@ -11,6 +11,7 @@ const util_1 = require("../../util");
 const moment_1 = __importDefault(require("moment"));
 const stream_1 = require("stream");
 const deep_equal_1 = __importDefault(require("deep-equal"));
+const NO_SEO = process.env.NO_SEO === "true";
 ;
 class SEOGenerator {
     /**
@@ -49,6 +50,10 @@ class SEOGenerator {
      * Run the seo generator mechanism, usually run once a day
      */
     async run() {
+        // if there's no seo we stop here
+        if (NO_SEO) {
+            return;
+        }
         try {
             // so first we check that we have all the paths
             // ready

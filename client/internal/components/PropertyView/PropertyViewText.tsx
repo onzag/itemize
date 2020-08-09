@@ -68,13 +68,18 @@ function cleanAllAttribs(node: HTMLElement) {
 }
 
 /**
- * The postprocessing hook that cleans the
- * @param relatedProperty 
- * @param currentFiles 
- * @param supportsImages 
- * @param supportsVideos 
- * @param supportsFiles 
- * @param node 
+ * The postprocessing hook that cleans and sets the attributes
+ * right for the rich text in order to follow the standards
+ * given by the text-specs.md file
+ *
+ * @param relatedProperty the property we are used as media property
+ * @param currentFiles the current files
+ * @param supportsImages whether we are supporting images
+ * @param supportsVideos whether we are supporting videos
+ * @param supportsFiles whether we are supporting files
+ * @param node the given node in question we are currently processing, this is a recursive
+ * function after all
+ * @returns a node
  */
 export function propertyViewPostProcessingHook(
   relatedProperty: PropertyDefinition,
@@ -231,6 +236,9 @@ export function propertyViewPostProcessingHook(
   return node;
 }
 
+/**
+ * The property view text class
+ */
 export default class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyViewTextRendererProps>> {
   constructor(props: IPropertyViewHandlerProps<IPropertyViewTextRendererProps>) {
     super(props);

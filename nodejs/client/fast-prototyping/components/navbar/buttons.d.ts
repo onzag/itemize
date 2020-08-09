@@ -45,6 +45,14 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
         onClose: () => void;
         onLoginRequest: () => void;
     }>;
+    /**
+     * Component for avatar
+     */
+    AvatarComponent: React.ComponentType<any>;
+    /**
+     * avatarProps
+     */
+    avatarProps: any;
 }
 /**
  * The buttons component which contains all the buttons that are in the navbar as well
@@ -55,5 +63,5 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
  * @param props the props
  * @returns a react component
  */
-export declare const Buttons: React.ComponentType<Pick<ButtonsProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog"> & import("@material-ui/styles").StyledComponentProps<"languageButton" | "loginButton" | "standardLanguageButtonLabel" | "shrunkLanguageButtonLabel">>;
+export declare const Buttons: React.ComponentType<Pick<ButtonsProps, "excludeLanguagePicker" | "LoginDialog" | "SignupDialog" | "RecoverDialog" | "AvatarComponent" | "avatarProps"> & import("@material-ui/styles").StyledComponentProps<"languageButton" | "loginButton" | "standardLanguageButtonLabel" | "shrunkLanguageButtonLabel">>;
 export {};

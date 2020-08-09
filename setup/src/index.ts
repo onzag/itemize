@@ -41,12 +41,14 @@ async function copyAndProcessDirectoryLevelFor(
   options: IOptionsForProcessingCode,
   sourcePath: string,
   targetPath: string,
-) {
+): Promise<IOptionsForProcessingCode> {
   // so now we get each file there
   const filesInDirectory = await fsAsync.readdir(sourcePath);
 
+  let currentOptions = options;
+
   // for every file in the directory
-  await Promise.all(filesInDirectory.map(async (fileNameInDirectory) => {
+  for (const fileNameInDirectory of filesInDirectory) {
     // let's get the path name
     const currentTotalFilePathName = path.join(sourcePath, fileNameInDirectory);
 
@@ -54,16 +56,14 @@ async function copyAndProcessDirectoryLevelFor(
     const stat = await fsAsync.lstat(currentTotalFilePathName);
     // if we have a directory
     if (stat.isDirectory()) {
-      // build the folder for that directory
-      await fsAsync.mkdir(path.join(targetPath, fileNameInDirectory));
-  
-      // and copy that directory level as well
-      return copyAndProcessDirectoryLevelFor(
+      currentOptions = await copyAllFilesFor(
         config,
-        options,
-        currentTotalFilePathName,
         path.join(targetPath, fileNameInDirectory),
+        currentTotalFilePathName,
+        currentOptions,
+        null,
       );
+      continue;
     }
 
     // so we get the content of the file, for code and js files
@@ -72,24 +72,57 @@ async function copyAndProcessDirectoryLevelFor(
       currentTotalFilePathName.endsWith(".js");
     // and the final filename we are going to use, by default the same
     let finalFileName: string = fileNameInDirectory;
+    if (readAsUtf8) {
+      finalFileName = fileNameInDirectory.replace(/\.code$/, "").replace(/\.js$/, "");
+    }
+  
     // and the utf8 read content
-    let utf8Content: string;
+    let content: string | Buffer = null;
+    let currentTargetContent: string | Buffer = null;
+
+    // let's export the file in the directory
+    const exportedFileName = path.join(targetPath, finalFileName);
 
     // if we are reading as utf8
     if (readAsUtf8) {
       // and we can read such content
-      utf8Content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
+      content = await fsAsync.readFile(currentTotalFilePathName, "utf8");
 
       // now if we are using a code files
       if (currentTotalFilePathName.endsWith(".code")) {
+
+        if (!currentOptions) {
+          const useSpaces = await confirm("Would you like to use spaces instead of tabs?");
+          let spacesSize = null;
+          if (useSpaces) {
+            spacesSize = await fieldRequest(
+              "integer",
+              "How many spaces?",
+              "spaces",
+              null,
+              2,
+              false,
+              (v) => !isNaN(v),
+            );
+          }
+    
+          const nextLineOnBrackets = !(await confirm("Are you a `function() {` same line kind of gal/guy?"));
+    
+          currentOptions = {
+            useSpaces,
+            spacesSize,
+            nextLineOnBrackets,
+          };
+        }
+
         // we can apply these options to format the code
-        if (options.nextLineOnBrackets) {
+        if (currentOptions.nextLineOnBrackets) {
           // and keep replacing the utf8 content to match these options
-          utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, (match, digit) => {
+          content = content.replace(/\<(\d+)\>\{/g, (match, digit) => {
             const digitInQuestion = parseInt(digit);
             let finalStr = "\n";
-            if (options.useSpaces) {
-              finalStr += " ".repeat(options.spacesSize * digitInQuestion)
+            if (currentOptions.useSpaces) {
+              finalStr += " ".repeat(currentOptions.spacesSize * digitInQuestion)
             } else {
               finalStr += "\t".repeat(digitInQuestion);
             }
@@ -97,37 +130,64 @@ async function copyAndProcessDirectoryLevelFor(
             return finalStr;
           });
         } else {
-          utf8Content = utf8Content.replace(/\<(\d+)\>\{/g, " {");
+          content = content.replace(/\<(\d+)\>\{/g, " {");
         }
-
-        // and we remove the code ending
-        finalFileName = fileNameInDirectory.replace(".code", "");
       } else if (currentTotalFilePathName.endsWith(".js")) {
         // similar to js in the case of js we execute, we pass both config
         // and options inside the context
-        utf8Content = Function("config", "options", utf8Content)(config, options);
-        finalFileName = fileNameInDirectory.replace(".js", "");
+        content = Function("config", "options", content)(config, options);
       }
 
       // and if we use spaces
-      if (options.useSpaces) {
+      if (currentOptions.useSpaces) {
         // our code always uses tabs
-        utf8Content = utf8Content.replace(/\t/g, " ".repeat(options.spacesSize));
+        content = (content as string).replace(/\t/g, " ".repeat(currentOptions.spacesSize));
+      }
+
+      try {
+        currentTargetContent = await fsAsync.readFile(exportedFileName, "utf-8");
+      } catch (err) {
+      }
+    } else {
+      content = await fsAsync.readFile(currentTotalFilePathName);
+      try {
+        currentTargetContent = await fsAsync.readFile(exportedFileName);
+      } catch (err) {
       }
     }
 
-    // let's export the file in the directory
-    const exportedFileName = path.join(targetPath, finalFileName);
-    // and emit it
-    console.log("emiting " + colors.green(exportedFileName));
-    await (utf8Content ?
-      fsAsync.writeFile(exportedFileName, utf8Content) :
-      fsAsync.copyFile(currentTotalFilePathName, exportedFileName));
-  }));
+    let isContentEquals: boolean;
+    if (!currentTargetContent) {
+      isContentEquals = false;
+    } else if (readAsUtf8) {
+      isContentEquals = currentTargetContent === content;
+    } else {
+      isContentEquals = Buffer.compare(currentTargetContent as Buffer, content as Buffer) === 0;
+    }
+
+    let isOverwrite = currentTargetContent !== null;
+    let writeFile = !isContentEquals;
+    if (
+      writeFile &&
+      isOverwrite
+    ) {
+      writeFile = await confirm(exportedFileName + " is non standard would you like to overwrite?");
+    }
+
+    if (writeFile) {
+      if (isOverwrite) {
+        await fsAsync.copyFile(exportedFileName, exportedFileName + ".old");
+      }
+      console.log("emiting " + colors.green(exportedFileName));
+      await fsAsync.writeFile(exportedFileName, content);
+    }
+  };
+
+  return currentOptions;
 }
 
 async function copyAllFilesFor(
-  arg: ISetupConfigType,
+  config: IConfigRawJSONDataType,
   target: string,
   source: string,
   previousOptions: IOptionsForProcessingCode,
@@ -140,58 +200,36 @@ async function copyAllFilesFor(
     exists = false;
   }
   
-  let options: IOptionsForProcessingCode = previousOptions;
   if (!exists) {
     console.log(colors.yellow(`A ${target} folder hasn't been determined`));
-    if (!options) {
-      const useSpaces = await confirm("Would you like to use spaces instead of tabs?");
-      let spacesSize = null;
-      if (useSpaces) {
-        spacesSize = await fieldRequest(
-          "integer",
-          "How many spaces?",
-          "spaces",
-          null,
-          2,
-          false,
-          (v) => !isNaN(v),
-        );
-      }
-
-      const nextLineOnBrackets = !(await confirm("Are you a `function() {` same line kind of gal/guy?"));
-
-      options = {
-        useSpaces,
-        spacesSize,
-        nextLineOnBrackets,
-      };
-    }
+    
     await fsAsync.mkdir(target, {recursive: true});
-    await copyAndProcessDirectoryLevelFor(
-      arg.standardConfig,
-      options,
-      path.join(__dirname, "..", "..", "..", "setup", "src", source),
-      target,
-    );
-    if (onceDone) {
-      await onceDone();
-    }
   }
 
+  const options = await copyAndProcessDirectoryLevelFor(
+    config,
+    previousOptions,
+    source,
+    target,
+  );
+
+  if (onceDone) {
+    await onceDone();
+  }
   return options;
 }
 export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("SOURCE SETUP"));
   let options = await copyAllFilesFor(
-    arg,
+    arg.standardConfig,
     "src",
-    "ts-files",
+    path.join(__dirname, "..", "..", "..", "setup", "src", "ts-files"),
     null,
   )
   options = await copyAllFilesFor(
-    arg,
+    arg.standardConfig,
     path.dirname(arg.standardConfig.entry),
-    "schema-files",
+    path.join(__dirname, "..", "..", "..", "setup", "src", "schema-files"),
     options,
     async () => {
       if (
@@ -215,9 +253,9 @@ export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupCon
     }
   );
   await copyAllFilesFor(
-    arg,
+    arg.standardConfig,
     "resources",
-    "resource-files",
+    path.join(__dirname, "..", "..", "..", "setup", "src", "resource-files"),
     options,
   )
   return arg;

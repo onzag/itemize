@@ -99,9 +99,11 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
 
     // that is basically the same as this
     if ((toProvide as II18nReadErrorProps).error) {
-      <I18nReadError {...toProvide as II18nReadErrorProps}>
-        {props.children}
-      </I18nReadError>
+      return (
+        <I18nReadError {...toProvide as II18nReadErrorProps}>
+          {props.children}
+        </I18nReadError>
+      );
     }
     return (
       <I18nRead {...toProvide as II18nReadProps}>

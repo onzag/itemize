@@ -135,6 +135,11 @@ export function mergeTriggerRegistries(
   };
 
   triggers.forEach((t) => {
+
+    if (t === null || typeof t === "undefined") {
+      return;
+    }
+
     const iTrigger = t.itemDefinition;
     const modTrigger = t.module;
 

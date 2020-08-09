@@ -34,7 +34,7 @@ const menuStyles = createStyles({
  * The menu entry itself that specifies
  * how a menu is to be built
  */
-export interface MenuEntry {
+export interface IMenuEntry {
   /**
    * The path it will take to, aka, the navigation
    * location
@@ -86,11 +86,11 @@ interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
   /**
    * The admin entries that appear on top
    */
-  adminEntries: MenuEntry[];
+  adminEntries: IMenuEntry[];
   /**
    * The standard entries
    */
-  entries: MenuEntry[];
+  entries: IMenuEntry[];
 }
 
 /**
@@ -100,7 +100,7 @@ interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
  * @param className the class name that will pop in the link container
  * @param role the role that the current user is logged as
  */
-function buildEntryFromList(entries: MenuEntry[], className: string, role: string) {
+function buildEntryFromList(entries: IMenuEntry[], className: string, role: string) {
   // so we start looping
   return entries.map((entry) => {
     // first we check if the role is there and if it doesn't match

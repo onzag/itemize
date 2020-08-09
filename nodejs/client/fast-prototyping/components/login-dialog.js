@@ -17,7 +17,6 @@ const snackbar_1 = __importDefault(require("./snackbar"));
 const util_1 = require("./util");
 const LogActioner_1 = require("../../components/login/LogActioner");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
-const I18nReadMany_1 = __importDefault(require("../../components/localization/I18nReadMany"));
 const Entry_1 = __importDefault(require("../../components/property/Entry"));
 /**
  * The login dialog styles
@@ -70,10 +69,7 @@ exports.LoginDialog = mui_core_1.withStyles(loginDialogStyles)((props) => {
                 react_1.default.createElement(mui_core_1.Typography, { variant: "h4", className: props.classes.welcomeTitle },
                     react_1.default.createElement(I18nRead_1.default, { id: "login_welcome", capitalize: true }))),
             react_1.default.createElement("form", null,
-                react_1.default.createElement(I18nReadMany_1.default, { data: [
-                        { id: "login_alt_field_label" },
-                        { id: "login_alt_field_placeholder" },
-                    ] }, (i18nAltLabel, i18nAltPlaceholder) => (react_1.default.createElement(Entry_1.default, { id: "username", onChange: actioner.dismissError, showAsInvalid: !!actioner.error, ignoreErrors: true, altLabel: i18nAltLabel, altPlaceholder: i18nAltPlaceholder, icon: react_1.default.createElement(mui_core_1.AccountCircleIcon, null), autoFocus: true }))),
+                react_1.default.createElement(I18nRead_1.default, { id: "login_alt_field_label" }, (i18nAltLabel) => (react_1.default.createElement(I18nRead_1.default, { id: "login_alt_field_placeholder" }, (i18nAltPlaceholder) => (react_1.default.createElement(Entry_1.default, { id: "username", onChange: actioner.dismissError, showAsInvalid: !!actioner.error, ignoreErrors: true, altLabel: i18nAltLabel, altPlaceholder: i18nAltPlaceholder, icon: react_1.default.createElement(mui_core_1.AccountCircleIcon, null), autoFocus: true }))))),
                 react_1.default.createElement(Entry_1.default, { id: "password", onChange: actioner.dismissError, showAsInvalid: !!actioner.error }),
                 react_1.default.createElement(util_1.ProgressingElement, { isProgressing: actioner.isLoggingIn, fullWidth: true, className: props.classes.loginButtonWrapper },
                     react_1.default.createElement(mui_core_1.Button, { color: "primary", variant: "contained", size: "large", "aria-label": i18nLogin, startIcon: react_1.default.createElement(mui_core_1.DoneIcon, null), onClick: actioner.login.bind(null, true), fullWidth: true }, i18nLogin)),

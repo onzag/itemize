@@ -21,7 +21,7 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
     /**
      * The title for the dialog
      */
-    title: string;
+    title: React.ReactNode;
     /**
      * A function that calls when the user wants to close the dialog
      */

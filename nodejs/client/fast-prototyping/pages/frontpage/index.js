@@ -33,14 +33,3 @@ function Frontpage(props) {
 }
 exports.Frontpage = Frontpage;
 ;
-/**
- * Allows to inject props to the frontpage
- * @param props the props to inject
- * @returns a non instantiated react component
- */
-function frontpageWithProps(props) {
-    return () => {
-        react_1.default.createElement(Frontpage, Object.assign({}, props));
-    };
-}
-exports.frontpageWithProps = frontpageWithProps;

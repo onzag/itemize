@@ -898,6 +898,7 @@ export default class PropertyDefinition {
       this.canCacheState = false;
     }
 
+    this.listeners = [];
     this.cleanState();
   }
 

@@ -14,7 +14,7 @@ import { Buttons } from "./buttons";
 import { ExternalDialogs } from "./external-dialogs";
 import { BlockingBackdrop } from "./blocking-backdrop";
 import { OutdatedDialog } from "./outdated-dialog";
-import { Menu, MenuEntry } from "./menu";
+import { Menu, IMenuEntry } from "./menu";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleReader from "../../../components/util/TitleReader";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
@@ -82,53 +82,25 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
    * it uses the MenuEntry form array for it, by default it includes only the CMS for ADMIN role
    * if you have removed the CMS then you need to remove this or this would cause an error
    */
-  menuAdminEntries?: MenuEntry[];
+  menuAdminEntries: IMenuEntry[];
   /**
    * the menu entries themselves, basic and available for all roles specified in the role list or not
    * fully modifiable, by default will contain the home, and news, more to come
    */
-  menuEntries?: MenuEntry[];
+  menuEntries: IMenuEntry[];
+  /**
+   * Extra properties in context, username, app_country, email, e_validated
+   */
+  avatarContextProperties: string[];
+  /**
+   * Component for avatar
+   */
+  AvatarComponent: React.ComponentType<any>;
+  /**
+   * avatar props
+   */
+  avatarProps: any;
 }
-
-/**
- * The default admin entries
- */
-const defaultMenuAdminEntries: MenuEntry[] = [
-  {
-    path: "/cms",
-    icon: <ImportantDevicesIcon/>,
-    module: "cms",
-    role: "ADMIN",
-    i18nProps: {
-      id: "name",
-      capitalize: true,
-    },
-  },
-]
-
-/**
- * The default menu entries
- */
-const defaultMenuEntries: MenuEntry[] = [
-  {
-    path: "/",
-    icon: <HomeIcon />,
-    i18nProps: {
-      id: "home",
-      capitalize: true,
-    },
-  },
-  {
-    path: "/news",
-    icon: <LibraryBooksIcon />,
-    module: "cms",
-    idef: "article",
-    i18nProps: {
-      id: "news",
-      capitalize: true,
-    },
-  },
-]
 
 /**
  * The navbar fast prototyping component, contains more than just a navbar, it has extra
@@ -141,6 +113,7 @@ const defaultMenuEntries: MenuEntry[] = [
 export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
+
   return (
     <>
       <AppBar>
@@ -170,15 +143,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   forId={user.id}
                   disableExternalChecks={true}
                   assumeOwnership={true}
-                  properties={[
-                    "username",
-                    "app_country",
-                    "email",
-                    "e_validated",
-                    "profile_picture",
-                    "address",
-                    "role",
-                  ]}
+                  properties={props.avatarContextProperties}
                   longTermCaching={true}
                   markForDestructionOnLogout={true}
                 >
@@ -187,6 +152,8 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     LoginDialog={props.LoginDialog}
                     SignupDialog={props.SignupDialog}
                     RecoverDialog={props.RecoverDialog}
+                    AvatarComponent={props.AvatarComponent}
+                    avatarProps={props.avatarProps}
                   />
                   <ExternalDialogs/>
                 </ItemDefinitionProvider>
@@ -205,8 +172,8 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
         isOpen={isMenuOpen}
         onClose={setMenuOpen.bind(this, false)}
         onOpen={setMenuOpen.bind(this, true)}
-        adminEntries={props.menuAdminEntries || defaultMenuAdminEntries}
-        entries={props.menuEntries || defaultMenuEntries}
+        adminEntries={props.menuAdminEntries}
+        entries={props.menuEntries}
       />
     </>
   );

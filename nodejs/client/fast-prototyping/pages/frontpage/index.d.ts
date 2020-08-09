@@ -41,10 +41,4 @@ interface FrontpageProps {
  * @returns a react element
  */
 export declare function Frontpage(props: FrontpageProps): JSX.Element;
-/**
- * Allows to inject props to the frontpage
- * @param props the props to inject
- * @returns a non instantiated react component
- */
-export declare function frontpageWithProps(props: FrontpageProps): () => void;
 export {};

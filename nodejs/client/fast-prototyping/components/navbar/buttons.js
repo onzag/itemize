@@ -11,7 +11,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../../mui-core");
 const language_picker_1 = require("../language-picker");
-const avatar_1 = require("../avatar");
 const LocationStateReader_1 = __importDefault(require("../../../components/navigation/LocationStateReader"));
 const IfLogStatus_1 = require("../../../components/login/IfLogStatus");
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
@@ -100,7 +99,8 @@ exports.Buttons = mui_core_1.withStyles(buttonsStyles)((props) => {
                     react_1.default.createElement(RecoverDialog, { open: state.recoverDialogOpen, onClose: closeRecoverDialog, onLoginRequest: openLoginDialog }));
             }
             else if (status === "LOGGED_IN") {
-                return react_1.default.createElement(avatar_1.Avatar, { fullWidth: true, showWarnings: true, profileURL: "my-profile", cacheImage: true, size: "small" });
+                const Avatar = props.AvatarComponent;
+                return react_1.default.createElement(Avatar, Object.assign({}, props.avatarProps));
             }
         }));
     }));

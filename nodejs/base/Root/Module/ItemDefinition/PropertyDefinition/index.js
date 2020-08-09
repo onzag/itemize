@@ -157,6 +157,7 @@ class PropertyDefinition {
             rawJSON.defaultIf) {
             this.canCacheState = false;
         }
+        this.listeners = [];
         this.cleanState();
     }
     /**

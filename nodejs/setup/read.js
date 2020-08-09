@@ -85,6 +85,28 @@ async function fieldRequest(type, message, variableName, basedOnValue, defaultVa
             // but we need to parse the int, this might be nan, hence the validate function
             currentValue = parseInt(retrievedValue.result);
         }
+        else if (type === "boolean") {
+            // we ask for
+            const retrievedValue = await request({
+                // the variable name and :
+                prompt: variableName + ": ",
+                // we cast to boolean and stringify
+                default: JSON.stringify(!!defaultValue),
+                // we are editing, rather than writting a new value if we have a based on value
+                edit: typeof basedOnValue !== "undefined" && basedOnValue !== null,
+                // silent if it's hidden
+                silent: hidden,
+                // and we use asterisk
+                replace: "*",
+            });
+            // but we need to parse the boolean
+            try {
+                currentValue = JSON.parse(retrievedValue.result);
+            }
+            catch (err) {
+                currentValue = false;
+            }
+        }
         else if (type === "strarray") {
             // str array uses a comma separated list
             const actualDefaultValue = Array.isArray(defaultValue) ? defaultValue.join(", ") : (defaultValue || "").toString();

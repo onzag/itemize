@@ -52,6 +52,7 @@ export async function sensitiveConfigSetup(
         variableName: "ipStackHttpsEnabled",
         message: "True when your subscription plan supports https, otherwise false",
         defaultValue: false,
+        type: "boolean",
       },
       {
         variableName: "currencyLayerAccessKey",
@@ -64,6 +65,7 @@ export async function sensitiveConfigSetup(
         variableName: "currencyLayerHttpsEnabled",
         message: "True when your subscription plan supports https, otherwise false",
         defaultValue: false,
+        type: "boolean",
       },
       {
         variableName: "hereApiKey",
@@ -142,14 +144,12 @@ export async function sensitiveConfigSetup(
         variableName: "mailgunDomain",
         message: "Your own domain used in order to send emails, get your key at https://www.mailgun.com/",
         defaultValue: "",
-        hidden: true,
         nullifyFalseValues: true,
       },
       {
         variableName: "mailgunAPIHost",
         message: "The mailgun api host, usually api.eu.mailgun.net or api.mailgun.net, get your key at https://www.mailgun.com/",
         defaultValue: "api.mailgun.net",
-        hidden: true,
         nullifyFalseValues: true,
       },
       {
@@ -157,7 +157,6 @@ export async function sensitiveConfigSetup(
         message: "The domain that is used in order to generate links, it should be equal the domain name where your app is hosted, " +
         "if unset it will default to the production hostname, you might want to use localhost when locally developing",
         defaultValue: "",
-        hidden: true,
         nullifyFalseValues: true,
       },
       {

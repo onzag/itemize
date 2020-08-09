@@ -70,7 +70,7 @@ function I18nReadMany(props) {
         const toProvide = props.data[0];
         // that is basically the same as this
         if (toProvide.error) {
-            react_1.default.createElement(I18nReadError_1.default, Object.assign({}, toProvide), props.children);
+            return (react_1.default.createElement(I18nReadError_1.default, Object.assign({}, toProvide), props.children));
         }
         return (react_1.default.createElement(I18nRead_1.default, Object.assign({}, toProvide), props.children));
     }

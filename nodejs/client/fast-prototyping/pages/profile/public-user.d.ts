@@ -11,5 +11,5 @@ import React from "react";
  * @returns a react element
  */
 export declare const PublicUserProfile: React.ComponentType<Pick<{
-    classes: Record<"username" | "role" | "country" | "container" | "paper" | "spacer" | "verifiedIcon" | "aboutMeCard", string>;
-}, never> & import("@material-ui/styles").StyledComponentProps<"username" | "role" | "country" | "container" | "paper" | "spacer" | "verifiedIcon" | "aboutMeCard">>;
+    classes: Record<"username" | "role" | "country" | "container" | "paper" | "verifiedIcon" | "aboutMeCard" | "spacer", string>;
+}, never> & import("@material-ui/styles").StyledComponentProps<"username" | "role" | "country" | "container" | "paper" | "verifiedIcon" | "aboutMeCard" | "spacer">>;

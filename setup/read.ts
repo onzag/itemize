@@ -39,7 +39,7 @@ export function request(options: read.Options): Promise<{
  * strarray is an array of string
  * strobject is an object with strings in it
  */
-type FieldRequestType = "strarray" | "string" | "integer" | "strobject";
+type FieldRequestType = "strarray" | "string" | "integer" | "boolean" | "strobject";
 
 /**
  * This function allows us to request one of the field types
@@ -103,6 +103,26 @@ export async function fieldRequest<T>(
       });
       // but we need to parse the int, this might be nan, hence the validate function
       currentValue = parseInt(retrievedValue.result) as any;
+    } else if (type === "boolean") {
+      // we ask for
+      const retrievedValue = await request({
+        // the variable name and :
+        prompt: variableName + ": ",
+        // we cast to boolean and stringify
+        default: JSON.stringify(!!defaultValue),
+        // we are editing, rather than writting a new value if we have a based on value
+        edit: typeof basedOnValue !== "undefined" && basedOnValue !== null,
+        // silent if it's hidden
+        silent: hidden,
+        // and we use asterisk
+        replace: "*",
+      });
+      // but we need to parse the boolean
+      try {
+        currentValue = JSON.parse(retrievedValue.result) as any;
+      } catch (err) {
+        currentValue = false as any;
+      }
     } else if (type === "strarray") {
       // str array uses a comma separated list
       const actualDefaultValue = Array.isArray(defaultValue) ? defaultValue.join(", ") : (defaultValue || "").toString();

@@ -14,7 +14,7 @@ declare const menuStyles: Record<"list" | "listLink", import("@material-ui/style
  * The menu entry itself that specifies
  * how a menu is to be built
  */
-export interface MenuEntry {
+export interface IMenuEntry {
     /**
      * The path it will take to, aka, the navigation
      * location
@@ -65,11 +65,11 @@ interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
     /**
      * The admin entries that appear on top
      */
-    adminEntries: MenuEntry[];
+    adminEntries: IMenuEntry[];
     /**
      * The standard entries
      */
-    entries: MenuEntry[];
+    entries: IMenuEntry[];
 }
 /**
  * Provides a menu for the navbar

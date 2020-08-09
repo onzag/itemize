@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * Contains the handler for the boolean type
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +10,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const util_1 = require("../../../../util");
+/**
+ * The property view boolean handler
+ */
 class PropertyViewBoolean extends react_1.default.Component {
     constructor(props) {
         super(props);

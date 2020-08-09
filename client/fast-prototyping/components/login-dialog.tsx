@@ -13,7 +13,6 @@ import Snackbar from "./snackbar";
 import { ProgressingElement } from "./util";
 import { LogActioner } from "../../components/login/LogActioner";
 import I18nRead from "../../components/localization/I18nRead";
-import I18nReadMany from "../../components/localization/I18nReadMany";
 import Entry from "../../components/property/Entry";
 
 /**
@@ -106,23 +105,24 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
                   </Typography>
                 </div>
                 <form>
-                  <I18nReadMany data={[
-                    {id: "login_alt_field_label"},
-                    {id: "login_alt_field_placeholder"},
-                  ]}>
-                    {(i18nAltLabel: string, i18nAltPlaceholder: string) => (
-                      <Entry
-                        id="username"
-                        onChange={actioner.dismissError}
-                        showAsInvalid={!!actioner.error}
-                        ignoreErrors={true}
-                        altLabel={i18nAltLabel}
-                        altPlaceholder={i18nAltPlaceholder}
-                        icon={<AccountCircleIcon/>}
-                        autoFocus={true}
-                      />
+                  <I18nRead id="login_alt_field_label">
+                    {(i18nAltLabel: string) => (
+                      <I18nRead id="login_alt_field_placeholder">
+                        {(i18nAltPlaceholder: string) => (
+                          <Entry
+                            id="username"
+                            onChange={actioner.dismissError}
+                            showAsInvalid={!!actioner.error}
+                            ignoreErrors={true}
+                            altLabel={i18nAltLabel}
+                            altPlaceholder={i18nAltPlaceholder}
+                            icon={<AccountCircleIcon />}
+                            autoFocus={true}
+                          />
+                        )}
+                      </I18nRead>
                     )}
-                  </I18nReadMany>
+                  </I18nRead>
                   <Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
                   <ProgressingElement

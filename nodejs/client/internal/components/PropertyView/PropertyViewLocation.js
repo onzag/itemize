@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * The property view location handler
+ * @packageDocumentation
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,6 +10,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const PropertyEntryLocation_1 = require("../PropertyEntry/PropertyEntryLocation");
+/**
+ * cheap function to compare two lng, and lat pairs to see
+ * if they are basically equal
+ * @param one an array of [lat, lng]
+ * @param two another array of [lat, lng]
+ * @returns a boolean on whether it is for all intents and purposes an equal location
+ */
 function isCenterBasicallyEquals(one, two) {
     const diffA = Math.abs(one[0] - two[0]);
     const diffB = Math.abs(one[1] - two[1]);
@@ -15,6 +26,9 @@ function isCenterBasicallyEquals(one, two) {
     return false;
 }
 exports.isCenterBasicallyEquals = isCenterBasicallyEquals;
+/**
+ * The property view location handler class
+ */
 class PropertyViewLocation extends react_1.default.Component {
     constructor(props) {
         super(props);

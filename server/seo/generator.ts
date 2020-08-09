@@ -11,6 +11,8 @@ import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
 
+const NO_SEO = process.env.NO_SEO === "true";
+
 interface ISEOCollectedDataWithCreatedAt extends ISEOCollectedData {
   created_at: string;
 }
@@ -79,6 +81,11 @@ export class SEOGenerator {
    * Run the seo generator mechanism, usually run once a day
    */
   public async run() {
+    // if there's no seo we stop here
+    if (NO_SEO) {
+      return;
+    }
+
     try {
       // so first we check that we have all the paths
       // ready
