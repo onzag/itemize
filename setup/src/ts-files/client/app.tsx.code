@@ -98,6 +98,8 @@ export default function App()<0>{
 				AvatarComponent={Avatar}
 				avatarProps={{
 					cacheImage: true,
+					profileURL: "/my-profile",
+					showWarnings: true,
 				}}
 			/>
 

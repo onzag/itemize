@@ -4,7 +4,7 @@ import { ItemDefinitionProvider, IActionResponseWithId } from "@onzag/itemize/cl
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
-import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
+import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import SubmitActioner from "@onzag/itemize/client/components/item-definition/SubmitActioner";
 
 import { Paper, createStyles, withStyles, WithStyles,
@@ -65,30 +65,27 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 						<Container maxWidth="md" className={props.classes.container + " trusted"}>
 							<Paper className={props.classes.paper}>
 
-								<I18nReadMany
-									data={[
-										{ id: "id", capitalize: true },
-										{ id: "version", capitalize: true },
-									]}
-								>
-									{(i18nId: string, i18nVersion: string) => (
-										<Box className={props.classes.box}>
-											<TextField
-												fullWidth={true}
-												value={locationState.id}
-												type="number"
-												onChange={updateLocationState.bind(null, "id")}
-												placeholder={i18nId}
-											/>
-											<TextField
-												fullWidth={true}
-												value={locationState.version}
-												onChange={updateLocationState.bind(null, "version")}
-												placeholder={i18nVersion}
-											/>
-										</Box>
+								<I18nRead id="id" capitalize={true}>
+									{(i18nId: string) => (
+										<TextField
+											fullWidth={true}
+											value={locationState.id}
+											type="number"
+											onChange={updateLocationState.bind(null, "id")}
+											placeholder={i18nId}
+										/>
 									)}
-								</I18nReadMany>
+								</I18nRead>
+								<I18nRead id="version" capitalize={true}>
+									{(i18nVersion: string) => (
+										<TextField
+											fullWidth={true}
+											value={locationState.version}
+											onChange={updateLocationState.bind(null, "version")}
+											placeholder={i18nVersion}
+										/>
+									)}
+								</I18nRead>
 
 								<Entry id="title" />
 								<Entry

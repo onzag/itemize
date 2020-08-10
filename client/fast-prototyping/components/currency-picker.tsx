@@ -23,6 +23,17 @@ interface ICurrencyPickerProps {
    * combination of the code and the symbol
    */
   useCode?: boolean;
+  /**
+   * handle the currency change yourself rather than the default
+   * which changes the application currency, this allows
+   * you to control custom properties using Setters
+   */
+  handleCurrencyChange?: (code: string, appChangeCurrencyTo: (code: string) => void) => void;
+  /**
+   * handle the current code yourself rather than using the application's
+   * default
+   */
+  currentCode?: string;
 }
 
 /**
@@ -64,12 +75,24 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
     this.setState({
       anchorEl: null,
     });
-    changeCurrencyToFn(code);
+    if (this.props.handleCurrencyChange) {
+      this.props.handleCurrencyChange(code, changeCurrencyToFn);
+    } else {
+      changeCurrencyToFn(code);
+    }
   }
   public render() {
     return (
       <AppCurrencyRetriever>
         {(currencyData) => {
+          let currentCurrency = currencyData.currentCurrency;
+          if (this.props.currentCode) {
+            currentCurrency = currencyData.availableCurrencies.find((c) => c.code === this.props.currentCode);
+          }
+          if (currentCurrency === null) {
+            return null;
+          }
+
           const menu = this.state.anchorEl ? <Menu
             anchorEl={this.state.anchorEl}
             // same optimization here
@@ -80,7 +103,7 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
             {currencyData.availableCurrencies.map((ac) => (
               <MenuItem
                 key={ac.code}
-                selected={ac.code === currencyData.currentCurrency.code}
+                selected={ac.code === currentCurrency.code}
                 onClick={this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code)}
               >
                 <b>{(ac.symbol || ac.code) + " (" + ac.code + ")"}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
@@ -92,11 +115,11 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
               <Button
                 classes={{ root: this.props.className }}
                 color="inherit"
-                startIcon={<b>{currencyData.currentCurrency.symbol}</b>}
+                startIcon={<b>{currentCurrency.symbol}</b>}
                 onClick={this.handleButtonSelectClick}
               >
-                {this.props.useCode ? currencyData.currentCurrency.code : currencyData.currentCurrency.name}
-                {this.props.useCode ? "" : " " + currencyData.currentCurrency.code}
+                {this.props.useCode ? currentCurrency.code : currentCurrency.name}
+                {this.props.useCode ? "" : " " + currentCurrency.code}
               </Button>
               {menu}
             </React.Fragment>

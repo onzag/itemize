@@ -1233,6 +1233,7 @@ export default class PropertyDefinition {
    * @returns a promise for the current value state
    */
   public async getState(id: number, version: string): Promise<IPropertyDefinitionState> {
+
     const mergedID = id + "." + (version || "");
     if (this.canCacheState && this.stateLastCachedWithExternal[mergedID]) {
       return this.stateLastCachedWithExternal[mergedID];
@@ -1248,10 +1249,45 @@ export default class PropertyDefinition {
       return (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"]);
     }
 
-    const possibleEnforcedValue = this.getEnforcedValue(id, version);
+    // noticed how it is possible that the enforced value changes
+    // during the isValidValue check which causes the wrong output
+    // of this getState action to be cached, causing issues
+    // so now we ensure that what we check against didn't change during our check
+    let possibleInvalidEnforcedReason: string = null;
+
+    // so this will be for our current we are working with enforced
+    // value that we checked by the is valid value function
+    let possibleEnforcedValue: {
+      enforced: boolean,
+      value?: PropertyDefinitionSupportedType,
+    } = null;
+    // and here we will store what comes later
+    let nextPossibleEnforcedValue: {
+      enforced: boolean,
+      value?: PropertyDefinitionSupportedType,
+    } = null;
+
+    // and we enter a loop here
+    do {
+      // we pick either what was our next or we get a new value for our current
+      possibleEnforcedValue = nextPossibleEnforcedValue || this.getEnforcedValue(id, version);
+      // and if it's enforced
+      if (possibleEnforcedValue.enforced) {
+        // we do the async check
+        possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
+        // and then we get our next value
+        nextPossibleEnforcedValue = this.getEnforcedValue(id, version);
+      }
+
+      // we will loop if there's a next value as in, it was enforced as well
+      // and if something changed during the event
+    } while (
+      nextPossibleEnforcedValue &&
+      nextPossibleEnforcedValue.enforced &&
+      possibleEnforcedValue.value !== nextPossibleEnforcedValue.value
+    );
 
     if (possibleEnforcedValue.enforced) {
-      const possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
       // we return the value that was set to be
       const stateValue: IPropertyDefinitionState = {
         userSet: false,
@@ -1298,15 +1334,30 @@ export default class PropertyDefinition {
       return stateValue;
     }
 
-    const value = this.getCurrentValue(id, version);
-    const invalidReason = await this.isValidValue(id, version, value);
+    let invalidReason: string = null;
+
+    // we do the same as in our enforced
+    let currentValue: PropertyDefinitionSupportedType;
+    // and here we will store what comes later
+    let nextValue: PropertyDefinitionSupportedType;
+
+    do {
+      currentValue = typeof nextValue === "undefined" ? this.getCurrentValue(id, version) : nextValue;
+      invalidReason = await this.isValidValue(id, version, currentValue);
+      nextValue = this.getCurrentValue(id, version);
+      // we will loop if there's a next value as in, it was enforced as well
+      // and if something changed during the event
+    } while (
+      nextValue !== currentValue
+    );
+
     const stateValue: IPropertyDefinitionState = {
       userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
       default: !this.stateValueModified[mergedID],
       valid: !invalidReason,
       invalidReason,
-      value,
+      value: currentValue,
       hidden: this.isCurrentlyHidden(id, version),
       internalValue: this.stateValueModified[mergedID] ? this.stateInternalValue[mergedID] : null,
       stateValue: nullIfUndefined(this.stateValue[mergedID]),
@@ -1318,6 +1369,7 @@ export default class PropertyDefinition {
     if (this.canCacheState) {
       this.stateLastCachedWithExternal[mergedID] = stateValue;
     }
+
     return stateValue;
   }
 

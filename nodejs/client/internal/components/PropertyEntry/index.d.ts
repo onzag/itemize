@@ -254,6 +254,13 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
      * Developer Provided check base.tsx
      */
     rendererArgs?: object;
+    /**
+     * A value to prefill with during the construction
+     * event of the property
+     *
+     * Developer provided check base.tsx
+     */
+    prefillWith?: PropertyDefinitionSupportedType;
 }
 /**
  * These represent values that are read from the context and every handler down the line gets

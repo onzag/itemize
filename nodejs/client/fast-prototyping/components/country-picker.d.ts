@@ -16,6 +16,17 @@ interface ICountryPickerProps {
      * Whether to use the country code rather than the native name
      */
     useCode?: boolean;
+    /**
+     * handle the country change yourself rather than the default
+     * which changes the application country, this allows
+     * you to control custom properties using Setters
+     */
+    handleCountryChange?: (code: string, appChangeCountryTo: (code: string) => void) => void;
+    /**
+     * handle the current code yourself rather than using the application's
+     * default
+     */
+    currentCode?: string;
 }
 /**
  * The state of the countrypicker

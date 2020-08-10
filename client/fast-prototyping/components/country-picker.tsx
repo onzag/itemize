@@ -21,6 +21,17 @@ interface ICountryPickerProps {
    * Whether to use the country code rather than the native name
    */
   useCode?: boolean;
+  /**
+   * handle the country change yourself rather than the default
+   * which changes the application country, this allows
+   * you to control custom properties using Setters
+   */
+  handleCountryChange?: (code: string, appChangeCountryTo: (code: string) => void) => void;
+  /**
+   * handle the current code yourself rather than using the application's
+   * default
+   */
+  currentCode?: string;
 }
 
 /**
@@ -66,12 +77,24 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
     this.setState({
       anchorEl: null,
     });
-    changeCountryToFn(code);
+    if (this.props.handleCountryChange) {
+      this.props.handleCountryChange(code, changeCountryToFn);
+    } else {
+      changeCountryToFn(code);
+    }
   }
   public render() {
     return (
       <AppCountryRetriever>
         {(countryData) => {
+          let currentCountry = countryData.currentCountry;
+          if (this.props.currentCode) {
+            currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode);
+          }
+          if (currentCountry === null) {
+            return null;
+          }
+
           const menu = this.state.anchorEl ? <Menu
             anchorEl={this.state.anchorEl}
             // this is important to keep it false in orer to ensure the app isn't sluggish
@@ -82,7 +105,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
             {countryData.availableCountries.map((ac) => (
               <MenuItem
                 key={ac.code}
-                selected={ac.code === countryData.currentCountry.code}
+                selected={ac.code === currentCountry.code}
                 onClick={this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code)}
               >
                 {ac.emoji} {capitalize(ac.native)}
@@ -94,10 +117,10 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
               <Button
                 classes={{ root: this.props.className }}
                 color="inherit"
-                startIcon={countryData.currentCountry.emoji}
+                startIcon={currentCountry.emoji}
                 onClick={this.handleButtonSelectClick}
               >
-                {this.props.useCode ? countryData.currentCountry.code : countryData.currentCountry.native}
+                {this.props.useCode ? currentCountry.code : currentCountry.native}
               </Button>
               {menu}
             </React.Fragment>

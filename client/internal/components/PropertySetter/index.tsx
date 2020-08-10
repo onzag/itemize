@@ -57,29 +57,26 @@ export default class PropertySetter extends React.Component<IPropertySetterBaseP
     // on mount we call the enforce
     this.props.onEnforce(this.props.value, this.props.forId || null, this.props.forVersion || null);
   }
-  public shouldComponentUpdate(nextProps: IPropertySetterBaseProps) {
+  public componentDidUpdate(prevProps: IPropertySetterBaseProps) {
     // on update we check for the id
-    const idHasChanged = (this.props.forId || null) !== (nextProps.forId || null) ||
-      (this.props.forVersion || null) !== (nextProps.forVersion || null);
+    const idHasChanged = (this.props.forId || null) !== (prevProps.forId || null) ||
+      (this.props.forVersion || null) !== (prevProps.forVersion || null);
 
     // if such id has changed
     if (idHasChanged) {
       // we clear the enforcement
-      this.props.onClearEnforcement(this.props.forId || null, this.props.forVersion || null);
+      prevProps.onClearEnforcement(prevProps.forId || null, prevProps.forVersion || null);
     }
 
     // and if the slot id has changed or if the
     // new value does not match
     if (
       idHasChanged ||
-      !equals(nextProps.value, this.props.value)
+      !equals(prevProps.value, this.props.value)
     ) {
       // we set the enforcement
-      this.props.onEnforce(nextProps.value, nextProps.forId, nextProps.forVersion);
+      this.props.onEnforce(this.props.value, this.props.forId, this.props.forVersion);
     }
-
-    // this always returns null, never upates
-    return false;
   }
   public componentWillUnmount() {
     // we clear the enfocement on unmount

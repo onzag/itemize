@@ -48,7 +48,7 @@ export interface IPropertySetterBaseProps {
 export default class PropertySetter extends React.Component<IPropertySetterBaseProps, {}> {
     constructor(props: IPropertySetterBaseProps);
     componentDidMount(): void;
-    shouldComponentUpdate(nextProps: IPropertySetterBaseProps): boolean;
+    componentDidUpdate(prevProps: IPropertySetterBaseProps): void;
     componentWillUnmount(): void;
     render(): React.ReactNode;
 }

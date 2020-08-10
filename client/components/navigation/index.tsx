@@ -56,8 +56,8 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
   if (state) {
     // we will loop into it
     Object.keys(state).forEach((key) => {
-      if (typeof state[key] !== "string") {
-        throw new Error("Attempted to set history state in the query string by using a non-string value in " + key);
+      if (typeof state[key] !== "string" && state[key] !== null) {
+        throw new Error("Attempted to set history state in the query string by using a non-string and non-null value in " + key);
       }
 
       // if our differ flag hasn't been trued

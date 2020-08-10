@@ -21,24 +21,22 @@ class PropertySetter extends react_1.default.Component {
         // on mount we call the enforce
         this.props.onEnforce(this.props.value, this.props.forId || null, this.props.forVersion || null);
     }
-    shouldComponentUpdate(nextProps) {
+    componentDidUpdate(prevProps) {
         // on update we check for the id
-        const idHasChanged = (this.props.forId || null) !== (nextProps.forId || null) ||
-            (this.props.forVersion || null) !== (nextProps.forVersion || null);
+        const idHasChanged = (this.props.forId || null) !== (prevProps.forId || null) ||
+            (this.props.forVersion || null) !== (prevProps.forVersion || null);
         // if such id has changed
         if (idHasChanged) {
             // we clear the enforcement
-            this.props.onClearEnforcement(this.props.forId || null, this.props.forVersion || null);
+            prevProps.onClearEnforcement(prevProps.forId || null, prevProps.forVersion || null);
         }
         // and if the slot id has changed or if the
         // new value does not match
         if (idHasChanged ||
-            !deep_equal_1.default(nextProps.value, this.props.value)) {
+            !deep_equal_1.default(prevProps.value, this.props.value)) {
             // we set the enforcement
-            this.props.onEnforce(nextProps.value, nextProps.forId, nextProps.forVersion);
+            this.props.onEnforce(this.props.value, this.props.forId, this.props.forVersion);
         }
-        // this always returns null, never upates
-        return false;
     }
     componentWillUnmount() {
         // we clear the enfocement on unmount

@@ -22,6 +22,17 @@ interface ILanguagePickerProps {
    */
   useCode?: boolean;
   /**
+   * handle the language change yourself rather than the default
+   * which changes the application language, this allows
+   * you to control custom properties using Setters
+   */
+  handleLanguageChange?: (code: string, appChangeLanguageTo: (code: string) => void) => void;
+  /**
+   * handle the current code yourself rather than using the application's
+   * default
+   */
+  currentCode?: string;
+  /**
    * whether to use a display that is able to shrink, one contains the
    * standard native name, and the other contains only the language code
    */
@@ -77,12 +88,25 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
     this.setState({
       anchorEl: null,
     });
-    changeLanguageToFn(code);
+
+    if (this.props.handleLanguageChange) {
+      this.props.handleLanguageChange(code, changeLanguageToFn);
+    } else {
+      changeLanguageToFn(code);
+    }
   }
   public render() {
     return (
       <AppLanguageRetriever>
         {(languageData) => {
+          let currentLanguage = languageData.currentLanguage;
+          if (this.props.currentCode) {
+            currentLanguage = languageData.availableLanguages.find((l) => l.code === this.props.currentCode);
+          }
+          if (currentLanguage === null) {
+            return null;
+          }
+
           const menu = this.state.anchorEl ? <Menu
             anchorEl={this.state.anchorEl}
             keepMounted={false}
@@ -92,7 +116,7 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
             {languageData.availableLanguages.map((al) => (
               <MenuItem
                 key={al.code}
-                selected={al.code === languageData.currentLanguage.code}
+                selected={al.code === currentLanguage.code}
                 onClick={this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code)}
               >
                 {capitalize(al.name)}
@@ -109,10 +133,10 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
               >
                 {
                   !this.props.shrinkingDisplay ?
-                    (this.props.useCode ? languageData.currentLanguage.code : languageData.currentLanguage.name) :
+                    (this.props.useCode ? currentLanguage.code : currentLanguage.name) :
                     <React.Fragment>
-                      <span className={this.props.shrinkingDisplayStandardClassName}>{languageData.currentLanguage.name}</span>
-                      <span className={this.props.shrinkingDisplayShrunkClassName}>{languageData.currentLanguage.code}</span>
+                      <span className={this.props.shrinkingDisplayStandardClassName}>{currentLanguage.name}</span>
+                      <span className={this.props.shrinkingDisplayShrunkClassName}>{currentLanguage.code}</span>
                     </React.Fragment>
                 }
               </Button>

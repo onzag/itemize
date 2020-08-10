@@ -85,6 +85,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
      * Focus on mount
      */
     autoFocus?: boolean;
+    /**
+     * The value to prefill with on mount
+     */
+    prefillWith?: PropertyDefinitionSupportedType;
 }
 /**
  * The setter props

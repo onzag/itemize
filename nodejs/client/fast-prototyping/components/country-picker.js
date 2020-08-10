@@ -46,18 +46,30 @@ class CountryPicker extends react_1.default.PureComponent {
         this.setState({
             anchorEl: null,
         });
-        changeCountryToFn(code);
+        if (this.props.handleCountryChange) {
+            this.props.handleCountryChange(code, changeCountryToFn);
+        }
+        else {
+            changeCountryToFn(code);
+        }
     }
     render() {
         return (react_1.default.createElement(AppCountryRetriever_1.default, null, (countryData) => {
+            let currentCountry = countryData.currentCountry;
+            if (this.props.currentCode) {
+                currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode);
+            }
+            if (currentCountry === null) {
+                return null;
+            }
             const menu = this.state.anchorEl ? react_1.default.createElement(mui_core_1.Menu, { anchorEl: this.state.anchorEl, 
                 // this is important to keep it false in orer to ensure the app isn't sluggish
-                keepMounted: false, open: !!this.state.anchorEl, onClose: this.handleMenuClose }, countryData.availableCountries.map((ac) => (react_1.default.createElement(mui_core_1.MenuItem, { key: ac.code, selected: ac.code === countryData.currentCountry.code, onClick: this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code) },
+                keepMounted: false, open: !!this.state.anchorEl, onClose: this.handleMenuClose }, countryData.availableCountries.map((ac) => (react_1.default.createElement(mui_core_1.MenuItem, { key: ac.code, selected: ac.code === currentCountry.code, onClick: this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code) },
                 ac.emoji,
                 " ",
                 localization_1.capitalize(ac.native))))) : null;
             return (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: countryData.currentCountry.emoji, onClick: this.handleButtonSelectClick }, this.props.useCode ? countryData.currentCountry.code : countryData.currentCountry.native),
+                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: currentCountry.emoji, onClick: this.handleButtonSelectClick }, this.props.useCode ? currentCountry.code : currentCountry.native),
                 menu));
         }));
     }

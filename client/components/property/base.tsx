@@ -98,6 +98,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * Focus on mount
    */
   autoFocus?: boolean;
+  /**
+   * The value to prefill with on mount
+   */
+  prefillWith?: PropertyDefinitionSupportedType;
 }
 
 /**
@@ -408,6 +412,7 @@ export function EntryViewReadSet(
                           altPlaceholder={props.altPlaceholder}
                           ignoreErrors={props.ignoreErrors}
                           autoFocus={props.autoFocus}
+                          prefillWith={props.prefillWith}
                         />
                       );
                     } else {

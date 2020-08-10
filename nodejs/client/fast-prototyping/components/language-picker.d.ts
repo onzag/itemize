@@ -17,6 +17,17 @@ interface ILanguagePickerProps {
      */
     useCode?: boolean;
     /**
+     * handle the language change yourself rather than the default
+     * which changes the application language, this allows
+     * you to control custom properties using Setters
+     */
+    handleLanguageChange?: (code: string, appChangeLanguageTo: (code: string) => void) => void;
+    /**
+     * handle the current code yourself rather than using the application's
+     * default
+     */
+    currentCode?: string;
+    /**
      * whether to use a display that is able to shrink, one contains the
      * standard native name, and the other contains only the language code
      */
