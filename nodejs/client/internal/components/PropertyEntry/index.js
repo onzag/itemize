@@ -63,7 +63,7 @@ const handlerRegistry = {
                 // references need the token and SSR in order
                 // to fetch values and assign itself
                 // values
-                includeTokenAndSSR: true,
+                includeTokenDataAndSSR: true,
             },
         },
     },
@@ -254,17 +254,17 @@ function PropertyEntry(props) {
             rendererArgs: props.rendererArgs || {},
         };
         // so now we should check for the contexts that we need
-        if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+        if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
             // first and foremost the static contexts, then the dynamic
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr, config: config })))))))));
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr, config: config })))))))));
         }
         else if (registryEntry.includeConfig) {
             // same here
             return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { config: config })))));
         }
-        else if (registryEntry.includeTokenAndSSR) {
+        else if (registryEntry.includeTokenDataAndSSR) {
             // and here
-            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr })))))));
+            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr })))))));
         }
         // if we don't need to read anything else from any other context
         // we can do this

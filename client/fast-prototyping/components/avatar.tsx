@@ -376,7 +376,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
               <Reader id="id">
                 {(id: number) => {
                   const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
-                  const specialUserClassName = role !== "USER" ? props.classes.specialUser : "";
+                  const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
                   const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
 
                   return (

@@ -131,15 +131,16 @@ class PropertyEntryReference extends react_1.default.Component {
         // now we do this and use the search prop we are searching for and get the conversion
         // id for the search mode and just paste the string there
         args[search_mode_1.getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+        const onlyCreatedBySelf = this.props.property.getSpecialProperty("referencedFilterByCreatedBySelf");
         // now we can run the search using the traditional mode
         const result = await gql_client_util_1.runSearchQueryFor({
             args,
             fields,
             orderBy: {},
-            createdBy: null,
+            createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
             parentedBy: null,
             cachePolicy: "none",
-            token: this.props.token,
+            token: this.props.tokenData.token,
             itemDefinition: idef.getSearchModeCounterpart(),
             traditional: true,
             offset: 0,
@@ -249,7 +250,7 @@ class PropertyEntryReference extends react_1.default.Component {
             id: forId,
             version: null,
             cacheStore: false,
-            token: this.props.token,
+            token: this.props.tokenData.token,
             itemDefinition: idef,
         });
         if (result.error) {

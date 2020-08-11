@@ -12,6 +12,7 @@ import { IRendererProps } from "../../renderer";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
+import { ITokenContextType } from "../../providers/token-provider";
 import { ISSRContextType } from "../../providers/ssr-provider";
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -279,7 +280,7 @@ export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extend
      *
      * Context Provided, Conditional, Standard Handler Only
      */
-    token?: string;
+    tokenData?: ITokenContextType;
     /**
      * SSR context is a conditional include that will pass the ssr context to the
      * handler, used in references mainly

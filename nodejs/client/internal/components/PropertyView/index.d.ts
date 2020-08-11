@@ -13,6 +13,7 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ISSRContextType } from "../../../../client/internal/providers/ssr-provider";
+import { ITokenContextType } from "../../../../client/internal/providers/token-provider";
 /**
  * This is what every view renderer gets
  *
@@ -125,7 +126,7 @@ export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyV
      *
      * Context Provided, Conditional, Standard Handler Only
      */
-    token?: string;
+    tokenData?: ITokenContextType;
     /**
      * SSR context is a conditional include that will pass the ssr context to the
      * handler, used in references mainly

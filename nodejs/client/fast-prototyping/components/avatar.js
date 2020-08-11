@@ -234,7 +234,7 @@ exports.AvatarRenderer = mui_core_1.withStyles(avatarStyles)((props) => {
     return (react_1.default.createElement("div", { className: `${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}` },
         react_1.default.createElement(Reader_1.default, { id: "username" }, (username) => (react_1.default.createElement(Reader_1.default, { id: "role" }, (role) => (react_1.default.createElement(Reader_1.default, { id: "id" }, (id) => {
             const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
-            const specialUserClassName = role !== "USER" ? props.classes.specialUser : "";
+            const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
             const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
             return (react_1.default.createElement(react_dropzone_1.default, { onDropAccepted: onDrop.bind(null, props.onSetFile), onDropRejected: onDrop.bind(null, props.onSetFile), maxSize: constants_1.MAX_FILE_SIZE, accept: props.accept, multiple: false, noClick: false, ref: dropzoneRef, disabled: props.disabled }, ({ getRootProps, getInputProps, isDragAccept, isDragReject, }) => {
                 const { ref, ...rootProps } = getRootProps();

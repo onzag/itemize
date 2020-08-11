@@ -39,7 +39,7 @@ const handlerRegistry = {
             reference: {
                 renderer: "PropertyViewSimple",
                 handler: PropertyViewReference_1.default,
-                includeTokenAndSSR: true,
+                includeTokenDataAndSSR: true,
             }
         }
     },
@@ -159,14 +159,14 @@ function PropertyView(props) {
             renderer,
             rendererArgs: props.rendererArgs || {},
         };
-        if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr, config: config })))))))));
+        if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
+            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr, config: config })))))))));
         }
         else if (registryEntry.includeConfig) {
             return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(Element, Object.assign({}, nProps, { config: config })))));
         }
-        else if (registryEntry.includeTokenAndSSR) {
-            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { token: tokenData.token, ssr: ssr })))))));
+        else if (registryEntry.includeTokenDataAndSSR) {
+            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(Element, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr })))))));
         }
         return (react_1.default.createElement(Element, Object.assign({}, nProps)));
     })));

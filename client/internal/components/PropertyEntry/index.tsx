@@ -28,7 +28,7 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
-import { TokenContext } from "../../providers/token-provider";
+import { TokenContext, ITokenContextType } from "../../providers/token-provider";
 import { ISSRContextType, SSRContext } from "../../providers/ssr-provider";
 
 /**
@@ -305,7 +305,7 @@ export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extend
    * 
    * Context Provided, Conditional, Standard Handler Only
    */
-  token?: string;
+  tokenData?: ITokenContextType;
   /**
    * SSR context is a conditional include that will pass the ssr context to the
    * handler, used in references mainly
@@ -406,7 +406,7 @@ interface IRendererHandlerType {
    * Whether the handler should include the user token as well as SSR
    * information
    */
-  includeTokenAndSSR?: boolean;
+  includeTokenDataAndSSR?: boolean;
 };
 
 /**
@@ -457,7 +457,7 @@ const handlerRegistry:
         // references need the token and SSR in order
         // to fetch values and assign itself
         // values
-        includeTokenAndSSR: true,
+        includeTokenDataAndSSR: true,
       },
     },
   },
@@ -671,7 +671,7 @@ export default function PropertyEntry(
                 };
 
                 // so now we should check for the contexts that we need
-                if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+                if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
                   // first and foremost the static contexts, then the dynamic
                   return (
                     <ConfigContext.Consumer>
@@ -682,7 +682,7 @@ export default function PropertyEntry(
                               {(tokenData) => (
                                 <HandlerElement
                                   {...nProps}
-                                  token={tokenData.token}
+                                  tokenData={tokenData}
                                   ssr={ssr}
                                   config={config}
                                 />
@@ -705,7 +705,7 @@ export default function PropertyEntry(
                       )}
                     </ConfigContext.Consumer>
                   );
-                } else if (registryEntry.includeTokenAndSSR) {
+                } else if (registryEntry.includeTokenDataAndSSR) {
                   // and here
                   return (
                     <SSRContext.Consumer>
@@ -714,7 +714,7 @@ export default function PropertyEntry(
                           {(tokenData) => (
                             <HandlerElement
                               {...nProps}
-                              token={tokenData.token}
+                              tokenData={tokenData}
                               ssr={ssr}
                             />
                           )}

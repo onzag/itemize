@@ -203,7 +203,7 @@ export default class PropertyViewReference
       id: forId,
       version: null,
       cacheStore: false,
-      token: this.props.token,
+      token: this.props.tokenData.token,
       itemDefinition: idef,
     });
 

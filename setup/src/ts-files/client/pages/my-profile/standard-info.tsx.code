@@ -136,7 +136,11 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 		return (
 			<Paper className={props.classes.paper}>
 				<ItemDefinitionLoader>
-					<Entry id="profile_picture" renderer={AvatarRenderer} />
+					<Entry
+						id="profile_picture"
+						renderer={AvatarRenderer}
+						rendererArgs={{specialUsers: ["ADMIN", "MODERATOR"]}}
+					/>
 					<div className={props.classes.pickers}>
 						<LanguagePicker />
 						<CountryPicker />

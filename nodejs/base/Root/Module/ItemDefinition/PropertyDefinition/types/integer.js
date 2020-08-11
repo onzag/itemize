@@ -107,6 +107,10 @@ const typeValue = {
             name: "referencedFilterByLanguage",
             type: "boolean",
         },
+        {
+            name: "referencedFilterByCreatedBySelf",
+            type: "boolean",
+        },
     ],
 };
 exports.default = typeValue;

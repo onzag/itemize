@@ -134,6 +134,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
       name: "referencedFilterByLanguage",
       type: "boolean",
     },
+    {
+      name: "referencedFilterByCreatedBySelf",
+      type: "boolean",
+    },
   ],
 };
 export default typeValue;

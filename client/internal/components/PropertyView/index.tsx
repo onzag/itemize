@@ -29,7 +29,7 @@ import { PropertyViewLocation } from "./PropertyViewLocation";
 import { PropertyViewCurrency } from "./PropertyViewCurrency";
 import PropertyViewReference from "./PropertyViewReference";
 import { ISSRContextType, SSRContext } from "../../../../client/internal/providers/ssr-provider";
-import { TokenContext } from "../../../../client/internal/providers/token-provider";
+import { TokenContext, ITokenContextType } from "../../../../client/internal/providers/token-provider";
 
 /**
  * This is what every view renderer gets
@@ -145,7 +145,7 @@ export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyV
    * 
    * Context Provided, Conditional, Standard Handler Only
    */
-  token?: string;
+  tokenData?: ITokenContextType;
   /**
    * SSR context is a conditional include that will pass the ssr context to the
    * handler, used in references mainly
@@ -243,7 +243,7 @@ interface IRendererHandlerType {
    * Whether the handler should include the user token as well as SSR
    * information
    */
-  includeTokenAndSSR?: boolean;
+  includeTokenDataAndSSR?: boolean;
 };
 
 /**
@@ -276,7 +276,7 @@ const handlerRegistry:
       reference: {
         renderer: "PropertyViewSimple",
         handler: PropertyViewReference,
-        includeTokenAndSSR: true,
+        includeTokenDataAndSSR: true,
       }
     }
   },
@@ -447,7 +447,7 @@ export default function PropertyView(
                   rendererArgs: props.rendererArgs || {},
                 };
 
-                if (registryEntry.includeConfig && registryEntry.includeTokenAndSSR) {
+                if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
                   return (
                     <ConfigContext.Consumer>
                       {(config) => (
@@ -457,7 +457,7 @@ export default function PropertyView(
                               {(tokenData) => (
                                 <Element
                                   {...nProps}
-                                  token={tokenData.token}
+                                  tokenData={tokenData}
                                   ssr={ssr}
                                   config={config}
                                 />
@@ -479,7 +479,7 @@ export default function PropertyView(
                       )}
                     </ConfigContext.Consumer>
                   );
-                } else if (registryEntry.includeTokenAndSSR) {
+                } else if (registryEntry.includeTokenDataAndSSR) {
                   return (
                     <SSRContext.Consumer>
                       {(ssr) => (
@@ -487,7 +487,7 @@ export default function PropertyView(
                           {(tokenData) => (
                             <Element
                               {...nProps}
-                              token={tokenData.token}
+                              tokenData={tokenData}
                               ssr={ssr}
                             />
                           )}

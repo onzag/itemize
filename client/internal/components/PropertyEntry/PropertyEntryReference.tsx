@@ -194,15 +194,17 @@ export default class PropertyEntryReference
     // id for the search mode and just paste the string there
     args[getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
 
+    const onlyCreatedBySelf = this.props.property.getSpecialProperty("referencedFilterByCreatedBySelf") as boolean;
+
     // now we can run the search using the traditional mode
     const result = await runSearchQueryFor({
       args,
       fields,
       orderBy: {},
-      createdBy: null,
+      createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
       parentedBy: null,
       cachePolicy: "none",
-      token: this.props.token,
+      token: this.props.tokenData.token,
       itemDefinition: idef.getSearchModeCounterpart(),
       traditional: true,
       offset: 0,
@@ -342,7 +344,7 @@ export default class PropertyEntryReference
       id: forId,
       version: null,
       cacheStore: false,
-      token: this.props.token,
+      token: this.props.tokenData.token,
       itemDefinition: idef,
     });
 

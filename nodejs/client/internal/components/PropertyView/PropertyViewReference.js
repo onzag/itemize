@@ -141,7 +141,7 @@ class PropertyViewReference extends react_1.default.Component {
             id: forId,
             version: null,
             cacheStore: false,
-            token: this.props.token,
+            token: this.props.tokenData.token,
             itemDefinition: idef,
         });
         if (this.currentlyFindingValueFor &&
