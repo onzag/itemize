@@ -11,7 +11,7 @@ import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 import { ISSRContextType, SSRContext } from "./ssr-provider";
-import { getCookie } from "../..";
+import { getCookie, COOKIE_EXPIRATION_DATE } from "../..";
 
 /**
  * State for the actual token provider that actually
@@ -296,9 +296,9 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       // we are not guests
       if (tokenDataToken !== null) {
         // we set them
-        document.cookie = "token=" + tokenDataToken + ";path=/";
-        document.cookie = "role=" + tokenDataRole + ";path=/";
-        document.cookie = "id=" + tokenDataId + ";path=/";
+        document.cookie = "token=" + tokenDataToken + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
+        document.cookie = "role=" + tokenDataRole + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
+        document.cookie = "id=" + tokenDataId + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
       } else {
         // otherwise we want to remove these cookies
         document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";

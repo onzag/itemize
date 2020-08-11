@@ -181,6 +181,13 @@ export interface IItemDefinitionProviderProps {
      */
     children: React.ReactNode;
     /**
+     * mounting id, adding a mounting id ensures
+     * that the on dismount functions are called
+     * if this changes, otherwise they will only be called
+     * on the literal componentWillUnmount alone
+     */
+    mountId?: string;
+    /**
      * the item definition slash/separated/path
      * if you don't specify this, the context will be
      * based on the prop extensions emulated item definition
@@ -252,6 +259,9 @@ export interface IItemDefinitionProviderProps {
     includePolicies?: boolean;
     /**
      * cleans or restores the value from the memory once the object dismounts
+     * or the mount id changes; always remember to set a mountId property
+     * for using this in order to be able to difference item definition
+     * loaders between themselves
      */
     cleanOnDismount?: boolean | IActionCleanOptions;
     /**
@@ -364,6 +374,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any): void;
     onPropertyEnforce(property: PropertyDefinition, value: PropertyDefinitionSupportedType, givenForId: number, givenForVersion: string, internal?: boolean): void;
     onPropertyClearEnforce(property: PropertyDefinition, givenForId: number, givenForVersion: string, internal?: boolean): void;
+    runDismountOn(props?: IActualItemDefinitionProviderProps): void;
     componentWillUnmount(): void;
     onIncludeSetExclusionState(include: Include, state: IncludeExclusionState): void;
     checkItemDefinitionStateValidity(options: {
@@ -375,6 +386,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     giveEmulatedInvalidError(stateApplied: string, withId: boolean, withSearchResults: boolean): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults;
     delete(options?: IActionDeleteOptions): Promise<IBasicActionResponse>;
     clean(options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
+    cleanWithProps(props: IActualItemDefinitionProviderProps, options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
     loadSearch(id: string): void;
     search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;

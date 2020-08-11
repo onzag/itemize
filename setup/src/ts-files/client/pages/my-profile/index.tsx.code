@@ -50,6 +50,7 @@ export function MyProfile()<0>{
 							includePolicies={true}
 							longTermCaching={true}
 							markForDestructionOnLogout={true}
+							mountId="my-profile"
 							cleanOnDismount={{
 								propertiesToRestoreOnAny: [
 									"username",

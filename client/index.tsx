@@ -22,6 +22,12 @@ import { ConfigProvider } from "./internal/providers/config-provider";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 
 /**
+ * when cookies expire
+ * @ignore
+ */
+export const COOKIE_EXPIRATION_DATE = (new Date(9999999999999)).toUTCString();
+
+/**
  * Provides a single cookie based on a name, this function
  * is used heavily in order to retrieve the session values
  * @param name the name of the cookie to provide
@@ -307,7 +313,7 @@ export async function initializeItemizeApp(
 
     // and we set it to local storage afterwards, we don't need to waste requests
     if (!serverMode) {
-      document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";path=/";
+      document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
     }
 
     // Let's set the values

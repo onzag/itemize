@@ -570,6 +570,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             mailgun,
             pkgcloudStorageClients,
             pkgcloudUploadContainers,
+            logger: exports.logger,
             // assigned later during rest setup
             customUserTokenQuery: null,
         };

@@ -1,8 +1,9 @@
 import { IAppDataType, logger } from "..";
 import { Router } from "express";
 import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../constants";
-import { jwtVerify } from "../token";
+import { jwtVerify, jwtSign } from "../token";
 import { ISQLTableRowValue } from "../../base/Root/sql";
+import bcyrpt from "bcrypt";
 
 export function userRestServices(appData: IAppDataType) {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -17,8 +18,10 @@ export function userRestServices(appData: IAppDataType) {
   router.get("/validate-email", async (req, res) => {
     if (!hasEmailProperty || !hasEvalidatedProperty) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
+      return;
     } else if (!req.query.token) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+      return;
     }
 
     let decoded: {
@@ -30,10 +33,12 @@ export function userRestServices(appData: IAppDataType) {
       decoded = await jwtVerify(req.query.token as string, appData.sensitiveConfig.jwtKey);
     } catch (err) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+      return;
     };
 
     if (!decoded.validateUserId || !decoded.validateUserEmail) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+      return;
     }
 
     let user: ISQLTableRowValue;
@@ -42,8 +47,10 @@ export function userRestServices(appData: IAppDataType) {
       user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
       if (!user) {
         res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
+        return;
       } else if (user.blocked_at !== null) {
         res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+        return;
       }
     } catch (err) {
       logger.error(
@@ -63,6 +70,7 @@ export function userRestServices(appData: IAppDataType) {
     if (user.email !== decoded.validateUserEmail) {
       // we consider this invalid as credentials it does refer
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+      return;
     }
 
     try {
@@ -118,6 +126,88 @@ export function userRestServices(appData: IAppDataType) {
     }
 
     res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+  });
+
+  router.get("/redirected-login", async (req, res) => {
+    const userId = parseInt(req.query.userid as string);
+    const password = req.query.password as string;
+  
+    let redirect = req.query.redirect as string;
+    if (redirect && !redirect.startsWith("/")) {
+      redirect = "/" + redirect;
+    } else if (!redirect) {
+      redirect = "/";
+    }
+
+    if ((isNaN(userId) || userId <= 0) || !password) {
+      res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
+      return;
+    }
+
+    let user: ISQLTableRowValue;
+    try {
+      user = await appData.cache.requestValue(userIdef, userId, null);
+      if (!user) {
+        res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
+      } else if (user.blocked_at !== null) {
+        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+      }
+    } catch (err) {
+      logger.error(
+        "userRestServices/redirected-login: failed to retrieve user from the id",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+      throw err;
+    }
+
+    let isValidPassword: boolean;
+    let token: string;
+    try {
+      isValidPassword = await bcyrpt.compare(password, user.password);
+      token = await jwtSign({
+        id: user.id,
+        role: user.role,
+        sessionId: user.session_id || 0,
+      }, appData.sensitiveConfig.jwtKey);
+    } catch (err) {
+      res.redirect("/" + user.app_language + "/?err=" + ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    res.cookie("token", token, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.cookie("lang", user.app_language, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.cookie("country", user.app_country, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.cookie("currency", user.app_currency, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.cookie("id", user.id, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.cookie("role", user.role, {
+      httpOnly: false,
+      expires: new Date(9999999999999),
+      path: "/",
+    });
+    res.redirect(`/${user.app_language}${redirect}`);
   });
 
   return router;

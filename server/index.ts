@@ -154,6 +154,7 @@ export interface IAppDataType {
   pkgcloudStorageClients: PkgCloudClients;
   pkgcloudUploadContainers: PkgCloudContainers;
   customUserTokenQuery: any;
+  logger: winston.Logger;
 }
 
 export interface IServerDataType {
@@ -823,6 +824,8 @@ export async function initializeServer(
       mailgun,
       pkgcloudStorageClients,
       pkgcloudUploadContainers,
+
+      logger,
 
       // assigned later during rest setup
       customUserTokenQuery: null,

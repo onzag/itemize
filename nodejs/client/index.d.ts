@@ -10,6 +10,11 @@ import { ISSRContextType } from "./internal/providers/ssr-provider";
 import { IConfigRawJSONDataType } from "../config";
 import Root, { ILangLocalesType } from "../base/Root";
 /**
+ * when cookies expire
+ * @ignore
+ */
+export declare const COOKIE_EXPIRATION_DATE: string;
+/**
  * Provides a single cookie based on a name, this function
  * is used heavily in order to retrieve the session values
  * @param name the name of the cookie to provide

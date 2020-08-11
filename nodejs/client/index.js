@@ -21,6 +21,11 @@ const Root_1 = __importDefault(require("../base/Root"));
 const cache_1 = __importDefault(require("./internal/workers/cache"));
 const config_provider_1 = require("./internal/providers/config-provider");
 /**
+ * when cookies expire
+ * @ignore
+ */
+exports.COOKIE_EXPIRATION_DATE = (new Date(9999999999999)).toUTCString();
+/**
  * Provides a single cookie based on a name, this function
  * is used heavily in order to retrieve the session values
  * @param name the name of the cookie to provide
@@ -237,7 +242,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         }
         // and we set it to local storage afterwards, we don't need to waste requests
         if (!serverMode) {
-            document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";path=/";
+            document.cookie = "guessedData=" + JSON.stringify(guessedUserData) + ";expires=" + exports.COOKIE_EXPIRATION_DATE + ";path=/";
         }
         // Let's set the values
         guessedLang = storedLang || guessedUserData.language;

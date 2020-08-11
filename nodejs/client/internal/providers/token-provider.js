@@ -167,9 +167,9 @@ class ActualTokenProvider extends react_1.default.Component {
             // we are not guests
             if (tokenDataToken !== null) {
                 // we set them
-                document.cookie = "token=" + tokenDataToken + ";path=/";
-                document.cookie = "role=" + tokenDataRole + ";path=/";
-                document.cookie = "id=" + tokenDataId + ";path=/";
+                document.cookie = "token=" + tokenDataToken + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
+                document.cookie = "role=" + tokenDataRole + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
+                document.cookie = "id=" + tokenDataId + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
             }
             else {
                 // otherwise we want to remove these cookies

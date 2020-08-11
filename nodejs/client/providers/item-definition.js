@@ -84,6 +84,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.canEdit = this.canEdit.bind(this);
         this.canCreate = this.canCreate.bind(this);
         this.canDelete = this.canDelete.bind(this);
+        this.cleanWithProps = this.cleanWithProps.bind(this);
         this.clean = this.clean.bind(this);
         this.poke = this.poke.bind(this);
         this.unpoke = this.unpoke.bind(this);
@@ -145,8 +146,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 userId: this.props.tokenData.id,
                 userRole: this.props.tokenData.role,
                 itemDefinitionInstance: this.props.itemDefinitionInstance,
-                forId: this.props.forId,
-                forVersion: this.props.forVersion,
+                forId: this.props.forId || null,
+                forVersion: this.props.forVersion || null,
             });
             // this will work even for null values, and null requestFields
             memoryLoadedAndValid = (appliedGQLValue &&
@@ -242,7 +243,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (props.setters) {
             props.setters.forEach((setter) => {
                 const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-                this.onPropertyEnforce(property, setter.value, props.forId, props.forVersion, true);
+                this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
             });
         }
     }
@@ -250,7 +251,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (props.setters) {
             props.setters.forEach((setter) => {
                 const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-                this.onPropertyClearEnforce(property, props.forId, props.forVersion, true);
+                this.onPropertyClearEnforce(property, props.forId || null, props.forVersion || null, true);
             });
         }
     }
@@ -382,7 +383,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             }
             else if (!isStatic && wasStatic && this.props.forId) {
                 alreadyAddedRemoteListeners = true;
-                this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.props.forVersion, this.reloadListener);
+                this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.props.forVersion || null, this.reloadListener);
                 this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
             }
             // if this was an item definition or id update
@@ -455,6 +456,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             else {
                 this.dismissSearchResults();
             }
+        }
+        // this is a different instance, we consider it dismounted
+        if (prevProps.mountId !== this.props.mountId) {
+            this.runDismountOn(prevProps);
         }
     }
     reloadListener() {
@@ -796,21 +801,24 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
     }
+    runDismountOn(props = this.props) {
+        // when unmounting we check our optimization flags to see
+        // if we are expecting to clean up the memory cache
+        if (props.cleanOnDismount) {
+            if (typeof props.cleanOnDismount === "boolean") {
+                props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
+                // this will affect other instances that didn't dismount
+                props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
+            }
+            else {
+                this.cleanWithProps(props, props.cleanOnDismount, "success", false);
+            }
+        }
+    }
     componentWillUnmount() {
         this.isUnmounted = true;
         this.unSetupListeners();
-        // when unmounting we check our optimization flags to see
-        // if we are expecting to clean up the memory cache
-        if (this.props.cleanOnDismount) {
-            if (typeof this.props.cleanOnDismount === "boolean") {
-                this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
-                // this will affect other instances that didn't dismount
-                this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
-            }
-            else {
-                this.clean(this.props.cleanOnDismount, "success", false);
-            }
-        }
+        this.runDismountOn();
     }
     onIncludeSetExclusionState(include, state) {
         // just sets the exclusion state
@@ -969,7 +977,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     },
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
             return this.giveEmulatedInvalidError("deleteError", false, false);
         }
         if (options.beforeDelete && !options.beforeDelete()) {
@@ -1017,10 +1025,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     },
                 });
             }
-            this.clean(options, "success");
+            this.cleanWithProps(this.props, options, "success");
         }
         else {
-            this.props.itemDefinitionInstance.cleanValueFor(this.props.forId, this.props.forVersion || null);
+            this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
             if (!this.isUnmounted) {
                 this.setState({
                     deleteError: null,
@@ -1034,7 +1042,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     },
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
             this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
         }
         return {
@@ -1042,6 +1050,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         };
     }
     clean(options, state, avoidTriggeringUpdate) {
+        return this.cleanWithProps(this.props, options, state, avoidTriggeringUpdate);
+    }
+    cleanWithProps(props, options, state, avoidTriggeringUpdate) {
         if (!this.isUnmounted) {
             if (options.unpokeAfterAny ||
                 options.unpokeAfterFailure && state === "fail" ||
@@ -1058,8 +1069,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         let needsUpdate = false;
         // CLEANING PROPERTIES
         const cleanupPropertyFn = (ptc) => {
-            this.props.itemDefinitionInstance
-                .getPropertyDefinitionFor(ptc, true).cleanValueFor(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance
+                .getPropertyDefinitionFor(ptc, true).cleanValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.propertiesToCleanOnSuccess && state === "success") {
             options.propertiesToCleanOnSuccess.forEach(cleanupPropertyFn);
@@ -1075,8 +1086,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // RESTORING PROPERTIES
         const restorePropertyFn = (ptr) => {
-            this.props.itemDefinitionInstance
-                .getPropertyDefinitionFor(ptr, true).restoreValueFor(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance
+                .getPropertyDefinitionFor(ptr, true).restoreValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.propertiesToRestoreOnSuccess && state === "success") {
             options.propertiesToRestoreOnSuccess.forEach(restorePropertyFn);
@@ -1092,7 +1103,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // CLEANING INCLUDES
         const cleanupIncludeFn = (itc) => {
-            this.props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.includesToCleanOnSuccess && state === "success") {
             options.includesToCleanOnSuccess.forEach(cleanupIncludeFn);
@@ -1108,8 +1119,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // RESTORING INCLUDES
         const restoreIncludeFn = (itr) => {
-            this.props.itemDefinitionInstance
-                .getIncludeFor(itr).restoreValueFor(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance
+                .getIncludeFor(itr).restoreValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.includesToRestoreOnSuccess && state === "success") {
             options.includesToRestoreOnSuccess.forEach(restoreIncludeFn);
@@ -1125,8 +1136,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // CLEANING POLICIES, POLICIES CAN'T BE RESTORED
         const cleanupPolicyFn = (policyArray) => {
-            this.props.itemDefinitionInstance
-                .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance
+                .getPropertyDefinitionForPolicy(...policyArray).cleanValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.policiesToCleanOnSuccess && state === "success") {
             options.policiesToCleanOnSuccess.forEach(cleanupPolicyFn);
@@ -1143,12 +1154,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (options.cleanSearchResultsOnAny ||
             options.cleanSearchResultsOnFailure && state === "fail" ||
             options.cleanSearchResultsOnSuccess && state === "success") {
-            debugger;
-            this.props.itemDefinitionInstance.cleanInternalState(this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
         }
         // NOw we check if we need an update in the listeners and if we are allowed to trigger it
         if (needsUpdate && !avoidTriggeringUpdate) {
-            this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+            props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
         }
     }
     async submit(options) {
@@ -1178,7 +1188,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     pokedElements,
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
             // if it's not poked already, let's poke it
             return this.giveEmulatedInvalidError("submitError", true, false);
         }
@@ -1209,7 +1219,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             userId: this.props.tokenData.id,
             userRole: this.props.tokenData.role,
             itemDefinitionInstance: this.props.itemDefinitionInstance,
-            forId: this.props.forId,
+            forId: this.props.forId || null,
             forVersion: this.props.forVersion || null,
         });
         // now checking the option for the before submit function, if it returns
@@ -1234,7 +1244,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     itemDefinition: this.props.itemDefinitionInstance,
                     token: this.props.tokenData.token,
                     language: this.props.localeData.language,
-                    id: this.props.forId,
+                    id: this.props.forId || null,
                     version: this.props.forVersion,
                     listenerUUID: this.props.remoteListener.getUUID(),
                     cacheStore: this.props.longTermCaching,
@@ -1294,7 +1304,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     pokedElements,
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
         }
         else if (value) {
             if (!this.isUnmounted) {
@@ -1308,8 +1318,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             recievedId = value.id;
             receivedVersion = value.version || null;
             this.props.itemDefinitionInstance.applyValue(recievedId, receivedVersion, value, false, this.props.tokenData.id, this.props.tokenData.role, getQueryFields, true);
-            this.clean(options, "success", true);
-            this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+            this.cleanWithProps(this.props, options, "success", true);
+            this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
         }
         // happens during an error or whatnot
         return {
@@ -1362,7 +1372,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     pokedElements,
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
             return this.giveEmulatedInvalidError("searchError", false, true);
         }
         if (options.cachePolicy !== "none" &&
@@ -1437,7 +1447,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             userId: this.props.tokenData.id,
             userRole: this.props.tokenData.role,
             itemDefinitionInstance: this.props.itemDefinitionInstance,
-            forId: this.props.forId,
+            forId: this.props.forId || null,
             forVersion: this.props.forVersion || null,
         });
         // the fields nevertheless are another story as it uses the standard logic
@@ -1531,7 +1541,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     pokedElements,
                 });
             }
-            this.clean(options, "fail");
+            this.cleanWithProps(this.props, options, "fail");
         }
         else {
             const searchState = {
@@ -1570,7 +1580,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     pokedElements,
                 });
             }
-            this.clean(options, "success");
+            this.cleanWithProps(this.props, options, "success");
         }
         return {
             searchId,
@@ -1668,7 +1678,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         return this.props.itemDefinitionInstance.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.DELETE, this.props.tokenData.role, this.props.tokenData.id, this.props.assumeOwnership ?
             (this.props.tokenData.id || constants_1.UNSPECIFIED_OWNER) :
-            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId, this.props.forVersion || null), {}, false);
+            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null), {}, false);
     }
     canCreate() {
         if (this.props.forId !== null) {
@@ -1682,7 +1692,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         return this.props.itemDefinitionInstance.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.EDIT, this.props.tokenData.role, this.props.tokenData.id, this.props.assumeOwnership ?
             (this.props.tokenData.id || constants_1.UNSPECIFIED_OWNER) :
-            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId, this.props.forVersion || null), {}, false);
+            this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null), {}, false);
     }
     poke(elements) {
         if (this.isUnmounted) {

@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const __1 = require("..");
 const express_1 = require("express");
 const constants_1 = require("../../constants");
 const token_1 = require("../token");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 function userRestServices(appData) {
     const userModule = appData.root.getModuleFor(["users"]);
     const userIdef = userModule.getItemDefinitionFor(["user"]);
@@ -14,9 +18,11 @@ function userRestServices(appData) {
     router.get("/validate-email", async (req, res) => {
         if (!hasEmailProperty || !hasEvalidatedProperty) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.UNSPECIFIED);
+            return;
         }
         else if (!req.query.token) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+            return;
         }
         let decoded;
         try {
@@ -25,19 +31,23 @@ function userRestServices(appData) {
         }
         catch (err) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+            return;
         }
         ;
         if (!decoded.validateUserId || !decoded.validateUserEmail) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+            return;
         }
         let user;
         try {
             user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
             if (!user) {
                 res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.USER_REMOVED);
+                return;
             }
             else if (user.blocked_at !== null) {
                 res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_BLOCKED}`);
+                return;
             }
         }
         catch (err) {
@@ -54,6 +64,7 @@ function userRestServices(appData) {
         if (user.email !== decoded.validateUserEmail) {
             // we consider this invalid as credentials it does refer
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+            return;
         }
         try {
             const result = await appData.knex.first(constants_1.CONNECTOR_SQL_COLUMN_ID_FK_NAME)
@@ -92,6 +103,83 @@ function userRestServices(appData) {
             throw err;
         }
         res.redirect(`/${user.app_language}/?msg=validate_account_success&msgtitle=validate_account_success_title`);
+    });
+    router.get("/redirected-login", async (req, res) => {
+        const userId = parseInt(req.query.userid);
+        const password = req.query.password;
+        let redirect = req.query.redirect;
+        if (redirect && !redirect.startsWith("/")) {
+            redirect = "/" + redirect;
+        }
+        else if (!redirect) {
+            redirect = "/";
+        }
+        if ((isNaN(userId) || userId <= 0) || !password) {
+            res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.UNSPECIFIED);
+            return;
+        }
+        let user;
+        try {
+            user = await appData.cache.requestValue(userIdef, userId, null);
+            if (!user) {
+                res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.USER_REMOVED);
+            }
+            else if (user.blocked_at !== null) {
+                res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_BLOCKED}`);
+            }
+        }
+        catch (err) {
+            __1.logger.error("userRestServices/redirected-login: failed to retrieve user from the id", {
+                errMessage: err.message,
+                errStack: err.stack,
+            });
+            throw err;
+        }
+        let isValidPassword;
+        let token;
+        try {
+            isValidPassword = await bcrypt_1.default.compare(password, user.password);
+            token = await token_1.jwtSign({
+                id: user.id,
+                role: user.role,
+                sessionId: user.session_id || 0,
+            }, appData.sensitiveConfig.jwtKey);
+        }
+        catch (err) {
+            res.redirect("/" + user.app_language + "/?err=" + constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
+            return;
+        }
+        res.cookie("token", token, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.cookie("lang", user.app_language, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.cookie("country", user.app_country, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.cookie("currency", user.app_currency, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.cookie("id", user.id, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.cookie("role", user.role, {
+            httpOnly: false,
+            expires: new Date(9999999999999),
+            path: "/",
+        });
+        res.redirect(`/${user.app_language}${redirect}`);
     });
     return router;
 }

@@ -221,7 +221,7 @@ class App extends react_1.default.Component {
         // Now we patch moment
         moment_1.default.locale(locale);
         // And we set the language
-        document.cookie = "lang=" + locale + ";path=/";
+        document.cookie = "lang=" + locale + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
         // now we set the html lang in locale
         document.body.parentElement.lang = locale;
         // we also update the manifest
@@ -324,7 +324,7 @@ class App extends react_1.default.Component {
             console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
         }
         // Now we set the country in local storage
-        document.cookie = "country=" + codeToSet + ";path=/";
+        document.cookie = "country=" + codeToSet + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
         if (!avoidUpdatingUser) {
             this.updateUserProperty("app_country", codeToSet);
         }
@@ -381,7 +381,7 @@ class App extends react_1.default.Component {
             console.warn("Attempted to set currency to unavailable " + code + ", defaulted to Euros");
         }
         // We set the currency in local storage
-        document.cookie = "currency=" + codeToSet + ";path=/";
+        document.cookie = "currency=" + codeToSet + ";expires=" + __1.COOKIE_EXPIRATION_DATE + ";path=/";
         if (!avoidUpdatingUser) {
             this.updateUserProperty("app_currency", codeToSet);
         }

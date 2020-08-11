@@ -78,6 +78,7 @@ export interface IAppDataType {
     pkgcloudStorageClients: PkgCloudClients;
     pkgcloudUploadContainers: PkgCloudContainers;
     customUserTokenQuery: any;
+    logger: winston.Logger;
 }
 export interface IServerDataType {
     CURRENCY_FACTORS: {

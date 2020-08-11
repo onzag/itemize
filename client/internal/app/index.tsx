@@ -6,7 +6,7 @@
 
 import React from "react";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../../../base/Root";
-import { importScript } from "../..";
+import { importScript, COOKIE_EXPIRATION_DATE } from "../..";
 import Moment from "moment";
 import { Route } from "react-router-dom";
 import { history } from "../..";
@@ -332,7 +332,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     Moment.locale(locale);
 
     // And we set the language
-    document.cookie = "lang=" + locale + ";path=/"
+    document.cookie = "lang=" + locale + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/"
 
     // now we set the html lang in locale
     document.body.parentElement.lang = locale;
@@ -452,7 +452,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // Now we set the country in local storage
-    document.cookie = "country=" + codeToSet + ";path=/";
+    document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_country", codeToSet);
     }
@@ -517,7 +517,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // We set the currency in local storage
-    document.cookie = "currency=" + codeToSet + ";path=/";
+    document.cookie = "currency=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_currency", codeToSet);
     }
