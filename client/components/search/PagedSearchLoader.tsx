@@ -50,8 +50,6 @@ interface IPagedSearchLoaderProps {
  * The page search loader component allows for creating pagination UI elements rather
  * simply, it extends the standard search loader for this, it uses the navigation in order
  * to store its page number so that searches are kept consistent
- * 
- * TODO somehow combine with searchId so that going back can also go back in search id
  */
 export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> {
   constructor(props: IPagedSearchLoaderProps) {
@@ -62,43 +60,52 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     this.goToPage = this.goToPage.bind(this);
     this.onSearchDataChange = this.onSearchDataChange.bind(this);
   }
-  public goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: {p: any}) => void) {
+  public goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: {p: string, r: string}) => void) {
     if (hasNextPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
         p: (currentPage + 2).toString(),
+        r: "t",
       });
     }
   }
-  public goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: {p: any}) => void) {
+  public goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: {p: string, r: string}) => void) {
     if (hasPrevPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
         p: currentPage.toString(),
+        r: "t",
       });
     }
   }
-  public goToPage(setState: (qs: {p: any}) => void, page: number) {
+  public goToPage(setState: (qs: {p: string, r: string}) => void, page: number) {
     setState({
       p: (page + 1).toString(),
+      r: "t",
     });
   }
   public shouldComponentUpdate(nextProps: IPagedSearchLoaderProps) {
     return nextProps.pageSize !== this.props.pageSize ||
       nextProps.children !== this.props.children;
   }
-  public onSearchDataChange(actualP: number, setState: (qs: {p: any}) => void) {
-    if (actualP !== 0) {
-      setState({
-        p: "1",
-      });
+  public onSearchDataChange(actualP: number, setState: (qs: {p: string, r: string}) => void, searchId: string, wasRestored: boolean) {
+    if (!wasRestored) {
+      if (actualP !== 0) {
+        setState({
+          p: "1",
+          r: "t",
+        });
+      }
+      // load the first page, always despite what current page might be
+      return 0;
     }
-    // load the first page, always despite what current page might be
-    return 0;
+
+    // load whatever if it was a restoration event
+    return null;
   }
   public render() {
     return (
-      <LocationStateReader defaultState={{ p: "1" }} stateIsInQueryString={true}>
+      <LocationStateReader defaultState={{ p: "1", r: "f" }} stateIsInQueryString={true}>
         {(state, setState) => {
           let actualP = parseInt(state.p, 10) || 1;
           actualP--;

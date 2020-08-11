@@ -47,7 +47,7 @@ class ActualSearchLoader extends react_1.default.Component {
             // if we have this function we call it
             if (this.props.onSearchDataChange) {
                 // to get the actual page we are meant to load
-                const newPage = this.props.onSearchDataChange();
+                const newPage = this.props.onSearchDataChange(this.props.searchId, this.props.searchWasRestored);
                 if (typeof newPage === "number") {
                     currentPage = newPage;
                 }
@@ -360,6 +360,6 @@ class ActualSearchLoader extends react_1.default.Component {
  * @returns a react component
  */
 function SearchLoader(props) {
-    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { itemDefinitionInstance: itemDefinitionContext.idef, remoteListener: itemDefinitionContext.remoteListener, searchId: itemDefinitionContext.searchId, searchRecords: itemDefinitionContext.searchRecords, searchResults: itemDefinitionContext.searchResults, searchCount: itemDefinitionContext.searchCount, searchOffset: itemDefinitionContext.searchOffset, searchLimit: itemDefinitionContext.searchLimit, searchOwner: itemDefinitionContext.searchOwner, searchShouldCache: itemDefinitionContext.searchShouldCache, searchRequestedIncludes: itemDefinitionContext.searchRequestedIncludes, searchRequestedProperties: itemDefinitionContext.searchRequestedProperties, searchFields: itemDefinitionContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { itemDefinitionInstance: itemDefinitionContext.idef, remoteListener: itemDefinitionContext.remoteListener, searchId: itemDefinitionContext.searchId, searchWasRestored: itemDefinitionContext.searchWasRestored, searchRecords: itemDefinitionContext.searchRecords, searchResults: itemDefinitionContext.searchResults, searchCount: itemDefinitionContext.searchCount, searchOffset: itemDefinitionContext.searchOffset, searchLimit: itemDefinitionContext.searchLimit, searchOwner: itemDefinitionContext.searchOwner, searchShouldCache: itemDefinitionContext.searchShouldCache, searchRequestedIncludes: itemDefinitionContext.searchRequestedIncludes, searchRequestedProperties: itemDefinitionContext.searchRequestedProperties, searchFields: itemDefinitionContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
 }
 exports.default = SearchLoader;

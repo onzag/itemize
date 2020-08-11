@@ -137,6 +137,7 @@ export interface IItemDefinitionContextType {
     searchOffset: number;
     searchCount: number;
     searchId: string;
+    searchWasRestored: boolean;
     searchOwner: number;
     searchShouldCache: boolean;
     searchFields: any;
@@ -323,6 +324,7 @@ interface IActualItemDefinitionProviderSearchState {
     searchFields: any;
 }
 interface IActualItemDefinitionProviderState extends IActualItemDefinitionProviderSearchState {
+    searchWasRestored: boolean;
     itemDefinitionState: IItemDefinitionStateType;
     isBlocked: boolean;
     isBlockedButDataIsAccessible: boolean;
@@ -346,15 +348,15 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
  */
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
+    private initialAutomaticNextSearch;
     private preventSearchFeedbackOnPossibleStaleData;
     private lastLoadingForId;
     private lastLoadingForVersion;
     private lastLoadValuePromise;
     private lastLoadValuePromiseIsResolved;
     private lastLoadValuePromiseResolve;
-    static getDerivedStateFromProps(props: IActualItemDefinitionProviderProps, state: IActualItemDefinitionProviderState): {
-        state: IItemDefinitionStateType;
-    };
+    private listenersReady;
+    static getDerivedStateFromProps(props: IActualItemDefinitionProviderProps, state: IActualItemDefinitionProviderState): Partial<IActualItemDefinitionProviderState>;
     private updateTimeout;
     private lastUpdateId;
     private lastOptionsUsedForSearch;
@@ -395,7 +397,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     cleanWithProps(props: IActualItemDefinitionProviderProps, options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
     loadSearch(): void;
-    search(options: IActionSearchOptions, initialAutomatic?: boolean): Promise<IActionResponseWithSearchResults>;
+    search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;
     dismissLoadError(): void;
     dismissDeleteError(): void;
     dismissSubmitError(): void;

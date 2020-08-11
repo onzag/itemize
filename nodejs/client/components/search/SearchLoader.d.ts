@@ -122,7 +122,7 @@ export interface ISearchLoaderProps {
      * specified by currentPage, remember to update the prop currentPage
      * after this fact, so avoid weirdness
      */
-    onSearchDataChange?: () => number | void;
+    onSearchDataChange?: (searchId: string, wasRestored: boolean) => number | void;
 }
 /**
  * The search loader allows to load search results

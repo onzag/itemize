@@ -226,6 +226,7 @@ export interface IItemDefinitionContextType {
   // a search id for the obtained results whether error
   // or success
   searchId: string;
+  searchWasRestored: boolean;
   // a search owner, or null, for the createdBy argument
   searchOwner: number;
   // passed onto the search to tell it if results that are retrieved
@@ -504,6 +505,7 @@ interface IActualItemDefinitionProviderSearchState {
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
 interface IActualItemDefinitionProviderState extends IActualItemDefinitionProviderSearchState {
+  searchWasRestored: boolean;
   itemDefinitionState: IItemDefinitionStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
@@ -531,6 +533,7 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
+  private initialAutomaticNextSearch: boolean = false;
   private preventSearchFeedbackOnPossibleStaleData: boolean = false;
 
   private lastLoadingForId: number = null;
@@ -538,6 +541,8 @@ export class ActualItemDefinitionProvider extends
   private lastLoadValuePromise: Promise<void> = null;
   private lastLoadValuePromiseIsResolved: boolean = true;
   private lastLoadValuePromiseResolve: () => void = null;
+
+  private listenersReady: boolean = false;
 
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
@@ -547,7 +552,7 @@ export class ActualItemDefinitionProvider extends
   public static getDerivedStateFromProps(
     props: IActualItemDefinitionProviderProps,
     state: IActualItemDefinitionProviderState,
-  ) {
+  ): Partial<IActualItemDefinitionProviderState> {
     // it is effective to do it here, so we use the state qualified name and the
     // idef qualified name to check, also the id in question matters to
     // normally we don't want to recalculate states in every render because
@@ -559,7 +564,7 @@ export class ActualItemDefinitionProvider extends
     ) {
       // note how we pass the optimization flags
       return {
-        state: props.itemDefinitionInstance.getStateNoExternalChecking(
+        itemDefinitionState: props.itemDefinitionInstance.getStateNoExternalChecking(
           props.forId || null,
           props.forVersion || null,
           !props.disableExternalChecks,
@@ -742,6 +747,7 @@ export class ActualItemDefinitionProvider extends
       deleted: false,
 
       ...searchState,
+      searchWasRestored: true,
 
       pokedElements: {
         properties: [],
@@ -811,10 +817,9 @@ export class ActualItemDefinitionProvider extends
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
-    if (this.props.location && this.props.location.state && this.props.location.state.searchId) {
-      this.loadSearch();
-    } else if (this.props.automaticSearch && !this.state.searchId) {
-      this.search(this.props.automaticSearch, true);
+    if (this.props.automaticSearch && !this.state.searchId) {
+      this.initialAutomaticNextSearch = true;
+      this.search(this.props.automaticSearch);
     }
 
     if (this.props.markForDestructionOnLogout) {
@@ -857,6 +862,8 @@ export class ActualItemDefinitionProvider extends
         this.props.forVersion || null,
       );
     }
+
+    this.listenersReady = true;
   }
   public unSetupListeners() {
     this.removePossibleSearchListeners();
@@ -920,8 +927,16 @@ export class ActualItemDefinitionProvider extends
       prevProps.location &&
       this.props.location &&
       prevProps.location !== this.props.location &&
-      ((prevProps.location.state && prevProps.location.state.searchId) || null) !== 
-      ((this.props.location.state && this.props.location.state.searchId) || null)
+      ((
+        prevProps.location.state &&
+        prevProps.location.state[prevProps.loadSearchFromNavigation] &&
+        prevProps.location.state[prevProps.loadSearchFromNavigation].searchId
+      ) || null) !== 
+      ((
+        this.props.location.state &&
+        this.props.location.state[this.props.loadSearchFromNavigation] &&
+        this.props.location.state[this.props.loadSearchFromNavigation].searchId
+      ) || null)
     ) {
       this.loadSearch();
     }
@@ -1478,6 +1493,12 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public onPropertyChangeOrRestoreFinal() {
+    // sometimes this gets called while did mount is happening
+    // and our own listeners are not ready, most notably
+    // with the initialPrefill
+    if (!this.listenersReady) {
+      this.changeListener();
+    }
     // trigger the listeners for change so everything updates nicely
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
@@ -1503,7 +1524,7 @@ export class ActualItemDefinitionProvider extends
       );
     }
 
-    if (this.props.automaticSearch) {
+    if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
       this.search(this.props.automaticSearch);
     }
   }
@@ -1561,7 +1582,7 @@ export class ActualItemDefinitionProvider extends
       givenForVersion || null,
       internal ? null : this.changeListener,
     );
-    if (!internal && this.props.automaticSearch) {
+    if (!internal && this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
       this.search(this.props.automaticSearch);
     }
   }
@@ -2235,7 +2256,7 @@ export class ActualItemDefinitionProvider extends
   public loadSearch() {
     const searchId = (
       this.props.location.state &&
-      this.props.location.state[this.props.loadSearchFromNavigation].searchId &&
+      this.props.location.state[this.props.loadSearchFromNavigation] &&
       this.props.location.state[this.props.loadSearchFromNavigation].searchId
     ) || null;
     if (searchId === this.state.searchId) {
@@ -2244,7 +2265,7 @@ export class ActualItemDefinitionProvider extends
 
     const mustClear: boolean = !searchId;
     if (!mustClear) {
-      const searchIdefState = this.props.location.state.searchIdefState;
+      const searchIdefState = this.props.location.state[this.props.loadSearchFromNavigation].searchIdefState;
       this.props.itemDefinitionInstance.applyState(
         this.props.forId || null,
         this.props.forVersion || null,
@@ -2258,7 +2279,7 @@ export class ActualItemDefinitionProvider extends
       );
     }
 
-    const searchState = mustClear ? null : this.props.location.state.searchState;
+    const searchState = mustClear ? null : this.props.location.state[this.props.loadSearchFromNavigation].searchState;
     this.setState({
       itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
@@ -2273,9 +2294,18 @@ export class ActualItemDefinitionProvider extends
         !this.props.includePolicies,
       ),
       ...searchState,
+      searchWasRestored: true,
     });
   }
-  public async search(options: IActionSearchOptions, initialAutomatic?: boolean): Promise<IActionResponseWithSearchResults> {
+  public async search(
+    options: IActionSearchOptions,
+  ): Promise<IActionResponseWithSearchResults> {
+    // had issues with pollution as other functions
+    // were calling search and passing a second argument
+    // causing initial automatic to be true
+    const initialAutomatic = this.initialAutomaticNextSearch;
+    this.initialAutomaticNextSearch = false;
+
     // we extract the hack variable
     const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
     this.preventSearchFeedbackOnPossibleStaleData = false;
@@ -2502,11 +2532,27 @@ export class ActualItemDefinitionProvider extends
       if (!this.isUnmounted) {
         this.setState({
           ...searchState,
+          searchWasRestored: false,
           pokedElements,
         }, () => {
           if (options.storeResultsInNavigation) {
+            // we need to use the current location in order to ensure
+            // that nothing changed during the set state event
+            const searchParams = new URLSearchParams(location.search);
+            const rFlagged = searchParams.get("r") === "t";
+            searchParams.delete("r");
+
+            let searchPart = searchParams.toString();
+            if (!searchPart.startsWith("?")) {
+              searchPart = "?" + searchPart;
+            }
             setHistoryState(
-              this.props.location,
+              {
+                state: this.props.location.state,
+                pathname: location.pathname,
+                search: searchPart,
+                hash: location.hash,
+              },
               {
                 [options.storeResultsInNavigation]: {
                   searchId,
@@ -2514,7 +2560,7 @@ export class ActualItemDefinitionProvider extends
                   searchIdefState: stateOfSearch,
                 }
               },
-              initialAutomatic,
+              initialAutomatic || rFlagged,
             );
           }
         });
@@ -2556,19 +2602,35 @@ export class ActualItemDefinitionProvider extends
       if (!this.isUnmounted) {
         this.setState({
           ...searchState,
+          searchWasRestored: false,
           pokedElements,
         }, () => {
           if (options.storeResultsInNavigation) {
+            // we need to use the current location in order to ensure
+            // that nothing changed during the set state event
+            const searchParams = new URLSearchParams(location.search);
+            const rFlagged = searchParams.get("r") === "t";
+            searchParams.delete("r");
+
+            let searchPart = searchParams.toString();
+            if (!searchPart.startsWith("?")) {
+              searchPart = "?" + searchPart;
+            }
             setHistoryState(
-              this.props.location,
               {
-                [options.storeResultsInNavigation] : {
+                state: this.props.location.state,
+                pathname: location.pathname,
+                search: searchPart,
+                hash: location.hash,
+              },
+              {
+                [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
                   searchIdefState: stateOfSearch,
-                },
+                }
               },
-              initialAutomatic,
+              initialAutomatic || rFlagged,
             );
           }
         });
@@ -2775,6 +2837,7 @@ export class ActualItemDefinitionProvider extends
           searchCount: this.state.searchCount,
           searchOffset: this.state.searchOffset,
           searchId: this.state.searchId,
+          searchWasRestored: this.state.searchWasRestored,
           searchOwner: this.state.searchOwner,
           searchShouldCache: this.state.searchShouldCache,
           searchFields: this.state.searchFields,

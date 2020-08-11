@@ -45,24 +45,26 @@ interface IPagedSearchLoaderProps {
  * The page search loader component allows for creating pagination UI elements rather
  * simply, it extends the standard search loader for this, it uses the navigation in order
  * to store its page number so that searches are kept consistent
- *
- * TODO somehow combine with searchId so that going back can also go back in search id
  */
 export declare class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> {
     constructor(props: IPagedSearchLoaderProps);
     goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: {
-        p: any;
+        p: string;
+        r: string;
     }) => void): void;
     goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: {
-        p: any;
+        p: string;
+        r: string;
     }) => void): void;
     goToPage(setState: (qs: {
-        p: any;
+        p: string;
+        r: string;
     }) => void, page: number): void;
     shouldComponentUpdate(nextProps: IPagedSearchLoaderProps): boolean;
     onSearchDataChange(actualP: number, setState: (qs: {
-        p: any;
-    }) => void): number;
+        p: string;
+        r: string;
+    }) => void, searchId: string, wasRestored: boolean): number;
     render(): JSX.Element;
 }
 export {};

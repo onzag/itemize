@@ -56,12 +56,14 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this variable is useful is async tasks like loadValue are still executing after
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
+        this.initialAutomaticNextSearch = false;
         this.preventSearchFeedbackOnPossibleStaleData = false;
         this.lastLoadingForId = null;
         this.lastLoadingForVersion = null;
         this.lastLoadValuePromise = null;
         this.lastLoadValuePromiseIsResolved = true;
         this.lastLoadValuePromiseResolve = null;
+        this.listenersReady = false;
         // the list of submit block promises
         this.submitBlockPromises = [];
         // Just binding all the functions to ensure their context is defined
@@ -122,7 +124,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             (props.forId || null) !== (state.itemDefinitionState.forId || null)) {
             // note how we pass the optimization flags
             return {
-                state: props.itemDefinitionInstance.getStateNoExternalChecking(props.forId || null, props.forVersion || null, !props.disableExternalChecks, props.itemDefinitionInstance.isInSearchMode() ?
+                itemDefinitionState: props.itemDefinitionInstance.getStateNoExternalChecking(props.forId || null, props.forVersion || null, !props.disableExternalChecks, props.itemDefinitionInstance.isInSearchMode() ?
                     getPropertyListForSearchMode(props.properties || [], props.itemDefinitionInstance.getStandardCounterpart()) : props.properties || [], props.includes || [], !props.includePolicies),
             };
         }
@@ -201,6 +203,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             deleting: false,
             deleted: false,
             ...searchState,
+            searchWasRestored: true,
             pokedElements: {
                 properties: [],
                 includes: [],
@@ -265,11 +268,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
         }
-        if (this.props.location && this.props.location.state && this.props.location.state.searchId) {
-            this.loadSearch();
-        }
-        else if (this.props.automaticSearch && !this.state.searchId) {
-            this.search(this.props.automaticSearch, true);
+        if (this.props.automaticSearch && !this.state.searchId) {
+            this.initialAutomaticNextSearch = true;
+            this.search(this.props.automaticSearch);
         }
         if (this.props.markForDestructionOnLogout) {
             this.markForDestruction();
@@ -298,6 +299,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // as it will send data either via HTTP or websockets
             this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
         }
+        this.listenersReady = true;
     }
     unSetupListeners() {
         this.removePossibleSearchListeners();
@@ -342,8 +344,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (prevProps.location &&
             this.props.location &&
             prevProps.location !== this.props.location &&
-            ((prevProps.location.state && prevProps.location.state.searchId) || null) !==
-                ((this.props.location.state && this.props.location.state.searchId) || null)) {
+            ((prevProps.location.state &&
+                prevProps.location.state[prevProps.loadSearchFromNavigation] &&
+                prevProps.location.state[prevProps.loadSearchFromNavigation].searchId) || null) !==
+                ((this.props.location.state &&
+                    this.props.location.state[this.props.loadSearchFromNavigation] &&
+                    this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null)) {
             this.loadSearch();
         }
         // whether the item definition was updated
@@ -756,6 +762,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
     }
     onPropertyChangeOrRestoreFinal() {
+        // sometimes this gets called while did mount is happening
+        // and our own listeners are not ready, most notably
+        // with the initialPrefill
+        if (!this.listenersReady) {
+            this.changeListener();
+        }
         // trigger the listeners for change so everything updates nicely
         this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -771,7 +783,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // will triger and an external check will launch
             this.updateTimeout = setTimeout(this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId), 600);
         }
-        if (this.props.automaticSearch) {
+        if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
             this.search(this.props.automaticSearch);
         }
     }
@@ -802,7 +814,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
-        if (!internal && this.props.automaticSearch) {
+        if (!internal && this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
             this.search(this.props.automaticSearch);
         }
     }
@@ -1340,27 +1352,33 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     }
     loadSearch() {
         const searchId = (this.props.location.state &&
-            this.props.location.state[this.props.loadSearchFromNavigation].searchId &&
+            this.props.location.state[this.props.loadSearchFromNavigation] &&
             this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null;
         if (searchId === this.state.searchId) {
             return;
         }
         const mustClear = !searchId;
         if (!mustClear) {
-            const searchIdefState = this.props.location.state.searchIdefState;
+            const searchIdefState = this.props.location.state[this.props.loadSearchFromNavigation].searchIdefState;
             this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, searchIdefState);
         }
         else {
             this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null, true);
         }
-        const searchState = mustClear ? null : this.props.location.state.searchState;
+        const searchState = mustClear ? null : this.props.location.state[this.props.loadSearchFromNavigation].searchState;
         this.setState({
             itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
                 getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
             ...searchState,
+            searchWasRestored: true,
         });
     }
-    async search(options, initialAutomatic) {
+    async search(options) {
+        // had issues with pollution as other functions
+        // were calling search and passing a second argument
+        // causing initial automatic to be true
+        const initialAutomatic = this.initialAutomaticNextSearch;
+        this.initialAutomaticNextSearch = false;
         // we extract the hack variable
         const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
         this.preventSearchFeedbackOnPossibleStaleData = false;
@@ -1550,16 +1568,31 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             if (!this.isUnmounted) {
                 this.setState({
                     ...searchState,
+                    searchWasRestored: false,
                     pokedElements,
                 }, () => {
                     if (options.storeResultsInNavigation) {
-                        navigation_1.setHistoryState(this.props.location, {
+                        // we need to use the current location in order to ensure
+                        // that nothing changed during the set state event
+                        const searchParams = new URLSearchParams(location.search);
+                        const rFlagged = searchParams.get("r") === "t";
+                        searchParams.delete("r");
+                        let searchPart = searchParams.toString();
+                        if (!searchPart.startsWith("?")) {
+                            searchPart = "?" + searchPart;
+                        }
+                        navigation_1.setHistoryState({
+                            state: this.props.location.state,
+                            pathname: location.pathname,
+                            search: searchPart,
+                            hash: location.hash,
+                        }, {
                             [options.storeResultsInNavigation]: {
                                 searchId,
                                 searchState,
                                 searchIdefState: stateOfSearch,
                             }
-                        }, initialAutomatic);
+                        }, initialAutomatic || rFlagged);
                     }
                 });
             }
@@ -1593,16 +1626,31 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             if (!this.isUnmounted) {
                 this.setState({
                     ...searchState,
+                    searchWasRestored: false,
                     pokedElements,
                 }, () => {
                     if (options.storeResultsInNavigation) {
-                        navigation_1.setHistoryState(this.props.location, {
+                        // we need to use the current location in order to ensure
+                        // that nothing changed during the set state event
+                        const searchParams = new URLSearchParams(location.search);
+                        const rFlagged = searchParams.get("r") === "t";
+                        searchParams.delete("r");
+                        let searchPart = searchParams.toString();
+                        if (!searchPart.startsWith("?")) {
+                            searchPart = "?" + searchPart;
+                        }
+                        navigation_1.setHistoryState({
+                            state: this.props.location.state,
+                            pathname: location.pathname,
+                            search: searchPart,
+                            hash: location.hash,
+                        }, {
                             [options.storeResultsInNavigation]: {
                                 searchId,
                                 searchState,
                                 searchIdefState: stateOfSearch,
-                            },
-                        }, initialAutomatic);
+                            }
+                        }, initialAutomatic || rFlagged);
                     }
                 });
             }
@@ -1769,6 +1817,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchCount: this.state.searchCount,
                 searchOffset: this.state.searchOffset,
                 searchId: this.state.searchId,
+                searchWasRestored: this.state.searchWasRestored,
                 searchOwner: this.state.searchOwner,
                 searchShouldCache: this.state.searchShouldCache,
                 searchFields: this.state.searchFields,

@@ -135,7 +135,7 @@ export interface ISearchLoaderProps {
    * specified by currentPage, remember to update the prop currentPage
    * after this fact, so avoid weirdness
    */
-  onSearchDataChange?: () => number | void;
+  onSearchDataChange?: (searchId: string, wasRestored: boolean) => number | void;
 }
 
 /**
@@ -158,6 +158,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   localeData: ILocaleContextType;
   remoteListener: RemoteListener;
   searchId: string;
+  searchWasRestored: boolean;
   searchOwner: number;
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;
@@ -211,7 +212,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // if we have this function we call it
       if (this.props.onSearchDataChange) {
         // to get the actual page we are meant to load
-        const newPage = this.props.onSearchDataChange();
+        const newPage = this.props.onSearchDataChange(this.props.searchId, this.props.searchWasRestored);
         if (typeof newPage === "number") {
           currentPage = newPage;
         }
@@ -636,6 +637,7 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                       itemDefinitionInstance={itemDefinitionContext.idef}
                       remoteListener={itemDefinitionContext.remoteListener}
                       searchId={itemDefinitionContext.searchId}
+                      searchWasRestored={itemDefinitionContext.searchWasRestored}
                       searchRecords={itemDefinitionContext.searchRecords}
                       searchResults={itemDefinitionContext.searchResults}
                       searchCount={itemDefinitionContext.searchCount}

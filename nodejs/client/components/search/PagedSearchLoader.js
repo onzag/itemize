@@ -16,8 +16,6 @@ const LocationStateReader_1 = __importDefault(require("../navigation/LocationSta
  * The page search loader component allows for creating pagination UI elements rather
  * simply, it extends the standard search loader for this, it uses the navigation in order
  * to store its page number so that searches are kept consistent
- *
- * TODO somehow combine with searchId so that going back can also go back in search id
  */
 class PagedSearchLoader extends react_1.default.Component {
     constructor(props) {
@@ -32,6 +30,7 @@ class PagedSearchLoader extends react_1.default.Component {
             // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
             setState({
                 p: (currentPage + 2).toString(),
+                r: "t",
             });
         }
     }
@@ -40,29 +39,36 @@ class PagedSearchLoader extends react_1.default.Component {
             // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
             setState({
                 p: currentPage.toString(),
+                r: "t",
             });
         }
     }
     goToPage(setState, page) {
         setState({
             p: (page + 1).toString(),
+            r: "t",
         });
     }
     shouldComponentUpdate(nextProps) {
         return nextProps.pageSize !== this.props.pageSize ||
             nextProps.children !== this.props.children;
     }
-    onSearchDataChange(actualP, setState) {
-        if (actualP !== 0) {
-            setState({
-                p: "1",
-            });
+    onSearchDataChange(actualP, setState, searchId, wasRestored) {
+        if (!wasRestored) {
+            if (actualP !== 0) {
+                setState({
+                    p: "1",
+                    r: "t",
+                });
+            }
+            // load the first page, always despite what current page might be
+            return 0;
         }
-        // load the first page, always despite what current page might be
-        return 0;
+        // load whatever if it was a restoration event
+        return null;
     }
     render() {
-        return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { p: "1" }, stateIsInQueryString: true }, (state, setState) => {
+        return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { p: "1", r: "f" }, stateIsInQueryString: true }, (state, setState) => {
             let actualP = parseInt(state.p, 10) || 1;
             actualP--;
             return (react_1.default.createElement(SearchLoader_1.default, { pageSize: this.props.pageSize, currentPage: actualP, onSearchDataChange: this.onSearchDataChange.bind(null, actualP, setState) }, (arg) => {

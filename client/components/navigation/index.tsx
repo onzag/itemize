@@ -95,7 +95,7 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
   if (!replace) {
     history.push(location.pathname + searchPart  + location.hash, location.state);
   } else {
-    history.replace(location.pathname + searchPart + searchParams.toString() + location.hash, location.state);
+    history.replace(location.pathname + searchPart + location.hash, location.state);
   }
 }
 

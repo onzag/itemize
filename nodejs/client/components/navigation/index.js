@@ -86,7 +86,7 @@ function setHistoryQSState(location, state, replace) {
         __1.history.push(location.pathname + searchPart + location.hash, location.state);
     }
     else {
-        __1.history.replace(location.pathname + searchPart + searchParams.toString() + location.hash, location.state);
+        __1.history.replace(location.pathname + searchPart + location.hash, location.state);
     }
 }
 exports.setHistoryQSState = setHistoryQSState;
