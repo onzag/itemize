@@ -933,7 +933,7 @@ class PropertyDefinition {
      * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
      * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id, version, value, modifiedState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
+    applyValue(id, version, value, modifiedState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers, rejectStateAppliedValue) {
         if (modifiedState === false && value !== null) {
             console.warn("You have set the modified state of a property as false, which means this" +
                 " property (" + this.rawData.id + ") has never been touched by the user/computer, yet the value specified (" +
@@ -965,8 +965,10 @@ class PropertyDefinition {
             this.stateInternalValue[mergedID] = null;
             this.stateValueHasBeenManuallySet[mergedID] = false;
         }
-        // the new applied value gets applied no matter what
-        this.stateAppliedValue[mergedID] = value;
+        if (!rejectStateAppliedValue) {
+            // the new applied value gets applied
+            this.stateAppliedValue[mergedID] = value;
+        }
         // clean cached values
         const mergedIDWithoutExternal1 = mergedID + ".t";
         const mergedIDWithoutExternal2 = mergedID + ".f";

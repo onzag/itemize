@@ -1569,6 +1569,7 @@ export default class PropertyDefinition {
     value: PropertyDefinitionSupportedType,
     modifiedState: boolean,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
+    rejectStateAppliedValue?: boolean,
   ) {
     if (modifiedState === false && value !== null) {
       console.warn("You have set the modified state of a property as false, which means this" +
@@ -1603,8 +1604,10 @@ export default class PropertyDefinition {
       this.stateValueHasBeenManuallySet[mergedID] = false;
     }
 
-    // the new applied value gets applied no matter what
-    this.stateAppliedValue[mergedID] = value;
+    if (!rejectStateAppliedValue) {
+      // the new applied value gets applied
+      this.stateAppliedValue[mergedID] = value;
+    }
 
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";

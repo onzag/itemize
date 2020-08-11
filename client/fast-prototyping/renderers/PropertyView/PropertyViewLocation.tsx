@@ -174,7 +174,11 @@ export default function PropertyViewLocationRenderer(props: IPropertyViewLocatio
   }
 
   if (props.args.hideMap) {
-    return <span>{props.currentValue.txt + " - " + props.currentValue.atxt}</span>
+    if (props.currentValue) {
+      return <span>{props.currentValue.txt + " - " + props.currentValue.atxt}</span>
+    } else {
+      return <span/>
+    }
   } else {
     return (<PropertyViewLocationMap {...props}/>);
   }

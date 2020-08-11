@@ -599,7 +599,7 @@ export default class PropertyDefinition {
      * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
      * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id: number, version: string, value: PropertyDefinitionSupportedType, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean): void;
+    applyValue(id: number, version: string, value: PropertyDefinitionSupportedType, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean, rejectStateAppliedValue?: boolean): void;
     /**
      * Frees the memory of stored values in a given slot id
      * @param id the slot id

@@ -1308,7 +1308,7 @@ export default class ItemDefinition {
   ) {
     state.properties.forEach((p) => {
       const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
-      pInIdef.applyValue(id, version, p.stateValue, p.stateValueModified, false);
+      pInIdef.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
     });
 
     state.includes.forEach((i) => {
@@ -1316,7 +1316,7 @@ export default class ItemDefinition {
       iInIdef.setExclusionState(id, version, i.exclusionState);
       i.itemDefinitionState.properties.forEach((p) => {
         const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
-        pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false);
+        pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
       });
     });
   }

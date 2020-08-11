@@ -137,7 +137,12 @@ function PropertyViewLocationRenderer(props) {
             react_1.default.createElement(NullComponent, Object.assign({}, nullArgs)));
     }
     if (props.args.hideMap) {
-        return react_1.default.createElement("span", null, props.currentValue.txt + " - " + props.currentValue.atxt);
+        if (props.currentValue) {
+            return react_1.default.createElement("span", null, props.currentValue.txt + " - " + props.currentValue.atxt);
+        }
+        else {
+            return react_1.default.createElement("span", null);
+        }
     }
     else {
         return (react_1.default.createElement(PropertyViewLocationMap, Object.assign({}, props)));
