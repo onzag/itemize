@@ -1542,16 +1542,15 @@ export class ActualItemDefinitionProvider extends
     this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
-  public onPropertyChange(
+  public async onPropertyChange(
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) {
     if (this.state.loading) {
-      // we will deny any change that happens
-      // if the item is loading, as everything
-      // will be removed anyway
-      return;
+      // loading will overwrite any possible property changes
+      // so we await for it to end
+      await this.lastLoadValuePromise;
     }
 
     // we simply set the current value in the property

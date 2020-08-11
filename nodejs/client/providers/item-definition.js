@@ -795,12 +795,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.onPropertyChangeOrRestoreFinal();
     }
-    onPropertyChange(property, value, internalValue) {
+    async onPropertyChange(property, value, internalValue) {
         if (this.state.loading) {
-            // we will deny any change that happens
-            // if the item is loading, as everything
-            // will be removed anyway
-            return;
+            // loading will overwrite any possible property changes
+            // so we await for it to end
+            await this.lastLoadValuePromise;
         }
         // we simply set the current value in the property
         property.setCurrentValue(this.props.forId || null, this.props.forVersion || null, value, internalValue);

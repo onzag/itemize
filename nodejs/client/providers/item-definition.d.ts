@@ -379,7 +379,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     setStateToCurrentValueWithExternalChecking(currentUpdateId: number): Promise<void>;
     onPropertyChangeOrRestoreFinal(): void;
     onPropertyRestore(property: PropertyDefinition): void;
-    onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any): void;
+    onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any): Promise<void>;
     onPropertyEnforce(property: PropertyDefinition, value: PropertyDefinitionSupportedType, givenForId: number, givenForVersion: string, internal?: boolean): void;
     onPropertyClearEnforce(property: PropertyDefinition, givenForId: number, givenForVersion: string, internal?: boolean): void;
     runDismountOn(props?: IActualItemDefinitionProviderProps): void;
