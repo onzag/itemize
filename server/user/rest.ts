@@ -177,37 +177,42 @@ export function userRestServices(appData: IAppDataType) {
       return;
     }
 
-    res.cookie("token", token, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.cookie("lang", user.app_language, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.cookie("country", user.app_country, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.cookie("currency", user.app_currency, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.cookie("id", user.id, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.cookie("role", user.role, {
-      httpOnly: false,
-      expires: new Date(9999999999999),
-      path: "/",
-    });
-    res.redirect(`/${user.app_language}${redirect}`);
+    if (isValidPassword) {
+      res.cookie("token", token, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.cookie("lang", user.app_language, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.cookie("country", user.app_country, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.cookie("currency", user.app_currency, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.cookie("id", user.id, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.cookie("role", user.role, {
+        httpOnly: false,
+        expires: new Date(9999999999999),
+        path: "/",
+      });
+      res.redirect(`/${user.app_language}${redirect}`);
+    } else {
+      res.redirect("/" + user.app_language + "/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+      return;
+    }
   });
 
   return router;

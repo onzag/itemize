@@ -203,7 +203,7 @@ function EntryViewReadSet(props, type) {
                 return null;
             }
             // so we return the propery setter
-            return (react_1.default.createElement(PropertySetter_1.default, { property: property, onEnforce: itemDefinitionContextualValue.onPropertyEnforce.bind(null, property), onClearEnforcement: itemDefinitionContextualValue.onPropertyClearEnforce.bind(null, property), forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, value: props.value }));
+            return (react_1.default.createElement(PropertySetter_1.default, { property: property, onEnforce: itemDefinitionContextualValue.onPropertyEnforce, onClearEnforcement: itemDefinitionContextualValue.onPropertyClearEnforce, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, value: props.value }));
         }
     }))))));
 }

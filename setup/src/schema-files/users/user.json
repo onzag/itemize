@@ -105,14 +105,16 @@
             "type": "location",
             "nullable": true,
             "readRoleAccess": ["&OWNER"],
-            "searchable": false
+            "searchable": false,
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}"
         },
         {
             "id": "about_me",
             "type": "text",
             "subtype": "html",
             "nullable": true,
-            "searchable": false
+            "searchable": false,
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}"
         },
         {
             "id": "session_id",
@@ -122,7 +124,8 @@
             "default": 0,
             "nullable": true,
             "hidden": true,
-            "coerceNullsIntoDefault": true
+            "coerceNullsIntoDefault": true,
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}"
         }
     ],
     "policies": {

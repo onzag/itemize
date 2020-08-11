@@ -34,12 +34,12 @@ export interface IPropertySetterBaseProps {
      * The enforcement function
      * retrieved from the item-definition.tsx context
      */
-    onEnforce: (value: PropertyDefinitionSupportedType, forId: number, forVersion: string) => void;
+    onEnforce: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, forId: number, forVersion: string) => void;
     /**
      * The clear enforcement function
      * retrieved from the item-definition.tsx context
      */
-    onClearEnforcement: (forId: number, forVersion: string) => void;
+    onClearEnforcement: (property: PropertyDefinition, forId: number, forVersion: string) => void;
 }
 /**
  * The property setter allows to manually set values for

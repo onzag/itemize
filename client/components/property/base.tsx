@@ -425,8 +425,8 @@ export function EntryViewReadSet(
                       return (
                         <PropertySetter
                           property={property}
-                          onEnforce={itemDefinitionContextualValue.onPropertyEnforce.bind(null, property)}
-                          onClearEnforcement={itemDefinitionContextualValue.onPropertyClearEnforce.bind(null, property)}
+                          onEnforce={itemDefinitionContextualValue.onPropertyEnforce}
+                          onClearEnforcement={itemDefinitionContextualValue.onPropertyClearEnforce}
                           forId={itemDefinitionContextualValue.forId}
                           forVersion={itemDefinitionContextualValue.forVersion}
                           value={props.value}
