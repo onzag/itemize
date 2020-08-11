@@ -272,7 +272,10 @@ class ActualPropertyEntryReferenceRenderer
     }
 
     // similarly to location
-    if (value !== this.props.currentTextualValue) {
+    if (
+      value !== this.props.currentTextualValue &&
+      autosuggestOverride.method === "type"
+    ) {
       // we call the change of search
       this.props.onChangeSearch(value);
     }
@@ -506,8 +509,10 @@ class ActualPropertyEntryReferenceRenderer
    * When the suggestion fetch is triggered
    * @param arg the arg
    */
-  public onSuggestionsFetchRequested(arg: {value: string}) {
-    this.props.onChangeSearch(arg.value);
+  public onSuggestionsFetchRequested(arg: {value: string, reason: string}) {
+    if (arg.reason !== "input-focused") {
+      this.props.onChangeSearch(arg.value);
+    }
   }
 
   /**
@@ -540,7 +545,7 @@ class ActualPropertyEntryReferenceRenderer
           sectionTitle: this.props.classes.autosuggestSectionTitle,
         }}
         inputProps={{
-          value: this.props.currentInternalValue || this.props.currentValue || "",
+          value: this.props.currentInternalValue || this.props.currentTextualValue || "",
           onChange: this.onChange,
           disabled: this.props.disabled,
         }}

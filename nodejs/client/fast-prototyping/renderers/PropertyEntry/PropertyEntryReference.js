@@ -216,7 +216,8 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             value = e.target.value.toString();
         }
         // similarly to location
-        if (value !== this.props.currentTextualValue) {
+        if (value !== this.props.currentTextualValue &&
+            autosuggestOverride.method === "type") {
             // we call the change of search
             this.props.onChangeSearch(value);
         }
@@ -352,7 +353,9 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
      * @param arg the arg
      */
     onSuggestionsFetchRequested(arg) {
-        this.props.onChangeSearch(arg.value);
+        if (arg.reason !== "input-focused") {
+            this.props.onChangeSearch(arg.value);
+        }
     }
     /**
      * render function
@@ -374,7 +377,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
                 sectionContainerFirst: this.props.classes.autosuggestFirstSectionContainer,
                 sectionTitle: this.props.classes.autosuggestSectionTitle,
             }, inputProps: {
-                value: this.props.currentInternalValue || this.props.currentValue || "",
+                value: this.props.currentInternalValue || this.props.currentTextualValue || "",
                 onChange: this.onChange,
                 disabled: this.props.disabled,
             } }));

@@ -59,7 +59,7 @@ class PropertyEntrySelect extends react_1.default.Component {
             value: null,
             i18nValue: i18nData.null_value,
         } : null;
-        const currentI18nValue = i18nData.values[currentValue.toString()] || currentValue.toString();
+        const currentI18nValue = currentValue !== null ? (i18nData.values[currentValue.toString()] || currentValue.toString()) : i18nData.values.null_value || "";
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             propertyId: this.props.property.getId(),
