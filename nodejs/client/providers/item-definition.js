@@ -17,10 +17,10 @@ const uuid_1 = __importDefault(require("uuid"));
 const gql_client_util_1 = require("../internal/gql-client-util");
 const search_interfaces_1 = require("../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces");
 const config_provider_1 = require("../internal/providers/config-provider");
+const navigation_1 = require("../components/navigation");
+const LocationRetriever_1 = __importDefault(require("../components/navigation/LocationRetriever"));
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
-// TODO this file is too complex, we need to simplify, specially policies they are killing this file
-const STORED_SEARCHES = {};
 function getPropertyListForSearchMode(properties, standardCounterpart) {
     let result = [];
     properties.forEach((propertyId) => {
@@ -265,10 +265,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
         }
-        if (this.props.automaticSearch) {
-            if (!this.props.automaticSearchInitialId || this.state.searchId !== this.props.automaticSearchInitialId) {
-                this.search(this.props.automaticSearch);
-            }
+        if (this.props.location && this.props.location.state && this.props.location.state.searchId) {
+            this.loadSearch();
+        }
+        else if (this.props.automaticSearch && !this.state.searchId) {
+            this.search(this.props.automaticSearch, true);
         }
         if (this.props.markForDestructionOnLogout) {
             this.markForDestruction();
@@ -331,11 +332,20 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             !deep_equal_1.default(nextProps.includes || [], this.props.includes || []) ||
             !!nextProps.static !== !!this.props.static ||
             !!nextProps.includePolicies !== !!this.props.includePolicies ||
+            !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
             !deep_equal_1.default(nextProps.automaticSearch, this.props.automaticSearch) ||
             !deep_equal_1.default(nextProps.setters, this.props.setters) ||
+            nextProps.location !== this.props.location ||
             !deep_equal_1.default(nextProps.injectedParentContext, this.props.injectedParentContext);
     }
     async componentDidUpdate(prevProps, prevState) {
+        if (prevProps.location &&
+            this.props.location &&
+            prevProps.location !== this.props.location &&
+            ((prevProps.location.state && prevProps.location.state.searchId) || null) !==
+                ((this.props.location.state && this.props.location.state.searchId) || null)) {
+            this.loadSearch();
+        }
         // whether the item definition was updated
         // and changed
         const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
@@ -437,14 +447,15 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 });
             }
         }
-        if (!deep_equal_1.default(this.props.automaticSearch, prevProps.automaticSearch) ||
-            // these two would cause search results to be dismissed because
-            // the fact the token is a key part of the search itself so we would
-            // dismiss the search in such a case as the token is different
-            // that or the automatic search would be reexecuted
-            itemDefinitionWasUpdated ||
-            didSomethingThatInvalidatedSetters ||
-            prevProps.tokenData.token !== this.props.tokenData.token) {
+        if (!this.props.automaticSearchIsOnlyInitial &&
+            (!deep_equal_1.default(this.props.automaticSearch, prevProps.automaticSearch) ||
+                // these two would cause search results to be dismissed because
+                // the fact the token is a key part of the search itself so we would
+                // dismiss the search in such a case as the token is different
+                // that or the automatic search would be reexecuted
+                itemDefinitionWasUpdated ||
+                didSomethingThatInvalidatedSetters ||
+                prevProps.tokenData.token !== this.props.tokenData.token)) {
             // we might have a listener in an old item definition
             // so we need to get rid of it
             if (itemDefinitionWasUpdated) {
@@ -1327,22 +1338,29 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             error,
         };
     }
-    loadSearch(id) {
-        if (id === this.state.searchId) {
+    loadSearch() {
+        const searchId = (this.props.location.state &&
+            this.props.location.state[this.props.loadSearchFromNavigation].searchId &&
+            this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null;
+        if (searchId === this.state.searchId) {
             return;
         }
-        else if (id && STORED_SEARCHES[id]) {
-            const state = STORED_SEARCHES[id].state;
-            this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, state);
-            const searchState = STORED_SEARCHES[id].searchState;
-            this.setState({
-                itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
-                    getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
-                ...searchState,
-            });
+        const mustClear = !searchId;
+        if (!mustClear) {
+            const searchIdefState = this.props.location.state.searchIdefState;
+            this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, searchIdefState);
         }
+        else {
+            this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null, true);
+        }
+        const searchState = mustClear ? null : this.props.location.state.searchState;
+        this.setState({
+            itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
+                getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
+            ...searchState,
+        });
     }
-    async search(options) {
+    async search(options, initialAutomatic) {
         // we extract the hack variable
         const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
         this.preventSearchFeedbackOnPossibleStaleData = false;
@@ -1521,12 +1539,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchRequestedProperties: options.requestedProperties,
                 searchRequestedIncludes: options.requestedIncludes || [],
             };
-            if (options.storeResults) {
-                STORED_SEARCHES[searchId] = {
-                    searchState,
-                    state: stateOfSearch,
-                };
-            }
             // this would be a wasted instruction otherwise as it'd be reversed
             if (!options.cleanSearchResultsOnAny &&
                 !options.cleanSearchResultsOnFailure) {
@@ -1539,6 +1551,16 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 this.setState({
                     ...searchState,
                     pokedElements,
+                }, () => {
+                    if (options.storeResultsInNavigation) {
+                        navigation_1.setHistoryState(this.props.location, {
+                            [options.storeResultsInNavigation]: {
+                                searchId,
+                                searchState,
+                                searchIdefState: stateOfSearch,
+                            }
+                        }, initialAutomatic);
+                    }
                 });
             }
             this.cleanWithProps(this.props, options, "fail");
@@ -1560,12 +1582,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchRequestedProperties: options.requestedProperties,
                 searchRequestedIncludes: options.requestedIncludes || [],
             };
-            if (options.storeResults) {
-                STORED_SEARCHES[searchId] = {
-                    searchState,
-                    state: stateOfSearch,
-                };
-            }
             // this would be a wasted instruction otherwise as it'd be reversed
             if (!options.cleanSearchResultsOnAny &&
                 !options.cleanSearchResultsOnSuccess) {
@@ -1578,6 +1594,16 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 this.setState({
                     ...searchState,
                     pokedElements,
+                }, () => {
+                    if (options.storeResultsInNavigation) {
+                        navigation_1.setHistoryState(this.props.location, {
+                            [options.storeResultsInNavigation]: {
+                                searchId,
+                                searchState,
+                                searchIdefState: stateOfSearch,
+                            },
+                        }, initialAutomatic);
+                    }
                 });
             }
             this.cleanWithProps(this.props, options, "success");
@@ -1754,7 +1780,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 delete: this.delete,
                 clean: this.clean,
                 search: this.search,
-                loadSearch: this.loadSearch,
                 forId: this.props.forId || null,
                 forVersion: this.props.forVersion || null,
                 dismissLoadError: this.dismissLoadError,
@@ -1810,9 +1835,19 @@ function ItemDefinitionProvider(props) {
             ...props,
         };
         if (props.injectParentContext) {
-            return (react_1.default.createElement(exports.ItemDefinitionContext.Consumer, null, (value) => (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: value })))));
+            if (props.loadSearchFromNavigation) {
+                return (react_1.default.createElement(LocationRetriever_1.default, null, (location) => (react_1.default.createElement(exports.ItemDefinitionContext.Consumer, null, (value) => (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: value, location: location })))))));
+            }
+            else {
+                return (react_1.default.createElement(exports.ItemDefinitionContext.Consumer, null, (value) => (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: value })))));
+            }
         }
-        return (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: null })));
+        if (props.loadSearchFromNavigation) {
+            return (react_1.default.createElement(LocationRetriever_1.default, null, (location) => (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: null, location: location })))));
+        }
+        else {
+            return (react_1.default.createElement(ActualItemDefinitionProvider, Object.assign({}, actualProps, { injectedParentContext: null })));
+        }
     }))))))))));
 }
 exports.ItemDefinitionProvider = ItemDefinitionProvider;

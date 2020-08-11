@@ -11,6 +11,7 @@ import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
 import { IPropertySetterProps } from "../components/property/base";
 import { IConfigRawJSONDataType } from "../../config";
+import { Location } from "history";
 /**
  * A response given by some handlers like
  * loadValue
@@ -101,7 +102,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     traditional?: boolean;
     limit: number;
     offset: number;
-    storeResults?: boolean;
+    storeResultsInNavigation?: string;
 }
 export interface IPokeElementsType {
     properties: string[];
@@ -150,7 +151,6 @@ export interface IItemDefinitionContextType {
     delete: () => Promise<IBasicActionResponse>;
     clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
     search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
-    loadSearch: (id: string) => void;
     onPropertyChange: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any) => void;
     onPropertyRestore: (property: PropertyDefinition) => void;
     onIncludeSetExclusionState: (include: Include, state: IncludeExclusionState) => void;
@@ -236,9 +236,14 @@ export interface IItemDefinitionProviderProps {
      */
     automaticSearch?: IActionSearchOptions;
     /**
-     * An id for the automatic search first search
+     * Makes automatic search happen only on mount
      */
-    automaticSearchInitialId?: string;
+    automaticSearchIsOnlyInitial?: boolean;
+    /**
+     * Load searches from the popstate event, use with the option for
+     * storeResultsInNavigation and the same identifier
+     */
+    loadSearchFromNavigation?: string;
     /**
      * Setters for setting values for the properties within the item definition
      * itself, useful not to depend on mounting at time
@@ -299,6 +304,7 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
     searchContext: ISearchItemDefinitionValueContextType;
     injectedParentContext: IItemDefinitionContextType;
     config: IConfigRawJSONDataType;
+    location?: Location<any>;
 }
 interface IActualItemDefinitionProviderSearchState {
     searchError: EndpointErrorType;
@@ -388,8 +394,8 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     clean(options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     cleanWithProps(props: IActualItemDefinitionProviderProps, options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
-    loadSearch(id: string): void;
-    search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;
+    loadSearch(): void;
+    search(options: IActionSearchOptions, initialAutomatic?: boolean): Promise<IActionResponseWithSearchResults>;
     dismissLoadError(): void;
     dismissDeleteError(): void;
     dismissSubmitError(): void;

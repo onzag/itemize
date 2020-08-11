@@ -31,7 +31,7 @@ class PagedSearchLoader extends react_1.default.Component {
         if (hasNextPage) {
             // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
             setState({
-                p: currentPage + 2,
+                p: (currentPage + 2).toString(),
             });
         }
     }
@@ -39,23 +39,25 @@ class PagedSearchLoader extends react_1.default.Component {
         if (hasPrevPage) {
             // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
             setState({
-                p: currentPage,
+                p: currentPage.toString(),
             });
         }
     }
     goToPage(setState, page) {
         setState({
-            p: page + 1,
+            p: (page + 1).toString(),
         });
     }
     shouldComponentUpdate(nextProps) {
         return nextProps.pageSize !== this.props.pageSize ||
             nextProps.children !== this.props.children;
     }
-    onSearchDataChange(setState) {
-        setState({
-            p: 1,
-        });
+    onSearchDataChange(actualP, setState) {
+        if (actualP !== 0) {
+            setState({
+                p: "1",
+            });
+        }
         // load the first page, always despite what current page might be
         return 0;
     }
@@ -63,7 +65,7 @@ class PagedSearchLoader extends react_1.default.Component {
         return (react_1.default.createElement(LocationStateReader_1.default, { defaultState: { p: "1" }, stateIsInQueryString: true }, (state, setState) => {
             let actualP = parseInt(state.p, 10) || 1;
             actualP--;
-            return (react_1.default.createElement(SearchLoader_1.default, { pageSize: this.props.pageSize, currentPage: actualP, onSearchDataChange: this.onSearchDataChange.bind(null, setState) }, (arg) => {
+            return (react_1.default.createElement(SearchLoader_1.default, { pageSize: this.props.pageSize, currentPage: actualP, onSearchDataChange: this.onSearchDataChange.bind(null, actualP, setState) }, (arg) => {
                 return this.props.children({
                     ...arg,
                     currentPage: actualP,

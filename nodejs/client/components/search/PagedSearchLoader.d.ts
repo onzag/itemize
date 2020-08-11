@@ -60,7 +60,7 @@ export declare class PagedSearchLoader extends React.Component<IPagedSearchLoade
         p: any;
     }) => void, page: number): void;
     shouldComponentUpdate(nextProps: IPagedSearchLoaderProps): boolean;
-    onSearchDataChange(setState: (qs: {
+    onSearchDataChange(actualP: number, setState: (qs: {
         p: any;
     }) => void): number;
     render(): JSX.Element;

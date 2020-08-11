@@ -66,7 +66,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     if (hasNextPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
-        p: currentPage + 2,
+        p: (currentPage + 2).toString(),
       });
     }
   }
@@ -74,23 +74,25 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     if (hasPrevPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
-        p: currentPage,
+        p: currentPage.toString(),
       });
     }
   }
   public goToPage(setState: (qs: {p: any}) => void, page: number) {
     setState({
-      p: page + 1,
+      p: (page + 1).toString(),
     });
   }
   public shouldComponentUpdate(nextProps: IPagedSearchLoaderProps) {
     return nextProps.pageSize !== this.props.pageSize ||
       nextProps.children !== this.props.children;
   }
-  public onSearchDataChange(setState: (qs: {p: any}) => void) {
-    setState({
-      p: 1,
-    });
+  public onSearchDataChange(actualP: number, setState: (qs: {p: any}) => void) {
+    if (actualP !== 0) {
+      setState({
+        p: "1",
+      });
+    }
     // load the first page, always despite what current page might be
     return 0;
   }
@@ -104,7 +106,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
             <SearchLoader
               pageSize={this.props.pageSize}
               currentPage={actualP}
-              onSearchDataChange={this.onSearchDataChange.bind(null, setState)}
+              onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
             >
               {(arg) => {
                 return this.props.children({

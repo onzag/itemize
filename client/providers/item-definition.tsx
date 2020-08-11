@@ -28,13 +28,12 @@ import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
 import { IConfigRawJSONDataType } from "../../config";
+import { setHistoryState } from "../components/navigation";
+import LocationRetriever from "../components/navigation/LocationRetriever";
+import { Location } from "history";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
-
-// TODO this file is too complex, we need to simplify, specially policies they are killing this file
-
-const STORED_SEARCHES: any = {}
 
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
@@ -159,7 +158,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   traditional?: boolean;
   limit: number;
   offset: number;
-  storeResults?: boolean;
+  storeResultsInNavigation?: string;
 }
 
 export interface IPokeElementsType {
@@ -268,7 +267,6 @@ export interface IItemDefinitionContextType {
   // in which case you'll just get a searchError you should be in search
   // mode because there are no endpoints otherwise
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
-  loadSearch: (id: string) => void;
   // this is a listener that basically takes a property, and a new value
   // and internal value, whatever is down the line is not expected to do
   // changes directly, but rather call this function, this function will
@@ -400,9 +398,14 @@ export interface IItemDefinitionProviderProps {
    */
   automaticSearch?: IActionSearchOptions;
   /**
-   * An id for the automatic search first search 
+   * Makes automatic search happen only on mount
    */
-  automaticSearchInitialId?: string;
+  automaticSearchIsOnlyInitial?: boolean;
+  /**
+   * Load searches from the popstate event, use with the option for
+   * storeResultsInNavigation and the same identifier
+   */
+  loadSearchFromNavigation?: string;
   /**
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
@@ -477,6 +480,8 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   injectedParentContext: IItemDefinitionContextType;
   // config
   config: IConfigRawJSONDataType;
+  // only available when supporting search from navigation
+  location?: Location<any>;
 }
 
 interface IActualItemDefinitionProviderSearchState {
@@ -806,10 +811,10 @@ export class ActualItemDefinitionProvider extends
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
-    if (this.props.automaticSearch) {
-      if (!this.props.automaticSearchInitialId || this.state.searchId !== this.props.automaticSearchInitialId) {
-        this.search(this.props.automaticSearch);
-      }
+    if (this.props.location && this.props.location.state && this.props.location.state.searchId) {
+      this.loadSearch();
+    } else if (this.props.automaticSearch && !this.state.searchId) {
+      this.search(this.props.automaticSearch, true);
     }
 
     if (this.props.markForDestructionOnLogout) {
@@ -901,14 +906,26 @@ export class ActualItemDefinitionProvider extends
       !equals(nextProps.includes || [], this.props.includes || []) ||
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
+      !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
       !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
       !equals(nextProps.setters, this.props.setters) ||
+      nextProps.location !== this.props.location ||
       !equals(nextProps.injectedParentContext, this.props.injectedParentContext);
   }
   public async componentDidUpdate(
     prevProps: IActualItemDefinitionProviderProps,
     prevState: IActualItemDefinitionProviderState,
   ) {
+    if (
+      prevProps.location &&
+      this.props.location &&
+      prevProps.location !== this.props.location &&
+      ((prevProps.location.state && prevProps.location.state.searchId) || null) !== 
+      ((this.props.location.state && this.props.location.state.searchId) || null)
+    ) {
+      this.loadSearch();
+    }
+
     // whether the item definition was updated
     // and changed
     const itemDefinitionWasUpdated = this.props.itemDefinitionInstance !== prevProps.itemDefinitionInstance;
@@ -1066,14 +1083,17 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (
-      !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
-      // these two would cause search results to be dismissed because
-      // the fact the token is a key part of the search itself so we would
-      // dismiss the search in such a case as the token is different
-      // that or the automatic search would be reexecuted
-      itemDefinitionWasUpdated ||
-      didSomethingThatInvalidatedSetters ||
-      prevProps.tokenData.token !== this.props.tokenData.token
+      !this.props.automaticSearchIsOnlyInitial &&
+      (
+        !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
+        // these two would cause search results to be dismissed because
+        // the fact the token is a key part of the search itself so we would
+        // dismiss the search in such a case as the token is different
+        // that or the automatic search would be reexecuted
+        itemDefinitionWasUpdated ||
+        didSomethingThatInvalidatedSetters ||
+        prevProps.tokenData.token !== this.props.tokenData.token
+      )
     ) {
       // we might have a listener in an old item definition
       // so we need to get rid of it
@@ -2212,36 +2232,50 @@ export class ActualItemDefinitionProvider extends
       error,
     };
   }
-  public loadSearch(id: string) {
-    if (id === this.state.searchId) {
+  public loadSearch() {
+    const searchId = (
+      this.props.location.state &&
+      this.props.location.state[this.props.loadSearchFromNavigation].searchId &&
+      this.props.location.state[this.props.loadSearchFromNavigation].searchId
+    ) || null;
+    if (searchId === this.state.searchId) {
       return;
-    } else if (id && STORED_SEARCHES[id]) {
-      const state = STORED_SEARCHES[id].state;
+    }
+
+    const mustClear: boolean = !searchId;
+    if (!mustClear) {
+      const searchIdefState = this.props.location.state.searchIdefState;
       this.props.itemDefinitionInstance.applyState(
         this.props.forId || null,
         this.props.forVersion || null,
-        state,
+        searchIdefState,
       );
-
-      const searchState = STORED_SEARCHES[id].searchState;
-      this.setState({
-        itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          !this.props.disableExternalChecks,
-          this.props.itemDefinitionInstance.isInSearchMode() ?
-            getPropertyListForSearchMode(
-              this.props.properties || [],
-              this.props.itemDefinitionInstance.getStandardCounterpart()
-            ) : this.props.properties || [],
-          this.props.includes || [],
-          !this.props.includePolicies,
-        ),
-        ...searchState,
-      });
+    } else {
+      this.props.itemDefinitionInstance.cleanValueFor(
+        this.props.forId || null,
+        this.props.forVersion || null,
+        true,
+      );
     }
+
+    const searchState = mustClear ? null : this.props.location.state.searchState;
+    this.setState({
+      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+        this.props.forId || null,
+        this.props.forVersion || null,
+        !this.props.disableExternalChecks,
+        this.props.itemDefinitionInstance.isInSearchMode() ?
+          getPropertyListForSearchMode(
+            this.props.properties || [],
+            this.props.itemDefinitionInstance.getStandardCounterpart()
+          ) : this.props.properties || [],
+        this.props.includes || [],
+        !this.props.includePolicies,
+      ),
+      ...searchState,
+    });
   }
-  public async search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults> {
+  public async search(options: IActionSearchOptions, initialAutomatic?: boolean): Promise<IActionResponseWithSearchResults> {
     // we extract the hack variable
     const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
     this.preventSearchFeedbackOnPossibleStaleData = false;
@@ -2450,13 +2484,6 @@ export class ActualItemDefinitionProvider extends
         searchRequestedIncludes: options.requestedIncludes || [],
       };
 
-      if (options.storeResults) {
-        STORED_SEARCHES[searchId] = {
-          searchState,
-          state: stateOfSearch,
-        };
-      }
-
       // this would be a wasted instruction otherwise as it'd be reversed
       if (
         !options.cleanSearchResultsOnAny &&
@@ -2476,6 +2503,20 @@ export class ActualItemDefinitionProvider extends
         this.setState({
           ...searchState,
           pokedElements,
+        }, () => {
+          if (options.storeResultsInNavigation) {
+            setHistoryState(
+              this.props.location,
+              {
+                [options.storeResultsInNavigation]: {
+                  searchId,
+                  searchState,
+                  searchIdefState: stateOfSearch,
+                }
+              },
+              initialAutomatic,
+            );
+          }
         });
       }
       this.cleanWithProps(this.props, options, "fail");
@@ -2497,13 +2538,6 @@ export class ActualItemDefinitionProvider extends
         searchRequestedIncludes: options.requestedIncludes || [],
       };
 
-      if (options.storeResults) {
-        STORED_SEARCHES[searchId] = {
-          searchState,
-          state: stateOfSearch,
-        };
-      }
-
       // this would be a wasted instruction otherwise as it'd be reversed
       if (
         !options.cleanSearchResultsOnAny &&
@@ -2523,6 +2557,20 @@ export class ActualItemDefinitionProvider extends
         this.setState({
           ...searchState,
           pokedElements,
+        }, () => {
+          if (options.storeResultsInNavigation) {
+            setHistoryState(
+              this.props.location,
+              {
+                [options.storeResultsInNavigation] : {
+                  searchId,
+                  searchState,
+                  searchIdefState: stateOfSearch,
+                },
+              },
+              initialAutomatic,
+            );
+          }
         });
       }
       this.cleanWithProps(this.props, options, "success");
@@ -2738,7 +2786,6 @@ export class ActualItemDefinitionProvider extends
           delete: this.delete,
           clean: this.clean,
           search: this.search,
-          loadSearch: this.loadSearch,
           forId: this.props.forId || null,
           forVersion: this.props.forVersion || null,
           dismissLoadError: this.dismissLoadError,
@@ -2811,24 +2858,56 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                               }
 
                               if (props.injectParentContext) {
-                                return (
-                                  <ItemDefinitionContext.Consumer>{
-                                    (value) => (
-                                      <ActualItemDefinitionProvider
-                                        {...actualProps}
-                                        injectedParentContext={value}
-                                      />
-                                    )
-                                  }</ItemDefinitionContext.Consumer>
-                                );
+                                if (props.loadSearchFromNavigation) {
+                                  return (
+                                    <LocationRetriever>
+                                      {(location) => (
+                                        <ItemDefinitionContext.Consumer>{
+                                          (value) => (
+                                            <ActualItemDefinitionProvider
+                                              {...actualProps}
+                                              injectedParentContext={value}
+                                              location={location}
+                                            />
+                                          )
+                                        }</ItemDefinitionContext.Consumer>
+                                      )}
+                                    </LocationRetriever>
+                                  );
+                                } else {
+                                  return (
+                                    <ItemDefinitionContext.Consumer>{
+                                      (value) => (
+                                        <ActualItemDefinitionProvider
+                                          {...actualProps}
+                                          injectedParentContext={value}
+                                        />
+                                      )
+                                    }</ItemDefinitionContext.Consumer>
+                                  );
+                                }
                               }
 
-                              return (
-                                <ActualItemDefinitionProvider
-                                  {...actualProps}
-                                  injectedParentContext={null}
-                                />
-                              );
+                              if (props.loadSearchFromNavigation) {
+                                return (
+                                  <LocationRetriever>
+                                    {(location) => (
+                                      <ActualItemDefinitionProvider
+                                        {...actualProps}
+                                        injectedParentContext={null}
+                                        location={location}
+                                      />
+                                    )}
+                                  </LocationRetriever>
+                                );
+                              } else {
+                                return (
+                                  <ActualItemDefinitionProvider
+                                    {...actualProps}
+                                    injectedParentContext={null}
+                                  />
+                                );
+                              }
                             }}
                           </SearchItemDefinitionValueContext.Consumer>
                         )
