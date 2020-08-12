@@ -354,6 +354,8 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
  */
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
+    private isMounted;
+    private mountCbFns;
     private initialAutomaticNextSearch;
     private preventSearchFeedbackOnPossibleStaleData;
     private lastLoadingForId;

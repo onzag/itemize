@@ -110,7 +110,7 @@ function EntryViewReadSet(props, type) {
                     }
                 }
                 // otherwise we just call the function as it is
-                return props.children(propertyState.value, propertyState);
+                return props.children(props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, propertyState);
             }
             // if we are talking a meta property
             if (isMetaProperty) {

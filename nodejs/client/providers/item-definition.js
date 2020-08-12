@@ -56,6 +56,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this variable is useful is async tasks like loadValue are still executing after
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
+        this.isMounted = false;
+        this.mountCbFns = [];
         this.initialAutomaticNextSearch = false;
         this.preventSearchFeedbackOnPossibleStaleData = false;
         this.lastLoadingForId = null;
@@ -98,6 +100,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.injectSubmitBlockPromise = this.injectSubmitBlockPromise.bind(this);
         this.installSetters = this.installSetters.bind(this);
         this.removeSetters = this.removeSetters.bind(this);
+        if (document) {
+            this.setupListeners();
+        }
         // we get the initial state
         this.state = this.setupInitialState();
         // and if we have a cache, which runs behind a worker
@@ -260,9 +265,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     }
     // so now we have mounted, what do we do at the start
     componentDidMount() {
+        this.isMounted = true;
+        this.mountCbFns.forEach((c) => c());
         // first we setup the listeners, this includes the on change listener that would make
         // the entire app respond to actions, otherwise the fields might as well be disabled
-        this.setupListeners();
         this.installSetters();
         // now we retrieve the externally checked value
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -480,6 +486,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
     }
     reloadListener() {
+        if (!this.isMounted) {
+            if (this.mountCbFns.indexOf(this.reloadListener) === -1) {
+                this.mountCbFns.push(this.reloadListener);
+            }
+            return;
+        }
         console.log("reload requested for", this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId);
         // well this is very simple the app requested a reload
         // because it says that whatever we have in memory is not valid
@@ -491,6 +503,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     }
     changeListener() {
         if (this.isUnmounted) {
+            return;
+        }
+        else if (!this.isMounted) {
+            if (this.mountCbFns.indexOf(this.changeListener) === -1) {
+                this.mountCbFns.push(this.changeListener);
+            }
             return;
         }
         // we basically just upgrade the state

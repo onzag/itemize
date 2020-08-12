@@ -539,6 +539,9 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
+  private isMounted: boolean = false;
+  private mountCbFns: Array<() => void> = [];
+
   private initialAutomaticNextSearch: boolean = false;
   private preventSearchFeedbackOnPossibleStaleData: boolean = false;
 
@@ -639,6 +642,10 @@ export class ActualItemDefinitionProvider extends
     this.injectSubmitBlockPromise = this.injectSubmitBlockPromise.bind(this);
     this.installSetters = this.installSetters.bind(this);
     this.removeSetters = this.removeSetters.bind(this);
+
+    if (document) {
+      this.setupListeners();
+    }
 
     // we get the initial state
     this.state = this.setupInitialState();
@@ -813,9 +820,11 @@ export class ActualItemDefinitionProvider extends
   }
   // so now we have mounted, what do we do at the start
   public componentDidMount() {
+    this.isMounted = true;
+    this.mountCbFns.forEach((c) => c());
+
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
-    this.setupListeners();
     this.installSetters();
 
     // now we retrieve the externally checked value
@@ -1137,6 +1146,12 @@ export class ActualItemDefinitionProvider extends
   }
 
   public reloadListener() {
+    if (!this.isMounted) {
+      if (this.mountCbFns.indexOf(this.reloadListener) === -1) {
+        this.mountCbFns.push(this.reloadListener);
+      }
+      return;
+    }
     console.log("reload requested for", this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId);
     // well this is very simple the app requested a reload
     // because it says that whatever we have in memory is not valid
@@ -1148,6 +1163,11 @@ export class ActualItemDefinitionProvider extends
   }
   public changeListener() {
     if (this.isUnmounted) {
+      return;
+    } else if (!this.isMounted) {
+      if (this.mountCbFns.indexOf(this.changeListener) === -1) {
+        this.mountCbFns.push(this.changeListener);
+      }
       return;
     }
     // we basically just upgrade the state
