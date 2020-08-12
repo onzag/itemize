@@ -59,6 +59,14 @@ export declare function checkListTypes(records: IGQLSearchRecord[], mod: Module)
  */
 export declare function checkLanguage(appData: IAppDataType, args: any): void;
 /**
+ * Checks that a given user can perform the given search
+ * as it was requested
+ * @param args the args
+ * @param moduleOrIdef a module or an item definition the search is held against
+ * @param tokenData the token data
+ */
+export declare function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinition, tokenData: IServerSideTokenDataType): void;
+/**
  * This just extracts the dictionary given the app data
  * and the language of choice
  * @param appData the app data

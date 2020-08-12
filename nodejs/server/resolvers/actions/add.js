@@ -69,7 +69,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
     }
     // now we must check if we are parenting
     const isParenting = !!(resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version);
-    basic_1.validateParentingRules(appData, resolverArgs.args.parent_id, resolverArgs.args.parent_version || null, resolverArgs.args.parent_type, itemDefinition, tokenData.id, tokenData.role);
+    await basic_1.validateParentingRules(appData, resolverArgs.args.parent_id, resolverArgs.args.parent_version || null, resolverArgs.args.parent_type, itemDefinition, tokenData.id, tokenData.role);
     // now we see which fields are being requested for the answer after adding, first
     // we flatten the fields, remember that we have external and internal fields
     // contained in the DATA value, we flatten that first

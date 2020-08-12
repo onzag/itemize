@@ -162,7 +162,7 @@ export async function getItemDefinition(
       value: valueToProvide.convertedValue,
       update: null,
       extraArgs: resolverArgs.args,
-      action: IOTriggerActions.GET,
+      action: IOTriggerActions.READ,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
@@ -182,7 +182,7 @@ export async function getItemDefinition(
       value: valueToProvide.convertedValue,
       update: null,
       extraArgs: resolverArgs.args,
-      action: IOTriggerActions.GET,
+      action: IOTriggerActions.READ,
       id: resolverArgs.args.id as number,
       version: resolverArgs.args.version as string || null,
       user: {
@@ -286,8 +286,8 @@ export async function getItemDefinitionList(
     resolverArgs.args.records,
   );
 
-  const finalValues = resultValues.map(
-    (value) => {
+  const finalValues = await Promise.all(resultValues.map(
+    async (value) => {
       // preveting another security leak here, the user might have lied by saying that these
       // items were all created by this specific creator when doing searches
       if (created_by && value.created_by !== created_by) {
@@ -296,16 +296,63 @@ export async function getItemDefinitionList(
           code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
-      return filterAndPrepareGQLValue(
+
+      const valueToProvide = filterAndPrepareGQLValue(
         appData.knex,
         appData.cache.getServerData(),
         value,
         requestedFields,
         tokenData.role,
         itemDefinition,
-      ).toReturnToUser;
+      );
+
+      const pathOfThisModule = mod.getPath().join("/");
+      const pathOfThisIdef = itemDefinition.getPath().join("/");
+      const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+      if (moduleTrigger) {
+        await moduleTrigger({
+          appData,
+          itemDefinition,
+          module: mod,
+          value: valueToProvide.convertedValue,
+          update: null,
+          extraArgs: resolverArgs.args,
+          action: IOTriggerActions.READ,
+          id: value.id as number,
+          version: value.version as string || null,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          forbid: defaultTriggerForbiddenFunction,
+        });
+      }
+
+      if (itemDefinitionTrigger) {
+        await itemDefinitionTrigger({
+          appData,
+          itemDefinition,
+          module: mod,
+          value: valueToProvide.convertedValue,
+          update: null,
+          extraArgs: resolverArgs.args,
+          action: IOTriggerActions.READ,
+          id: value.id as number,
+          version: value.version as string || null,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          forbid: defaultTriggerForbiddenFunction,
+        });
+      }
+
+      return valueToProvide.toReturnToUser;
     },
-  );
+  ));
 
   const resultAsObject = {
     results: finalValues,
@@ -372,8 +419,8 @@ export async function getModuleList(
   );
 
   // return if otherwise succeeds
-  const finalValues = resultValues.map(
-    (value) => {
+  const finalValues = await Promise.all(resultValues.map(
+    async (value) => {
       // preveting another security leak here, the user might have lied by saying that these
       // items were all created by this specific creator when doing searches
       if (created_by && value.created_by !== created_by) {
@@ -382,16 +429,64 @@ export async function getModuleList(
           code: ENDPOINT_ERRORS.UNSPECIFIED,
         });
       }
-      return filterAndPrepareGQLValue(
+
+      const valueToProvide = filterAndPrepareGQLValue(
         appData.knex,
         appData.cache.getServerData(),
         value,
         requestedFields,
         tokenData.role,
         mod,
-      ).toReturnToUser;
+      );
+
+      const itemDefinition = appData.root.registry[value.type] as ItemDefinition;
+      const pathOfThisModule = mod.getPath().join("/");
+      const pathOfThisIdef = itemDefinition.getPath().join("/");
+      const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+      if (moduleTrigger) {
+        await moduleTrigger({
+          appData,
+          itemDefinition,
+          module: mod,
+          value: valueToProvide.convertedValue,
+          update: null,
+          extraArgs: resolverArgs.args,
+          action: IOTriggerActions.READ,
+          id: value.id as number,
+          version: value.version as string || null,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          forbid: defaultTriggerForbiddenFunction,
+        });
+      }
+
+      if (itemDefinitionTrigger) {
+        await itemDefinitionTrigger({
+          appData,
+          itemDefinition,
+          module: mod,
+          value: valueToProvide.convertedValue,
+          update: null,
+          extraArgs: resolverArgs.args,
+          action: IOTriggerActions.READ,
+          id: value.id as number,
+          version: value.version as string || null,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          forbid: defaultTriggerForbiddenFunction,
+        });
+      }
+
+      return valueToProvide.toReturnToUser;
     },
-  );
+  ));
 
   const resultAsObject = {
     results: finalValues,

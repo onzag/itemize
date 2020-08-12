@@ -14,6 +14,7 @@ import {
   checkLimit,
   checkLimiters,
   defaultTriggerForbiddenFunction,
+  checkUserCanSearch,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -33,6 +34,7 @@ import graphqlFields from "graphql-fields";
 import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
+import { IOTriggerActions } from "../triggers";
 
 function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
   let maximumRecords: IGQLSearchRecord[] = [];
@@ -91,6 +93,7 @@ export async function searchModule(
   checkLanguage(appData, resolverArgs.args);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
   await validateTokenIsntBlocked(appData.cache, tokenData);
+  checkUserCanSearch(resolverArgs.args, mod, tokenData);
 
   // now build the fields we are searching
   const searchingFields = {};
@@ -239,16 +242,65 @@ export async function searchModule(
   const count = (countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
-      results: baseResult.map((r) => {
-        return filterAndPrepareGQLValue(
-          appData.knex,
-          appData.cache.getServerData(),
-          r,
-          requestedFields,
-          tokenData.role,
-          mod,
-        ).toReturnToUser;
-      }),
+      results: await Promise.all(
+        baseResult.map(async (r) => {
+          const valueToProvide = filterAndPrepareGQLValue(
+            appData.knex,
+            appData.cache.getServerData(),
+            r,
+            requestedFields,
+            tokenData.role,
+            mod,
+          );
+
+          const itemDefinition = appData.root.registry[r.type] as ItemDefinition;
+          const pathOfThisModule = mod.getPath().join("/");
+          const pathOfThisIdef = itemDefinition.getPath().join("/");
+          const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+          const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+          if (moduleTrigger) {
+            await moduleTrigger({
+              appData,
+              itemDefinition,
+              module: mod,
+              value: valueToProvide.convertedValue,
+              update: null,
+              extraArgs: resolverArgs.args,
+              action: IOTriggerActions.READ,
+              id: r.id as number,
+              version: r.version as string || null,
+              user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+              },
+              forbid: defaultTriggerForbiddenFunction,
+            });
+          }
+
+          if (itemDefinitionTrigger) {
+            await itemDefinitionTrigger({
+              appData,
+              itemDefinition,
+              module: mod,
+              value: valueToProvide.convertedValue,
+              update: null,
+              extraArgs: resolverArgs.args,
+              action: IOTriggerActions.READ,
+              id: r.id as number,
+              version: r.version as string || null,
+              user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+              },
+              forbid: defaultTriggerForbiddenFunction,
+            });
+          }
+
+          return valueToProvide.toReturnToUser;
+        }),
+      ),
       limit,
       offset,
       count, 
@@ -324,6 +376,7 @@ export async function searchItemDefinition(
     tokenData.role,
   );
   await validateTokenIsntBlocked(appData.cache, tokenData);
+  checkUserCanSearch(resolverArgs.args, itemDefinition, tokenData);
 
   // now we need to get the fields that we are using to search
   const searchingFields = {};
@@ -475,7 +528,7 @@ export async function searchItemDefinition(
   if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
     queryModel
       .andWhere("parent_id", resolverArgs.args.parent_id)
-      .andWhere("parent_version", resolverArgs.args.parent_version || null)
+      .andWhere("parent_version", resolverArgs.args.parent_version || "")
       .andWhere("parent_type", resolverArgs.args.parent_type);
   } else {
     queryModel
@@ -516,16 +569,64 @@ export async function searchItemDefinition(
   const count = (countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
-      results: baseResult.map((r) => {
-        return filterAndPrepareGQLValue(
-          appData.knex,
-          appData.cache.getServerData(),
-          r,
-          requestedFields,
-          tokenData.role,
-          itemDefinition,
-        ).toReturnToUser;
-      }),
+      results: await Promise.all(
+        baseResult.map(async (r) => {
+          const valueToProvide = filterAndPrepareGQLValue(
+            appData.knex,
+            appData.cache.getServerData(),
+            r,
+            requestedFields,
+            tokenData.role,
+            itemDefinition,
+          );
+
+          const pathOfThisModule = mod.getPath().join("/");
+          const pathOfThisIdef = itemDefinition.getPath().join("/");
+          const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+          const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+          if (moduleTrigger) {
+            await moduleTrigger({
+              appData,
+              itemDefinition,
+              module: mod,
+              value: valueToProvide.convertedValue,
+              update: null,
+              extraArgs: resolverArgs.args,
+              action: IOTriggerActions.READ,
+              id: r.id as number,
+              version: r.version as string || null,
+              user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+              },
+              forbid: defaultTriggerForbiddenFunction,
+            });
+          }
+
+          if (itemDefinitionTrigger) {
+            await itemDefinitionTrigger({
+              appData,
+              itemDefinition,
+              module: mod,
+              value: valueToProvide.convertedValue,
+              update: null,
+              extraArgs: resolverArgs.args,
+              action: IOTriggerActions.READ,
+              id: r.id as number,
+              version: r.version as string || null,
+              user: {
+                role: tokenData.role,
+                id: tokenData.id,
+                customData: tokenData.customData,
+              },
+              forbid: defaultTriggerForbiddenFunction,
+            });
+          }
+
+          return valueToProvide.toReturnToUser;
+        })
+      ),
       limit,
       offset,
       count, 

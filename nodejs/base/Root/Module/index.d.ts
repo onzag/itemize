@@ -152,6 +152,10 @@ export interface IModuleRawJSONDataType {
      */
     readRoleAccess?: string[];
     /**
+     * The search role access
+     */
+    searchRoleAccess?: string[];
+    /**
      * The roles that have moderation capabilities
      * over the item definitions under this module
      * modding only exist at module level as well
@@ -419,6 +423,11 @@ export default class Module {
      * @returns the string qualified path name
      */
     getQualifiedPathName(): string;
+    /**
+     * Provides the search access for the given module
+     * @retuns an array with the approved roles or the anyone metarole
+     */
+    getRolesWithSearchAccess(): string[];
     /**
      * Provides the roles that have access to a given
      * action based on the rules that were set

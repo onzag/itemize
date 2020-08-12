@@ -1223,6 +1223,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             await Promise.all(this.submitBlockPromises);
             this.submitBlockPromises = [];
         }
+        // now checking the option for the before submit function, if it returns
+        // false we cancel the submit request, we don't check policies yet
+        if (options.beforeSubmit && !options.beforeSubmit()) {
+            return null;
+        }
         // now we are going to build our query
         // also we make a check later on for the policies
         // if necessary
@@ -1244,10 +1249,13 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             forId: this.props.forId || null,
             forVersion: this.props.forVersion || null,
         });
-        // now checking the option for the before submit function, if it returns
-        // false we cancel the submit request, we don't check policies yet
-        if (options.beforeSubmit && !options.beforeSubmit()) {
-            return null;
+        if (options.parentedBy) {
+            const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
+                .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
+            const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(options.parentedBy.itemDefinition.split("/"));
+            argumentsForQuery.parent_id = options.parentedBy.id;
+            argumentsForQuery.parent_version = options.parentedBy.version || null;
+            argumentsForQuery.parent_type = itemDefinitionInQuestion.getQualifiedPathName();
         }
         // now it's when we are actually submitting
         if (!this.isUnmounted) {

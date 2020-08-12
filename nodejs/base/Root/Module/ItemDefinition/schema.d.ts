@@ -41,6 +41,12 @@ declare const _default: {
         searchable: {
             type: string;
         };
+        searchRoleAccess: {
+            type: string;
+            items: {
+                type: string;
+            };
+        };
         readRoleAccess: {
             type: string;
             items: {

@@ -11,12 +11,15 @@ export interface IReferrencedPropertySet {
     [propertyId: string]: PropertyDefinitionValueType;
 }
 export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
+    isNullable: boolean;
+    i18nUnspecified: string;
     currentTextualValue: string;
     currentValueIsFullfilled: boolean;
     currentOptions: IPropertyEntryReferenceOption[];
     currentFindError: EndpointErrorType;
     currentSearchError: EndpointErrorType;
     onChangeSearch: (str: string) => void;
+    loadAllPossibleValues: (limit: number) => void;
     onSelect: (option: IPropertyEntryReferenceOption) => void;
     onCancel: () => void;
     dismissSearchError: () => void;
@@ -24,6 +27,7 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
 }
 interface IPropertyEntryReferenceState {
     currentOptions: IPropertyEntryReferenceOption[];
+    currentOptionsVersion: string;
     currentSearchError: EndpointErrorType;
     currentFindError: EndpointErrorType;
 }
@@ -38,10 +42,11 @@ export default class PropertyEntryReference extends React.Component<IPropertyEnt
     toggleListener(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>, fn: string): void;
     addListeners(props?: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>): void;
     removeListeners(props?: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>): void;
-    search(): Promise<void>;
+    search(loadAll?: boolean, limit?: number): Promise<void>;
     getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition];
     getSSRFoundValue(forId: number, forVersion: string): string;
     findCurrentStrValue(forId: number, forVersion: string): Promise<void>;
+    loadAllPossibleValues(limit: number): void;
     onChangeSearch(str: string): void;
     onSelect(option: IPropertyEntryReferenceOption): void;
     onCancel(): void;

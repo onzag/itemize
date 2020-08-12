@@ -8,7 +8,7 @@ var IOTriggerActions;
     IOTriggerActions[IOTriggerActions["EDITED"] = 3] = "EDITED";
     IOTriggerActions[IOTriggerActions["DELETE"] = 4] = "DELETE";
     IOTriggerActions[IOTriggerActions["DELETED"] = 5] = "DELETED";
-    IOTriggerActions[IOTriggerActions["GET"] = 6] = "GET";
+    IOTriggerActions[IOTriggerActions["READ"] = 6] = "READ";
 })(IOTriggerActions = exports.IOTriggerActions || (exports.IOTriggerActions = {}));
 function fixPaths(src) {
     const output = {};

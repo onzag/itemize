@@ -122,6 +122,10 @@ export interface IItemDefinitionRawJSONDataType {
      */
     versioningRoleAccess?: string[];
     /**
+     * Permissions for search purposes
+     */
+    searchRoleAccess?: string[];
+    /**
      * Read role permissions
      */
     readRoleAccess?: string[];
@@ -755,6 +759,12 @@ export default class ItemDefinition {
      * @returns a boolean on whether it is in search mode
      */
     isInSearchMode(): boolean;
+    /**
+     * Provides the roles that can search within the item
+     * definition, will give the module search role
+     * access if not overwritten by this
+     */
+    getRolesWithSearchAccess(): string[];
     /**
      * Provides the roles that have access to a given
      * action based on the rules that were set

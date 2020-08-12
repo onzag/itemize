@@ -93,6 +93,7 @@ class Module {
             name: this.rawData.name + "__PROPEXT_IDEF",
             i18nData: this.rawData.i18nData,
             readRoleAccess: this.rawData.readRoleAccess,
+            searchRoleAccess: this.rawData.searchRoleAccess,
         }, this, null);
         this.childPropExtensionItemDefinition.setAsExtensionsInstance();
         this.parentRoot.registry[this.getQualifiedPathName()] = this;
@@ -428,6 +429,13 @@ class Module {
             return constants_1.PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), constants_1.MODULE_PREFIX + this.getName());
         }
         return constants_1.MODULE_PREFIX + this.getName();
+    }
+    /**
+     * Provides the search access for the given module
+     * @retuns an array with the approved roles or the anyone metarole
+     */
+    getRolesWithSearchAccess() {
+        return this.rawData.searchRoleAccess || [constants_1.ANYONE_METAROLE];
     }
     /**
      * Provides the roles that have access to a given

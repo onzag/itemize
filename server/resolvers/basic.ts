@@ -5,6 +5,7 @@ import {
   ANYONE_METAROLE,
   ANYONE_LOGGED_METAROLE,
   ENDPOINT_ERRORS,
+  OWNER_METAROLE,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import ItemDefinition, { IItemDefinitionStateType } from "../../base/Root/Module/ItemDefinition";
@@ -485,6 +486,39 @@ export function checkLanguage(appData: IAppDataType, args: any) {
   logger.silly(
     "checkLanguage: checking limits succeed",
   );
+}
+
+/**
+ * Checks that a given user can perform the given search
+ * as it was requested
+ * @param args the args
+ * @param moduleOrIdef a module or an item definition the search is held against
+ * @param tokenData the token data
+ */
+export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinition, tokenData: IServerSideTokenDataType) {
+  const roles = moduleOrIdef.getRolesWithSearchAccess();
+  if (
+    roles.includes(ANYONE_METAROLE) ||
+    roles.includes(tokenData.role)
+  ) {
+    return;
+  }
+
+  const canOwnerSearch = roles.includes(OWNER_METAROLE);
+  if (canOwnerSearch && args.created_by === tokenData.id) {
+    return;
+  } else if (canOwnerSearch && args.created_by && tokenData.id && args.created_by !== tokenData.id) {
+    throw new EndpointError({
+      message: "You have requested a search for items owned by user " + args.created_by +
+      " , but you identify yourself as " + tokenData.id,
+      code: ENDPOINT_ERRORS.FORBIDDEN,
+    });
+  }
+
+  throw new EndpointError({
+    message: "Your role is forbidden from performing search",
+    code: ENDPOINT_ERRORS.FORBIDDEN,
+  });
 }
 
 /**

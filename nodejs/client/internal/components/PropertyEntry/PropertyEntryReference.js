@@ -13,10 +13,12 @@ class PropertyEntryReference extends react_1.default.Component {
         super(props);
         this.state = {
             currentOptions: [],
+            currentOptionsVersion: null,
             currentSearchError: null,
             currentFindError: null,
         };
         this.onChangeSearch = this.onChangeSearch.bind(this);
+        this.loadAllPossibleValues = this.loadAllPossibleValues.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.search = this.search.bind(this);
@@ -73,7 +75,7 @@ class PropertyEntryReference extends react_1.default.Component {
     removeListeners(props = this.props) {
         this.toggleListener(props, "addChangeListener");
     }
-    async search() {
+    async search(loadAll, limit) {
         const strToSearchForValue = this.props.state.internalValue || "";
         const [idef, dProp, sProp] = this.getSpecialData();
         const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
@@ -84,6 +86,13 @@ class PropertyEntryReference extends react_1.default.Component {
             }
         };
         const propertySet = this.props.property.getSpecialProperty("referencedFilteringPropertySet") || {};
+        if (this.props.referenceFilteringSet) {
+            Object.keys(this.props.referenceFilteringSet).forEach((key) => {
+                propertySet[key] = {
+                    exactValue: this.props.referenceFilteringSet[key],
+                };
+            });
+        }
         const args = {};
         // first we need the standard form not of our target item definition
         // but rather the one we are currently working within, hence the difference
@@ -128,9 +137,11 @@ class PropertyEntryReference extends react_1.default.Component {
                 args[applicableId] = actualReferredProperty.getCurrentValue(this.props.forId, this.props.forVersion || null);
             }
         });
-        // now we do this and use the search prop we are searching for and get the conversion
-        // id for the search mode and just paste the string there
-        args[search_mode_1.getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+        if (!loadAll) {
+            // now we do this and use the search prop we are searching for and get the conversion
+            // id for the search mode and just paste the string there
+            args[search_mode_1.getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+        }
         const onlyCreatedBySelf = this.props.property.getSpecialProperty("referencedFilterByCreatedBySelf");
         // now we can run the search using the traditional mode
         const result = await gql_client_util_1.runSearchQueryFor({
@@ -144,7 +155,7 @@ class PropertyEntryReference extends react_1.default.Component {
             itemDefinition: idef.getSearchModeCounterpart(),
             traditional: true,
             offset: 0,
-            limit: 6,
+            limit: !loadAll ? 6 : (limit || 50),
             language: this.props.language,
             versionFilter: filterByLanguage ? this.props.language : null,
         }, null);
@@ -181,6 +192,7 @@ class PropertyEntryReference extends react_1.default.Component {
         this.setState({
             currentSearchError: null,
             currentOptions: options,
+            currentOptionsVersion: filterByLanguage ? this.props.language : null,
         });
     }
     getSpecialData() {
@@ -233,6 +245,12 @@ class PropertyEntryReference extends react_1.default.Component {
             this.props.onChange(forId, ssrValue);
             return;
         }
+        const valueInSearchResults = this.state.currentOptionsVersion === forVersion &&
+            this.state.currentOptions.find((r) => r.id === forId);
+        if (valueInSearchResults) {
+            this.props.onChange(forId, valueInSearchResults.text);
+            return;
+        }
         this.currentlyFindingValueFor = [forId, forVersion];
         const [idef, dProp] = this.getSpecialData();
         const fields = {
@@ -268,6 +286,9 @@ class PropertyEntryReference extends react_1.default.Component {
         }
         this.props.onChange(forId, pMatch.toString());
     }
+    loadAllPossibleValues(limit) {
+        this.search(true, limit);
+    }
     onChangeSearch(str) {
         let value = str.trim().length ? NaN : null;
         let foundInList = this.state.currentOptions.find((o) => o.text === str);
@@ -287,6 +308,7 @@ class PropertyEntryReference extends react_1.default.Component {
     onCancel() {
         this.setState({
             currentOptions: [],
+            currentOptionsVersion: null,
             currentSearchError: null,
         });
     }
@@ -352,6 +374,7 @@ class PropertyEntryReference extends react_1.default.Component {
             i18nData.error && i18nData.error[invalidReason]) {
             i18nInvalidReason = i18nData.error[invalidReason];
         }
+        const i18nUnspecified = this.props.i18n[this.props.language].unspecified;
         const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
         const RendererElement = this.props.renderer;
         const rendererArgs = {
@@ -362,6 +385,8 @@ class PropertyEntryReference extends react_1.default.Component {
             placeholder: i18nPlaceholder,
             description: i18nDescription,
             icon: this.props.icon,
+            isNullable: this.props.property.isNullable(),
+            i18nUnspecified,
             currentAppliedValue: this.props.state.stateAppliedValue,
             currentValue: this.props.state.value,
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
@@ -374,6 +399,7 @@ class PropertyEntryReference extends react_1.default.Component {
             currentFindError: this.state.currentFindError,
             canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
             onChangeSearch: this.onChangeSearch,
+            loadAllPossibleValues: this.loadAllPossibleValues,
             onSelect: this.onSelect,
             onCancel: this.onCancel,
             dismissSearchError: this.dismissSearchError,

@@ -89,6 +89,13 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
      * The value to prefill with on mount
      */
     prefillWith?: PropertyDefinitionSupportedType;
+    /**
+     * Used only for the referenced type, to add to
+     * the reference filtering set options
+     */
+    referenceFilteringSet?: {
+        [key: string]: PropertyDefinitionSupportedType;
+    };
 }
 /**
  * The setter props

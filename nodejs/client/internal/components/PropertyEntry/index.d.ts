@@ -262,6 +262,16 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
      * Developer provided check base.tsx
      */
     prefillWith?: PropertyDefinitionSupportedType;
+    /**
+     * A value used for the reference type in order
+     * to apply to the filtering set that is used
+     * in the reference
+     *
+     * Developer provided check base.tsx
+     */
+    referenceFilteringSet?: {
+        [key: string]: PropertyDefinitionSupportedType;
+    };
 }
 /**
  * These represent values that are read from the context and every handler down the line gets

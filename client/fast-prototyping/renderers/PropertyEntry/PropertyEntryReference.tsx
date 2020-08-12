@@ -24,6 +24,7 @@ import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
+import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -230,6 +231,10 @@ class ActualPropertyEntryReferenceRenderer
   public componentDidMount() {
     if (this.props.autoFocus && this.inputRef) {
       this.inputRef.focus();
+    }
+
+    if (this.props.args.selectField) {
+      this.props.loadAllPossibleValues(this.props.args.selectField);
     }
   }
 
@@ -515,10 +520,54 @@ class ActualPropertyEntryReferenceRenderer
     }
   }
 
+  public render() {
+    if (this.props.args.selectField) {
+      return this.renderAsSelectField();
+    }
+
+    return this.renderAsAutosuggest();
+  }
+
+  public renderAsSelectField() {
+    const values = this.props.currentOptions.map((o) => ({
+      i18nValue: o.text,
+      value: o.id,
+    }));
+    const nullValue = {
+      i18nValue: this.props.i18nUnspecified,
+      value: null as any,
+    };
+    return (
+      <PropertyEntrySelectRenderer
+        values={values}
+        canRestore={this.props.canRestore}
+        currentAppliedValue={this.props.currentAppliedValue}
+        currentI18nValue={this.props.currentTextualValue}
+        currentValid={this.props.currentValid}
+        currentValue={this.props.currentValue}
+        currentInternalValue={this.props.currentInternalValue}
+        currentInvalidReason={this.props.currentInvalidReason}
+        rtl={this.props.rtl}
+        propertyId={this.props.propertyId}
+        placeholder={this.props.placeholder}
+        args={this.props.args}
+        label={this.props.label}
+        icon={this.props.icon}
+        disabled={this.props.disabled}
+        autoFocus={this.props.autoFocus}
+        onChange={this.props.onChange}
+        onRestore={this.props.onRestore}
+        nullValue={nullValue}
+        isNullable={this.props.isNullable}
+        isNumeric={true}
+      />
+    );
+  }
+
   /**
    * render function
    */
-  public render() {
+  public renderAsAutosuggest() {
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}

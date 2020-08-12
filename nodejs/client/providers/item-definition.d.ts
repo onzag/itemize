@@ -77,6 +77,12 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     includes?: string[];
     policies?: PolicyPathType[];
     beforeSubmit?: () => boolean;
+    parentedBy?: {
+        module: string;
+        itemDefinition: string;
+        id: number;
+        version?: string;
+    };
 }
 export interface IActionDeleteOptions extends IActionCleanOptions {
     policies?: PolicyPathType[];

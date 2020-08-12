@@ -400,6 +400,36 @@ function checkLanguage(appData, args) {
 }
 exports.checkLanguage = checkLanguage;
 /**
+ * Checks that a given user can perform the given search
+ * as it was requested
+ * @param args the args
+ * @param moduleOrIdef a module or an item definition the search is held against
+ * @param tokenData the token data
+ */
+function checkUserCanSearch(args, moduleOrIdef, tokenData) {
+    const roles = moduleOrIdef.getRolesWithSearchAccess();
+    if (roles.includes(constants_1.ANYONE_METAROLE) ||
+        roles.includes(tokenData.role)) {
+        return;
+    }
+    const canOwnerSearch = roles.includes(constants_1.OWNER_METAROLE);
+    if (canOwnerSearch && args.created_by === tokenData.id) {
+        return;
+    }
+    else if (canOwnerSearch && args.created_by && tokenData.id && args.created_by !== tokenData.id) {
+        throw new errors_1.EndpointError({
+            message: "You have requested a search for items owned by user " + args.created_by +
+                " , but you identify yourself as " + tokenData.id,
+            code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+        });
+    }
+    throw new errors_1.EndpointError({
+        message: "Your role is forbidden from performing search",
+        code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+    });
+}
+exports.checkUserCanSearch = checkUserCanSearch;
+/**
  * This just extracts the dictionary given the app data
  * and the language of choice
  * @param appData the app data

@@ -14,6 +14,7 @@ const gql_util_1 = require("../../../gql-util");
 const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const nanodate_1 = require("../../../nanodate");
 const errors_1 = require("../../../base/errors");
+const triggers_1 = require("../triggers");
 function findLastRecordDateCheatMethod(records) {
     let maximumRecords = [];
     let maximumRecordId = null;
@@ -55,6 +56,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     basic_1.checkLanguage(appData, resolverArgs.args);
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
+    basic_1.checkUserCanSearch(resolverArgs.args, mod, tokenData);
     // now build the fields we are searching
     const searchingFields = {};
     // the search mode counterpart module
@@ -153,9 +155,53 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     const count = (countResult[0] && countResult[0].count) || null;
     if (traditional) {
         const finalResult = {
-            results: baseResult.map((r) => {
-                return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, mod).toReturnToUser;
-            }),
+            results: await Promise.all(baseResult.map(async (r) => {
+                const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, mod);
+                const itemDefinition = appData.root.registry[r.type];
+                const pathOfThisModule = mod.getPath().join("/");
+                const pathOfThisIdef = itemDefinition.getPath().join("/");
+                const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+                const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+                if (moduleTrigger) {
+                    await moduleTrigger({
+                        appData,
+                        itemDefinition,
+                        module: mod,
+                        value: valueToProvide.convertedValue,
+                        update: null,
+                        extraArgs: resolverArgs.args,
+                        action: triggers_1.IOTriggerActions.READ,
+                        id: r.id,
+                        version: r.version || null,
+                        user: {
+                            role: tokenData.role,
+                            id: tokenData.id,
+                            customData: tokenData.customData,
+                        },
+                        forbid: basic_1.defaultTriggerForbiddenFunction,
+                    });
+                }
+                if (itemDefinitionTrigger) {
+                    await itemDefinitionTrigger({
+                        appData,
+                        itemDefinition,
+                        module: mod,
+                        value: valueToProvide.convertedValue,
+                        update: null,
+                        extraArgs: resolverArgs.args,
+                        action: triggers_1.IOTriggerActions.READ,
+                        id: r.id,
+                        version: r.version || null,
+                        user: {
+                            role: tokenData.role,
+                            id: tokenData.id,
+                            customData: tokenData.customData,
+                        },
+                        forbid: basic_1.defaultTriggerForbiddenFunction,
+                    });
+                }
+                return valueToProvide.toReturnToUser;
+            })),
             limit,
             offset,
             count,
@@ -205,6 +251,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     const tokenData = await basic_1.validateTokenAndGetData(appData, resolverArgs.args.token);
     basic_1.checkReadPoliciesAllowThisUserToSearch(itemDefinition, tokenData.role);
     await basic_1.validateTokenIsntBlocked(appData.cache, tokenData);
+    basic_1.checkUserCanSearch(resolverArgs.args, itemDefinition, tokenData);
     // now we need to get the fields that we are using to search
     const searchingFields = {};
     // for that we get the search mode counterpart of the item definition,
@@ -309,7 +356,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
         queryModel
             .andWhere("parent_id", resolverArgs.args.parent_id)
-            .andWhere("parent_version", resolverArgs.args.parent_version || null)
+            .andWhere("parent_version", resolverArgs.args.parent_version || "")
             .andWhere("parent_type", resolverArgs.args.parent_type);
     }
     else {
@@ -338,9 +385,52 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     const count = (countResult[0] && countResult[0].count) || null;
     if (traditional) {
         const finalResult = {
-            results: baseResult.map((r) => {
-                return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
-            }),
+            results: await Promise.all(baseResult.map(async (r) => {
+                const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), r, requestedFields, tokenData.role, itemDefinition);
+                const pathOfThisModule = mod.getPath().join("/");
+                const pathOfThisIdef = itemDefinition.getPath().join("/");
+                const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+                const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+                if (moduleTrigger) {
+                    await moduleTrigger({
+                        appData,
+                        itemDefinition,
+                        module: mod,
+                        value: valueToProvide.convertedValue,
+                        update: null,
+                        extraArgs: resolverArgs.args,
+                        action: triggers_1.IOTriggerActions.READ,
+                        id: r.id,
+                        version: r.version || null,
+                        user: {
+                            role: tokenData.role,
+                            id: tokenData.id,
+                            customData: tokenData.customData,
+                        },
+                        forbid: basic_1.defaultTriggerForbiddenFunction,
+                    });
+                }
+                if (itemDefinitionTrigger) {
+                    await itemDefinitionTrigger({
+                        appData,
+                        itemDefinition,
+                        module: mod,
+                        value: valueToProvide.convertedValue,
+                        update: null,
+                        extraArgs: resolverArgs.args,
+                        action: triggers_1.IOTriggerActions.READ,
+                        id: r.id,
+                        version: r.version || null,
+                        user: {
+                            role: tokenData.role,
+                            id: tokenData.id,
+                            customData: tokenData.customData,
+                        },
+                        forbid: basic_1.defaultTriggerForbiddenFunction,
+                    });
+                }
+                return valueToProvide.toReturnToUser;
+            })),
             limit,
             offset,
             count,

@@ -131,6 +131,12 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   includes?: string[];
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean;
+  parentedBy?: {
+    module: string,
+    itemDefinition: string,
+    id: number,
+    version?: string,
+  };
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
@@ -2110,6 +2116,12 @@ export class ActualItemDefinitionProvider extends
       this.submitBlockPromises = [];
     }
 
+    // now checking the option for the before submit function, if it returns
+    // false we cancel the submit request, we don't check policies yet
+    if (options.beforeSubmit && !options.beforeSubmit()) {
+      return null;
+    }
+
     // now we are going to build our query
     // also we make a check later on for the policies
     // if necessary
@@ -2135,11 +2147,16 @@ export class ActualItemDefinitionProvider extends
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
     });
+    
+    if (options.parentedBy) {
+      const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
+        .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
+      const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
+        options.parentedBy.itemDefinition.split("/"));
 
-    // now checking the option for the before submit function, if it returns
-    // false we cancel the submit request, we don't check policies yet
-    if (options.beforeSubmit && !options.beforeSubmit()) {
-      return null;
+      argumentsForQuery.parent_id = options.parentedBy.id;
+      argumentsForQuery.parent_version = options.parentedBy.version || null;
+      argumentsForQuery.parent_type = itemDefinitionInQuestion.getQualifiedPathName();
     }
 
     // now it's when we are actually submitting

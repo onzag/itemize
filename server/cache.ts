@@ -17,7 +17,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
@@ -470,6 +470,42 @@ export class Cache {
     })();
 
     return sqlValue;
+  }
+
+  /**
+   * Requests an update for an item definition in a simple way
+   * this might have more overhead than the normal request update
+   * @param itemDefinition the item definition in question
+   * @param id 
+   * @param version 
+   * @param update 
+   * @param dictionary 
+   */
+  public async requestUpdateSimple(
+    itemDefinition: ItemDefinition,
+    id: number,
+    version: string,
+    update: IGQLArgs,
+    dictionary: string,
+  ) {
+    const currentValue = await this.requestValue(itemDefinition, id, version);
+    const currentValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+      this.knex,
+      this.serverData,
+      itemDefinition,
+      currentValue,
+    );
+    await this.requestUpdate(
+      itemDefinition,
+      id,
+      version,
+      update,
+      currentValueAsGQL,
+      null,
+      dictionary,
+      currentValue.container_id,
+      null,
+    );
   }
 
   /**

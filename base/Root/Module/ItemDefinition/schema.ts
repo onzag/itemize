@@ -184,6 +184,12 @@ export default {
     searchable: {
       type: "boolean",
     },
+    searchRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     readRoleAccess: {
       type: "array",
       items: {

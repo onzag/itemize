@@ -12,7 +12,7 @@ import PropertyDefinition, {
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
 import { IModuleRawJSONDataType, IRawJSONI18NDataType, IModuleRequestLimitersType } from "../base/Root/Module";
 import {
-  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType,
+  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType, IItemDefinitionParentingRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition";
 import {
   PropertyDefinitionSearchInterfacesType,
@@ -84,6 +84,7 @@ interface IFileRootDataRawUntreatedJSONDataType {
 interface IFileModuleDataRawUntreatedJSONDataType {
   type: "module";
   children: string[];
+  searchRoleAccess?: string[];
   readRoleAccess?: string[];
   searchable?: boolean;
   maxSearchResults?: number;
@@ -103,7 +104,11 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   createRoleAccess?: string[];
   editRoleAccess?: string[];
   deleteRoleAccess?: string[];
+  searchRoleAccess?: string[];
   readRoleAccess?: string[];
+  parentingRoleAccess?: string[];
+  canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  mustBeParented?: boolean;
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
   searchable?: boolean;
@@ -529,6 +534,10 @@ async function buildModule(
     finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
   }
 
+  if (actualEvaledFileData.searchRoleAccess) {
+    finalValue.searchRoleAccess = actualEvaledFileData.searchRoleAccess;
+  }
+
   if (typeof actualEvaledFileData.maxSearchRecords !== "undefined") {
     finalValue.maxSearchRecords = actualEvaledFileData.maxSearchRecords;
   }
@@ -642,6 +651,10 @@ async function buildItemDefinition(
     finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
   }
 
+  if (actualEvaledFileData.searchRoleAccess) {
+    finalValue.searchRoleAccess = actualEvaledFileData.searchRoleAccess;
+  }
+
   if (actualEvaledFileData.createRoleAccess) {
     finalValue.createRoleAccess = actualEvaledFileData.createRoleAccess;
   }
@@ -652,6 +665,18 @@ async function buildItemDefinition(
 
   if (actualEvaledFileData.deleteRoleAccess) {
     finalValue.deleteRoleAccess = actualEvaledFileData.deleteRoleAccess;
+  }
+
+  if (actualEvaledFileData.parentingRoleAccess) {
+    finalValue.parentingRoleAccess = actualEvaledFileData.parentingRoleAccess;
+  }
+
+  if (actualEvaledFileData.mustBeParented) {
+    finalValue.mustBeParented = true;
+  }
+
+  if (actualEvaledFileData.canBeParentedBy) {
+    finalValue.canBeParentedBy = actualEvaledFileData.canBeParentedBy;
   }
 
   if (actualEvaledFileData.ownerIsObjectId) {

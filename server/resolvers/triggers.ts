@@ -10,7 +10,7 @@ export enum IOTriggerActions {
   EDITED,
   DELETE,
   DELETED,
-  GET,
+  READ,
 }
 
 export interface IOTriggerArgType {

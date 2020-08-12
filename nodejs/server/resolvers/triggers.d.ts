@@ -9,7 +9,7 @@ export declare enum IOTriggerActions {
     EDITED = 3,
     DELETE = 4,
     DELETED = 5,
-    GET = 6
+    READ = 6
 }
 export interface IOTriggerArgType {
     appData: IAppDataType;

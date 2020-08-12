@@ -91,6 +91,16 @@ export declare class Cache {
         type: string;
     }): Promise<ISQLTableRowValue>;
     /**
+     * Requests an update for an item definition in a simple way
+     * this might have more overhead than the normal request update
+     * @param itemDefinition the item definition in question
+     * @param id
+     * @param version
+     * @param update
+     * @param dictionary
+     */
+    requestUpdateSimple(itemDefinition: ItemDefinition, id: number, version: string, update: IGQLArgs, dictionary: string): Promise<void>;
+    /**
      * Requests an update for an item definition where new values are set for this existent item
      * definition value, these are taken as instructions and no checks are done on it
      * @param itemDefinition the item definition in question

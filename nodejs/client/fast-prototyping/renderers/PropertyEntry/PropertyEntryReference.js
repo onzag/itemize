@@ -14,6 +14,7 @@ const index_1 = require("../../mui-core/index");
 const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
+const PropertyEntrySelect_1 = __importDefault(require("./PropertyEntrySelect"));
 /**
  * A simple helper function that says when it should show invalid
  * @param props the renderer props
@@ -183,6 +184,9 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
     componentDidMount() {
         if (this.props.autoFocus && this.inputRef) {
             this.inputRef.focus();
+        }
+        if (this.props.args.selectField) {
+            this.props.loadAllPossibleValues(this.props.args.selectField);
         }
     }
     /**
@@ -357,10 +361,27 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             this.props.onChangeSearch(arg.value);
         }
     }
+    render() {
+        if (this.props.args.selectField) {
+            return this.renderAsSelectField();
+        }
+        return this.renderAsAutosuggest();
+    }
+    renderAsSelectField() {
+        const values = this.props.currentOptions.map((o) => ({
+            i18nValue: o.text,
+            value: o.id,
+        }));
+        const nullValue = {
+            i18nValue: this.props.i18nUnspecified,
+            value: null,
+        };
+        return (react_1.default.createElement(PropertyEntrySelect_1.default, { values: values, canRestore: this.props.canRestore, currentAppliedValue: this.props.currentAppliedValue, currentI18nValue: this.props.currentTextualValue, currentValid: this.props.currentValid, currentValue: this.props.currentValue, currentInternalValue: this.props.currentInternalValue, currentInvalidReason: this.props.currentInvalidReason, rtl: this.props.rtl, propertyId: this.props.propertyId, placeholder: this.props.placeholder, args: this.props.args, label: this.props.label, icon: this.props.icon, disabled: this.props.disabled, autoFocus: this.props.autoFocus, onChange: this.props.onChange, onRestore: this.props.onRestore, nullValue: nullValue, isNullable: this.props.isNullable, isNumeric: true }));
+    }
     /**
      * render function
      */
-    render() {
+    renderAsAutosuggest() {
         return (react_1.default.createElement(react_autosuggest_1.default, { renderInputComponent: this.renderBasicTextField, renderSuggestionsContainer: this.renderAutosuggestContainer, renderSuggestion: this.renderAutosuggestSuggestion, getSuggestionValue: this.getSuggestionValue, onSuggestionsFetchRequested: this.onSuggestionsFetchRequested, onSuggestionsClearRequested: this.props.onCancel, suggestions: this.props.currentOptions, theme: {
                 container: this.props.classes.autosuggestContainer,
                 containerOpen: this.props.classes.autosuggestContainerOpen,

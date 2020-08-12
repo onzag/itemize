@@ -111,7 +111,7 @@ export async function addItemDefinition(
   const isParenting = !!(
     resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
   );
-  validateParentingRules(
+  await validateParentingRules(
     appData,
     resolverArgs.args.parent_id,
     resolverArgs.args.parent_version || null,

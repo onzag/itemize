@@ -171,6 +171,10 @@ export interface IItemDefinitionRawJSONDataType {
   versioningRoleAccess?: string[];
 
   /**
+   * Permissions for search purposes
+   */
+  searchRoleAccess?: string[]
+  /**
    * Read role permissions
    */
   readRoleAccess?: string[];
@@ -324,7 +328,7 @@ export enum ItemDefinitionIOActions {
   READ = "READ",
   CREATE = "CREATE",
   EDIT = "EDIT",
-  DELETE = "DELETE",
+  DELETE = "DELETE"
 }
 
 /**
@@ -1583,6 +1587,19 @@ export default class ItemDefinition {
   }
 
   /**
+   * Provides the roles that can search within the item
+   * definition, will give the module search role
+   * access if not overwritten by this
+   */
+  public getRolesWithSearchAccess() {
+    return (
+      this.rawData.searchRoleAccess ||
+      this.parentModule.rawData.searchRoleAccess ||
+      [ANYONE_METAROLE]
+    );
+  }
+
+  /**
    * Provides the roles that have access to a given
    * action based on the rules that were set
    * @param action the action from the ItemDefinitionIOActions
@@ -1591,7 +1608,7 @@ export default class ItemDefinition {
   public getRolesWithAccessTo(action: ItemDefinitionIOActions) {
     if (action === ItemDefinitionIOActions.READ) {
       // Anyone can read by default
-      return this.rawData.readRoleAccess || [ANYONE_METAROLE];
+      return this.rawData.readRoleAccess || this.parentModule.rawData.readRoleAccess || [ANYONE_METAROLE];
     } else if (action === ItemDefinitionIOActions.CREATE) {
       // Anyone logged can create by default
       return this.rawData.createRoleAccess || [ANYONE_LOGGED_METAROLE];

@@ -315,6 +315,20 @@ class Cache {
         return sqlValue;
     }
     /**
+     * Requests an update for an item definition in a simple way
+     * this might have more overhead than the normal request update
+     * @param itemDefinition the item definition in question
+     * @param id
+     * @param version
+     * @param update
+     * @param dictionary
+     */
+    async requestUpdateSimple(itemDefinition, id, version, update, dictionary) {
+        const currentValue = await this.requestValue(itemDefinition, id, version);
+        const currentValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, currentValue);
+        await this.requestUpdate(itemDefinition, id, version, update, currentValueAsGQL, null, dictionary, currentValue.container_id, null);
+    }
+    /**
      * Requests an update for an item definition where new values are set for this existent item
      * definition value, these are taken as instructions and no checks are done on it
      * @param itemDefinition the item definition in question

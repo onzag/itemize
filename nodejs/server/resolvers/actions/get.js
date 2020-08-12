@@ -95,7 +95,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
             value: valueToProvide.convertedValue,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.IOTriggerActions.GET,
+            action: triggers_1.IOTriggerActions.READ,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
@@ -114,7 +114,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
             value: valueToProvide.convertedValue,
             update: null,
             extraArgs: resolverArgs.args,
-            action: triggers_1.IOTriggerActions.GET,
+            action: triggers_1.IOTriggerActions.READ,
             id: resolverArgs.args.id,
             version: resolverArgs.args.version || null,
             user: {
@@ -177,7 +177,7 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
         }
     });
     const resultValues = await appData.cache.requestListCache(resolverArgs.args.records);
-    const finalValues = resultValues.map((value) => {
+    const finalValues = await Promise.all(resultValues.map(async (value) => {
         // preveting another security leak here, the user might have lied by saying that these
         // items were all created by this specific creator when doing searches
         if (created_by && value.created_by !== created_by) {
@@ -186,8 +186,51 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
             });
         }
-        return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, itemDefinition).toReturnToUser;
-    });
+        const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, itemDefinition);
+        const pathOfThisModule = mod.getPath().join("/");
+        const pathOfThisIdef = itemDefinition.getPath().join("/");
+        const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+        const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+        if (moduleTrigger) {
+            await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: valueToProvide.convertedValue,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: value.id,
+                version: value.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
+        if (itemDefinitionTrigger) {
+            await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: valueToProvide.convertedValue,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: value.id,
+                version: value.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
+        return valueToProvide.toReturnToUser;
+    }));
     const resultAsObject = {
         results: finalValues,
     };
@@ -226,7 +269,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
     const resultValues = await appData.cache.requestListCache(resolverArgs.args.records);
     // return if otherwise succeeds
-    const finalValues = resultValues.map((value) => {
+    const finalValues = await Promise.all(resultValues.map(async (value) => {
         // preveting another security leak here, the user might have lied by saying that these
         // items were all created by this specific creator when doing searches
         if (created_by && value.created_by !== created_by) {
@@ -235,8 +278,52 @@ async function getModuleList(appData, resolverArgs, mod) {
                 code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
             });
         }
-        return basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, mod).toReturnToUser;
-    });
+        const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), value, requestedFields, tokenData.role, mod);
+        const itemDefinition = appData.root.registry[value.type];
+        const pathOfThisModule = mod.getPath().join("/");
+        const pathOfThisIdef = itemDefinition.getPath().join("/");
+        const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
+        const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+        if (moduleTrigger) {
+            await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: valueToProvide.convertedValue,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: value.id,
+                version: value.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
+        if (itemDefinitionTrigger) {
+            await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: valueToProvide.convertedValue,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: value.id,
+                version: value.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
+        return valueToProvide.toReturnToUser;
+    }));
     const resultAsObject = {
         results: finalValues,
     };

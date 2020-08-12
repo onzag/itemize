@@ -27,6 +27,12 @@ export default {
         type: "string",
       },
     },
+    searchRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     modRoleAccess: {
       type: "array",
       items: {

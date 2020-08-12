@@ -291,6 +291,9 @@ async function buildModule(rawDataConfig, actualLocation, fileData, pointers, ra
     if (actualEvaledFileData.readRoleAccess) {
         finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
     }
+    if (actualEvaledFileData.searchRoleAccess) {
+        finalValue.searchRoleAccess = actualEvaledFileData.searchRoleAccess;
+    }
     if (typeof actualEvaledFileData.maxSearchRecords !== "undefined") {
         finalValue.maxSearchRecords = actualEvaledFileData.maxSearchRecords;
     }
@@ -355,6 +358,9 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
     if (actualEvaledFileData.readRoleAccess) {
         finalValue.readRoleAccess = actualEvaledFileData.readRoleAccess;
     }
+    if (actualEvaledFileData.searchRoleAccess) {
+        finalValue.searchRoleAccess = actualEvaledFileData.searchRoleAccess;
+    }
     if (actualEvaledFileData.createRoleAccess) {
         finalValue.createRoleAccess = actualEvaledFileData.createRoleAccess;
     }
@@ -363,6 +369,15 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
     }
     if (actualEvaledFileData.deleteRoleAccess) {
         finalValue.deleteRoleAccess = actualEvaledFileData.deleteRoleAccess;
+    }
+    if (actualEvaledFileData.parentingRoleAccess) {
+        finalValue.parentingRoleAccess = actualEvaledFileData.parentingRoleAccess;
+    }
+    if (actualEvaledFileData.mustBeParented) {
+        finalValue.mustBeParented = true;
+    }
+    if (actualEvaledFileData.canBeParentedBy) {
+        finalValue.canBeParentedBy = actualEvaledFileData.canBeParentedBy;
     }
     if (actualEvaledFileData.ownerIsObjectId) {
         finalValue.ownerIsObjectId = actualEvaledFileData.ownerIsObjectId;

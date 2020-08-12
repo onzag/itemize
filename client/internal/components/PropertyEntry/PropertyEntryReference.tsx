@@ -18,6 +18,9 @@ export interface IReferrencedPropertySet {
 }
 
 export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
+  isNullable: boolean;
+  i18nUnspecified: string;
+
   currentTextualValue: string;
   currentValueIsFullfilled: boolean;
   currentOptions: IPropertyEntryReferenceOption[];
@@ -25,6 +28,7 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
   currentSearchError: EndpointErrorType;
 
   onChangeSearch: (str: string) => void;
+  loadAllPossibleValues: (limit: number) => void;
   onSelect: (option: IPropertyEntryReferenceOption) => void;
   onCancel: () => void;
   dismissSearchError: () => void;
@@ -33,6 +37,7 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
 
 interface IPropertyEntryReferenceState {
   currentOptions: IPropertyEntryReferenceOption[];
+  currentOptionsVersion: string;
   currentSearchError: EndpointErrorType;
   currentFindError: EndpointErrorType;
 }
@@ -50,11 +55,13 @@ export default class PropertyEntryReference
 
     this.state = {
       currentOptions: [],
+      currentOptionsVersion: null,
       currentSearchError: null,
       currentFindError: null,
     };
 
     this.onChangeSearch = this.onChangeSearch.bind(this);
+    this.loadAllPossibleValues = this.loadAllPossibleValues.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.search = this.search.bind(this);
@@ -129,7 +136,7 @@ export default class PropertyEntryReference
     this.toggleListener(props, "addChangeListener");
   }
 
-  public async search() {
+  public async search(loadAll?: boolean, limit?: number) {
     const strToSearchForValue = this.props.state.internalValue || "";
     const [idef, dProp, sProp] = this.getSpecialData();
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
@@ -142,6 +149,13 @@ export default class PropertyEntryReference
     } as IGQLRequestFields;
 
     const propertySet = this.props.property.getSpecialProperty("referencedFilteringPropertySet") as IReferrencedPropertySet || {};
+    if (this.props.referenceFilteringSet) {
+      Object.keys(this.props.referenceFilteringSet).forEach((key) => {
+        propertySet[key] = {
+          exactValue: this.props.referenceFilteringSet[key],
+        }
+      });
+    }
     const args: IGQLArgs = {};
 
     // first we need the standard form not of our target item definition
@@ -190,9 +204,11 @@ export default class PropertyEntryReference
       }
     });
 
-    // now we do this and use the search prop we are searching for and get the conversion
-    // id for the search mode and just paste the string there
-    args[getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+    if (!loadAll) {
+      // now we do this and use the search prop we are searching for and get the conversion
+      // id for the search mode and just paste the string there
+      args[getConversionIds(sProp.rawData)[0]] = strToSearchForValue;
+    }
 
     const onlyCreatedBySelf = this.props.property.getSpecialProperty("referencedFilterByCreatedBySelf") as boolean;
 
@@ -208,7 +224,7 @@ export default class PropertyEntryReference
       itemDefinition: idef.getSearchModeCounterpart(),
       traditional: true,
       offset: 0,
-      limit: 6,
+      limit: !loadAll ? 6 : (limit || 50),
       language: this.props.language,
       versionFilter: filterByLanguage ? this.props.language : null,
     }, null);
@@ -248,7 +264,8 @@ export default class PropertyEntryReference
     this.setState({
       currentSearchError: null,
       currentOptions: options,
-    })
+      currentOptionsVersion: filterByLanguage ? this.props.language : null,
+    });
   }
 
   public getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition] {
@@ -324,6 +341,17 @@ export default class PropertyEntryReference
       return;
     }
 
+    const valueInSearchResults = this.state.currentOptionsVersion === forVersion &&
+      this.state.currentOptions.find((r) => r.id === forId);
+
+    if (valueInSearchResults) {
+      this.props.onChange(
+        forId,
+        valueInSearchResults.text,
+      );
+      return;
+    }
+
     this.currentlyFindingValueFor = [forId, forVersion];
 
     const [idef, dProp] = this.getSpecialData();
@@ -370,6 +398,10 @@ export default class PropertyEntryReference
     );
   }
 
+  public loadAllPossibleValues(limit: number) {
+    this.search(true, limit);
+  }
+
   public onChangeSearch(str: string) {
     let value: number = str.trim().length ? NaN : null;
     let foundInList = this.state.currentOptions.find((o) => o.text === str);
@@ -395,6 +427,7 @@ export default class PropertyEntryReference
   public onCancel() {
     this.setState({
       currentOptions: [],
+      currentOptionsVersion: null,
       currentSearchError: null,
     });
   }
@@ -485,6 +518,8 @@ export default class PropertyEntryReference
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const i18nUnspecified = this.props.i18n[this.props.language].unspecified;
+
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
 
     const RendererElement = this.props.renderer;
@@ -497,6 +532,9 @@ export default class PropertyEntryReference
       placeholder: i18nPlaceholder,
       description: i18nDescription,
       icon: this.props.icon,
+
+      isNullable: this.props.property.isNullable(),
+      i18nUnspecified,
 
       currentAppliedValue: this.props.state.stateAppliedValue as any,
       currentValue: this.props.state.value as any,
@@ -514,6 +552,7 @@ export default class PropertyEntryReference
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
       onChangeSearch: this.onChangeSearch,
+      loadAllPossibleValues: this.loadAllPossibleValues,
       onSelect: this.onSelect,
       onCancel: this.onCancel,
       dismissSearchError: this.dismissSearchError,

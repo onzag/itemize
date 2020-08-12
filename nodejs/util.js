@@ -143,7 +143,15 @@ exports.mimeTypeToExtension = mimeTypeToExtension;
  * @returns a string
  */
 function localeReplacer(str, ...args) {
-    return str.replace(/\{(\d+)\}/g, (match, indexMatch) => (args[indexMatch] || "?"));
+    return str.replace(/\{(\d+)\}/g, (match, indexMatch) => {
+        if (typeof args[indexMatch] === "undefined") {
+            return "?";
+        }
+        else if (args[indexMatch] === null) {
+            return "";
+        }
+        return args[indexMatch].toString();
+    });
 }
 exports.localeReplacer = localeReplacer;
 /**

@@ -33,6 +33,7 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     versionIsCountry?: boolean;
     versionIsLanguage?: boolean;
     versioningRoleAccess?: string[];
+    searchRoleAccess?: string[];
     readRoleAccess?: string[];
     createRoleAccess?: string[];
     editRoleAccess?: string[];
@@ -77,6 +78,7 @@ export declare function processModule(rawData: IModuleRawJSONDataType, locale?: 
     name: string;
     i18nData: import("../base/Root/Module").IRawJSONI18NDataType;
     readRoleAccess?: string[];
+    searchRoleAccess?: string[];
     modRoleAccess?: string[];
     flagRoleAccess?: string[];
     searchable?: boolean;

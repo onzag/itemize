@@ -7,7 +7,7 @@
  */
 import { IPropertyDefinitionRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
-import { IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType } from "../base/Root/Module/ItemDefinition";
+import { IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType, IItemDefinitionParentingRawJSONDataType } from "../base/Root/Module/ItemDefinition";
 import "source-map-support/register";
 /**
  * and this is the raw untreated json for an item
@@ -21,7 +21,11 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     createRoleAccess?: string[];
     editRoleAccess?: string[];
     deleteRoleAccess?: string[];
+    searchRoleAccess?: string[];
     readRoleAccess?: string[];
+    parentingRoleAccess?: string[];
+    canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+    mustBeParented?: boolean;
     policies?: IPoliciesRawJSONDataType;
     ownerIsObjectId?: boolean;
     searchable?: boolean;

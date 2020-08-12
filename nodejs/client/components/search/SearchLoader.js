@@ -338,6 +338,7 @@ class ActualSearchLoader extends react_1.default.Component {
                         cleanOnDismount: this.props.cleanOnDismount,
                         static: this.props.static,
                         longTermCaching: this.props.searchShouldCache,
+                        disableExternalChecks: this.props.disableExternalChecks,
                     },
                     itemDefinition,
                 };

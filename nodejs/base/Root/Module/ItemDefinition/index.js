@@ -958,6 +958,16 @@ class ItemDefinition {
         return this.parentModule.isInSearchMode();
     }
     /**
+     * Provides the roles that can search within the item
+     * definition, will give the module search role
+     * access if not overwritten by this
+     */
+    getRolesWithSearchAccess() {
+        return (this.rawData.searchRoleAccess ||
+            this.parentModule.rawData.searchRoleAccess ||
+            [constants_1.ANYONE_METAROLE]);
+    }
+    /**
      * Provides the roles that have access to a given
      * action based on the rules that were set
      * @param action the action from the ItemDefinitionIOActions
@@ -966,7 +976,7 @@ class ItemDefinition {
     getRolesWithAccessTo(action) {
         if (action === ItemDefinitionIOActions.READ) {
             // Anyone can read by default
-            return this.rawData.readRoleAccess || [constants_1.ANYONE_METAROLE];
+            return this.rawData.readRoleAccess || this.parentModule.rawData.readRoleAccess || [constants_1.ANYONE_METAROLE];
         }
         else if (action === ItemDefinitionIOActions.CREATE) {
             // Anyone logged can create by default

@@ -121,6 +121,11 @@ export interface ISearchLoaderProps {
    */
   cleanOnDismount?: boolean;
   /**
+   * Whether to disable the external checks for the item definition
+   * results provider props
+   */
+  disableExternalChecks?: boolean;
+  /**
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
    * or NO_LISTENING for just not getting updates but asking for feedback
@@ -597,6 +602,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   cleanOnDismount: this.props.cleanOnDismount,
                   static: this.props.static,
                   longTermCaching: this.props.searchShouldCache,
+                  disableExternalChecks: this.props.disableExternalChecks,
                 },
                 itemDefinition,
               };

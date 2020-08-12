@@ -179,6 +179,11 @@ export interface IModuleRawJSONDataType {
   readRoleAccess?: string[];
 
   /**
+   * The search role access
+   */
+  searchRoleAccess?: string[];
+
+  /**
    * The roles that have moderation capabilities
    * over the item definitions under this module
    * modding only exist at module level as well
@@ -451,6 +456,7 @@ export default class Module {
       name: this.rawData.name + "__PROPEXT_IDEF",
       i18nData: this.rawData.i18nData,
       readRoleAccess: this.rawData.readRoleAccess,
+      searchRoleAccess: this.rawData.searchRoleAccess,
     }, this, null);
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
 
@@ -775,6 +781,14 @@ export default class Module {
     }
     return MODULE_PREFIX + this.getName();
   }
+
+  /**
+   * Provides the search access for the given module
+   * @retuns an array with the approved roles or the anyone metarole
+   */
+  public getRolesWithSearchAccess() {
+    return this.rawData.searchRoleAccess || [ANYONE_METAROLE];
+  } 
 
   /**
    * Provides the roles that have access to a given
