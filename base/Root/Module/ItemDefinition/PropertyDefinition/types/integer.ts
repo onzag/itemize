@@ -18,7 +18,7 @@ import {
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
-import { PropertyInvalidReason } from "../../PropertyDefinition";
+import { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_INTEGER,
   MIN_SUPPORTED_INTEGER,
@@ -73,7 +73,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localSearch: standardLocalSearchExactAndRange,
 
   // it gotta be validated to check it's a number
-  validate: (n: PropertyDefinitionSupportedIntegerType, subtype: string) => {
+  validate: (n: PropertyDefinitionSupportedIntegerType, property: IPropertyDefinitionRawJSONDataType) => {
     if (isNaN(n) || !Number.isInteger(n)) {
       return PropertyInvalidReason.INVALID_VALUE;
     } else if (n > MAX_SUPPORTED_INTEGER) {
@@ -81,7 +81,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     } else if (
       n < MIN_SUPPORTED_INTEGER ||
       (
-        subtype === "reference" &&
+        property.subtype === "reference" &&
         n <= 0
       )
     ) {

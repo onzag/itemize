@@ -336,6 +336,9 @@ declare const _default: {
                     type: string;
                     minimum: number;
                 };
+                pattern: {
+                    type: string;
+                };
                 values: {
                     type: string;
                     items: {
@@ -390,11 +393,6 @@ declare const _default: {
                         type: string;
                         properties: {
                             if: {
-                                /**
-                                 * The reference shema of item definitions
-                                 * used to refer to other item definitions
-                                 * whatever module they come from
-                                 */
                                 $ref: string;
                             };
                             value: {};

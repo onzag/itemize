@@ -16,6 +16,7 @@ const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDe
 const errors_1 = require("../base/errors");
 const _1 = require(".");
 const CACHE_EXPIRES_DAYS = 14;
+const MEMCACHE_EXPIRES_MS = 1000;
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -546,10 +547,15 @@ class Cache {
      * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
      * @param id the id to request for
      * @param version the version
-     * @param refresh whether to skip the cache and request directly from the database and update the cache
+     * @param options.refresh whether to skip the cache and request directly from the database and update the cache
+     * @param options.useMemoryCache a total opposite of refresh, (do not use together as refresh beats this one)
+     * which will use a 1 second memory cache to retrieve values and store them, use this if you think the value
+     * might be used consecutively and you don't care about accuraccy that much
      * @returns a whole sql value that can be converted into graphql if necessary
      */
-    async requestValue(itemDefinition, id, version, refresh) {
+    async requestValue(itemDefinition, id, version, options) {
+        const refresh = options && options.refresh;
+        const memCache = options && options.useMemoryCache;
         const idefTable = Array.isArray(itemDefinition) ?
             itemDefinition[0] : itemDefinition.getQualifiedPathName();
         const moduleTable = Array.isArray(itemDefinition) ?
@@ -558,8 +564,17 @@ class Cache {
             moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh);
         if (!refresh) {
             const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+            if (memCache && this.memoryCache[idefQueryIdentifier]) {
+                return this.memoryCache[idefQueryIdentifier].value;
+            }
             const currentValue = await this.getRaw(idefQueryIdentifier);
             if (currentValue) {
+                if (memCache) {
+                    this.memoryCache[idefQueryIdentifier] = currentValue;
+                    setTimeout(() => {
+                        delete this.memoryCache[idefQueryIdentifier];
+                    }, MEMCACHE_EXPIRES_MS);
+                }
                 return currentValue.value;
             }
         }
@@ -575,6 +590,15 @@ class Cache {
             }) || null);
             // we don't wait for this
             this.forceCacheInto(idefTable, id, version, queryValue);
+            if (memCache) {
+                const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+                this.memoryCache[idefQueryIdentifier] = {
+                    value: queryValue,
+                };
+                setTimeout(() => {
+                    delete this.memoryCache[idefQueryIdentifier];
+                }, MEMCACHE_EXPIRES_MS);
+            }
             return queryValue;
         }
         catch (err) {
@@ -631,7 +655,9 @@ class Cache {
             }
             else if (value) {
                 if (typeof data === "undefined") {
-                    this.requestValue(this.root.registry[itemDefinition], id, version, true);
+                    this.requestValue(this.root.registry[itemDefinition], id, version, {
+                        refresh: true,
+                    });
                 }
                 else {
                     // if we have such a value we want to update it

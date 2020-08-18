@@ -92,6 +92,9 @@ exports.default = {
             type: "number",
             minimum: 0,
         },
+        pattern: {
+            type: "string",
+        },
         values: {
             type: "array",
             items: {

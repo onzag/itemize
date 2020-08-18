@@ -49,7 +49,7 @@ const typeValue = {
     },
     localSearch: local_search_1.standardLocalSearchExactAndRange,
     // it gotta be validated to check it's a number
-    validate: (n, subtype) => {
+    validate: (n, property) => {
         if (isNaN(n) || !Number.isInteger(n)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
@@ -57,7 +57,7 @@ const typeValue = {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_LARGE;
         }
         else if (n < constants_1.MIN_SUPPORTED_INTEGER ||
-            (subtype === "reference" &&
+            (property.subtype === "reference" &&
                 n <= 0)) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_SMALL;
         }

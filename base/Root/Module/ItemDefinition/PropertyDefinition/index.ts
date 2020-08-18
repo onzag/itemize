@@ -114,6 +114,12 @@ export interface IPropertyDefinitionRawJSONDataType {
    * The min accepted decimal count (numeric types)
    */
   minDecimalCount?: number;
+  /**
+   * A pattern to match, only really makes sense
+   * on the string, password and text type, must
+   * be a valid regex
+   */
+  pattern?: string;
 
   /**
    * values for the property set
@@ -446,6 +452,10 @@ async function clientSideIndexChecker(
   }
 }
 
+const CACHED_REGEXP: {
+  [key: string]: RegExp,
+} = {};
+
 /**
  * The property definition class that defines how properties
  * are to be defined
@@ -587,12 +597,22 @@ export default class PropertyDefinition {
       }
     }
 
+    if (propertyDefinitionRaw.pattern && typeof value === "string") {
+      const regxp = CACHED_REGEXP[propertyDefinitionRaw.pattern] || new RegExp(propertyDefinitionRaw.pattern);
+      if (!CACHED_REGEXP[propertyDefinitionRaw.pattern]) {
+        CACHED_REGEXP[propertyDefinitionRaw.pattern] = regxp;
+      }
+      if (!regxp.test(value)) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+    }
+
     // if we have a validate function
     if (definition.validate) {
       // run it
       const invalidReason = definition.validate(
         value,
-        propertyDefinitionRaw.subtype,
+        propertyDefinitionRaw,
       );
       // if it gives an invalid reason
       if (invalidReason) {

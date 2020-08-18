@@ -73,6 +73,9 @@ declare const _default: {
             type: string;
             minimum: number;
         };
+        pattern: {
+            type: string;
+        };
         values: {
             type: string;
             items: {

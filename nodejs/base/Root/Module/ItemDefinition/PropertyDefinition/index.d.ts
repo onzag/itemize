@@ -88,6 +88,12 @@ export interface IPropertyDefinitionRawJSONDataType {
      */
     minDecimalCount?: number;
     /**
+     * A pattern to match, only really makes sense
+     * on the string, password and text type, must
+     * be a valid regex
+     */
+    pattern?: string;
+    /**
      * values for the property set
      */
     values?: PropertyDefinitionSupportedType[];

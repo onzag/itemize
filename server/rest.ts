@@ -92,7 +92,7 @@ export default function restServices(appData: IAppDataType) {
     if (definition.validate) {
       const invalidReason = definition.validate(
         value,
-        property.getSubtype(),
+        property.rawData,
       );
 
       // if the property definition complains

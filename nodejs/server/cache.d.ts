@@ -27,6 +27,7 @@ export declare class Cache {
     private root;
     private serverData;
     private listener;
+    private memoryCache;
     /**
      * Builds a new cache instance, before the cache is ready
      * it needs to be able to access the listener as well, but due
@@ -147,10 +148,16 @@ export declare class Cache {
      * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
      * @param id the id to request for
      * @param version the version
-     * @param refresh whether to skip the cache and request directly from the database and update the cache
+     * @param options.refresh whether to skip the cache and request directly from the database and update the cache
+     * @param options.useMemoryCache a total opposite of refresh, (do not use together as refresh beats this one)
+     * which will use a 1 second memory cache to retrieve values and store them, use this if you think the value
+     * might be used consecutively and you don't care about accuraccy that much
      * @returns a whole sql value that can be converted into graphql if necessary
      */
-    requestValue(itemDefinition: ItemDefinition | [string, string], id: number, version: string, refresh?: boolean): Promise<ISQLTableRowValue>;
+    requestValue(itemDefinition: ItemDefinition | [string, string], id: number, version: string, options?: {
+        refresh?: boolean;
+        useMemoryCache?: boolean;
+    }): Promise<ISQLTableRowValue>;
     /**
      * TODO Optimize this, right now it retrieves the list one by one
      * Requests a whole list of search results
@@ -168,6 +175,6 @@ export declare class Cache {
      * @param version the version or null
      * @param data the entire SQL result
      */
-    onChangeInformed(itemDefinition: string, id: number, version: string, data: ISQLTableRowValue): void;
+    onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue): void;
     onChangeInformedNoData(itemDefinition: string, id: number, version: string): void;
 }

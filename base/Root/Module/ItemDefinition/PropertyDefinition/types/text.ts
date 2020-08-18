@@ -117,7 +117,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   },
 
   // validates the text, texts don't support json value
-  validate: (s: PropertyDefinitionSupportedTextType, subtype?: string) => {
+  validate: (s: PropertyDefinitionSupportedTextType) => {
     if (typeof s !== "string") {
       return PropertyInvalidReason.INVALID_VALUE;
     }

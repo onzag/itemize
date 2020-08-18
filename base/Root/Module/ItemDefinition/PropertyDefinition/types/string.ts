@@ -16,7 +16,7 @@ import {
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
-import { PropertyInvalidReason } from "../../PropertyDefinition";
+import { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import {
   MAX_STRING_LENGTH,
   CLASSIC_BASE_I18N,
@@ -138,13 +138,15 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
   nullableDefault: "",
   supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
-  // validates just the length
-  validate: (s: PropertyDefinitionSupportedStringType, subtype: string) => {
+
+  validate: (s: PropertyDefinitionSupportedStringType, p: IPropertyDefinitionRawJSONDataType) => {
     if (typeof s !== "string") {
       return PropertyInvalidReason.INVALID_VALUE;
     } else if (s.length > MAX_STRING_LENGTH) {
       return PropertyInvalidReason.TOO_LARGE;
     }
+
+    const subtype = p.subtype;
 
     if (subtype === "email" && !EMAIL_REGEX.test(s)) {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;

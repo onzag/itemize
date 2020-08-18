@@ -1189,10 +1189,22 @@ async function getI18nPropertyData(
       property.type === "currency" ||
       property.type === "integer" ||
       property.type === "year" ||
-      property.type === "unit"
+      property.type === "unit" ||
+      property.pattern
     ) && !property.values
   ) {
     errorRequiredProperties.push("error.INVALID_VALUE");
+  }
+
+  if (property.pattern) {
+    try {
+      new RegExp(property.pattern);
+    } catch {
+      throw new CheckUpError(
+        `Invalid pattern ${JSON.stringify(property.pattern)}`,
+        traceback.newTraceToBit("pattern"),
+      );
+    }
   }
 
   // if a minlenght is specified in the property it means

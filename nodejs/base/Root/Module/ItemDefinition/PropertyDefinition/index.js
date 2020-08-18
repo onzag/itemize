@@ -110,6 +110,7 @@ async function clientSideIndexChecker(itemDefinition, include, property, value, 
         return true;
     }
 }
+const CACHED_REGEXP = {};
 /**
  * The property definition class that defines how properties
  * are to be defined
@@ -271,10 +272,19 @@ class PropertyDefinition {
                 return PropertyInvalidReason.INVALID_VALUE;
             }
         }
+        if (propertyDefinitionRaw.pattern && typeof value === "string") {
+            const regxp = CACHED_REGEXP[propertyDefinitionRaw.pattern] || new RegExp(propertyDefinitionRaw.pattern);
+            if (!CACHED_REGEXP[propertyDefinitionRaw.pattern]) {
+                CACHED_REGEXP[propertyDefinitionRaw.pattern] = regxp;
+            }
+            if (!regxp.test(value)) {
+                return PropertyInvalidReason.INVALID_VALUE;
+            }
+        }
         // if we have a validate function
         if (definition.validate) {
             // run it
-            const invalidReason = definition.validate(value, propertyDefinitionRaw.subtype);
+            const invalidReason = definition.validate(value, propertyDefinitionRaw);
             // if it gives an invalid reason
             if (invalidReason) {
                 // return it

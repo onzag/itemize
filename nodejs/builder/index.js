@@ -732,8 +732,17 @@ async function getI18nPropertyData(rawDataConfig, actualLocation, property, sear
         property.type === "currency" ||
         property.type === "integer" ||
         property.type === "year" ||
-        property.type === "unit") && !property.values) {
+        property.type === "unit" ||
+        property.pattern) && !property.values) {
         errorRequiredProperties.push("error.INVALID_VALUE");
+    }
+    if (property.pattern) {
+        try {
+            new RegExp(property.pattern);
+        }
+        catch {
+            throw new Error_1.default(`Invalid pattern ${JSON.stringify(property.pattern)}`, traceback.newTraceToBit("pattern"));
+        }
     }
     // if a minlenght is specified in the property it means
     // that a too small value must exist, eg. a min len of 2

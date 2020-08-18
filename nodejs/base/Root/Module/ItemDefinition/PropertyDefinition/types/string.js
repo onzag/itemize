@@ -104,14 +104,14 @@ const typeValue = {
     localEqual: local_sql_1.standardLocalEqual,
     nullableDefault: "",
     supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
-    // validates just the length
-    validate: (s, subtype) => {
+    validate: (s, p) => {
         if (typeof s !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }
         else if (s.length > constants_1.MAX_STRING_LENGTH) {
             return PropertyDefinition_1.PropertyInvalidReason.TOO_LARGE;
         }
+        const subtype = p.subtype;
         if (subtype === "email" && !EMAIL_REGEX.test(s)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
         }

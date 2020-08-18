@@ -8,7 +8,7 @@
 import { GraphQLOutputType } from "graphql";
 import { IGQLFieldsDefinitionType } from "../../../../gql";
 import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../../sql";
-import PropertyDefinition, { PropertyInvalidReason } from "../../PropertyDefinition";
+import PropertyDefinition, { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import { PropertyDefinitionSupportedBooleanType } from "./boolean";
 import { PropertyDefinitionSupportedNumberType } from "./number";
 import { PropertyDefinitionSupportedStringType } from "./string";
@@ -263,7 +263,7 @@ export interface IPropertyDefinitionSupportedType {
      * this is a validation function that checks whether the value
      * is valid,
      */
-    validate?: (value: PropertyDefinitionSupportedType, subtype?: string) => PropertyInvalidReason;
+    validate?: (value: PropertyDefinitionSupportedType, p: IPropertyDefinitionRawJSONDataType) => PropertyInvalidReason;
     /**
      * whether it is searchable or not
      */

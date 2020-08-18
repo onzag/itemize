@@ -26,6 +26,7 @@ import { EndpointError } from "../base/errors";
 import { logger, PkgCloudContainers, IServerDataType } from ".";
 
 const CACHE_EXPIRES_DAYS = 14;
+const MEMCACHE_EXPIRES_MS = 1000;
 
 /**
  * The cache class that provides all the functionality that is
@@ -40,6 +41,11 @@ export class Cache {
   private root: Root;
   private serverData: IServerDataType;
   private listener: Listener;
+  private memoryCache: {
+    [key: string]: {
+      value: ISQLTableRowValue
+    };
+  }
 
   /**
    * Builds a new cache instance, before the cache is ready
@@ -838,15 +844,24 @@ export class Cache {
    * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
    * @param id the id to request for
    * @param version the version
-   * @param refresh whether to skip the cache and request directly from the database and update the cache
+   * @param options.refresh whether to skip the cache and request directly from the database and update the cache
+   * @param options.useMemoryCache a total opposite of refresh, (do not use together as refresh beats this one)
+   * which will use a 1 second memory cache to retrieve values and store them, use this if you think the value
+   * might be used consecutively and you don't care about accuraccy that much
    * @returns a whole sql value that can be converted into graphql if necessary
    */
   public async requestValue(
     itemDefinition: ItemDefinition | [string, string],
     id: number,
     version: string,
-    refresh?: boolean,
+    options?: {
+      refresh?: boolean,
+      useMemoryCache?: boolean,
+    },
   ): Promise<ISQLTableRowValue> {
+    const refresh = options && options.refresh;
+    const memCache = options && options.useMemoryCache;
+
     const idefTable = Array.isArray(itemDefinition) ?
       itemDefinition[0] : itemDefinition.getQualifiedPathName();
     const moduleTable = Array.isArray(itemDefinition) ?
@@ -859,8 +874,17 @@ export class Cache {
 
     if (!refresh) {
       const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+      if (memCache && this.memoryCache[idefQueryIdentifier]) {
+        return this.memoryCache[idefQueryIdentifier].value;
+      }
       const currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
       if (currentValue) {
+        if (memCache) {
+          this.memoryCache[idefQueryIdentifier] = currentValue;
+          setTimeout(() => {
+            delete this.memoryCache[idefQueryIdentifier];
+          }, MEMCACHE_EXPIRES_MS);
+        }
         return currentValue.value;
       }
     }
@@ -880,6 +904,17 @@ export class Cache {
       }) || null);
       // we don't wait for this
       this.forceCacheInto(idefTable, id, version, queryValue);
+
+      if (memCache) {
+        const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+        this.memoryCache[idefQueryIdentifier] = {
+          value: queryValue,
+        };
+        setTimeout(() => {
+          delete this.memoryCache[idefQueryIdentifier];
+        }, MEMCACHE_EXPIRES_MS);
+      }
+
       return queryValue;
     } catch (err) {
       logger.error(
@@ -930,7 +965,7 @@ export class Cache {
    * @param version the version or null
    * @param data the entire SQL result
    */
-  public onChangeInformed(itemDefinition: string, id: number, version: string, data: ISQLTableRowValue) {
+  public onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
     // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
     // and expire and as so we only want to update values that exist already there
@@ -950,7 +985,9 @@ export class Cache {
             this.root.registry[itemDefinition] as ItemDefinition,
             id,
             version,
-            true,
+            {
+              refresh: true,
+            },
           );
         } else {
           // if we have such a value we want to update it

@@ -86,7 +86,7 @@ function restServices(appData) {
         }
         // let's pass it over the validate function
         if (definition.validate) {
-            const invalidReason = definition.validate(value, property.getSubtype());
+            const invalidReason = definition.validate(value, property.rawData);
             // if the property definition complains
             if (invalidReason) {
                 res.status(400);

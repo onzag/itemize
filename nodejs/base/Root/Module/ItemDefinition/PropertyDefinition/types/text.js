@@ -92,7 +92,7 @@ const typeValue = {
         return 0;
     },
     // validates the text, texts don't support json value
-    validate: (s, subtype) => {
+    validate: (s) => {
         if (typeof s !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
         }

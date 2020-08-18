@@ -106,12 +106,19 @@ class PropertyEntryReference extends react_1.default.Component {
         Object.keys(propertySet).forEach((pId) => {
             // we try to get the property for the given id from the target
             // item definition as that is what we are setting in the search
-            const property = idef.getPropertyDefinitionFor(pId, true);
-            // we need then the conversion id for that specific target
-            const conversionIds = search_mode_1.getConversionIds(property.rawData);
-            // now the applicatble id that we will use to search, this is in the target
-            // eg. EXACT_username or SEARCH_username
-            const applicableId = conversionIds[0];
+            const property = idef.hasPropertyDefinitionFor(pId, true) && idef.getPropertyDefinitionFor(pId, true);
+            // now we need the applicable id we will be using for search
+            let applicableId;
+            if (property) {
+                // we need then the conversion id for that specific target
+                const conversionIds = search_mode_1.getConversionIds(property.rawData);
+                // now the applicatble id that we will use to search, this is in the target
+                // eg. EXACT_username or SEARCH_username
+                applicableId = conversionIds[0];
+            }
+            else {
+                applicableId = pId;
+            }
             // now the value we will use will depend on the type of condition we have here
             const valueToUse = propertySet[pId];
             // if it's an exact value we just paste it in the arg
