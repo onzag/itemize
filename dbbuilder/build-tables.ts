@@ -63,12 +63,21 @@ export async function addMissingColumnToTable(
       console.log(updateQuery.toString());
       await updateQuery;
       if (await yesno("Do you want to set a default value for this newly added column?")) {
-        const updateValue = await fastRead({
-          prompt: "? = ",
-          default: "NULL",
-        });
+        let lastReadAttemptFailed = true;
+        let updateValue: any;
+        while (lastReadAttemptFailed) {
+          try {
+            updateValue = JSON.parse((await fastRead({
+              prompt: "? = ",
+              default: "null",
+            })).result);
+            lastReadAttemptFailed = false;
+          } catch (err) {
+            console.log(colors.yellow("Failed to read json value"));
+          }
+        }
         await knex.update({
-          [newColumnName]: knex.raw("?", updateValue),
+          [newColumnName]: updateValue,
         }).table(tableName);
       }
       return newColumnSchema;

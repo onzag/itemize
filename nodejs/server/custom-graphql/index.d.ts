@@ -5,7 +5,6 @@ export interface IReferredTokenStructure {
     withRole: string;
     expiresIn?: string;
     customData?: any;
-    isRealUser?: boolean;
     error?: string;
 }
 export interface ICustomTokenGQLQueryDefinition {

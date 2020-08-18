@@ -38,7 +38,7 @@ function buildCustomTokenQueries(appData, customTokens) {
                 if (value.customData) {
                     dataToSign.customData = value.customData;
                 }
-                if (value.isRealUser) {
+                if (value.onBehalfOf) {
                     dataToSign.isRealUser = true;
                     const sqlResult = await appData.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], value.onBehalfOf, null);
                     dataToSign.sessionId = sqlResult.sessionId;

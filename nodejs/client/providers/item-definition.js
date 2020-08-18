@@ -57,15 +57,60 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
         this.isMounted = false;
+        /**
+         * Because sometimes functions for listeners run while the thing
+         * is mounting, but we haven't mounted yet, we use these callbacks
+         * to store these callbacks for the listeners; this happens
+         * because the willUnmount of another item definition might trigger
+         * a change event while this instance is mounting, during cleanup
+         */
         this.mountCbFns = [];
+        /**
+         * Because the listener might be triggered during a mount cb and this
+         * will not change the state, automatic search might not trigger on mount
+         * as it sees the previous state, so with this, we might now if the
+         * search id was changed and for what, and trigger automatic search
+         */
+        this.changedSearchListenerLastCollectedSearchId = null;
         this.initialAutomaticNextSearch = false;
+        /**
+         * this is a hack variable, when the server
+         * sends a reload event for a search and that causes
+         * the cache worker to add such a value to the list
+         * that it considered to be added, and then this
+         * causes this instance to call for an update
+         * and the search needs to be reloaded
+         * however the server has already specified how the data
+         * is meant to update, but launching this as it is, will
+         * cause the client to check because it considers that the
+         * data might be stale because it got the data from the
+         * cache worker, but we had updated this data a couple of microseconds
+         * earlier so we make this hack variable to prevent asking for
+         * feedback as we already got feedback
+         *
+         * Check the on search reload function where it is set and then
+         * it's sent to the search querier so that feedback
+         * is not requested
+         */
         this.preventSearchFeedbackOnPossibleStaleData = false;
+        /**
+         * During loading both the id and version might be suddenly hot
+         * updated before the server had time to reply this ensures
+         * that we will only apply the value for the last loading
+         * value and not overwrite if we have changed such value hot
+         */
         this.lastLoadingForId = null;
         this.lastLoadingForVersion = null;
+        /**
+         * Some functons such as submit, on property change
+         * events where we request new values for the
+         * properties need to wait for loading to be done
+         * with these promises we can await for the last loading
+         * event
+         */
         this.lastLoadValuePromise = null;
         this.lastLoadValuePromiseIsResolved = true;
         this.lastLoadValuePromiseResolve = null;
-        this.listenersReady = false;
         // the list of submit block promises
         this.submitBlockPromises = [];
         // Just binding all the functions to ensure their context is defined
@@ -76,6 +121,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.loadValue = this.loadValue.bind(this);
         this.delete = this.delete.bind(this);
         this.changeListener = this.changeListener.bind(this);
+        this.changeSearchListener = this.changeSearchListener.bind(this);
         this.reloadListener = this.reloadListener.bind(this);
         this.submit = this.submit.bind(this);
         this.dismissLoadError = this.dismissLoadError.bind(this);
@@ -182,6 +228,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             const state = internalState.state;
             this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, state);
         }
+        if (this.props.loadSearchFromNavigation) {
+            const loadedSearchState = this.loadSearch(true, searchState.searchId);
+            if (loadedSearchState) {
+                searchState = loadedSearchState;
+            }
+        }
         // so the initial setup
         return {
             // same we get the initial state, without checking it externally and passing
@@ -274,7 +326,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
         }
-        if (this.props.automaticSearch && !this.state.searchId) {
+        // the search listener might have triggered during the mount callback,
+        // which means this function won't see the new state and won't trigger
+        // automatic search so we use this variable to check it
+        const searchIdToCheckAgainst = this.changedSearchListenerLastCollectedSearchId ?
+            this.changedSearchListenerLastCollectedSearchId.id : this.state.searchId;
+        if (this.props.automaticSearch && !searchIdToCheckAgainst) {
             this.initialAutomaticNextSearch = true;
             this.search(this.props.automaticSearch);
         }
@@ -290,6 +347,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     setupListeners() {
         /// first the change listener that checks for every change event that happens with the state
         this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+        // the search change listener
+        if (this.props.itemDefinitionInstance.isInSearchMode()) {
+            this.props.itemDefinitionInstance.addListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
+        }
         // second are the remote listeners, only when there's an id defined
         if (this.props.forId && !this.props.static) {
             // one is the reload, this gets called when the value of the field has differed from the one that
@@ -305,12 +366,14 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // as it will send data either via HTTP or websockets
             this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
         }
-        this.listenersReady = true;
     }
     unSetupListeners() {
         this.removePossibleSearchListeners();
         // here we just remove the listeners that we have setup
         this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+        if (this.props.itemDefinitionInstance.isInSearchMode()) {
+            this.props.itemDefinitionInstance.removeListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
+        }
         if (this.props.forId && !this.props.static) {
             // remove all the remote listeners
             this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.props.forVersion || null, this.reloadListener);
@@ -413,6 +476,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 uniqueIDChanged) {
                 // we need to remove the old listeners
                 prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, prevProps.forVersion || null, this.changeListener);
+                if (prevProps.itemDefinitionInstance.isInSearchMode()) {
+                    prevProps.itemDefinitionInstance.removeListener("search-change", prevProps.forId || null, prevProps.forVersion || null, this.changeSearchListener);
+                }
                 // we only remove this listeners if we haven't done it before for other reasons
                 if (prevProps.forId && !wasStatic && !alreadyRemovedRemoteListeners) {
                     prevProps.itemDefinitionInstance.removeListener("reload", prevProps.forId, prevProps.forVersion || null, this.reloadListener);
@@ -420,6 +486,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 }
                 // add the new listeners
                 this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+                if (this.props.itemDefinitionInstance.isInSearchMode()) {
+                    this.props.itemDefinitionInstance.addListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
+                }
                 if (this.props.forId && !isStatic && !alreadyAddedRemoteListeners) {
                     this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.props.forVersion || null, this.reloadListener);
                     this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
@@ -500,6 +569,41 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (!this.props.avoidLoading) {
             this.loadValue(true);
         }
+    }
+    changeSearchListener() {
+        if (this.isUnmounted) {
+            return;
+        }
+        else if (!this.isMounted) {
+            if (this.mountCbFns.indexOf(this.changeSearchListener) === -1) {
+                this.mountCbFns.push(this.changeSearchListener);
+            }
+            return;
+        }
+        let searchState = {
+            searchError: null,
+            searching: false,
+            searchResults: null,
+            searchRecords: null,
+            searchLimit: null,
+            searchOffset: null,
+            searchCount: null,
+            searchId: null,
+            searchOwner: null,
+            searchParent: null,
+            searchShouldCache: false,
+            searchFields: null,
+            searchRequestedIncludes: [],
+            searchRequestedProperties: [],
+        };
+        const internalState = this.props.itemDefinitionInstance.getInternalState(this.props.forId || null, this.props.forVersion || null);
+        if (internalState) {
+            searchState = internalState.searchState;
+        }
+        this.changedSearchListenerLastCollectedSearchId = {
+            id: searchState.searchId
+        };
+        this.setState(searchState);
     }
     changeListener() {
         if (this.isUnmounted) {
@@ -780,12 +884,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
     }
     onPropertyChangeOrRestoreFinal() {
-        // sometimes this gets called while did mount is happening
-        // and our own listeners are not ready, most notably
-        // with the initialPrefill
-        if (!this.listenersReady) {
-            this.changeListener();
-        }
         // trigger the listeners for change so everything updates nicely
         this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -1107,6 +1205,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             }
         }
         let needsUpdate = false;
+        let needsSearchUpdate = false;
         // CLEANING PROPERTIES
         const cleanupPropertyFn = (ptc) => {
             props.itemDefinitionInstance
@@ -1194,11 +1293,15 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (options.cleanSearchResultsOnAny ||
             options.cleanSearchResultsOnFailure && state === "fail" ||
             options.cleanSearchResultsOnSuccess && state === "success") {
+            needsSearchUpdate = true;
             props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
         }
         // NOw we check if we need an update in the listeners and if we are allowed to trigger it
         if (needsUpdate && !avoidTriggeringUpdate) {
             props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
+        }
+        if (needsSearchUpdate && !avoidTriggeringUpdate) {
+            props.itemDefinitionInstance.triggerListeners("search-change", props.forId || null, props.forVersion || null);
         }
     }
     async submit(options) {
@@ -1375,11 +1478,14 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             error,
         };
     }
-    loadSearch() {
+    loadSearch(doNotUseState, currentSearchId) {
         const searchId = (this.props.location.state &&
             this.props.location.state[this.props.loadSearchFromNavigation] &&
             this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null;
-        if (searchId === this.state.searchId) {
+        if (doNotUseState ? searchId === currentSearchId : searchId === this.state.searchId) {
+            if (doNotUseState) {
+                return null;
+            }
             return;
         }
         const mustClear = !searchId;
@@ -1391,6 +1497,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null, true);
         }
         const searchState = mustClear ? null : this.props.location.state[this.props.loadSearchFromNavigation].searchState;
+        if (doNotUseState) {
+            return searchState;
+        }
         this.setState({
             itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
                 getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
@@ -1681,6 +1790,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             }
             this.cleanWithProps(this.props, options, "success");
         }
+        this.props.itemDefinitionInstance.triggerListeners("search-change", this.props.forId, this.props.forVersion, this.changeSearchListener);
         return {
             searchId,
             results,
@@ -1740,6 +1850,15 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         });
     }
     onSearchReload() {
+        // this function is called when remotely the search
+        // is said to update, and it needs to be reloaded
+        // however the server has already specified how the data
+        // is meant to update, but launching this as it is, will
+        // cause the client to check because it considers that the
+        // data might be stale because it got the data from the
+        // cache worker, but we had updated this data a couple of microseconds
+        // earlier so we make this hack variable to prevent asking for
+        // feedback as we already got feedback
         this.preventSearchFeedbackOnPossibleStaleData = true;
         this.search(this.lastOptionsUsedForSearch);
     }

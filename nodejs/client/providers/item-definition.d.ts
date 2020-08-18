@@ -355,15 +355,60 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
     private isMounted;
+    /**
+     * Because sometimes functions for listeners run while the thing
+     * is mounting, but we haven't mounted yet, we use these callbacks
+     * to store these callbacks for the listeners; this happens
+     * because the willUnmount of another item definition might trigger
+     * a change event while this instance is mounting, during cleanup
+     */
     private mountCbFns;
+    /**
+     * Because the listener might be triggered during a mount cb and this
+     * will not change the state, automatic search might not trigger on mount
+     * as it sees the previous state, so with this, we might now if the
+     * search id was changed and for what, and trigger automatic search
+     */
+    private changedSearchListenerLastCollectedSearchId;
     private initialAutomaticNextSearch;
+    /**
+     * this is a hack variable, when the server
+     * sends a reload event for a search and that causes
+     * the cache worker to add such a value to the list
+     * that it considered to be added, and then this
+     * causes this instance to call for an update
+     * and the search needs to be reloaded
+     * however the server has already specified how the data
+     * is meant to update, but launching this as it is, will
+     * cause the client to check because it considers that the
+     * data might be stale because it got the data from the
+     * cache worker, but we had updated this data a couple of microseconds
+     * earlier so we make this hack variable to prevent asking for
+     * feedback as we already got feedback
+     *
+     * Check the on search reload function where it is set and then
+     * it's sent to the search querier so that feedback
+     * is not requested
+     */
     private preventSearchFeedbackOnPossibleStaleData;
+    /**
+     * During loading both the id and version might be suddenly hot
+     * updated before the server had time to reply this ensures
+     * that we will only apply the value for the last loading
+     * value and not overwrite if we have changed such value hot
+     */
     private lastLoadingForId;
     private lastLoadingForVersion;
+    /**
+     * Some functons such as submit, on property change
+     * events where we request new values for the
+     * properties need to wait for loading to be done
+     * with these promises we can await for the last loading
+     * event
+     */
     private lastLoadValuePromise;
     private lastLoadValuePromiseIsResolved;
     private lastLoadValuePromiseResolve;
-    private listenersReady;
     static getDerivedStateFromProps(props: IActualItemDefinitionProviderProps, state: IActualItemDefinitionProviderState): Partial<IActualItemDefinitionProviderState>;
     private updateTimeout;
     private lastUpdateId;
@@ -381,6 +426,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     shouldComponentUpdate(nextProps: IActualItemDefinitionProviderProps, nextState: IActualItemDefinitionProviderState): boolean;
     componentDidUpdate(prevProps: IActualItemDefinitionProviderProps, prevState: IActualItemDefinitionProviderState): Promise<void>;
     reloadListener(): void;
+    changeSearchListener(): void;
     changeListener(): void;
     loadValue(denyCache?: boolean): Promise<IActionResponseWithValue>;
     loadValueCompleted(value: ILoadCompletedPayload): IActionResponseWithValue;
@@ -404,7 +450,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     clean(options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     cleanWithProps(props: IActualItemDefinitionProviderProps, options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
-    loadSearch(): void;
+    loadSearch(doNotUseState?: boolean, currentSearchId?: string): any;
     search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;
     dismissLoadError(): void;
     dismissDeleteError(): void;

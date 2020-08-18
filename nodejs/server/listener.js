@@ -392,7 +392,7 @@ class Listener {
             else {
                 mod = itemDefinitionOrModule;
             }
-            const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, constants_1.UNSPECIFIED_OWNER, {}, false);
+            const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, request.createdBy, {}, false);
             if (!hasAccess) {
                 _1.logger.debug("Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
                     " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName);

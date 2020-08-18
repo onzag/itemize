@@ -4,13 +4,13 @@ import TOKEN_OBJECT from "./graphql-token-object";
 import { EndpointError } from "../../base/errors";
 import { jwtSign } from "../token";
 import { ENDPOINT_ERRORS } from "../../constants";
+import { IServerSideTokenDataType } from "../../server/resolvers/basic";
 
 export interface IReferredTokenStructure {
   onBehalfOf?: number;
   withRole: string;
   expiresIn?: string;
   customData?: any;
-  isRealUser?: boolean;
   error?: string;
 }
 
@@ -57,7 +57,7 @@ export function buildCustomTokenQueries(
           options.expiresIn = value.expiresIn;
         }
 
-        const dataToSign: any = {
+        const dataToSign: IServerSideTokenDataType = {
           role: value.withRole,
           id: value.onBehalfOf || null,
           custom: true,
@@ -67,7 +67,7 @@ export function buildCustomTokenQueries(
           dataToSign.customData = value.customData;
         }
 
-        if (value.isRealUser) {
+        if (value.onBehalfOf) {
           dataToSign.isRealUser = true;
 
           const sqlResult = await appData.cache.requestValue(

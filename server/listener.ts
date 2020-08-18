@@ -647,7 +647,7 @@ export class Listener {
         ItemDefinitionIOActions.READ,
         listenerData.user.role,
         listenerData.user.id,
-        UNSPECIFIED_OWNER,
+        request.createdBy,
         {},
         false,
       )

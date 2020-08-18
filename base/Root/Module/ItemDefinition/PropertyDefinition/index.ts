@@ -18,6 +18,7 @@ import {
   UNSPECIFIED_OWNER,
   LAST_RICH_TEXT_CHANGE_LENGTH,
   MAX_RAW_TEXT_LENGTH,
+  ANYONE_LOGGED_METAROLE,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -1454,13 +1455,19 @@ export default class PropertyDefinition {
 
     const mergedID = id + "." + (version || "");
     this.stateSuperEnforcedValue[mergedID] = actualValue;
-
+    
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";
     const mergedIDWithoutExternal2 = mergedID + ".f";
     delete this.stateLastCachedWithExternal[mergedID];
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
+
+    if (this.stateValue[mergedID] !== actualValue) {
+      this.listeners.forEach((listener) => {
+        listener(id || null, version || null, actualValue);
+      });
+    }
   }
 
   /**
@@ -1473,6 +1480,7 @@ export default class PropertyDefinition {
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
+    const deletedValue = this.stateSuperEnforcedValue[mergedID];
     delete this.stateSuperEnforcedValue[mergedID];
 
     // clean cached values
@@ -1481,6 +1489,12 @@ export default class PropertyDefinition {
     delete this.stateLastCachedWithExternal[mergedID];
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
+
+    if (this.stateValue[mergedID] !== deletedValue) {
+      this.listeners.forEach((listener) => {
+        listener(id || null, version || null, this.stateValue[mergedID]);
+      });
+    }
   }
 
   /**
@@ -2120,6 +2134,8 @@ export default class PropertyDefinition {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // so if ANYONE_METAROLE is included we have access
     const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+    ) || (
       // or if OWNER_METAROLE is included and our user matches our owner user
       // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
       // because null === null in the case of eg. GUEST_METAROLE
