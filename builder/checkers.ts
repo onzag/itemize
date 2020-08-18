@@ -910,6 +910,16 @@ export function checkPropertyDefinition(
     }
   }
 
+  if (rawData.searchInvalidIf) {
+    const possiblyBrokenErrorIndex = rawData.searchInvalidIf.findIndex((ii) => PropertyInvalidReason[ii.error]);
+    if (possiblyBrokenErrorIndex !== -1) {
+      throw new CheckUpError(
+        `cannot use searchInvalidIf using a builtin error as name '${rawData.searchInvalidIf[possiblyBrokenErrorIndex].error}'`,
+        traceback.newTraceToBit("searchInvalidIf").newTraceToBit(possiblyBrokenErrorIndex).newTraceToBit("error"),
+      );
+    }
+  }
+
   // check special properties are set
   if (propertyDefintionTypeStandard.specialProperties) {
     propertyDefintionTypeStandard.specialProperties.forEach((property) => {

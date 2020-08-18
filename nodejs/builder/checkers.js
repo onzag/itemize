@@ -591,6 +591,12 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
             throw new Error_1.default(`cannot use invalidIf using a builtin error as name '${rawData.invalidIf[possiblyBrokenErrorIndex].error}'`, traceback.newTraceToBit("invalidIf").newTraceToBit(possiblyBrokenErrorIndex).newTraceToBit("error"));
         }
     }
+    if (rawData.searchInvalidIf) {
+        const possiblyBrokenErrorIndex = rawData.searchInvalidIf.findIndex((ii) => PropertyDefinition_1.PropertyInvalidReason[ii.error]);
+        if (possiblyBrokenErrorIndex !== -1) {
+            throw new Error_1.default(`cannot use searchInvalidIf using a builtin error as name '${rawData.searchInvalidIf[possiblyBrokenErrorIndex].error}'`, traceback.newTraceToBit("searchInvalidIf").newTraceToBit(possiblyBrokenErrorIndex).newTraceToBit("error"));
+        }
+    }
     // check special properties are set
     if (propertyDefintionTypeStandard.specialProperties) {
         propertyDefintionTypeStandard.specialProperties.forEach((property) => {

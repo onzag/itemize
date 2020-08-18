@@ -53,7 +53,7 @@ const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%",
  */
 export type PropertyDefinitionSupportedStringType = string;
 
-export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
+export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier"];
 
 /**
  * The behaviour of strings is described by this type
@@ -137,7 +137,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localEqual: standardLocalEqual,
 
   nullableDefault: "",
-  supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
+  supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role"],
 
   validate: (s: PropertyDefinitionSupportedStringType, p: IPropertyDefinitionRawJSONDataType) => {
     if (typeof s !== "string") {
@@ -152,7 +152,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
     }
 
-    if (subtype === "identifier") {
+    if (subtype === "identifier" || subtype === "exact-identifier") {
       const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);
       if (containsOneOfThose) {
         return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
@@ -202,8 +202,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     optional: CLASSIC_OPTIONAL_I18N,
     searchBase: CLASSIC_SEARCH_BASE_I18N,
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    tooLargeErrorInclude: [null, "email", "identifier"],
-    invalidSubtypeErrorInclude: true,
+    tooLargeErrorInclude: [null, "email", "identifier", "exact-identifier"],
+    invalidSubtypeErrorInclude: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
   },
 };
 export default typeValue;

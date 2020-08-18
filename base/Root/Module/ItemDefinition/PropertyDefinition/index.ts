@@ -182,6 +182,10 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   invalidIf?: IPropertyDefinitionRawJSONInvalidRuleDataType[];
   /**
+   * conditional custom invalid value in search only
+   */
+  searchInvalidIf?: IPropertyDefinitionRawJSONInvalidRuleDataType[];
+  /**
    * enforced values
    */
   enforcedValues?: IPropertyDefinitionRawJSONRuleDataType[];
@@ -1596,6 +1600,8 @@ export default class PropertyDefinition {
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
    * to false as it's been used applyValue on it, it's been set now by the computer
+   * @param rejectStateAppliedValue does not make the value as a state applied, this is used
+   * by the item definition apply state function to apply a new state
    */
   public applyValue(
     id: number,
@@ -1686,13 +1692,20 @@ export default class PropertyDefinition {
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
-    this.applyValue(
-      id,
-      version,
-      this.stateAppliedValue[mergedID] || null,
-      true,
-      false,
-    );
+
+    // if we have a state applied value we can restore for it
+    if (typeof this.stateAppliedValue[mergedID] !== "undefined") {
+      this.applyValue(
+        id,
+        version,
+        this.stateAppliedValue[mergedID],
+        true,
+        false,
+      );
+    // otherwise restoring is literally clearing
+    } else {
+      this.cleanValueFor(id, version);
+    }
   }
 
   /**

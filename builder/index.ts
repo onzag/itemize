@@ -1140,7 +1140,9 @@ async function getI18nPropertyData(
       }] : []
     )
     .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
-      .map((b) => ({key: "error." + b, required: true})));
+      .map((b) => ({key: "error." + b, required: true})))
+    .concat((property.searchInvalidIf && !property.hidden ? property.searchInvalidIf.map((ii) => ii.error) : [])
+      .map((b) => ({key: "error." + b, required: true})));;
 
   const errorRequiredProperties = [];
   if (!property.nullable && property.type !== "boolean") {

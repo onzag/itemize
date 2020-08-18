@@ -122,9 +122,21 @@ exports.default = {
                 additionalProperties: false,
                 required: ["value", "if"],
             },
-            minItems: 1,
         },
-        searchDefaultIf: {},
+        searchDefaultIf: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    if: {
+                        $ref: "ConditionalRuleSet",
+                    },
+                    value: {},
+                },
+                additionalProperties: false,
+                required: ["value", "if"],
+            },
+        },
         invalidIf: {
             type: "array",
             items: {
@@ -141,7 +153,23 @@ exports.default = {
                 additionalProperties: false,
                 required: ["error", "if"],
             },
-            minItems: 1,
+        },
+        searchInvalidIf: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    if: {
+                        $ref: "ConditionalRuleSet",
+                    },
+                    error: {
+                        type: "string",
+                        pattern: "^[A-Z_]+$",
+                    },
+                },
+                additionalProperties: false,
+                required: ["error", "if"],
+            },
         },
         enforcedValues: {
             type: "array",
@@ -156,7 +184,6 @@ exports.default = {
                 additionalProperties: false,
                 required: ["value", "if"],
             },
-            minItems: 1,
         },
         nullIfHidden: {
             type: "boolean",

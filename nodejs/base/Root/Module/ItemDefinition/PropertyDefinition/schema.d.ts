@@ -103,9 +103,21 @@ declare const _default: {
                 additionalProperties: boolean;
                 required: string[];
             };
-            minItems: number;
         };
-        searchDefaultIf: {};
+        searchDefaultIf: {
+            type: string;
+            items: {
+                type: string;
+                properties: {
+                    if: {
+                        $ref: string;
+                    };
+                    value: {};
+                };
+                additionalProperties: boolean;
+                required: string[];
+            };
+        };
         invalidIf: {
             type: string;
             items: {
@@ -122,7 +134,23 @@ declare const _default: {
                 additionalProperties: boolean;
                 required: string[];
             };
-            minItems: number;
+        };
+        searchInvalidIf: {
+            type: string;
+            items: {
+                type: string;
+                properties: {
+                    if: {
+                        $ref: string;
+                    };
+                    error: {
+                        type: string;
+                        pattern: string;
+                    };
+                };
+                additionalProperties: boolean;
+                required: string[];
+            };
         };
         enforcedValues: {
             type: string;
@@ -137,7 +165,6 @@ declare const _default: {
                 additionalProperties: boolean;
                 required: string[];
             };
-            minItems: number;
         };
         nullIfHidden: {
             type: string;

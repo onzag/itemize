@@ -131,8 +131,8 @@ function buildSearchModePropertyDefinitions(rawData, otherKnownProperties) {
         }
     }
     // invalid if gets the same treatment
-    if (newPropDef.invalidIf) {
-        newPropDef.invalidIf = newPropDef.invalidIf.map((ii) => {
+    if (newPropDef.searchInvalidIf || newPropDef.invalidIf) {
+        newPropDef.invalidIf = (newPropDef.searchInvalidIf || newPropDef.invalidIf).map((ii) => {
             return {
                 error: ii.error,
                 if: search_mode_1.buildSearchModeConditionalRuleSet(ii.if, otherKnownProperties),

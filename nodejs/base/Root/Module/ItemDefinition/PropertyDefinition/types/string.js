@@ -29,7 +29,7 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
  * that can be used to build other stuff, and can make for confusing user identifiers
  */
 const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
-exports.exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency"];
+exports.exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier"];
 /**
  * The behaviour of strings is described by this type
  */
@@ -103,7 +103,7 @@ const typeValue = {
     },
     localEqual: local_sql_1.standardLocalEqual,
     nullableDefault: "",
-    supportedSubtypes: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
+    supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role"],
     validate: (s, p) => {
         if (typeof s !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;
@@ -115,7 +115,7 @@ const typeValue = {
         if (subtype === "email" && !EMAIL_REGEX.test(s)) {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
         }
-        if (subtype === "identifier") {
+        if (subtype === "identifier" || subtype === "exact-identifier") {
             const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);
             if (containsOneOfThose) {
                 return PropertyDefinition_1.PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
@@ -166,8 +166,8 @@ const typeValue = {
         optional: constants_1.CLASSIC_OPTIONAL_I18N,
         searchBase: constants_1.CLASSIC_SEARCH_BASE_I18N,
         searchOptional: constants_1.CLASSIC_SEARCH_OPTIONAL_I18N,
-        tooLargeErrorInclude: [null, "email", "identifier"],
-        invalidSubtypeErrorInclude: true,
+        tooLargeErrorInclude: [null, "email", "identifier", "exact-identifier"],
+        invalidSubtypeErrorInclude: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
     },
 };
 exports.default = typeValue;

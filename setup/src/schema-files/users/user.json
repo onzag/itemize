@@ -80,6 +80,7 @@
         {
             "id": "role",
             "type": "string",
+            "subtype": "role",
             "values": "$CONFIG:return config.roles;",
             "nullable": true,
             "default": "$CONFIG:if(config.roles.includes('USER')){return ['USER']}else{return config.roles[0]}",
