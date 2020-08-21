@@ -129,6 +129,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.dismissDeleteError = this.dismissSubmitError.bind(this);
         this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
         this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
+        this.onPropertyEnforceOrClearFinal = this.onPropertyEnforceOrClearFinal.bind(this);
         this.dismissSubmitted = this.dismissSubmitted.bind(this);
         this.dismissDeleted = this.dismissDeleted.bind(this);
         this.canEdit = this.canEdit.bind(this);
@@ -146,6 +147,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.injectSubmitBlockPromise = this.injectSubmitBlockPromise.bind(this);
         this.installSetters = this.installSetters.bind(this);
         this.removeSetters = this.removeSetters.bind(this);
+        this.installPrefills = this.installPrefills.bind(this);
+        // first we setup the listeners, this includes the on change listener that would make
+        // the entire app respond to actions, otherwise the fields might as well be disabled
+        // we do this here to avoid useless callback changes as the listeners are not ready
+        this.installSetters();
+        this.installPrefills();
         if (document) {
             this.setupListeners();
         }
@@ -315,13 +322,20 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             });
         }
     }
+    installPrefills(props = this.props) {
+        if (props.prefills) {
+            props.prefills.forEach((prefill) => {
+                const property = getPropertyForSetter(prefill, props.itemDefinitionInstance);
+                property.setCurrentValue(props.forId || null, props.forVersion || null, prefill.value, null);
+            });
+            props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+            props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
+        }
+    }
     // so now we have mounted, what do we do at the start
     componentDidMount() {
         this.isMounted = true;
         this.mountCbFns.forEach((c) => c());
-        // first we setup the listeners, this includes the on change listener that would make
-        // the entire app respond to actions, otherwise the fields might as well be disabled
-        this.installSetters();
         // now we retrieve the externally checked value
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
@@ -922,22 +936,29 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
         this.onPropertyChangeOrRestoreFinal();
     }
+    onPropertyEnforceOrClearFinal(givenForId, givenForVersion) {
+        this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, this.changeListener);
+        if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isMounted) {
+            this.search(this.props.automaticSearch);
+        }
+    }
     onPropertyEnforce(property, value, givenForId, givenForVersion, internal) {
         // this function is basically run by the setter
         // since they might be out of sync that's why the id is passed
         // the setter enforces values
         property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
-        this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
-        if (!internal && this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
-            this.search(this.props.automaticSearch);
+        if (!internal) {
+            this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
         }
     }
     onPropertyClearEnforce(property, givenForId, givenForVersion, internal) {
         // same but removes the enforcement
         property.clearSuperEnforced(givenForId || null, givenForVersion || null);
         this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
-        this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, internal ? null : this.changeListener);
+        if (!internal) {
+            this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
+        }
     }
     runDismountOn(props = this.props) {
         // when unmounting we check our optimization flags to see
@@ -1212,15 +1233,27 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 .getPropertyDefinitionFor(ptc, true).cleanValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.propertiesToCleanOnSuccess && state === "success") {
-            options.propertiesToCleanOnSuccess.forEach(cleanupPropertyFn);
+            let propertiesToClean = options.propertiesToCleanOnSuccess;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToClean.forEach(cleanupPropertyFn);
             needsUpdate = true;
         }
         if (options.propertiesToCleanOnAny) {
-            options.propertiesToCleanOnAny.forEach(cleanupPropertyFn);
+            let propertiesToClean = options.propertiesToCleanOnAny;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToClean.forEach(cleanupPropertyFn);
             needsUpdate = true;
         }
         if (options.propertiesToCleanOnFailure && state === "fail") {
-            options.propertiesToCleanOnFailure.forEach(cleanupPropertyFn);
+            let propertiesToClean = options.propertiesToCleanOnFailure;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToClean.forEach(cleanupPropertyFn);
             needsUpdate = true;
         }
         // RESTORING PROPERTIES
@@ -1229,15 +1262,27 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 .getPropertyDefinitionFor(ptr, true).restoreValueFor(props.forId || null, props.forVersion || null);
         };
         if (options.propertiesToRestoreOnSuccess && state === "success") {
-            options.propertiesToRestoreOnSuccess.forEach(restorePropertyFn);
+            let propertiesToRestore = options.propertiesToRestoreOnSuccess;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToRestore = getPropertyListForSearchMode(propertiesToRestore, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToRestore.forEach(restorePropertyFn);
             needsUpdate = true;
         }
         if (options.propertiesToRestoreOnAny) {
-            options.propertiesToRestoreOnAny.forEach(restorePropertyFn);
+            let propertiesToRestore = options.propertiesToRestoreOnAny;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToRestore = getPropertyListForSearchMode(propertiesToRestore, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToRestore.forEach(restorePropertyFn);
             needsUpdate = true;
         }
         if (options.propertiesToRestoreOnFailure && state === "fail") {
-            options.propertiesToRestoreOnFailure.forEach(restorePropertyFn);
+            let propertiesToRestore = options.propertiesToRestoreOnFailure;
+            if (props.itemDefinitionInstance.isInSearchMode()) {
+                propertiesToRestore = getPropertyListForSearchMode(propertiesToRestore, props.itemDefinitionInstance.getStandardCounterpart());
+            }
+            propertiesToRestore.forEach(restorePropertyFn);
             needsUpdate = true;
         }
         // CLEANING INCLUDES

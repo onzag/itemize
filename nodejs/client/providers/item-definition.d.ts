@@ -257,6 +257,12 @@ export interface IItemDefinitionProviderProps {
      */
     setters?: IPropertySetterProps[];
     /**
+     * Similar to setters but the values are just prefilled and as such are not
+     * readonly, prefills only get executed during the initial mount
+     * of the component
+     */
+    prefills?: IPropertySetterProps[];
+    /**
      * only downloads and includes the properties specified in the list
      * in the state
      */
@@ -420,6 +426,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     markForDestruction(): void;
     installSetters(props?: IActualItemDefinitionProviderProps): void;
     removeSetters(props?: IActualItemDefinitionProviderProps): void;
+    installPrefills(props?: IActualItemDefinitionProviderProps): void;
     componentDidMount(): void;
     setupListeners(): void;
     unSetupListeners(): void;
@@ -434,6 +441,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     onPropertyChangeOrRestoreFinal(): void;
     onPropertyRestore(property: PropertyDefinition): void;
     onPropertyChange(property: PropertyDefinition, value: PropertyDefinitionSupportedType, internalValue: any): Promise<void>;
+    onPropertyEnforceOrClearFinal(givenForId: number, givenForVersion: string): void;
     onPropertyEnforce(property: PropertyDefinition, value: PropertyDefinitionSupportedType, givenForId: number, givenForVersion: string, internal?: boolean): void;
     onPropertyClearEnforce(property: PropertyDefinition, givenForId: number, givenForVersion: string, internal?: boolean): void;
     runDismountOn(props?: IActualItemDefinitionProviderProps): void;
