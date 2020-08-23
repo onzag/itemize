@@ -186,7 +186,7 @@ export interface IItemDefinitionProviderProps {
     /**
      * children that will be feed into the context
      */
-    children: React.ReactNode;
+    children?: React.ReactNode;
     /**
      * mounting id, adding a mounting id ensures
      * that the on dismount functions are called
@@ -306,6 +306,22 @@ export interface IItemDefinitionProviderProps {
      * allows insertion of the parent context within the children
      */
     injectParentContext?: boolean;
+    /**
+     * callback triggers on search with the response
+     */
+    onSearch?: (data: IActionResponseWithSearchResults) => void;
+    /**
+     * Callback triggers on submit
+     */
+    onSubmit?: (data: IActionResponseWithId) => void;
+    /**
+     * Callback triggers on load
+     */
+    onLoad?: (data: IActionResponseWithValue) => void;
+    /**
+     * Callback triggers on delete
+     */
+    onDelete?: (data: IBasicActionResponse) => void;
 }
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
     tokenData: ITokenContextType;
@@ -415,6 +431,7 @@ export declare class ActualItemDefinitionProvider extends React.Component<IActua
     private lastLoadValuePromise;
     private lastLoadValuePromiseIsResolved;
     private lastLoadValuePromiseResolve;
+    private automaticSearchTimeout;
     static getDerivedStateFromProps(props: IActualItemDefinitionProviderProps, state: IActualItemDefinitionProviderState): Partial<IActualItemDefinitionProviderState>;
     private updateTimeout;
     private lastUpdateId;

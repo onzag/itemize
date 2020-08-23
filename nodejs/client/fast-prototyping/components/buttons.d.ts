@@ -79,7 +79,7 @@ interface ISubmitButtonProps extends IGenericButtonProps {
      * A function that triggers when it has submitted and gives the state of the
      * submit action
      */
-    onSubmit?: (status: IActionResponseWithId) => void;
+    onSubmit?: (status: IActionResponseWithId) => Promise<void>;
 }
 /**
  * Provides a very useful submit button that extends via the submit

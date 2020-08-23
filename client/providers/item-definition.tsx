@@ -348,7 +348,7 @@ export interface IItemDefinitionProviderProps {
   /**
    * children that will be feed into the context
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /**
    * mounting id, adding a mounting id ensures
    * that the on dismount functions are called
@@ -468,6 +468,22 @@ export interface IItemDefinitionProviderProps {
    * allows insertion of the parent context within the children
    */
   injectParentContext?: boolean;
+  /**
+   * callback triggers on search with the response
+   */
+  onSearch?: (data: IActionResponseWithSearchResults) => void;
+  /**
+   * Callback triggers on submit
+   */
+  onSubmit?: (data: IActionResponseWithId) => void;
+  /**
+   * Callback triggers on load
+   */
+  onLoad?: (data: IActionResponseWithValue) => void;
+  /**
+   * Callback triggers on delete
+   */
+  onDelete?: (data: IBasicActionResponse) => void;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -605,6 +621,8 @@ export class ActualItemDefinitionProvider extends
   private lastLoadValuePromise: Promise<void> = null;
   private lastLoadValuePromiseIsResolved: boolean = true;
   private lastLoadValuePromiseResolve: () => void = null;
+
+  private automaticSearchTimeout: NodeJS.Timer = null;
 
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
@@ -1065,6 +1083,10 @@ export class ActualItemDefinitionProvider extends
       !equals(this.props.setters, prevProps.setters) ||
       uniqueIDChanged ||
       itemDefinitionWasUpdated;
+    const didSomethingThatInvalidatedPrefills =
+      !equals(this.props.prefills, prevProps.prefills) ||
+      uniqueIDChanged ||
+      itemDefinitionWasUpdated;
 
     // if the mark for destruction has changed in a meaningful way
     // we recheck it
@@ -1083,12 +1105,17 @@ export class ActualItemDefinitionProvider extends
       this.installSetters();
     }
 
+    if (didSomethingThatInvalidatedPrefills) {
+      this.installPrefills();
+    }
+
     // now if the id changed, the optimization flags changed, or the item definition
     // itself changed
     if (
       itemDefinitionWasUpdated ||
       uniqueIDChanged ||
       didSomethingThatInvalidatedSetters ||
+      didSomethingThatInvalidatedPrefills ||
       !equals(prevProps.properties || [], this.props.properties || []) ||
       !equals(prevProps.includes || [], this.props.includes || []) ||
       !!prevProps.static !== !!this.props.static ||
@@ -1232,6 +1259,7 @@ export class ActualItemDefinitionProvider extends
         // that or the automatic search would be reexecuted
         itemDefinitionWasUpdated ||
         didSomethingThatInvalidatedSetters ||
+        didSomethingThatInvalidatedPrefills ||
         prevProps.tokenData.token !== this.props.tokenData.token
       )
     ) {
@@ -1451,6 +1479,8 @@ export class ActualItemDefinitionProvider extends
             );
           }
         }
+
+        this.props.onLoad && this.props.onLoad(completedValue);
         return completedValue;
       }
     }
@@ -1584,10 +1614,12 @@ export class ActualItemDefinitionProvider extends
 
     // return immediately
     if (shouldNotUpdateState) {
-      return {
+      const result = {
         value: value.value,
         error: value.error,
       };
+      this.props.onLoad && this.props.onLoad(result)
+      return result;
     }
 
     // so once everything has been completed this function actually runs per instance
@@ -1630,10 +1662,12 @@ export class ActualItemDefinitionProvider extends
     this.lastLoadValuePromiseResolve();
 
     // now we return
-    return {
+    const result = {
       value: value.value,
       error: value.error,
     };
+    this.props.onLoad && this.props.onLoad(result);
+    return result;
   }
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     // so when we want to externally check we first run the external check
@@ -1694,7 +1728,10 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
-      this.search(this.props.automaticSearch);
+      clearTimeout(this.automaticSearchTimeout);
+      this.automaticSearchTimeout = setTimeout(() => {
+        this.search(this.props.automaticSearch);
+      }, 300);
     }
   }
   public onPropertyRestore(
@@ -2059,6 +2096,7 @@ export class ActualItemDefinitionProvider extends
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
+    this.props.onDelete && this.props.onDelete({error});
     return {
       error,
     };
@@ -2411,7 +2449,7 @@ export class ActualItemDefinitionProvider extends
             submitted: false,
           });
         }
-        return;
+        return null;
       }
     } else {
       let containerId: string 
@@ -2479,10 +2517,12 @@ export class ActualItemDefinitionProvider extends
     }
 
     // happens during an error or whatnot
-    return {
+    const result = {
       id: recievedId,
       error,
     };
+    this.props.onSubmit && this.props.onSubmit(result);
+    return result;
   }
   public loadSearch(doNotUseState?: boolean, currentSearchId?: string) {
     const searchId = (
@@ -2578,7 +2618,9 @@ export class ActualItemDefinitionProvider extends
         });
       }
       this.cleanWithProps(this.props, options, "fail");
-      return this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
+      const result = this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
+      this.props.onSearch && this.props.onSearch(result);
+      return result;;
     }
 
     if (
@@ -2884,15 +2926,17 @@ export class ActualItemDefinitionProvider extends
       this.changeSearchListener,
     );
 
-    return {
+    const result = {
       searchId,
       results,
       records,
       count,
       limit,
       offset,
-      error: null,
+      error,
     };
+    this.props.onSearch && this.props.onSearch(result);
+    return result;
   }
   public dismissLoadError() {
     if (this.isUnmounted) {

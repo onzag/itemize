@@ -53,7 +53,7 @@ const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%",
  */
 export type PropertyDefinitionSupportedStringType = string;
 
-export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier"];
+export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier", "exact-value"];
 
 /**
  * The behaviour of strings is described by this type
@@ -137,7 +137,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localEqual: standardLocalEqual,
 
   nullableDefault: "",
-  supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role"],
+  supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role", "exact-value"],
 
   validate: (s: PropertyDefinitionSupportedStringType, p: IPropertyDefinitionRawJSONDataType) => {
     if (typeof s !== "string") {

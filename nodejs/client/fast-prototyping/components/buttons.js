@@ -40,7 +40,7 @@ function SubmitButton(props) {
     return (react_1.default.createElement(SubmitActioner_1.default, null, (actioner) => {
         const runProcess = async () => {
             const status = await actioner.submit(props.options);
-            props.onSubmit && props.onSubmit(status);
+            props.onSubmit && (await props.onSubmit(status));
             if (!status.error && !props.redirectOnSuccess && props.redirectGoBack) {
                 navigation_1.goBack();
             }

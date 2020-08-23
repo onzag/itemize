@@ -111,6 +111,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.lastLoadValuePromise = null;
         this.lastLoadValuePromiseIsResolved = true;
         this.lastLoadValuePromiseResolve = null;
+        this.automaticSearchTimeout = null;
         // the list of submit block promises
         this.submitBlockPromises = [];
         // Just binding all the functions to ensure their context is defined
@@ -443,6 +444,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         const didSomethingThatInvalidatedSetters = !deep_equal_1.default(this.props.setters, prevProps.setters) ||
             uniqueIDChanged ||
             itemDefinitionWasUpdated;
+        const didSomethingThatInvalidatedPrefills = !deep_equal_1.default(this.props.prefills, prevProps.prefills) ||
+            uniqueIDChanged ||
+            itemDefinitionWasUpdated;
         // if the mark for destruction has changed in a meaningful way
         // we recheck it
         if (this.props.markForDestructionOnLogout &&
@@ -454,11 +458,15 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.removeSetters(prevProps);
             this.installSetters();
         }
+        if (didSomethingThatInvalidatedPrefills) {
+            this.installPrefills();
+        }
         // now if the id changed, the optimization flags changed, or the item definition
         // itself changed
         if (itemDefinitionWasUpdated ||
             uniqueIDChanged ||
             didSomethingThatInvalidatedSetters ||
+            didSomethingThatInvalidatedPrefills ||
             !deep_equal_1.default(prevProps.properties || [], this.props.properties || []) ||
             !deep_equal_1.default(prevProps.includes || [], this.props.includes || []) ||
             !!prevProps.static !== !!this.props.static ||
@@ -550,6 +558,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 // that or the automatic search would be reexecuted
                 itemDefinitionWasUpdated ||
                 didSomethingThatInvalidatedSetters ||
+                didSomethingThatInvalidatedPrefills ||
                 prevProps.tokenData.token !== this.props.tokenData.token)) {
             // we might have a listener in an old item definition
             // so we need to get rid of it
@@ -725,6 +734,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                         cache_1.default.instance.setCachedValueAsNullAndUpdateSearches(forId, forVersion || null, qualifiedName, constants_1.PREFIX_GET + qualifiedName, constants_1.PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(), constants_1.PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName());
                     }
                 }
+                this.props.onLoad && this.props.onLoad(completedValue);
                 return completedValue;
             }
         }
@@ -826,10 +836,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             value.forVersion !== this.lastLoadingForVersion;
         // return immediately
         if (shouldNotUpdateState) {
-            return {
+            const result = {
                 value: value.value,
                 error: value.error,
             };
+            this.props.onLoad && this.props.onLoad(result);
+            return result;
         }
         // so once everything has been completed this function actually runs per instance
         if (value.error) {
@@ -871,10 +883,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         this.lastLoadValuePromiseIsResolved = true;
         this.lastLoadValuePromiseResolve();
         // now we return
-        return {
+        const result = {
             value: value.value,
             error: value.error,
         };
+        this.props.onLoad && this.props.onLoad(result);
+        return result;
     }
     async setStateToCurrentValueWithExternalChecking(currentUpdateId) {
         // so when we want to externally check we first run the external check
@@ -914,7 +928,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.updateTimeout = setTimeout(this.setStateToCurrentValueWithExternalChecking.bind(this, currentUpdateId), 600);
         }
         if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
-            this.search(this.props.automaticSearch);
+            clearTimeout(this.automaticSearchTimeout);
+            this.automaticSearchTimeout = setTimeout(() => {
+                this.search(this.props.automaticSearch);
+            }, 300);
         }
     }
     onPropertyRestore(property) {
@@ -1204,6 +1221,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.cleanWithProps(this.props, options, "fail");
             this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
         }
+        this.props.onDelete && this.props.onDelete({ error });
         return {
             error,
         };
@@ -1460,7 +1478,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                         submitted: false,
                     });
                 }
-                return;
+                return null;
             }
         }
         else {
@@ -1518,10 +1536,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
         }
         // happens during an error or whatnot
-        return {
+        const result = {
             id: recievedId,
             error,
         };
+        this.props.onSubmit && this.props.onSubmit(result);
+        return result;
     }
     loadSearch(doNotUseState, currentSearchId) {
         const searchId = (this.props.location.state &&
@@ -1588,7 +1608,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 });
             }
             this.cleanWithProps(this.props, options, "fail");
-            return this.giveEmulatedInvalidError("searchError", false, true);
+            const result = this.giveEmulatedInvalidError("searchError", false, true);
+            this.props.onSearch && this.props.onSearch(result);
+            return result;
+            ;
         }
         if (options.cachePolicy !== "none" &&
             typeof options.cachePolicy !== "undefined" &&
@@ -1836,15 +1859,17 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.cleanWithProps(this.props, options, "success");
         }
         this.props.itemDefinitionInstance.triggerListeners("search-change", this.props.forId, this.props.forVersion, this.changeSearchListener);
-        return {
+        const result = {
             searchId,
             results,
             records,
             count,
             limit,
             offset,
-            error: null,
+            error,
         };
+        this.props.onSearch && this.props.onSearch(result);
+        return result;
     }
     dismissLoadError() {
         if (this.isUnmounted) {

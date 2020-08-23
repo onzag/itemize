@@ -29,7 +29,7 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
  * that can be used to build other stuff, and can make for confusing user identifiers
  */
 const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
-exports.exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier"];
+exports.exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier", "exact-value"];
 /**
  * The behaviour of strings is described by this type
  */
@@ -103,7 +103,7 @@ const typeValue = {
     },
     localEqual: local_sql_1.standardLocalEqual,
     nullableDefault: "",
-    supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role"],
+    supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role", "exact-value"],
     validate: (s, p) => {
         if (typeof s !== "string") {
             return PropertyDefinition_1.PropertyInvalidReason.INVALID_VALUE;

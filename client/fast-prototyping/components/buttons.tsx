@@ -85,7 +85,7 @@ interface ISubmitButtonProps extends IGenericButtonProps {
    * A function that triggers when it has submitted and gives the state of the
    * submit action
    */
-  onSubmit?: (status: IActionResponseWithId) => void;
+  onSubmit?: (status: IActionResponseWithId) => Promise<void>;
 }
 
 /**
@@ -107,7 +107,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
       {(actioner) => {
         const runProcess = async () => {
           const status = await actioner.submit(props.options);
-          props.onSubmit && props.onSubmit(status);
+          props.onSubmit && (await props.onSubmit(status));
 
           if (!status.error && !props.redirectOnSuccess && props.redirectGoBack) {
             goBack();
