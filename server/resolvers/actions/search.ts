@@ -530,9 +530,6 @@ export async function searchItemDefinition(
       .andWhere("parent_id", resolverArgs.args.parent_id)
       .andWhere("parent_version", resolverArgs.args.parent_version || "")
       .andWhere("parent_type", resolverArgs.args.parent_type);
-  } else {
-    queryModel
-      .andWhere("parent_id", null);
   }
 
   // and now we call the function that builds the query itself into

@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 import React from "react";
-import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item-definition";
 import { PropTypes } from "../mui-core";
 /**
  * A redirect function called on the success event
@@ -44,6 +44,10 @@ interface IGenericButtonProps {
      * Another icon for the button but at the end
      */
     buttonStartIcon?: React.ReactNode;
+    /**
+     * Make button disabled
+     */
+    buttonDisabled?: boolean;
 }
 /**
  * The submit button props
@@ -115,7 +119,44 @@ interface ISearchButtonProps extends IGenericButtonProps {
  */
 export declare function SearchButton(props: ISearchButtonProps): JSX.Element;
 /**
- * TODO
+ * A redirect function called on the success event
  */
-export declare function DeleteButton(): void;
+declare type RedirectCallbackDeleteFn = (status: IBasicActionResponse) => string;
+/**
+ * The delete button props
+ */
+interface IDeleteButtonProps extends IGenericButtonProps {
+    /**
+     * The search options to trigger in the search actioner
+     */
+    options: IActionDeleteOptions;
+    /**
+     * If specified, instead of immediately deleting will ask
+     * for confirmation of this action via this component, the component
+     * must take an isActive prop and onClose props, when it closes it would give true or false
+     * to specifies if it will delete or cancel, true = delete, false = cancel
+     */
+    CustomConfirmationComponent?: React.ComponentType<{
+        isActive: boolean;
+        onClose: (continueWithProcess: boolean) => void;
+    }>;
+    /**
+     * Redirect to an url if succeeded
+     */
+    redirectOnSuccess?: string | RedirectCallbackDeleteFn;
+    /**
+     * Go back if succeed
+     */
+    redirectGoBack?: boolean;
+    /**
+     * Replace during redirection, doesn't work with goback
+     */
+    redirectReplace?: boolean;
+    /**
+     * A function that triggers when it has submitted and gives the state of the
+     * submit action
+     */
+    onDelete?: (status: IBasicActionResponse) => Promise<void>;
+}
+export declare function DeleteButton(props: IDeleteButtonProps): JSX.Element;
 export {};

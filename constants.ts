@@ -393,6 +393,9 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "edited_by",
   "reviewed_at",
   "reviewed_by",
+  "parent_id",
+  "parent_version",
+  "parent_type",
 ];
 /**
  * The reserved base properties that are exists within every graphql query

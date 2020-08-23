@@ -59,6 +59,12 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         }
         itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by, true);
     }
+    else if (resolverArgs.args.version) {
+        throw new errors_1.EndpointError({
+            message: "Specifying version without a for_id is not allowed",
+            code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+        });
+    }
     // check the version on whether it's a valid value
     const isValidVersion = itemDefinition.isValidVersion(resolverArgs.args.version || null, appData.config.supportedLanguages);
     if (!isValidVersion) {

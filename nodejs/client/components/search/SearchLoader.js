@@ -72,8 +72,16 @@ class ActualSearchLoader extends react_1.default.Component {
         });
     }
     async loadValues(currentSearchRecords) {
+        const currentSearchLoadTime = (new Date()).getTime();
+        this.lastSearchLoadValuesTime = currentSearchLoadTime;
         // if we have no search id we have nothing to search for
         if (!this.props.searchId) {
+            this.setState({
+                error: null,
+                currentlySearching: [],
+                currentSearchRecords,
+                searchFields: this.props.searchFields,
+            });
             return;
         }
         // this happens for traditional search, we dont need to
@@ -159,6 +167,9 @@ class ActualSearchLoader extends react_1.default.Component {
                 };
             }
         }));
+        if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+            return;
+        }
         // now what we are left are these uncached results
         this.setState({
             currentlySearching: uncachedResults,
@@ -217,6 +228,9 @@ class ActualSearchLoader extends react_1.default.Component {
             });
             // and then we get the value
             const gqlValue = await gql_querier_1.gqlQuery(listQuery);
+            if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+                return;
+            }
             // now we got to check for errors
             let error = null;
             if (gqlValue.errors) {
@@ -278,6 +292,9 @@ class ActualSearchLoader extends react_1.default.Component {
             }
         }
         else {
+            if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+                return;
+            }
             // otherwise if there's nothing left from the uncached
             // results and we had everything cached, then no error, and nothing being searched
             this.setState({

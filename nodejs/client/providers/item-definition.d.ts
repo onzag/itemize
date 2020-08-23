@@ -31,6 +31,7 @@ export interface ILoadCompletedPayload extends IActionResponseWithValue {
  */
 export interface IActionResponseWithId extends IBasicActionResponse {
     id: number;
+    version: string;
 }
 /**
  * A response given by search
@@ -83,6 +84,9 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
         id: number;
         version?: string;
     };
+    action?: "add" | "edit";
+    submitForId?: number;
+    submitForVersion?: string;
 }
 export interface IActionDeleteOptions extends IActionCleanOptions {
     policies?: PolicyPathType[];

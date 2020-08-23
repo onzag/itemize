@@ -359,10 +359,6 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             .andWhere("parent_version", resolverArgs.args.parent_version || "")
             .andWhere("parent_type", resolverArgs.args.parent_type);
     }
-    else {
-        queryModel
-            .andWhere("parent_id", null);
-    }
     // and now we call the function that builds the query itself into
     // that parent query, and adds the andWhere as required
     // into such query

@@ -95,6 +95,11 @@ export async function addItemDefinition(
       });
     }
     itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as number, true);
+  } else if (resolverArgs.args.version) {
+    throw new EndpointError({
+      message: "Specifying version without a for_id is not allowed",
+      code: ENDPOINT_ERRORS.FORBIDDEN,
+    });
   }
 
   // check the version on whether it's a valid value

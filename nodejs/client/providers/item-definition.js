@@ -550,7 +550,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 });
             }
         }
-        if (!this.props.automaticSearchIsOnlyInitial &&
+        if (
+        // if the automatic search is not setup to just initial
+        !this.props.automaticSearchIsOnlyInitial &&
+            // if there was previously an automatic search
+            prevProps.automaticSearch &&
             (!deep_equal_1.default(this.props.automaticSearch, prevProps.automaticSearch) ||
                 // these two would cause search results to be dismissed because
                 // the fact the token is a key part of the search itself so we would
@@ -565,6 +569,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             if (itemDefinitionWasUpdated) {
                 this.removePossibleSearchListeners(prevProps, prevState);
             }
+            // maybe there's no new automatic search
             if (this.props.automaticSearch) {
                 this.search(this.props.automaticSearch);
             }
@@ -1113,6 +1118,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (withId) {
             return {
                 id: null,
+                version: null,
                 error: emulatedError,
             };
         }
@@ -1447,10 +1453,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 submitting: true,
             });
         }
+        const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
+        const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
         let value;
         let error;
         let getQueryFields;
-        if (this.props.forId) {
+        if (options.action ? options.action === "edit" : submitForId) {
             if (!this.state.notFound) {
                 const totalValues = await gql_client_util_1.runEditQueryFor({
                     args: argumentsForQuery,
@@ -1458,8 +1466,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     itemDefinition: this.props.itemDefinitionInstance,
                     token: this.props.tokenData.token,
                     language: this.props.localeData.language,
-                    id: this.props.forId || null,
-                    version: this.props.forVersion,
+                    id: submitForId || null,
+                    version: submitForVersion || null,
                     listenerUUID: this.props.remoteListener.getUUID(),
                     cacheStore: this.props.longTermCaching,
                 });
@@ -1499,8 +1507,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 language: this.props.localeData.language,
                 listenerUUID: this.props.remoteListener.getUUID(),
                 cacheStore: this.props.longTermCaching,
-                forId: this.props.forId || null,
-                forVersion: this.props.forVersion || null,
+                forId: submitForId || null,
+                forVersion: submitForVersion || null,
                 containerId,
             });
             value = totalValues.value;
@@ -1533,11 +1541,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             receivedVersion = value.version || null;
             this.props.itemDefinitionInstance.applyValue(recievedId, receivedVersion, value, false, this.props.tokenData.id, this.props.tokenData.role, getQueryFields, true);
             this.cleanWithProps(this.props, options, "success", true);
-            this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+            this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
         }
         // happens during an error or whatnot
         const result = {
             id: recievedId,
+            version: receivedVersion || null,
             error,
         };
         this.props.onSubmit && this.props.onSubmit(result);
@@ -1956,7 +1965,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 searchShouldCache: false,
                 searchRequestedIncludes: [],
                 searchRequestedProperties: [],
-                searchResults: [],
+                searchResults: null,
+                searchRecords: null,
             });
         }
     }

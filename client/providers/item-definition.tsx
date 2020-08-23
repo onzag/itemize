@@ -81,6 +81,7 @@ export interface ILoadCompletedPayload extends IActionResponseWithValue {
  */
 export interface IActionResponseWithId extends IBasicActionResponse {
   id: number;
+  version: string;
 }
 
 /**
@@ -137,6 +138,9 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     id: number,
     version?: string,
   };
+  action?: "add" | "edit",
+  submitForId?: number;
+  submitForVersion?: string;
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
@@ -1250,7 +1254,10 @@ export class ActualItemDefinitionProvider extends
     }
 
     if (
+      // if the automatic search is not setup to just initial
       !this.props.automaticSearchIsOnlyInitial &&
+      // if there was previously an automatic search
+      prevProps.automaticSearch &&
       (
         !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
         // these two would cause search results to be dismissed because
@@ -1268,6 +1275,7 @@ export class ActualItemDefinitionProvider extends
       if (itemDefinitionWasUpdated) {
         this.removePossibleSearchListeners(prevProps, prevState);
       }
+      // maybe there's no new automatic search
       if (this.props.automaticSearch) {
         this.search(this.props.automaticSearch);
       } else {
@@ -1979,6 +1987,7 @@ export class ActualItemDefinitionProvider extends
     if (withId) {
       return {
         id: null,
+        version: null,
         error: emulatedError,
       };
     } else if (withSearchResults) {
@@ -2419,10 +2428,13 @@ export class ActualItemDefinitionProvider extends
       });
     }
 
+    const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
+    const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
+
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
-    if (this.props.forId) {
+    if (options.action ? options.action === "edit" : submitForId) {
       if (!this.state.notFound) {
         const totalValues = await runEditQueryFor({
           args: argumentsForQuery,
@@ -2430,8 +2442,8 @@ export class ActualItemDefinitionProvider extends
           itemDefinition: this.props.itemDefinitionInstance,
           token: this.props.tokenData.token,
           language: this.props.localeData.language,
-          id: this.props.forId || null,
-          version: this.props.forVersion,
+          id: submitForId || null,
+          version: submitForVersion || null,
           listenerUUID: this.props.remoteListener.getUUID(),
           cacheStore: this.props.longTermCaching,
         });
@@ -2469,8 +2481,8 @@ export class ActualItemDefinitionProvider extends
         language: this.props.localeData.language,
         listenerUUID: this.props.remoteListener.getUUID(),
         cacheStore: this.props.longTermCaching,
-        forId: this.props.forId || null,
-        forVersion: this.props.forVersion || null,
+        forId: submitForId || null,
+        forVersion: submitForVersion || null,
         containerId,
       });
       value = totalValues.value;
@@ -2513,12 +2525,13 @@ export class ActualItemDefinitionProvider extends
         true,
       );
       this.cleanWithProps(this.props, options, "success", true);
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
+      this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
     }
 
     // happens during an error or whatnot
     const result = {
       id: recievedId,
+      version: receivedVersion || null,
       error,
     };
     this.props.onSubmit && this.props.onSubmit(result);
@@ -3037,7 +3050,8 @@ export class ActualItemDefinitionProvider extends
         searchShouldCache: false,
         searchRequestedIncludes: [],
         searchRequestedProperties: [],
-        searchResults: [],
+        searchResults: null,
+        searchRecords: null,
       });
     }
   }

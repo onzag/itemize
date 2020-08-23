@@ -182,6 +182,12 @@ class Cache {
                 code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
             });
         }
+        else if (!forId && version) {
+            throw new errors_1.EndpointError({
+                message: "You can't specify a version without a standard for_id value",
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
         else if (forId) {
             // now this is important
             sqlModData.id = forId;

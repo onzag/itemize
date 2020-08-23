@@ -266,6 +266,11 @@ export class Cache {
         message: "You can't specify your own id for values without version",
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
+    } else if (!forId && version) {
+      throw new EndpointError({
+        message: "You can't specify a version without a standard for_id value",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
     } else if (forId) {
       // now this is important
       sqlModData.id = forId;

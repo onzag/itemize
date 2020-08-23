@@ -185,6 +185,10 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
     }
+    // now we run the function to delete possible children of this item definition
+    // if it was parented by something in there, such children must be removed
+    // this is done to the side nevertheless
+    deletePossibleChildrenOf(appData, itemDefinition, resolverArgs.args.id, resolverArgs.args.version || null);
     __1.logger.debug("deleteItemDefinition: done");
     // return null, yep, the output is always null, because it's gone
     // however we are not running the check on the fields that can be read
@@ -192,6 +196,111 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     return null;
 }
 exports.deleteItemDefinition = deleteItemDefinition;
+/**
+ * This function analyzes an item definition to check for a possible
+ * parent and returns true if there's any parent rule within itself, including
+ * its children that matches the possible parent
+ * @param possibleParent the possible parent
+ * @param idef the item definition in question
+ * @returns a simple boolean
+ */
+function analyzeIdef(possibleParent, idef) {
+    const canBeParented = idef.checkCanBeParentedBy(possibleParent, false);
+    if (canBeParented) {
+        return true;
+    }
+    return idef.getChildDefinitions().some(analyzeIdef.bind(null, possibleParent));
+}
+/**
+ * This function finds modules for a given module, including its children
+ * that do match a possible parent rule
+ * @param possibleParent the possible parent
+ * @param module the current module to analyze
+ * @returns a list of modules
+ */
+function findModules(possibleParent, module) {
+    // first we set up the modules we have collected, nothing yet
+    let collectedModules = [];
+    // now we check if at least one of the item definitions within this module
+    // can be set as child of the given possible parent
+    const canAtLeastOneIdefBeChildOf = module.getAllChildItemDefinitions().some(analyzeIdef.bind(null, possibleParent));
+    // if that's the case we add this same module to the list
+    if (canAtLeastOneIdefBeChildOf) {
+        collectedModules.push(module);
+    }
+    // now we need to check the child modules, for that we run this function recursively
+    const childModules = module.getAllModules().map(findModules.bind(null, possibleParent));
+    // and now we check if we got anything, if we did
+    if (childModules.length) {
+        // we concat the result
+        collectedModules = collectedModules.concat(childModules);
+    }
+    // and return that
+    return collectedModules;
+}
+/**
+ * Deletes all the possible children that might have been set as parent of the deleted
+ * item definition value
+ * @param appData
+ * @param itemDefinition
+ * @param id
+ * @param version
+ */
+async function deletePossibleChildrenOf(appData, itemDefinition, id, version) {
+    // first we need to find if there is even such a rule and in which modules so we can
+    // query the database
+    const modulesThatMightBeSetAsChildOf = appData.root.getAllModules().map(findModules.bind(null, itemDefinition)).flat();
+    // if such is the case
+    if (modulesThatMightBeSetAsChildOf.length) {
+        // we get this is our current deleted item qualified name, and it's our parent type
+        const idefQualified = itemDefinition.getQualifiedPathName();
+        // now we can loop in these modules
+        await Promise.all(modulesThatMightBeSetAsChildOf.map(async (mod) => {
+            // and ask for results from the module table, where parents do match this
+            let results;
+            try {
+                results = await appData.knex.select(["id", "version", "type", "content_id"]).from(mod.getQualifiedPathName()).where({
+                    parent_id: id,
+                    parent_version: version || "",
+                    parent_type: idefQualified,
+                });
+            }
+            catch (err) {
+                __1.logger.error("deletePossibleChildrenOf (MAYBE-ORPHANED): Failed to attempt to find orphans for deleting", {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                    parentItemDefinition: itemDefinition.getQualifiedPathName(),
+                    parentId: id,
+                    parentVersion: version,
+                    moduleChildCheck: mod.getQualifiedPathName(),
+                });
+                return;
+            }
+            // if we got results
+            if (results.length) {
+                // then we need to delete each, one by one
+                await Promise.all(results.map(async (r) => {
+                    // we use the registry to get the proper item definition that represented
+                    // that module item
+                    const deleteItemDefinition = appData.root.registry[r.type];
+                    try {
+                        // and request a delete on it
+                        await appData.cache.requestDelete(deleteItemDefinition, r.id, r.version || null, false, r.content_id, null);
+                    }
+                    catch (err) {
+                        __1.logger.error("deletePossibleChildrenOf (ORPHANED): Failed to delete an orphan", {
+                            errMessage: err.message,
+                            errStack: err.stack,
+                            orphanItemDefinition: deleteItemDefinition.getQualifiedPathName(),
+                            orphanId: r.id,
+                            orphanVersion: r.version || null,
+                        });
+                    }
+                }));
+            }
+        }));
+    }
+}
 function deleteItemDefinitionFn(appData) {
     return deleteItemDefinition.bind(null, appData);
 }

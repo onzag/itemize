@@ -6,13 +6,14 @@
  */
 
 import React, { useState } from "react";
-import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item-definition";
 import { ProgressingElement } from "./util";
 import SubmitActioner from "../../components/item-definition/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
 import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
 import { Button, PropTypes } from "../mui-core";
+import DeleteActioner from "../../components/item-definition/DeleteActioner";
 
 /**
  * A redirect function called on the success event
@@ -52,6 +53,10 @@ interface IGenericButtonProps {
    * Another icon for the button but at the end
    */
   buttonStartIcon?: React.ReactNode;
+  /**
+   * Make button disabled
+   */
+  buttonDisabled?: boolean;
 }
 
 /**
@@ -148,6 +153,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
                 endIcon={props.buttonEndIcon}
                 startIcon={props.buttonStartIcon}
                 className={props.buttonClassName}
+                disabled={props.buttonDisabled}
                 onClick={submitAction}
               >
                 <I18nRead capitalize={true} id={props.i18nId} />
@@ -162,7 +168,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
         );
       }}
     </SubmitActioner>
-  )
+  );
 }
 
 /**
@@ -199,6 +205,7 @@ export function SearchButton(props: ISearchButtonProps) {
                 endIcon={props.buttonEndIcon}
                 startIcon={props.buttonStartIcon}
                 className={props.buttonClassName}
+                disabled={props.buttonDisabled}
                 onClick={actioner.search.bind(null, props.options)}
               >
                 <I18nRead capitalize={true} id={props.i18nId} />
@@ -212,8 +219,108 @@ export function SearchButton(props: ISearchButtonProps) {
 }
 
 /**
- * TODO
+ * A redirect function called on the success event
  */
-export function DeleteButton() {
+type RedirectCallbackDeleteFn = (status: IBasicActionResponse) => string;
 
+/**
+ * The delete button props
+ */
+interface IDeleteButtonProps extends IGenericButtonProps {
+  /**
+   * The search options to trigger in the search actioner
+   */
+  options: IActionDeleteOptions;
+  /**
+   * If specified, instead of immediately deleting will ask
+   * for confirmation of this action via this component, the component
+   * must take an isActive prop and onClose props, when it closes it would give true or false
+   * to specifies if it will delete or cancel, true = delete, false = cancel
+   */
+  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
+  /**
+   * Redirect to an url if succeeded
+   */
+  redirectOnSuccess?: string | RedirectCallbackDeleteFn;
+  /**
+   * Go back if succeed
+   */
+  redirectGoBack?: boolean;
+  /**
+   * Replace during redirection, doesn't work with goback
+   */
+  redirectReplace?: boolean;
+  /**
+   * A function that triggers when it has submitted and gives the state of the
+   * submit action
+   */
+  onDelete?: (status: IBasicActionResponse) => Promise<void>;
+}
+
+
+export function DeleteButton(props: IDeleteButtonProps) {
+  const [confirmationIsActive, setConfirmationIsActive] = useState(false);
+  const CustomConfirmationComponent = props.CustomConfirmationComponent;
+  return (
+    <DeleteActioner>
+      {(actioner) => {
+        const runProcess = async () => {
+          const status = await actioner.delete(props.options);
+          props.onDelete && (await props.onDelete(status));
+
+          if (!status.error && !props.redirectOnSuccess && props.redirectGoBack) {
+            goBack();
+          } else if (!status.error && props.redirectOnSuccess) {
+            const redirectCalculated: string = typeof props.redirectOnSuccess === "string" ?
+              props.redirectOnSuccess : props.redirectOnSuccess(status);
+            if (props.redirectGoBack) {
+              goBack();
+              setTimeout(() => {
+                localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+              }, 10);
+            } else {
+              localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+            }
+          }
+        }
+        const deleteAction = () => {
+          if (props.CustomConfirmationComponent) {
+            setConfirmationIsActive(true);
+          } else {
+            runProcess();
+          }
+        }
+        const onCloseAction = (continueWithProcess: boolean) => {
+          setConfirmationIsActive(false);
+          if (continueWithProcess) {
+            runProcess();
+          } else {
+            actioner.clean(props.options, "fail");
+          }
+        }
+        return (
+          <>
+            <ProgressingElement isProgressing={actioner.deleting} className={props.wrapperClassName}>
+              <Button
+                variant={props.buttonVariant}
+                color={props.buttonColor}
+                endIcon={props.buttonEndIcon}
+                startIcon={props.buttonStartIcon}
+                className={props.buttonClassName}
+                disabled={props.buttonDisabled}
+                onClick={deleteAction}
+              >
+                <I18nRead capitalize={true} id={props.i18nId} />
+              </Button>
+            </ProgressingElement>
+            {
+              CustomConfirmationComponent ?
+                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction}/> :
+                null
+            }
+          </>
+        );
+      }}
+    </DeleteActioner>
+  );
 }

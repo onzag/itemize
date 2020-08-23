@@ -187,6 +187,7 @@ interface IActualSearchLoaderState {
  * The actual search loader class which contains the actual logic
  */
 class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActualSearchLoaderState> {
+  private lastSearchLoadValuesTime: number;
   constructor(props: IActualSearchLoaderProps) {
     super(props);
 
@@ -252,8 +253,17 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     });
   }
   public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
+    const currentSearchLoadTime = (new Date()).getTime();
+    this.lastSearchLoadValuesTime = currentSearchLoadTime;
+
     // if we have no search id we have nothing to search for
     if (!this.props.searchId) {
+      this.setState({
+        error: null,
+        currentlySearching: [],
+        currentSearchRecords,
+        searchFields: this.props.searchFields,
+      });
       return;
     }
 
@@ -369,6 +379,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       }
     }));
 
+    if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+      return;
+    }
+
     // now what we are left are these uncached results
     this.setState({
       currentlySearching: uncachedResults,
@@ -445,6 +459,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       const gqlValue = await gqlQuery(
         listQuery,
       );
+
+      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+        return;
+      }
 
       // now we got to check for errors
       let error: EndpointErrorType = null;
@@ -533,6 +551,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         });
       }
     } else {
+      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+        return;
+      }
       // otherwise if there's nothing left from the uncached
       // results and we had everything cached, then no error, and nothing being searched
       this.setState({
