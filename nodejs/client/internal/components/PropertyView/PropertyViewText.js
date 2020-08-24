@@ -210,7 +210,7 @@ class PropertyViewText extends react_1.default.Component {
         const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
         const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
         const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
-        if (isRichText) {
+        if (isRichText && currentValue !== null) {
             const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
             const currentFiles = mediaProperty &&
                 mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null);

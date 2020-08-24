@@ -141,7 +141,7 @@ async function runImageConversions(imageStream, filePath, fileName, fileMimeType
             .resize(conversionOutput.width, conversionOutput.height, {
             fit: conversionOutput.fit,
             withoutEnlargement: true,
-        }).flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
+        }).rotate().flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
         return file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, outputPipeline, outputFileName);
     }).concat([
         file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, imageStream, originalImageFilePath),

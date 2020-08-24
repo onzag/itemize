@@ -185,7 +185,7 @@ export async function runImageConversions(
   const fileNameNoExtension = path.basename(fileName, path.extname(fileName));
   // this is the sharp pipeline that will stream the data directly from the network
   // this stream hasn't been piped before and has been on hold so far
-  const conversionPipeline = sharp()
+  const conversionPipeline = sharp();
   const conversionPromises = imageConversionOutputs.map((conversionOutput) => {
     // note how we attach the output name before the filename without a extension and make it
     // a jpg extension because that's what we want, the original can be anything
@@ -197,7 +197,7 @@ export async function runImageConversions(
       .resize(conversionOutput.width, conversionOutput.height, {
         fit: conversionOutput.fit,
         withoutEnlargement: true,
-      }).flatten({background: {r: 255, g: 255, b: 255, alpha: 1}}).jpeg();
+      }).rotate().flatten({background: {r: 255, g: 255, b: 255, alpha: 1}}).jpeg();
 
     return sqlUploadPipeFile(
       uploadsContainer,

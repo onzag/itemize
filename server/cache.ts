@@ -9,8 +9,10 @@
 
 import { RedisClient } from "redis";
 import Knex from "knex";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX } from "../constants";
+import {
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX
+} from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -82,7 +84,7 @@ export class Cache {
    */
   public getRaw<T>(
     key: string,
-  ): Promise<{value: T}> {
+  ): Promise<{ value: T }> {
     logger.debug(
       "Cache.getRaw: requesting " + key,
     );
@@ -225,7 +227,7 @@ export class Cache {
 
     logger.debug(
       "Cache.requestCreation: requesting creation for " + selfTable + " at module " +
-        moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
+      moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready, and hence needs
@@ -331,7 +333,7 @@ export class Cache {
     // two tables to be modified, and it always does so, as item definition information
     // must be added because create requires so
     let sqlValue: ISQLTableRowValue;
-    
+
     try {
       sqlValue = convertVersionsIntoNullsWhenNecessary(
         await this.knex.transaction(async (transactionKnex) => {
@@ -342,17 +344,17 @@ export class Cache {
           // because we always need the id
           const insertQueryValueMod = await transactionKnex(moduleTable)
             .insert(sqlModData).returning("*");
-  
+
           // so with that in mind, we add the foreign key column value
           // for combining both and keeping them joined togeher
           sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
           sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
-  
+
           // so now we create the insert query
           const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
           // so we call the qery
           const insertQueryValueIdef = await insertQueryIdef;
-  
+
           // and we return the joined result
           return {
             ...insertQueryValueMod[0],
@@ -380,8 +382,37 @@ export class Cache {
     logger.debug(
       "Cache.requestCreation: consuming binary information streams",
     );
-    await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
-    await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+
+    try {
+      await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    } catch (err) {
+      logger.error(
+        "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          selfTable,
+          moduleTable,
+          forId,
+          version,
+        }
+      );
+    }
+    try {
+      await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    } catch (err) {
+      logger.error(
+        "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          selfTable,
+          moduleTable,
+          forId,
+          version,
+        }
+      );
+    }
 
     (async () => {
       logger.debug(
@@ -412,7 +443,7 @@ export class Cache {
         type: selfTable,
         created_at: sqlValue.created_at,
       };
-    
+
       const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
         qualifiedPathName: selfTable,
         createdBy: itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlModData.created_by,
@@ -421,7 +452,7 @@ export class Cache {
         ],
         newLastRecordDate: searchResultForThisValue.created_at,
       };
-  
+
       logger.debug(
         "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
         itemDefinitionBasedOwnedEvent,
@@ -430,12 +461,12 @@ export class Cache {
         itemDefinitionBasedOwnedEvent,
         null, // TODO add the listener uuid, maybe?
       );
-    
+
       const moduleBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
         ...itemDefinitionBasedOwnedEvent,
         qualifiedPathName: moduleTable,
       };
-  
+
       logger.debug(
         "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
         moduleBasedOwnedEvent,
@@ -444,8 +475,8 @@ export class Cache {
         moduleBasedOwnedEvent,
         null, // TODO add the listener uuid, maybe?
       );
-    
-      if (parent) {
+
+      if (parent) {
         const itemDefinitionBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
           qualifiedPathName: selfTable,
           parentId: parent.id,
@@ -464,7 +495,7 @@ export class Cache {
           itemDefinitionBasedParentedEvent,
           null, // TODO add the listener uuid, maybe?
         );
-    
+
         const moduleBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
           ...itemDefinitionBasedParentedEvent,
           qualifiedPathName: moduleTable,
@@ -562,8 +593,8 @@ export class Cache {
 
     logger.debug(
       "Cache.requestUpdate: requesting update for " + selfTable + " at module " +
-        moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
-        "container id " + containerId,
+      moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
+      "container id " + containerId,
     );
 
     // We get only the fields that we expect to be updated
@@ -664,7 +695,7 @@ export class Cache {
               CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
               version || "",
             ).returning("*");
-          // otherwise we check if we are just requesting some fields from the idef
+            // otherwise we check if we are just requesting some fields from the idef
           } else {
             // and make a simple select query
             updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
@@ -707,8 +738,37 @@ export class Cache {
     logger.debug(
       "Cache.requestUpdate: consuming binary information streams",
     );
-    await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
-    await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    
+    try {
+      await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    } catch (err) {
+      logger.error(
+        "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          selfTable,
+          moduleTable,
+          id,
+          version,
+        }
+      );
+    }
+    try {
+      await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+    } catch (err) {
+      logger.error(
+        "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          selfTable,
+          moduleTable,
+          id,
+          version,
+        }
+      );
+    }
 
     // we return and this executes after it returns
     (async () => {
@@ -763,7 +823,7 @@ export class Cache {
 
     logger.debug(
       "Cache.requestDelete: requesting delete for " + selfTable + " at module " +
-        moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
+      moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
     );
 
     let deleteFilesInContainer = async (specifiedVersion: string) => {
@@ -874,7 +934,7 @@ export class Cache {
 
     logger.debug(
       "Cache.requestValue: requesting value for " + idefTable + " at module " +
-        moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
+      moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
     );
 
     if (!refresh) {
@@ -904,9 +964,9 @@ export class Cache {
         // the invalid empty string "" value
         await this.knex.first("*").from(moduleTable)
           .where("id", id).andWhere("version", version || "").join(idefTable, (clause) => {
-        clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-        clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-      }) || null);
+            clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+            clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+          }) || null);
       // we don't wait for this
       this.forceCacheInto(idefTable, id, version, queryValue);
 

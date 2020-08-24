@@ -262,8 +262,32 @@ class Cache {
             throw err;
         }
         _1.logger.debug("Cache.requestCreation: consuming binary information streams");
-        await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
-        await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        try {
+            await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        }
+        catch (err) {
+            _1.logger.error("Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted", {
+                errMessage: err.message,
+                errStack: err.stack,
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+            });
+        }
+        try {
+            await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        }
+        catch (err) {
+            _1.logger.error("Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted", {
+                errMessage: err.message,
+                errStack: err.stack,
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+            });
+        }
         (async () => {
             _1.logger.debug("Cache.requestCreation (detached): storing cache value from the action");
             await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
@@ -450,8 +474,32 @@ class Cache {
             throw err;
         }
         _1.logger.debug("Cache.requestUpdate: consuming binary information streams");
-        await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
-        await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        try {
+            await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        }
+        catch (err) {
+            _1.logger.error("Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted", {
+                errMessage: err.message,
+                errStack: err.stack,
+                selfTable,
+                moduleTable,
+                id,
+                version,
+            });
+        }
+        try {
+            await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+        }
+        catch (err) {
+            _1.logger.error("Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted", {
+                errMessage: err.message,
+                errStack: err.stack,
+                selfTable,
+                moduleTable,
+                id,
+                version,
+            });
+        }
         // we return and this executes after it returns
         (async () => {
             _1.logger.debug("Cache.requestUpdate (detached): storing cache value from the action");

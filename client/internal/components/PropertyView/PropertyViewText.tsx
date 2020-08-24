@@ -272,7 +272,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
 
-    if (isRichText) {
+    if (isRichText && currentValue !== null) {
       const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
       const currentFiles = mediaProperty &&
         mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
