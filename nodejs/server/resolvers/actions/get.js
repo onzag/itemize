@@ -11,6 +11,7 @@ const constants_1 = require("../../../constants");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
+const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     __1.logger.debug("getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
@@ -87,43 +88,46 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
     const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
     let toReturnToUser = valueToProvide.toReturnToUser;
-    if (moduleTrigger) {
-        await moduleTrigger({
-            appData,
-            itemDefinition,
-            module: mod,
-            value: valueToProvide.convertedValue,
-            update: null,
-            extraArgs: resolverArgs.args,
-            action: triggers_1.IOTriggerActions.READ,
-            id: resolverArgs.args.id,
-            version: resolverArgs.args.version || null,
-            user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-            },
-            forbid: basic_1.defaultTriggerForbiddenFunction,
-        });
-    }
-    if (itemDefinitionTrigger) {
-        await itemDefinitionTrigger({
-            appData,
-            itemDefinition,
-            module: mod,
-            value: valueToProvide.convertedValue,
-            update: null,
-            extraArgs: resolverArgs.args,
-            action: triggers_1.IOTriggerActions.READ,
-            id: resolverArgs.args.id,
-            version: resolverArgs.args.version || null,
-            user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-            },
-            forbid: basic_1.defaultTriggerForbiddenFunction,
-        });
+    if (moduleTrigger || itemDefinitionTrigger) {
+        const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, selectQueryValue);
+        if (moduleTrigger) {
+            await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
+        if (itemDefinitionTrigger) {
+            await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: triggers_1.IOTriggerActions.READ,
+                id: resolverArgs.args.id,
+                version: resolverArgs.args.version || null,
+                user: {
+                    role: tokenData.role,
+                    id: tokenData.id,
+                    customData: tokenData.customData,
+                },
+                forbid: basic_1.defaultTriggerForbiddenFunction,
+            });
+        }
     }
     __1.logger.debug("getItemDefinition: GQL ouput retrieved");
     __1.logger.silly("getItemDefinition: value is", toReturnToUser);
@@ -191,43 +195,46 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
         const pathOfThisIdef = itemDefinition.getPath().join("/");
         const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
         const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
-        if (moduleTrigger) {
-            await moduleTrigger({
-                appData,
-                itemDefinition,
-                module: mod,
-                value: valueToProvide.convertedValue,
-                update: null,
-                extraArgs: resolverArgs.args,
-                action: triggers_1.IOTriggerActions.READ,
-                id: value.id,
-                version: value.version || null,
-                user: {
-                    role: tokenData.role,
-                    id: tokenData.id,
-                    customData: tokenData.customData,
-                },
-                forbid: basic_1.defaultTriggerForbiddenFunction,
-            });
-        }
-        if (itemDefinitionTrigger) {
-            await itemDefinitionTrigger({
-                appData,
-                itemDefinition,
-                module: mod,
-                value: valueToProvide.convertedValue,
-                update: null,
-                extraArgs: resolverArgs.args,
-                action: triggers_1.IOTriggerActions.READ,
-                id: value.id,
-                version: value.version || null,
-                user: {
-                    role: tokenData.role,
-                    id: tokenData.id,
-                    customData: tokenData.customData,
-                },
-                forbid: basic_1.defaultTriggerForbiddenFunction,
-            });
+        if (moduleTrigger || itemDefinitionTrigger) {
+            const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, value);
+            if (moduleTrigger) {
+                await moduleTrigger({
+                    appData,
+                    itemDefinition,
+                    module: mod,
+                    value: currentWholeValueAsGQL,
+                    update: null,
+                    extraArgs: resolverArgs.args,
+                    action: triggers_1.IOTriggerActions.READ,
+                    id: value.id,
+                    version: value.version || null,
+                    user: {
+                        role: tokenData.role,
+                        id: tokenData.id,
+                        customData: tokenData.customData,
+                    },
+                    forbid: basic_1.defaultTriggerForbiddenFunction,
+                });
+            }
+            if (itemDefinitionTrigger) {
+                await itemDefinitionTrigger({
+                    appData,
+                    itemDefinition,
+                    module: mod,
+                    value: currentWholeValueAsGQL,
+                    update: null,
+                    extraArgs: resolverArgs.args,
+                    action: triggers_1.IOTriggerActions.READ,
+                    id: value.id,
+                    version: value.version || null,
+                    user: {
+                        role: tokenData.role,
+                        id: tokenData.id,
+                        customData: tokenData.customData,
+                    },
+                    forbid: basic_1.defaultTriggerForbiddenFunction,
+                });
+            }
         }
         return valueToProvide.toReturnToUser;
     }));
@@ -284,43 +291,46 @@ async function getModuleList(appData, resolverArgs, mod) {
         const pathOfThisIdef = itemDefinition.getPath().join("/");
         const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
         const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
-        if (moduleTrigger) {
-            await moduleTrigger({
-                appData,
-                itemDefinition,
-                module: mod,
-                value: valueToProvide.convertedValue,
-                update: null,
-                extraArgs: resolverArgs.args,
-                action: triggers_1.IOTriggerActions.READ,
-                id: value.id,
-                version: value.version || null,
-                user: {
-                    role: tokenData.role,
-                    id: tokenData.id,
-                    customData: tokenData.customData,
-                },
-                forbid: basic_1.defaultTriggerForbiddenFunction,
-            });
-        }
-        if (itemDefinitionTrigger) {
-            await itemDefinitionTrigger({
-                appData,
-                itemDefinition,
-                module: mod,
-                value: valueToProvide.convertedValue,
-                update: null,
-                extraArgs: resolverArgs.args,
-                action: triggers_1.IOTriggerActions.READ,
-                id: value.id,
-                version: value.version || null,
-                user: {
-                    role: tokenData.role,
-                    id: tokenData.id,
-                    customData: tokenData.customData,
-                },
-                forbid: basic_1.defaultTriggerForbiddenFunction,
-            });
+        if (moduleTrigger || itemDefinitionTrigger) {
+            const currentWholeValueAsGQL = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, value);
+            if (moduleTrigger) {
+                await moduleTrigger({
+                    appData,
+                    itemDefinition,
+                    module: mod,
+                    value: currentWholeValueAsGQL,
+                    update: null,
+                    extraArgs: resolverArgs.args,
+                    action: triggers_1.IOTriggerActions.READ,
+                    id: value.id,
+                    version: value.version || null,
+                    user: {
+                        role: tokenData.role,
+                        id: tokenData.id,
+                        customData: tokenData.customData,
+                    },
+                    forbid: basic_1.defaultTriggerForbiddenFunction,
+                });
+            }
+            if (itemDefinitionTrigger) {
+                await itemDefinitionTrigger({
+                    appData,
+                    itemDefinition,
+                    module: mod,
+                    value: currentWholeValueAsGQL,
+                    update: null,
+                    extraArgs: resolverArgs.args,
+                    action: triggers_1.IOTriggerActions.READ,
+                    id: value.id,
+                    version: value.version || null,
+                    user: {
+                        role: tokenData.role,
+                        id: tokenData.id,
+                        customData: tokenData.customData,
+                    },
+                    forbid: basic_1.defaultTriggerForbiddenFunction,
+                });
+            }
         }
         return valueToProvide.toReturnToUser;
     }));

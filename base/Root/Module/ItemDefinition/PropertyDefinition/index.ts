@@ -1658,7 +1658,8 @@ export default class PropertyDefinition {
   }
 
   /**
-   * Frees the memory of stored values in a given slot id
+   * Frees the memory of stored values in a given slot id however
+   * it will not clear enforced values
    * @param id the slot id
    * @param version the slot version
    */
@@ -1671,7 +1672,7 @@ export default class PropertyDefinition {
     delete this.stateValueModified[mergedID];
     delete this.stateInternalValue[mergedID];
     delete this.stateValueHasBeenManuallySet[mergedID];
-    delete this.stateSuperEnforcedValue[mergedID];
+    // delete this.stateSuperEnforcedValue[mergedID];
 
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";

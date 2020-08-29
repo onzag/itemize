@@ -360,6 +360,10 @@ export async function addItemDefinition(
     }
   }
 
+  const isNowParenting = !!(
+    gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+  );
+
   // the creation will ensure that the for_id and version
   // are valid and do not create strange data structures
   const value = await appData.cache.requestCreation(
@@ -370,10 +374,10 @@ export async function addItemDefinition(
     tokenData.id,
     dictionary,
     containerId,
-    isParenting ? {
-      id: resolverArgs.args.parent_id,
-      version: resolverArgs.args.parent_version,
-      type: resolverArgs.args.parent_type,
+    isNowParenting ? {
+      id: gqlValueToConvert.parent_id as number,
+      version: gqlValueToConvert.parent_version as string,
+      type: gqlValueToConvert.parent_type as string,
     } : null,
   );
 

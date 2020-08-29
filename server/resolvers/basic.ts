@@ -6,6 +6,7 @@ import {
   ANYONE_LOGGED_METAROLE,
   ENDPOINT_ERRORS,
   OWNER_METAROLE,
+  RESERVED_BASE_PROPERTIES,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import ItemDefinition, { IItemDefinitionStateType } from "../../base/Root/Module/ItemDefinition";
@@ -640,7 +641,6 @@ export interface IFilteredAndPreparedValueType {
   toReturnToUser: any;
   actualValue: any;
   requestFields: any;
-  convertedValue: any;
 }
 
 /**
@@ -657,7 +657,7 @@ export interface IFilteredAndPreparedValueType {
 export function filterAndPrepareGQLValue(
   knex: Knex,
   serverData: any,
-  value: IGQLValue,
+  value: ISQLTableRowValue,
   requestedFields: IGQLRequestFields,
   role: string,
   parentModuleOrIdef: ItemDefinition | Module,
@@ -912,6 +912,7 @@ export function checkReadPoliciesAllowThisUserToSearch(
   );
 }
 
+const reservedKeys = Object.keys(RESERVED_BASE_PROPERTIES);
 /**
  * Splits the arguments in a graphql query from what it comes to be part
  * of the item definition or module in question and what is extra arguments
@@ -932,7 +933,7 @@ export function splitArgsInGraphqlQuery(
     moduleOrItemDefinition.getAllIncludes()).map((i) => i.getQualifiedIdentifier());
 
   Object.keys(args).forEach((key) => {
-    if (propertyIds.includes(key) || includeIds.includes(key)) {
+    if (propertyIds.includes(key) || includeIds.includes(key) || reservedKeys.includes(key)) {
       resultingSelfValues[key] = args[key];
     } else {
       resultingExtraArgs[key] = args[key];

@@ -729,6 +729,7 @@ function checkReadPoliciesAllowThisUserToSearch(itemDefinition, role) {
     __1.logger.silly("checkReadPoliciesAllowThisUserToSearch: succeed checking policies allow user to search");
 }
 exports.checkReadPoliciesAllowThisUserToSearch = checkReadPoliciesAllowThisUserToSearch;
+const reservedKeys = Object.keys(constants_1.RESERVED_BASE_PROPERTIES);
 /**
  * Splits the arguments in a graphql query from what it comes to be part
  * of the item definition or module in question and what is extra arguments
@@ -745,7 +746,7 @@ function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
     const includeIds = (moduleOrItemDefinition instanceof Module_1.default ? [] :
         moduleOrItemDefinition.getAllIncludes()).map((i) => i.getQualifiedIdentifier());
     Object.keys(args).forEach((key) => {
-        if (propertyIds.includes(key) || includeIds.includes(key)) {
+        if (propertyIds.includes(key) || includeIds.includes(key) || reservedKeys.includes(key)) {
             resultingSelfValues[key] = args[key];
         }
         else {

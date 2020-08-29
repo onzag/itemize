@@ -392,7 +392,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         }
         const redisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
         if (INSTANCE_MODE === "CLUSTER_MANAGER") {
-            const cache = new cache_1.Cache(redisClient, null, null, null, null);
+            const cache = new cache_1.Cache(redisClient, null, null, null, null, null);
             exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
             // in case both the global and local cluster are the same
             const getPromisified = util_1.promisify(redisClient.get).bind(redisClient);
@@ -518,7 +518,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             }
         }
         exports.logger.info("initializeServer: initializing cache instance");
-        const cache = new cache_1.Cache(redisClient, knex, pkgcloudUploadContainers, root, serverData);
+        const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, root, serverData);
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");

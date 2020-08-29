@@ -15,6 +15,7 @@ const sql_2 = require("../base/Root/Module/sql");
 const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management");
 const errors_1 = require("../base/errors");
 const _1 = require(".");
+const token_1 = require("./token");
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
 /**
@@ -34,12 +35,14 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, uploadsContainers, root, initialServerData) {
+    constructor(redisClient, knex, sensitiveConfig, uploadsContainers, root, initialServerData) {
+        this.memoryCache = {};
         this.redisClient = redisClient;
         this.knex = knex;
         this.root = root;
         this.uploadsContainers = uploadsContainers;
         this.serverData = initialServerData;
+        this.sensitiveConfig = sensitiveConfig;
     }
     /**
      * Sets the listener for the remote interaction with the clients
@@ -595,6 +598,26 @@ class Cache {
             });
             throw err;
         }
+    }
+    async requestToken(id) {
+        const user = await this.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+        if (!user) {
+            throw new errors_1.EndpointError({
+                message: "User does not exist",
+                code: constants_1.ENDPOINT_ERRORS.USER_REMOVED,
+            });
+        }
+        else if (user.blocked_at) {
+            throw new errors_1.EndpointError({
+                message: "User has been banned",
+                code: constants_1.ENDPOINT_ERRORS.USER_BLOCKED,
+            });
+        }
+        return await token_1.jwtSign({
+            id: user.id,
+            role: user.role,
+            sessionId: user.session_id || 0,
+        }, this.sensitiveConfig.jwtKey);
     }
     /**
      * Requests a value from the cache

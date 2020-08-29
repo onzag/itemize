@@ -288,7 +288,7 @@ export class RemoteListener {
   /**
    * Provides the remote listener uuid
    */
-  public getUUID() {
+  public getUUID() {
     return this.uuid;
   }
 
@@ -501,7 +501,7 @@ export class RemoteListener {
           );
         }
 
-      // ohterwise
+        // ohterwise
       } else {
         // we assign the new listener value
         this.listeners[qualifiedID] = newListenerValue;
@@ -534,8 +534,8 @@ export class RemoteListener {
           );
         }
       }
-    
-    // otherwise we will add to the delayed feedback list
+
+      // otherwise we will add to the delayed feedback list
     } else if (
       this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
     ) {
@@ -558,21 +558,20 @@ export class RemoteListener {
     // we wait if not ready
     if (this.socket.connected) {
       await this.onIdentificationDone();
+
+      if (this.socket.connected) {
+        // the reason we use delayed feedbacks is for efficiency, while we don't
+        // use this for owned searches, but sometimes a same feedback would be requested twice
+        this.delayedFeedbacks.forEach((df) => {
+          this.socket.emit(
+            FEEDBACK_REQUEST,
+            df,
+          );
+        });
+      }
     }
 
-    // the reason we use delayed feedbacks is for efficiency, while we don't
-    // use this for owned searches, but sometimes a same feedback would be requested twice
-    this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
-      // and yet we recheck, as we need to be connected even as we emit
-      if (this.socket.connected) {
-        this.socket.emit(
-          FEEDBACK_REQUEST,
-          df,
-        );
-      }
-
-      return false;
-    });
+    this.delayedFeedbacks = [];
   }
 
   /**
@@ -675,7 +674,7 @@ export class RemoteListener {
           );
         }
 
-      // otherwise
+        // otherwise
       } else {
         // just upate the value
         this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
@@ -690,7 +689,7 @@ export class RemoteListener {
   public async requestOwnedSearchFeedbackFor(request: IOwnedSearchFeedbackRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
-    
+
       // check if still connected after a possible await
       if (this.socket.connected) {
         this.socket.emit(
@@ -769,7 +768,7 @@ export class RemoteListener {
       }
     }
   }
-  
+
   /**
    * Removes a parented search feedback listener and its given callback
    * that is related to
@@ -818,7 +817,7 @@ export class RemoteListener {
           );
         }
 
-      // otherwise if there are callbacks left
+        // otherwise if there are callbacks left
       } else {
         // we just update the value with the new callbacks
         this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
@@ -872,7 +871,7 @@ export class RemoteListener {
         // we request a reload
         itemDefinition.triggerListeners("reload", event.id, event.version);
 
-      // otherwise it was deleted
+        // otherwise it was deleted
       } else if (event.type === "not_found") {
 
         // we clean the value
@@ -895,14 +894,14 @@ export class RemoteListener {
         itemDefinition.triggerListeners("change", event.id, event.version);
       }
 
-    // otherwise if we don't have one an it's either the modified event
-    // for that the thing has been modified, it has been created, or last modified, basically
-    // anything but not found
+      // otherwise if we don't have one an it's either the modified event
+      // for that the thing has been modified, it has been created, or last modified, basically
+      // anything but not found
     } else if (event.type === "modified" || event.type === "created" || event.type === "last_modified") {
       // we ask fora reload for any possible stray item definition provider around
       itemDefinition.triggerListeners("reload", event.id, event.version);
 
-    // and now for not found
+      // and now for not found
     } else if (event.type === "not_found") {
       // we wnat to clean the value
       itemDefinition.cleanValueFor(event.id, event.version);
@@ -1036,10 +1035,17 @@ export class RemoteListener {
     return new Promise((resolve) => {
       const doneListener = () => {
         this.socket.off(IDENTIFIED_EVENT, doneListener);
-        this.socket.off("disconnect", doneListener);
+        this.socket.off("disconnect", doneListenerDisconnect);
         resolve();
       };
-      this.socket.on("disconnect", doneListener);
+      const doneListenerDisconnect = () => {
+        this.offline = true;
+        this.isReady = false;
+        this.socket.off(IDENTIFIED_EVENT, doneListener);
+        this.socket.off("disconnect", doneListenerDisconnect);
+        resolve();
+      }
+      this.socket.on("disconnect", doneListenerDisconnect);
       this.socket.on(IDENTIFIED_EVENT, doneListener);
     });
   }
@@ -1070,7 +1076,7 @@ export class RemoteListener {
           token: this.token,
         },
       );
-  
+
       // now we await for identification to be sucesful
       await this.onIdentificationDone();
     }

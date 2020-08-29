@@ -365,16 +365,15 @@ class RemoteListener {
         // we wait if not ready
         if (this.socket.connected) {
             await this.onIdentificationDone();
-        }
-        // the reason we use delayed feedbacks is for efficiency, while we don't
-        // use this for owned searches, but sometimes a same feedback would be requested twice
-        this.delayedFeedbacks = this.delayedFeedbacks.filter((df) => {
-            // and yet we recheck, as we need to be connected even as we emit
             if (this.socket.connected) {
-                this.socket.emit(remote_protocol_1.FEEDBACK_REQUEST, df);
+                // the reason we use delayed feedbacks is for efficiency, while we don't
+                // use this for owned searches, but sometimes a same feedback would be requested twice
+                this.delayedFeedbacks.forEach((df) => {
+                    this.socket.emit(remote_protocol_1.FEEDBACK_REQUEST, df);
+                });
             }
-            return false;
-        });
+        }
+        this.delayedFeedbacks = [];
     }
     /**
      * Adds a listener for an owned search
@@ -720,10 +719,17 @@ class RemoteListener {
         return new Promise((resolve) => {
             const doneListener = () => {
                 this.socket.off(remote_protocol_1.IDENTIFIED_EVENT, doneListener);
-                this.socket.off("disconnect", doneListener);
+                this.socket.off("disconnect", doneListenerDisconnect);
                 resolve();
             };
-            this.socket.on("disconnect", doneListener);
+            const doneListenerDisconnect = () => {
+                this.offline = true;
+                this.isReady = false;
+                this.socket.off(remote_protocol_1.IDENTIFIED_EVENT, doneListener);
+                this.socket.off("disconnect", doneListenerDisconnect);
+                resolve();
+            };
+            this.socket.on("disconnect", doneListenerDisconnect);
             this.socket.on(remote_protocol_1.IDENTIFIED_EVENT, doneListener);
         });
     }

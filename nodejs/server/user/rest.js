@@ -107,6 +107,7 @@ function userRestServices(appData) {
     router.get("/redirected-login", async (req, res) => {
         const userId = parseInt(req.query.userid);
         const password = req.query.password;
+        const token = req.query.token;
         let redirect = req.query.redirect;
         if (redirect && !redirect.startsWith("/")) {
             redirect = "/" + redirect;
@@ -114,18 +115,28 @@ function userRestServices(appData) {
         else if (!redirect) {
             redirect = "/";
         }
-        if ((isNaN(userId) || userId <= 0) || !password) {
+        if ((isNaN(userId) || userId <= 0) || (!password && !token)) {
             res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.UNSPECIFIED);
             return;
+        }
+        let tokenData;
+        if (token) {
+            tokenData = await token_1.jwtVerify(token, appData.sensitiveConfig.jwtKey);
+            if (!tokenData.isRealUser) {
+                res.redirect(`/en/?err=${constants_1.ENDPOINT_ERRORS.UNSPECIFIED}`);
+                return;
+            }
         }
         let user;
         try {
             user = await appData.cache.requestValue(userIdef, userId, null);
             if (!user) {
                 res.redirect("/en/?err=" + constants_1.ENDPOINT_ERRORS.USER_REMOVED);
+                return;
             }
             else if (user.blocked_at !== null) {
                 res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.USER_BLOCKED}`);
+                return;
             }
         }
         catch (err) {
@@ -135,22 +146,34 @@ function userRestServices(appData) {
             });
             throw err;
         }
-        let isValidPassword;
-        let token;
-        try {
-            isValidPassword = await bcrypt_1.default.compare(password, user.password);
-            token = await token_1.jwtSign({
-                id: user.id,
-                role: user.role,
-                sessionId: user.session_id || 0,
-            }, appData.sensitiveConfig.jwtKey);
+        if (token) {
+            if (tokenData.id !== userId) {
+                res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.UNSPECIFIED}`);
+                return;
+            }
+            else if ((tokenData.sessionId || 0) !== (user.session_id || 0)) {
+                res.redirect(`/${user.app_language}/?err=${constants_1.ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+                return;
+            }
         }
-        catch (err) {
-            res.redirect("/" + user.app_language + "/?err=" + constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
-            return;
+        let isValidPassword = false;
+        let assignedToken = token || null;
+        if (!assignedToken) {
+            try {
+                isValidPassword = await bcrypt_1.default.compare(password, user.password);
+                assignedToken = await token_1.jwtSign({
+                    id: user.id,
+                    role: user.role,
+                    sessionId: user.session_id || 0,
+                }, appData.sensitiveConfig.jwtKey);
+            }
+            catch (err) {
+                res.redirect("/" + user.app_language + "/?err=" + constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
+                return;
+            }
         }
-        if (isValidPassword) {
-            res.cookie("token", token, {
+        if (isValidPassword || assignedToken) {
+            res.cookie("token", assignedToken, {
                 httpOnly: false,
                 expires: new Date(9999999999999),
                 path: "/",

@@ -4,6 +4,7 @@ import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../constant
 import { jwtVerify, jwtSign } from "../token";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import bcyrpt from "bcrypt";
+import { IServerSideTokenDataType } from "../resolvers/basic";
 
 export function userRestServices(appData: IAppDataType) {
   const userModule = appData.root.getModuleFor(["users"]);
@@ -79,7 +80,7 @@ export function userRestServices(appData: IAppDataType) {
           email: user.email,
           e_validated: true,
         });
-      
+
       if (result) {
         if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
           res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_EMAIL_TAKEN}`);
@@ -131,7 +132,8 @@ export function userRestServices(appData: IAppDataType) {
   router.get("/redirected-login", async (req, res) => {
     const userId = parseInt(req.query.userid as string);
     const password = req.query.password as string;
-  
+    const token = req.query.token as string;
+
     let redirect = req.query.redirect as string;
     if (redirect && !redirect.startsWith("/")) {
       redirect = "/" + redirect;
@@ -139,9 +141,18 @@ export function userRestServices(appData: IAppDataType) {
       redirect = "/";
     }
 
-    if ((isNaN(userId) || userId <= 0) || !password) {
+    if ((isNaN(userId) || userId <= 0) || (!password && !token)) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
       return;
+    }
+
+    let tokenData: IServerSideTokenDataType;
+    if (token) {
+      tokenData = await jwtVerify(token, appData.sensitiveConfig.jwtKey);
+      if (!tokenData.isRealUser) {
+        res.redirect(`/en/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
+        return;
+      }
     }
 
     let user: ISQLTableRowValue;
@@ -149,8 +160,10 @@ export function userRestServices(appData: IAppDataType) {
       user = await appData.cache.requestValue(userIdef, userId, null);
       if (!user) {
         res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
+        return;
       } else if (user.blocked_at !== null) {
         res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+        return;
       }
     } catch (err) {
       logger.error(
@@ -163,22 +176,34 @@ export function userRestServices(appData: IAppDataType) {
       throw err;
     }
 
-    let isValidPassword: boolean;
-    let token: string;
-    try {
-      isValidPassword = await bcyrpt.compare(password, user.password);
-      token = await jwtSign({
-        id: user.id,
-        role: user.role,
-        sessionId: user.session_id || 0,
-      }, appData.sensitiveConfig.jwtKey);
-    } catch (err) {
-      res.redirect("/" + user.app_language + "/?err=" + ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
-      return;
+    if (token) {
+      if (tokenData.id !== userId) {
+        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
+        return;
+      } else if ((tokenData.sessionId || 0) !== (user.session_id || 0)) {
+        res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+        return;
+      }
     }
 
-    if (isValidPassword) {
-      res.cookie("token", token, {
+    let isValidPassword: boolean = false;
+    let assignedToken: string = token || null;
+    if (!assignedToken) {
+      try {
+        isValidPassword = await bcyrpt.compare(password, user.password);
+        assignedToken = await jwtSign({
+          id: user.id,
+          role: user.role,
+          sessionId: user.session_id || 0,
+        }, appData.sensitiveConfig.jwtKey);
+      } catch (err) {
+        res.redirect("/" + user.app_language + "/?err=" + ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR);
+        return;
+      }
+    }
+
+    if (isValidPassword || assignedToken) {
+      res.cookie("token", assignedToken, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",

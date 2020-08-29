@@ -536,7 +536,7 @@ class ActualPropertyEntryReferenceRenderer
 
     // because the option might be missing if we haven't loaded
     // the current options, at least we add the current
-    if (this.props.currentValue !== null && !values.find(v => v.value !== this.props.currentValue)) {
+    if (this.props.currentValue !== null && !values.find(v => v.value === this.props.currentValue)) {
       values.push({
         i18nValue: this.props.currentTextualValue,
         value: this.props.currentValue,

@@ -92,7 +92,6 @@ export interface IFilteredAndPreparedValueType {
     toReturnToUser: any;
     actualValue: any;
     requestFields: any;
-    convertedValue: any;
 }
 /**
  * Filters and prepares a graphql value for output to the rest endpoint
@@ -105,7 +104,7 @@ export interface IFilteredAndPreparedValueType {
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-export declare function filterAndPrepareGQLValue(knex: Knex, serverData: any, value: IGQLValue, requestedFields: IGQLRequestFields, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
+export declare function filterAndPrepareGQLValue(knex: Knex, serverData: any, value: ISQLTableRowValue, requestedFields: IGQLRequestFields, role: string, parentModuleOrIdef: ItemDefinition | Module): IFilteredAndPreparedValueType;
 /**
  * Checks that an item definition current state is
  * valid and that the gqlArgValue provided is a match

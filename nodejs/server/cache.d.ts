@@ -14,6 +14,7 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
 import { PkgCloudContainers, IServerDataType } from ".";
+import { ISensitiveConfigRawJSONDataType } from "../config";
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -27,6 +28,7 @@ export declare class Cache {
     private root;
     private serverData;
     private listener;
+    private sensitiveConfig;
     private memoryCache;
     /**
      * Builds a new cache instance, before the cache is ready
@@ -38,7 +40,7 @@ export declare class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType);
+    constructor(redisClient: RedisClient, knex: Knex, sensitiveConfig: ISensitiveConfigRawJSONDataType, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType);
     /**
      * Sets the listener for the remote interaction with the clients
      * that are connected, this listener is what informs the client of updates
@@ -143,6 +145,7 @@ export declare class Cache {
      * listener uuid ensures only those that needs updates will get them
      */
     requestDelete(itemDefinition: ItemDefinition, id: number, version: string, dropAllVersions: boolean, containerId: string, listenerUUID: string): Promise<void>;
+    requestToken(id: number): Promise<string>;
     /**
      * Requests a value from the cache
      * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo

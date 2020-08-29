@@ -35,6 +35,7 @@ export default class PropertyEntryReference extends React.Component<IPropertyEnt
     private searchTimeout;
     private currentlyFindingValueFor;
     private lastCachedSearch;
+    private isUnmounted;
     constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>);
     changeListener(id: number, version: string): void;
     componentDidMount(): void;

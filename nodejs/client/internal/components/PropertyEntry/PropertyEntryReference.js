@@ -11,6 +11,7 @@ const search_mode_1 = require("../../../../base/Root/Module/ItemDefinition/Prope
 class PropertyEntryReference extends react_1.default.Component {
     constructor(props) {
         super(props);
+        this.isUnmounted = false;
         this.state = {
             currentOptions: [],
             currentOptionsVersion: null,
@@ -42,6 +43,7 @@ class PropertyEntryReference extends react_1.default.Component {
         this.addListeners();
     }
     componentWillUnmount() {
+        this.isUnmounted = true;
         this.removeListeners();
     }
     toggleListener(props = this.props, fn) {
@@ -169,9 +171,11 @@ class PropertyEntryReference extends react_1.default.Component {
         // these nulls which represent the listener are only truly used for the
         // cached searches, we don't use that here
         if (result.error) {
-            this.setState({
-                currentSearchError: result.error,
-            });
+            if (!this.isUnmounted) {
+                this.setState({
+                    currentSearchError: result.error,
+                });
+            }
             return;
         }
         // we get the options and sort alphabetically
@@ -196,11 +200,13 @@ class PropertyEntryReference extends react_1.default.Component {
                 this.props.onChange(foundInList.id, (this.props.state.internalValue || ""));
             }
         }
-        this.setState({
-            currentSearchError: null,
-            currentOptions: options,
-            currentOptionsVersion: filterByLanguage ? this.props.language : null,
-        });
+        if (!this.isUnmounted) {
+            this.setState({
+                currentSearchError: null,
+                currentOptions: options,
+                currentOptionsVersion: filterByLanguage ? this.props.language : null,
+            });
+        }
     }
     getSpecialData() {
         const modPath = this.props.property.getSpecialProperty("referencedModule");
@@ -279,9 +285,11 @@ class PropertyEntryReference extends react_1.default.Component {
             itemDefinition: idef,
         });
         if (result.error) {
-            this.setState({
-                currentFindError: result.error,
-            });
+            if (!this.isUnmounted) {
+                this.setState({
+                    currentFindError: result.error,
+                });
+            }
             return;
         }
         this.setState({

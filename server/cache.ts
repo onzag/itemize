@@ -26,6 +26,8 @@ import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from 
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
 import { logger, PkgCloudContainers, IServerDataType } from ".";
+import { jwtSign } from "./token";
+import { ISensitiveConfigRawJSONDataType } from "../config";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -43,11 +45,12 @@ export class Cache {
   private root: Root;
   private serverData: IServerDataType;
   private listener: Listener;
+  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private memoryCache: {
     [key: string]: {
       value: ISQLTableRowValue
     };
-  }
+  } = {};
 
   /**
    * Builds a new cache instance, before the cache is ready
@@ -59,12 +62,20 @@ export class Cache {
    * @param knex the knex instance
    * @param root the root of itemize
    */
-  constructor(redisClient: RedisClient, knex: Knex, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType) {
+  constructor(
+    redisClient: RedisClient,
+    knex: Knex,
+    sensitiveConfig: ISensitiveConfigRawJSONDataType,
+    uploadsContainers: PkgCloudContainers,
+    root: Root,
+    initialServerData: IServerDataType
+  ) {
     this.redisClient = redisClient;
     this.knex = knex;
     this.root = root;
     this.uploadsContainers = uploadsContainers;
     this.serverData = initialServerData;
+    this.sensitiveConfig = sensitiveConfig;
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -902,6 +913,29 @@ export class Cache {
       );
       throw err;
     }
+  }
+
+  public async requestToken(
+    id: number,
+  ) {
+    const user = await this.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+    if (!user) {
+      throw new EndpointError({
+        message: "User does not exist",
+        code: ENDPOINT_ERRORS.USER_REMOVED,
+      });
+    } else if (user.blocked_at) {
+      throw new EndpointError({
+        message: "User has been banned",
+        code: ENDPOINT_ERRORS.USER_BLOCKED,
+      });
+    }
+
+    return await jwtSign({
+      id: user.id,
+      role: user.role,
+      sessionId: user.session_id || 0,
+    }, this.sensitiveConfig.jwtKey);
   }
 
   /**

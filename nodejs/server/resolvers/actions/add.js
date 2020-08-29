@@ -253,12 +253,13 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             }
         }
     }
+    const isNowParenting = !!(gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version);
     // the creation will ensure that the for_id and version
     // are valid and do not create strange data structures
-    const value = await appData.cache.requestCreation(itemDefinition, resolverArgs.args.for_id || null, resolverArgs.args.version || null, gqlValueToConvert, tokenData.id, dictionary, containerId, isParenting ? {
-        id: resolverArgs.args.parent_id,
-        version: resolverArgs.args.parent_version,
-        type: resolverArgs.args.parent_type,
+    const value = await appData.cache.requestCreation(itemDefinition, resolverArgs.args.for_id || null, resolverArgs.args.version || null, gqlValueToConvert, tokenData.id, dictionary, containerId, isNowParenting ? {
+        id: gqlValueToConvert.parent_id,
+        version: gqlValueToConvert.parent_version,
+        type: gqlValueToConvert.parent_type,
     } : null);
     __1.logger.debug("addItemDefinition: SQL ouput retrieved");
     __1.logger.silly("addItemDefinition: Value is", value);

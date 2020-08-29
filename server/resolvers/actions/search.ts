@@ -26,7 +26,7 @@ import {
   UNSPECIFIED_OWNER,
   ENDPOINT_ERRORS,
 } from "../../../constants";
-import { buildSQLQueryForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
@@ -258,44 +258,54 @@ export async function searchModule(
           const pathOfThisIdef = itemDefinition.getPath().join("/");
           const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
           const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
-          if (moduleTrigger) {
-            await moduleTrigger({
-              appData,
-              itemDefinition,
-              module: mod,
-              value: valueToProvide.convertedValue,
-              update: null,
-              extraArgs: resolverArgs.args,
-              action: IOTriggerActions.READ,
-              id: r.id as number,
-              version: r.version as string || null,
-              user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-              },
-              forbid: defaultTriggerForbiddenFunction,
-            });
-          }
 
-          if (itemDefinitionTrigger) {
-            await itemDefinitionTrigger({
-              appData,
+          if (moduleTrigger || itemDefinitionTrigger) {
+            const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+              appData.knex,
+              appData.cache.getServerData(),
               itemDefinition,
-              module: mod,
-              value: valueToProvide.convertedValue,
-              update: null,
-              extraArgs: resolverArgs.args,
-              action: IOTriggerActions.READ,
-              id: r.id as number,
-              version: r.version as string || null,
-              user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-              },
-              forbid: defaultTriggerForbiddenFunction,
-            });
+              r,
+            );
+
+            if (moduleTrigger) {
+              await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: IOTriggerActions.READ,
+                id: r.id as number,
+                version: r.version as string || null,
+                user: {
+                  role: tokenData.role,
+                  id: tokenData.id,
+                  customData: tokenData.customData,
+                },
+                forbid: defaultTriggerForbiddenFunction,
+              });
+            }
+  
+            if (itemDefinitionTrigger) {
+              await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: IOTriggerActions.READ,
+                id: r.id as number,
+                version: r.version as string || null,
+                user: {
+                  role: tokenData.role,
+                  id: tokenData.id,
+                  customData: tokenData.customData,
+                },
+                forbid: defaultTriggerForbiddenFunction,
+              });
+            }
           }
 
           return valueToProvide.toReturnToUser;
@@ -581,44 +591,54 @@ export async function searchItemDefinition(
           const pathOfThisIdef = itemDefinition.getPath().join("/");
           const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
           const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
-          if (moduleTrigger) {
-            await moduleTrigger({
-              appData,
-              itemDefinition,
-              module: mod,
-              value: valueToProvide.convertedValue,
-              update: null,
-              extraArgs: resolverArgs.args,
-              action: IOTriggerActions.READ,
-              id: r.id as number,
-              version: r.version as string || null,
-              user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-              },
-              forbid: defaultTriggerForbiddenFunction,
-            });
-          }
 
-          if (itemDefinitionTrigger) {
-            await itemDefinitionTrigger({
-              appData,
+          if (moduleTrigger || itemDefinitionTrigger) {
+            const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+              appData.knex,
+              appData.cache.getServerData(),
               itemDefinition,
-              module: mod,
-              value: valueToProvide.convertedValue,
-              update: null,
-              extraArgs: resolverArgs.args,
-              action: IOTriggerActions.READ,
-              id: r.id as number,
-              version: r.version as string || null,
-              user: {
-                role: tokenData.role,
-                id: tokenData.id,
-                customData: tokenData.customData,
-              },
-              forbid: defaultTriggerForbiddenFunction,
-            });
+              r,
+            );
+
+            if (moduleTrigger) {
+              await moduleTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: IOTriggerActions.READ,
+                id: r.id as number,
+                version: r.version as string || null,
+                user: {
+                  role: tokenData.role,
+                  id: tokenData.id,
+                  customData: tokenData.customData,
+                },
+                forbid: defaultTriggerForbiddenFunction,
+              });
+            }
+  
+            if (itemDefinitionTrigger) {
+              await itemDefinitionTrigger({
+                appData,
+                itemDefinition,
+                module: mod,
+                value: currentWholeValueAsGQL,
+                update: null,
+                extraArgs: resolverArgs.args,
+                action: IOTriggerActions.READ,
+                id: r.id as number,
+                version: r.version as string || null,
+                user: {
+                  role: tokenData.role,
+                  id: tokenData.id,
+                  customData: tokenData.customData,
+                },
+                forbid: defaultTriggerForbiddenFunction,
+              });
+            }
           }
 
           return valueToProvide.toReturnToUser;

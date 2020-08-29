@@ -50,6 +50,8 @@ export default class PropertyEntryReference
 
   private lastCachedSearch: IPropertyEntryReferenceOption[];
 
+  private isUnmounted = false;
+
   constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>) {
     super(props);
 
@@ -95,6 +97,7 @@ export default class PropertyEntryReference
   }
 
   public componentWillUnmount() {
+    this.isUnmounted = true;
     this.removeListeners();
   }
 
@@ -240,9 +243,11 @@ export default class PropertyEntryReference
     // cached searches, we don't use that here
 
     if (result.error) {
-      this.setState({
-        currentSearchError: result.error,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          currentSearchError: result.error,
+        });
+      }
       return;
     }
 
@@ -269,11 +274,13 @@ export default class PropertyEntryReference
       }
     }
 
-    this.setState({
-      currentSearchError: null,
-      currentOptions: options,
-      currentOptionsVersion: filterByLanguage ? this.props.language : null,
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        currentSearchError: null,
+        currentOptions: options,
+        currentOptionsVersion: filterByLanguage ? this.props.language : null,
+      });
+    }
   }
 
   public getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition] {
@@ -385,9 +392,11 @@ export default class PropertyEntryReference
     });
 
     if (result.error) {
-      this.setState({
-        currentFindError: result.error,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          currentFindError: result.error,
+        });
+      }
       return;
     }
 

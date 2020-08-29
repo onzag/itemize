@@ -551,7 +551,7 @@ export async function initializeServer(
     const redisClient: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
 
     if (INSTANCE_MODE === "CLUSTER_MANAGER") {
-      const cache = new Cache(redisClient, null, null, null, null);
+      const cache = new Cache(redisClient, null, null, null, null, null);
       logger.info(
         "initializeServer: server initialized in cluster manager exclusive mode flushing redis",
       );
@@ -740,7 +740,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, pkgcloudUploadContainers, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );

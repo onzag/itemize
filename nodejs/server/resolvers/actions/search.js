@@ -162,43 +162,46 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
                 const pathOfThisIdef = itemDefinition.getPath().join("/");
                 const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
                 const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
-                if (moduleTrigger) {
-                    await moduleTrigger({
-                        appData,
-                        itemDefinition,
-                        module: mod,
-                        value: valueToProvide.convertedValue,
-                        update: null,
-                        extraArgs: resolverArgs.args,
-                        action: triggers_1.IOTriggerActions.READ,
-                        id: r.id,
-                        version: r.version || null,
-                        user: {
-                            role: tokenData.role,
-                            id: tokenData.id,
-                            customData: tokenData.customData,
-                        },
-                        forbid: basic_1.defaultTriggerForbiddenFunction,
-                    });
-                }
-                if (itemDefinitionTrigger) {
-                    await itemDefinitionTrigger({
-                        appData,
-                        itemDefinition,
-                        module: mod,
-                        value: valueToProvide.convertedValue,
-                        update: null,
-                        extraArgs: resolverArgs.args,
-                        action: triggers_1.IOTriggerActions.READ,
-                        id: r.id,
-                        version: r.version || null,
-                        user: {
-                            role: tokenData.role,
-                            id: tokenData.id,
-                            customData: tokenData.customData,
-                        },
-                        forbid: basic_1.defaultTriggerForbiddenFunction,
-                    });
+                if (moduleTrigger || itemDefinitionTrigger) {
+                    const currentWholeValueAsGQL = sql_2.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, r);
+                    if (moduleTrigger) {
+                        await moduleTrigger({
+                            appData,
+                            itemDefinition,
+                            module: mod,
+                            value: currentWholeValueAsGQL,
+                            update: null,
+                            extraArgs: resolverArgs.args,
+                            action: triggers_1.IOTriggerActions.READ,
+                            id: r.id,
+                            version: r.version || null,
+                            user: {
+                                role: tokenData.role,
+                                id: tokenData.id,
+                                customData: tokenData.customData,
+                            },
+                            forbid: basic_1.defaultTriggerForbiddenFunction,
+                        });
+                    }
+                    if (itemDefinitionTrigger) {
+                        await itemDefinitionTrigger({
+                            appData,
+                            itemDefinition,
+                            module: mod,
+                            value: currentWholeValueAsGQL,
+                            update: null,
+                            extraArgs: resolverArgs.args,
+                            action: triggers_1.IOTriggerActions.READ,
+                            id: r.id,
+                            version: r.version || null,
+                            user: {
+                                role: tokenData.role,
+                                id: tokenData.id,
+                                customData: tokenData.customData,
+                            },
+                            forbid: basic_1.defaultTriggerForbiddenFunction,
+                        });
+                    }
                 }
                 return valueToProvide.toReturnToUser;
             })),
@@ -387,43 +390,46 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
                 const pathOfThisIdef = itemDefinition.getPath().join("/");
                 const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
                 const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
-                if (moduleTrigger) {
-                    await moduleTrigger({
-                        appData,
-                        itemDefinition,
-                        module: mod,
-                        value: valueToProvide.convertedValue,
-                        update: null,
-                        extraArgs: resolverArgs.args,
-                        action: triggers_1.IOTriggerActions.READ,
-                        id: r.id,
-                        version: r.version || null,
-                        user: {
-                            role: tokenData.role,
-                            id: tokenData.id,
-                            customData: tokenData.customData,
-                        },
-                        forbid: basic_1.defaultTriggerForbiddenFunction,
-                    });
-                }
-                if (itemDefinitionTrigger) {
-                    await itemDefinitionTrigger({
-                        appData,
-                        itemDefinition,
-                        module: mod,
-                        value: valueToProvide.convertedValue,
-                        update: null,
-                        extraArgs: resolverArgs.args,
-                        action: triggers_1.IOTriggerActions.READ,
-                        id: r.id,
-                        version: r.version || null,
-                        user: {
-                            role: tokenData.role,
-                            id: tokenData.id,
-                            customData: tokenData.customData,
-                        },
-                        forbid: basic_1.defaultTriggerForbiddenFunction,
-                    });
+                if (moduleTrigger || itemDefinitionTrigger) {
+                    const currentWholeValueAsGQL = sql_2.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, r);
+                    if (moduleTrigger) {
+                        await moduleTrigger({
+                            appData,
+                            itemDefinition,
+                            module: mod,
+                            value: currentWholeValueAsGQL,
+                            update: null,
+                            extraArgs: resolverArgs.args,
+                            action: triggers_1.IOTriggerActions.READ,
+                            id: r.id,
+                            version: r.version || null,
+                            user: {
+                                role: tokenData.role,
+                                id: tokenData.id,
+                                customData: tokenData.customData,
+                            },
+                            forbid: basic_1.defaultTriggerForbiddenFunction,
+                        });
+                    }
+                    if (itemDefinitionTrigger) {
+                        await itemDefinitionTrigger({
+                            appData,
+                            itemDefinition,
+                            module: mod,
+                            value: currentWholeValueAsGQL,
+                            update: null,
+                            extraArgs: resolverArgs.args,
+                            action: triggers_1.IOTriggerActions.READ,
+                            id: r.id,
+                            version: r.version || null,
+                            user: {
+                                role: tokenData.role,
+                                id: tokenData.id,
+                                customData: tokenData.customData,
+                            },
+                            forbid: basic_1.defaultTriggerForbiddenFunction,
+                        });
+                    }
                 }
                 return valueToProvide.toReturnToUser;
             })),

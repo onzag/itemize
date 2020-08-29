@@ -613,7 +613,8 @@ export default class PropertyDefinition {
      */
     applyValue(id: number, version: string, value: PropertyDefinitionSupportedType, modifiedState: boolean, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean, rejectStateAppliedValue?: boolean): void;
     /**
-     * Frees the memory of stored values in a given slot id
+     * Frees the memory of stored values in a given slot id however
+     * it will not clear enforced values
      * @param id the slot id
      * @param version the slot version
      */
