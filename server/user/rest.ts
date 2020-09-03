@@ -143,14 +143,33 @@ export function userRestServices(appData: IAppDataType) {
 
     if ((isNaN(userId) || userId <= 0) || (!password && !token)) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
+      logger.error(
+        "userRestServices/redirected-login: user id not provided or password nor token provided",
+        {
+          userId,
+          passwordGiven: !!password,
+          tokenGiven: !!token,
+        }
+      );
       return;
     }
 
     let tokenData: IServerSideTokenDataType;
     if (token) {
-      tokenData = await jwtVerify(token, appData.sensitiveConfig.jwtKey);
-      if (!tokenData.isRealUser) {
-        res.redirect(`/en/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
+      try {
+        tokenData = await jwtVerify(token, appData.sensitiveConfig.jwtKey);
+        if (tokenData.custom && !tokenData.isRealUser) {
+          res.redirect(`/en/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
+          logger.error(
+            "userRestServices/redirected-login: tried to login with a custom token that is not a real user",
+            {
+              tokenData,
+            }
+          );
+          return;
+        }
+      } catch {
+        res.redirect(`/en/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
         return;
       }
     }
