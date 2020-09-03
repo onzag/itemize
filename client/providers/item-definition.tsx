@@ -131,7 +131,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   differingOnly?: boolean;
   includes?: string[];
   policies?: PolicyPathType[];
-  beforeSubmit?: () => boolean;
+  beforeSubmit?: () => boolean | Promise<boolean>;
   parentedBy?: {
     module: string,
     itemDefinition: string,
@@ -145,7 +145,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
   policies?: PolicyPathType[];
-  beforeDelete?: () => boolean;
+  beforeDelete?: () => boolean | Promise<boolean>;
 }
 
 /**
@@ -2032,8 +2032,11 @@ export class ActualItemDefinitionProvider extends
       return this.giveEmulatedInvalidError("deleteError", false, false);
     }
 
-    if (options.beforeDelete && !options.beforeDelete()) {
-      return null;
+    if (options.beforeDelete) {
+      const result = await options.beforeDelete();
+      if (!result) {
+        return null;
+      }
     }
 
     const {
@@ -2380,8 +2383,11 @@ export class ActualItemDefinitionProvider extends
 
     // now checking the option for the before submit function, if it returns
     // false we cancel the submit request, we don't check policies yet
-    if (options.beforeSubmit && !options.beforeSubmit()) {
-      return null;
+    if (options.beforeSubmit) {
+      const result = await options.beforeSubmit();
+      if (!result) {
+        return null;
+      }
     }
 
     // now we are going to build our query

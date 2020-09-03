@@ -1162,8 +1162,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.cleanWithProps(this.props, options, "fail");
             return this.giveEmulatedInvalidError("deleteError", false, false);
         }
-        if (options.beforeDelete && !options.beforeDelete()) {
-            return null;
+        if (options.beforeDelete) {
+            const result = await options.beforeDelete();
+            if (!result) {
+                return null;
+            }
         }
         const { argumentsForQuery, } = gql_client_util_1.getFieldsAndArgs({
             includeArgs: false,
@@ -1415,8 +1418,11 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
         // now checking the option for the before submit function, if it returns
         // false we cancel the submit request, we don't check policies yet
-        if (options.beforeSubmit && !options.beforeSubmit()) {
-            return null;
+        if (options.beforeSubmit) {
+            const result = await options.beforeSubmit();
+            if (!result) {
+                return null;
+            }
         }
         // now we are going to build our query
         // also we make a check later on for the policies

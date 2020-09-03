@@ -77,7 +77,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     differingOnly?: boolean;
     includes?: string[];
     policies?: PolicyPathType[];
-    beforeSubmit?: () => boolean;
+    beforeSubmit?: () => boolean | Promise<boolean>;
     parentedBy?: {
         module: string;
         itemDefinition: string;
@@ -90,7 +90,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
 }
 export interface IActionDeleteOptions extends IActionCleanOptions {
     policies?: PolicyPathType[];
-    beforeDelete?: () => boolean;
+    beforeDelete?: () => boolean | Promise<boolean>;
 }
 /**
  * The options for searching
