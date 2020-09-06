@@ -232,6 +232,12 @@ declare const _default: {
                 type: string;
             };
         };
+        canCreateInBehalfTargetRoles: {
+            type: string;
+            items: {
+                type: string;
+            };
+        };
         canBeParentedBy: {
             type: string;
             itemDefinition: {
@@ -875,6 +881,7 @@ declare const _default: {
     required: string[];
     dependencies: {
         createInBehalfRoleAccess: string[];
+        canCreateInBehalfTargetRoles: string[];
         versioningRoleAccess: string[];
         versionIsLanguageAndCountry: string[];
         versionIsLanguage: string[];

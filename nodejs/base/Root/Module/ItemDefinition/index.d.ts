@@ -180,6 +180,11 @@ export interface IItemDefinitionRawJSONDataType {
      */
     createInBehalfRoleAccess?: string[];
     /**
+     * A list of roles which the item definition is allowed to create
+     * in behalf to
+     */
+    createInBehalfTargetRoles?: string[];
+    /**
      * Whether it can be parented by other item definitions, these
      * represent a list of rules
      */
@@ -811,7 +816,7 @@ export default class ItemDefinition {
      * @param throwError whether to throw an error if failed (otherwise returns a boolean)
      * @return a boolean on whether the user is allowed
      */
-    checkRoleCanCreateInBehalf(role: string, throwError: boolean): boolean;
+    checkRoleCanCreateInBehalf(role: string, targetRole: string, throwError: boolean): boolean;
     /**
      * Provides the roles that are allowed versioning
      */

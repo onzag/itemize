@@ -150,9 +150,24 @@ export async function addItemDefinition(
 
   let finalOwner = tokenData.id || UNSPECIFIED_OWNER;
   if (resolverArgs.args.in_behalf_of) {
-    itemDefinition.checkRoleCanCreateInBehalf(tokenData.role, true);
+    let targetRole: string = null;
+    let alreadyCheckedUserExisted = false;
+    if (itemDefinition.rawData.createInBehalfTargetRoles && itemDefinition.rawData.createInBehalfTargetRoles.length) {
+      const targetUser = await appData.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], resolverArgs.args.in_behalf_of, null);
+      if (!targetUser) {
+        throw new EndpointError({
+          message: `There's no user to create in behalf of with id ${resolverArgs.args.in_behalf_of}`,
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      }
+      alreadyCheckedUserExisted = true;
+      targetRole = targetUser.role;
+    }
+    itemDefinition.checkRoleCanCreateInBehalf(tokenData.role, targetRole, true);
     finalOwner = resolverArgs.args.in_behalf_of;
-    await checkUserExists(appData.cache, finalOwner);
+    if (!alreadyCheckedUserExisted) {
+      await checkUserExists(appData.cache, finalOwner);
+    }
   }
 
   logger.debug(
@@ -371,7 +386,7 @@ export async function addItemDefinition(
     resolverArgs.args.for_id || null,
     resolverArgs.args.version || null,
     gqlValueToConvert,
-    tokenData.id,
+    finalOwner,
     dictionary,
     containerId,
     isNowParenting ? {

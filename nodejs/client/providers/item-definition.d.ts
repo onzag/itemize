@@ -9,6 +9,7 @@ import { IOrderByRuleType } from "../../constants";
 import { IGQLSearchRecord, IGQLValue } from "../../gql-querier";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "../internal/app/remote-listener";
+import { IIncludeOverride, IPropertyOverride } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { IConfigRawJSONDataType } from "../../config";
 import { Location } from "history";
@@ -87,6 +88,9 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     action?: "add" | "edit";
     submitForId?: number;
     submitForVersion?: string;
+    inBehalfOf?: number;
+    propertyOverrides?: IPropertyOverride[];
+    includeOverrides?: IIncludeOverride[];
 }
 export interface IActionDeleteOptions extends IActionCleanOptions {
     policies?: PolicyPathType[];

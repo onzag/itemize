@@ -9,6 +9,16 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, IGQLSearchRecord } from "../../gql-querier";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+export interface IPropertyOverride {
+    id: string;
+    value: PropertyDefinitionSupportedType;
+}
+export interface IIncludeOverride {
+    id: string;
+    exclusionState?: "INCLUDED" | "EXCLUDED" | "ANY";
+    overrides?: IPropertyOverride[];
+}
 /**
  * Provides the fields and args for an item definition in order
  * to create a query
@@ -42,6 +52,8 @@ export declare function getFieldsAndArgs(options: {
     forId: number;
     forVersion: string;
     uniteFieldsWithAppliedValue?: boolean;
+    propertyOverrides?: IPropertyOverride[];
+    includeOverrides?: IIncludeOverride[];
 }): {
     requestFields: any;
     argumentsForQuery: any;

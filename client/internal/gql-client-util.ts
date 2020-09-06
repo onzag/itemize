@@ -29,6 +29,18 @@ import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
 import { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
+import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+
+export interface IPropertyOverride {
+  id: string;
+  value: PropertyDefinitionSupportedType;
+}
+
+export interface IIncludeOverride {
+  id: string;
+  exclusionState?: "INCLUDED" | "EXCLUDED" | "ANY",
+  overrides?: IPropertyOverride[];
+}
 
 /**
  * Provides the fields and args for an item definition in order
@@ -64,6 +76,8 @@ export function getFieldsAndArgs(
     forId: number;
     forVersion: string;
     uniteFieldsWithAppliedValue?: boolean;
+    propertyOverrides?: IPropertyOverride[];
+    includeOverrides?: IIncludeOverride[];
   },
 ) {
   // so the requested fields, at base
@@ -171,7 +185,8 @@ export function getFieldsAndArgs(
     if (options.propertiesForArgs && options.propertiesForArgs.length) {
       options.propertiesForArgs.forEach((pId) => {
         const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
-        const currentValue = pd.getCurrentValue(options.forId || null, options.forVersion || null);
+        const currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id);
+        const currentValue = currentOverride ? currentOverride.value : pd.getCurrentValue(options.forId || null, options.forVersion || null);
         if (options.differingPropertiesOnlyForArgs) {
           const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
           const isEqual = pd.getPropertyDefinitionDescription().localEqual({
@@ -193,10 +208,12 @@ export function getFieldsAndArgs(
     if (options.includesForArgs && options.includesForArgs.length) {
       options.includesForArgs.forEach((iId) => {
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
+        const currentOverride = options.includeOverrides && options.includeOverrides.find((o) => o.id === iId);
+
         // and now we get the qualified identifier that grapqhl expects
         const qualifiedId = include.getQualifiedIdentifier();
         const qualifiedExlcusionStateId = include.getQualifiedExclusionStateIdentifier();
-        const exclusionState = include.getExclusionState(options.forId || null, options.forVersion || null);
+        const exclusionState = currentOverride && currentOverride.exclusionState ? currentOverride.exclusionState : include.getExclusionState(options.forId || null, options.forVersion || null);
         
         if (options.differingIncludesOnlyForArgs) {
           const appliedExclusion = include.getAppliedExclusionState(options.forId || null, options.forVersion || null);
@@ -236,7 +253,8 @@ export function getFieldsAndArgs(
           if (
             hasRoleAccessToIncludeProperty
           ) {
-            const currentValue = sp.getCurrentValue(
+            const currentPropertyOverride = currentOverride && currentOverride.overrides && currentOverride.overrides.find((o) => o.id === sp.getId());
+            const currentValue = currentPropertyOverride ? currentPropertyOverride.value : sp.getCurrentValue(
               options.forId || null, options.forVersion || null);
             if (options.differingIncludesOnlyForArgs) {
               const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);

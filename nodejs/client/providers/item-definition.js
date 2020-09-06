@@ -1444,6 +1444,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             itemDefinitionInstance: this.props.itemDefinitionInstance,
             forId: this.props.forId || null,
             forVersion: this.props.forVersion || null,
+            propertyOverrides: options.propertyOverrides,
+            includeOverrides: options.includeOverrides,
         });
         if (options.parentedBy) {
             const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -1452,6 +1454,9 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             argumentsForQuery.parent_id = options.parentedBy.id;
             argumentsForQuery.parent_version = options.parentedBy.version || null;
             argumentsForQuery.parent_type = itemDefinitionInQuestion.getQualifiedPathName();
+        }
+        if (options.inBehalfOf) {
+            argumentsForQuery.in_behalf_of = options.inBehalfOf;
         }
         // now it's when we are actually submitting
         if (!this.isUnmounted) {

@@ -22,7 +22,7 @@ import { RemoteListener } from "../../internal/app/remote-listener";
  * The property for the provider but with the key and no children
  */
 interface IItemDefinitionProviderPropsWithKey extends
-  Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
+  Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
   key: string;
 }
 
@@ -215,6 +215,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     if (
       prevProps.searchId !== this.props.searchId
     ) {
+      if (this.props.searchResults) {
+        this.loadSearchResults();
+      }
+
       // if we have this function we call it
       if (this.props.onSearchDataChange) {
         // to get the actual page we are meant to load
@@ -241,7 +245,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public refreshPage() {
     // a refresh will reload regardless
-    const currentSearchRecords = (this.props.searchRecords || []).slice(
+    const currentSearchRecords = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
@@ -250,6 +254,27 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   public dismissError() {
     this.setState({
       error: null,
+    });
+  }
+  public loadSearchResults() {
+    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+    this.props.searchResults.forEach((sr) => {
+      const itemDefintionInQuestion = root.registry[sr.type as string] as ItemDefinition;
+      // we apply the value, whatever we have gotten this will affect all the instances
+      // that use the same value
+      itemDefintionInQuestion.applyValue(
+        sr.id as number,
+        sr.version as string,
+        sr,
+        false,
+        this.props.tokenData.id,
+        this.props.tokenData.role,
+        this.props.searchFields,
+        true,
+      );
+
+      // and then we trigger the change listener for all the instances
+      itemDefintionInQuestion.triggerListeners("change", sr.id as number, sr.version as string);
     });
   }
   public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
@@ -268,27 +293,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }
 
     // this happens for traditional search, we dont need to
-    // do a second re-request round
+    // do a second re-request round this would have happened during the
+    // search data change
     if (this.props.searchResults) {
-      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      this.props.searchResults.forEach((sr) => {
-        const itemDefintionInQuestion = root.registry[sr.type as string] as ItemDefinition;
-          // we apply the value, whatever we have gotten this will affect all the instances
-          // that use the same value
-          itemDefintionInQuestion.applyValue(
-            sr.id as number,
-            sr.version as string,
-            sr,
-            false,
-            this.props.tokenData.id,
-            this.props.tokenData.role,
-            this.props.searchFields,
-            true,
-          );
-
-          // and then we trigger the change listener for all the instances
-          itemDefintionInQuestion.triggerListeners("change", sr.id as number, sr.version as string);
-      });
       // now we set the state, notice that it started with something else
       // and as such currentSearchRecord will use the value that we have applied
       // from memory as it is its new state for its given slot
@@ -581,7 +588,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public render() {
     // the accessible count is just the length of the search records
-    const accessibleCount = (this.props.searchRecords || []).length;
+    const accessibleCount = (this.props.searchRecords || []).length;
     // the page count, is the top from the page size, or 0 if accessible count is 0
     const pageCount = accessibleCount === 0 ? 0 : Math.ceil(accessibleCount / this.props.pageSize);
     // the total count is the search count or 0, the search count is a count(*) from the database

@@ -45,6 +45,7 @@ export declare function processItemDefinition(rawData: IItemDefinitionRawJSONDat
     searchable?: boolean;
     canCreateInBehalf?: boolean;
     createInBehalfRoleAccess?: string[];
+    createInBehalfTargetRoles?: string[];
     canBeParentedBy?: import("../base/Root/Module/ItemDefinition").IItemDefinitionParentingRawJSONDataType[];
     mustBeParented?: boolean;
     parentingRoleAccess?: string[];

@@ -25,6 +25,9 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
     readRoleAccess?: string[];
     parentingRoleAccess?: string[];
     canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+    canCreateInBehalf?: boolean;
+    canCreateInBehalfRoleAccess?: string[];
+    canCreateInBehalfTargetRoles?: string[];
     mustBeParented?: boolean;
     policies?: IPoliciesRawJSONDataType;
     ownerIsObjectId?: boolean;

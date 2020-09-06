@@ -379,6 +379,15 @@ async function buildItemDefinition(rawDataConfig, actualLocation, lastModuleDire
     if (actualEvaledFileData.canBeParentedBy) {
         finalValue.canBeParentedBy = actualEvaledFileData.canBeParentedBy;
     }
+    if (actualEvaledFileData.canCreateInBehalf) {
+        finalValue.canCreateInBehalf = true;
+        if (actualEvaledFileData.canCreateInBehalfRoleAccess) {
+            finalValue.createInBehalfRoleAccess = actualEvaledFileData.canCreateInBehalfRoleAccess;
+        }
+        if (actualEvaledFileData.canCreateInBehalfTargetRoles) {
+            finalValue.createInBehalfTargetRoles = actualEvaledFileData.canCreateInBehalfTargetRoles;
+        }
+    }
     if (actualEvaledFileData.ownerIsObjectId) {
         finalValue.ownerIsObjectId = actualEvaledFileData.ownerIsObjectId;
     }

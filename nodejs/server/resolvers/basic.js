@@ -753,10 +753,7 @@ function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
             resultingExtraArgs[key] = args[key];
         }
     });
-    __1.logger.silly("splitArgsInGraphqlQuery: succeed splitting args for graphql", {
-        resultingSelfValues,
-        resultingExtraArgs,
-    });
+    __1.logger.silly("splitArgsInGraphqlQuery: succeed splitting args for graphql");
     return [resultingSelfValues, resultingExtraArgs];
 }
 exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
@@ -780,7 +777,7 @@ exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
  * @param arg.parentPrevalidation a pre validation to run
  */
 async function runPolicyCheck(arg) {
-    __1.logger.silly("runPolicyCheck: Executed policy check for item definition", arg);
+    __1.logger.silly("runPolicyCheck: Executed policy check for item definition");
     // so now we get the information we need first
     const mod = arg.itemDefinition.getParentModule();
     let selectQueryValue = null;

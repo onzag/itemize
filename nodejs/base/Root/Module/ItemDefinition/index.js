@@ -1140,10 +1140,11 @@ class ItemDefinition {
      * @param throwError whether to throw an error if failed (otherwise returns a boolean)
      * @return a boolean on whether the user is allowed
      */
-    checkRoleCanCreateInBehalf(role, throwError) {
+    checkRoleCanCreateInBehalf(role, targetRole, throwError) {
         let canCreateInBehalf = false;
-        if (this.rawData.canCreateInBehalf && this.rawData.createInBehalfRoleAccess) {
-            canCreateInBehalf = this.rawData.createInBehalfRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
+        if (this.rawData.canCreateInBehalf) {
+            canCreateInBehalf = !this.rawData.createInBehalfRoleAccess ||
+                this.rawData.createInBehalfRoleAccess.includes(constants_1.ANYONE_METAROLE) ||
                 (this.rawData.createInBehalfRoleAccess.includes(constants_1.ANYONE_LOGGED_METAROLE) && role !== constants_1.GUEST_METAROLE) || this.rawData.createInBehalfRoleAccess.includes(role);
             const notLoggedInWhenShould = role === constants_1.GUEST_METAROLE;
             if (!canCreateInBehalf && throwError) {
@@ -1152,6 +1153,17 @@ class ItemDefinition {
                         ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
                     code: notLoggedInWhenShould ? constants_1.ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : constants_1.ENDPOINT_ERRORS.FORBIDDEN,
                 });
+            }
+            if (canCreateInBehalf &&
+                this.rawData.createInBehalfTargetRoles &&
+                !this.rawData.createInBehalfTargetRoles.includes(targetRole)) {
+                canCreateInBehalf = false;
+                if (throwError) {
+                    throw new errors_1.EndpointError({
+                        message: `Forbidden, only roles that can be created in behalf for are ${this.rawData.createInBehalfTargetRoles.join(", ")}`,
+                        code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+                    });
+                }
             }
         }
         else if (throwError) {

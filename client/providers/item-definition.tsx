@@ -23,7 +23,7 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import CacheWorkerInstance from "../internal/workers/cache";
 import { RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
-import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor } from "../internal/gql-client-util";
+import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride, IPropertyOverride } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
@@ -141,6 +141,9 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   action?: "add" | "edit",
   submitForId?: number;
   submitForVersion?: string;
+  inBehalfOf?: number;
+  propertyOverrides?: IPropertyOverride[];
+  includeOverrides?: IIncludeOverride[];
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
@@ -2414,6 +2417,8 @@ export class ActualItemDefinitionProvider extends
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
+      propertyOverrides: options.propertyOverrides,
+      includeOverrides: options.includeOverrides,
     });
     
     if (options.parentedBy) {
@@ -2425,6 +2430,10 @@ export class ActualItemDefinitionProvider extends
       argumentsForQuery.parent_id = options.parentedBy.id;
       argumentsForQuery.parent_version = options.parentedBy.version || null;
       argumentsForQuery.parent_type = itemDefinitionInQuestion.getQualifiedPathName();
+    }
+
+    if (options.inBehalfOf) {
+      argumentsForQuery.in_behalf_of = options.inBehalfOf;
     }
 
     // now it's when we are actually submitting

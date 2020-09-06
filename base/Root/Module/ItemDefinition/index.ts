@@ -236,6 +236,12 @@ export interface IItemDefinitionRawJSONDataType {
   createInBehalfRoleAccess?: string[];
 
   /**
+   * A list of roles which the item definition is allowed to create
+   * in behalf to
+   */
+  createInBehalfTargetRoles?: string[];
+
+  /**
    * Whether it can be parented by other item definitions, these
    * represent a list of rules
    */
@@ -1809,10 +1815,11 @@ export default class ItemDefinition {
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
    * @return a boolean on whether the user is allowed
    */
-  public checkRoleCanCreateInBehalf(role: string, throwError: boolean) {
+  public checkRoleCanCreateInBehalf(role: string, targetRole: string, throwError: boolean) {
     let canCreateInBehalf = false;
-    if (this.rawData.canCreateInBehalf && this.rawData.createInBehalfRoleAccess) {
-      canCreateInBehalf = this.rawData.createInBehalfRoleAccess.includes(ANYONE_METAROLE) ||
+    if (this.rawData.canCreateInBehalf) {
+      canCreateInBehalf = !this.rawData.createInBehalfRoleAccess ||
+        this.rawData.createInBehalfRoleAccess.includes(ANYONE_METAROLE) ||
         (
           this.rawData.createInBehalfRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
         ) || this.rawData.createInBehalfRoleAccess.includes(role);
@@ -1825,6 +1832,21 @@ export default class ItemDefinition {
           ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
+      }
+
+      if (
+        canCreateInBehalf &&
+        this.rawData.createInBehalfTargetRoles &&
+        !this.rawData.createInBehalfTargetRoles.includes(targetRole)
+      ) {
+        canCreateInBehalf = false;
+
+        if (throwError) {
+          throw new EndpointError({
+            message: `Forbidden, only roles that can be created in behalf for are ${this.rawData.createInBehalfTargetRoles.join(", ")}`,
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
       }
     } else if (throwError) {
       throw new EndpointError({

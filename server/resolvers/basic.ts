@@ -942,10 +942,6 @@ export function splitArgsInGraphqlQuery(
 
   logger.silly(
     "splitArgsInGraphqlQuery: succeed splitting args for graphql",
-    {
-      resultingSelfValues,
-      resultingExtraArgs,
-    }
   );
 
   return [resultingSelfValues, resultingExtraArgs];
@@ -991,7 +987,6 @@ export async function runPolicyCheck(
 ) {
   logger.silly(
     "runPolicyCheck: Executed policy check for item definition",
-    arg,
   );
 
   // so now we get the information we need first

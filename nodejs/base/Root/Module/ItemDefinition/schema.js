@@ -234,6 +234,12 @@ exports.default = {
                 type: "string",
             },
         },
+        canCreateInBehalfTargetRoles: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+        },
         canBeParentedBy: {
             type: "array",
             itemDefinition: itemDefinitionReferenceSchema,
@@ -293,6 +299,7 @@ exports.default = {
     required: ["type"],
     dependencies: {
         createInBehalfRoleAccess: ["canCreateInBehalf"],
+        canCreateInBehalfTargetRoles: ["canCreateInBehalf"],
         versioningRoleAccess: ["enableVersioning"],
         versionIsLanguageAndCountry: ["enableVersioning"],
         versionIsLanguage: ["enableVersioning"],
