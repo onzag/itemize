@@ -44,6 +44,9 @@ class ActualSearchLoader extends react_1.default.Component {
         let currentPage = this.props.currentPage;
         // if this is a new search
         if (prevProps.searchId !== this.props.searchId) {
+            if (this.props.searchResults) {
+                this.loadSearchResults();
+            }
             // if we have this function we call it
             if (this.props.onSearchDataChange) {
                 // to get the actual page we are meant to load
@@ -71,6 +74,17 @@ class ActualSearchLoader extends react_1.default.Component {
             error: null,
         });
     }
+    loadSearchResults() {
+        const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+        this.props.searchResults.forEach((sr) => {
+            const itemDefintionInQuestion = root.registry[sr.type];
+            // we apply the value, whatever we have gotten this will affect all the instances
+            // that use the same value
+            itemDefintionInQuestion.applyValue(sr.id, sr.version, sr, false, this.props.tokenData.id, this.props.tokenData.role, this.props.searchFields, true);
+            // and then we trigger the change listener for all the instances
+            itemDefintionInQuestion.triggerListeners("change", sr.id, sr.version);
+        });
+    }
     async loadValues(currentSearchRecords) {
         const currentSearchLoadTime = (new Date()).getTime();
         this.lastSearchLoadValuesTime = currentSearchLoadTime;
@@ -85,17 +99,9 @@ class ActualSearchLoader extends react_1.default.Component {
             return;
         }
         // this happens for traditional search, we dont need to
-        // do a second re-request round
+        // do a second re-request round this would have happened during the
+        // search data change
         if (this.props.searchResults) {
-            const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-            this.props.searchResults.forEach((sr) => {
-                const itemDefintionInQuestion = root.registry[sr.type];
-                // we apply the value, whatever we have gotten this will affect all the instances
-                // that use the same value
-                itemDefintionInQuestion.applyValue(sr.id, sr.version, sr, false, this.props.tokenData.id, this.props.tokenData.role, this.props.searchFields, true);
-                // and then we trigger the change listener for all the instances
-                itemDefintionInQuestion.triggerListeners("change", sr.id, sr.version);
-            });
             // now we set the state, notice that it started with something else
             // and as such currentSearchRecord will use the value that we have applied
             // from memory as it is its new state for its given slot

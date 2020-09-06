@@ -367,19 +367,21 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.props.itemDefinitionInstance.addListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
         }
         // second are the remote listeners, only when there's an id defined
-        if (this.props.forId && !this.props.static) {
+        if (this.props.forId) {
             // one is the reload, this gets called when the value of the field has differed from the one that
             // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
             // will get frozen in the past
             this.props.itemDefinitionInstance.addListener("reload", this.props.forId, this.props.forVersion || null, this.reloadListener);
-            // note how we used the item definition instance and that's because those events are piped from
-            // within this remote listener, the remote listener pipes the events from the websocket
-            // and triggers them in within the item definition instance; that's because the server just says what it does
-            // it says "this has been deleted" or "this element has changed" or "the last time this element was changed was"
-            // so the remote listener job is to check how does it compare to what we have in our application state
-            // do the dates match?... do we even have a value for it?... etc... adding remote listeners is heavy
-            // as it will send data either via HTTP or websockets
-            this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
+            if (!this.props.static) {
+                // note how we used the item definition instance and that's because those events are piped from
+                // within this remote listener, the remote listener pipes the events from the websocket
+                // and triggers them in within the item definition instance; that's because the server just says what it does
+                // it says "this has been deleted" or "this element has changed" or "the last time this element was changed was"
+                // so the remote listener job is to check how does it compare to what we have in our application state
+                // do the dates match?... do we even have a value for it?... etc... adding remote listeners is heavy
+                // as it will send data either via HTTP or websockets
+                this.props.remoteListener.addItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
+            }
         }
     }
     unSetupListeners() {
@@ -389,10 +391,12 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.props.itemDefinitionInstance.isInSearchMode()) {
             this.props.itemDefinitionInstance.removeListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
         }
-        if (this.props.forId && !this.props.static) {
+        if (this.props.forId) {
             // remove all the remote listeners
             this.props.itemDefinitionInstance.removeListener("reload", this.props.forId, this.props.forVersion || null, this.reloadListener);
-            this.props.remoteListener.removeItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
+            if (!this.props.static) {
+                this.props.remoteListener.removeItemDefinitionListenerFor(this, this.props.itemDefinitionInstance.getQualifiedPathName(), this.props.forId, this.props.forVersion || null);
+            }
         }
     }
     shouldComponentUpdate(nextProps, nextState) {
@@ -1469,7 +1473,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         let value;
         let error;
         let getQueryFields;
-        if (options.action ? options.action === "edit" : submitForId) {
+        if (options.action ? options.action === "edit" : (submitForId && !this.state.notFound)) {
             if (!this.state.notFound) {
                 const totalValues = await gql_client_util_1.runEditQueryFor({
                     args: argumentsForQuery,
@@ -1497,7 +1501,14 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                         submitted: false,
                     });
                 }
-                return null;
+                return {
+                    id: null,
+                    version: null,
+                    error: {
+                        message: "Edit refused due to item not found",
+                        code: "NOT_FOUND",
+                    },
+                };
             }
         }
         else {
@@ -1568,10 +1579,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             this.props.location.state[this.props.loadSearchFromNavigation] &&
             this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null;
         if (doNotUseState ? searchId === currentSearchId : searchId === this.state.searchId) {
-            if (doNotUseState) {
-                return null;
-            }
-            return;
+            return null;
         }
         const mustClear = !searchId;
         if (!mustClear) {

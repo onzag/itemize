@@ -143,7 +143,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             });
         }
     }
-    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, false, contentId, resolverArgs.args.listener_uuid || null);
+    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, !resolverArgs.args.version, contentId, resolverArgs.args.listener_uuid || null);
     if (moduleTrigger) {
         // we execute the trigger
         await moduleTrigger({

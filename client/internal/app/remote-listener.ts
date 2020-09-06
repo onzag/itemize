@@ -865,7 +865,13 @@ export class RemoteListener {
         event.type === "modified" || event.type === "created" ||
         (
           event.type === "last_modified" &&
-          event.lastModified !== appliedGQLValue.flattenedValue.last_modified
+          (
+            // our applied value is null, basically we have save and stored
+            // the item as not found
+            !appliedGQLValue.flattenedValue ||
+            // our last modified event differs, means it's newer
+            event.lastModified !== appliedGQLValue.flattenedValue.last_modified
+          )
         )
       ) {
         // we request a reload

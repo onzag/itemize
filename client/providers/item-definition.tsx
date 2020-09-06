@@ -30,7 +30,7 @@ import { ConfigContext } from "../internal/providers/config-provider";
 import { IConfigRawJSONDataType } from "../../config";
 import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
-import { Location } from "history";
+import { Location } from "history";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -659,7 +659,7 @@ export class ActualItemDefinitionProvider extends
             getPropertyListForSearchMode(
               props.properties || [],
               props.itemDefinitionInstance.getStandardCounterpart()
-            ) : props.properties || [],
+            ) : props.properties || [],
           props.includes || [],
           !props.includePolicies,
         ),
@@ -750,12 +750,12 @@ export class ActualItemDefinitionProvider extends
     // the value might already be available in memory, this is either because it was loaded
     // by another instance or because of SSR during the initial render
     const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(
-      this.props.forId || null, this.props.forVersion || null,
+      this.props.forId || null, this.props.forVersion || null,
     ));
     let memoryLoadedAndValid = false;
     if (memoryLoaded) {
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId || null, this.props.forVersion || null,
+        this.props.forId || null, this.props.forVersion || null,
       );
       // this is the same as for loadValue we are tyring to predict
       const { requestFields } = getFieldsAndArgs({
@@ -795,7 +795,7 @@ export class ActualItemDefinitionProvider extends
       searchRequestedProperties: [],
     };
     const internalState = this.props.itemDefinitionInstance.getInternalState(
-      this.props.forId || null, this.props.forVersion || null,
+      this.props.forId || null, this.props.forVersion || null,
     );
     if (internalState) {
       searchState = internalState.searchState;
@@ -826,7 +826,7 @@ export class ActualItemDefinitionProvider extends
           getPropertyListForSearchMode(
             this.props.properties || [],
             this.props.itemDefinitionInstance.getStandardCounterpart()
-          ) : this.props.properties || [],
+          ) : this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -899,15 +899,15 @@ export class ActualItemDefinitionProvider extends
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
-      });     
+        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
+      });
     }
   }
   public removeSetters(props: IActualItemDefinitionProviderProps = this.props) {
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyClearEnforce(property, props.forId || null, props.forVersion || null, true); 
+        this.onPropertyClearEnforce(property, props.forId || null, props.forVersion || null, true);
       });
     }
   }
@@ -975,7 +975,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     // second are the remote listeners, only when there's an id defined
-    if (this.props.forId && !this.props.static) {
+    if (this.props.forId) {
       // one is the reload, this gets called when the value of the field has differed from the one that
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
@@ -983,19 +983,21 @@ export class ActualItemDefinitionProvider extends
         "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
       );
 
-      // note how we used the item definition instance and that's because those events are piped from
-      // within this remote listener, the remote listener pipes the events from the websocket
-      // and triggers them in within the item definition instance; that's because the server just says what it does
-      // it says "this has been deleted" or "this element has changed" or "the last time this element was changed was"
-      // so the remote listener job is to check how does it compare to what we have in our application state
-      // do the dates match?... do we even have a value for it?... etc... adding remote listeners is heavy
-      // as it will send data either via HTTP or websockets
-      this.props.remoteListener.addItemDefinitionListenerFor(
-        this,
-        this.props.itemDefinitionInstance.getQualifiedPathName(),
-        this.props.forId,
-        this.props.forVersion || null,
-      );
+      if (!this.props.static) {
+        // note how we used the item definition instance and that's because those events are piped from
+        // within this remote listener, the remote listener pipes the events from the websocket
+        // and triggers them in within the item definition instance; that's because the server just says what it does
+        // it says "this has been deleted" or "this element has changed" or "the last time this element was changed was"
+        // so the remote listener job is to check how does it compare to what we have in our application state
+        // do the dates match?... do we even have a value for it?... etc... adding remote listeners is heavy
+        // as it will send data either via HTTP or websockets
+        this.props.remoteListener.addItemDefinitionListenerFor(
+          this,
+          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          this.props.forId,
+          this.props.forVersion || null,
+        );
+      }
     }
   }
   public unSetupListeners() {
@@ -1012,17 +1014,20 @@ export class ActualItemDefinitionProvider extends
       );
     }
 
-    if (this.props.forId && !this.props.static) {
+    if (this.props.forId) {
       // remove all the remote listeners
       this.props.itemDefinitionInstance.removeListener(
         "reload", this.props.forId, this.props.forVersion || null, this.reloadListener,
       );
-      this.props.remoteListener.removeItemDefinitionListenerFor(
-        this,
-        this.props.itemDefinitionInstance.getQualifiedPathName(),
-        this.props.forId,
-        this.props.forVersion || null,
-      );
+
+      if (!this.props.static) {
+        this.props.remoteListener.removeItemDefinitionListenerFor(
+          this,
+          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          this.props.forId,
+          this.props.forVersion || null,
+        );
+      }
     }
   }
   public shouldComponentUpdate(
@@ -1055,7 +1060,7 @@ export class ActualItemDefinitionProvider extends
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
       !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
       !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
-      !equals(nextProps.setters, this.props.setters) ||
+      !equals(nextProps.setters, this.props.setters) ||
       nextProps.location !== this.props.location ||
       !equals(nextProps.injectedParentContext, this.props.injectedParentContext);
   }
@@ -1071,7 +1076,7 @@ export class ActualItemDefinitionProvider extends
         prevProps.location.state &&
         prevProps.location.state[prevProps.loadSearchFromNavigation] &&
         prevProps.location.state[prevProps.loadSearchFromNavigation].searchId
-      ) || null) !== 
+      ) || null) !==
       ((
         this.props.location.state &&
         this.props.location.state[this.props.loadSearchFromNavigation] &&
@@ -1121,7 +1126,7 @@ export class ActualItemDefinitionProvider extends
     if (
       itemDefinitionWasUpdated ||
       uniqueIDChanged ||
-      didSomethingThatInvalidatedSetters ||
+      didSomethingThatInvalidatedSetters ||
       didSomethingThatInvalidatedPrefills ||
       !equals(prevProps.properties || [], this.props.properties || []) ||
       !equals(prevProps.includes || [], this.props.includes || []) ||
@@ -1217,7 +1222,7 @@ export class ActualItemDefinitionProvider extends
               getPropertyListForSearchMode(
                 this.props.properties || [],
                 this.props.itemDefinitionInstance.getStandardCounterpart()
-              ) : this.props.properties || [],
+              ) : this.props.properties || [],
             this.props.includes || [],
             !this.props.includePolicies,
           ),
@@ -1268,7 +1273,7 @@ export class ActualItemDefinitionProvider extends
         // dismiss the search in such a case as the token is different
         // that or the automatic search would be reexecuted
         itemDefinitionWasUpdated ||
-        didSomethingThatInvalidatedSetters ||
+        didSomethingThatInvalidatedSetters ||
         didSomethingThatInvalidatedPrefills ||
         prevProps.tokenData.token !== this.props.tokenData.token
       )
@@ -1337,7 +1342,7 @@ export class ActualItemDefinitionProvider extends
       searchRequestedProperties: [],
     };
     const internalState = this.props.itemDefinitionInstance.getInternalState(
-      this.props.forId || null, this.props.forVersion || null,
+      this.props.forId || null, this.props.forVersion || null,
     );
     if (internalState) {
       searchState = internalState.searchState;
@@ -1365,10 +1370,10 @@ export class ActualItemDefinitionProvider extends
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
         this.props.itemDefinitionInstance.isInSearchMode() ?
-            getPropertyListForSearchMode(
-              this.props.properties || [],
-              this.props.itemDefinitionInstance.getStandardCounterpart()
-            ) : this.props.properties || [],
+          getPropertyListForSearchMode(
+            this.props.properties || [],
+            this.props.itemDefinitionInstance.getStandardCounterpart()
+          ) : this.props.properties || [],
         this.props.includes || [],
         !this.props.includePolicies,
       ),
@@ -1690,7 +1695,7 @@ export class ActualItemDefinitionProvider extends
         getPropertyListForSearchMode(
           this.props.properties || [],
           this.props.itemDefinitionInstance.getStandardCounterpart()
-        ) : this.props.properties || [],
+        ) : this.props.properties || [],
       this.props.includes || [],
       !this.props.includePolicies,
     );
@@ -2111,7 +2116,7 @@ export class ActualItemDefinitionProvider extends
       this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
     }
 
-    this.props.onDelete && this.props.onDelete({error});
+    this.props.onDelete && this.props.onDelete({ error });
     return {
       error,
     };
@@ -2202,7 +2207,7 @@ export class ActualItemDefinitionProvider extends
     // RESTORING PROPERTIES
     const restorePropertyFn = (ptr: string) => {
       props.itemDefinitionInstance
-        .getPropertyDefinitionFor(ptr, true).restoreValueFor(props.forId || null,
+        .getPropertyDefinitionFor(ptr, true).restoreValueFor(props.forId || null,
           props.forVersion || null);
     };
     if (
@@ -2272,7 +2277,7 @@ export class ActualItemDefinitionProvider extends
     // RESTORING INCLUDES
     const restoreIncludeFn = (itr: string) => {
       props.itemDefinitionInstance
-        .getIncludeFor(itr).restoreValueFor(props.forId || null,
+        .getIncludeFor(itr).restoreValueFor(props.forId || null,
           props.forVersion || null);
     };
     if (
@@ -2420,7 +2425,7 @@ export class ActualItemDefinitionProvider extends
       propertyOverrides: options.propertyOverrides,
       includeOverrides: options.includeOverrides,
     });
-    
+
     if (options.parentedBy) {
       const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
         .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
@@ -2428,7 +2433,7 @@ export class ActualItemDefinitionProvider extends
         options.parentedBy.itemDefinition.split("/"));
 
       argumentsForQuery.parent_id = options.parentedBy.id;
-      argumentsForQuery.parent_version = options.parentedBy.version || null;
+      argumentsForQuery.parent_version = options.parentedBy.version || null;
       argumentsForQuery.parent_type = itemDefinitionInQuestion.getQualifiedPathName();
     }
 
@@ -2449,7 +2454,7 @@ export class ActualItemDefinitionProvider extends
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
-    if (options.action ? options.action === "edit" : submitForId) {
+    if (options.action ? options.action === "edit" : (submitForId && !this.state.notFound)) {
       if (!this.state.notFound) {
         const totalValues = await runEditQueryFor({
           args: argumentsForQuery,
@@ -2458,7 +2463,7 @@ export class ActualItemDefinitionProvider extends
           token: this.props.tokenData.token,
           language: this.props.localeData.language,
           id: submitForId || null,
-          version: submitForVersion || null,
+          version: submitForVersion || null,
           listenerUUID: this.props.remoteListener.getUUID(),
           cacheStore: this.props.longTermCaching,
         });
@@ -2476,10 +2481,17 @@ export class ActualItemDefinitionProvider extends
             submitted: false,
           });
         }
-        return null;
+        return {
+          id: null,
+          version: null,
+          error: {
+            message: "Edit refused due to item not found",
+            code: "NOT_FOUND",
+          },
+        };
       }
     } else {
-      let containerId: string 
+      let containerId: string
       Object.keys(this.props.config.containersRegionMappers).forEach((mapper) => {
         if (mapper.split(";").includes(this.props.localeData.country)) {
           containerId = this.props.config.containersRegionMappers[mapper];
@@ -2546,7 +2558,7 @@ export class ActualItemDefinitionProvider extends
     // happens during an error or whatnot
     const result = {
       id: recievedId,
-      version: receivedVersion || null,
+      version: receivedVersion || null,
       error,
     };
     this.props.onSubmit && this.props.onSubmit(result);
@@ -2560,10 +2572,7 @@ export class ActualItemDefinitionProvider extends
     ) || null;
 
     if (doNotUseState ? searchId === currentSearchId : searchId === this.state.searchId) {
-      if (doNotUseState) {
-        return null;
-      }
-      return;
+      return null;
     }
 
     const mustClear: boolean = !searchId;
@@ -2616,7 +2625,7 @@ export class ActualItemDefinitionProvider extends
     // we extract the hack variable
     const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
     this.preventSearchFeedbackOnPossibleStaleData = false;
-    
+
     if (this.state.searching) {
       return null;
     }
@@ -2732,7 +2741,7 @@ export class ActualItemDefinitionProvider extends
       userId: this.props.tokenData.id,
       userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
-      forId: this.props.forId || null,
+      forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
     });
 
@@ -2769,7 +2778,7 @@ export class ActualItemDefinitionProvider extends
 
     const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(
       this.props.forId || null,
-      this.props.forVersion || null,
+      this.props.forVersion || null,
     );
 
     const {
@@ -2830,7 +2839,7 @@ export class ActualItemDefinitionProvider extends
       ) {
         this.props.itemDefinitionInstance.setInternalState(
           this.props.forId || null,
-          this.props.forVersion || null,
+          this.props.forVersion || null,
           {
             searchState,
             state: stateOfSearch,
@@ -2900,7 +2909,7 @@ export class ActualItemDefinitionProvider extends
       ) {
         this.props.itemDefinitionInstance.setInternalState(
           this.props.forId || null,
-          this.props.forVersion || null,
+          this.props.forVersion || null,
           {
             searchState,
             state: stateOfSearch,
@@ -3108,13 +3117,13 @@ export class ActualItemDefinitionProvider extends
       this.props.tokenData.id,
       this.props.assumeOwnership ?
         (this.props.tokenData.id || UNSPECIFIED_OWNER) :
-        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null),
+        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null),
       {},
       false,
     );
   }
   public poke(elements: IPokeElementsType) {
-    if (this.isUnmounted) {
+    if (this.isUnmounted) {
       return;
     }
 
@@ -3373,7 +3382,7 @@ export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProvi
   )
 }
 
-export function ParentItemDefinitionContextProvider(props: {children: React.ReactNode}) {
+export function ParentItemDefinitionContextProvider(props: { children: React.ReactNode }) {
   return (
     <ItemDefinitionContext.Consumer>
       {(value) => (

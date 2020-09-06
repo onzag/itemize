@@ -202,7 +202,7 @@ export async function deleteItemDefinition(
     itemDefinition,
     resolverArgs.args.id,
     resolverArgs.args.version,
-    false,
+    !resolverArgs.args.version,
     contentId,
     resolverArgs.args.listener_uuid || null,
   );

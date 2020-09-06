@@ -32,8 +32,8 @@ const fragmentStyles = createStyles({
 	},
 });
 
-const redirectOnSuccess = (version: string, status: IActionResponseWithId) =>
-	`/cms/fragment?id=${status.id}&version=${version || ""}`;
+const redirectOnSuccess = (status: IActionResponseWithId) =>
+	`/cms/fragment?id=${status.id}&version=${status.version || ""}`;
 
 /**
  * The fragment section itself that allows modifying and creating new fragments
@@ -105,7 +105,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 											"attachments",
 										],
 									}}
-									redirectOnSuccess={redirectOnSuccess.bind(null, locationState.version)}
+									redirectOnSuccess={redirectOnSuccess}
 									redirectReplace={true}
 								/>
 

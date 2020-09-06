@@ -602,7 +602,12 @@ class RemoteListener {
             // a last modified that doesn't match our applied value
             if (event.type === "modified" || event.type === "created" ||
                 (event.type === "last_modified" &&
-                    event.lastModified !== appliedGQLValue.flattenedValue.last_modified)) {
+                    (
+                    // our applied value is null, basically we have save and stored
+                    // the item as not found
+                    !appliedGQLValue.flattenedValue ||
+                        // our last modified event differs, means it's newer
+                        event.lastModified !== appliedGQLValue.flattenedValue.last_modified))) {
                 // we request a reload
                 itemDefinition.triggerListeners("reload", event.id, event.version);
                 // otherwise it was deleted
