@@ -36,6 +36,11 @@ import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
 import { IOTriggerActions } from "../triggers";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+
 function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
   let maximumRecords: IGQLSearchRecord[] = [];
   let maximumRecordId: number = null;
@@ -81,7 +86,7 @@ export async function searchModule(
   mod: Module,
   traditional?: boolean,
 ) {
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchModule: executed search for " + mod.getQualifiedPathName(),
   );
 
@@ -108,7 +113,7 @@ export async function searchModule(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchModule: retrieved search fields as",
     searchingFields,
   );
@@ -122,7 +127,7 @@ export async function searchModule(
   // check role access for those searching fields
   // yes they are not being directly read but they can
   // be brute forced this way, and we are paranoid as hell
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
   );
   searchModeCounterpart.checkRoleAccessFor(
@@ -149,7 +154,7 @@ export async function searchModule(
         requestedFieldsInMod[arg] = requestedFields[arg];
       }
     });
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchModule: Extracted requested fields from module",
       fieldsToRequest,
     );
@@ -316,7 +321,7 @@ export async function searchModule(
       count, 
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchModule: succeed traditionally",
     );
 
@@ -330,7 +335,7 @@ export async function searchModule(
       count, 
     };
   
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchModule: succeed with records",
     );
   
@@ -370,7 +375,7 @@ export async function searchItemDefinition(
   }
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName(),
   );
 
@@ -406,7 +411,7 @@ export async function searchItemDefinition(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchItemDefinition: retrieved search fields as",
     searchingFields,
   );
@@ -426,7 +431,7 @@ export async function searchItemDefinition(
   // and uses the EXACT_phone_number field, he will get returned null
   // until he matches the phone number, this is a leak, a weak one
   // but a leak nevertheless, we are so paranoid we prevent this
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName(),
   );
   searchModeCounterpart.checkRoleAccessFor(
@@ -469,7 +474,7 @@ export async function searchItemDefinition(
         requestedFieldsInIdef[arg] = requestedFields[arg];
       }
     });
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchItemDefinition: Extracted requested fields from module",
       fieldsToRequest,
     );
@@ -649,7 +654,7 @@ export async function searchItemDefinition(
       count, 
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchItemDefinition: succeed traditionally",
     );
 
@@ -665,7 +670,7 @@ export async function searchItemDefinition(
       count, 
     };
   
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "searchItemDefinition: succeed with records",
     );
   

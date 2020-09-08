@@ -21,6 +21,11 @@ import { logger } from "../../../../../../server";
 import Module from "../../..";
 import https from "https";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+
 /**
  * Processes an extended list based
  * file value
@@ -347,7 +352,7 @@ export async function removeFolderFor(
   mainPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    logger.debug("removeFolderFor: Deleting folder for", {mainPath});
+    CAN_LOG_DEBUG && logger.debug("removeFolderFor: Deleting folder for", {mainPath});
 
     (uploadsContainer as any).getFiles({
       prefix: mainPath,
@@ -355,7 +360,7 @@ export async function removeFolderFor(
       if (err) {
         reject(err);
       } else if (files && files.length) {
-        logger.debug("removeFolderFor: Bulk deleting", {files});
+        CAN_LOG_DEBUG && logger.debug("removeFolderFor: Bulk deleting", {files});
         (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
           if (err) {
             reject(err);
@@ -364,7 +369,7 @@ export async function removeFolderFor(
           }
         });
       } else {
-        logger.debug("removeFolderFor: Could not find any files");
+        CAN_LOG_DEBUG && logger.debug("removeFolderFor: Could not find any files");
         resolve();
       }
     });
@@ -439,7 +444,7 @@ export async function sqlUploadPipeFile(
   readStream: ReadStream | sharp.Sharp,
   remote: string,
 ): Promise<void> {
-  logger.debug("sqlUploadPipeFile: Uploading", {remote});
+  CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Uploading", {remote});
 
   // we make a write stream to the uploads container
   const writeStream = uploadsContainer.client.upload({
@@ -452,7 +457,7 @@ export async function sqlUploadPipeFile(
   // return a promise for it
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
-      logger.debug("sqlUploadPipeFile: Finished uploading", {remote});
+      CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Finished uploading", {remote});
       // we call the verify resource is ready function
       verifyResourceIsReady(
         new URL(uploadsPrefix + remote),
@@ -473,7 +478,7 @@ export async function sqlUploadPipeFile(
 function verifyResourceIsReady(url: URL, done: () => void) {
   // so we get the url string value, for debugging purposes
   const strURL = url.toString();
-  logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
+  CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
 
   // now we use https to call and do a head request to check the status
   https.get({
@@ -483,11 +488,11 @@ function verifyResourceIsReady(url: URL, done: () => void) {
   }, (resp) => {
     // status is succesful
     if (resp.statusCode === 200 || resp.statusCode === 0) {
-      logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
+      CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
       done();
     } else {
       // otherwise we wait 100 milliseconds, and recursively execute until it's ready
-      logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
+      CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
       setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
     }
   });

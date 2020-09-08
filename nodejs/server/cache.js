@@ -18,6 +18,11 @@ const _1 = require(".");
 const token_1 = require("./token");
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -60,7 +65,7 @@ class Cache {
      * @returns a promise with the value
      */
     getRaw(key) {
-        _1.logger.debug("Cache.getRaw: requesting " + key);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.getRaw: requesting " + key);
         // we build the promise
         return new Promise((resolve) => {
             // and call redis, note how we never reject
@@ -97,7 +102,7 @@ class Cache {
         });
     }
     setRaw(key, value) {
-        _1.logger.debug("Cache.setRaw: setting " + key);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.setRaw: setting " + key);
         return new Promise((resolve) => {
             this.redisClient.set(key, JSON.stringify(value), (error) => {
                 resolve(value);
@@ -118,7 +123,7 @@ class Cache {
      * @param keyIdentifier the identifier
      */
     pokeCache(keyIdentifier) {
-        _1.logger.debug("Cache.pokeCache: poking " + keyIdentifier);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.pokeCache: poking " + keyIdentifier);
         this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400, (err) => {
             if (err) {
                 _1.logger.error("Cache.pokeCache: could not poke " + keyIdentifier + " with error", err.stack ? err.stack : err.message);
@@ -134,8 +139,8 @@ class Cache {
      */
     forceCacheInto(idefTable, id, version, value) {
         const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-        _1.logger.debug("Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier);
-        _1.logger.silly("Cache.forceCacheInto: value is", value);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier);
+        CAN_LOG_SILLY && _1.logger.silly("Cache.forceCacheInto: value is", value);
         this.listener.registerSS({
             itemDefinition: idefTable,
             id: id,
@@ -163,7 +168,7 @@ class Cache {
     async requestCreation(itemDefinition, forId, version, value, createdBy, dictionary, containerId, parent) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
-        _1.logger.debug("Cache.requestCreation: requesting creation for " + selfTable + " at module " +
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: requesting creation for " + selfTable + " at module " +
             moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary);
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
@@ -214,15 +219,15 @@ class Cache {
             }
         }
         if (parent) {
-            _1.logger.debug("Cache.requestCreation: parent specified is id " + parent.id + " with version " + parent.version + " and type " + parent.type);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: parent specified is id " + parent.id + " with version " + parent.version + " and type " + parent.type);
             sqlModData.parent_id = parent.id;
             // the version can never be null, so we must cast it into the invalid
             // empty string value
             sqlModData.parent_version = parent.version || "";
             sqlModData.parent_type = parent.type;
         }
-        _1.logger.debug("Cache.requestCreation: finalizing SQL data with module data", sqlModData);
-        _1.logger.debug("Cache.requestCreation: finalizing SQL data with item definition data", sqlIdefData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: finalizing SQL data with module data", sqlModData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: finalizing SQL data with item definition data", sqlIdefData);
         // now let's build the transaction for the insert query which requires
         // two tables to be modified, and it always does so, as item definition information
         // must be added because create requires so
@@ -264,7 +269,7 @@ class Cache {
             });
             throw err;
         }
-        _1.logger.debug("Cache.requestCreation: consuming binary information streams");
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: consuming binary information streams");
         try {
             await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         }
@@ -292,7 +297,7 @@ class Cache {
             });
         }
         (async () => {
-            _1.logger.debug("Cache.requestCreation (detached): storing cache value from the action");
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): storing cache value from the action");
             await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
             const changeEvent = {
                 itemDefinition: selfTable,
@@ -301,7 +306,7 @@ class Cache {
                 type: "created",
                 lastModified: null,
             };
-            _1.logger.debug("Cache.requestCreation (detached): built and triggering created change event", changeEvent);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): built and triggering created change event", changeEvent);
             this.listener.triggerChangedListeners(changeEvent, sqlValue, null);
             const searchResultForThisValue = {
                 id: sqlValue.id,
@@ -317,13 +322,13 @@ class Cache {
                 ],
                 newLastRecordDate: searchResultForThisValue.created_at,
             };
-            _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)", itemDefinitionBasedOwnedEvent);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)", itemDefinitionBasedOwnedEvent);
             this.listener.triggerOwnedSearchListeners(itemDefinitionBasedOwnedEvent, null);
             const moduleBasedOwnedEvent = {
                 ...itemDefinitionBasedOwnedEvent,
                 qualifiedPathName: moduleTable,
             };
-            _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for active searches (module)", moduleBasedOwnedEvent);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for active searches (module)", moduleBasedOwnedEvent);
             this.listener.triggerOwnedSearchListeners(moduleBasedOwnedEvent, null);
             if (parent) {
                 const itemDefinitionBasedParentedEvent = {
@@ -336,13 +341,13 @@ class Cache {
                     ],
                     newLastRecordDate: searchResultForThisValue.created_at,
                 };
-                _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)", itemDefinitionBasedParentedEvent);
+                CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)", itemDefinitionBasedParentedEvent);
                 this.listener.triggerParentedSearchListeners(itemDefinitionBasedParentedEvent, null);
                 const moduleBasedParentedEvent = {
                     ...itemDefinitionBasedParentedEvent,
                     qualifiedPathName: moduleTable,
                 };
-                _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)", moduleBasedParentedEvent);
+                CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)", moduleBasedParentedEvent);
                 this.listener.triggerParentedSearchListeners(moduleBasedParentedEvent, null);
             }
         })();
@@ -392,7 +397,7 @@ class Cache {
     async requestUpdate(itemDefinition, id, version, update, currentValue, editedBy, dictionary, containerId, listenerUUID) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
-        _1.logger.debug("Cache.requestUpdate: requesting update for " + selfTable + " at module " +
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: requesting update for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
             "container id " + containerId);
         // We get only the fields that we expect to be updated
@@ -428,8 +433,8 @@ class Cache {
             sqlModData.edited_by = editedBy;
         }
         sqlModData.last_modified = this.knex.fn.now();
-        _1.logger.debug("Cache.requestUpdate: finalizing SQL data with module data", sqlModData);
-        _1.logger.debug("Cache.requestUpdate: finalizing SQL data with item definition data", sqlIdefData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: finalizing SQL data with module data", sqlModData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: finalizing SQL data with item definition data", sqlIdefData);
         // we build the transaction for the action
         let sqlValue;
         try {
@@ -476,7 +481,7 @@ class Cache {
             });
             throw err;
         }
-        _1.logger.debug("Cache.requestUpdate: consuming binary information streams");
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: consuming binary information streams");
         try {
             await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
         }
@@ -505,7 +510,7 @@ class Cache {
         }
         // we return and this executes after it returns
         (async () => {
-            _1.logger.debug("Cache.requestUpdate (detached): storing cache value from the action");
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate (detached): storing cache value from the action");
             await this.forceCacheInto(selfTable, id, version, sqlValue);
             const changeEvent = {
                 itemDefinition: selfTable,
@@ -514,7 +519,7 @@ class Cache {
                 type: "modified",
                 lastModified: null,
             };
-            _1.logger.debug("Cache.requestUpdate (detached): built and triggering created change event", changeEvent);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate (detached): built and triggering created change event", changeEvent);
             this.listener.triggerChangedListeners(changeEvent, sqlValue, listenerUUID || null);
         })();
         return sqlValue;
@@ -535,7 +540,7 @@ class Cache {
     async requestDelete(itemDefinition, id, version, dropAllVersions, containerId, listenerUUID) {
         const selfTable = itemDefinition.getQualifiedPathName();
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
-        _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions);
         let deleteFilesInContainer = async (specifiedVersion) => {
             const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
@@ -637,7 +642,7 @@ class Cache {
             itemDefinition[0] : itemDefinition.getQualifiedPathName();
         const moduleTable = Array.isArray(itemDefinition) ?
             itemDefinition[1] : itemDefinition.getParentModule().getQualifiedPathName();
-        _1.logger.debug("Cache.requestValue: requesting value for " + idefTable + " at module " +
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestValue: requesting value for " + idefTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh);
         if (!refresh) {
             const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
@@ -655,7 +660,7 @@ class Cache {
                 return currentValue.value;
             }
         }
-        _1.logger.debug("Cache.requestValue: not found in memory or refresh expected, requesting database");
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestValue: not found in memory or refresh expected, requesting database");
         try {
             const queryValue = version_null_value_1.convertVersionsIntoNullsWhenNecessary(
             // let's remember versions as null do not exist in the database, instead it uses
@@ -707,7 +712,7 @@ class Cache {
         return this.serverData;
     }
     onServerDataChangeInformed(newData) {
-        _1.logger.debug("Cache.onServerDataChangeInformed: new server data has been informed");
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.onServerDataChangeInformed: new server data has been informed");
         this.serverData = newData;
     }
     /**

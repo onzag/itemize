@@ -12,6 +12,11 @@ const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) {
     let pooledRoot;
     try {
@@ -28,7 +33,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         });
     }
     const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
-    __1.logger.debug("addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName());
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName());
     // First we check the language and the region, based on the args
     // as we expect every request to contain this data and be
     // valid for our app
@@ -115,8 +120,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             await basic_1.checkUserExists(appData.cache, finalOwner);
         }
     }
-    __1.logger.debug("addItemDefinition: Fields to add have been extracted", addingFields);
-    __1.logger.debug("addItemDefinition: Checking basic role access for creation");
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: Fields to add have been extracted", addingFields);
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: Checking basic role access for creation");
     // now we check the role access for the given
     // create action
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.CREATE, tokenData.role, tokenData.id, finalOwner, addingFields, true);
@@ -131,8 +136,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             requestedFieldsThatRepresentPropertiesAndIncludes[arg] = requestedFields[arg];
         }
     });
-    __1.logger.debug("addItemDefinition: Fields to be requested have been extracted", requestedFieldsThatRepresentPropertiesAndIncludes);
-    __1.logger.debug("addItemDefinition: Checking basic role access for read");
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: Fields to be requested have been extracted", requestedFieldsThatRepresentPropertiesAndIncludes);
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: Checking basic role access for read");
     // so now we check the role access for the reading of
     // those fields, as you can see we use the userId of the user
     // since he will be the owner as well
@@ -169,7 +174,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 // this shouldn't really happen because validateParentingRules should have
                 // checked whether it existed, but we check anyway
                 if (!content) {
-                    __1.logger.debug("addItemDefinition: failed due to lack of content data");
+                    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: failed due to lack of content data");
                     throw new errors_1.EndpointError({
                         message: `There's no parent ${resolverArgs.args.parent_type} with ` +
                             `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
@@ -179,7 +184,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
                 // this should have also not happen because validate should also have done it
                 // but we check anyway
                 if (content.blocked_at !== null) {
-                    __1.logger.debug("addItemDefinition: failed due to element being blocked");
+                    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: failed due to element being blocked");
                     throw new errors_1.EndpointError({
                         message: "The parent is blocked",
                         code: constants_1.ENDPOINT_ERRORS.BLOCKED,
@@ -276,8 +281,8 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         version: gqlValueToConvert.parent_version,
         type: gqlValueToConvert.parent_type,
     } : null);
-    __1.logger.debug("addItemDefinition: SQL ouput retrieved");
-    __1.logger.silly("addItemDefinition: Value is", value);
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: SQL ouput retrieved");
+    CAN_LOG_SILLY && __1.logger.silly("addItemDefinition: Value is", value);
     // now we convert that SQL value to the respective GQL value
     // the reason we pass the requested fields is to filter by the fields
     // that we actually want, not passing this would make the gql value
@@ -326,7 +331,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
     }
-    __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
+    CAN_LOG_DEBUG && __1.logger.debug("addItemDefinition: GQL output calculated", finalOutput);
     pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     // items that have just been added cannot be blocked or deleted, hence we just return

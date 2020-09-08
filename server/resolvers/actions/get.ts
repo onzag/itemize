@@ -27,12 +27,18 @@ import { IGQLSearchRecord } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+
 export async function getItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName(),
   );
   // first we check that the language and region provided are
@@ -101,7 +107,7 @@ export async function getItemDefinition(
       requestedFieldsInIdef,
       true,
     );
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "getItemDefinition: no results found returning null",
     );
     // We do not return the 404, just return null in this case
@@ -113,7 +119,7 @@ export async function getItemDefinition(
     userId = selectQueryValue.id;
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinition: checking role access for read",
   );
   // now we check the role access, this function will throw an error
@@ -127,10 +133,10 @@ export async function getItemDefinition(
     true,
   );
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinition: SQL ouput retrieved",
   );
-  logger.silly(
+  CAN_LOG_SILLY && logger.silly(
     "getItemDefinition: value is",
     selectQueryValue,
   );
@@ -204,10 +210,10 @@ export async function getItemDefinition(
     }
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinition: GQL ouput retrieved",
   );
-  logger.silly(
+  CAN_LOG_SILLY && logger.silly(
     "getItemDefinition: value is",
     toReturnToUser,
   );
@@ -221,7 +227,7 @@ export async function getItemDefinitionList(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName(),
   );
 
@@ -254,7 +260,7 @@ export async function getItemDefinitionList(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinitionList: Extracted requested fields from idef",
     requestedFields,
   );
@@ -265,7 +271,7 @@ export async function getItemDefinitionList(
     ownerToCheckAgainst = created_by;
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getItemDefinitionList: checking role access for read",
   );
   itemDefinition.checkRoleAccessFor(
@@ -376,7 +382,7 @@ export async function getItemDefinitionList(
   const resultAsObject = {
     results: finalValues,
   };
-  logger.debug("getItemDefinitionList: done");
+  CAN_LOG_DEBUG && logger.debug("getItemDefinitionList: done");
 
   return resultAsObject;
 }
@@ -386,7 +392,7 @@ export async function getModuleList(
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getModuleList: executed get list for " + mod.getQualifiedPathName(),
   );
   // first we check that the language and region provided are
@@ -410,7 +416,7 @@ export async function getModuleList(
       requestedFieldsInMod[arg] = requestedFields[arg];
     }
   });
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getModuleList: Extracted requested fields from idef",
     requestedFieldsInMod,
   );
@@ -421,7 +427,7 @@ export async function getModuleList(
     ownerToCheckAgainst = created_by;
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "getModuleList: checking role access for read",
   );
   mod.checkRoleAccessFor(
@@ -520,7 +526,7 @@ export async function getModuleList(
     results: finalValues,
   };
 
-  logger.debug("getModuleList: done");
+  CAN_LOG_DEBUG && logger.debug("getModuleList: done");
   return resultAsObject;
 }
 

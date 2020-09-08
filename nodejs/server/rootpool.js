@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tarn_1 = require("tarn");
 const Root_1 = __importDefault(require("../base/Root"));
 const _1 = require(".");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 function retrieveRootPool(rawData) {
     const pool = new tarn_1.Pool({
         create: (cb) => {
@@ -21,7 +25,7 @@ function retrieveRootPool(rawData) {
             return;
         },
         log: (message) => {
-            _1.logger.debug(message);
+            CAN_LOG_DEBUG && _1.logger.debug(message);
         },
         min: 10,
         max: 40,

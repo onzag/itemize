@@ -21,12 +21,17 @@ import { IOTriggerActions } from "../triggers";
 import { IGQLValue } from "../../../gql-querier";
 import Module from "../../../base/Root/Module";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+
 export async function deleteItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ): Promise<any> {
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "deleteItemDefinition: executed delete for " + itemDefinition.getQualifiedPathName(),
   );
 
@@ -46,7 +51,7 @@ export async function deleteItemDefinition(
   const mod = itemDefinition.getParentModule();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "deleteItemDefinition: checking policy check for delete",
   );
 
@@ -76,7 +81,7 @@ export async function deleteItemDefinition(
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no userId then the row was null, we throw an error
         if (!content) {
-          logger.debug(
+          CAN_LOG_DEBUG && logger.debug(
             "deleteItemDefinition: failed due to lack of content data",
           );
           throw new EndpointError({
@@ -104,7 +109,7 @@ export async function deleteItemDefinition(
             (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
             rolesThatHaveAccessToModerationFields.includes(tokenData.role);
           if (!hasAccessToModerationFields) {
-            logger.debug(
+            CAN_LOG_DEBUG && logger.debug(
               "deleteItemDefinition: failed due to blocked content and no moderation access for role " + tokenData.role,
             );
             throw new EndpointError({
@@ -121,7 +126,7 @@ export async function deleteItemDefinition(
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant
   // for the delete action
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "deleteItemDefinition: checking role access for delete",
   );
   itemDefinition.checkRoleAccessFor(
@@ -255,7 +260,7 @@ export async function deleteItemDefinition(
   // this is done to the side nevertheless
   deletePossibleChildrenOf(appData, itemDefinition, resolverArgs.args.id as number, resolverArgs.args.version as string || null);
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "deleteItemDefinition: done",
   );
 

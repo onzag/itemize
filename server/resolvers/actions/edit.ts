@@ -29,6 +29,12 @@ import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+
 export async function editItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
@@ -52,7 +58,7 @@ export async function editItemDefinition(
   }
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName(),
   );
 
@@ -72,7 +78,7 @@ export async function editItemDefinition(
   const mod = itemDefinition.getParentModule();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: retrieving actual owner of this item",
   );
 
@@ -100,7 +106,7 @@ export async function editItemDefinition(
       preValidation: (content: ISQLTableRowValue) => {
         // if we don't get an user id this means that there's no owner, this is bad input
         if (!content) {
-          logger.debug(
+          CAN_LOG_DEBUG && logger.debug(
             "editItemDefinition: failed due to lack of content data",
           );
           throw new EndpointError({
@@ -118,7 +124,7 @@ export async function editItemDefinition(
 
         // also throw an error if it's blocked
         if (content.blocked_at !== null) {
-          logger.debug(
+          CAN_LOG_DEBUG && logger.debug(
             "editItemDefinition: failed due to element being blocked",
           );
           throw new EndpointError({
@@ -186,7 +192,7 @@ export async function editItemDefinition(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: Fields to be edited from the idef have been extracted as",
     editingFields,
   );
@@ -200,12 +206,12 @@ export async function editItemDefinition(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: Fields to be requested from the idef have been extracted as",
     requestedFieldsInIdef,
   );
 
-  logger.debug("editItemDefinition: Checking role access for editing");
+  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for editing");
   // checking the role access for both
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
@@ -215,7 +221,7 @@ export async function editItemDefinition(
     editingFields,
     true,
   );
-  logger.debug("editItemDefinition: Checking role access for read");
+  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for read");
   itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -362,10 +368,10 @@ export async function editItemDefinition(
     });
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: SQL ouput retrieved",
   );
-  logger.silly(
+  CAN_LOG_SILLY && logger.silly(
     "editItemDefinition: Value is",
     sqlValue,
   );
@@ -387,10 +393,10 @@ export async function editItemDefinition(
     ...gqlValue,
   };
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: GQL ouput retrieved",
   );
-  logger.silly(
+  CAN_LOG_SILLY && logger.silly(
     "editItemDefinition: value is",
     finalOutput,
   );

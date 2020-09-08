@@ -14,6 +14,10 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
 const Include_1 = require("../../base/Root/Module/ItemDefinition/Include");
 const token_1 = require("../token");
 const search_mode_1 = require("../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 function defaultTriggerForbiddenFunction(message) {
     throw new errors_1.EndpointError({
         message,
@@ -65,7 +69,7 @@ async function validateTokenAndGetData(appData, token) {
             });
         }
     }
-    __1.logger.silly("validateTokenAndGetData: validating token for user succeed", {
+    CAN_LOG_SILLY && __1.logger.silly("validateTokenAndGetData: validating token for user succeed", {
         token,
         result,
     });
@@ -129,7 +133,7 @@ async function validateParentingRules(appData, parentId, parentVersion, parentTy
         const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
         itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
     }
-    __1.logger.silly("validateParentingRules: parenting rules have passed");
+    CAN_LOG_SILLY && __1.logger.silly("validateParentingRules: parenting rules have passed");
 }
 exports.validateParentingRules = validateParentingRules;
 /**
@@ -152,7 +156,7 @@ function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, 
             (rolesThatHaveAccessToModerationFields.includes(constants_1.ANYONE_LOGGED_METAROLE) && tokenData.role !== constants_1.GUEST_METAROLE) ||
             rolesThatHaveAccessToModerationFields.includes(tokenData.role);
         if (!hasAccessToModerationFields) {
-            __1.logger.silly("checkBasicFieldsAreAvailableForRole: Attempted to access to moderation fields with invalid role", {
+            CAN_LOG_SILLY && __1.logger.silly("checkBasicFieldsAreAvailableForRole: Attempted to access to moderation fields with invalid role", {
                 role: tokenData.role,
                 rolesThatHaveAccessToModerationFields,
             });
@@ -163,7 +167,7 @@ function checkBasicFieldsAreAvailableForRole(itemDefinitionOrModule, tokenData, 
             });
         }
     }
-    __1.logger.silly("checkBasicFieldsAreAvailableForRole: basic fields access role succeed");
+    CAN_LOG_SILLY && __1.logger.silly("checkBasicFieldsAreAvailableForRole: basic fields access role succeed");
 }
 exports.checkBasicFieldsAreAvailableForRole = checkBasicFieldsAreAvailableForRole;
 function retrieveSince(args) {
@@ -345,7 +349,7 @@ function checkLimit(limit, idefOrMod, traditional) {
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
-    __1.logger.silly("checkLimit: checking limits succeed");
+    CAN_LOG_SILLY && __1.logger.silly("checkLimit: checking limits succeed");
 }
 exports.checkLimit = checkLimit;
 function checkListTypes(records, mod) {
@@ -370,7 +374,7 @@ function checkListTypes(records, mod) {
             });
         }
     });
-    __1.logger.silly("checkListLimit: checking list types succeed");
+    CAN_LOG_SILLY && __1.logger.silly("checkListLimit: checking list types succeed");
 }
 exports.checkListTypes = checkListTypes;
 /**
@@ -396,7 +400,7 @@ function checkLanguage(appData, args) {
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
         });
     }
-    __1.logger.silly("checkLanguage: checking limits succeed");
+    CAN_LOG_SILLY && __1.logger.silly("checkLanguage: checking limits succeed");
 }
 exports.checkLanguage = checkLanguage;
 /**
@@ -437,7 +441,7 @@ exports.checkUserCanSearch = checkUserCanSearch;
  */
 function getDictionary(appData, args) {
     const dictionary = appData.config.dictionaries[args.language];
-    __1.logger.silly("getDictionary: got dictionary " + dictionary);
+    CAN_LOG_SILLY && __1.logger.silly("getDictionary: got dictionary " + dictionary);
     return dictionary;
 }
 exports.getDictionary = getDictionary;
@@ -501,7 +505,7 @@ async function validateTokenIsntBlocked(cache, tokenData) {
             });
         }
     }
-    __1.logger.silly("validateTokenIsntBlocked: token block checking succeed");
+    CAN_LOG_SILLY && __1.logger.silly("validateTokenIsntBlocked: token block checking succeed");
 }
 exports.validateTokenIsntBlocked = validateTokenIsntBlocked;
 async function checkUserExists(cache, id) {
@@ -523,7 +527,7 @@ async function checkUserExists(cache, id) {
             code: constants_1.ENDPOINT_ERRORS.USER_REMOVED,
         });
     }
-    __1.logger.silly("checkUserExists: check user exist succeed");
+    CAN_LOG_SILLY && __1.logger.silly("checkUserExists: check user exist succeed");
 }
 exports.checkUserExists = checkUserExists;
 /**
@@ -581,7 +585,7 @@ function filterAndPrepareGQLValue(knex, serverData, value, requestedFields, role
             valueToProvide.toReturnToUser.DATA = null;
         }
     }
-    __1.logger.silly("validateTokenIsntBlocked: prepared the value to provide", valueToProvide);
+    CAN_LOG_SILLY && __1.logger.silly("validateTokenIsntBlocked: prepared the value to provide", valueToProvide);
     return valueToProvide;
 }
 exports.filterAndPrepareGQLValue = filterAndPrepareGQLValue;
@@ -616,14 +620,14 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
         });
         throw err;
     }
-    __1.logger.silly("serverSideCheckItemDefinitionAgainst: current state value for " + id + " and " + version, currentValue);
+    CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: current state value for " + id + " and " + version, currentValue);
     // now we are going to loop over the properties of that value
     currentValue.properties.forEach((propertyValue) => {
         // and we get what is set in the graphql value
         const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
         // now we check if it has an invalid reason
         if (propertyValue.invalidReason) {
-            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " failing", propertyValue);
+            CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " failing", propertyValue);
             // throw an error then
             throw new errors_1.EndpointError({
                 message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
@@ -639,7 +643,7 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
             // defined in the graphql value
         }
         else if (typeof gqlPropertyValue !== "undefined" && !deep_equal_1.default(gqlPropertyValue, propertyValue.value)) {
-            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " being unequal", {
+            CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " being unequal", {
                 propertyValue,
                 gqlPropertyValue,
             });
@@ -672,7 +676,7 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
         const gqlExclusionState = gqlArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
         // now we check if the exclusion states match
         if (includeValue.exclusionState !== gqlExclusionState) {
-            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to exclusion mismatch", {
+            CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to exclusion mismatch", {
                 includeValue,
                 gqlExclusionState,
             });
@@ -687,7 +691,7 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
             // and we check if the there's a value set despite it being excluded
         }
         else if (gqlExclusionState === Include_1.IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
-            __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to value set on include where it was excluded", {
+            CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: failed due to value set on include where it was excluded", {
                 includeValue,
                 gqlExclusionState,
             });
@@ -704,7 +708,7 @@ async function serverSideCheckItemDefinitionAgainst(itemDefinition, gqlArgValue,
         // specific item data, that's where we use our referred item
         await serverSideCheckItemDefinitionAgainst(include.getItemDefinition(), gqlIncludeValue, id, version, include, referredParentOfInclude || itemDefinition);
     }
-    __1.logger.silly("serverSideCheckItemDefinitionAgainst: succeed checking item definition consistency");
+    CAN_LOG_SILLY && __1.logger.silly("serverSideCheckItemDefinitionAgainst: succeed checking item definition consistency");
 }
 exports.serverSideCheckItemDefinitionAgainst = serverSideCheckItemDefinitionAgainst;
 /**
@@ -726,7 +730,7 @@ function checkReadPoliciesAllowThisUserToSearch(itemDefinition, role) {
             });
         }
     });
-    __1.logger.silly("checkReadPoliciesAllowThisUserToSearch: succeed checking policies allow user to search");
+    CAN_LOG_SILLY && __1.logger.silly("checkReadPoliciesAllowThisUserToSearch: succeed checking policies allow user to search");
 }
 exports.checkReadPoliciesAllowThisUserToSearch = checkReadPoliciesAllowThisUserToSearch;
 const reservedKeys = Object.keys(constants_1.RESERVED_BASE_PROPERTIES);
@@ -753,7 +757,7 @@ function splitArgsInGraphqlQuery(moduleOrItemDefinition, args) {
             resultingExtraArgs[key] = args[key];
         }
     });
-    __1.logger.silly("splitArgsInGraphqlQuery: succeed splitting args for graphql");
+    CAN_LOG_SILLY && __1.logger.silly("splitArgsInGraphqlQuery: succeed splitting args for graphql");
     return [resultingSelfValues, resultingExtraArgs];
 }
 exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
@@ -777,7 +781,7 @@ exports.splitArgsInGraphqlQuery = splitArgsInGraphqlQuery;
  * @param arg.parentPrevalidation a pre validation to run
  */
 async function runPolicyCheck(arg) {
-    __1.logger.silly("runPolicyCheck: Executed policy check for item definition");
+    CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Executed policy check for item definition");
     // so now we get the information we need first
     const mod = arg.itemDefinition.getParentModule();
     let selectQueryValue = null;
@@ -826,14 +830,14 @@ async function runPolicyCheck(arg) {
         const policiesForThisType = arg.itemDefinition.getPolicyNamesFor(policyType);
         // so we loop in these policies
         for (const policyName of policiesForThisType) {
-            __1.logger.silly("runPolicyCheck: Found policy", {
+            CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Found policy", {
                 policyName,
             });
             // and we get the roles that need to apply to this policy
             const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
             // if this is not our user, we can just continue with the next
             if (!rolesForThisSpecificPolicy.includes(arg.role)) {
-                __1.logger.silly("ignoring policy the role does not require it", {
+                CAN_LOG_SILLY && __1.logger.silly("ignoring policy the role does not require it", {
                     policyName,
                     role: arg.role,
                     rolesForThisSpecificPolicy,
@@ -868,7 +872,7 @@ async function runPolicyCheck(arg) {
                     }
                 }
                 if (!someIncludeOrPropertyIsApplied) {
-                    __1.logger.silly("runPolicyCheck: ignoring policy as there was no match for applying property or include", {
+                    CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: ignoring policy as there was no match for applying property or include", {
                         policyName,
                         applyingPropertyIds,
                     });
@@ -880,7 +884,7 @@ async function runPolicyCheck(arg) {
             const propertiesInContext = arg.itemDefinition.getPropertiesForPolicy(policyType, policyName);
             // we loop through those properties
             for (const property of propertiesInContext) {
-                __1.logger.silly("runPolicyCheck: found property in policy", {
+                CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: found property in policy", {
                     propertyId: property.getId(),
                 });
                 // now we need the qualified policy identifier, that's where in the args
@@ -892,7 +896,7 @@ async function runPolicyCheck(arg) {
                 if (typeof policyValueForTheProperty === "undefined") {
                     policyValueForTheProperty = null;
                 }
-                __1.logger.silly("runPolicyCheck: Property qualified policy identifier found and value is set", {
+                CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Property qualified policy identifier found and value is set", {
                     qualifiedPolicyIdentifier,
                     policyValueForTheProperty,
                 });
@@ -912,7 +916,7 @@ async function runPolicyCheck(arg) {
                 }
                 // if we get an invalid reason, the policy cannot even pass there
                 if (invalidReason) {
-                    __1.logger.silly("runPolicyCheck: Failed for not passing property validation", {
+                    CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Failed for not passing property validation", {
                         invalidReason,
                     });
                     throw new errors_1.EndpointError({
@@ -939,7 +943,7 @@ async function runPolicyCheck(arg) {
                     itemDefinition: arg.itemDefinition,
                 });
                 if (!policyMatches) {
-                    __1.logger.silly("runPolicyCheck: Failed due to policy not pasing", {
+                    CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Failed due to policy not pasing", {
                         policyName,
                     });
                     throw new errors_1.EndpointError({
@@ -954,7 +958,7 @@ async function runPolicyCheck(arg) {
             }
         }
     }
-    __1.logger.silly("runPolicyCheck: Completed checking policies");
+    CAN_LOG_SILLY && __1.logger.silly("runPolicyCheck: Completed checking policies");
     return selectQueryValue;
 }
 exports.runPolicyCheck = runPolicyCheck;

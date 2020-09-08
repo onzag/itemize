@@ -15,6 +15,10 @@ const constants_1 = require("../../../../../../constants");
 const image_conversions_1 = require("./image-conversions");
 const server_1 = require("../../../../../../server");
 const https_1 = __importDefault(require("https"));
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 /**
  * Processes an extended list based
  * file value
@@ -238,7 +242,7 @@ function deleteEverythingInFilesContainerId(uploadsContainer, itemDefinitionOrMo
 exports.deleteEverythingInFilesContainerId = deleteEverythingInFilesContainerId;
 async function removeFolderFor(uploadsContainer, mainPath) {
     return new Promise((resolve, reject) => {
-        server_1.logger.debug("removeFolderFor: Deleting folder for", { mainPath });
+        CAN_LOG_DEBUG && server_1.logger.debug("removeFolderFor: Deleting folder for", { mainPath });
         uploadsContainer.getFiles({
             prefix: mainPath,
         }, (err, files) => {
@@ -246,7 +250,7 @@ async function removeFolderFor(uploadsContainer, mainPath) {
                 reject(err);
             }
             else if (files && files.length) {
-                server_1.logger.debug("removeFolderFor: Bulk deleting", { files });
+                CAN_LOG_DEBUG && server_1.logger.debug("removeFolderFor: Bulk deleting", { files });
                 uploadsContainer.client.bulkDelete(uploadsContainer, files, (err) => {
                     if (err) {
                         reject(err);
@@ -257,7 +261,7 @@ async function removeFolderFor(uploadsContainer, mainPath) {
                 });
             }
             else {
-                server_1.logger.debug("removeFolderFor: Could not find any files");
+                CAN_LOG_DEBUG && server_1.logger.debug("removeFolderFor: Could not find any files");
                 resolve();
             }
         });
@@ -306,7 +310,7 @@ async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploa
  * @returns a void promise
  */
 async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, remote) {
-    server_1.logger.debug("sqlUploadPipeFile: Uploading", { remote });
+    CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Uploading", { remote });
     // we make a write stream to the uploads container
     const writeStream = uploadsContainer.client.upload({
         container: uploadsContainer,
@@ -317,7 +321,7 @@ async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, re
     // return a promise for it
     return new Promise((resolve, reject) => {
         writeStream.on("finish", () => {
-            server_1.logger.debug("sqlUploadPipeFile: Finished uploading", { remote });
+            CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Finished uploading", { remote });
             // we call the verify resource is ready function
             verifyResourceIsReady(new URL(uploadsPrefix + remote), resolve);
         });
@@ -335,7 +339,7 @@ exports.sqlUploadPipeFile = sqlUploadPipeFile;
 function verifyResourceIsReady(url, done) {
     // so we get the url string value, for debugging purposes
     const strURL = url.toString();
-    server_1.logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
+    CAN_LOG_DEBUG && server_1.logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
     // now we use https to call and do a head request to check the status
     https_1.default.get({
         method: "HEAD",
@@ -344,12 +348,12 @@ function verifyResourceIsReady(url, done) {
     }, (resp) => {
         // status is succesful
         if (resp.statusCode === 200 || resp.statusCode === 0) {
-            server_1.logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
+            CAN_LOG_DEBUG && server_1.logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
             done();
         }
         else {
             // otherwise we wait 100 milliseconds, and recursively execute until it's ready
-            server_1.logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
+            CAN_LOG_DEBUG && server_1.logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
             setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
         }
     });

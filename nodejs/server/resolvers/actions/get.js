@@ -12,8 +12,13 @@ const gql_util_1 = require("../../../gql-util");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
 const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 async function getItemDefinition(appData, resolverArgs, itemDefinition) {
-    __1.logger.debug("getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName());
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -65,7 +70,7 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
         // null, but still, just to keep some consistency we
         // run this function
         itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, constants_1.UNSPECIFIED_OWNER, requestedFieldsInIdef, true);
-        __1.logger.debug("getItemDefinition: no results found returning null");
+        CAN_LOG_DEBUG && __1.logger.debug("getItemDefinition: no results found returning null");
         // We do not return the 404, just return null in this case
         return null;
     }
@@ -73,12 +78,12 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
     if (itemDefinition.isOwnerObjectId()) {
         userId = selectQueryValue.id;
     }
-    __1.logger.debug("getItemDefinition: checking role access for read");
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinition: checking role access for read");
     // now we check the role access, this function will throw an error
     // if that fails, and we only check for the requested fields
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, userId, requestedFieldsInIdef, true);
-    __1.logger.debug("getItemDefinition: SQL ouput retrieved");
-    __1.logger.silly("getItemDefinition: value is", selectQueryValue);
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinition: SQL ouput retrieved");
+    CAN_LOG_SILLY && __1.logger.silly("getItemDefinition: value is", selectQueryValue);
     const valueToProvide = basic_1.filterAndPrepareGQLValue(appData.knex, appData.cache.getServerData(), selectQueryValue, requestedFields, tokenData.role, itemDefinition);
     // now we need to find the triggers
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -129,14 +134,14 @@ async function getItemDefinition(appData, resolverArgs, itemDefinition) {
             });
         }
     }
-    __1.logger.debug("getItemDefinition: GQL ouput retrieved");
-    __1.logger.silly("getItemDefinition: value is", toReturnToUser);
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinition: GQL ouput retrieved");
+    CAN_LOG_SILLY && __1.logger.silly("getItemDefinition: value is", toReturnToUser);
     // return if otherwise succeeds
     return toReturnToUser;
 }
 exports.getItemDefinition = getItemDefinition;
 async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
-    __1.logger.debug("getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName());
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -158,13 +163,13 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
             requestedFieldsInIdef[arg] = requestedFields[arg];
         }
     });
-    __1.logger.debug("getItemDefinitionList: Extracted requested fields from idef", requestedFields);
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinitionList: Extracted requested fields from idef", requestedFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
         ownerToCheckAgainst = created_by;
     }
-    __1.logger.debug("getItemDefinitionList: checking role access for read");
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinitionList: checking role access for read");
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInIdef, true);
     // preventing a security leak here by ensuring that the type that we are searching
     // in the list is all consistent for the type of this item definition, when requesting
@@ -241,12 +246,12 @@ async function getItemDefinitionList(appData, resolverArgs, itemDefinition) {
     const resultAsObject = {
         results: finalValues,
     };
-    __1.logger.debug("getItemDefinitionList: done");
+    CAN_LOG_DEBUG && __1.logger.debug("getItemDefinitionList: done");
     return resultAsObject;
 }
 exports.getItemDefinitionList = getItemDefinitionList;
 async function getModuleList(appData, resolverArgs, mod) {
-    __1.logger.debug("getModuleList: executed get list for " + mod.getQualifiedPathName());
+    CAN_LOG_DEBUG && __1.logger.debug("getModuleList: executed get list for " + mod.getQualifiedPathName());
     // first we check that the language and region provided are
     // right and available
     basic_1.checkLanguage(appData, resolverArgs.args);
@@ -266,13 +271,13 @@ async function getModuleList(appData, resolverArgs, mod) {
             requestedFieldsInMod[arg] = requestedFields[arg];
         }
     });
-    __1.logger.debug("getModuleList: Extracted requested fields from idef", requestedFieldsInMod);
+    CAN_LOG_DEBUG && __1.logger.debug("getModuleList: Extracted requested fields from idef", requestedFieldsInMod);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
         ownerToCheckAgainst = created_by;
     }
-    __1.logger.debug("getModuleList: checking role access for read");
+    CAN_LOG_DEBUG && __1.logger.debug("getModuleList: checking role access for read");
     mod.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, requestedFieldsInMod, true);
     const resultValues = await appData.cache.requestListCache(resolverArgs.args.records);
     // return if otherwise succeeds
@@ -337,7 +342,7 @@ async function getModuleList(appData, resolverArgs, mod) {
     const resultAsObject = {
         results: finalValues,
     };
-    __1.logger.debug("getModuleList: done");
+    CAN_LOG_DEBUG && __1.logger.debug("getModuleList: done");
     return resultAsObject;
 }
 exports.getModuleList = getModuleList;

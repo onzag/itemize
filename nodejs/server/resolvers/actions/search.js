@@ -15,6 +15,10 @@ const graphql_fields_1 = __importDefault(require("graphql-fields"));
 const nanodate_1 = require("../../../nanodate");
 const errors_1 = require("../../../base/errors");
 const triggers_1 = require("../triggers");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 function findLastRecordDateCheatMethod(records) {
     let maximumRecords = [];
     let maximumRecordId = null;
@@ -48,7 +52,7 @@ function searchModuleTraditional(appData, resolverArgs, mod) {
 }
 exports.searchModuleTraditional = searchModuleTraditional;
 async function searchModule(appData, resolverArgs, mod, traditional) {
-    server_1.logger.debug("searchModule: executed search for " + mod.getQualifiedPathName());
+    CAN_LOG_DEBUG && server_1.logger.debug("searchModule: executed search for " + mod.getQualifiedPathName());
     const since = basic_1.retrieveSince(resolverArgs.args);
     basic_1.checkLimit(resolverArgs.args.limit, mod, traditional);
     basic_1.checkLimiters(resolverArgs.args, mod);
@@ -69,7 +73,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
             searchingFields[arg] = resolverArgs.args[arg];
         }
     });
-    server_1.logger.debug("searchModule: retrieved search fields as", searchingFields);
+    CAN_LOG_DEBUG && server_1.logger.debug("searchModule: retrieved search fields as", searchingFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
@@ -78,7 +82,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     // check role access for those searching fields
     // yes they are not being directly read but they can
     // be brute forced this way, and we are paranoid as hell
-    server_1.logger.debug("searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName());
+    CAN_LOG_DEBUG && server_1.logger.debug("searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
     let fieldsToRequest = ["id", "version", "type", "created_at"];
     let requestedFields = null;
@@ -93,7 +97,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
                 requestedFieldsInMod[arg] = requestedFields[arg];
             }
         });
-        server_1.logger.debug("searchModule: Extracted requested fields from module", fieldsToRequest);
+        CAN_LOG_DEBUG && server_1.logger.debug("searchModule: Extracted requested fields from module", fieldsToRequest);
         if (!fieldsToRequest.includes("created_at")) {
             fieldsToRequest.push("created_at");
         }
@@ -209,7 +213,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
             offset,
             count,
         };
-        server_1.logger.debug("searchModule: succeed traditionally");
+        CAN_LOG_DEBUG && server_1.logger.debug("searchModule: succeed traditionally");
         return finalResult;
     }
     else {
@@ -220,7 +224,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
             offset,
             count,
         };
-        server_1.logger.debug("searchModule: succeed with records");
+        CAN_LOG_DEBUG && server_1.logger.debug("searchModule: succeed with records");
         return finalResult;
     }
 }
@@ -245,7 +249,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
         });
     }
     const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
-    server_1.logger.debug("searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName());
+    CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName());
     const since = basic_1.retrieveSince(resolverArgs.args);
     basic_1.checkLimit(resolverArgs.args.limit, itemDefinition, traditional);
     basic_1.checkLimiters(resolverArgs.args, itemDefinition);
@@ -270,7 +274,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             searchingFields[arg] = resolverArgs.args[arg];
         }
     });
-    server_1.logger.debug("searchItemDefinition: retrieved search fields as", searchingFields);
+    CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: retrieved search fields as", searchingFields);
     const created_by = resolverArgs.args.created_by;
     let ownerToCheckAgainst = constants_1.UNSPECIFIED_OWNER;
     if (created_by) {
@@ -285,7 +289,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     // and uses the EXACT_phone_number field, he will get returned null
     // until he matches the phone number, this is a leak, a weak one
     // but a leak nevertheless, we are so paranoid we prevent this
-    server_1.logger.debug("searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName());
+    CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
     // Checking search mode counterpart to validate
     searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
@@ -308,7 +312,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
                 requestedFieldsInIdef[arg] = requestedFields[arg];
             }
         });
-        server_1.logger.debug("searchItemDefinition: Extracted requested fields from module", fieldsToRequest);
+        CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: Extracted requested fields from module", fieldsToRequest);
         if (!fieldsToRequest.includes("created_at")) {
             fieldsToRequest.push("created_at");
         }
@@ -437,7 +441,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             offset,
             count,
         };
-        server_1.logger.debug("searchItemDefinition: succeed traditionally");
+        CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: succeed traditionally");
         pooledRoot.cleanState();
         appData.rootPool.release(pooledRoot);
         return finalResult;
@@ -450,7 +454,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
             offset,
             count,
         };
-        server_1.logger.debug("searchItemDefinition: succeed with records");
+        CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: succeed with records");
         pooledRoot.cleanState();
         appData.rootPool.release(pooledRoot);
         return finalResult;

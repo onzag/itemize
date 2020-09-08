@@ -18,6 +18,10 @@ const _1 = require(".");
 const constants_1 = require("../constants");
 const ajv_1 = __importDefault(require("ajv"));
 const token_1 = require("./token");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 const ajv = new ajv_1.default();
 const checkRegisterRequest = ajv.compile(remote_protocol_1.RegisterRequestSchema);
 const checkOwnedSearchRegisterRequest = ajv.compile(remote_protocol_1.OwnedSearchRegisterRequestSchema);
@@ -136,7 +140,7 @@ class Listener {
     async identify(socket, request) {
         const valid = checkIdentifyRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.identify: can't indentify due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.identify: can't indentify due to invalid request", {
                 errors: checkIdentifyRequest.errors,
             });
             this.emitError(socket, "can't identify user due to invalid request", request);
@@ -184,14 +188,14 @@ class Listener {
             };
         }
         if (invalid) {
-            _1.logger.debug("Listener.identify: socket " + socket.id + " failed to identify due to " + invalidReason);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.identify: socket " + socket.id + " failed to identify due to " + invalidReason);
             this.emitError(socket, "failed to identify due to " + invalidReason, request);
             // yes kick the socket, why was it using an invalid token to start with, that's fishy
             this.kick(socket);
         }
         else {
             if (!this.listeners[socket.id]) {
-                _1.logger.debug("Listener.identify: socket " + socket.id + " provides initial identification");
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.identify: socket " + socket.id + " provides initial identification");
                 this.listeners[socket.id] = {
                     socket,
                     listens: {},
@@ -202,7 +206,7 @@ class Listener {
                 };
             }
             else {
-                _1.logger.debug("Listener.identify: socket " + socket.id + " updates identification criteria");
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.identify: socket " + socket.id + " updates identification criteria");
                 this.listeners[socket.id].uuid = request.uuid;
                 this.listeners[socket.id].token = request.token;
                 this.listeners[socket.id].user = result;
@@ -212,30 +216,30 @@ class Listener {
     }
     registerSS(request) {
         const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
-        _1.logger.debug("Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier);
         if (INSTANCE_MODE !== "CLUSTER_MANAGER" && INSTANCE_MODE !== "ABSOLUTE") {
-            _1.logger.debug("Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager");
             this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(request));
         }
         else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
-            _1.logger.debug("Listener.registerSS: performing subscription as cluster manager");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.registerSS: performing subscription as cluster manager");
             this.redisSub.subscribe(mergedIndexIdentifier);
             this.listensSS[mergedIndexIdentifier] = true;
         }
         else {
-            _1.logger.debug("Listener.registerSS: invalid instance attempting a server side registration " + INSTANCE_MODE);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.registerSS: invalid instance attempting a server side registration " + INSTANCE_MODE);
         }
     }
     async register(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.register: can't register listener to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: can't register listener to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkRegisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.register: can't register listener due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: can't register listener due to invalid request", {
                 errors: checkRegisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -243,13 +247,13 @@ class Listener {
         }
         // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
         if (listenerData.amount > constants_1.MAX_REMOTE_LISTENERS_PER_SOCKET) {
-            _1.logger.debug("Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach");
             this.emitError(socket, "exceeded socket max listeners per socket", request);
             return;
         }
         const itemDefinition = this.root.registry[request.itemDefinition];
         if (!itemDefinition || !(itemDefinition instanceof ItemDefinition_1.default)) {
-            _1.logger.debug("Listener.register: could not find " + request.itemDefinition);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: could not find " + request.itemDefinition);
             this.emitError(socket, "could not find item definition", request);
             return;
         }
@@ -257,14 +261,14 @@ class Listener {
         const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : constants_1.UNSPECIFIED_OWNER;
         const hasAccess = itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, creator, {}, false);
         if (!hasAccess) {
-            _1.logger.debug("Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
                 " with role " + listenerData.user.role + " cannot listen to " + itemDefinition);
             this.emitError(socket, "user has not access", request);
             return;
         }
         const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
         if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-            _1.logger.debug("Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
             this.redisSub.subscribe(mergedIndexIdentifier);
             this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
             this.listeners[socket.id].amount++;
@@ -273,13 +277,13 @@ class Listener {
     ownedSearchRegister(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkOwnedSearchRegisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.ownedSearchRegister: can't register listener due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: can't register listener due to invalid request", {
                 errors: checkOwnedSearchRegisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -287,14 +291,14 @@ class Listener {
         }
         // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
         if (listenerData.amount > constants_1.MAX_REMOTE_LISTENERS_PER_SOCKET) {
-            _1.logger.debug("Listener.ownedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach");
             this.emitError(socket, "exceeded socket max listeners per socket", request);
             return;
         }
         const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
         let hasAccess;
         if (!itemDefinitionOrModule) {
-            _1.logger.debug("Listener.ownedSearchRegister: could not find item definition or module for " + request.qualifiedPathName);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: could not find item definition or module for " + request.qualifiedPathName);
             this.emitError(socket, "could not find item definition or module", request);
             return;
         }
@@ -302,14 +306,14 @@ class Listener {
             hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, constants_1.UNSPECIFIED_OWNER, {}, false);
         }
         if (!hasAccess) {
-            _1.logger.debug("Listener.ownedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName);
             this.emitError(socket, "user has not access", request);
             return;
         }
         const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
         if (!listenerData.listens[mergedIndexIdentifier]) {
-            _1.logger.debug("Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
             this.redisSub.subscribe(mergedIndexIdentifier);
             listenerData.listens[mergedIndexIdentifier] = true;
             listenerData.amount++;
@@ -318,13 +322,13 @@ class Listener {
     parentedSearchRegister(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.parentedSearchRegister: can't register listener to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: can't register listener to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkParentedSearchRegisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.parentedSearchRegister: can't register listener due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: can't register listener due to invalid request", {
                 errors: checkParentedSearchRegisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -332,14 +336,14 @@ class Listener {
         }
         // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
         if (this.listeners[socket.id].amount > constants_1.MAX_REMOTE_LISTENERS_PER_SOCKET) {
-            _1.logger.debug("Listener.parentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach");
             this.emitError(socket, "exceeded socket max listeners per socket", request);
             return;
         }
         const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
         let hasAccess;
         if (!itemDefinitionOrModule) {
-            _1.logger.debug("Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName);
             this.emitError(socket, "could not find item definition or module", request);
             return;
         }
@@ -347,7 +351,7 @@ class Listener {
             hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, constants_1.UNSPECIFIED_OWNER, {}, false);
         }
         if (!hasAccess) {
-            _1.logger.debug("Listener.parentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName);
             this.emitError(socket, "user has not access", request);
             return;
@@ -355,7 +359,7 @@ class Listener {
         const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." +
             request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
         if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
-            _1.logger.debug("Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier);
             this.redisSub.subscribe(mergedIndexIdentifier);
             this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
             this.listeners[socket.id].amount++;
@@ -364,13 +368,13 @@ class Listener {
     async ownedSearchFeedback(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.ownedSearchFeedback: can't give feedback to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchFeedback: can't give feedback to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkOwnedSearchFeedbackRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.ownedSearchFeedback: can't give feedback due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchFeedback: can't give feedback due to invalid request", {
                 errors: checkOwnedSearchFeedbackRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -379,7 +383,7 @@ class Listener {
         try {
             const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
             if (!itemDefinitionOrModule) {
-                _1.logger.debug("Listener.ownedSearchFeedback: could not find " + request.qualifiedPathName);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchFeedback: could not find " + request.qualifiedPathName);
                 this.emitError(socket, "could not find item definition or module", request);
                 return;
             }
@@ -394,7 +398,7 @@ class Listener {
             }
             const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, request.createdBy, {}, false);
             if (!hasAccess) {
-                _1.logger.debug("Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
                     " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName);
                 this.emitError(socket, "user has not access", request);
                 return;
@@ -418,7 +422,7 @@ class Listener {
                     // this contains all the data and the new record has the right form
                     newLastRecordDate: newRecords[0].created_at,
                 };
-                _1.logger.debug("Listener.ownedSearchFeedback: triggering " + remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, event);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchFeedback: triggering " + remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, event);
                 socket.emit(remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT, event);
             }
         }
@@ -432,13 +436,13 @@ class Listener {
     async parentedSearchFeedback(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.parentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkParentedSearchFeedbackRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.parentedSearchFeedback: can't register listener due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchFeedback: can't register listener due to invalid request", {
                 errors: checkParentedSearchFeedbackRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -447,7 +451,7 @@ class Listener {
         try {
             const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
             if (!itemDefinitionOrModule) {
-                _1.logger.debug("Listener.parentedSearchFeedback: could not find " + request.qualifiedPathName);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchFeedback: could not find " + request.qualifiedPathName);
                 this.emitError(socket, "could not find item definition or module", request);
                 return;
             }
@@ -462,7 +466,7 @@ class Listener {
             }
             const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, constants_1.UNSPECIFIED_OWNER, {}, false);
             if (!hasAccess) {
-                _1.logger.debug("Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
                     " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName);
                 this.emitError(socket, "user has not access", request);
                 return;
@@ -489,7 +493,7 @@ class Listener {
                     newRecords: newRecords,
                     newLastRecordDate: newRecords[0].created_at,
                 };
-                _1.logger.debug("Listener.parentedSearchFeedback: emmitting " + remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchFeedback: emmitting " + remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);
                 socket.emit(remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT, event);
             }
         }
@@ -503,13 +507,13 @@ class Listener {
     async feedback(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.feedback: can't give feedback to an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.feedback: can't give feedback to an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkFeedbackRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.feedback: can't register listener due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.feedback: can't register listener due to invalid request", {
                 errors: checkFeedbackRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -517,7 +521,7 @@ class Listener {
         }
         const itemDefinition = this.root.registry[request.itemDefinition];
         if (!itemDefinition || !(itemDefinition instanceof ItemDefinition_1.default)) {
-            _1.logger.debug("Listener.register: could not find " + request.itemDefinition);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: could not find " + request.itemDefinition);
             this.emitError(socket, "could not find item definition", request);
             return;
         }
@@ -525,7 +529,7 @@ class Listener {
         const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : constants_1.UNSPECIFIED_OWNER;
         const hasAccess = itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, listenerData.user.role, listenerData.user.id, creator, {}, false);
         if (!hasAccess) {
-            _1.logger.debug("Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
                 " with role " + listenerData.user.role + " cannot listen to " + itemDefinition);
             this.emitError(socket, "user has not access", request);
             return;
@@ -533,7 +537,7 @@ class Listener {
         try {
             const itemDefinition = this.root.registry[request.itemDefinition];
             if (!itemDefinition || !(itemDefinition instanceof ItemDefinition_1.default)) {
-                _1.logger.debug("Listener.feedback: could not find " + request.itemDefinition);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.feedback: could not find " + request.itemDefinition);
                 this.emitError(socket, "could not find item definition", request);
                 return;
             }
@@ -546,7 +550,7 @@ class Listener {
                     type: "last_modified",
                     lastModified: queriedResult.last_modified,
                 };
-                _1.logger.debug("Listener.feedback: emitting " + remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.feedback: emitting " + remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
                 socket.emit(remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
             }
             else {
@@ -557,7 +561,7 @@ class Listener {
                     type: "not_found",
                     lastModified: null,
                 };
-                _1.logger.debug("Listener.feedback: emitting " + remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.feedback: emitting " + remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
                 socket.emit(remote_protocol_1.CHANGED_FEEEDBACK_EVENT, event);
             }
         }
@@ -573,14 +577,14 @@ class Listener {
             return !this.listeners[socketId].listens[mergedIndexIdentifier];
         });
         if (noSocketsListeningLeft) {
-            _1.logger.debug("Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis");
             this.redisSub.unsubscribe(mergedIndexIdentifier);
         }
     }
     removeListener(socket, mergedIndexIdentifier) {
         const listenerData = this.listeners[socket.id];
         if (listenerData && listenerData.listens[mergedIndexIdentifier]) {
-            _1.logger.debug("Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier);
             delete listenerData.listens[mergedIndexIdentifier];
             listenerData.amount--;
             this.removeListenerFinal(mergedIndexIdentifier);
@@ -600,13 +604,13 @@ class Listener {
     unregister(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.unregister: can't unregister an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.unregister: can't unregister an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkUnregisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.unregister: can't unregister due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.unregister: can't unregister due to invalid request", {
                 errors: checkUnregisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -618,13 +622,13 @@ class Listener {
     ownedSearchUnregister(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.ownedSearchUnregister: can't owned search unregister an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchUnregister: can't owned search unregister an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkOwnedSearchUnregisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.ownedSearchUnregister: can't unregister due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.ownedSearchUnregister: can't unregister due to invalid request", {
                 errors: checkOwnedSearchUnregisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -636,13 +640,13 @@ class Listener {
     parentedSearchUnregister(socket, request) {
         const listenerData = this.listeners[socket.id];
         if (!listenerData) {
-            _1.logger.debug("Listener.parentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id);
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id);
             this.emitError(socket, "socket is unidentified", request);
             return;
         }
         const valid = checkParentedSearchUnregisterRequest(request);
         if (!valid) {
-            _1.logger.debug("Listener.parentedSearchUnregister: can't unregister due to invalid request", {
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.parentedSearchUnregister: can't unregister due to invalid request", {
                 errors: checkParentedSearchUnregisterRequest.errors,
             });
             this.emitError(socket, "invalid request", request);
@@ -662,7 +666,7 @@ class Listener {
             eventType: remote_protocol_1.CHANGED_FEEEDBACK_EVENT,
             data,
         };
-        _1.logger.debug("Listener.triggerChangedListeners: triggering redis event", redisEvent);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.triggerChangedListeners: triggering redis event", redisEvent);
         this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }
     triggerOwnedSearchListeners(event, listenerUUID) {
@@ -673,7 +677,7 @@ class Listener {
             mergedIndexIdentifier,
             eventType: remote_protocol_1.OWNED_SEARCH_RECORDS_ADDED_EVENT,
         };
-        _1.logger.debug("Listener.triggerOwnedSearchListeners: triggering redis event", redisEvent);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.triggerOwnedSearchListeners: triggering redis event", redisEvent);
         this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }
     triggerParentedSearchListeners(event, listenerUUID) {
@@ -685,12 +689,12 @@ class Listener {
             mergedIndexIdentifier,
             eventType: remote_protocol_1.PARENTED_SEARCH_RECORDS_ADDED_EVENT,
         };
-        _1.logger.debug("Listener.triggerParentedSearchListeners: triggering redis event", redisEvent);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.triggerParentedSearchListeners: triggering redis event", redisEvent);
         this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }
     pubSubTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
-        _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubTriggerListeners: received redis event", parsedContent);
         if (channel === constants_1.SERVER_DATA_IDENTIFIER) {
             this.cache.onServerDataChangeInformed(parsedContent);
             this.io.emit(remote_protocol_1.CURRENCY_FACTORS_UPDATED_EVENT);
@@ -699,7 +703,7 @@ class Listener {
         if (channel === constants_1.SERVER_USER_KICK_IDENTIFIER) {
             const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
             if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
-                _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
             }
             else if (typeof parsedContent.userId === "number") {
                 this.onReceiveKickEvent(parsedContent.userId);
@@ -708,10 +712,10 @@ class Listener {
         }
         // only the cluster manager and absolute happens to recieve these
         if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
-            _1.logger.debug("Listener.pubSubTriggerListeners: our own server is expecting it");
+            CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubTriggerListeners: our own server is expecting it");
             const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
             if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
-                _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event");
             }
             else {
                 const event = parsedContent.event;
@@ -727,14 +731,14 @@ class Listener {
             const whatListening = this.listeners[socketKey].listens;
             if (whatListening[parsedContent.mergedIndexIdentifier] &&
                 this.listeners[socketKey].uuid !== parsedContent.listenerUUID) {
-                _1.logger.debug("Listener.pubSubTriggerListeners: socket " + socketKey + " was expecting it, emitting");
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubTriggerListeners: socket " + socketKey + " was expecting it, emitting");
                 this.listeners[socketKey].socket.emit(parsedContent.eventType, parsedContent.event);
             }
         });
     }
     pubSubLocalTriggerListeners(channel, message) {
         const parsedContent = JSON.parse(message);
-        _1.logger.debug("Listener.pubSubLocalTriggerListeners: cluster manager recieved register event", parsedContent);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.pubSubLocalTriggerListeners: cluster manager recieved register event", parsedContent);
         this.registerSS(parsedContent);
     }
     removeSocket(socket) {
@@ -742,7 +746,7 @@ class Listener {
         if (!listenerData) {
             return;
         }
-        _1.logger.debug("Listener.removeSocket: removing socket " + socket.id);
+        CAN_LOG_DEBUG && _1.logger.debug("Listener.removeSocket: removing socket " + socket.id);
         Object.keys(listenerData.listens).forEach((listensMergedIdentifier) => {
             const noSocketsListeningLeft = !this.listensSS[listensMergedIdentifier] &&
                 Object.keys(this.listeners).every((socketId) => {
@@ -752,7 +756,7 @@ class Listener {
                     return !this.listeners[socketId].listens[listensMergedIdentifier];
                 });
             if (noSocketsListeningLeft) {
-                _1.logger.debug("Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier);
+                CAN_LOG_DEBUG && _1.logger.debug("Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier);
                 this.redisSub.unsubscribe(listensMergedIdentifier);
             }
         });

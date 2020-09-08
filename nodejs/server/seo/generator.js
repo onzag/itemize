@@ -12,6 +12,10 @@ const moment_1 = __importDefault(require("moment"));
 const stream_1 = require("stream");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const NO_SEO = process.env.NO_SEO === "true";
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 ;
 class SEOGenerator {
     /**
@@ -279,7 +283,7 @@ class SEOGenerator {
         readStream.pipe(writeStream);
         return new Promise((resolve, reject) => {
             writeStream.on("finish", () => {
-                index_1.logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
+                CAN_LOG_DEBUG && index_1.logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
                 resolve();
             });
             writeStream.on("error", reject);

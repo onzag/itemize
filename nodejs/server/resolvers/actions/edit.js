@@ -12,6 +12,11 @@ const sql_1 = require("../../../base/Root/Module/ItemDefinition/sql");
 const errors_1 = require("../../../base/errors");
 const gql_util_1 = require("../../../gql-util");
 const triggers_1 = require("../triggers");
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 async function editItemDefinition(appData, resolverArgs, resolverItemDefinition) {
     let pooledRoot;
     try {
@@ -28,7 +33,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
         });
     }
     const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()];
-    __1.logger.debug("editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName());
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName());
     // First we check the language and region of the item
     basic_1.checkLanguage(appData, resolverArgs.args);
     // we ge the token data
@@ -41,7 +46,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
     // now we get the basic information
     const mod = itemDefinition.getParentModule();
     const selfTable = itemDefinition.getQualifiedPathName();
-    __1.logger.debug("editItemDefinition: retrieving actual owner of this item");
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: retrieving actual owner of this item");
     // now we get these variables ready
     // we need to get the userId and the current
     // entire item definition value that is in the database
@@ -64,7 +69,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
         preValidation: (content) => {
             // if we don't get an user id this means that there's no owner, this is bad input
             if (!content) {
-                __1.logger.debug("editItemDefinition: failed due to lack of content data");
+                CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: failed due to lack of content data");
                 throw new errors_1.EndpointError({
                     message: `There's no ${selfTable} with id ${resolverArgs.args.id} and version ${resolverArgs.args.version}`,
                     code: constants_1.ENDPOINT_ERRORS.NOT_FOUND,
@@ -78,7 +83,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
             containerId = content.container_id;
             // also throw an error if it's blocked
             if (content.blocked_at !== null) {
-                __1.logger.debug("editItemDefinition: failed due to element being blocked");
+                CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: failed due to element being blocked");
                 throw new errors_1.EndpointError({
                     message: "The item is blocked",
                     code: constants_1.ENDPOINT_ERRORS.BLOCKED,
@@ -113,7 +118,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
             editingFields[arg] = resolverArgs.args[arg];
         }
     });
-    __1.logger.debug("editItemDefinition: Fields to be edited from the idef have been extracted as", editingFields);
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: Fields to be edited from the idef have been extracted as", editingFields);
     const requestedFieldsInIdef = {};
     Object.keys(requestedFields).forEach((arg) => {
         if (itemDefinition.hasPropertyDefinitionFor(arg, true) ||
@@ -121,11 +126,11 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
             requestedFieldsInIdef[arg] = requestedFields[arg];
         }
     });
-    __1.logger.debug("editItemDefinition: Fields to be requested from the idef have been extracted as", requestedFieldsInIdef);
-    __1.logger.debug("editItemDefinition: Checking role access for editing");
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: Fields to be requested from the idef have been extracted as", requestedFieldsInIdef);
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: Checking role access for editing");
     // checking the role access for both
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.EDIT, tokenData.role, tokenData.id, userId, editingFields, true);
-    __1.logger.debug("editItemDefinition: Checking role access for read");
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: Checking role access for read");
     itemDefinition.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, userId, requestedFieldsInIdef, true);
     // now we need to setup what we want to convert, since the
     // converting functions can take the whole args with its extra
@@ -242,8 +247,8 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
             forbid: basic_1.defaultTriggerInvalidForbiddenFunction,
         });
     }
-    __1.logger.debug("editItemDefinition: SQL ouput retrieved");
-    __1.logger.silly("editItemDefinition: Value is", sqlValue);
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: SQL ouput retrieved");
+    CAN_LOG_SILLY && __1.logger.silly("editItemDefinition: Value is", sqlValue);
     // convert it using the requested fields for that, and ignoring everything else
     const gqlValue = sql_1.convertSQLValueToGQLValueForItemDefinition(appData.knex, appData.cache.getServerData(), itemDefinition, sqlValue, requestedFields);
     // we don't need to check for blocked or deleted because such items cannot be edited,
@@ -253,8 +258,8 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
         DATA: gqlValue,
         ...gqlValue,
     };
-    __1.logger.debug("editItemDefinition: GQL ouput retrieved");
-    __1.logger.silly("editItemDefinition: value is", finalOutput);
+    CAN_LOG_DEBUG && __1.logger.debug("editItemDefinition: GQL ouput retrieved");
+    CAN_LOG_SILLY && __1.logger.silly("editItemDefinition: value is", finalOutput);
     pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     return finalOutput;

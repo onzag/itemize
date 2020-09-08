@@ -13,6 +13,11 @@ import equals from "deep-equal";
 
 const NO_SEO = process.env.NO_SEO === "true";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+
 interface ISEOCollectedDataWithCreatedAt extends ISEOCollectedData {
   created_at: string;
 }
@@ -369,7 +374,7 @@ export class SEOGenerator {
   
     return new Promise((resolve, reject) => {
       writeStream.on("finish", () => {
-        logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
+        CAN_LOG_DEBUG && logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
         resolve();
       });
       writeStream.on("error", reject);

@@ -32,6 +32,12 @@ import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
@@ -55,7 +61,7 @@ export async function addItemDefinition(
   }
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName(),
   );
 
@@ -170,12 +176,12 @@ export async function addItemDefinition(
     }
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: Fields to add have been extracted",
     addingFields,
   );
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: Checking basic role access for creation",
   );
 
@@ -204,12 +210,12 @@ export async function addItemDefinition(
     }
   });
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: Fields to be requested have been extracted",
     requestedFieldsThatRepresentPropertiesAndIncludes,
   );
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: Checking basic role access for read",
   );
 
@@ -260,7 +266,7 @@ export async function addItemDefinition(
         // this shouldn't really happen because validateParentingRules should have
         // checked whether it existed, but we check anyway
         if (!content) {
-          logger.debug(
+          CAN_LOG_DEBUG && logger.debug(
             "addItemDefinition: failed due to lack of content data",
           );
           throw new EndpointError({
@@ -273,7 +279,7 @@ export async function addItemDefinition(
         // this should have also not happen because validate should also have done it
         // but we check anyway
         if (content.blocked_at !== null) {
-          logger.debug(
+          CAN_LOG_DEBUG && logger.debug(
             "addItemDefinition: failed due to element being blocked",
           );
           throw new EndpointError({
@@ -396,10 +402,10 @@ export async function addItemDefinition(
     } : null,
   );
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: SQL ouput retrieved",
   );
-  logger.silly(
+  CAN_LOG_SILLY && logger.silly(
     "addItemDefinition: Value is",
     value,
   );
@@ -463,7 +469,7 @@ export async function addItemDefinition(
     });
   }
 
-  logger.debug(
+  CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: GQL output calculated",
     finalOutput,
   );

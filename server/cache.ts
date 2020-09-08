@@ -32,6 +32,12 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
 
+// Used to optimize, it is found out that passing unecessary logs to the transport
+// can slow the logger down even if it won't display
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -96,7 +102,7 @@ export class Cache {
   public getRaw<T>(
     key: string,
   ): Promise<{ value: T }> {
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.getRaw: requesting " + key,
     );
     // we build the promise
@@ -140,7 +146,7 @@ export class Cache {
   }
 
   public setRaw(key: string, value: any) {
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.setRaw: setting " + key,
     );
     return new Promise((resolve) => {
@@ -165,7 +171,7 @@ export class Cache {
    * @param keyIdentifier the identifier
    */
   private pokeCache(keyIdentifier: string) {
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.pokeCache: poking " + keyIdentifier,
     );
     this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400, (err) => {
@@ -187,10 +193,10 @@ export class Cache {
    */
   private forceCacheInto(idefTable: string, id: number, version: string, value: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier,
     );
-    logger.silly(
+    CAN_LOG_SILLY && logger.silly(
       "Cache.forceCacheInto: value is",
       value,
     );
@@ -236,7 +242,7 @@ export class Cache {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: requesting creation for " + selfTable + " at module " +
       moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
@@ -320,7 +326,7 @@ export class Cache {
     }
 
     if (parent) {
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestCreation: parent specified is id " + parent.id + " with version " + parent.version + " and type " + parent.type,
       );
       sqlModData.parent_id = parent.id;
@@ -330,12 +336,12 @@ export class Cache {
       sqlModData.parent_type = parent.type;
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: finalizing SQL data with module data",
       sqlModData,
     );
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: finalizing SQL data with item definition data",
       sqlIdefData,
     );
@@ -390,7 +396,7 @@ export class Cache {
       throw err;
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: consuming binary information streams",
     );
 
@@ -426,7 +432,7 @@ export class Cache {
     }
 
     (async () => {
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestCreation (detached): storing cache value from the action",
       );
       await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
@@ -438,7 +444,7 @@ export class Cache {
         lastModified: null,
       };
 
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestCreation (detached): built and triggering created change event",
         changeEvent,
       );
@@ -464,7 +470,7 @@ export class Cache {
         newLastRecordDate: searchResultForThisValue.created_at,
       };
 
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
         itemDefinitionBasedOwnedEvent,
       );
@@ -478,7 +484,7 @@ export class Cache {
         qualifiedPathName: moduleTable,
       };
 
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
         moduleBasedOwnedEvent,
       );
@@ -498,7 +504,7 @@ export class Cache {
           ],
           newLastRecordDate: searchResultForThisValue.created_at,
         };
-        logger.debug(
+        CAN_LOG_DEBUG && logger.debug(
           "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)",
           itemDefinitionBasedParentedEvent,
         );
@@ -511,7 +517,7 @@ export class Cache {
           ...itemDefinitionBasedParentedEvent,
           qualifiedPathName: moduleTable,
         };
-        logger.debug(
+        CAN_LOG_DEBUG && logger.debug(
           "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)",
           moduleBasedParentedEvent,
         );
@@ -602,7 +608,7 @@ export class Cache {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: requesting update for " + selfTable + " at module " +
       moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
       "container id " + containerId,
@@ -671,12 +677,12 @@ export class Cache {
     }
     sqlModData.last_modified = this.knex.fn.now();
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: finalizing SQL data with module data",
       sqlModData,
     );
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: finalizing SQL data with item definition data",
       sqlIdefData,
     );
@@ -746,7 +752,7 @@ export class Cache {
       throw err;
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: consuming binary information streams",
     );
     
@@ -783,7 +789,7 @@ export class Cache {
 
     // we return and this executes after it returns
     (async () => {
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestUpdate (detached): storing cache value from the action",
       );
       await this.forceCacheInto(selfTable, id, version, sqlValue);
@@ -794,7 +800,7 @@ export class Cache {
         type: "modified",
         lastModified: null,
       };
-      logger.debug(
+      CAN_LOG_DEBUG && logger.debug(
         "Cache.requestUpdate (detached): built and triggering created change event",
         changeEvent,
       );
@@ -832,7 +838,7 @@ export class Cache {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestDelete: requesting delete for " + selfTable + " at module " +
       moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
     );
@@ -966,7 +972,7 @@ export class Cache {
     const moduleTable = Array.isArray(itemDefinition) ?
       itemDefinition[1] : itemDefinition.getParentModule().getQualifiedPathName();
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestValue: requesting value for " + idefTable + " at module " +
       moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
     );
@@ -988,7 +994,7 @@ export class Cache {
       }
     }
 
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.requestValue: not found in memory or refresh expected, requesting database",
     );
 
@@ -1050,7 +1056,7 @@ export class Cache {
   }
 
   public onServerDataChangeInformed(newData: IServerDataType) {
-    logger.debug(
+    CAN_LOG_DEBUG && logger.debug(
       "Cache.onServerDataChangeInformed: new server data has been informed",
     );
     this.serverData = newData;
