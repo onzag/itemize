@@ -18,6 +18,7 @@ const _1 = require(".");
 const token_1 = require("./token");
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
+const NODE_ENV = process.env.NODE_ENV;
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -40,7 +41,7 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, sensitiveConfig, uploadsContainers, root, initialServerData) {
+    constructor(redisClient, knex, sensitiveConfig, uploadsContainers, domain, root, initialServerData) {
         this.memoryCache = {};
         this.redisClient = redisClient;
         this.knex = knex;
@@ -48,6 +49,7 @@ class Cache {
         this.uploadsContainers = uploadsContainers;
         this.serverData = initialServerData;
         this.sensitiveConfig = sensitiveConfig;
+        this.domain = domain;
     }
     /**
      * Sets the listener for the remote interaction with the clients
@@ -173,8 +175,8 @@ class Cache {
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, this.domain, dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, this.domain, dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -415,8 +417,8 @@ class Cache {
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all

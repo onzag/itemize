@@ -171,7 +171,7 @@ exports.getSQLTablesSchemaForModule = getSQLTablesSchemaForModule;
  * in a partial field value, don't use partial fields to create
  * @returns the composed row value with the consume streams function
  */
-function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData, uploadsContainer, uploadsPrefix, dictionary, partialFields) {
+function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, partialFields) {
     // first we create the row value
     const result = {};
     const consumeStreamsFns = [];
@@ -180,7 +180,7 @@ function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, mod, null, null, pd, data, oldData, uploadsContainer, uploadsPrefix, dictionary);
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, mod, null, null, pd, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary);
             Object.assign(result, addedFieldsByProperty.value);
             consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }

@@ -44,6 +44,7 @@ export function processFileListFor(
   oldValues: IGQLFile[],
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -72,6 +73,7 @@ export function processFileListFor(
       relativeOldValue,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -84,6 +86,7 @@ export function processFileListFor(
       removedValue,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -114,6 +117,7 @@ export function processFileListFor(
  * @param oldValue the old value
  * @param uploadsContainer the upload container to uploads file for or delete for
  * @param uploadsPrefix the uploads prefix of such container
+ * @param domain the domain we are storing for
  * @param itemDefinitionOrModule the item definition or module these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
@@ -125,6 +129,7 @@ export function processSingleFileFor(
   oldValue: IGQLFile,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -138,6 +143,7 @@ export function processSingleFileFor(
       oldValue,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -151,6 +157,7 @@ export function processSingleFileFor(
       oldValue,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -161,6 +168,7 @@ export function processSingleFileFor(
       null,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       itemDefinitionOrModule,
       include,
       propertyDefinition,
@@ -192,6 +200,7 @@ function processOneFileAndItsSameIDReplacement(
   oldVersion: IGQLFile,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -320,6 +329,7 @@ function processOneFileAndItsSameIDReplacement(
         curatedFileName,
         uploadsContainer,
         uploadsPrefix,
+        domain,
         valueWithStream,
         propertyDefinition,
       )
@@ -394,6 +404,7 @@ async function addFileFor(
   curatedFileName: string,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
@@ -417,6 +428,7 @@ async function addFileFor(
       value.type,
       uploadsContainer,
       uploadsPrefix,
+      domain,
       propertyDefinition,
     );
   } else {
@@ -425,6 +437,7 @@ async function addFileFor(
       uploadsContainer,
       uploadsPrefix,
       stream,
+      domain,
       path.join(mainFilePath, curatedFileName),
     );
   }
@@ -442,14 +455,17 @@ export async function sqlUploadPipeFile(
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
   readStream: ReadStream | sharp.Sharp,
+  domain: string,
   remote: string,
 ): Promise<void> {
-  CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Uploading", {remote});
+  const finalLocation = domain + "/" + remote;
+
+  CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Uploading", {path: finalLocation});
 
   // we make a write stream to the uploads container
   const writeStream = uploadsContainer.client.upload({
     container: uploadsContainer as any,
-    remote,
+    remote: finalLocation,
   });
   // and pipe our read stream
   readStream.pipe(writeStream);
@@ -457,10 +473,10 @@ export async function sqlUploadPipeFile(
   // return a promise for it
   return new Promise((resolve, reject) => {
     writeStream.on("finish", () => {
-      CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Finished uploading", {remote});
+      CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Finished uploading", {path: finalLocation});
       // we call the verify resource is ready function
       verifyResourceIsReady(
-        new URL(uploadsPrefix + remote),
+        new URL(uploadsPrefix + finalLocation),
         resolve,
       );
     });

@@ -56,7 +56,7 @@ export declare function convertSQLValueToGQLValueForInclude(knex: Knex, serverDa
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export declare function convertGQLValueToSQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an include
  * @param knex the knex instance

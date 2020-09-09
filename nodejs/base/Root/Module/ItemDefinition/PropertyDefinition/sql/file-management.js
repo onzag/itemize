@@ -32,7 +32,7 @@ const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LE
  * @returns the new values and the consume streams function that will actually consume the
  * streams to store in the remote storage solution
  */
-function processFileListFor(newValues, oldValues, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition) {
+function processFileListFor(newValues, oldValues, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition) {
     // the values might be null so let's ensure them
     const actualNewValues = newValues || [];
     const actualOldValues = oldValues || [];
@@ -47,11 +47,11 @@ function processFileListFor(newValues, oldValues, uploadsContainer, uploadsPrefi
         // let's pass it to the function that does that
         // job, pick the old value, if exists
         const relativeOldValue = actualOldValues.find((oldValue) => oldValue.id === newValue.id) || null;
-        return processOneFileAndItsSameIDReplacement(newValue, relativeOldValue, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition);
+        return processOneFileAndItsSameIDReplacement(newValue, relativeOldValue, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
     }).concat(removedFiles.map((removedValue) => {
         // for the removed it's the same but the new value
         // is null
-        return processOneFileAndItsSameIDReplacement(null, removedValue, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition);
+        return processOneFileAndItsSameIDReplacement(null, removedValue, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
     }));
     // let's filter the nulls
     let filteredNewValues = allNewValues.map((v) => v.value).filter((newValue) => newValue !== null);
@@ -76,23 +76,24 @@ exports.processFileListFor = processFileListFor;
  * @param oldValue the old value
  * @param uploadsContainer the upload container to uploads file for or delete for
  * @param uploadsPrefix the uploads prefix of such container
+ * @param domain the domain we are storing for
  * @param itemDefinitionOrModule the item definition or module these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns the new value (or null) consume streams function that will actually consume the
  * streams to store in the remote storage solution
  */
-function processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition) {
+function processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition) {
     if (oldValue && oldValue.id === newValue.id) {
-        return processOneFileAndItsSameIDReplacement(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition);
+        return processOneFileAndItsSameIDReplacement(newValue, oldValue, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
     }
     else {
         // basically we run this asa two step process
         // first we drop the old value, by using the same id
         // function giving no new value
-        const initialStepOutput = processOneFileAndItsSameIDReplacement(null, oldValue, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition);
+        const initialStepOutput = processOneFileAndItsSameIDReplacement(null, oldValue, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
         // and return with the same id but no old value, create it
-        const secondStepOutput = processOneFileAndItsSameIDReplacement(newValue, null, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition);
+        const secondStepOutput = processOneFileAndItsSameIDReplacement(newValue, null, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
         return {
             value: secondStepOutput.value,
             consumeStreams: async (containerId) => {
@@ -114,7 +115,7 @@ exports.processSingleFileFor = processSingleFileFor;
  * @returns the new value (or null) and the consume streams function that will actually consume the
  * streams to store in the remote storage solution
  */
-function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsContainer, uploadsPrefix, itemDefinitionOrModule, include, propertyDefinition) {
+function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition) {
     // if the new version is null, this means that the old file
     // is meant to be removed
     if (newVersion === null) {
@@ -221,7 +222,7 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
             // different variations in the case of media types
             const filePath = path_1.default.join(propertyLocationPath, newVersion.id);
             // we pass the file with the stream property in it
-            await addFileFor(filePath, curatedFileName, uploadsContainer, uploadsPrefix, valueWithStream, propertyDefinition);
+            await addFileFor(filePath, curatedFileName, uploadsContainer, uploadsPrefix, domain, valueWithStream, propertyDefinition);
         }
     };
 }
@@ -281,7 +282,7 @@ exports.removeFolderFor = removeFolderFor;
  * @param propertyDefinition the property definition for this
  * @returns a void promise
  */
-async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploadsPrefix, value, propertyDefinition) {
+async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploadsPrefix, domain, value, propertyDefinition) {
     // first we get the createReadStream function from the source gql file
     const { createReadStream } = await value.src;
     // we get it
@@ -294,11 +295,11 @@ async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploa
     // algorithm located in the image-conversions.ts file in this same
     // folder
     if (needsImageProcessing) {
-        await image_conversions_1.runImageConversions(stream, mainFilePath, curatedFileName, value.type, uploadsContainer, uploadsPrefix, propertyDefinition);
+        await image_conversions_1.runImageConversions(stream, mainFilePath, curatedFileName, value.type, uploadsContainer, uploadsPrefix, domain, propertyDefinition);
     }
     else {
         // otherwise we just pipe the file
-        await sqlUploadPipeFile(uploadsContainer, uploadsPrefix, stream, path_1.default.join(mainFilePath, curatedFileName));
+        await sqlUploadPipeFile(uploadsContainer, uploadsPrefix, stream, domain, path_1.default.join(mainFilePath, curatedFileName));
     }
 }
 /**
@@ -309,21 +310,22 @@ async function addFileFor(mainFilePath, curatedFileName, uploadsContainer, uploa
  * @param remote the remote name this file is uploaded as, it's whole path
  * @returns a void promise
  */
-async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, remote) {
-    CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Uploading", { remote });
+async function sqlUploadPipeFile(uploadsContainer, uploadsPrefix, readStream, domain, remote) {
+    const finalLocation = domain + "/" + remote;
+    CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Uploading", { path: finalLocation });
     // we make a write stream to the uploads container
     const writeStream = uploadsContainer.client.upload({
         container: uploadsContainer,
-        remote,
+        remote: finalLocation,
     });
     // and pipe our read stream
     readStream.pipe(writeStream);
     // return a promise for it
     return new Promise((resolve, reject) => {
         writeStream.on("finish", () => {
-            CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Finished uploading", { remote });
+            CAN_LOG_DEBUG && server_1.logger.debug("sqlUploadPipeFile: Finished uploading", { path: finalLocation });
             // we call the verify resource is ready function
-            verifyResourceIsReady(new URL(uploadsPrefix + remote), resolve);
+            verifyResourceIsReady(new URL(uploadsPrefix + finalLocation), resolve);
         });
         writeStream.on("error", reject);
     });

@@ -232,6 +232,7 @@ export function getLocalizedDateTimeFormat() {
 
 /**
  * Converts a file to its absolute URL counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param file the file to convert
@@ -245,6 +246,7 @@ export function getLocalizedDateTimeFormat() {
  * @returns a new IGQLFile but absolute
  */
 export function fileURLAbsoluter(
+  domain: string,
   containerHostnamePrefixes: {
     [key: string]: string,
   },
@@ -269,6 +271,10 @@ export function fileURLAbsoluter(
   }
 
   let prefix: string = containerHostnamePrefixes[containerId];
+  if (prefix[prefix.length - 1] !== "/") {
+    prefix += "/";
+  }
+  prefix += domain + "/";
   if (prefix.indexOf("/") !== 0) {
     prefix = "https://" + prefix;
   }
@@ -291,6 +297,7 @@ export function fileURLAbsoluter(
 
 /**
  * Converts an array of files to its absolute url counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param files the array of files to convert
@@ -304,6 +311,7 @@ export function fileURLAbsoluter(
  * @returns a new array of files
  */
 export function fileArrayURLAbsoluter(
+  domain: string,
   containerHostnamePrefixes: {
     [key: string]: string,
   },
@@ -318,7 +326,7 @@ export function fileArrayURLAbsoluter(
   if (files === null) {
     return null;
   }
-  return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
+  return files.map((file) => fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

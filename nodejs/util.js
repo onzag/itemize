@@ -221,6 +221,7 @@ function getLocalizedDateTimeFormat() {
 exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
 /**
  * Converts a file to its absolute URL counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param file the file to convert
@@ -233,7 +234,7 @@ exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
  * @param property the property it came from
  * @returns a new IGQLFile but absolute
  */
-function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
+function fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
     if (file === null) {
         return null;
     }
@@ -244,6 +245,10 @@ function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, v
         return null;
     }
     let prefix = containerHostnamePrefixes[containerId];
+    if (prefix[prefix.length - 1] !== "/") {
+        prefix += "/";
+    }
+    prefix += domain + "/";
     if (prefix.indexOf("/") !== 0) {
         prefix = "https://" + prefix;
     }
@@ -262,6 +267,7 @@ function fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, v
 exports.fileURLAbsoluter = fileURLAbsoluter;
 /**
  * Converts an array of files to its absolute url counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param files the array of files to convert
@@ -274,11 +280,11 @@ exports.fileURLAbsoluter = fileURLAbsoluter;
  * @param property the property it came from
  * @returns a new array of files
  */
-function fileArrayURLAbsoluter(containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
+function fileArrayURLAbsoluter(domain, containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
     if (files === null) {
         return null;
     }
-    return files.map((file) => fileURLAbsoluter(containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
+    return files.map((file) => fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
 }
 exports.fileArrayURLAbsoluter = fileArrayURLAbsoluter;
 exports.DOMWindow = jsdom_1.JSDOM ? (new jsdom_1.JSDOM("")).window : window;

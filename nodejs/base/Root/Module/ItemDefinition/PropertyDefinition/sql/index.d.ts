@@ -116,7 +116,7 @@ export declare function convertSQLValueToGQLValueForProperty(knex: Knex, serverD
  * @returns a composed value with a partial row value and the consume streams functionality
  * included in it
  */
-export declare function convertGQLValueToSQLValueForProperty(knex: Knex, serverData: any, mod: Module, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, dictionary: string): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForProperty(knex: Knex, serverData: any, mod: Module, itemDefinition: ItemDefinition, include: Include, propertyDefinition: PropertyDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, dictionary: string): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the knex builder

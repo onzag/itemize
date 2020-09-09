@@ -204,6 +204,7 @@ export function convertGQLValueToSQLValueForModule(
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): ISQLStreamComposedTableRowValue {
@@ -229,6 +230,7 @@ export function convertGQLValueToSQLValueForModule(
         oldData,
         uploadsContainer,
         uploadsPrefix,
+        domain,
         dictionary,
       );
       Object.assign(

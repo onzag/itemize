@@ -40,7 +40,7 @@ export class SEOGenerator {
 
   private primaryIndex: ISitemapJSONType = null;
   private mainIndex: ISitemapJSONType = null;
-  private cache: {[key: string]: ISEOCollectedDataWithCreatedAt[]} = {};
+  private cache: { [key: string]: ISEOCollectedDataWithCreatedAt[] } = {};
 
   /**
    * Buillds a new seo generator
@@ -144,7 +144,7 @@ export class SEOGenerator {
       // prepare this change variable which means any change
       // in any sitemap
       let changed = false;
-      
+
       // now we get our current static file
       const currentStatic = await this.runGetRequest(
         "sitemaps/" + this.hostname + "/main/static.json",
@@ -305,7 +305,7 @@ export class SEOGenerator {
           } else {
             logger.info("SEOGenerator.runHeadRequest: Checking failed " + at);
           }
-    
+
           return resolve(resp.statusCode === 200 || resp.statusCode === 0);
         });
       } catch (err) {
@@ -371,7 +371,7 @@ export class SEOGenerator {
     });
     const readStream = Readable.from(data);
     readStream.pipe(writeStream);
-  
+
     return new Promise((resolve, reject) => {
       writeStream.on("finish", () => {
         CAN_LOG_DEBUG && logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
@@ -405,22 +405,9 @@ export class SEOGenerator {
       return;
     }
 
-    // first we need to see if the primary index exists at all
-    const primaryIndexFound = await this.runHeadRequest("sitemaps/" + this.hostname + "/index.xml");
-    // and do the same about the language indexes
-    const languagesIndexFound = await Promise.all(this.supportedLanguages.map(async (lang) => {
-      return {
-        lang,
-        found: await this.runHeadRequest("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
-      }
-    }));
-
-    // the primary index is not valid as some language is missing
-    // this does not mean the language in question is invalid, it might just have been
-    // added so the index must reflect that
-    if (!primaryIndexFound || languagesIndexFound.some((li) => !li.found)) {
-      await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
-    }
+    // we will rewrite the primary index every time regardless if found or not, this ensures that
+    // it's in sync
+    await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
 
     // we need to retrieve now the main index based on the json, if it exists
     this.mainIndex = await this.runGetRequest("sitemaps/" + this.hostname + "/main/index.json");
@@ -435,9 +422,17 @@ export class SEOGenerator {
       }
     }
 
+    // and do the same about the language indexes
+    const languagesIndexFound = await Promise.all(this.supportedLanguages.map(async (lang) => {
+      return {
+        lang,
+        found: await this.runHeadRequest("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
+      }
+    }));
+
     // we use this variable to cache the content of the sitemaps in case
     // that we need to add more than one language at a given time
-    const cachedEntries: {[url: string]: ISitemapJSONType} = {};
+    const cachedEntries: { [url: string]: ISitemapJSONType } = {};
 
     // so we loop per language
     for (const languageIndex of languagesIndexFound) {
@@ -502,7 +497,7 @@ export class SEOGenerator {
         static: true,
       }
     }
-  
+
     // otherwise let's see if it's a dynamic collect type
     if (rule.collect) {
       // so here we will store our results

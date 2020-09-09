@@ -252,10 +252,13 @@ export function EntryViewReadSet(
                           // and if that is the case, now we need to check if it's a
                           // list or a single value
 
+                          const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
+
                           // and as such we absolute the files so that their urls
                           // are indeed proper, being a read operation, there's no risk on it
                           if (!propertyDescription.gqlList) {
                             return props.children(fileURLAbsoluter(
+                              domain,
                               config.containersHostnamePrefixes,
                               props.useAppliedValue ? propertyState.stateAppliedValue as IGQLFile : propertyState.value as IGQLFile,
                               itemDefinitionContextualValue.idef,
@@ -267,6 +270,7 @@ export function EntryViewReadSet(
                             ), propertyState);
                           } else {
                             return props.children(fileArrayURLAbsoluter(
+                              domain,
                               config.containersHostnamePrefixes,
                               props.useAppliedValue ? propertyState.stateAppliedValue as IGQLFile[] : propertyState.value as IGQLFile[],
                               itemDefinitionContextualValue.idef,

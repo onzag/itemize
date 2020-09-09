@@ -74,7 +74,8 @@ class PropertyEntryFile extends react_1.default.Component {
                 };
             }
             else {
-                currentValue = util_1.fileURLAbsoluter(this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
+                const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
+                currentValue = util_1.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
             }
         }
         return currentValue;

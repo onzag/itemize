@@ -28,7 +28,7 @@ import Module from "../../..";
  * @returns the new values and the consume streams function that will actually consume the
  * streams to store in the remote storage solution
  */
-export declare function processFileListFor(newValues: IGQLFile[], oldValues: IGQLFile[], uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, itemDefinitionOrModule: ItemDefinition | Module, include: Include, propertyDefinition: PropertyDefinition): {
+export declare function processFileListFor(newValues: IGQLFile[], oldValues: IGQLFile[], uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, itemDefinitionOrModule: ItemDefinition | Module, include: Include, propertyDefinition: PropertyDefinition): {
     value: IGQLFile[];
     consumeStreams: ConsumeStreamsFnType;
 };
@@ -40,13 +40,14 @@ export declare function processFileListFor(newValues: IGQLFile[], oldValues: IGQ
  * @param oldValue the old value
  * @param uploadsContainer the upload container to uploads file for or delete for
  * @param uploadsPrefix the uploads prefix of such container
+ * @param domain the domain we are storing for
  * @param itemDefinitionOrModule the item definition or module these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
  * @returns the new value (or null) consume streams function that will actually consume the
  * streams to store in the remote storage solution
  */
-export declare function processSingleFileFor(newValue: IGQLFile, oldValue: IGQLFile, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, itemDefinitionOrModule: ItemDefinition | Module, include: Include, propertyDefinition: PropertyDefinition): {
+export declare function processSingleFileFor(newValue: IGQLFile, oldValue: IGQLFile, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, itemDefinitionOrModule: ItemDefinition | Module, include: Include, propertyDefinition: PropertyDefinition): {
     value: IGQLFile;
     consumeStreams: ConsumeStreamsFnType;
 };
@@ -68,4 +69,4 @@ export declare function removeFolderFor(uploadsContainer: pkgcloud.storage.Conta
  * @param remote the remote name this file is uploaded as, it's whole path
  * @returns a void promise
  */
-export declare function sqlUploadPipeFile(uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, readStream: ReadStream | sharp.Sharp, remote: string): Promise<void>;
+export declare function sqlUploadPipeFile(uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, readStream: ReadStream | sharp.Sharp, domain: string, remote: string): Promise<void>;

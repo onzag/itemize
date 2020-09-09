@@ -257,7 +257,7 @@ exports.convertSQLValueToGQLValueForProperty = convertSQLValueToGQLValueForPrope
  * @returns a composed value with a partial row value and the consume streams functionality
  * included in it
  */
-function convertGQLValueToSQLValueForProperty(knex, serverData, mod, itemDefinition, include, propertyDefinition, data, oldData, uploadsContainer, uploadsPrefix, dictionary) {
+function convertGQLValueToSQLValueForProperty(knex, serverData, mod, itemDefinition, include, propertyDefinition, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary) {
     // and this is the value of the property, again, properties
     // are not prefixed, they are either in their own object
     // or in the root
@@ -279,12 +279,12 @@ function convertGQLValueToSQLValueForProperty(knex, serverData, mod, itemDefinit
         const oldValue = (oldData && oldData[propertyDefinition.getId()]) || null;
         const newValue = gqlPropertyValue;
         if (description.gqlList) {
-            const processedValue = file_management_1.processFileListFor(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinition || mod, include, propertyDefinition);
+            const processedValue = file_management_1.processFileListFor(newValue, oldValue, uploadsContainer, uploadsPrefix, domain, itemDefinition || mod, include, propertyDefinition);
             gqlPropertyValue = processedValue.value;
             consumeStreams = processedValue.consumeStreams;
         }
         else {
-            const processedValue = file_management_1.processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefix, itemDefinition || mod, include, propertyDefinition);
+            const processedValue = file_management_1.processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefix, domain, itemDefinition || mod, include, propertyDefinition);
             gqlPropertyValue = processedValue.value;
             consumeStreams = processedValue.consumeStreams;
         }

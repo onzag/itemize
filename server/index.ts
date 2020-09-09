@@ -43,7 +43,7 @@ const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 
@@ -331,7 +331,7 @@ export async function initializeServer(
     // changed events of the same type the client uses to update the redis database
     if (INSTANCE_MODE === "CLUSTER_MANAGER") {
       // as such 
-      const cache = new Cache(redisClient, null, null, null, null, null);
+      const cache = new Cache(redisClient, null, null, null, null, null, null);
       logger.info(
         "initializeServer: server initialized in cluster manager exclusive mode flushing redis",
       );
@@ -396,6 +396,8 @@ export async function initializeServer(
       connection: dbConnectionKnexConfig,
     });
 
+    const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
+
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
         "initializeServer: setting up global manager",
@@ -431,7 +433,7 @@ export async function initializeServer(
           root,
           prefix,
           config.supportedLanguages,
-          NODE_ENV === "production" ? config.productionHostname : config.developmentHostname,
+          domain,
           PING_GOOGLE,
         );
         manager.setSEOGenerator(seoGenerator);
@@ -476,17 +478,25 @@ export async function initializeServer(
       };
     }));
 
-    if (INSTANCE_MODE === "CLEAN_STORAGE") {
+    if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
         "initializeServer: cleaning storage",
       );
 
       await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
-        logger.info(
-          "initializeServer: cleaning " + containerId,
-        );
-        const container = pkgcloudUploadContainers[containerId];
-        await removeFolderFor(container.container, "");
+        if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
+          logger.info(
+            "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
+          );
+          const container = pkgcloudUploadContainers[containerId];
+          await removeFolderFor(container.container, "sitemaps/" + domain);
+        } else {
+          logger.info(
+            "initializeServer: cleaning " + containerId + " data for " + domain,
+          );
+          const container = pkgcloudUploadContainers[containerId];
+          await removeFolderFor(container.container, domain);
+        }
       }));
 
       process.exit(0);
@@ -521,7 +531,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );

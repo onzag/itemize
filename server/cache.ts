@@ -32,6 +32,8 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
 
+const NODE_ENV = process.env.NODE_ENV
+
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -46,6 +48,7 @@ const CAN_LOG_SILLY = LOG_LEVEL === "silly";
  */
 export class Cache {
   private redisClient: RedisClient;
+  private domain: string;
   private knex: Knex;
   private uploadsContainers: PkgCloudContainers;
   private root: Root;
@@ -73,6 +76,7 @@ export class Cache {
     knex: Knex,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     uploadsContainers: PkgCloudContainers,
+    domain: string,
     root: Root,
     initialServerData: IServerDataType
   ) {
@@ -82,6 +86,7 @@ export class Cache {
     this.uploadsContainers = uploadsContainers;
     this.serverData = initialServerData;
     this.sensitiveConfig = sensitiveConfig;
+    this.domain = domain;
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -257,6 +262,7 @@ export class Cache {
       null,
       this.uploadsContainers[containerId].container,
       this.uploadsContainers[containerId].prefix,
+      this.domain,
       dictionary,
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
@@ -267,6 +273,7 @@ export class Cache {
       null,
       this.uploadsContainers[containerId].container,
       this.uploadsContainers[containerId].prefix,
+      this.domain,
       dictionary,
     );
     const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
@@ -642,6 +649,7 @@ export class Cache {
       currentValue,
       containerId ? this.uploadsContainers[containerId].container : null,
       containerId ? this.uploadsContainers[containerId].prefix : null,
+      this.domain,
       dictionary,
       partialUpdateFields,
     );
@@ -653,6 +661,7 @@ export class Cache {
       currentValue,
       containerId ? this.uploadsContainers[containerId].container : null,
       containerId ? this.uploadsContainers[containerId].prefix : null,
+      this.domain,
       dictionary,
       partialUpdateFields,
     );

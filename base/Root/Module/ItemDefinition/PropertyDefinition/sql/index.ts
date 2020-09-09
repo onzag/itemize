@@ -313,6 +313,7 @@ export function convertGQLValueToSQLValueForProperty(
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   dictionary: string,
 ): ISQLStreamComposedTableRowValue {
   // and this is the value of the property, again, properties
@@ -347,6 +348,7 @@ export function convertGQLValueToSQLValueForProperty(
         oldValue,
         uploadsContainer,
         uploadsPrefix,
+        domain,
         itemDefinition || mod,
         include,
         propertyDefinition,
@@ -359,6 +361,7 @@ export function convertGQLValueToSQLValueForProperty(
         oldValue,
         uploadsContainer,
         uploadsPrefix,
+        domain,
         itemDefinition || mod,
         include,
         propertyDefinition,

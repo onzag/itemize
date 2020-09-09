@@ -75,6 +75,14 @@ The absolute is a combination of an extended instance, global manager and cluste
 
 A cheat mode to run build database from the built app, the reason this mode exist is because it provides easy access to a docker tty to connect and update the database without having to use a different docker build, remember to use `USING_DOCKER=true` when using it in this configuration, even when this instance mode would be rare to use.
 
+### CLEAN_STORAGE
+
+A cheat mode to clean all the stored files for a given domain, it will wipe all the files there, use mainly for development, as you are likely to create orphaned files and clutter, it will use the current active domain, be careful when using this instance mode
+
+### CLEAN_SITEMAPS
+
+A cheat mode to clean all the stored sitemaps for a given domain
+
 ## USING_DOCKER
 
 Default `false` because the same setup is meant to run inside or outside docker, but docker DNS is different from your host DNS, as docker networking has to be setup differently, when USING_DOCKER is true these things happen.

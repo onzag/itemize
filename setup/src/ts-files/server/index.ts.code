@@ -101,6 +101,7 @@ initializeServer(
             // container they are in, because containers aren't centralized
             // we need to use this function,
             const absolutedFile = fileURLAbsoluter(
+              process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname,
               config.containersHostnamePrefixes,
               collectedValues[0].value.DATA.profile_picture,
               userIdef,

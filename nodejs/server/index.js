@@ -210,7 +210,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         // changed events of the same type the client uses to update the redis database
         if (INSTANCE_MODE === "CLUSTER_MANAGER") {
             // as such 
-            const cache = new cache_1.Cache(redisClient, null, null, null, null, null);
+            const cache = new cache_1.Cache(redisClient, null, null, null, null, null, null);
             exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
             // in case both the global and local cluster are the same
             const getPromisified = util_1.promisify(redisClient.get).bind(redisClient);
@@ -248,6 +248,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             debug: process.env.NODE_ENV !== "production",
             connection: dbConnectionKnexConfig,
         });
+        const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
         if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: setting up global manager");
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
@@ -272,7 +273,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                     prefix = "https://" + prefix;
                 }
                 const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-                const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, NODE_ENV === "production" ? config.productionHostname : config.developmentHostname, PING_GOOGLE);
+                const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
                 manager.setSEOGenerator(seoGenerator);
             }
             manager.run();
@@ -307,12 +308,19 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                 container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
             };
         }));
-        if (INSTANCE_MODE === "CLEAN_STORAGE") {
+        if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
             exports.logger.info("initializeServer: cleaning storage");
             await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
-                exports.logger.info("initializeServer: cleaning " + containerId);
-                const container = pkgcloudUploadContainers[containerId];
-                await file_management_1.removeFolderFor(container.container, "");
+                if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
+                    exports.logger.info("initializeServer: cleaning " + containerId + " sitemaps for " + domain);
+                    const container = pkgcloudUploadContainers[containerId];
+                    await file_management_1.removeFolderFor(container.container, "sitemaps/" + domain);
+                }
+                else {
+                    exports.logger.info("initializeServer: cleaning " + containerId + " data for " + domain);
+                    const container = pkgcloudUploadContainers[containerId];
+                    await file_management_1.removeFolderFor(container.container, domain);
+                }
             }));
             process.exit(0);
         }
@@ -337,7 +345,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             }
         }
         exports.logger.info("initializeServer: initializing cache instance");
-        const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, root, serverData);
+        const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, domain, root, serverData);
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(exports.app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");

@@ -202,7 +202,9 @@ export default class PropertyEntryFile
           url: this.ownedObjectURLPool[currentValue.id],
         };
       } else {
+        const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
         currentValue = fileURLAbsoluter(
+          domain,
           this.props.config.containersHostnamePrefixes,
           currentValue,
           this.props.itemDefinition,

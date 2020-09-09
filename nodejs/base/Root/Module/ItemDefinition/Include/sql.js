@@ -108,7 +108,7 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, uploadsPrefix, dictionary, partialFields) {
+function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, partialFields) {
     // the exclusion state in the graphql information should be included in
     // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
     const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
@@ -132,7 +132,7 @@ function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, i
                 // are an object within there, we pass that, as all the info should be
                 // there, the prefix then represents the fact, we want all the added properties
                 // to be prefixed with what we are giving, in this case ITEM_wheel_
-                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, uploadsContainer, uploadsPrefix, dictionary);
+                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, uploadsContainer, uploadsPrefix, domain, dictionary);
                 Object.assign(result, addedFieldsByProperty.value);
                 consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
             }

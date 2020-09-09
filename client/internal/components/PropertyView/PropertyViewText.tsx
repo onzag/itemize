@@ -130,7 +130,9 @@ export function propertyViewPostProcessingHook(
       if (!srcId || !currentFile) {
         node.parentElement && node.parentElement.removeChild(node);
       } else {
+        const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
         const absolutedFile = fileURLAbsoluter(
+          domain,
           this.props.config.containersHostnamePrefixes,
           currentFile,
           this.props.itemDefinition,
@@ -171,7 +173,9 @@ export function propertyViewPostProcessingHook(
         // spellcheck
         node.spellcheck = false;
 
+        const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
         const absolutedFile = fileURLAbsoluter(
+          domain,
           this.props.config.containersHostnamePrefixes,
           currentFile,
           this.props.itemDefinition,

@@ -305,21 +305,9 @@ class SEOGenerator {
         if (this.mainIndex) {
             return;
         }
-        // first we need to see if the primary index exists at all
-        const primaryIndexFound = await this.runHeadRequest("sitemaps/" + this.hostname + "/index.xml");
-        // and do the same about the language indexes
-        const languagesIndexFound = await Promise.all(this.supportedLanguages.map(async (lang) => {
-            return {
-                lang,
-                found: await this.runHeadRequest("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
-            };
-        }));
-        // the primary index is not valid as some language is missing
-        // this does not mean the language in question is invalid, it might just have been
-        // added so the index must reflect that
-        if (!primaryIndexFound || languagesIndexFound.some((li) => !li.found)) {
-            await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
-        }
+        // we will rewrite the primary index every time regardless if found or not, this ensures that
+        // it's in sync
+        await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
         // we need to retrieve now the main index based on the json, if it exists
         this.mainIndex = await this.runGetRequest("sitemaps/" + this.hostname + "/main/index.json");
         let mainIndexWasNotFound = !this.mainIndex;
@@ -331,6 +319,13 @@ class SEOGenerator {
                 isIndex: true,
             };
         }
+        // and do the same about the language indexes
+        const languagesIndexFound = await Promise.all(this.supportedLanguages.map(async (lang) => {
+            return {
+                lang,
+                found: await this.runHeadRequest("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
+            };
+        }));
         // we use this variable to cache the content of the sitemaps in case
         // that we need to add more than one language at a given time
         const cachedEntries = {};

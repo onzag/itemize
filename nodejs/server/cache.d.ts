@@ -23,6 +23,7 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
  */
 export declare class Cache {
     private redisClient;
+    private domain;
     private knex;
     private uploadsContainers;
     private root;
@@ -40,7 +41,7 @@ export declare class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient: RedisClient, knex: Knex, sensitiveConfig: ISensitiveConfigRawJSONDataType, uploadsContainers: PkgCloudContainers, root: Root, initialServerData: IServerDataType);
+    constructor(redisClient: RedisClient, knex: Knex, sensitiveConfig: ISensitiveConfigRawJSONDataType, uploadsContainers: PkgCloudContainers, domain: string, root: Root, initialServerData: IServerDataType);
     /**
      * Sets the listener for the remote interaction with the clients
      * that are connected, this listener is what informs the client of updates

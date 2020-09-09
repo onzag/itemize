@@ -64,6 +64,7 @@ export declare function getLocalizedDateFormat(): any;
 export declare function getLocalizedDateTimeFormat(): string;
 /**
  * Converts a file to its absolute URL counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param file the file to convert
@@ -76,11 +77,12 @@ export declare function getLocalizedDateTimeFormat(): string;
  * @param property the property it came from
  * @returns a new IGQLFile but absolute
  */
-export declare function fileURLAbsoluter(containerHostnamePrefixes: {
+export declare function fileURLAbsoluter(domain: string, containerHostnamePrefixes: {
     [key: string]: string;
 }, file: IGQLFile, itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile;
 /**
  * Converts an array of files to its absolute url counterpart
+ * @param domain the domain that is being used according to the env
  * @param containerHostnamePrefixes the containers hostnames prefixes that allow
  * to identify the url prefix to access a given container
  * @param files the array of files to convert
@@ -93,7 +95,7 @@ export declare function fileURLAbsoluter(containerHostnamePrefixes: {
  * @param property the property it came from
  * @returns a new array of files
  */
-export declare function fileArrayURLAbsoluter(containerHostnamePrefixes: {
+export declare function fileArrayURLAbsoluter(domain: string, containerHostnamePrefixes: {
     [key: string]: string;
 }, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile[];
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);

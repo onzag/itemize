@@ -79,7 +79,9 @@ export default class PropertyViewFile
       currentValue &&
       currentValue.url.indexOf("blob:") !== 0
     ) {
+      const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
       currentValue = fileURLAbsoluter(
+        domain,
         this.props.config.containersHostnamePrefixes,
         currentValue,
         this.props.itemDefinition,

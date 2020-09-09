@@ -118,6 +118,7 @@ export async function runImageConversions(
   fileMimeType: string,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   propDef: PropertyDefinition,
 ): Promise<void> {
   // first we get the original file path, by joining the file path
@@ -130,6 +131,7 @@ export async function runImageConversions(
       uploadsContainer,
       uploadsPrefix,
       imageStream,
+      domain,
       originalImageFilePath,
     );
     return;
@@ -203,6 +205,7 @@ export async function runImageConversions(
       uploadsContainer,
       uploadsPrefix,
       outputPipeline,
+      domain,
       outputFileName,
     );
   }).concat([
@@ -210,6 +213,7 @@ export async function runImageConversions(
       uploadsContainer,
       uploadsPrefix,
       imageStream,
+      domain,
       originalImageFilePath,
     ),
   ]);

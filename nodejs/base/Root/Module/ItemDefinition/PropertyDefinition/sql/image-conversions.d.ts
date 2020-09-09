@@ -20,4 +20,4 @@ import pkgcloud from "pkgcloud";
  * @param propDef the property definition that this refers to
  * @returns a void promise for when this is done
  */
-export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, propDef: PropertyDefinition): Promise<void>;
+export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, propDef: PropertyDefinition): Promise<void>;

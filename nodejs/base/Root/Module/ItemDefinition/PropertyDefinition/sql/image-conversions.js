@@ -85,13 +85,13 @@ function manyOptionsAnalysis(value) {
  * @param propDef the property definition that this refers to
  * @returns a void promise for when this is done
  */
-async function runImageConversions(imageStream, filePath, fileName, fileMimeType, uploadsContainer, uploadsPrefix, propDef) {
+async function runImageConversions(imageStream, filePath, fileName, fileMimeType, uploadsContainer, uploadsPrefix, domain, propDef) {
     // first we get the original file path, by joining the file path
     // and the name
     const originalImageFilePath = path_1.default.join(filePath, fileName);
     // we use that for svg types, no need to convert
     if (fileMimeType === "image/svg+xml") {
-        await file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, imageStream, originalImageFilePath);
+        await file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, imageStream, domain, originalImageFilePath);
         return;
     }
     // the properties in question are, smallDimension
@@ -142,9 +142,9 @@ async function runImageConversions(imageStream, filePath, fileName, fileMimeType
             fit: conversionOutput.fit,
             withoutEnlargement: true,
         }).rotate().flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
-        return file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, outputPipeline, outputFileName);
+        return file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, outputPipeline, domain, outputFileName);
     }).concat([
-        file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, imageStream, originalImageFilePath),
+        file_management_1.sqlUploadPipeFile(uploadsContainer, uploadsPrefix, imageStream, domain, originalImageFilePath),
     ]);
     // now we pipe the image read stream to the conversion pipeline
     // that will run the conversions

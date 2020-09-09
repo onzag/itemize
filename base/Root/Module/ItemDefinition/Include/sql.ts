@@ -152,6 +152,7 @@ export function convertGQLValueToSQLValueForInclude(
   oldData: IGQLValue,
   uploadsContainer: pkgcloud.storage.Container,
   uploadsPrefix: string,
+  domain: string,
   dictionary: string,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
@@ -193,6 +194,7 @@ export function convertGQLValueToSQLValueForInclude(
           (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
           uploadsContainer,
           uploadsPrefix,
+          domain,
           dictionary,
         );
         Object.assign(
