@@ -4,33 +4,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const express_graphql_1 = __importDefault(require("express-graphql"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const Root_1 = __importDefault(require("../base/Root"));
-const resolvers_1 = __importDefault(require("./resolvers"));
-const gql_1 = require("../base/Root/gql");
 const knex_1 = __importDefault(require("knex"));
 const pg_1 = require("pg");
 const constants_1 = require("../constants");
-const errors_1 = require("../base/errors");
 const PropertyDefinition_1 = __importDefault(require("../base/Root/Module/ItemDefinition/PropertyDefinition"));
 const server_checkers_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers");
-const rest_1 = __importDefault(require("./rest"));
-const queries_1 = require("./user/queries");
-const mutations_1 = require("./user/mutations");
 const listener_1 = require("./listener");
 const redis_1 = __importDefault(require("redis"));
 const cache_1 = require("./cache");
-const graphql_upload_1 = require("graphql-upload");
-const custom_graphql_1 = require("./custom-graphql");
-const mode_1 = require("./mode");
 const triggers_1 = require("./resolvers/triggers");
 const triggers_2 = require("./user/triggers");
 const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
-const rest_2 = require("./user/rest");
 const pkgcloud_1 = __importDefault(require("pkgcloud"));
 const here_1 = require("./services/here");
 const util_1 = require("util");
@@ -38,10 +27,10 @@ const winston_1 = __importDefault(require("winston"));
 require("winston-daily-rotate-file");
 const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
-const generator_1 = require("./ssr/generator");
 const rootpool_1 = require("./rootpool");
 const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management");
-const generator_2 = require("./seo/generator");
+const generator_1 = require("./seo/generator");
+const initialize_1 = require("./initialize");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -79,197 +68,7 @@ pg_1.types.setTypeParser(DATE_OID, (val) => val);
 // we need the async fs
 const fsAsync = fs_1.default.promises;
 // now in order to build the database in the cheat mode, we don't need express
-const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
-/**
- * This is the function that catches the errors that are thrown
- * within graphql
- * @param error the error that is thrown
- */
-const customFormatErrorFn = (error) => {
-    const originalError = error.originalError;
-    let constructor = null;
-    if (originalError) {
-        constructor = originalError.constructor;
-    }
-    let extensions;
-    switch (constructor) {
-        case errors_1.EndpointError:
-            const gqlDataInputError = error.originalError;
-            extensions = gqlDataInputError.data;
-            break;
-        default:
-            exports.logger.error("customFormatErrorFn: Caught unexpected error from graphql parsing", {
-                errMessage: error.message,
-                errStack: error.stack,
-            });
-            extensions = {
-                message: "Unspecified Error while parsing data",
-                code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,
-            };
-    }
-    return {
-        extensions,
-        ...error,
-    };
-};
-/**
- * The resolve wrappers that wraps every resolve function
- * from graphql
- * @param fn the function that is supposed to run
- * @param source graphql source
- * @param args grapql args
- * @param context grapql context
- * @param info graphql info
- */
-async function customResolveWrapper(fn, source, args, context, info) {
-    try {
-        return await fn(source, args, context, info);
-    }
-    catch (err) {
-        if (err instanceof errors_1.EndpointError) {
-            throw err;
-        }
-        exports.logger.error("customResolveWrapper: Found internal server error", {
-            errStack: err.stack,
-            errMessage: err.message,
-        });
-        throw new errors_1.EndpointError({
-            message: "Internal Server Error",
-            code: constants_1.ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
-        });
-    }
-}
-/**
- * Initializes the server application with its configuration
- * @param appData the application data to use
- * @param custom the custom config that has been passed
- */
-function initializeApp(appData, custom) {
-    // removing the powered by header
-    app.use((req, res, next) => {
-        res.removeHeader("X-Powered-By");
-        next();
-    });
-    // if we have a custom router and custom router endpoint rather than the standard
-    if (custom.customRouterEndpoint) {
-        app.use(custom.customRouterEndpoint, custom.customRouter(appData));
-    }
-    else if (custom.customRouter) {
-        app.use(custom.customRouter(appData));
-    }
-    // adding rest services
-    app.use("/rest/user", rest_2.userRestServices(appData));
-    app.use("/rest", rest_1.default(appData));
-    const customUserQueriesProcessed = queries_1.customUserQueries(appData);
-    appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;
-    // custom graphql queries combined
-    const allCustomQueries = {
-        ...customUserQueriesProcessed,
-        ...(custom.customGQLQueries && custom.customGQLQueries(appData)),
-        ...(custom.customTokenGQLQueries && custom_graphql_1.buildCustomTokenQueries(appData, custom.customTokenGQLQueries)),
-    };
-    // custom mutations combined
-    const allCustomMutations = {
-        ...mutations_1.customUserMutations(appData),
-        ...(custom.customGQLMutations && custom.customGQLMutations(appData)),
-    };
-    // now we need to combine such queries with the resolvers
-    const finalAllCustomQueries = {};
-    Object.keys(allCustomQueries).forEach((customQueryKey) => {
-        finalAllCustomQueries[customQueryKey] = {
-            ...allCustomQueries[customQueryKey],
-            resolve: customResolveWrapper.bind(null, allCustomQueries[customQueryKey].resolve),
-        };
-    });
-    // do the same with the mutations
-    const finalAllCustomMutations = {};
-    Object.keys(allCustomMutations).forEach((customMutationKey) => {
-        finalAllCustomMutations[customMutationKey] = {
-            ...allCustomMutations[customMutationKey],
-            resolve: customResolveWrapper.bind(null, allCustomMutations[customMutationKey].resolve),
-        };
-    });
-    // now weadd the graphql endpoint
-    app.use("/graphql", graphql_upload_1.graphqlUploadExpress({
-        maxFileSize: constants_1.MAX_FILE_SIZE,
-        maxFiles: constants_1.MAX_FILE_TOTAL_BATCH_COUNT,
-        maxFieldSize: constants_1.MAX_FIELD_SIZE,
-    }), express_graphql_1.default({
-        schema: gql_1.getGQLSchemaForRoot(appData.root, finalAllCustomQueries, finalAllCustomMutations, resolvers_1.default(appData)),
-        graphiql: true,
-        customFormatErrorFn,
-    }));
-    // service worker setup
-    app.get("/sw.development.js", (req, res) => {
-        res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.development.js")));
-    });
-    app.get("/sw.production.js", (req, res) => {
-        res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
-    });
-    const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
-    app.get("/robots.txt", (req, res) => {
-        res.setHeader("content-type", "text/plain; charset=utf-8");
-        let result = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
-            "disallow: /rest/currency-factors\ndisallow: /graphql\n";
-        if (appData.seoConfig) {
-            Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
-                const rule = appData.seoConfig.seoRules[urlSet];
-                if (!rule.crawable) {
-                    const splittedSet = urlSet.replace(/^:[A-Za-z_-]+/g, "*").split(",");
-                    appData.config.supportedLanguages.forEach((supportedLanguage) => {
-                        splittedSet.forEach((denyURL) => {
-                            result += "disallow: /" + supportedLanguage;
-                            if (!denyURL.startsWith("/")) {
-                                result += "/";
-                            }
-                            result += denyURL;
-                        });
-                    });
-                }
-            });
-            result += "Sitemap: " +
-                appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix +
-                "sitemaps/" + hostname + "/index.xml";
-        }
-        res.end(result);
-    });
-    app.get("/sitemap.xml", (req, res) => {
-        res.redirect(appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix + "sitemaps/" + hostname + "/index.xml");
-    });
-    const router = express_1.default.Router();
-    Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
-        const rule = appData.ssrConfig.ssrRules[urlCombo];
-        urlCombo.split(",").forEach((url) => {
-            const actualURL = url.startsWith("/") ? url : "/" + url;
-            router.get(actualURL, (req, res) => {
-                const mode = mode_1.getMode(appData, req);
-                if (mode === "development") {
-                    generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule);
-                }
-                else {
-                    generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
-                }
-            });
-        });
-    });
-    app.use("/:lang", (req, res, next) => {
-        if (req.params.lang.length !== 2) {
-            next();
-            return;
-        }
-        router(req, res, next);
-    });
-    // and now the main index setup
-    app.get("*", (req, res) => {
-        const mode = mode_1.getMode(appData, req);
-        if (mode === "development") {
-            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, null);
-        }
-        else {
-            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, null);
-        }
-    });
-}
+exports.app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
 /**
  * Provides the pkgloud client container from ovh
  * @param client the client to use
@@ -301,10 +100,12 @@ function getContainerPromisified(client, containerName) {
  * @param custom.customTriggers a registry for custom triggers
  */
 async function initializeServer(ssrConfig, seoConfig, custom = {}) {
+    // for build database we just build the database
     if (INSTANCE_MODE === "BUILD_DATABASE") {
         dbbuilder_1.default(NODE_ENV);
         return;
     }
+    // now we try to read the basic configuration
     try {
         exports.logger.info("initializeServer: reading configuration data");
         // first let's read all the configurations
@@ -359,14 +160,16 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             }
         });
         exports.logger.info("initializeServer: using docker " + USING_DOCKER);
+        // We change the hosts depending to whether we are using docker or not
+        // and if our hosts are set to the local
         if (USING_DOCKER) {
-            if (redisConfig.cache.host === "127.0.0.1") {
+            if (redisConfig.cache.host === "127.0.0.1" || redisConfig.cache.host === "localhost") {
                 redisConfig.cache.host = "redis";
             }
-            if (redisConfig.pubSub.host === "127.0.0.1") {
+            if (redisConfig.pubSub.host === "127.0.0.1" || redisConfig.pubSub.host === "localhost") {
                 redisConfig.pubSub.host = "redis";
             }
-            if (redisConfig.global.host === "127.0.0.1") {
+            if (redisConfig.global.host === "127.0.0.1" || redisConfig.global.host === "localhost") {
                 redisConfig.global.host = "redis";
             }
             if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
@@ -377,21 +180,36 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         buildnumber = buildnumber.replace("\n", "").trim();
         exports.logger.info("initializeServer: buildnumber is " + buildnumber);
         exports.logger.info("initializeServer: INSTANCE_MODE is " + INSTANCE_MODE);
+        // now we create the pub sub clients or only the pub client
+        // if we are the global manager as the global manager only needs
+        // to publish and never subscribes because the global manager
+        // needs to inform of new server data, absolute mode will also do
+        // this
         exports.logger.info(INSTANCE_MODE === "GLOBAL_MANAGER" ?
             "initializeServer: initializing redis global pub client" :
             "initializeServer: initializing redis global pub/sub client");
         const redisPub = redis_1.default.createClient(redisConfig.pubSub);
         const redisSub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.pubSub);
+        // so every other instance mode will end up setting up a local pub/sub for the local cache, however not the global manager
+        // because it only talks to the global redis by publishing server data, and it shouldn't have anything to do with
+        // the local redis
         if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
             exports.logger.info("initializeServer: initializing local redis pub/sub client");
         }
         const redisLocalPub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
         const redisLocalSub = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
+        // same for this, for the cache, as the cache is the same that is used for local pub/sub
         if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
             exports.logger.info("initializeServer: initializing redis cache client");
         }
         const redisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis_1.default.createClient(redisConfig.cache);
+        // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
+        // go futher, the job of the cluster manager is to mantain the cluster redis database
+        // up to date, and handle the requests for these up to date requests, it basically
+        // listens to the register requests that are given by other instances and then listens to
+        // changed events of the same type the client uses to update the redis database
         if (INSTANCE_MODE === "CLUSTER_MANAGER") {
+            // as such 
             const cache = new cache_1.Cache(redisClient, null, null, null, null, null);
             exports.logger.info("initializeServer: server initialized in cluster manager exclusive mode flushing redis");
             // in case both the global and local cluster are the same
@@ -407,7 +225,8 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             if (currencyLayerCachedResponseRestore) {
                 await setPromisified(constants_1.CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
             }
-            new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null, sensitiveConfig);
+            const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, null, cache, null, null, sensitiveConfig);
+            listener.informClusterManagerReset();
             return;
         }
         exports.logger.info("initializeServer: initializing redis global cache client");
@@ -453,7 +272,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                     prefix = "https://" + prefix;
                 }
                 const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-                const seoGenerator = new generator_2.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, NODE_ENV === "production" ? config.productionHostname : config.developmentHostname, PING_GOOGLE);
+                const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, NODE_ENV === "production" ? config.productionHostname : config.developmentHostname, PING_GOOGLE);
                 manager.setSEOGenerator(seoGenerator);
             }
             manager.run();
@@ -520,7 +339,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         exports.logger.info("initializeServer: initializing cache instance");
         const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, root, serverData);
         exports.logger.info("initializeServer: creating server");
-        const server = http_1.default.createServer(app);
+        const server = http_1.default.createServer(exports.app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
         const listener = new listener_1.Listener(buildnumber, redisSub, redisPub, redisLocalSub, redisLocalPub, root, cache, knex, server, sensitiveConfig);
         if (sensitiveConfig.ipStackAccessKey) {
@@ -594,7 +413,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             exports.logger.info("initializeServer: server initialized in standard mode, not flushing redis");
         }
         exports.logger.info("initializeServer: setting up endpoints");
-        initializeApp(appData, custom);
+        initialize_1.initializeApp(appData, custom);
         exports.logger.info("initializeServer: attempting to listen at " + PORT);
         server.listen(PORT, () => {
             exports.logger.info("initializeServer: listening at " + PORT);

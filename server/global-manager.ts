@@ -12,6 +12,7 @@ import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefin
 import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
+import { IRedisEvent } from "../base/remote-protocol";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -463,10 +464,17 @@ export class GlobalManager {
       }
     );
 
+    const redisEvent: IRedisEvent = {
+      source: "global",
+      type: SERVER_DATA_IDENTIFIER,
+      serverInstanceGroupId: null,
+      data: this.serverData,
+    }
+
     // publishing new server data
     this.redisPub.publish(
       SERVER_DATA_IDENTIFIER,
-      stringifiedServerData,
+      JSON.stringify(redisEvent),
       (err: Error) => {
         if (err) {
           logger.error(

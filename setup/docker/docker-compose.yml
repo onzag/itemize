@@ -48,6 +48,8 @@ services:
             - PORT=8000
             - LOG_LEVEL=error
             - USING_DOCKER=true
+            - NO_SSR=false
+            - NO_SEO=false
     redis:
         image: redis:latest
         ports:

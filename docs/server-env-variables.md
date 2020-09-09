@@ -88,4 +88,10 @@ This allows to use the same config inside and outside docker, other than local n
 
 Default `false`
 
-Disables server side rendering
+Disables server side rendering, useful for development
+
+## NO_SEO
+
+Default `false`
+
+Disables seo indexing, useful for development

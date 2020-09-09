@@ -755,7 +755,7 @@ export class Cache {
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: consuming binary information streams",
     );
-    
+
     try {
       await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
@@ -801,7 +801,7 @@ export class Cache {
         lastModified: null,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestUpdate (detached): built and triggering created change event",
+        "Cache.requestUpdate (detached): built and triggering updated change event",
         changeEvent,
       );
       this.listener.triggerChangedListeners(
@@ -1069,47 +1069,59 @@ export class Cache {
    * @param id the id of such
    * @param version the version or null
    * @param data the entire SQL result
+   * @returns a void promise when done
    */
   public onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
-    // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
-    // and expire and as so we only want to update values that exist already there
-    this.redisClient.exists(idefQueryIdentifier, (error, value) => {
-      // if we have an error log it
-      if (error) {
-        logger.error(
-          "Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier,
-          {
-            errStack: error.stack,
-            errMessage: error.message,
-          },
-        );
-      } else if (value) {
-        if (typeof data === "undefined") {
-          this.requestValue(
-            this.root.registry[itemDefinition] as ItemDefinition,
-            id,
-            version,
+    return new Promise((resolve) => {
+      // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
+      // and expire and as so we only want to update values that exist already there
+      this.redisClient.exists(idefQueryIdentifier, async (error, value) => {
+        // if we have an error log it
+        if (error) {
+          logger.error(
+            "Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier,
             {
-              refresh: true,
+              errStack: error.stack,
+              errMessage: error.message,
             },
           );
-        } else {
-          // if we have such a value we want to update it
-          this.forceCacheInto(itemDefinition, id, version, data);
+          resolve();
+        } else if (value) {
+          if (typeof data === "undefined") {
+            await this.requestValue(
+              this.root.registry[itemDefinition] as ItemDefinition,
+              id,
+              version,
+              {
+                refresh: true,
+              },
+            );
+            resolve();
+          } else {
+            // if we have such a value we want to update it
+            await this.forceCacheInto(itemDefinition, id, version, data);
+            resolve();
+          }
+        } else if (!value) {
+          // it's done, the value has just expired and it's not hold in
+          // memory, we are done updating the redis database, we don't do anything
+          // we don't need to worry about this value unless it's further requested
+          // down the line
+          resolve();
+          // we simply unregister the event, if a client requests it later
+          // it will be re registered and value fetched and repopulated
+          this.listener.unregisterSS({
+            itemDefinition,
+            id,
+            version,
+          });
         }
-      } else if (!value) {
-        // otherwise we ignore everything and simply unregister the event
-        this.listener.unregisterSS({
-          itemDefinition,
-          id,
-          version,
-        });
-      }
+      });
     });
   }
 
-  public onChangeInformedNoData(itemDefinition: string, id: number, version: string) {
-    this.onChangeInformed(itemDefinition, id, version, undefined);
+  public async onChangeInformedNoData(itemDefinition: string, id: number, version: string) {
+    await this.onChangeInformed(itemDefinition, id, version, undefined);
   }
 }

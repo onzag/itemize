@@ -177,7 +177,8 @@ export declare class Cache {
      * @param id the id of such
      * @param version the version or null
      * @param data the entire SQL result
+     * @returns a void promise when done
      */
-    onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue): void;
-    onChangeInformedNoData(itemDefinition: string, id: number, version: string): void;
+    onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue): Promise<unknown>;
+    onChangeInformedNoData(itemDefinition: string, id: number, version: string): Promise<void>;
 }

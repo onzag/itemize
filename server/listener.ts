@@ -51,6 +51,7 @@ import {
   ERROR_EVENT,
   IErrorEvent,
   KICKED_EVENT,
+  IRedisEvent,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -120,6 +121,7 @@ const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 
 const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
+const CLUSTER_MANAGER_RESET = "CLUSTER_MANAGER_RESET";
 
 export class Listener {
   private io: ioMain.Server;
@@ -127,8 +129,8 @@ export class Listener {
   private listeners: IListenerList = {};
   private listensSS: IServerListensList = {};
 
-  private redisSub: RedisClient;
-  private redisPub: RedisClient;
+  private redisGlobalSub: RedisClient;
+  private redisGlobalPub: RedisClient;
   private redisLocalSub: RedisClient;
   private redisLocalPub: RedisClient;
   private buildnumber: string;
@@ -139,8 +141,8 @@ export class Listener {
 
   constructor(
     buildnumber: string,
-    redisSub: RedisClient,
-    redisPub: RedisClient,
+    redisGlobalSub: RedisClient,
+    redisGlobalPub: RedisClient,
     redisLocalSub: RedisClient,
     redisLocalPub: RedisClient,
     root: Root,
@@ -149,8 +151,8 @@ export class Listener {
     server: Server,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
   ) {
-    this.redisSub = redisSub;
-    this.redisPub = redisPub;
+    this.redisGlobalSub = redisGlobalSub;
+    this.redisGlobalPub = redisGlobalPub;
     this.redisLocalSub = redisLocalSub;
     this.redisLocalPub = redisLocalPub;
     this.buildnumber = buildnumber;
@@ -161,14 +163,16 @@ export class Listener {
 
     this.cache.setListener(this);
 
-    this.pubSubTriggerListeners = this.pubSubTriggerListeners.bind(this);
-    this.pubSubLocalTriggerListeners = this.pubSubLocalTriggerListeners.bind(this);
+    this.globalRedisListener = this.globalRedisListener.bind(this);
+    this.localRedisListener = this.localRedisListener.bind(this);
 
-    this.redisSub.on("message", this.pubSubTriggerListeners);
-    this.redisSub.subscribe(SERVER_DATA_IDENTIFIER);
+    this.redisGlobalSub.on("message", this.globalRedisListener);
+    this.redisGlobalSub.subscribe(SERVER_DATA_IDENTIFIER);
+    this.redisLocalSub.on("message", this.localRedisListener);
     if (INSTANCE_MODE === "ABSOLUTE" || INSTANCE_MODE === "CLUSTER_MANAGER") {
-      this.redisLocalSub.on("message", this.pubSubLocalTriggerListeners);
       this.redisLocalSub.subscribe(CLUSTER_MANAGER_REGISTER_SS);
+    } else {
+      this.redisLocalSub.subscribe(CLUSTER_MANAGER_RESET);
     }
 
     if (server === null) {
@@ -241,10 +245,15 @@ export class Listener {
     userId: number,
   ) {
     this.onReceiveKickEvent(userId);
-    this.redisPub.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify({
-      userId,
+    const redisEvent: IRedisEvent = {
+      type: SERVER_USER_KICK_IDENTIFIER,
       serverInstanceGroupId: INSTANCE_GROUP_ID,
-    }));
+      data: {
+        userId,
+      },
+      source: "global",
+    };
+    this.redisGlobalPub.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify(redisEvent));
   }
   public onReceiveKickEvent(
     userId: number,
@@ -374,16 +383,29 @@ export class Listener {
       "Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier,
     );
 
+    if (this.listensSS[mergedIndexIdentifier]) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.registerSS: already subscribed, ignoring",
+      );
+      return;
+    }
+
     if (INSTANCE_MODE !== "CLUSTER_MANAGER" && INSTANCE_MODE !== "ABSOLUTE") {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager",
       );
-      this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(request));
+      const redisEvent: IRedisEvent = {
+        type: CLUSTER_MANAGER_REGISTER_SS,
+        request,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "local",
+      }
+      this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(redisEvent));
     } else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.registerSS: performing subscription as cluster manager",
       );
-      this.redisSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
       this.listensSS[mergedIndexIdentifier] = true;
     } else {
       CAN_LOG_DEBUG && logger.debug(
@@ -457,7 +479,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -528,7 +550,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
       listenerData.listens[mergedIndexIdentifier] = true;
       listenerData.amount++;
     }
@@ -600,7 +622,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -928,7 +950,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
       );
-      this.redisSub.unsubscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.unsubscribe(mergedIndexIdentifier);
     }
   }
   public removeListener(
@@ -1047,36 +1069,46 @@ export class Listener {
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
-    const redisEvent = {
+    const redisEvent: IRedisEvent = {
       event,
       listenerUUID,
       serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "global",
       mergedIndexIdentifier,
-      eventType: CHANGED_FEEEDBACK_EVENT,
+      type: CHANGED_FEEEDBACK_EVENT,
       data,
     };
+
+    // due to data we avoid logging this, data can be fairly large
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.triggerChangedListeners: triggering redis event",
-      redisEvent,
+      "Listener.triggerChangedListeners: triggering redis changed event for",
+      {
+        event: redisEvent.event,
+        listenerUUID,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+      },
     );
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+
+    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerOwnedSearchListeners(
     event: IOwnedSearchRecordsAddedEvent,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "OWNED_SEARCH." + event.qualifiedPathName + "." + event.createdBy;
-    const redisEvent = {
+    const redisEvent: IRedisEvent = {
+      type: OWNED_SEARCH_RECORDS_ADDED_EVENT,
       event,
       listenerUUID,
       mergedIndexIdentifier,
-      eventType: OWNED_SEARCH_RECORDS_ADDED_EVENT,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "global",
     };
     CAN_LOG_DEBUG && logger.debug(
       "Listener.triggerOwnedSearchListeners: triggering redis event",
       redisEvent,
     );
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerParentedSearchListeners(
     event: IParentedSearchRecordsAddedEvent,
@@ -1084,94 +1116,144 @@ export class Listener {
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
       "." + event.parentId + "." + (event.parentVersion || "");
-    const redisEvent = {
+    const redisEvent: IRedisEvent = {
       event,
       listenerUUID,
       mergedIndexIdentifier,
-      eventType: PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+      type: PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "global",
     }
     CAN_LOG_DEBUG && logger.debug(
       "Listener.triggerParentedSearchListeners: triggering redis event",
       redisEvent,
     );
-    this.redisPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
-  public pubSubTriggerListeners(
+  public async globalRedisListener(
     channel: string,
     message: string,
   ) {
-    const parsedContent = JSON.parse(message);
+    const redisEvent: IRedisEvent = JSON.parse(message);
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.pubSubTriggerListeners: received redis event",
-      parsedContent,
+      "Listener.globalRedisListener: received redis event",
+      redisEvent,
     );
 
-    if (channel === SERVER_DATA_IDENTIFIER) {
-      this.cache.onServerDataChangeInformed(parsedContent);
+    if (redisEvent.source !== "global") {
+      // this happens when we use the same redis database for both global and local
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.globalRedisListener: redis event source is not global, ignoring",
+      );
+      return;
+    }
+
+    if (redisEvent.type === SERVER_DATA_IDENTIFIER) {
+      this.cache.onServerDataChangeInformed(redisEvent.data);
       this.io.emit(
         CURRENCY_FACTORS_UPDATED_EVENT,
       );
       return;
     }
 
-    if (channel === SERVER_USER_KICK_IDENTIFIER) {
-      const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
+    if (redisEvent.type === SERVER_USER_KICK_IDENTIFIER) {
+      const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
       if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
+          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
         );
-      } else if (typeof parsedContent.userId === "number") {
-        this.onReceiveKickEvent(parsedContent.userId);
+      } else if (redisEvent.data && redisEvent.data.userId === "number") {
+        this.onReceiveKickEvent(redisEvent.data.userId);
       }
       return;
     }
 
     // only the cluster manager and absolute happens to recieve these
-    if (this.listensSS[parsedContent.mergedIndexIdentifier]) {
+    // as these are the remote listening functions
+    if (redisEvent.mergedIndexIdentifier && this.listensSS[redisEvent.mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.pubSubTriggerListeners: our own server is expecting it",
+        "Listener.globalRedisListener: our own server is expecting it",
       );
 
-      const serverInstanceGroupId = parsedContent.serverInstanceGroupId;
+      const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
       if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
+        // when we were the originators, our local cache is expected
+        // to have been updated, as such, we literally don't care
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.pubSubTriggerListeners: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
+          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
         );
       } else {
-        const event: IChangedFeedbackEvent = parsedContent.event;
-        if (typeof parsedContent.data === "undefined") {
+        const event: IChangedFeedbackEvent = redisEvent.event;
+        if (typeof redisEvent.data === "undefined") {
           this.cache.onChangeInformedNoData(event.itemDefinition, event.id, event.version || null);
         } else {
-          this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, parsedContent.data);
+          this.cache.onChangeInformed(event.itemDefinition, event.id, event.version || null, redisEvent.data);
         }
       }
     }
 
-    Object.keys(this.listeners).forEach((socketKey) => {
-      const whatListening = this.listeners[socketKey].listens;
-      if (whatListening[parsedContent.mergedIndexIdentifier] &&
-        this.listeners[socketKey].uuid !== parsedContent.listenerUUID) {
-        CAN_LOG_DEBUG && logger.debug(
-          "Listener.pubSubTriggerListeners: socket " + socketKey + " was expecting it, emitting",
-        );
-        this.listeners[socketKey].socket.emit(
-          parsedContent.eventType,
-          parsedContent.event,
-        );
-      }
-    });
+    // the cluster manager might be doing its job, and resetting the data
+    // of the instance however, since the cluster manager should be extremely
+    // fast network latency should be enough for the cluster manager to complete
+    // before this, technically the cluster manager is not required for itemize
+    // to work but it would leave the instance into a frozen state, where nothing
+    // can update because caches are not taken care of, once the cache restarts an
+    // emergency is launched
+    if (redisEvent.mergedIndexIdentifier) {
+      // we give 100 milliseconds for the cluster manager to have updated
+      // these values, this is very generous, but that's alright
+      // redis shouldn't even take more than 10ms to update these
+      // and cluster manager should be close
+      setTimeout(() => {
+        Object.keys(this.listeners).forEach((socketKey) => {
+          const whatListening = this.listeners[socketKey].listens;
+          if (
+            whatListening[redisEvent.mergedIndexIdentifier]
+          ) {
+            if (this.listeners[socketKey].uuid === redisEvent.listenerUUID) {
+              CAN_LOG_DEBUG && logger.debug(
+                "Listener.globalRedisListener: socket " + socketKey + " is listening, but was also the initial emitter, ignoring",
+              );
+            } else {
+              CAN_LOG_DEBUG && logger.debug(
+                "Listener.globalRedisListener: socket " + socketKey + " was expecting it, emitting",
+              );
+              this.listeners[socketKey].socket.emit(
+                redisEvent.type,
+                redisEvent.event,
+              );
+            }
+          }
+        });
+      }, 100);
+    }
   }
-  public pubSubLocalTriggerListeners(
+  public localRedisListener(
     channel: string,
     message: string,
   ) {
-    const parsedContent: IRegisterRequest = JSON.parse(message);
+    const redisEvent: IRedisEvent = JSON.parse(message);
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.pubSubLocalTriggerListeners: cluster manager recieved register event",
-      parsedContent,
+      "Listener.localRedisListener: recieved redis event",
+      redisEvent,
     );
 
-    this.registerSS(parsedContent);
+    if (redisEvent.source !== "local") {
+      // this happens when we use the same redis database for both global and local
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.localRedisListener: redis event source is not local, ignoring",
+      );
+      return;
+    }
+
+    if (redisEvent.type === CLUSTER_MANAGER_REGISTER_SS) {
+      // we are the cluster manager, and we handle these registrations
+      this.registerSS(redisEvent.request);
+    } else if (redisEvent.type === CLUSTER_MANAGER_RESET) {
+      // we are an extended instance and we have been informed that the cluster manager has
+      // reset
+      this.onClusterManagerResetInformed();
+    }
   }
   public removeSocket(socket: Socket) {
     const listenerData = this.listeners[socket.id];
@@ -1195,9 +1277,44 @@ export class Listener {
         CAN_LOG_DEBUG && logger.debug(
           "Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier,
         );
-        this.redisSub.unsubscribe(listensMergedIdentifier);
+        this.redisGlobalSub.unsubscribe(listensMergedIdentifier);
       }
     });
     delete this.listeners[socket.id];
+  }
+  public onClusterManagerResetInformed() {
+    // the redis database has been wiped if this happened here
+    // as such now we might have issues with sync, as the users might
+    // have not received changes, as such, we will check every listener
+    // and force the users to reqeust for feedback by making a last modified
+    // event
+
+    CAN_LOG_DEBUG && logger.debug(
+      "Listener.onClusterManagerResetInformed [SERIOUS]: received cluster manager reset event, " +
+      "this means the cluster manager died out and restarted, now all the clients must be reconnected",
+    );
+
+    // a cluster manager reset should not happen at all when starting the server
+    // as the cluster manager should start before the extended instances, and such
+    // none would be listening for this event
+    Object.keys(this.listeners).forEach((lKey) => {
+      const socket = this.listeners[lKey].socket;
+      this.removeSocket(socket);
+      // force the user to reconnect, when they reconnect they will
+      // ask for feedback, this is a cheap solution, but the cluster manager
+      // shouldn't have died to start with
+      socket.disconnect();
+    });
+  }
+  public informClusterManagerReset() {
+    CAN_LOG_DEBUG && logger.debug(
+      "Listener.informClusterManagerReset: informing a reset of the cluster manager",
+    );
+    const redisEvent: IRedisEvent = {
+      type: CLUSTER_MANAGER_RESET,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "local",
+    }
+    this.redisLocalPub.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
   }
 }

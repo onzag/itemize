@@ -8,6 +8,7 @@
  */
 
 import { IGQLSearchRecord } from "../gql-querier";
+import { ISQLTableRowValue } from "./Root/sql";
 
 // EVENTS
 
@@ -179,6 +180,7 @@ export const IdentifyRequestSchema = {
  * a single item definition for updates and changes
  */
 export const REGISTER_REQUEST = "register";
+
 /**
  * The register event contains the item definition qualified
  * path name and the slot id
@@ -515,4 +517,15 @@ export const ParentedSearchFeedbackRequestSchema = {
     "parentId",
     "parentVersion",
   ],
+}
+
+export interface IRedisEvent {
+  type: string;
+  request?: any;
+  event?: any;
+  listenerUUID?: string;
+  source: "local" | "global";
+  serverInstanceGroupId: string;
+  mergedIndexIdentifier?: string;
+  data?: any;
 }

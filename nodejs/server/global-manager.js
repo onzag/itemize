@@ -346,8 +346,14 @@ class GlobalManager {
                 });
             }
         });
+        const redisEvent = {
+            source: "global",
+            type: constants_1.SERVER_DATA_IDENTIFIER,
+            serverInstanceGroupId: null,
+            data: this.serverData,
+        };
         // publishing new server data
-        this.redisPub.publish(constants_1.SERVER_DATA_IDENTIFIER, stringifiedServerData, (err) => {
+        this.redisPub.publish(constants_1.SERVER_DATA_IDENTIFIER, JSON.stringify(redisEvent), (err) => {
             if (err) {
                 _1.logger.error("GlobalManager.informNewServerData: [SERIOUS] was unable to inform for new server data in publish", {
                     errMessage: err.message,

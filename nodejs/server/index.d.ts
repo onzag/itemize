@@ -22,6 +22,7 @@ import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { ISEORuleSet } from "./seo";
 export declare const logger: winston.Logger;
+export declare const app: import("express-serve-static-core").Express;
 /**
  * Contains all the pkgcloud clients connection for every container id
  */

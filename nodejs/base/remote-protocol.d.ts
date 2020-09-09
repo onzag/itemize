@@ -441,4 +441,14 @@ export declare const ParentedSearchFeedbackRequestSchema: {
     };
     required: string[];
 };
+export interface IRedisEvent {
+    type: string;
+    request?: any;
+    event?: any;
+    listenerUUID?: string;
+    source: "local" | "global";
+    serverInstanceGroupId: string;
+    mergedIndexIdentifier?: string;
+    data?: any;
+}
 export {};

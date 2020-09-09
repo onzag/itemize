@@ -12,8 +12,8 @@ export declare class Listener {
     private io;
     private listeners;
     private listensSS;
-    private redisSub;
-    private redisPub;
+    private redisGlobalSub;
+    private redisGlobalPub;
     private redisLocalSub;
     private redisLocalPub;
     private buildnumber;
@@ -21,7 +21,7 @@ export declare class Listener {
     private knex;
     private cache;
     private sensitiveConfig;
-    constructor(buildnumber: string, redisSub: RedisClient, redisPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server, sensitiveConfig: ISensitiveConfigRawJSONDataType);
+    constructor(buildnumber: string, redisGlobalSub: RedisClient, redisGlobalPub: RedisClient, redisLocalSub: RedisClient, redisLocalPub: RedisClient, root: Root, cache: Cache, knex: Knex, server: Server, sensitiveConfig: ISensitiveConfigRawJSONDataType);
     addSocket(socket: Socket): void;
     emitError(socket: Socket, message: string, request: any): void;
     sendKickEvent(userId: number): void;
@@ -48,7 +48,9 @@ export declare class Listener {
     triggerChangedListeners(event: IChangedFeedbackEvent, data: ISQLTableRowValue, listenerUUID: string): void;
     triggerOwnedSearchListeners(event: IOwnedSearchRecordsAddedEvent, listenerUUID: string): void;
     triggerParentedSearchListeners(event: IParentedSearchRecordsAddedEvent, listenerUUID: string): void;
-    pubSubTriggerListeners(channel: string, message: string): void;
-    pubSubLocalTriggerListeners(channel: string, message: string): void;
+    globalRedisListener(channel: string, message: string): Promise<void>;
+    localRedisListener(channel: string, message: string): void;
     removeSocket(socket: Socket): void;
+    onClusterManagerResetInformed(): void;
+    informClusterManagerReset(): void;
 }

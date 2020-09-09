@@ -519,7 +519,7 @@ class Cache {
                 type: "modified",
                 lastModified: null,
             };
-            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate (detached): built and triggering created change event", changeEvent);
+            CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate (detached): built and triggering updated change event", changeEvent);
             this.listener.triggerChangedListeners(changeEvent, sqlValue, listenerUUID || null);
         })();
         return sqlValue;
@@ -722,42 +722,54 @@ class Cache {
      * @param id the id of such
      * @param version the version or null
      * @param data the entire SQL result
+     * @returns a void promise when done
      */
     onChangeInformed(itemDefinition, id, version, data) {
         const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
-        // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
-        // and expire and as so we only want to update values that exist already there
-        this.redisClient.exists(idefQueryIdentifier, (error, value) => {
-            // if we have an error log it
-            if (error) {
-                _1.logger.error("Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier, {
-                    errStack: error.stack,
-                    errMessage: error.message,
-                });
-            }
-            else if (value) {
-                if (typeof data === "undefined") {
-                    this.requestValue(this.root.registry[itemDefinition], id, version, {
-                        refresh: true,
+        return new Promise((resolve) => {
+            // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
+            // and expire and as so we only want to update values that exist already there
+            this.redisClient.exists(idefQueryIdentifier, async (error, value) => {
+                // if we have an error log it
+                if (error) {
+                    _1.logger.error("Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier, {
+                        errStack: error.stack,
+                        errMessage: error.message,
+                    });
+                    resolve();
+                }
+                else if (value) {
+                    if (typeof data === "undefined") {
+                        await this.requestValue(this.root.registry[itemDefinition], id, version, {
+                            refresh: true,
+                        });
+                        resolve();
+                    }
+                    else {
+                        // if we have such a value we want to update it
+                        await this.forceCacheInto(itemDefinition, id, version, data);
+                        resolve();
+                    }
+                }
+                else if (!value) {
+                    // it's done, the value has just expired and it's not hold in
+                    // memory, we are done updating the redis database, we don't do anything
+                    // we don't need to worry about this value unless it's further requested
+                    // down the line
+                    resolve();
+                    // we simply unregister the event, if a client requests it later
+                    // it will be re registered and value fetched and repopulated
+                    this.listener.unregisterSS({
+                        itemDefinition,
+                        id,
+                        version,
                     });
                 }
-                else {
-                    // if we have such a value we want to update it
-                    this.forceCacheInto(itemDefinition, id, version, data);
-                }
-            }
-            else if (!value) {
-                // otherwise we ignore everything and simply unregister the event
-                this.listener.unregisterSS({
-                    itemDefinition,
-                    id,
-                    version,
-                });
-            }
+            });
         });
     }
-    onChangeInformedNoData(itemDefinition, id, version) {
-        this.onChangeInformed(itemDefinition, id, version, undefined);
+    async onChangeInformedNoData(itemDefinition, id, version) {
+        await this.onChangeInformed(itemDefinition, id, version, undefined);
     }
 }
 exports.Cache = Cache;
