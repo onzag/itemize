@@ -470,7 +470,7 @@ async function validateTokenIsntBlocked(cache, tokenData) {
     if (tokenData.id && (!tokenData.custom || tokenData.isRealUser)) {
         let sqlResult;
         try {
-            sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null);
+            sqlResult = await cache.requestValue("MOD_users__IDEF_user", tokenData.id, null);
         }
         catch (err) {
             __1.logger.error("validateTokenIsntBlocked [SERIOUS]: Couldn't validate whether the token is blocked or not", {
@@ -511,7 +511,7 @@ exports.validateTokenIsntBlocked = validateTokenIsntBlocked;
 async function checkUserExists(cache, id) {
     let sqlResult;
     try {
-        sqlResult = await cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+        sqlResult = await cache.requestValue("MOD_users__IDEF_user", id, null);
     }
     catch (err) {
         __1.logger.error("checkUserExists [SERIOUS]: Couldn't check whether the user exists", {
@@ -801,7 +801,7 @@ async function runPolicyCheck(arg) {
     }
     if (arg.policyTypes.includes("parent")) {
         try {
-            parentSelectQueryValue = await arg.cache.requestValue([arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion);
+            parentSelectQueryValue = await arg.cache.requestValue(arg.parentType, arg.parentId, arg.parentVersion);
         }
         catch (err) {
             __1.logger.error("runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail on parent rule", {

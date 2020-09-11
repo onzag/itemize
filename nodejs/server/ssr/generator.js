@@ -112,8 +112,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             ogImage: null,
             collect: [],
             collectResources: [],
-            // collectSearch: [],
-            memId: "*.root.redirect",
         };
     }
     let etag;
@@ -185,12 +183,8 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             rtl: config.rtlLanguages.includes(language),
             languages: config.supportedLanguages,
             forUser: userAfterValidate,
+            memId: req.originalUrl + "." + appData.buildnumber + "." + mode + "." + appliedRule.language
         };
-        // language makes the memory specific for it, in this case language
-        // matters so we need to add it to the memory id
-        if (appliedRule.memId) {
-            appliedRule.memId += "." + appData.buildnumber + "." + mode + "." + appliedRule.language;
-        }
         etag = appliedRule.memId;
         // however like previously specified, we don't want to cache answers for specific
         // users, because they are different, only guests really matter, so we want

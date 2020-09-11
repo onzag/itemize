@@ -113,14 +113,14 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig) {
         {
             variableName: "defaultContainerID",
             message: "of all the previous containers id which one is used by default for internal usage only when no country specified",
-            defaultValue: "",
+            defaultValue: "MAIN",
             hidden: false,
             nullifyFalseValues: true,
         },
         {
             variableName: "seoContainerID",
             message: "of all the previous containers id which one is used for storing SEO and sitemap information",
-            defaultValue: "",
+            defaultValue: "MAIN",
             hidden: false,
             nullifyFalseValues: true,
         },

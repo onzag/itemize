@@ -172,11 +172,12 @@ class Cache {
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: requesting creation for " + selfTable + " at module " +
             moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary);
+        const containerExists = containerId && this.uploadsContainers[containerId];
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, this.domain, dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, this.uploadsContainers[containerId].container, this.uploadsContainers[containerId].prefix, this.domain, dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -412,13 +413,14 @@ class Cache {
                 partialUpdateFields[arg] = update[arg];
             }
         });
+        const containerExists = containerId && this.uploadsContainers[containerId];
         // and we now build both queries for updating
         // we are telling by setting the partialFields variable
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerId ? this.uploadsContainers[containerId].container : null, containerId ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all
@@ -544,16 +546,31 @@ class Cache {
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions);
+        const containerExists = containerId && this.uploadsContainers[containerId];
         let deleteFilesInContainer = async (specifiedVersion) => {
             const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
             const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
             if (someFilesInItemDef) {
-                await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+                if (containerExists) {
+                    await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+                }
+                else {
+                    _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available", {
+                        containerId,
+                    });
+                }
             }
             if (someFilesInModule) {
-                await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+                if (containerExists) {
+                    await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+                }
+                else {
+                    _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available", {
+                        containerId,
+                    });
+                }
             }
         };
         let runDetachedEvents = async (specifiedVersion) => {
@@ -607,7 +624,7 @@ class Cache {
         }
     }
     async requestToken(id) {
-        const user = await this.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+        const user = await this.requestValue("MOD_users__IDEF_user", id, null);
         if (!user) {
             throw new errors_1.EndpointError({
                 message: "User does not exist",
@@ -628,7 +645,7 @@ class Cache {
     }
     /**
      * Requests a value from the cache
-     * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
+     * @param itemDefinitionOrQualifiedName the item definition or a qualified name
      * @param id the id to request for
      * @param version the version
      * @param options.refresh whether to skip the cache and request directly from the database and update the cache
@@ -637,13 +654,14 @@ class Cache {
      * might be used consecutively and you don't care about accuraccy that much
      * @returns a whole sql value that can be converted into graphql if necessary
      */
-    async requestValue(itemDefinition, id, version, options) {
+    async requestValue(itemDefinitionOrQualifiedName, id, version, options) {
         const refresh = options && options.refresh;
         const memCache = options && options.useMemoryCache;
-        const idefTable = Array.isArray(itemDefinition) ?
-            itemDefinition[0] : itemDefinition.getQualifiedPathName();
-        const moduleTable = Array.isArray(itemDefinition) ?
-            itemDefinition[1] : itemDefinition.getParentModule().getQualifiedPathName();
+        const itemDefinition = typeof itemDefinitionOrQualifiedName === "string" ?
+            this.root.registry[itemDefinitionOrQualifiedName] :
+            itemDefinitionOrQualifiedName;
+        const idefTable = itemDefinition.getQualifiedPathName();
+        const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestValue: requesting value for " + idefTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh);
         if (!refresh) {

@@ -267,10 +267,16 @@ export function fileURLAbsoluter(
   }
 
   if (!containerId) {
+    console.warn("fileURLAbsoluter: no container id specified");
     return null;
   }
 
   let prefix: string = containerHostnamePrefixes[containerId];
+  if (!prefix) {
+    console.warn("fileURLAbsoluter: there's no container prefix for container id: " + containerId);
+    return null;
+  }
+
   if (prefix[prefix.length - 1] !== "/") {
     prefix += "/";
   }

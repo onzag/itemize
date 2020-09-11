@@ -1,6 +1,6 @@
 # Itemize configuration
 
-To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs 
+To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs
 
 ## Create your first project
 
@@ -25,6 +25,8 @@ Follow the steps of this step, and then run
 You need to have the right permissions in order to be able to access this npm module given that it is private
 
 ### Setup your project initial configuration
+
+Please ensure docker is installed and running
 
 Before running this step you might want to get ahead of the game you need to get api keys from the following services
 

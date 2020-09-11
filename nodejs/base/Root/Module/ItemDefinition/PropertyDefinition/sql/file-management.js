@@ -62,8 +62,8 @@ function processFileListFor(newValues, oldValues, uploadsContainer, uploadsPrefi
     // return what we've got
     return {
         value: filteredNewValues,
-        consumeStreams: async (containerId) => {
-            await Promise.all(allNewValues.map(fn => fn.consumeStreams(containerId)));
+        consumeStreams: async (propertyLocationId) => {
+            await Promise.all(allNewValues.map(fn => fn.consumeStreams(propertyLocationId)));
         }
     };
 }
@@ -96,8 +96,8 @@ function processSingleFileFor(newValue, oldValue, uploadsContainer, uploadsPrefi
         const secondStepOutput = processOneFileAndItsSameIDReplacement(newValue, null, uploadsContainer, uploadsPrefix, domain, itemDefinitionOrModule, include, propertyDefinition);
         return {
             value: secondStepOutput.value,
-            consumeStreams: async (containerId) => {
-                await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(containerId)));
+            consumeStreams: async (propertyLocationId) => {
+                await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
             }
         };
     }
@@ -121,15 +121,19 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
     if (newVersion === null) {
         return {
             value: null,
-            consumeStreams: async (containerId) => {
+            consumeStreams: async (propertyLocationId) => {
                 // however we must still check
                 // is there an old version actually?
                 if (oldVersion) {
+                    if (!uploadsContainer) {
+                        server_1.logger.warn("processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted");
+                        return;
+                    }
                     // and let's remove that folder, note how we don't
                     // really wait for this, we detatch this function
                     await (async () => {
                         const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-                        const transitoryLocationPath = path_1.default.join(idefOrModLocationPath, containerId);
+                        const transitoryLocationPath = path_1.default.join(idefOrModLocationPath, propertyLocationId);
                         const includeLocationPath = include ?
                             path_1.default.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
                         const propertyLocationPath = path_1.default.join(includeLocationPath, propertyDefinition.getId());
@@ -138,7 +142,7 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
                             await removeFolderFor(uploadsContainer, fileLocationPath);
                         }
                         catch (err) {
-                            server_1.logger.error("processOneFileAndItsSameIDReplacement: could not remove folder at container " + uploadsContainer + " in " + fileLocationPath, {
+                            server_1.logger.error("processOneFileAndItsSameIDReplacement: could not remove folder at in " + fileLocationPath, {
                                 errStack: err.stack,
                                 errMessage: err.message,
                             });
@@ -209,11 +213,15 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
     };
     return {
         value,
-        consumeStreams: async (containerId) => {
+        consumeStreams: async (propertyLocationId) => {
+            if (!uploadsContainer) {
+                server_1.logger.warn("processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted");
+                return;
+            }
             // we calculate the paths where we are saving this
             // /MOD_module__idefOrMod_item_definition/:id.:version/ITEM_etc/property...
             const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-            const transitoryLocationPath = path_1.default.join(idefOrModLocationPath, containerId);
+            const transitoryLocationPath = path_1.default.join(idefOrModLocationPath, propertyLocationId);
             const includeLocationPath = include ?
                 path_1.default.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
             const propertyLocationPath = path_1.default.join(includeLocationPath, propertyDefinition.getId());

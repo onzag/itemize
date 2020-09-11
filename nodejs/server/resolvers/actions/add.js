@@ -104,7 +104,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         let targetRole = null;
         let alreadyCheckedUserExisted = false;
         if (itemDefinition.rawData.createInBehalfTargetRoles && itemDefinition.rawData.createInBehalfTargetRoles.length) {
-            const targetUser = await appData.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], resolverArgs.args.in_behalf_of, null);
+            const targetUser = await appData.cache.requestValue("MOD_users__IDEF_user", resolverArgs.args.in_behalf_of, null);
             if (!targetUser) {
                 throw new errors_1.EndpointError({
                     message: `There's no user to create in behalf of with id ${resolverArgs.args.in_behalf_of}`,

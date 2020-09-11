@@ -411,6 +411,7 @@ export async function initializeServer(
         if (!seoContainerData) {
           throw new Error("Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
         }
+
         const seoContainerClient = pkgcloud.storage.createClient({
           provider: "openstack",
           username: seoContainerData.username,
@@ -421,6 +422,7 @@ export async function initializeServer(
           password: seoContainerData.password,
           authUrl: seoContainerData.authUrl,
         } as any);
+  
         let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
         if (prefix.indexOf("/") !== 0) {
           prefix = "https://" + prefix;
@@ -452,31 +454,33 @@ export async function initializeServer(
 
     const pkgcloudStorageClients: PkgCloudClients = {};
     const pkgcloudUploadContainers: PkgCloudContainers = {};
-    await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-      const containerData = sensitiveConfig.openstackContainers[containerIdX];
-      pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
-        provider: "openstack",
-        username: containerData.username,
-        keystoneAuthVersion: 'v3',
-        region: containerData.region,
-        domainId: containerData.domainId, //default
-        domainName: containerData.domainName,
-        password: containerData.password,
-        authUrl: containerData.authUrl,
-      } as any);
+    if (sensitiveConfig.openstackContainers) {
+      await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
+        const containerData = sensitiveConfig.openstackContainers[containerIdX];
+        pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
+          provider: "openstack",
+          username: containerData.username,
+          keystoneAuthVersion: 'v3',
+          region: containerData.region,
+          domainId: containerData.domainId, //default
+          domainName: containerData.domainName,
+          password: containerData.password,
+          authUrl: containerData.authUrl,
+        } as any);
 
-      logger.info(
-        "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
-      );
-      let prefix = config.containersHostnamePrefixes[containerIdX];
-      if (prefix.indexOf("/") !== 0) {
-        prefix = "https://" + prefix;
-      }
-      pkgcloudUploadContainers[containerIdX] = {
-        prefix,
-        container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-      };
-    }));
+        logger.info(
+          "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
+        );
+        let prefix = config.containersHostnamePrefixes[containerIdX];
+        if (prefix.indexOf("/") !== 0) {
+          prefix = "https://" + prefix;
+        }
+        pkgcloudUploadContainers[containerIdX] = {
+          prefix,
+          container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+        };
+      }));
+    }
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(

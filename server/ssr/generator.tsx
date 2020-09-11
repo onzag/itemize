@@ -2,7 +2,7 @@ import { IAppDataType, logger } from "..";
 import React from "react";
 import express from "express";
 import { ISSRRule, ISSRRuleDynamic, ISSRRuleSetCb } from ".";
-import { GUEST_METAROLE, PREFIX_GET, UNSPECIFIED_OWNER, CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
+import { GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 import { getCookie } from "../mode";
 import { ISSRContextType, ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { initializeItemizeApp } from "../../client";
@@ -149,8 +149,6 @@ export async function ssrGenerator(
       ogImage: null,
       collect: [],
       collectResources: [],
-      // collectSearch: [],
-      memId: "*.root.redirect",
     };
   }
 
@@ -231,12 +229,7 @@ export async function ssrGenerator(
       rtl: config.rtlLanguages.includes(language),
       languages: config.supportedLanguages,
       forUser: userAfterValidate,
-    }
-
-    // language makes the memory specific for it, in this case language
-    // matters so we need to add it to the memory id
-    if (appliedRule.memId) {
-      appliedRule.memId += "." + appData.buildnumber + "." + mode + "." + appliedRule.language;
+      memId: req.originalUrl + "." + appData.buildnumber + "." + mode + "." + appliedRule.language
     }
 
     etag = appliedRule.memId;
@@ -522,7 +515,7 @@ export async function ssrGenerator(
       await appData.cache.setRaw("MEM." + appliedRule.memId, {
         html: newHTML,
         collectionSignature,
-      })
+      });
     })();
   }
 

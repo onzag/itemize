@@ -574,7 +574,7 @@ export async function validateTokenIsntBlocked(
     
     try {
       sqlResult = await cache.requestValue(
-        ["MOD_users__IDEF_user", "MOD_users"], tokenData.id, null,
+        "MOD_users__IDEF_user", tokenData.id, null,
       );
     } catch (err) {
       logger.error(
@@ -618,7 +618,7 @@ export async function checkUserExists(cache: Cache, id: number) {
   let sqlResult: ISQLTableRowValue;
   try {
     sqlResult = await cache.requestValue(
-      ["MOD_users__IDEF_user", "MOD_users"], id, null,
+      "MOD_users__IDEF_user", id, null,
     );
   } catch (err) {
     logger.error(
@@ -1017,7 +1017,7 @@ export async function runPolicyCheck(
   if (arg.policyTypes.includes("parent")) {
     try {
       parentSelectQueryValue = await arg.cache.requestValue(
-        [arg.parentType, arg.parentModule], arg.parentId, arg.parentVersion,
+        arg.parentType, arg.parentId, arg.parentVersion,
       );
     } catch (err) {
       logger.error(

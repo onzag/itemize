@@ -170,7 +170,7 @@ class Listener {
                 invalidReason = "invalid token";
             }
             if (!invalid) {
-                const sqlResult = await this.cache.requestValue(["MOD_users__IDEF_user", "MOD_users"], result.id, null);
+                const sqlResult = await this.cache.requestValue("MOD_users__IDEF_user", result.id, null);
                 if (!sqlResult) {
                     invalid = true;
                     invalidReason = "user deleted";

@@ -286,28 +286,30 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
         const pkgcloudStorageClients = {};
         const pkgcloudUploadContainers = {};
-        await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-            const containerData = sensitiveConfig.openstackContainers[containerIdX];
-            pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
-                provider: "openstack",
-                username: containerData.username,
-                keystoneAuthVersion: 'v3',
-                region: containerData.region,
-                domainId: containerData.domainId,
-                domainName: containerData.domainName,
-                password: containerData.password,
-                authUrl: containerData.authUrl,
-            });
-            exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
-            let prefix = config.containersHostnamePrefixes[containerIdX];
-            if (prefix.indexOf("/") !== 0) {
-                prefix = "https://" + prefix;
-            }
-            pkgcloudUploadContainers[containerIdX] = {
-                prefix,
-                container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-            };
-        }));
+        if (sensitiveConfig.openstackContainers) {
+            await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
+                const containerData = sensitiveConfig.openstackContainers[containerIdX];
+                pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
+                    provider: "openstack",
+                    username: containerData.username,
+                    keystoneAuthVersion: 'v3',
+                    region: containerData.region,
+                    domainId: containerData.domainId,
+                    domainName: containerData.domainName,
+                    password: containerData.password,
+                    authUrl: containerData.authUrl,
+                });
+                exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
+                let prefix = config.containersHostnamePrefixes[containerIdX];
+                if (prefix.indexOf("/") !== 0) {
+                    prefix = "https://" + prefix;
+                }
+                pkgcloudUploadContainers[containerIdX] = {
+                    prefix,
+                    container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+                };
+            }));
+        }
         if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
             exports.logger.info("initializeServer: cleaning storage");
             await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {

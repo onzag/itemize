@@ -103,8 +103,8 @@ export function processFileListFor(
   // return what we've got
   return {
     value: filteredNewValues,
-    consumeStreams: async (containerId: string) => {
-      await Promise.all(allNewValues.map(fn => fn.consumeStreams(containerId)));
+    consumeStreams: async (propertyLocationId: string) => {
+      await Promise.all(allNewValues.map(fn => fn.consumeStreams(propertyLocationId)));
     }
   }
 }
@@ -176,8 +176,8 @@ export function processSingleFileFor(
 
     return {
       value: secondStepOutput.value,
-      consumeStreams: async (containerId: string) => {
-        await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(containerId)));
+      consumeStreams: async (propertyLocationId: string) => {
+        await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
       }
     }
   }
@@ -213,15 +213,21 @@ function processOneFileAndItsSameIDReplacement(
   if (newVersion === null) {
     return {
       value: null,
-      consumeStreams: async (containerId: string) => {
+      consumeStreams: async (propertyLocationId: string) => {
         // however we must still check
         // is there an old version actually?
         if (oldVersion) {
+          if (!uploadsContainer) {
+            logger.warn(
+              "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
+            );
+            return;
+          }
           // and let's remove that folder, note how we don't
           // really wait for this, we detatch this function
           await (async () => {
             const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-            const transitoryLocationPath = path.join(idefOrModLocationPath, containerId);
+            const transitoryLocationPath = path.join(idefOrModLocationPath, propertyLocationId);
             const includeLocationPath = include ?
               path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
@@ -230,7 +236,7 @@ function processOneFileAndItsSameIDReplacement(
               await removeFolderFor(uploadsContainer, fileLocationPath);
             } catch (err) {
               logger.error(
-                "processOneFileAndItsSameIDReplacement: could not remove folder at container " + uploadsContainer + " in " + fileLocationPath,
+                "processOneFileAndItsSameIDReplacement: could not remove folder at in " + fileLocationPath,
                 {
                   errStack: err.stack,
                   errMessage: err.message,
@@ -309,11 +315,18 @@ function processOneFileAndItsSameIDReplacement(
   };
   return {
     value,
-    consumeStreams: async (containerId: string) => {
+    consumeStreams: async (propertyLocationId: string) => {
+      if (!uploadsContainer) {
+        logger.warn(
+          "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
+        );
+        return;
+      }
+
       // we calculate the paths where we are saving this
       // /MOD_module__idefOrMod_item_definition/:id.:version/ITEM_etc/property...
       const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-      const transitoryLocationPath = path.join(idefOrModLocationPath, containerId);
+      const transitoryLocationPath = path.join(idefOrModLocationPath, propertyLocationId);
       const includeLocationPath = include ?
         path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
       const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());

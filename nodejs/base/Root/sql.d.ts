@@ -97,7 +97,7 @@ export interface ISQLSchemaDefinitionType {
 export interface ISQLTableRowValue {
     [columnName: string]: any;
 }
-export declare type ConsumeStreamsFnType = (containerId: string) => Promise<void>;
+export declare type ConsumeStreamsFnType = (propertyLocationId: string) => Promise<void>;
 /**
  * A sql composed row value
  */

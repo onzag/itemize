@@ -149,7 +149,7 @@ export declare class Cache {
     requestToken(id: number): Promise<string>;
     /**
      * Requests a value from the cache
-     * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
+     * @param itemDefinitionOrQualifiedName the item definition or a qualified name
      * @param id the id to request for
      * @param version the version
      * @param options.refresh whether to skip the cache and request directly from the database and update the cache
@@ -158,7 +158,7 @@ export declare class Cache {
      * might be used consecutively and you don't care about accuraccy that much
      * @returns a whole sql value that can be converted into graphql if necessary
      */
-    requestValue(itemDefinition: ItemDefinition | [string, string], id: number, version: string, options?: {
+    requestValue(itemDefinitionOrQualifiedName: ItemDefinition | string, id: number, version: string, options?: {
         refresh?: boolean;
         useMemoryCache?: boolean;
     }): Promise<ISQLTableRowValue>;

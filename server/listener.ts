@@ -315,7 +315,7 @@ export class Listener {
 
       if (!invalid) {
         const sqlResult = await this.cache.requestValue(
-          ["MOD_users__IDEF_user", "MOD_users"], result.id, null,
+          "MOD_users__IDEF_user", result.id, null,
         );
 
         if (!sqlResult) {

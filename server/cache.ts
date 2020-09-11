@@ -251,6 +251,9 @@ export class Cache {
       "Cache.requestCreation: requesting creation for " + selfTable + " at module " +
       moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
+
+    const containerExists = containerId && this.uploadsContainers[containerId];
+
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready, and hence needs
     // knex and the dictionary to convert fields that need it
@@ -260,8 +263,8 @@ export class Cache {
       itemDefinition,
       value,
       null,
-      this.uploadsContainers[containerId].container,
-      this.uploadsContainers[containerId].prefix,
+      containerExists ? this.uploadsContainers[containerId].container : null,
+      containerExists ? this.uploadsContainers[containerId].prefix : null,
       this.domain,
       dictionary,
     );
@@ -271,8 +274,8 @@ export class Cache {
       itemDefinition.getParentModule(),
       value,
       null,
-      this.uploadsContainers[containerId].container,
-      this.uploadsContainers[containerId].prefix,
+      containerExists ? this.uploadsContainers[containerId].container : null,
+      containerExists ? this.uploadsContainers[containerId].prefix : null,
       this.domain,
       dictionary,
     );
@@ -636,6 +639,8 @@ export class Cache {
       }
     });
 
+    const containerExists = containerId && this.uploadsContainers[containerId];
+
     // and we now build both queries for updating
     // we are telling by setting the partialFields variable
     // that we only want the editingFields to be returned
@@ -647,8 +652,8 @@ export class Cache {
       itemDefinition,
       update,
       currentValue,
-      containerId ? this.uploadsContainers[containerId].container : null,
-      containerId ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.uploadsContainers[containerId].container : null,
+      containerExists ? this.uploadsContainers[containerId].prefix : null,
       this.domain,
       dictionary,
       partialUpdateFields,
@@ -659,8 +664,8 @@ export class Cache {
       itemDefinition.getParentModule(),
       update,
       currentValue,
-      containerId ? this.uploadsContainers[containerId].container : null,
-      containerId ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.uploadsContainers[containerId].container : null,
+      containerExists ? this.uploadsContainers[containerId].prefix : null,
       this.domain,
       dictionary,
       partialUpdateFields,
@@ -852,24 +857,44 @@ export class Cache {
       moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
     );
 
+    const containerExists = containerId && this.uploadsContainers[containerId];
+
     let deleteFilesInContainer = async (specifiedVersion: string) => {
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
       const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
       if (someFilesInItemDef) {
-        await deleteEverythingInFilesContainerId(
-          this.uploadsContainers[containerId].container,
-          itemDefinition,
-          id + "." + (specifiedVersion || null),
-        );
+        if (containerExists) {
+          await deleteEverythingInFilesContainerId(
+            this.uploadsContainers[containerId].container,
+            itemDefinition,
+            id + "." + (specifiedVersion || null),
+          );
+        } else {
+          logger.warn(
+            "Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available",
+            {
+              containerId,
+            }
+          );
+        }
       }
       if (someFilesInModule) {
-        await deleteEverythingInFilesContainerId(
-          this.uploadsContainers[containerId].container,
-          itemDefinition.getParentModule(),
-          id + "." + (specifiedVersion || null),
-        );
+        if (containerExists) {
+          await deleteEverythingInFilesContainerId(
+            this.uploadsContainers[containerId].container,
+            itemDefinition.getParentModule(),
+            id + "." + (specifiedVersion || null),
+          );
+        } else {
+          logger.warn(
+            "Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+            {
+              containerId,
+            }
+          );
+        }
       }
     }
 
@@ -933,7 +958,7 @@ export class Cache {
   public async requestToken(
     id: number,
   ) {
-    const user = await this.requestValue(["MOD_users__IDEF_user", "MOD_users"], id, null);
+    const user = await this.requestValue("MOD_users__IDEF_user", id, null);
     if (!user) {
       throw new EndpointError({
         message: "User does not exist",
@@ -955,7 +980,7 @@ export class Cache {
 
   /**
    * Requests a value from the cache
-   * @param itemDefinition the item definition or a [qualifiedItemDefinitionName, qualifiedModuleName] combo
+   * @param itemDefinitionOrQualifiedName the item definition or a qualified name
    * @param id the id to request for
    * @param version the version
    * @param options.refresh whether to skip the cache and request directly from the database and update the cache
@@ -965,7 +990,7 @@ export class Cache {
    * @returns a whole sql value that can be converted into graphql if necessary
    */
   public async requestValue(
-    itemDefinition: ItemDefinition | [string, string],
+    itemDefinitionOrQualifiedName: ItemDefinition | string,
     id: number,
     version: string,
     options?: {
@@ -976,10 +1001,12 @@ export class Cache {
     const refresh = options && options.refresh;
     const memCache = options && options.useMemoryCache;
 
-    const idefTable = Array.isArray(itemDefinition) ?
-      itemDefinition[0] : itemDefinition.getQualifiedPathName();
-    const moduleTable = Array.isArray(itemDefinition) ?
-      itemDefinition[1] : itemDefinition.getParentModule().getQualifiedPathName();
+    const itemDefinition = typeof itemDefinitionOrQualifiedName === "string" ?
+      this.root.registry[itemDefinitionOrQualifiedName] as ItemDefinition :
+      itemDefinitionOrQualifiedName;
+
+    const idefTable = itemDefinition.getQualifiedPathName();
+    const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestValue: requesting value for " + idefTable + " at module " +
