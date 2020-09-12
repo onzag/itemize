@@ -455,7 +455,7 @@ export async function initializeItemizeApp(
     // now we need to load all the information that is included
     // with the SSR into the root
     ssrContext && ssrContext.queries.forEach((query) => {
-      if (!query || !query.value) {
+      if (!query) {
         return;
       }
       const idef: ItemDefinition = root.registry[query.idef] as ItemDefinition;

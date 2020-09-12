@@ -2111,7 +2111,9 @@ export default class PropertyDefinition {
     // first we get all the roles that have the access
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // so if ANYONE_METAROLE is included we have access
-    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || 
+    (rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+    (
       // or if OWNER_METAROLE is included and our user matches our owner user
       // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
       // because null === null in the case of eg. GUEST_METAROLE

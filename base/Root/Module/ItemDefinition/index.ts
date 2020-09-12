@@ -1686,7 +1686,7 @@ export default class ItemDefinition {
     // now we add all the reserver properties
     Object.keys(RESERVED_BASE_PROPERTIES).forEach((pKey) => {
       requestFields[pKey] = {};
-    })
+    });
 
     const modFieldsAccess = this.getRolesWithModerationAccess();
     const modLevelAccess =

@@ -26,7 +26,8 @@ function collectionFailedCheck(results) {
 function lastModifiedFind(results, current) {
     let final = current;
     results.forEach((r) => {
-        if (r.lastModified.getTime() > final.getTime()) {
+        // last modified can be null due to it being not found
+        if (r.lastModified && r.lastModified.getTime() > final.getTime()) {
             final = r.lastModified;
         }
         if (r.subcollection) {
@@ -183,7 +184,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             rtl: config.rtlLanguages.includes(language),
             languages: config.supportedLanguages,
             forUser: userAfterValidate,
-            memId: req.originalUrl + "." + appData.buildnumber + "." + mode + "." + appliedRule.language
+            memId: req.originalUrl + "." + appData.buildnumber + "." + mode,
         };
         etag = appliedRule.memId;
         // however like previously specified, we don't want to cache answers for specific

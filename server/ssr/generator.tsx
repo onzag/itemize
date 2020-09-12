@@ -37,7 +37,8 @@ function collectionFailedCheck(results: ICollectionResult[]): boolean {
 function lastModifiedFind(results: ICollectionResult[], current: Date): Date {
   let final = current;
   results.forEach((r) => {
-    if (r.lastModified.getTime() > final.getTime()) {
+    // last modified can be null due to it being not found
+    if (r.lastModified && r.lastModified.getTime() > final.getTime()) {
       final = r.lastModified;
     }
     if (r.subcollection) {
@@ -229,7 +230,7 @@ export async function ssrGenerator(
       rtl: config.rtlLanguages.includes(language),
       languages: config.supportedLanguages,
       forUser: userAfterValidate,
-      memId: req.originalUrl + "." + appData.buildnumber + "." + mode + "." + appliedRule.language
+      memId: req.originalUrl + "." + appData.buildnumber + "." + mode,
     }
 
     etag = appliedRule.memId;

@@ -568,7 +568,7 @@ export class ActualItemDefinitionProvider extends
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
-  private isMounted: boolean = false;
+  private isCMounted: boolean = false;
   /**
    * Because sometimes functions for listeners run while the thing
    * is mounting, but we haven't mounted yet, we use these callbacks
@@ -730,7 +730,7 @@ export class ActualItemDefinitionProvider extends
     this.installSetters();
     this.installPrefills();
 
-    if (document) {
+    if (typeof document !== "undefined") {
       this.setupListeners();
     }
 
@@ -753,6 +753,8 @@ export class ActualItemDefinitionProvider extends
       this.props.forId || null, this.props.forVersion || null,
     ));
     let memoryLoadedAndValid = false;
+    // by default we don't know
+    let isNotFound = false;
     if (memoryLoaded) {
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         this.props.forId || null, this.props.forVersion || null,
@@ -776,6 +778,7 @@ export class ActualItemDefinitionProvider extends
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
       );
+      isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
     }
 
     let searchState: IActualItemDefinitionProviderSearchState = {
@@ -833,7 +836,7 @@ export class ActualItemDefinitionProvider extends
       // and we pass all this state
       isBlocked: false,
       isBlockedButDataIsAccessible: false,
-      notFound: false,
+      notFound: isNotFound,
       loadError: null,
       // loading will be true if we are setting up with an id
       // as after mount it will attempt to load such id, in order
@@ -932,7 +935,7 @@ export class ActualItemDefinitionProvider extends
   }
   // so now we have mounted, what do we do at the start
   public componentDidMount() {
-    this.isMounted = true;
+    this.isCMounted = true;
     this.mountCbFns.forEach((c) => c());
 
     // now we retrieve the externally checked value
@@ -1300,7 +1303,7 @@ export class ActualItemDefinitionProvider extends
   }
 
   public reloadListener() {
-    if (!this.isMounted) {
+    if (!this.isCMounted) {
       if (this.mountCbFns.indexOf(this.reloadListener) === -1) {
         this.mountCbFns.push(this.reloadListener);
       }
@@ -1318,7 +1321,7 @@ export class ActualItemDefinitionProvider extends
   public changeSearchListener() {
     if (this.isUnmounted) {
       return;
-    } else if (!this.isMounted) {
+    } else if (!this.isCMounted) {
       if (this.mountCbFns.indexOf(this.changeSearchListener) === -1) {
         this.mountCbFns.push(this.changeSearchListener);
       }
@@ -1357,7 +1360,7 @@ export class ActualItemDefinitionProvider extends
   public changeListener() {
     if (this.isUnmounted) {
       return;
-    } else if (!this.isMounted) {
+    } else if (!this.isCMounted) {
       if (this.mountCbFns.indexOf(this.changeListener) === -1) {
         this.mountCbFns.push(this.changeListener);
       }
@@ -1795,7 +1798,7 @@ export class ActualItemDefinitionProvider extends
       givenForVersion || null,
       this.changeListener,
     );
-    if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isMounted) {
+    if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isCMounted) {
       this.search(this.props.automaticSearch);
     }
   }

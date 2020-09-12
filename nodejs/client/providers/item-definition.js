@@ -56,7 +56,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // this variable is useful is async tasks like loadValue are still executing after
         // this component has unmounted, which is a memory leak
         this.isUnmounted = false;
-        this.isMounted = false;
+        this.isCMounted = false;
         /**
          * Because sometimes functions for listeners run while the thing
          * is mounting, but we haven't mounted yet, we use these callbacks
@@ -154,7 +154,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // we do this here to avoid useless callback changes as the listeners are not ready
         this.installSetters();
         this.installPrefills();
-        if (document) {
+        if (typeof document !== "undefined") {
             this.setupListeners();
         }
         // we get the initial state
@@ -194,6 +194,8 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         // by another instance or because of SSR during the initial render
         const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null, this.props.forVersion || null));
         let memoryLoadedAndValid = false;
+        // by default we don't know
+        let isNotFound = false;
         if (memoryLoaded) {
             const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null, this.props.forVersion || null);
             // this is the same as for loadValue we are tyring to predict
@@ -213,6 +215,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // this will work even for null values, and null requestFields
             memoryLoadedAndValid = (appliedGQLValue &&
                 gql_util_1.requestFieldsAreContained(requestFields, appliedGQLValue.requestFields));
+            isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
         }
         let searchState = {
             searchError: null,
@@ -251,7 +254,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // and we pass all this state
             isBlocked: false,
             isBlockedButDataIsAccessible: false,
-            notFound: false,
+            notFound: isNotFound,
             loadError: null,
             // loading will be true if we are setting up with an id
             // as after mount it will attempt to load such id, in order
@@ -335,7 +338,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     }
     // so now we have mounted, what do we do at the start
     componentDidMount() {
-        this.isMounted = true;
+        this.isCMounted = true;
         this.mountCbFns.forEach((c) => c());
         // now we retrieve the externally checked value
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
@@ -587,7 +590,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }
     }
     reloadListener() {
-        if (!this.isMounted) {
+        if (!this.isCMounted) {
             if (this.mountCbFns.indexOf(this.reloadListener) === -1) {
                 this.mountCbFns.push(this.reloadListener);
             }
@@ -606,7 +609,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.isUnmounted) {
             return;
         }
-        else if (!this.isMounted) {
+        else if (!this.isCMounted) {
             if (this.mountCbFns.indexOf(this.changeSearchListener) === -1) {
                 this.mountCbFns.push(this.changeSearchListener);
             }
@@ -641,7 +644,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (this.isUnmounted) {
             return;
         }
-        else if (!this.isMounted) {
+        else if (!this.isCMounted) {
             if (this.mountCbFns.indexOf(this.changeListener) === -1) {
                 this.mountCbFns.push(this.changeListener);
             }
@@ -964,7 +967,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
     }
     onPropertyEnforceOrClearFinal(givenForId, givenForVersion) {
         this.props.itemDefinitionInstance.triggerListeners("change", givenForId || null, givenForVersion || null, this.changeListener);
-        if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isMounted) {
+        if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isCMounted) {
             this.search(this.props.automaticSearch);
         }
     }

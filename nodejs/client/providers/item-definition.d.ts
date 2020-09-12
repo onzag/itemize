@@ -384,7 +384,7 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
  */
 export declare class ActualItemDefinitionProvider extends React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
     private isUnmounted;
-    private isMounted;
+    private isCMounted;
     /**
      * Because sometimes functions for listeners run while the thing
      * is mounting, but we haven't mounted yet, we use these callbacks
