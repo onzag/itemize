@@ -1,69 +1,37 @@
-# Itemize configuration
+# Documentation
 
-To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs
+## Basics
 
-## Create your first project
+ - [Tutorial](./basics/tutorial.md)
+ - [Initialization](./basics/initialization.md)
+ - [Understanding Itemize](./basics/understanding.md)
+ - [Developing Flow](./basics/developing-flow.md)
+ - [Configuration and setup](./basics/configuration.md)
+ - [NPM Commands](./basics/npm-commands.md)
+ - [Fast Prototyping](./basics/fast-prototyping.md)
+ - [SSR](./basics/ssr.md)
+ - [SEO](./basics/seo.md)
+ - [Server Environment Variables](./basics/server-env-variables.md)
+ - [Customizing Rendering of Entry/View](./basics/custom-renderers.md)
+ - [Clusters and Infraestructure](./basics/clusters.md)
+ - [Deploying a Cluster](./basics/deploying.md)
 
-### Create a folder where you intend your project to be hosted
+## Development
 
-Make a directory say
+ - [Building Schemas](./dev/building-schemas.md)
+ - [Adding Items](./dev/records.md)
+ - [Searching within Items](./dev/search.md)
+ - [Deleting items](./dev/delete.md)
+ - [Triggers and Custom Security](./dev/triggers.md)
 
-`mkdir myprojekt`
+## API
 
-And get into it
+ - [Schemas](./api/schemas.md)
+ - [Providers](./api/providers.md)
+ - [Components](./api/components.md)
 
-`cd myprojekt`
+## Advanced
 
-### Inialize a npm project and intall itemize
-
-`npm init`
-
-Follow the steps of this step, and then run
-
-`npm install --save @onzag/itemize`
-
-You need to have the right permissions in order to be able to access this npm module given that it is private
-
-### Setup your project initial configuration
-
-Please ensure docker is installed and running
-
-Before running this step you might want to get ahead of the game you need to get api keys from the following services
-
-`https://developer.here.com/` For usage in geocoding, geolocation, and autocomplete; the service doesn't need to be paid for initial usage.
-
-You need an openstack object storage provider
-
-`https://www.ovhcloud.com/en-gb/public-cloud/object-storage/` OVH is one such provider, and the service login costs money, you will need such a container or otherwise the server won't launch, you can have many of these containers setup worldwide from different clusters.
-
-`https://ipstack.com/` An ipstack api key, this should not costs any money and you shouldn't need to pay until you have more than 10000 users.
-
-Since nothing is configured yet you need to run
-
-`./node_modules/.bin/itemize setup`
-
-Follow the steps that are requested, there are many of them, more often than not the default configuration works, but this might not be the case, you will need the following; you will be asked for the previous information, you mighst just press enter and accept everything; and then go to your config folder and setup from there
-
-### Build your project
-
-`npm run build`
-
-This will run webpack, typescript compiler and the build data process that is necessary.
-
-### Start a development environment
-
-`npm run start-dev-environment development`
-
-This will spawn both redis and postgreSQL using your development configuration
-
-### Update your database
-
-`npm run build-database development`
-
-This will build the database
-
-### Run a local server
-
-`npm run start-dev-server development`
-
-Starts a local server that is listening at port 8000, go to localhost:8000 and your server must be setup up and running.
+ - [Integration with 3rd parties](./advanced/integration.md)
+ - [GeoDNS](./advanced/geodns.md)
+ - [Specifications of the text type](./advanced/text-specs.md)

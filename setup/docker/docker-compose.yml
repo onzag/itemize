@@ -28,9 +28,11 @@ services:
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=error
             - USING_DOCKER=true
+            - NO_SEO=false
             - PING_GOOGLE=false
     servers:
         image: app:latest
+        restart: always
         depends_on:
             - redis
             - pgsql
@@ -49,13 +51,14 @@ services:
             - LOG_LEVEL=error
             - USING_DOCKER=true
             - NO_SSR=false
-            - NO_SEO=false
     redis:
         image: redis:latest
+        restart: always
         ports:
             - "%{REDIS_PORT}:6379"
     nginx:
         image: nginx:latest
+        restart: always
         ports:
             - "80:80"
             - "443:443"
@@ -68,6 +71,7 @@ services:
             - ./nginx-logs:/var/log/nginx
     pgsql:
         image: pgsqlpostgis:latest
+        restart: always
         ports:
             - "%{DB_PORT}:5432"
         volumes: 

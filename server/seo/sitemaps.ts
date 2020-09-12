@@ -2,7 +2,16 @@ export interface ISitemapLastQueryType {
   [id: string]: string,
 };
 
+/**
+ * This is the sitemap as a json and it's used as a parsed
+ * value for a sitemap that should exist in the specified folder
+ * where the sitemap should be
+ */
 export interface ISitemapJSONType {
+  /**
+   * This is an object for all the elements inside the sitemap
+   * and when they were last queried
+   */
   lastQueried: ISitemapLastQueryType;
   isIndex: boolean;
   entries: string[];

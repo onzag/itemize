@@ -403,42 +403,44 @@ export async function initializeServer(
         "initializeServer: setting up global manager",
       );
       const manager: GlobalManager = new GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
-      if (seoConfig) {
+      if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
           "initializeServer: initializing SEO configuration",
         );
         const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
         if (!seoContainerData) {
-          throw new Error("Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
+          logger.error(
+            "initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'",
+          );
+        } else {
+          const seoContainerClient = pkgcloud.storage.createClient({
+            provider: "openstack",
+            username: seoContainerData.username,
+            keystoneAuthVersion: 'v3',
+            region: seoContainerData.region,
+            domainId: seoContainerData.domainId, //default
+            domainName: seoContainerData.domainName,
+            password: seoContainerData.password,
+            authUrl: seoContainerData.authUrl,
+          } as any);
+    
+          let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
+          if (prefix.indexOf("/") !== 0) {
+            prefix = "https://" + prefix;
+          }
+          const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
+          const seoGenerator = new SEOGenerator(
+            seoConfig.seoRules,
+            seoContainer,
+            knex,
+            root,
+            prefix,
+            config.supportedLanguages,
+            domain,
+            PING_GOOGLE,
+          );
+          manager.setSEOGenerator(seoGenerator);
         }
-
-        const seoContainerClient = pkgcloud.storage.createClient({
-          provider: "openstack",
-          username: seoContainerData.username,
-          keystoneAuthVersion: 'v3',
-          region: seoContainerData.region,
-          domainId: seoContainerData.domainId, //default
-          domainName: seoContainerData.domainName,
-          password: seoContainerData.password,
-          authUrl: seoContainerData.authUrl,
-        } as any);
-  
-        let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
-        if (prefix.indexOf("/") !== 0) {
-          prefix = "https://" + prefix;
-        }
-        const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-        const seoGenerator = new SEOGenerator(
-          seoConfig.seoRules,
-          seoContainer,
-          knex,
-          root,
-          prefix,
-          config.supportedLanguages,
-          domain,
-          PING_GOOGLE,
-        );
-        manager.setSEOGenerator(seoGenerator);
       }
       manager.run();
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
