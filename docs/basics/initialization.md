@@ -105,3 +105,7 @@ Itemize currently is not open source, as such it needs a npm token for correct f
 `echo "YOUR_TOKEN_HERE" > .npm-token`
 
 Even if you have access to the repository you need this file as docker and the docker npm user does not have such direct access, the setup will take care of the rest
+
+#### Install docker-compose
+
+Install docker compose in order to be able to run deployments

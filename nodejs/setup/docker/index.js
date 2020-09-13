@@ -26,6 +26,7 @@ const filesToConfirm = [
     "run.sh",
     "start.sh",
     "start-ssl.sh",
+    "stop.sh",
 ];
 /**
  * To setup docker step and its files, it takes the setup config type

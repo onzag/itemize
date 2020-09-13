@@ -24,6 +24,7 @@ const filesToConfirm = [
   "run.sh",
   "start.sh",
   "start-ssl.sh",
+  "stop.sh",
 ];
 
 /**

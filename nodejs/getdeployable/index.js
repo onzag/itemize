@@ -73,7 +73,9 @@ async function build(version, buildID, services) {
         actualServices = services.split(",");
     }
     if (actualServices.includes("cluster-manager") || actualServices.includes("servers")) {
-        await fsAsync.writeFile(path_1.default.join("deployments", buildID, ".env"), "INSTANCE_GROUP_ID=" + buildID);
+        const envPath = path_1.default.join("deployments", buildID, ".env");
+        console.log("emiting " + safe_1.default.green(envPath));
+        await fsAsync.writeFile(envPath, "INSTANCE_GROUP_ID=" + buildID);
         message += "This build has been initialized with the cluster id of " + buildID + " in order to clone this cluster and\n" +
             "execute such somewhere else, refer to the .env file which contains the identifier\n\n";
     }
@@ -131,11 +133,18 @@ async function build(version, buildID, services) {
     }
     // and the deployements start.sh file
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "start.sh")));
-    await fsAsync.copyFile("start.sh", path_1.default.join("deployments", buildID, "start.sh"));
+    await fsAsync.copyFile("stop.sh", path_1.default.join("deployments", buildID, "start.sh"));
+    console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "stop.sh")));
+    await fsAsync.copyFile("stop.sh", path_1.default.join("deployments", buildID, "stop.sh"));
     // finally our nginx file
     if (actualServices.includes("nginx")) {
+        // and the deployements start-ssl.sh file
+        console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "start-ssl.sh")));
+        await fsAsync.copyFile("start-ssl.sh", path_1.default.join("deployments", buildID, "start-ssl.sh"));
         console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "nginx.conf")));
         await fsAsync.copyFile("nginx.conf", path_1.default.join("deployments", buildID, "nginx.conf"));
+        console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "nginx-ssl.conf")));
+        await fsAsync.copyFile("nginx-ssl.conf", path_1.default.join("deployments", buildID, "nginx-ssl.conf"));
     }
     // now we add a bunch of messages about configuration
     if (actualServices.includes("redis")) {

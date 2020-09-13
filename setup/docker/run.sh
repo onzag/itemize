@@ -2,10 +2,11 @@
 
 # now we display our server scale
 echo "APP SERVER SCALE IS $1"
-echo "NGINX CONF IS $2"
 
 # now we want to check for our nginx conf
 if [[ -f "./nginx.conf" ]]; then
+    echo "NGINX CONF IS $2"
+
     # and we want to get our folder name for the docker network names to setup nginx
     LOCALPWD=$(realpath --relative-to="$PWD/.." "$PWD")
     UNSEPARATEDPWD=$(echo ${LOCALPWD//_})
