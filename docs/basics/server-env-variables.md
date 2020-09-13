@@ -29,7 +29,7 @@ Only log errors, this affects the file transport
 
 ### info
 
-This is the standard log level when `NODE_ENV=production` or `NODE_ENV=staging` as this is what used by the file transports
+This is the standard log level when `NODE_ENV=production` as this is what used by the file transports
 
 ### debug
 
@@ -65,7 +65,7 @@ Note that only one manager instace should run at a time, otherwise this will res
 
 ### GLOBAL_MANAGER
 
-Manager the global manager that connects to postgresql and performs type mantenience tasks, this global manager then sends messages to the cluster managers and extended instances about any updates it has performed to the values in the database, these will in turn keep the users updated, mantaining the realtime of things.
+The global manager that connects to postgresql and performs type mantenience tasks, this global manager then sends messages to the cluster managers and extended instances about any updates it has performed to the values in the database, these will in turn keep the users updated, mantaining the realtime of things.
 
 ### ABSOLUTE
 

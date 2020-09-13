@@ -65,7 +65,6 @@ export default async function build(version: string, buildID: string, services: 
   // and we need to replace these variables from it
   fullYMLTemplate =
     fullYMLTemplate.replace(/\%\{NODE_ENV\}/g, version)
-    .replace(/\%\{INSTANCE_GROUP_ID\}/g, buildID)
     .replace(/\%\{REDIS_PORT\}/g, redisConfig.cache.port.toString())
     .replace(/\%\{DB_PORT\}/g, dbConfig.port.toString())
     .replace(/\%\{DB_USER\}/g, dbConfig.user)
@@ -83,6 +82,12 @@ export default async function build(version: string, buildID: string, services: 
   } else {
     actualServices = services.split(",");
   }
+
+  if (actualServices.includes("cluster-manager") || actualServices.includes("servers")) {
+    await fsAsync.writeFile(path.join("deployments", buildID, ".env"), "INSTANCE_GROUP_ID=" + buildID);
+    message += "This build has been initialized with the cluster id of " + buildID + " in order to clone this cluster and\n" +
+      "execute such somewhere else, refer to the .env file which contains the identifier\n\n";
+  }
   
   // we include this information in our final message
   message += "This build contains the following services: " + actualServices.join(", ");
@@ -91,7 +96,7 @@ export default async function build(version: string, buildID: string, services: 
   if (actualServices.includes("nginx")) {
     await fsAsync.mkdir(path.join("deployments", buildID, "nginx-logs"));
 
-    message += "\n\nYou have included NGINX in your build remember that nginx will search for a key.pem and a cert.pem file" +
+    message += "\n\nYou have included NGINX in your build remember that nginx will search for a key.pem and a cert.pem file on SSL mode" +
     "\nthese are necessary for HTTPS, check out let's encrypt and acme.sh for the purposes of having these certificates";
   }
 

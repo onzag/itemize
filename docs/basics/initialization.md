@@ -28,7 +28,7 @@ You need to have the right permissions in order to be able to access this npm mo
 
 Please ensure docker is installed and running
 
-Before running this step you might want to consider getting api keys from the following services, without these Itemize will not work at its full potential, if you are coming from the tutorial you might skip all these
+Before running this step you might want to consider getting api keys from the following services, without these Itemize will not work at its full potential, if you are coming from the tutorial you might skip all these.
 
 `https://www.ovhcloud.com/en-gb/public-cloud/object-storage/` You need an openstack object storage container, for usage for files and sitemaps, it's necessary for SEO and file support, OVH is one such provider, without adding an object storage provider, the file types and file uploading won't work whatsoever.
 
@@ -95,3 +95,13 @@ This will spawn both redis and postgreSQL using your development configuration
 `npm run build-database development`
 
 This will build the database
+
+### Additional Steps
+
+#### Setup the npm token
+
+Itemize currently is not open source, as such it needs a npm token for correct functioning, after you have been added to the repository refer to npmjs.com and create a read-only token at `https://www.npmjs.com/settings/username/token` then do the following.
+
+`echo "YOUR_TOKEN_HERE" > .npm-token`
+
+Even if you have access to the repository you need this file as docker and the docker npm user does not have such direct access, the setup will take care of the rest

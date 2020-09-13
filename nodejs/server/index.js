@@ -252,29 +252,31 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
             exports.logger.info("initializeServer: setting up global manager");
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
-            if (seoConfig) {
+            if (seoConfig && sensitiveConfig.seoContainerID) {
                 exports.logger.info("initializeServer: initializing SEO configuration");
                 const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
                 if (!seoContainerData) {
-                    throw new Error("Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
+                    exports.logger.error("initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
                 }
-                const seoContainerClient = pkgcloud_1.default.storage.createClient({
-                    provider: "openstack",
-                    username: seoContainerData.username,
-                    keystoneAuthVersion: 'v3',
-                    region: seoContainerData.region,
-                    domainId: seoContainerData.domainId,
-                    domainName: seoContainerData.domainName,
-                    password: seoContainerData.password,
-                    authUrl: seoContainerData.authUrl,
-                });
-                let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
-                if (prefix.indexOf("/") !== 0) {
-                    prefix = "https://" + prefix;
+                else {
+                    const seoContainerClient = pkgcloud_1.default.storage.createClient({
+                        provider: "openstack",
+                        username: seoContainerData.username,
+                        keystoneAuthVersion: 'v3',
+                        region: seoContainerData.region,
+                        domainId: seoContainerData.domainId,
+                        domainName: seoContainerData.domainName,
+                        password: seoContainerData.password,
+                        authUrl: seoContainerData.authUrl,
+                    });
+                    let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
+                    if (prefix.indexOf("/") !== 0) {
+                        prefix = "https://" + prefix;
+                    }
+                    const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
+                    const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
+                    manager.setSEOGenerator(seoGenerator);
                 }
-                const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-                const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
-                manager.setSEOGenerator(seoGenerator);
             }
             manager.run();
             if (INSTANCE_MODE === "GLOBAL_MANAGER") {
