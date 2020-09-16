@@ -362,7 +362,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
             }
             const idef = root.registry[query.idef];
             if (idef) {
-                idef.applyValue(query.id, query.version, query.value, false, ssrContext.user.id, ssrContext.user.role, query.fields, false);
+                idef.applyValue(query.id, query.version, query.value, false, query.fields, false);
             }
         });
         const actualApp = (react_1.default.createElement(config_provider_1.ConfigProvider, { value: config },

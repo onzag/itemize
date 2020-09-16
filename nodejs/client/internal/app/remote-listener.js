@@ -614,7 +614,8 @@ class RemoteListener {
             }
             else if (event.type === "not_found") {
                 // we clean the value
-                itemDefinition.cleanValueFor(event.id, event.version);
+                // itemDefinition.cleanValueFor(event.id, event.version);
+                itemDefinition.applyValue(event.id, event.version, null, false, null, false);
                 // and if we got a cache worker
                 if (cache_1.default.isSupported) {
                     // we do the delete

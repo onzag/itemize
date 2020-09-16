@@ -344,14 +344,6 @@ export enum ItemDefinitionIOActions {
  */
 export interface IItemDefinitionGQLValueType {
   /**
-   * The user id that requested this
-   */
-  userIdRequester: number;
-  /**
-   * The role of the user that requested this
-   */
-  roleRequester: string;
-  /**
    * The value as it came from graphql endpoint
    */
   rawValue: IGQLValue;
@@ -1337,8 +1329,6 @@ export default class ItemDefinition {
    * @param version the version of this state is for (can be null)
    * @param value the value itself from graphql, DATA values and flattened values are valid.
    * @param excludeExtensions whether to exclude the extensions for applying the value
-   * @param graphqlRoleRequester the role that requested this data (can be null)
-   * @param graphqlUserIdRequester the user id that requested this data (can be null)
    * @param requestFields the fields that were used to request this data (can be null) but be careful
    * this might be used for catching
    * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
@@ -1352,8 +1342,6 @@ export default class ItemDefinition {
     version: string,
     value: IGQLValue,
     excludeExtensions: boolean,
-    graphqlUserIdRequester: number,
-    graphqlRoleRequester: string,
     requestFields: IGQLRequestFields,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
   ) {
@@ -1365,8 +1353,6 @@ export default class ItemDefinition {
     this.stateInternal[mergedID] = null;
     // and set all the data regarding that value
     this.stateGQLAppliedValue[mergedID] = {
-      userIdRequester: graphqlUserIdRequester,
-      roleRequester: graphqlRoleRequester,
       rawValue: value,
       flattenedValue,
       requestFields,
@@ -1433,8 +1419,6 @@ export default class ItemDefinition {
         version,
         entireValue.rawValue,
         excludeExtensions,
-        entireValue.userIdRequester,
-        entireValue.roleRequester,
         entireValue.requestFields,
         false,
       );

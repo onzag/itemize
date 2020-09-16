@@ -329,7 +329,6 @@ export declare const rawSensitiveConfigSchema: {
                 };
                 required: string[];
             };
-            minProperties: number;
         };
         defaultContainerID: {
             type: string;
@@ -443,7 +442,6 @@ export declare const rawConfigSchema: {
             additionalProperties: {
                 type: string;
             };
-            minProperties: number;
         };
     };
     additionalProperties: boolean;

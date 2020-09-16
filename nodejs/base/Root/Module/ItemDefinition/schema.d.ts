@@ -85,7 +85,6 @@ declare const _default: {
                                     items: {
                                         type: string;
                                     };
-                                    minItems: number;
                                 };
                                 properties: {
                                     type: string;
@@ -128,7 +127,6 @@ declare const _default: {
                                     items: {
                                         type: string;
                                     };
-                                    minItems: number;
                                 };
                                 properties: {
                                     type: string;
@@ -154,7 +152,6 @@ declare const _default: {
                                     items: {
                                         type: string;
                                     };
-                                    minItems: number;
                                 };
                                 properties: {
                                     type: string;
@@ -197,7 +194,6 @@ declare const _default: {
                                     items: {
                                         type: string;
                                     };
-                                    minItems: number;
                                 };
                                 properties: {
                                     type: string;

@@ -146,7 +146,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
     // the value from graphql, now you should understand how this is handled
     // the values are applied so that the whole item definition value is
     // fulfilled
-    itemDefinition.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
+    itemDefinition.applyValue(null, null, resolverArgs.args, false, null, false);
     // now we use this function which checks the current value against
     // the value that we have just set, the reason we are sending the args
     // is because we want to ensure that the values that you updated for

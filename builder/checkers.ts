@@ -968,7 +968,7 @@ export function checkPropertyDefinition(
       );
       if (invalidreason) {
         throw new CheckUpError(
-          "Invalid value for item: " + invalidreason,
+          "Invalid value for item: (" + JSON.stringify(value) + ")" + invalidreason,
           valuesTraceback.newTraceToBit(index),
         );
       }
@@ -984,7 +984,7 @@ export function checkPropertyDefinition(
     );
     if (invalidReason) {
       throw new CheckUpError(
-        "Invalid type for default: " + invalidReason,
+        "Invalid type for default: (" + JSON.stringify(rawData.default) + ")" + invalidReason,
         traceback.newTraceToBit("default"),
       );
     }
@@ -1009,7 +1009,7 @@ export function checkPropertyDefinition(
       );
       if (invalidReason) {
         throw new CheckUpError(
-          "Invalid value for default if definition: " + invalidReason,
+          "Invalid value for default if definition: (" + JSON.stringify(rule.value) + ")" + invalidReason,
           defaultIfTraceback.newTraceToBit(index).newTraceToBit("value"),
         );
       }
@@ -1024,7 +1024,7 @@ export function checkPropertyDefinition(
     );
     if (invalidReason) {
       throw new CheckUpError(
-        "Invalid value for enforced value definition: " + invalidReason,
+        "Invalid value for enforced value definition: (" + JSON.stringify(rawData.enforcedValue) + ")" + invalidReason,
         traceback.newTraceToBit("enforcedValue"),
       );
     }
@@ -1054,7 +1054,7 @@ export function checkPropertyDefinition(
       // ensure that it's a valid value
       if (invalidReason) {
         throw new CheckUpError(
-          "Invalid type for enforcedValues enforced value: " + invalidReason,
+          "Invalid type for enforcedValues enforced value: (" + JSON.stringify(ev.value) + ")" + invalidReason,
           enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("value"),
         );
       }

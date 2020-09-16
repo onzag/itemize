@@ -625,7 +625,7 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
         rawData.values.forEach((value, index) => {
             const invalidreason = PropertyDefinition_1.default.isValidValue(rawData, value, false);
             if (invalidreason) {
-                throw new Error_1.default("Invalid value for item: " + invalidreason, valuesTraceback.newTraceToBit(index));
+                throw new Error_1.default("Invalid value for item: (" + JSON.stringify(value) + ")" + invalidreason, valuesTraceback.newTraceToBit(index));
             }
         });
     }
@@ -633,7 +633,7 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
     if (rawData.default) {
         const invalidReason = PropertyDefinition_1.default.isValidValue(rawData, rawData.default, true);
         if (invalidReason) {
-            throw new Error_1.default("Invalid type for default: " + invalidReason, traceback.newTraceToBit("default"));
+            throw new Error_1.default("Invalid type for default: (" + JSON.stringify(rawData.default) + ")" + invalidReason, traceback.newTraceToBit("default"));
         }
     }
     // And the default if values are valid
@@ -643,14 +643,14 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
             checkConditionalRuleSet(rule.if, parentItemDefinition, parentModule, defaultIfTraceback.newTraceToBit(index).newTraceToBit("if"));
             const invalidReason = PropertyDefinition_1.default.isValidValue(rawData, rule.value, true);
             if (invalidReason) {
-                throw new Error_1.default("Invalid value for default if definition: " + invalidReason, defaultIfTraceback.newTraceToBit(index).newTraceToBit("value"));
+                throw new Error_1.default("Invalid value for default if definition: (" + JSON.stringify(rule.value) + ")" + invalidReason, defaultIfTraceback.newTraceToBit(index).newTraceToBit("value"));
             }
         });
     }
     if (rawData.enforcedValue) {
         const invalidReason = PropertyDefinition_1.default.isValidValue(rawData, rawData.enforcedValue, true);
         if (invalidReason) {
-            throw new Error_1.default("Invalid value for enforced value definition: " + invalidReason, traceback.newTraceToBit("enforcedValue"));
+            throw new Error_1.default("Invalid value for enforced value definition: (" + JSON.stringify(rawData.enforcedValue) + ")" + invalidReason, traceback.newTraceToBit("enforcedValue"));
         }
     }
     // enforced values is what happens when a property meets a condition
@@ -666,7 +666,7 @@ function checkPropertyDefinition(rawData, parentItemDefinition, parentModule, tr
             const invalidReason = PropertyDefinition_1.default.isValidValue(rawData, ev.value, true);
             // ensure that it's a valid value
             if (invalidReason) {
-                throw new Error_1.default("Invalid type for enforcedValues enforced value: " + invalidReason, enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("value"));
+                throw new Error_1.default("Invalid type for enforcedValues enforced value: (" + JSON.stringify(ev.value) + ")" + invalidReason, enforcedValuesTraceback.newTraceToBit(index).newTraceToBit("value"));
             }
         });
     }

@@ -2,6 +2,11 @@
 
 To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs
 
+## Install the main dependencies
+
+- NodeJS `https://nodejs.org/en/download/`
+- Docker `https://docs.docker.com/get-docker/`
+
 ## Create your first project
 
 ### Create a folder where you intend your project to be hosted
@@ -18,7 +23,11 @@ And get into it
 
 `npm init`
 
-Follow the steps of this step, and then run
+Install the peer dependencies
+
+`npm install --save react react-dom @types/react @types/react-dom`
+
+Install itemize
 
 `npm install --save @onzag/itemize`
 
@@ -74,15 +83,19 @@ This will build the database
 
 Starts a local server that is listening at port 8000, go to localhost:8000 and your server must be setup up and running.
 
-## Initialize an already existing project
-
-After you have copied the files for the project you will need the config files, the config files are not included in source control, as such you need to get them in a different way since they contain sensitive information.
-
-After that
-
 ### Build the project
 
 `npm run build`
+
+You might see the warning of
+
+```
+Missing resource file: privacy-policy/en.html
+Missing resource file: terms-and-conditions/en.html
+Missing resource file: contact/en.html
+```
+
+This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
 
 ### Start a development environment (optional)
 
@@ -90,15 +103,65 @@ After that
 
 This will spawn both redis and postgreSQL using your development configuration
 
+Remember to stop the dev environment once you are done
+
+`npm run stop-dev-environment development`
+
 ### Update the database
 
 `npm run build-database development`
 
 This will build the database
 
-### Additional Steps
+### Start the development server
 
-#### Setup the npm token
+`npm run start-dev-server`
+
+This will start the development server locally and listening at localhost:8000
+
+Note that if you didn't setup the openstack containers which are necessary for handling files, you will get this error when starting:
+
+`error: initializeServer [SERIOUS]: Invalid seo container id for the openstack container 'MAIN' {"timestamp":"2020-09-16T16:42:46.165Z"}`
+
+This is fine and the server should work just fine, just seo didn't initialize for building the `sitemap.xml` files, however files will not work properly due to the missing openstack configuration, itemize is made to work despite of this, and you will get warnings such as:
+
+`warn: processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted {"timestamp":"2020-09-16T17:34:46.167Z"}`
+
+These warnings and errors will go away when you setup openstack containers, if you didn't do it during setup, check out how to do it manually at [Openstack Setup](./openstack.md), you might easily get rid of the seo container error by disabling seo via the environment variable `NO_SEO=true`
+
+### Access your application
+
+Open your favorite browser and go to `localhost:8000` it should be up and running there
+
+## Initialize an already existing project
+
+After you have gotten the files for the project you will need the config files, the config files are not included in source control, as such you need to get them in a different way since they contain sensitive information.
+
+After that you should run `npm run build` and then you might start a dev environment via `npm run start-dev-environment development` and if required you should run `npm run build-database development` and then start a dev server via `npm run start-dev-server`
+
+## Additional Steps
+
+### See the automatically generated graphql endpoints
+
+If running a development server, you should have a graphqliq client setup in your host, it should be running at `localhost:8000/graphql` it will provide some insight on how your application is structured, however it should be unecessary to understand these endpoints as you are not supposed to deal with them directly and rather let itemize components handle them.
+
+Despite its rather complex generated names documentation is automatically generated where possible, these endpoints can be rather complex but understanding them can help understanding how itemize works internally.
+
+Note that itemize supports and heavily uses the [Multipart Spec](https://github.com/jaydenseric/graphql-multipart-request-spec) for graphql, however the standard JSON form is also supported, but if you debug the network you will realize that the content type is `multipart/form-data` rather than `application/json`
+
+### Get the admin user
+
+The admin user is automatically generated if not found and this is done by the global manager, when starting in developing mode you should have gotten your admin user log information with the temporary password displayed in the terminal, example:
+
+`info: GlobalManager.addAdminUserIfMissing: Sucessfully added admin user {"username":"admin","password":"c2bf50ba9bd142f29ea40fab653a7689","timestamp":"2020-09-16T16:42:46.249Z"`
+
+These are your login credentials within the application for the administrator with the role ADMIN, if you have no terminal logs eg. ran it in production mode instead of development, it can be found in the info logs via:
+
+`cat logs/info.ABSOLUTE.log.2020-09-16 | grep "GlobalManager.addAdminUserIfMissing"`
+
+And that should show the relevant lines, note that the date 2020-09-16 should be replaced to the log day, the format is YYYY-MM-DD
+
+### Setup the npm token
 
 Itemize currently is not open source, as such it needs a npm token for correct functioning, after you have been added to the repository refer to npmjs.com and create a read-only token at `https://www.npmjs.com/settings/username/token` then do the following.
 
@@ -106,6 +169,44 @@ Itemize currently is not open source, as such it needs a npm token for correct f
 
 Even if you have access to the repository you need this file as docker and the docker npm user does not have such direct access, the setup will take care of the rest
 
-#### Install docker-compose
+### Install docker-compose
 
 Install docker compose in order to be able to run deployments
+
+## Other initialization options
+
+### Start the development server (NO_SSR and NO_SEO mode)
+
+Having SSR enabled can disrupt development, because this means that there will be a mismatch whenever you do changes and rebuild and package your application, this is seen in depth in [Developing Flow](./developing-flow.md) this usually goes in combination with disabling service workers as otherwise changes will not reflect, so a common way to start your development server is:
+
+`NO_SSR=true NO_SEO=true npm run start-dev-server`
+
+Note that restarts are still required if for example there are changes to the schema files.
+
+### Start the silly server
+
+`npm run start-silly-server`
+
+The silly server is the same as the development server but logs much more information, normally used when changes to itemize are required or bugs are found within it, everything that is verbose and marked as silly is logged, which can mean a lot of information to work with.
+
+### Start the production server
+
+`npm run start-silly-server`
+
+Not really recommended to use, will connect and use production configuration files and nothing is logged to the console, minified files take priority when being served, and you will need to use the devkey in your cookie to switch to development files, regarding that.
+
+### Switch to development mode on production builds
+
+Debugging in production can be a pain, this is why itemize provides with a devkey option, in order to use the devkey it is recommended that you clear up everything in your browser, cookies, storage, cache; your devkey should be in your sensitive config information, looking like eg. `NwKFS1rODXqf4D8D` or a custom value that you have set it as.
+
+Please ensure to have service workers disabled, otherwise you might be served the default mode version.
+
+In order to switch the mode, open the console in your browser and run `SET_DEV_MODE("development", "YOUR_KEY");` or `SET_DEV_MODE("production", "YOUR_KEY");` this should make it so that the mode is switched, and do a hard refresh, now you should have a development version of the client up and running which should help debugging even on your live production builds.
+
+Note that this will cause SSR to die off, as SSR can only run in the default mode as the server can only run on one mode at a time, so this is not good for debugging SSR issues; but you should now have available, custom logs, react tools, and other tools that use development builds right on live.
+
+The development build is protected by default, so it can't be easily accessed unless it's the development server, it's considered a protected resource this should help by adding obscurity on top of it (don't confuse it with security, as minified files can also be analyzed); this is only to make copycats and replication by harmful parties harder, but not impossible.
+
+## Start hacking
+
+Now you know all the basic initialization steps, you should now follow the [Developing Flow](./tutorial.md) which will explain how to create a airbnb like website using itemize.

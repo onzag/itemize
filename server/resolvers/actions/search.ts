@@ -444,7 +444,7 @@ export async function searchItemDefinition(
   );
 
   // Checking search mode counterpart to validate
-  searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
+  searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, null, false);
   await serverSideCheckItemDefinitionAgainst(
     searchModeCounterpart,
     resolverArgs.args,

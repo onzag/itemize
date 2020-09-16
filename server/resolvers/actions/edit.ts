@@ -159,8 +159,6 @@ export async function editItemDefinition(
     resolverArgs.args.version || null,
     expectedUpdatedValue,
     false,
-    tokenData.id,
-    tokenData.role,
     null,
     false,
   );

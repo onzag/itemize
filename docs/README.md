@@ -4,6 +4,7 @@
 
  - [Tutorial](./basics/tutorial.md)
  - [Initialization](./basics/initialization.md)
+ - [Openstack Setup](./basics/openstack.md)
  - [Understanding Itemize](./basics/understanding.md)
  - [Developing Flow](./basics/developing-flow.md)
  - [Configuration and setup](./basics/configuration.md)

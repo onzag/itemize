@@ -80,7 +80,7 @@ class ActualSearchLoader extends react_1.default.Component {
             const itemDefintionInQuestion = root.registry[sr.type];
             // we apply the value, whatever we have gotten this will affect all the instances
             // that use the same value
-            itemDefintionInQuestion.applyValue(sr.id, sr.version, sr, false, this.props.tokenData.id, this.props.tokenData.role, this.props.searchFields, true);
+            itemDefintionInQuestion.applyValue(sr.id, sr.version, sr, false, this.props.searchFields, true);
             // and then we trigger the change listener for all the instances
             itemDefintionInQuestion.triggerListeners("change", sr.id, sr.version);
         });
@@ -191,7 +191,7 @@ class ActualSearchLoader extends react_1.default.Component {
                 if (cr.cachedResult.value) {
                     // we apply the value, whatever we have gotten this will affect all the instances
                     // that use the same value
-                    itemDefintionInQuestion.applyValue(cr.forId, cr.forVersion, cr.cachedResult.value, false, this.props.tokenData.id, this.props.tokenData.role, cr.cachedResult.fields, true);
+                    itemDefintionInQuestion.applyValue(cr.forId, cr.forVersion, cr.cachedResult.value, false, cr.cachedResult.fields, true);
                     // and then we trigger the change listener for all the instances
                     itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
                 }
@@ -290,7 +290,7 @@ class ActualSearchLoader extends react_1.default.Component {
                             mergedQueryFields = gql_util_1.deepMerge(this.props.searchFields, appliedGQLValue.requestFields);
                         }
                         // we apply such thing here
-                        itemDefintionInQuestion.applyValue(valueToApply.id, valueToApply.version, valueToApply, false, this.props.tokenData.id, this.props.tokenData.role, mergedQueryFields, true);
+                        itemDefintionInQuestion.applyValue(valueToApply.id, valueToApply.version, valueToApply, false, mergedQueryFields, true);
                         // and trigger the listeners for change
                         itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
                     }

@@ -129,7 +129,6 @@ exports.rawSensitiveConfigSchema = {
                     "authUrl",
                 ],
             },
-            minProperties: 1,
         },
         defaultContainerID: {
             type: "string",
@@ -263,7 +262,6 @@ exports.rawConfigSchema = {
             additionalProperties: {
                 type: "string",
             },
-            minProperties: 1,
         },
     },
     additionalProperties: false,

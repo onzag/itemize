@@ -95,6 +95,19 @@ function ajvCheck(fn, rawData, traceback) {
                     // and trace
                     actualTraceback = actualTraceback.newTraceToBit(pathLocation);
                 }
+                else if (pathLocation.startsWith("'")) {
+                    // this is one of those 'EXAMPLE_LOCATION' that is somehow inside a bracket and it's not a number
+                    // we need to parse it for that we are going to convert it to valid json
+                    try {
+                        const validJSON = pathLocation.replace(/"/g, "__-QUOT-__").replace(/'/g, "\"");
+                        const result = JSON.parse(validJSON).replace(/\_\_\-QUOT\-\_\_/g, "\"");
+                        actualTraceback = actualTraceback.newTraceToBit(result);
+                    }
+                    catch {
+                        // otherwise return, something has messed up
+                        break;
+                    }
+                }
                 else {
                     // otherwise return, something has messed up
                     break;

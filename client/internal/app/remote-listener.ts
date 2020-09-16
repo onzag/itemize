@@ -46,7 +46,6 @@ import {
   CURRENCY_FACTORS_UPDATED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import { throws } from "assert";
 
 /**
  * The remote listener class creates a websocket connection (as well as it falling back to polling)
@@ -877,11 +876,19 @@ export class RemoteListener {
         // we request a reload
         itemDefinition.triggerListeners("reload", event.id, event.version);
 
-        // otherwise it was deleted
-      } else if (event.type === "not_found") {
-
+        // otherwise it was deleted and we are currently not aware that this is the
+        // situation
+      } else if (event.type === "not_found" && appliedGQLValue.rawValue !== null) {
         // we clean the value
-        itemDefinition.cleanValueFor(event.id, event.version);
+        // itemDefinition.cleanValueFor(event.id, event.version);
+        itemDefinition.applyValue(
+          event.id,
+          event.version,
+          null,
+          false,
+          null,
+          false,
+        );
 
         // and if we got a cache worker
         if (CacheWorkerInstance.isSupported) {

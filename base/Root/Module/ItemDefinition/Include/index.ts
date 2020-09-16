@@ -668,10 +668,6 @@ export default class Include {
       value || {},
       // exclude all extensions
       true,
-      // graphql user id, unknown
-      null,
-      // grapqhl role, unknown
-      null,
       // graphql requested fields, none
       null,
       doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers,

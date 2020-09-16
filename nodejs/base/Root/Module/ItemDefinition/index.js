@@ -753,8 +753,6 @@ class ItemDefinition {
      * @param version the version of this state is for (can be null)
      * @param value the value itself from graphql, DATA values and flattened values are valid.
      * @param excludeExtensions whether to exclude the extensions for applying the value
-     * @param graphqlRoleRequester the role that requested this data (can be null)
-     * @param graphqlUserIdRequester the user id that requested this data (can be null)
      * @param requestFields the fields that were used to request this data (can be null) but be careful
      * this might be used for catching
      * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
@@ -763,7 +761,7 @@ class ItemDefinition {
      * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
      * to false as it's been used applyValue on it, it's been set now by the computer
      */
-    applyValue(id, version, value, excludeExtensions, graphqlUserIdRequester, graphqlRoleRequester, requestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
+    applyValue(id, version, value, excludeExtensions, requestFields, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers) {
         // first we flatten the value if necessary
         const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? gql_util_1.flattenRawGQLValueOrFields(value) : value);
         const mergedID = id + "." + (version || "");
@@ -772,8 +770,6 @@ class ItemDefinition {
         this.stateInternal[mergedID] = null;
         // and set all the data regarding that value
         this.stateGQLAppliedValue[mergedID] = {
-            userIdRequester: graphqlUserIdRequester,
-            roleRequester: graphqlRoleRequester,
             rawValue: value,
             flattenedValue,
             requestFields,
@@ -822,7 +818,7 @@ class ItemDefinition {
         const mergedID = id + "." + (version || "");
         if (this.stateHasAppliedValueTo[mergedID]) {
             const entireValue = this.stateGQLAppliedValue[mergedID];
-            this.applyValue(id, version, entireValue.rawValue, excludeExtensions, entireValue.userIdRequester, entireValue.roleRequester, entireValue.requestFields, false);
+            this.applyValue(id, version, entireValue.rawValue, excludeExtensions, entireValue.requestFields, false);
         }
         else {
             this.cleanValueFor(id, version, excludeExtensions);

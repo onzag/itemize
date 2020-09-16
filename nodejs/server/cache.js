@@ -229,7 +229,11 @@ class Cache {
             sqlModData.parent_version = parent.version || "";
             sqlModData.parent_type = parent.type;
         }
-        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: finalizing SQL data with module data", sqlModData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: finalizing SQL data with module data", {
+            ...sqlModData,
+            created_at: "[this.knex.fn.now()]",
+            last_modified: "[this.knex.fn.now()]",
+        });
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: finalizing SQL data with item definition data", sqlIdefData);
         // now let's build the transaction for the insert query which requires
         // two tables to be modified, and it always does so, as item definition information
@@ -437,7 +441,14 @@ class Cache {
             sqlModData.edited_by = editedBy;
         }
         sqlModData.last_modified = this.knex.fn.now();
-        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: finalizing SQL data with module data", sqlModData);
+        CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: finalizing SQL data with module data", sqlModData.edited_at ? {
+            ...sqlModData,
+            edited_at: "[this.knex.fn.now()]",
+            last_modified: "[this.knex.fn.now()]",
+        } : {
+            ...sqlModData,
+            last_modified: "[this.knex.fn.now()]",
+        });
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestUpdate: finalizing SQL data with item definition data", sqlIdefData);
         // we build the transaction for the action
         let sqlValue;

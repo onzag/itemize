@@ -1366,6 +1366,18 @@ export class ActualItemDefinitionProvider extends
       }
       return;
     }
+
+    let isNotFound = false;
+    if (this.props.forId) {
+      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        this.props.forId || null,
+        this.props.forVersion || null,
+      );
+      if (appliedValue) {
+        isNotFound = appliedValue.rawValue === null;
+      }
+    }
+
     // we basically just upgrade the state
     this.setState({
       itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -1384,12 +1396,7 @@ export class ActualItemDefinitionProvider extends
       // no notify that things aren't loading anymore
       loading: false,
       // also search might do this, and it's true anyway
-      notFound:
-        // an id is required for this to be true
-        this.props.forId ? !this.props.itemDefinitionInstance.hasAppliedValueTo(
-          this.props.forId || null,
-          this.props.forVersion || null,
-        ) : false,
+      notFound: isNotFound,
     });
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
@@ -1543,8 +1550,6 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const tokenDataId = this.props.tokenData.id;
-    const tokenDataRole = this.props.tokenData.role;
     const containsExternallyCheckedProperty = this.props.containsExternallyCheckedProperty;
     const qualifiedPathName = this.props.itemDefinitionInstance.getQualifiedPathName();
 
@@ -1577,8 +1582,6 @@ export class ActualItemDefinitionProvider extends
         forVersion,
         value,
         false,
-        tokenDataId,
-        tokenDataRole,
         getQueryFields,
         true,
       );
@@ -2549,8 +2552,6 @@ export class ActualItemDefinitionProvider extends
         receivedVersion,
         value,
         false,
-        this.props.tokenData.id,
-        this.props.tokenData.role,
         getQueryFields,
         true,
       );

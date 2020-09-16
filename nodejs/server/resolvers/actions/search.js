@@ -292,7 +292,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     CAN_LOG_DEBUG && server_1.logger.debug("searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName());
     searchModeCounterpart.checkRoleAccessFor(ItemDefinition_1.ItemDefinitionIOActions.READ, tokenData.role, tokenData.id, ownerToCheckAgainst, searchingFields, true);
     // Checking search mode counterpart to validate
-    searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, tokenData.id, tokenData.role, null, false);
+    searchModeCounterpart.applyValue(null, null, resolverArgs.args, false, null, false);
     await basic_1.serverSideCheckItemDefinitionAgainst(searchModeCounterpart, resolverArgs.args, null, null);
     // retrieve basic information
     const mod = itemDefinition.getParentModule();

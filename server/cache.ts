@@ -348,7 +348,11 @@ export class Cache {
 
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: finalizing SQL data with module data",
-      sqlModData,
+      {
+        ...sqlModData,
+        created_at: "[this.knex.fn.now()]",
+        last_modified: "[this.knex.fn.now()]",
+      },
     );
 
     CAN_LOG_DEBUG && logger.debug(
@@ -693,7 +697,14 @@ export class Cache {
 
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: finalizing SQL data with module data",
-      sqlModData,
+      sqlModData.edited_at ? {
+        ...sqlModData,
+        edited_at: "[this.knex.fn.now()]",
+        last_modified: "[this.knex.fn.now()]",
+      } : {
+        ...sqlModData,
+        last_modified: "[this.knex.fn.now()]",
+      },
     );
 
     CAN_LOG_DEBUG && logger.debug(

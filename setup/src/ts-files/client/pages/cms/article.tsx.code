@@ -64,7 +64,7 @@ const SingleArticle = withStyles(articlesStyles)((props: WithStyles<typeof artic
 });
 
 const redirectOnSuccess = (status: IActionResponseWithId) =>
-	`/cms/article?id=${status.id}`;
+	`/cms/article?id=${status.id}&version=${status.version || ""}`;
 
 /**
  * Page section that allows for creating and modifying articles
@@ -73,11 +73,11 @@ const redirectOnSuccess = (status: IActionResponseWithId) =>
  */
 export const Article = withStyles(articleStyles)((props: WithStyles<typeof articleStyles>) => {
 	return (
-		<LocationStateReader defaultState={{ id: "" }} stateIsInQueryString={true}>
+		<LocationStateReader defaultState={{ id: "", version: "" }} stateIsInQueryString={true}>
 			{(locationState, setState) => {
-				const updateLocationId = (e: React.ChangeEvent<HTMLInputElement>) => {
+				const updateLocationState = (which: string, e: React.ChangeEvent<HTMLInputElement>) => {
 					setState({
-						id: e.target.value,
+						[which]: e.target.value,
 					}, true);
 				};
 
@@ -95,6 +95,7 @@ export const Article = withStyles(articleStyles)((props: WithStyles<typeof artic
 						includePolicies={false}
 						longTermCaching={false}
 						forId={parseInt(locationState.id, 10) || null}
+						forVersion={locationState.version || null}
 					>
 						<Container maxWidth="md" className={props.classes.container + " trusted"}>
 							<Paper className={props.classes.paper}>
@@ -106,10 +107,20 @@ export const Article = withStyles(articleStyles)((props: WithStyles<typeof artic
 												fullWidth={true}
 												value={locationState.id}
 												type="number"
-												onChange={updateLocationId}
+												onChange={updateLocationState.bind(null, "id")}
 												placeholder={i18nId}
 											/>
 										</Box>
+									)}
+								</I18nRead>
+								<I18nRead id="version" capitalize={true}>
+									{(i18nVersion: string) => (
+										<TextField
+											fullWidth={true}
+											value={locationState.version}
+											onChange={updateLocationState.bind(null, "version")}
+											placeholder={i18nVersion}
+										/>
 									)}
 								</I18nRead>
 

@@ -103,7 +103,7 @@ async function editItemDefinition(appData, resolverArgs, resolverItemDefinition)
         ...resolverArgs.args,
     };
     // and as so we apply the value from graphql
-    itemDefinition.applyValue(resolverArgs.args.id, resolverArgs.args.version || null, expectedUpdatedValue, false, tokenData.id, tokenData.role, null, false);
+    itemDefinition.applyValue(resolverArgs.args.id, resolverArgs.args.version || null, expectedUpdatedValue, false, null, false);
     // and then we check with the entire full value, we want to ensure no changes occurred
     // and that the updated value will be exactly the result and it will be valid
     await basic_1.serverSideCheckItemDefinitionAgainst(itemDefinition, expectedUpdatedValue, resolverArgs.args.id, resolverArgs.args.version || null);

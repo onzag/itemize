@@ -465,8 +465,6 @@ export async function initializeItemizeApp(
           query.version,
           query.value,
           false,
-          ssrContext.user.id,
-          ssrContext.user.role,
           query.fields,
           false,
         );

@@ -385,7 +385,6 @@ export const rawSensitiveConfigSchema = {
           "authUrl",
         ],
       },
-      minProperties: 1,
     },
     defaultContainerID: {
       type: "string",
@@ -520,7 +519,6 @@ export const rawConfigSchema = {
       additionalProperties: {
         type: "string",
       },
-      minProperties: 1,
     },
   },
   additionalProperties: false,

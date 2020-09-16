@@ -650,6 +650,13 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             }
             return;
         }
+        let isNotFound = false;
+        if (this.props.forId) {
+            const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(this.props.forId || null, this.props.forVersion || null);
+            if (appliedValue) {
+                isNotFound = appliedValue.rawValue === null;
+            }
+        }
         // we basically just upgrade the state
         this.setState({
             itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
@@ -658,9 +665,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             // no notify that things aren't loading anymore
             loading: false,
             // also search might do this, and it's true anyway
-            notFound: 
-            // an id is required for this to be true
-            this.props.forId ? !this.props.itemDefinitionInstance.hasAppliedValueTo(this.props.forId || null, this.props.forVersion || null) : false,
+            notFound: isNotFound,
         });
     }
     async loadValue(denyCache) {
@@ -783,8 +788,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             gql_util_1.requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)) {
             return null;
         }
-        const tokenDataId = this.props.tokenData.id;
-        const tokenDataRole = this.props.tokenData.role;
         const containsExternallyCheckedProperty = this.props.containsExternallyCheckedProperty;
         const qualifiedPathName = this.props.itemDefinitionInstance.getQualifiedPathName();
         // remember that this waiter only runs on the first instance
@@ -805,7 +808,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (!error) {
             // we apply the value, whatever we have gotten this will affect all the instances
             // that use the same value, note that value can be null
-            this.props.itemDefinitionInstance.applyValue(forId, forVersion, value, false, tokenDataId, tokenDataRole, getQueryFields, true);
+            this.props.itemDefinitionInstance.applyValue(forId, forVersion, value, false, getQueryFields, true);
             // and then we trigger the change listener for all the instances
             this.props.itemDefinitionInstance.triggerListeners("change", forId, forVersion);
             // and if we have an externally checked property we do the external check
@@ -1564,7 +1567,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             }
             recievedId = value.id;
             receivedVersion = value.version || null;
-            this.props.itemDefinitionInstance.applyValue(recievedId, receivedVersion, value, false, this.props.tokenData.id, this.props.tokenData.role, getQueryFields, true);
+            this.props.itemDefinitionInstance.applyValue(recievedId, receivedVersion, value, false, getQueryFields, true);
             this.cleanWithProps(this.props, options, "success", true);
             this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
         }

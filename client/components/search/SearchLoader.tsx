@@ -267,8 +267,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         sr.version as string,
         sr,
         false,
-        this.props.tokenData.id,
-        this.props.tokenData.role,
         this.props.searchFields,
         true,
       );
@@ -412,8 +410,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             cr.forVersion,
             cr.cachedResult.value,
             false,
-            this.props.tokenData.id,
-            this.props.tokenData.role,
             cr.cachedResult.fields,
             true,
           );
@@ -546,8 +542,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               valueToApply.version as string,
               valueToApply,
               false,
-              this.props.tokenData.id,
-              this.props.tokenData.role,
               mergedQueryFields,
               true,
             );

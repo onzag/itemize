@@ -25,7 +25,6 @@ const policySchema = {
           items: {
             type: "string",
           },
-          minItems: 1,
         },
         properties: {
           type: "array",
@@ -72,7 +71,6 @@ const policySchemaWithModuleAndItemDefinition = {
           items: {
             type: "string",
           },
-          minItems: 1,
         },
         properties: {
           type: "array",
@@ -109,7 +107,6 @@ const policySchemaNoApplying = {
           items: {
             type: "string",
           },
-          minItems: 1,
         },
         properties: {
           type: "array",
