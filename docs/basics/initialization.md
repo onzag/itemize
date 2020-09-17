@@ -65,6 +65,16 @@ Follow the steps that are requested, there are many of them, more often than not
 
 This will run webpack, typescript compiler and the build data process that is necessary.
 
+You might see the warning of
+
+```
+Missing resource file: privacy-policy/en.html
+Missing resource file: terms-and-conditions/en.html
+Missing resource file: contact/en.html
+```
+
+This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
+
 ### Start a development environment (optional)
 
 `npm run start-dev-environment development`
@@ -82,20 +92,6 @@ This will build the database
 `npm run start-dev-server development`
 
 Starts a local server that is listening at port 8000, go to localhost:8000 and your server must be setup up and running.
-
-### Build the project
-
-`npm run build`
-
-You might see the warning of
-
-```
-Missing resource file: privacy-policy/en.html
-Missing resource file: terms-and-conditions/en.html
-Missing resource file: contact/en.html
-```
-
-This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
 
 ### Start a development environment (optional)
 

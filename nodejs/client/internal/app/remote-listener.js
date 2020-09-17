@@ -610,9 +610,10 @@ class RemoteListener {
                         event.lastModified !== appliedGQLValue.flattenedValue.last_modified))) {
                 // we request a reload
                 itemDefinition.triggerListeners("reload", event.id, event.version);
-                // otherwise it was deleted
+                // otherwise it was deleted and we are currently not aware that this is the
+                // situation
             }
-            else if (event.type === "not_found") {
+            else if (event.type === "not_found" && appliedGQLValue.rawValue !== null) {
                 // we clean the value
                 // itemDefinition.cleanValueFor(event.id, event.version);
                 itemDefinition.applyValue(event.id, event.version, null, false, null, false);
