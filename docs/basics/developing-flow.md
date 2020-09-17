@@ -9,6 +9,10 @@ It is assumed that your app is initialized and currently running, if you haven't
  - Distribution Resources: These are part of the distribution sources and it represents files that can be accessed and are meant to be accessed by the browser, they should exist within a folder called `dist/data` and can be accessed in the browser via `/rest/resources/[name of the resource]`
  - Source Resources: It represents sources for resources that are to be copied (and sometimes optimized) to place within these `/rest/resources` for access via the browser these resources are defined by you the developer and they are considered as tied to the buildnumber, as such, they might be cached and considered frozen until the build number changes, make sure that there's no overlap, and use folders when possible, you don't want a `index.html` file in such sources.
 
+## SSR Concerns
+
+Note that if you are checking SSR, it will only be avialble in the mode that you are executing, for example, if you have `start-dev-server` SSR will only be available when the client is also in development mode, it is indeed totally possible to load the production version on the client using the devkey even if the server is in dev mode, and vice-versa, this allows to check for special bugs, and in production debugging; nevertheless SSR should work out of the box if enabled and if you haven't messed with modes and the devkey.
+
 ## Safe Developing Flow
 
 No matter the situation, this method should completely work regardless in order to see development updates, it consists of the following steps:
@@ -16,7 +20,7 @@ No matter the situation, this method should completely work regardless in order 
  1. Kill the dev server via ctrl+c
  2. `npm run build`
  3. `npm run build-database development` (if there are changes to the schema files)
- 4. `npm run start-dev-server`
+ 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
  5. Your browser should complain that the app is outdated, run the refresh.
 
 This method is however not optimal in most scenarios, one thing, it's slow, and it builds more than it should be necessary.
@@ -57,7 +61,7 @@ If you have performed changes to the internationalization `.properties` files, o
  1. Kill the server via ctrl+c
  2. `npm run build-data`
  3. `npm run build-database development`
- 4. `npm run start-dev-server development`
+ 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
 
 This should provide a new fresh instance that contains all the updates in the server side, your client now should complain of the app being outdated, and receive the updates as well.
 
@@ -67,7 +71,7 @@ If you have done changes to the server side, the proces to update the server cod
 
  1. Kill the server via ctrl+c
  2. `npm run install`
- 3. `npm run start-dev-server development`
+ 3. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
 
 Note that this will not affect your client side at all.
 
@@ -78,6 +82,27 @@ As you notice only the `npm run build-data` command and subsequently starting th
 Itemize is extremely efficient and freezes and ties resources to buildnumbers using the service worker, as such nothing will update in production properly unless there's a buildnumber change.
 
 Disruption should be minimal, having offline support the users should not even notice and just get a sudden app outdated message; or otherwise the app will automatically update on next restart.
+
+## Itemize Developing Flow
+
+If you are an itemize itself developer, you might need to make changes to the itemize library itself, this is not an easy feat, but this should provide insight on how to achieve just that.
+
+You should have your own local repository of itemize for this, and do the changes within it.
+
+### Itemize Specific Server Changes
+
+ 1. Kill the server of the itemize powered application. (within the project directory)
+ 2. `npm run install` (within the itemize repository)
+ 3. `cp -r nodejs/ directory/of/your/project/node_modules/@onzag/itemize` (within the itemize repository)
+ 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
+
+### Itemize Specific Client Changes
+
+ 1. Kill the server of the itemize powered application. (within the project directory)
+ 2. `npm run install` (within the itemize repository)
+ 3. `cp -r * directory/of/your/project/node_modules/@onzag/itemize` (within the itemize repository)
+ 4. `npm run webpack-dev` or `npm run webpack` (within the project directory)
+ 5. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
 
 ## More information
 
