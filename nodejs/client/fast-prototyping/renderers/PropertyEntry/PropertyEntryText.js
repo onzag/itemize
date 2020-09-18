@@ -59,18 +59,18 @@ class ItemizeImageBlot extends BlockEmbed {
             return null;
         }
         // all this process folows the text-specs.md file
-        // first we get this information from it in order
-        // to build a ratio
-        const width = value.srcWidth;
-        const height = value.srcHeight;
-        const ratio = height / width;
-        const percentage = ratio * 100;
         // create a main container
         const mainContainer = super.create();
         mainContainer.className = "image";
+        if (value.style) {
+            mainContainer.setAttribute("style", value.style);
+        }
         // a parent container that contains the image
         const parentContainer = document.createElement("div");
         parentContainer.className = "image-container";
+        if (value.containerStyle) {
+            parentContainer.setAttribute("style", value.containerStyle);
+        }
         mainContainer.appendChild(parentContainer);
         // and a child container for it
         const childContainer = document.createElement("div");
@@ -78,7 +78,9 @@ class ItemizeImageBlot extends BlockEmbed {
         // might come itself, we always calculate it here in the blot
         // as this can be an addition
         childContainer.className = "image-pad";
-        childContainer.setAttribute("style", "padding-bottom: " + percentage + "%");
+        if (value.padStyle) {
+            childContainer.setAttribute("style", value.padStyle);
+        }
         parentContainer.appendChild(childContainer);
         // then the image
         const img = document.createElement("img");
@@ -91,6 +93,9 @@ class ItemizeImageBlot extends BlockEmbed {
         img.setAttribute("sizes", value.sizes || "");
         img.setAttribute("src", value.src || "");
         img.setAttribute("srcset", value.srcSet || "");
+        if (value.imgStyle) {
+            img.setAttribute("style", value.imgStyle);
+        }
         // return the main
         return mainContainer;
     }
@@ -98,11 +103,27 @@ class ItemizeImageBlot extends BlockEmbed {
      * How to stract the value of an image
      */
     static value(node) {
+        const style = node.getAttribute("style");
+        // container
+        const container = node.querySelector("image-container");
+        if (!container) {
+            return null;
+        }
+        // might be null
+        const containerStyle = container.getAttribute("style");
+        const imgPad = node.querySelector("image-pad");
+        if (!imgPad) {
+            return null;
+        }
+        // might be null if manually removed or whatnot
+        const padStyle = imgPad.getAttribute("style");
         // first we need to check everything is fine
         const img = node.querySelector("img");
         if (!img) {
             return null;
         }
+        // might be null
+        const imgStyle = img.getAttribute("style");
         // and extract the info according to the specs
         // the spec says srcset sizes and src will be stripped but can be available
         return {
@@ -113,6 +134,10 @@ class ItemizeImageBlot extends BlockEmbed {
             sizes: img.getAttribute("sizes") || null,
             srcWidth: parseInt(img.dataset.srcWidth) || null,
             srcHeight: parseInt(img.dataset.srcHeight) || null,
+            style,
+            padStyle,
+            containerStyle,
+            imgStyle,
         };
     }
 }
@@ -389,6 +414,9 @@ function RichTextEditorToolbar(props) {
             props.supportsFiles ?
                 (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddFileLabel, classes: { root: "ql-file" } },
                     react_1.default.createElement(mui_core_1.AttachFileIcon, null))) : null) : null,
+        props.supportsContainers ?
+            (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, classes: { root: "ql-container" } },
+                react_1.default.createElement(mui_core_1.CropSquareIcon, null))) : null,
         props.supportsRawMode ?
             (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, onClick: props.onToggleRawMode },
                 react_1.default.createElement(mui_core_1.CodeIcon, null))) : null));
@@ -520,6 +548,13 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
             if (!data) {
                 return;
             }
+            // first we get this information from it in order
+            // to build a ratio
+            const width = data.width;
+            const height = data.height;
+            const ratio = height / width;
+            const percentage = ratio * 100;
+            const padStyle = "padding-bottom:" + percentage + "%";
             const range = editor.getSelection(true);
             editor.insertEmbed(range.index, "itemizeimage", {
                 alt: null,
@@ -529,6 +564,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 sizes: null,
                 srcWidth: data.width,
                 srcHeight: data.height,
+                padStyle,
             }, ReactQuill.Quill.sources.USER);
             editor.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         });
@@ -681,6 +717,13 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         }
         try {
             const data = await this.props.onInsertFile(file, true);
+            // first we get this information from it in order
+            // to build a ratio
+            const width = data.width;
+            const height = data.height;
+            const ratio = height / width;
+            const percentage = ratio * 100;
+            const padStyle = "padding-bottom:" + percentage + "%";
             const quill = this.quillRef.current.getEditor();
             const range = quill.getSelection(true);
             quill.insertEmbed(range.index, "itemizeimage", {
@@ -691,6 +734,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                 sizes: null,
                 srcWidth: data.width,
                 srcHeight: data.height,
+                padStyle,
             }, ReactQuill.Quill.sources.USER);
             quill.setSelection(range.index + 2, 0, ReactQuill.Quill.sources.SILENT);
         }
@@ -745,7 +789,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: !!this.props.lastLoadedFileError, onClose: this.props.dismissLastLoadedFileError, title: util_1.capitalize(this.props.i18nGenericError), buttons: react_1.default.createElement(mui_core_1.Button, { onClick: this.props.dismissLastLoadedFileError }, util_1.capitalize(this.props.i18nOk)) },
             react_1.default.createElement(mui_core_1.Typography, null, this.props.lastLoadedFileError))) : null;
         const quill = react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
+            react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, supportsContainers: this.props.args.supportsContainers, onToggleRawMode: this.toggleRawMode }),
             this.state.isReadyToType ? react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }) : null);
         // we return the component, note how we set the thing to focused
         return (react_1.default.createElement("div", { className: this.props.classes.container },
@@ -764,7 +808,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                     util_1.capitalize(this.props.label),
                     iconComponent),
                 this.props.isRichText && !this.state.rawMode ? quill : (react_1.default.createElement(react_1.default.Fragment, null,
-                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
+                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, supportsContainers: false, onToggleRawMode: this.toggleRawMode }) : null,
                     react_1.default.createElement("div", { className: this.props.classes.quill + (this.state.focused ? " focused" : "") },
                         react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea", onMount: this.focusIfNecessary },
                             react_1.default.createElement(react_textarea_autosize_1.default, { ref: this.textAreaRef, className: this.props.classes.rawTextArea, onChange: this.onChangeByTextarea, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onFocus: this.onFocus, onBlur: this.onBlur, disabled: this.props.disabled })))))),

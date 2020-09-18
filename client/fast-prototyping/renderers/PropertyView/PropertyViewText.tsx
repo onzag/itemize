@@ -138,6 +138,7 @@ function lazyloaderExecute(element: HTMLElement) {
  * The rich text viewer props
  */
 interface IPropertyViewRichTextViewerProps {
+  disableLinks: boolean;
   children?: string;
 }
 
@@ -156,7 +157,7 @@ interface IPropertyViewRichTextViewerState {
 /**
  * The rich text viewer used to view only types of text/html
  */
-export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
+export class PropertyViewRichTextViewer extends React.PureComponent<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
   /**
    * The reference for our div
    */
@@ -199,16 +200,19 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
     // so first we get all the images
     this.cheapdiv.querySelectorAll("img").forEach((img: HTMLImageElement) => {
+      let a: HTMLAnchorElement = null;
+      if (!this.props.disableLinks) {
+        // this will wrap our image, for SEO purposes as well as to
+        // have a click to it
+        a = DOMWindow.document.createElement("a");
+        a.href = img.src;
+        a.title = img.alt || "";
+      }
+
       // yes the src can be a blob, if the image hasn't been uploaded
       // yet, this is a valid protocol, and since it's local, lazyloading
       // preparations make no sense
       if (!img.src.startsWith("blob:")) {
-        // this will wrap our image, for SEO purposes as well as to
-        // have a click to it
-        const a = DOMWindow.document.createElement("a");
-        a.href = img.src;
-        a.title = img.alt || "";
-
         // we move all these attributes to the dataset
         img.dataset.srcset = img.srcset;
         img.removeAttribute("srcset");
@@ -216,7 +220,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         img.removeAttribute("src");
         img.dataset.sizes = img.sizes;
         img.removeAttribute("sizes");
+      }
 
+      if (!this.props.disableLinks) {
         // now we replace the img with the a link
         img.parentNode.replaceChild(a, img);
         // and add the image inside the a link
@@ -314,7 +320,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     this.prepareLazyLoader();
     this.attachEvents();
   }
-  public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
+  public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
     if (nextProps.children !== this.props.children) {
       this.updateHTML(nextProps.children);
     }
@@ -323,7 +329,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public render() {
     return (
-      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{__html: this.state.html}}/>
+      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
     )
   }
 }
@@ -342,12 +348,12 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   if (props.args.NullComponent && props.currentValue === null) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
-    return <NullComponent {...nullArgs}/>;
+    return <NullComponent {...nullArgs} />;
   }
 
   if (props.isRichText) {
     return (
-      <PropertyViewRichTextViewer>{props.currentValue}</PropertyViewRichTextViewer>
+      <PropertyViewRichTextViewer disableLinks={!!props.args.disableLinks}>{props.currentValue}</PropertyViewRichTextViewer>
     );
   } else if (props.subtype === "plain") {
     return (

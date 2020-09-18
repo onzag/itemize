@@ -30,12 +30,13 @@ exports.PROPERTY_VIEW_SANITIZE_CONFIG = {
 exports.ALLOWED_CLASSES = [
     "image", "image-container", "image-pad", "video", "video-container",
     "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
+    "container",
 ];
 /**
  * The list of allowed prefixes
  */
 exports.ALLOWED_CLASSES_PREFIXES = [
-    "rich-text--",
+    "rich-text--", "container-", "custom-",
 ];
 /**
  * clean all attributes in a html element

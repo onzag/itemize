@@ -16,7 +16,7 @@ import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
   TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
   Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, CodeIcon } from "../../mui-core";
+  FormatBoldIcon, CodeIcon, CropSquareIcon } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 
 import { capitalize, mimeTypeToExtension } from "../../../../util";
@@ -69,6 +69,11 @@ interface ItemizeImageBlotValue {
   sizes: string;
   srcWidth: number;
   srcHeight: number;
+
+  style?: string;
+  containerStyle?: string;
+  padStyle?: string;
+  imgStyle?: string;
 }
 
 /**
@@ -86,20 +91,19 @@ class ItemizeImageBlot extends BlockEmbed {
 
     // all this process folows the text-specs.md file
 
-    // first we get this information from it in order
-    // to build a ratio
-    const width = value.srcWidth;
-    const height = value.srcHeight;
-    const ratio = height / width;
-    const percentage = ratio * 100;
-
     // create a main container
     const mainContainer = super.create();
     mainContainer.className = "image";
+    if (value.style) {
+      mainContainer.setAttribute("style", value.style);
+    }
 
     // a parent container that contains the image
     const parentContainer = document.createElement("div");
     parentContainer.className = "image-container";
+    if (value.containerStyle) {
+      parentContainer.setAttribute("style", value.containerStyle);
+    }
     mainContainer.appendChild(parentContainer);
 
     // and a child container for it
@@ -108,7 +112,9 @@ class ItemizeImageBlot extends BlockEmbed {
     // might come itself, we always calculate it here in the blot
     // as this can be an addition
     childContainer.className = "image-pad";
-    childContainer.setAttribute("style", "padding-bottom: " + percentage + "%");
+    if (value.padStyle) {
+      childContainer.setAttribute("style", value.padStyle);
+    }
     parentContainer.appendChild(childContainer);
 
     // then the image
@@ -124,6 +130,10 @@ class ItemizeImageBlot extends BlockEmbed {
     img.setAttribute("src", value.src || "");
     img.setAttribute("srcset", value.srcSet || "");
 
+    if (value.imgStyle) {
+      img.setAttribute("style", value.imgStyle);
+    }
+
     // return the main
     return mainContainer;
   }
@@ -132,11 +142,33 @@ class ItemizeImageBlot extends BlockEmbed {
    * How to stract the value of an image
    */
   static value(node: HTMLDivElement) {
+    const style = node.getAttribute("style");
+
+    // container
+    const container = node.querySelector("image-container") as HTMLDivElement;
+    if (!container) {
+      return null;
+    }
+
+    // might be null
+    const containerStyle = container.getAttribute("style");
+
+    const imgPad = node.querySelector("image-pad") as HTMLDivElement;
+    if (!imgPad) {
+      return null;
+    }
+
+    // might be null if manually removed or whatnot
+    const padStyle = imgPad.getAttribute("style");
+
     // first we need to check everything is fine
     const img = node.querySelector("img") as HTMLImageElement;
     if (!img) {
       return null;
     }
+
+    // might be null
+    const imgStyle = img.getAttribute("style");
 
     // and extract the info according to the specs
     // the spec says srcset sizes and src will be stripped but can be available
@@ -148,6 +180,11 @@ class ItemizeImageBlot extends BlockEmbed {
       sizes: img.getAttribute("sizes") || null,
       srcWidth: parseInt(img.dataset.srcWidth) || null,
       srcHeight: parseInt(img.dataset.srcHeight) || null,
+
+      style,
+      padStyle,
+      containerStyle,
+      imgStyle,
     };
   }
 }
@@ -460,6 +497,7 @@ function RichTextEditorToolbar(props: {
   supportsFiles: boolean;
   supportsVideos: boolean;
   supportsRawMode: boolean;
+  supportsContainers: boolean;
   supportsBasicMode: boolean;
   className: string;
   onToggleRawMode: () => void;
@@ -564,6 +602,17 @@ function RichTextEditorToolbar(props: {
           ) : null
         }
       </> : null}
+      {
+        props.supportsContainers ?
+        (
+          <IconButton
+            tabIndex={-1}
+            classes={{ root: "ql-container" }}
+          >
+            <CropSquareIcon/>
+          </IconButton>
+        ) : null
+      }
       {
         props.supportsRawMode ?
         (
@@ -764,6 +813,14 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       if (!data) {
         return;
       }
+
+      // first we get this information from it in order
+      // to build a ratio
+      const width = data.width;
+      const height = data.height;
+      const ratio = height / width;
+      const percentage = ratio * 100;
+      const padStyle = "padding-bottom:" + percentage + "%";
   
       const range = editor.getSelection(true);
       editor.insertEmbed(range.index, "itemizeimage", {
@@ -774,6 +831,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
+        padStyle,
       }, (ReactQuill.Quill as any).sources.USER);
       editor.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     });
@@ -943,6 +1001,14 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     }
     try {
       const data = await this.props.onInsertFile(file, true);
+
+      // first we get this information from it in order
+      // to build a ratio
+      const width = data.width;
+      const height = data.height;
+      const ratio = height / width;
+      const percentage = ratio * 100;
+      const padStyle = "padding-bottom:" + percentage + "%";
     
       const quill = this.quillRef.current.getEditor();
       const range = quill.getSelection(true);
@@ -954,6 +1020,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         sizes: null,
         srcWidth: data.width,
         srcHeight: data.height,
+        padStyle,
       }, (ReactQuill.Quill as any).sources.USER);
       quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     } catch (err) {
@@ -1083,6 +1150,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         supportsBasicMode={true}
         className={this.props.classes.toolbar}
         supportsRawMode={this.props.args.supportsRawMode}
+        supportsContainers={this.props.args.supportsContainers}
         onToggleRawMode={this.toggleRawMode}
       />
       {this.state.isReadyToType ? <ReactQuill
@@ -1142,6 +1210,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   supportsBasicMode={false}
                   className={this.props.classes.toolbar}
                   supportsRawMode={this.props.args.supportsRawMode}
+                  supportsContainers={false}
                   onToggleRawMode={this.toggleRawMode}
                 /> : null}
                 <div

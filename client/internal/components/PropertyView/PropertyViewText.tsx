@@ -48,13 +48,14 @@ export const PROPERTY_VIEW_SANITIZE_CONFIG = {
 export const ALLOWED_CLASSES = [
   "image", "image-container", "image-pad", "video", "video-container",
   "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
+  "container",
 ]
 
 /**
  * The list of allowed prefixes
  */
 export const ALLOWED_CLASSES_PREFIXES = [
-  "rich-text--",
+  "rich-text--", "container-", "custom-",
 ];
 
 /**

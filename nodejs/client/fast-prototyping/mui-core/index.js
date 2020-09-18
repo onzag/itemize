@@ -233,3 +233,5 @@ const GpsFixed_1 = __importDefault(require("@material-ui/icons/GpsFixed"));
 exports.GpsFixedIcon = GpsFixed_1.default;
 const Edit_1 = __importDefault(require("@material-ui/icons/Edit"));
 exports.EditIcon = Edit_1.default;
+const CropSquare_1 = __importDefault(require("@material-ui/icons/CropSquare"));
+exports.CropSquareIcon = CropSquare_1.default;
