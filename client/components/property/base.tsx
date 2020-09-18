@@ -109,6 +109,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
   referenceFilteringSet?: {
     [key: string]: PropertyDefinitionSupportedType;
   };
+  /**
+   * whether to cache files when running the url absoluter
+   */
+  cacheFiles?: boolean;
 }
 
 /**
@@ -135,6 +139,10 @@ export interface IPropertyReadProps extends IPropertyBaseProps {
    * with the server
    */
   useAppliedValue?: boolean;
+  /**
+   * whether to cache files when running the url absoluter
+   */
+  cacheFiles?: boolean;
 }
 
 /**
@@ -151,6 +159,10 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
    * with the server
    */
   useAppliedValue?: boolean;
+  /**
+   * whether to cache files when running the url absoluter
+   */
+  cacheFiles?: boolean;
 }
 
 /**
@@ -267,6 +279,7 @@ export function EntryViewReadSet(
                               containerId,
                               includeContextualValue && includeContextualValue.include,
                               property,
+                              !!props.cacheFiles,
                             ), propertyState);
                           } else {
                             return props.children(fileArrayURLAbsoluter(
@@ -279,6 +292,7 @@ export function EntryViewReadSet(
                               containerId,
                               includeContextualValue && includeContextualValue.include,
                               property,
+                              !!props.cacheFiles,
                             ), propertyState);
                           }
                         }
@@ -324,6 +338,7 @@ export function EntryViewReadSet(
                             forVersion={itemDefinitionContextualValue.forVersion}
                             itemDefinition={itemDefinitionContextualValue.idef}
                             useAppliedValue={props.useAppliedValue}
+                            cacheFiles={props.cacheFiles}
                           />
                         );
                       }
@@ -428,6 +443,7 @@ export function EntryViewReadSet(
                           autoFocus={props.autoFocus}
                           prefillWith={props.prefillWith}
                           referenceFilteringSet={props.referenceFilteringSet}
+                          cacheFiles={props.cacheFiles}
                         />
                       );
                     } else {

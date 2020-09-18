@@ -296,6 +296,11 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   referenceFilteringSet?: {
     [key: string]: PropertyDefinitionSupportedType;
   };
+  /**
+   * A value specified to cache url files as they are loaded
+   * via the url
+   */
+  cacheFiles: boolean;
 }
 
 /**

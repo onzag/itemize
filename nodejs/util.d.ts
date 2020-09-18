@@ -75,11 +75,12 @@ export declare function getLocalizedDateTimeFormat(): string;
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting url should be cached
  * @returns a new IGQLFile but absolute
  */
 export declare function fileURLAbsoluter(domain: string, containerHostnamePrefixes: {
     [key: string]: string;
-}, file: IGQLFile, itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile;
+}, file: IGQLFile, itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition, cacheable: boolean): IGQLFile;
 /**
  * Converts an array of files to its absolute url counterpart
  * @param domain the domain that is being used according to the env
@@ -93,10 +94,11 @@ export declare function fileURLAbsoluter(domain: string, containerHostnamePrefix
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting urls should be cacheable
  * @returns a new array of files
  */
 export declare function fileArrayURLAbsoluter(domain: string, containerHostnamePrefixes: {
     [key: string]: string;
-}, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition): IGQLFile[];
+}, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition, cacheable: boolean): IGQLFile[];
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);
 export declare const DOMPurify: createDOMPurify.DOMPurifyI;

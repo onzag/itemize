@@ -213,6 +213,7 @@ export default class PropertyEntryFile
           this.props.containerId,
           this.props.include,
           this.props.property,
+          this.props.cacheFiles,
         );
       }
     }

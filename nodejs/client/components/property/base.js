@@ -104,10 +104,10 @@ function EntryViewReadSet(props, type) {
                     // and as such we absolute the files so that their urls
                     // are indeed proper, being a read operation, there's no risk on it
                     if (!propertyDescription.gqlList) {
-                        return props.children(util_1.fileURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property), propertyState);
+                        return props.children(util_1.fileURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
                     }
                     else {
-                        return props.children(util_1.fileArrayURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property), propertyState);
+                        return props.children(util_1.fileArrayURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
                     }
                 }
                 // otherwise we just call the function as it is
@@ -133,7 +133,7 @@ function EntryViewReadSet(props, type) {
             // now in the case of these, we have special considerations
             if (propertyState) {
                 // if we have a state it's simple, and we pass these values into it
-                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, itemDefinition: itemDefinitionContextualValue.idef, useAppliedValue: props.useAppliedValue }));
+                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, itemDefinition: itemDefinitionContextualValue.idef, useAppliedValue: props.useAppliedValue, cacheFiles: props.cacheFiles }));
             }
             // if we have a meta property nevertheless
             if (isMetaProperty) {
@@ -196,7 +196,7 @@ function EntryViewReadSet(props, type) {
                 });
             }
             // and then we can return the property entry in all its glory
-            return (react_1.default.createElement(PropertyEntry_1.default, { itemDefinition: itemDefinitionContextualValue.idef, injectSubmitBlockPromise: itemDefinitionContextualValue.injectSubmitBlockPromise, include: (includeContextualValue && includeContextualValue.include) || null, property: property, state: propertyState, onChange: onChange, onRestore: onRestore, forceInvalid: props.showAsInvalid, containerId: containerId, icon: props.icon, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, poked: isPoked, renderer: props.renderer, rendererArgs: props.rendererArgs, hideDescription: props.hideDescription, altDescription: props.altDescription, altLabel: props.altLabel, altPlaceholder: props.altPlaceholder, ignoreErrors: props.ignoreErrors, autoFocus: props.autoFocus, prefillWith: props.prefillWith, referenceFilteringSet: props.referenceFilteringSet }));
+            return (react_1.default.createElement(PropertyEntry_1.default, { itemDefinition: itemDefinitionContextualValue.idef, injectSubmitBlockPromise: itemDefinitionContextualValue.injectSubmitBlockPromise, include: (includeContextualValue && includeContextualValue.include) || null, property: property, state: propertyState, onChange: onChange, onRestore: onRestore, forceInvalid: props.showAsInvalid, containerId: containerId, icon: props.icon, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, poked: isPoked, renderer: props.renderer, rendererArgs: props.rendererArgs, hideDescription: props.hideDescription, altDescription: props.altDescription, altLabel: props.altLabel, altPlaceholder: props.altPlaceholder, ignoreErrors: props.ignoreErrors, autoFocus: props.autoFocus, prefillWith: props.prefillWith, referenceFilteringSet: props.referenceFilteringSet, cacheFiles: props.cacheFiles }));
         }
         else {
             // property has no state it must be hidden

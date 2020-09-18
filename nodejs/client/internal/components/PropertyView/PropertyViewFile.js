@@ -40,7 +40,7 @@ class PropertyViewFile extends react_1.default.Component {
         if (currentValue &&
             currentValue.url.indexOf("blob:") !== 0) {
             const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
-            currentValue = util_2.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property);
+            currentValue = util_2.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentValue, this.props.itemDefinition, this.props.forId, this.props.forVersion, this.props.containerId, this.props.include, this.props.property, this.props.cacheFiles);
         }
         const prettySize = currentValue && pretty_bytes_1.default(currentValue.size);
         const extension = currentValue && util_2.mimeTypeToExtension(currentValue.type);

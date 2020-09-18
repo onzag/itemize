@@ -127,6 +127,10 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
    * Developer Provided check base.tsx
    */
   rendererArgs?: object;
+  /**
+   * Whether file urls are to be cached
+   */
+  cacheFiles: boolean;
 }
 
 /**
@@ -392,6 +396,7 @@ export function RawBasePropertyView(props: {
                     country={countries[locale.country]}
                     renderer={renderer}
                     rendererArgs={props.rendererArgs || {}}
+                    cacheFiles={false}
                   />
                 );
               }

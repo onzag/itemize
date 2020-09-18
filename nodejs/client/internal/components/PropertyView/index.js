@@ -125,7 +125,7 @@ function RawBasePropertyView(props) {
                 invalidReason: null,
                 internalValue: null,
                 propertyId: null,
-            }, currencyFactors: null, language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {} }));
+            }, currencyFactors: null, language: locale.language, i18n: locale.i18n, rtl: locale.rtl, currency: imported_resources_1.currencies[locale.currency], country: imported_resources_1.countries[locale.country], renderer: renderer, rendererArgs: props.rendererArgs || {}, cacheFiles: false }));
     })));
 }
 exports.RawBasePropertyView = RawBasePropertyView;

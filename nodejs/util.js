@@ -232,9 +232,10 @@ exports.getLocalizedDateTimeFormat = getLocalizedDateTimeFormat;
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting url should be cached
  * @returns a new IGQLFile but absolute
  */
-function fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property) {
+function fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable) {
     if (file === null) {
         return null;
     }
@@ -266,7 +267,8 @@ function fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinitio
             id + "." + (version || "") + "/" +
             (include ? include.getId() + "/" : "") +
             property.getId() + "/" +
-            file.id + "/" + file.url,
+            file.id + "/" + file.url +
+            (cacheable ? "?sw-cacheable=true" : ""),
     };
 }
 exports.fileURLAbsoluter = fileURLAbsoluter;
@@ -283,13 +285,14 @@ exports.fileURLAbsoluter = fileURLAbsoluter;
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting urls should be cacheable
  * @returns a new array of files
  */
-function fileArrayURLAbsoluter(domain, containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property) {
+function fileArrayURLAbsoluter(domain, containerHostnamePrefixes, files, itemDefinition, id, version, containerId, include, property, cacheable) {
     if (files === null) {
         return null;
     }
-    return files.map((file) => fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
+    return files.map((file) => fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable));
 }
 exports.fileArrayURLAbsoluter = fileArrayURLAbsoluter;
 exports.DOMWindow = jsdom_1.JSDOM ? (new jsdom_1.JSDOM("")).window : window;

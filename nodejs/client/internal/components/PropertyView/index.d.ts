@@ -109,6 +109,10 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
      * Developer Provided check base.tsx
      */
     rendererArgs?: object;
+    /**
+     * Whether file urls are to be cached
+     */
+    cacheFiles: boolean;
 }
 /**
  * Views handlers that are standard will receive these props that actually

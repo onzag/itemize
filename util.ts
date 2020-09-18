@@ -243,6 +243,7 @@ export function getLocalizedDateTimeFormat() {
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting url should be cached
  * @returns a new IGQLFile but absolute
  */
 export function fileURLAbsoluter(
@@ -257,6 +258,7 @@ export function fileURLAbsoluter(
   containerId: string,
   include: Include,
   property: PropertyDefinition,
+  cacheable: boolean,
 ): IGQLFile {
   if (file === null) {
     return null;
@@ -297,7 +299,8 @@ export function fileURLAbsoluter(
       id + "." + (version || "") + "/" +
       (include ? include.getId() + "/" : "") +
       property.getId() + "/" +
-      file.id + "/" + file.url,
+      file.id + "/" + file.url +
+      (cacheable ? "?sw-cacheable=true" : ""),
   }
 }
 
@@ -314,6 +317,7 @@ export function fileURLAbsoluter(
  * @param containerId the container id this file was found to be in
  * @param include the include (or null)
  * @param property the property it came from
+ * @param cacheable whether the resulting urls should be cacheable
  * @returns a new array of files
  */
 export function fileArrayURLAbsoluter(
@@ -328,11 +332,15 @@ export function fileArrayURLAbsoluter(
   containerId: string,
   include: Include,
   property: PropertyDefinition,
+  cacheable: boolean,
 ) {
   if (files === null) {
     return null;
   }
-  return files.map((file) => fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property));
+  return files.map(
+    (file) =>
+    fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable)
+  );
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

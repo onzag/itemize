@@ -101,7 +101,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             }
             else {
                 const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
-                const absolutedFile = util_1.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
+                const absolutedFile = util_1.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty, this.props.cacheFiles);
                 const srcset = util_2.imageSrcSetRetriever(absolutedFile, relatedProperty);
                 // srcset
                 node.setAttribute("srcset", srcset);
@@ -133,7 +133,7 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
                 // spellcheck
                 node.spellcheck = false;
                 const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
-                const absolutedFile = util_1.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty);
+                const absolutedFile = util_1.fileURLAbsoluter(domain, this.props.config.containersHostnamePrefixes, currentFile, this.props.itemDefinition, this.props.forId, this.props.forVersion || null, this.props.containerId, this.props.include, relatedProperty, this.props.cacheFiles);
                 // data-src-id
                 node.dataset.srcId = srcId;
                 // data-src

@@ -105,6 +105,7 @@ initializeServer(
               collectedValues[0].value.container_id,
               null,
               profilePictureProperty,
+              false,
             );
             // no profile picture, absolutedFile might be null, then set it to the standard icon
             return (absolutedFile && absolutedFile.url) || "/rest/resource/icons/android-chrome-512x512.png";

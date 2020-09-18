@@ -35,6 +35,23 @@ is still valid and appropiate.
 
 However once saved all src, srcset and sizes references will be removed
 
+### Standalone images
+
+While images are mainly meant to be setup as specified, images are also allowed to be standalone, as such this is valid as well.
+
+```html
+<img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
+```
+
+You might wrap them up inside a custom container, a standard container or anything as your hearts content remember to keep the names valid
+
+```html
+<div class="rich-text--header">
+  <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
+  <p>This is my header</p>
+</div>
+```
+
 ### Forbidden attributes
 
 These attributes can be used but they are removed by the server side for security reasons

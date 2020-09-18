@@ -96,6 +96,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
     referenceFilteringSet?: {
         [key: string]: PropertyDefinitionSupportedType;
     };
+    /**
+     * whether to cache files when running the url absoluter
+     */
+    cacheFiles?: boolean;
 }
 /**
  * The setter props
@@ -120,6 +124,10 @@ export interface IPropertyReadProps extends IPropertyBaseProps {
      * with the server
      */
     useAppliedValue?: boolean;
+    /**
+     * whether to cache files when running the url absoluter
+     */
+    cacheFiles?: boolean;
 }
 /**
  * The view props
@@ -135,6 +143,10 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
      * with the server
      */
     useAppliedValue?: boolean;
+    /**
+     * whether to cache files when running the url absoluter
+     */
+    cacheFiles?: boolean;
 }
 /**
  * The props it takes basically extends everything

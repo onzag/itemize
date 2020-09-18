@@ -142,6 +142,7 @@ export function propertyViewPostProcessingHook(
           this.props.containerId,
           this.props.include,
           relatedProperty,
+          this.props.cacheFiles,
         );
         const srcset = imageSrcSetRetriever(absolutedFile, relatedProperty);
 
@@ -185,6 +186,7 @@ export function propertyViewPostProcessingHook(
           this.props.containerId,
           this.props.include,
           relatedProperty,
+          this.props.cacheFiles,
         );
 
         // data-src-id

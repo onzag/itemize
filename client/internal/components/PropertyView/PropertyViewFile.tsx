@@ -90,6 +90,7 @@ export default class PropertyViewFile
         this.props.containerId,
         this.props.include,
         this.props.property,
+        this.props.cacheFiles,
       );
     }
 
