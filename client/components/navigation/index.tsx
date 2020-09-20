@@ -16,7 +16,8 @@ import { history } from "../..";
  */
 export function setHistoryState<S>(location: Location, state: Partial<S>, replace?: boolean) {
   // first we copy the current state
-  const newState = {...location.state};
+  // due to a bug in typescript this cannot be achieved anymore and has to be set as any
+  const newState = {...(location as any).state};
 
   // and if we have a new partial state
   if (state) {

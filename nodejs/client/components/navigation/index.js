@@ -16,6 +16,7 @@ const __1 = require("../..");
  */
 function setHistoryState(location, state, replace) {
     // first we copy the current state
+    // due to a bug in typescript this cannot be achieved anymore and has to be set as any
     const newState = { ...location.state };
     // and if we have a new partial state
     if (state) {
