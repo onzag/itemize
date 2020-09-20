@@ -186,13 +186,16 @@ export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefini
     // might already be relative or absolute
     const splittedURL = fileData.url.split("/");
     // now from that we get the filename
-    const fileName = splittedURL.pop();
+    const fileNameWithQS = splittedURL.pop();
+    // now we need the filename with out the qs
+    const [fileName, QS] = [...fileNameWithQS.split("?")];
+    const addedQS = QS ? "?" + QS : "";
     // and the base url is just the joined version
     const baseURL = splittedURL.join("/");
     // now we need to remove the . section from the filename to get a file without a extension
     const fileNameDotSplitted = fileName.split(".");
     // we remove such extension from the end
-    fileNameDotSplitted.pop();
+    const removedExtension = fileNameDotSplitted.pop();
     // now we join to get a recovered version
     const recoveredFileName = fileNameDotSplitted.join(".");
     // however if this means we got nothing as a name, we recover as the filename
@@ -203,9 +206,9 @@ export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefini
         recoveredFileName;
     
     // now we can start making the medium, small and large file sizes in jpeg
-    finalValue.imageMediumSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg";
-    finalValue.imageSmallSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg";
-    finalValue.imageLargeSizeURL = baseURL + "/large_" + fileNameWithoutExtension + ".jpg";
+    finalValue.imageMediumSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg" + addedQS;
+    finalValue.imageSmallSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg" + addedQS;
+    finalValue.imageLargeSizeURL = baseURL + "/large_" + fileNameWithoutExtension + ".jpg" + addedQS;
 
     // if we have a property we can get the other special dimensions
     if (property) {
@@ -214,7 +217,7 @@ export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefini
       if (dimensions) {
         dimensions.split(";").forEach((dimension) => {
           const name = dimension.trim().split(" ")[0];
-          finalValue[name] = baseURL + "/" + name + "_" + fileNameWithoutExtension + ".jpg";
+          finalValue[name] = baseURL + "/" + name + "_" + fileNameWithoutExtension + ".jpg" + addedQS;
         });
       }
     }

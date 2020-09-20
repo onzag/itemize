@@ -31,6 +31,8 @@ import Divider from "@material-ui/core/Divider";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardMedia from "@material-ui/core/CardMedia";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   createStyles,
@@ -246,5 +248,7 @@ export {
   IconVisibility,
   GpsFixedIcon,
   EditIcon,
+  CardMedia,
+  CardActionArea,
   CropSquareIcon,
 }
