@@ -414,9 +414,6 @@ function RichTextEditorToolbar(props) {
             props.supportsFiles ?
                 (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, title: props.i18n.formatAddFileLabel, classes: { root: "ql-file" } },
                     react_1.default.createElement(mui_core_1.AttachFileIcon, null))) : null) : null,
-        props.supportsContainers ?
-            (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, classes: { root: "ql-container" } },
-                react_1.default.createElement(mui_core_1.CropSquareIcon, null))) : null,
         props.supportsRawMode ?
             (react_1.default.createElement(mui_core_1.IconButton, { tabIndex: -1, onClick: props.onToggleRawMode },
                 react_1.default.createElement(mui_core_1.CodeIcon, null))) : null));
@@ -789,7 +786,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
         const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (react_1.default.createElement(dialog_1.Dialog, { fullScreen: false, open: !!this.props.lastLoadedFileError, onClose: this.props.dismissLastLoadedFileError, title: util_1.capitalize(this.props.i18nGenericError), buttons: react_1.default.createElement(mui_core_1.Button, { onClick: this.props.dismissLastLoadedFileError }, util_1.capitalize(this.props.i18nOk)) },
             react_1.default.createElement(mui_core_1.Typography, null, this.props.lastLoadedFileError))) : null;
         const quill = react_1.default.createElement(react_1.default.Fragment, null,
-            react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, supportsContainers: this.props.args.supportsContainers, onToggleRawMode: this.toggleRawMode }),
+            react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId, i18n: this.props.i18nFormat, supportsImages: this.props.supportsImages, supportsFiles: this.props.supportsFiles, supportsVideos: this.props.supportsVideos, supportsBasicMode: true, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }),
             this.state.isReadyToType ? react_1.default.createElement(ReactQuill, { ref: this.quillRef, className: this.props.classes.quill + (this.state.focused ? " focused" : ""), modules: this.cachedModuleOptionsRich, formats: CACHED_FORMATS_RICH, theme: null, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onChange: this.onChange, beforeChange: this.beforeChange, onFocus: this.onFocus, onBlur: this.onBlur, disableClipboardMatchersOnUpdate: CACHED_CLIPBOARD_MATCHERS, readOnly: this.props.disabled }) : null);
         // we return the component, note how we set the thing to focused
         return (react_1.default.createElement("div", { className: this.props.classes.container },
@@ -808,7 +805,7 @@ class ActualPropertyEntryTextRenderer extends react_1.default.PureComponent {
                     util_1.capitalize(this.props.label),
                     iconComponent),
                 this.props.isRichText && !this.state.rawMode ? quill : (react_1.default.createElement(react_1.default.Fragment, null,
-                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, supportsContainers: false, onToggleRawMode: this.toggleRawMode }) : null,
+                    this.props.isRichText && this.props.args.supportsRawMode ? react_1.default.createElement(RichTextEditorToolbar, { id: this.props.propertyId + "-raw-mode-only", i18n: this.props.i18nFormat, supportsImages: false, supportsFiles: false, supportsVideos: false, supportsBasicMode: false, className: this.props.classes.toolbar, supportsRawMode: this.props.args.supportsRawMode, onToggleRawMode: this.toggleRawMode }) : null,
                     react_1.default.createElement("div", { className: this.props.classes.quill + (this.state.focused ? " focused" : "") },
                         react_1.default.createElement(util_2.SlowLoadingElement, { id: "textarea", onMount: this.focusIfNecessary },
                             react_1.default.createElement(react_textarea_autosize_1.default, { ref: this.textAreaRef, className: this.props.classes.rawTextArea, onChange: this.onChangeByTextarea, placeholder: util_1.capitalize(this.props.placeholder), value: editorValue, onFocus: this.onFocus, onBlur: this.onBlur, disabled: this.props.disabled })))))),
