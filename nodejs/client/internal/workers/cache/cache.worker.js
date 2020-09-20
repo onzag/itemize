@@ -10,6 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SEARCHES_TABLE_NAME = exports.QUERIES_TABLE_NAME = exports.CACHE_NAME = void 0;
 require("core-js/stable");
 require("regenerator-runtime/runtime");
 const comlink_1 = require("comlink");

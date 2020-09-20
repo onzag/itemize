@@ -7,6 +7,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.serverSideIndexChecker = void 0;
 const constants_1 = require("../../../../../constants");
 /**
  * The server side index checker checks for unique indexes within properties

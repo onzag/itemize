@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getMode = exports.getCookie = void 0;
 function getCookie(splittedCookie, name) {
     const nameEQ = name + "=";
     const foundCookie = splittedCookie.find((cookieValue) => {

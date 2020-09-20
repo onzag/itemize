@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.sensitiveConfigSetup = void 0;
 const read_1 = require("../read");
 /**
  * A list of characters

@@ -10,6 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RemoteListener = void 0;
 const socket_io_client_1 = __importDefault(require("socket.io-client"));
 const uuid_1 = __importDefault(require("uuid"));
 const cache_1 = __importDefault(require("../workers/cache"));

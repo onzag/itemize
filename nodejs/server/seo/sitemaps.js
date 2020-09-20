@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.toXML = void 0;
 ;
 /**
  * Converts a json sitemap file to a proper sitemap

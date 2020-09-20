@@ -8,6 +8,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getGQLSchemaForRoot = void 0;
 const graphql_1 = require("graphql");
 const gql_1 = require("./Module/gql");
 /**

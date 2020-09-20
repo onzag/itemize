@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.convertVersionsIntoNullsWhenNecessary = void 0;
 /**
  * Modifies the value in place to remove empty string version values
  * which are invalid to nulls
