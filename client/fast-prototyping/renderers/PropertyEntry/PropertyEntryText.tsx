@@ -16,7 +16,7 @@ import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
   TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
   Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, CodeIcon, CropSquareIcon } from "../../mui-core";
+  FormatBoldIcon, CodeIcon } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 
 import { capitalize, mimeTypeToExtension } from "../../../../util";
@@ -497,7 +497,6 @@ function RichTextEditorToolbar(props: {
   supportsFiles: boolean;
   supportsVideos: boolean;
   supportsRawMode: boolean;
-  supportsContainers: boolean;
   supportsBasicMode: boolean;
   className: string;
   onToggleRawMode: () => void;
@@ -602,17 +601,6 @@ function RichTextEditorToolbar(props: {
           ) : null
         }
       </> : null}
-      {
-        props.supportsContainers ?
-        (
-          <IconButton
-            tabIndex={-1}
-            classes={{ root: "ql-container" }}
-          >
-            <CropSquareIcon/>
-          </IconButton>
-        ) : null
-      }
       {
         props.supportsRawMode ?
         (
@@ -1150,7 +1138,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         supportsBasicMode={true}
         className={this.props.classes.toolbar}
         supportsRawMode={this.props.args.supportsRawMode}
-        supportsContainers={this.props.args.supportsContainers}
         onToggleRawMode={this.toggleRawMode}
       />
       {this.state.isReadyToType ? <ReactQuill
@@ -1210,7 +1197,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   supportsBasicMode={false}
                   className={this.props.classes.toolbar}
                   supportsRawMode={this.props.args.supportsRawMode}
-                  supportsContainers={false}
                   onToggleRawMode={this.toggleRawMode}
                 /> : null}
                 <div
