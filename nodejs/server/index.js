@@ -271,6 +271,10 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                         authUrl: seoContainerData.authUrl,
                     });
                     let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
+                    if (!prefix) {
+                        exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for SEO in '" + sensitiveConfig.seoContainerID + "'");
+                        return;
+                    }
                     if (prefix.indexOf("/") !== 0) {
                         prefix = "https://" + prefix;
                     }
@@ -304,6 +308,10 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                 });
                 exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
                 let prefix = config.containersHostnamePrefixes[containerIdX];
+                if (!prefix) {
+                    exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for SEO in '" + containerIdX + "'");
+                    process.exit(1);
+                }
                 if (prefix.indexOf("/") !== 0) {
                     prefix = "https://" + prefix;
                 }

@@ -135,6 +135,9 @@ exports.importScript = importScript;
 async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // so let's check if we are in server mode
     const serverMode = options && options.serverMode;
+    // CONFIG, as well as SSR are injected variables via index.html
+    const config = serverMode ? serverMode.config : window.CONFIG;
+    const ssrContext = serverMode ? serverMode.ssrContext : window.SSR;
     // basically the way this website works is that the
     // language is the first argument of the location url
     // so /en/whatever /fi/whatever, determine the language
@@ -144,12 +147,12 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
     // The stored locale data takes priority over everything
     // The stored locale data has been set manually when fiddling
     // with the language selection, otherwise no language gets stored
-    const storedLang = serverMode ? serverMode.clientDetails.lang : getCookie("lang");
+    let storedLang = serverMode ? serverMode.clientDetails.lang : getCookie("lang");
+    if (storedLang && !config.supportedLanguages.includes(storedLang)) {
+        storedLang = config.fallbackLanguage;
+    }
     const storedCurrency = serverMode ? serverMode.clientDetails.currency : getCookie("currency");
     const storedCountry = serverMode ? serverMode.clientDetails.country : getCookie("country");
-    // CONFIG, as well as SSR are injected variables via index.html
-    const config = serverMode ? serverMode.config : window.CONFIG;
-    const ssrContext = serverMode ? serverMode.ssrContext : window.SSR;
     // so if we are not in server mode, and we are definetely in
     // the client side
     if (!serverMode && document) {
@@ -253,7 +256,7 @@ async function initializeItemizeApp(rendererContext, mainComponent, options) {
         // this is a very simple way to have it available in the client side
         // and it's always necessary, it's hardcoded in the webpage HTML during the build
         if (!config.supportedLanguages.includes(guessedLang)) {
-            guessedLang = "en";
+            guessedLang = config.fallbackLanguage;
         }
         // if we have no url language we need to set it to the guessed value
         // this is for example when coming from a search engine to the main

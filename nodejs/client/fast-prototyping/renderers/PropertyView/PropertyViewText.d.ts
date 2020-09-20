@@ -28,7 +28,7 @@ interface IPropertyViewRichTextViewerState {
 /**
  * The rich text viewer used to view only types of text/html
  */
-export declare class PropertyViewRichTextViewer extends React.PureComponent<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
+export declare class PropertyViewRichTextViewer extends React.Component<IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewerState> {
     /**
      * The reference for our div
      */

@@ -132,7 +132,7 @@ function lazyloaderExecute(element) {
 /**
  * The rich text viewer used to view only types of text/html
  */
-class PropertyViewRichTextViewer extends react_1.default.PureComponent {
+class PropertyViewRichTextViewer extends react_1.default.Component {
     /**
      * The builder for the rich text viewer in text/html
      * @param props the props

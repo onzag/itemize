@@ -12,6 +12,7 @@ import sudo from "sudo-prompt";
  * @returns a void promise
  */
 export function execAsync(code: string) {
+  console.log(code);
   // this is the promise
   return new Promise((resolve, reject) => {
     // we need to rid of spaces
@@ -51,6 +52,7 @@ export function execAsync(code: string) {
  * @returns a void promise
  */
 export function execSudo(code: string, name: string, icns?: string) {
+  console.log(code);
   return new Promise((resolve, reject) => {
     sudo.exec(
       code,

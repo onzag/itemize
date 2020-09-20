@@ -16,6 +16,7 @@ const sudo_prompt_1 = __importDefault(require("sudo-prompt"));
  * @returns a void promise
  */
 function execAsync(code) {
+    console.log(code);
     // this is the promise
     return new Promise((resolve, reject) => {
         // we need to rid of spaces
@@ -56,6 +57,7 @@ exports.execAsync = execAsync;
  * @returns a void promise
  */
 function execSudo(code, name, icns) {
+    console.log(code);
     return new Promise((resolve, reject) => {
         sudo_prompt_1.default.exec(code, {
             name,

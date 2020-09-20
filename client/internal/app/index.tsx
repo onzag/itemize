@@ -367,12 +367,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     let localeToSet = locale;
     // if there is no locale data
     if (!this.hasLocaleDataFor(localeToSet)) {
-      // we will force it to english, for example if an user picks the language
-      // that we don't have, we'll default to english
+      // we will force it to ethe fallbackh, for example if an user picks the language
+      // that we don't have, we'll default to fallback
       // this might happen for example when selecting a country, changing the country attempts to change
-      // the language of the country, so we default to english in such case
-      localeToSet = "en";
-      console.warn("Attempted to set to unavailable language locale " + locale + ", defaulted to english");
+      // the language of the country, so we default to fallback in such case
+      localeToSet = this.props.config.fallbackLanguage;
+      console.warn("Attempted to set to unavailable language locale " + locale + ", defaulted to " + this.props.config.fallbackLanguage);
     }
 
     // Like we did in our main file we need to take care of the url in such case
