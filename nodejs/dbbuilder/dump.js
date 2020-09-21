@@ -100,8 +100,23 @@ async function dumpAllFromModuleRecursive(knex, root, mod) {
     return final;
 }
 async function getFile(container, file) {
-    console.log("Copying " + file.name);
-    // TODO
+    const target = file.name.split("/");
+    target.shift();
+    const targetStr = path_1.default.join("dump", ...target);
+    target.pop();
+    const targetDir = path_1.default.join("dump", ...target);
+    await fsAsync.mkdir(targetDir, { recursive: true });
+    console.log("Copying " + file.name + " to " + targetStr);
+    const targetStream = fs_1.default.createWriteStream(targetStr);
+    container.client.download({
+        container,
+        remote: file.name,
+        stream: targetStream,
+    });
+    return new Promise((resolve, reject) => {
+        targetStream.on("error", reject);
+        targetStream.on("success", resolve);
+    });
 }
 async function copyDataAt(domain, qualifiedPathName, idVersionHandle, container) {
     return new Promise((resolve, reject) => {
@@ -224,25 +239,32 @@ async function dump(version, knex, root) {
     catch (e) {
         exists = false;
     }
-    let continueWithProcessing = true;
-    if (!exists) {
-        console.log(safe_1.default.yellow(`A dump folder hasn't been determined`));
-        await fsAsync.mkdir("dump", { recursive: true });
-    }
-    else {
-        continueWithProcessing = await _1.yesno("Saving the dump will override the previous content, proceed?...");
-    }
-    if (continueWithProcessing) {
-        console.log("emiting " + safe_1.default.green("dump/dump.json"));
-        await fsAsync.writeFile("dump/dump.json", JSON.stringify(final, null, 2));
-        for (const row of final) {
-            await copyDataOf(row, root, pkgcloudUploadContainers, version === "development" ?
-                config.developmentHostname :
-                config.productionHostname);
+    try {
+        let continueWithProcessing = true;
+        if (!exists) {
+            console.log(safe_1.default.yellow(`A dump folder hasn't been determined`));
+            await fsAsync.mkdir("dump", { recursive: true });
         }
+        else {
+            continueWithProcessing = await _1.yesno("Saving the dump will override the previous content, proceed?...");
+            await fsAsync.rmdir("dump", { recursive: true });
+            await fsAsync.mkdir("dump", { recursive: true });
+        }
+        if (continueWithProcessing) {
+            console.log("emiting " + safe_1.default.green("dump/dump.json"));
+            await fsAsync.writeFile("dump/dump.json", JSON.stringify(final, null, 2));
+            for (const row of final) {
+                await copyDataOf(row, root, pkgcloudUploadContainers, version === "development" ?
+                    config.developmentHostname :
+                    config.productionHostname);
+            }
+        }
+        // say it's all done
+        console.log(safe_1.default.green("All done..."));
     }
-    // say it's all done
-    console.log(safe_1.default.green("All done..."));
+    catch (err) {
+        console.log(safe_1.default.red(err.stack));
+    }
 }
 exports.default = dump;
 ;

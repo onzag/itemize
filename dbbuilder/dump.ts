@@ -117,8 +117,29 @@ async function dumpAllFromModuleRecursive(knex: Knex, root: Root, mod: Module): 
 }
 
 async function getFile(container: pkgcloud.storage.Container, file: pkgcloud.storage.File) {
-  console.log("Copying " + file.name);
-  // TODO
+  const target = file.name.split("/");
+  target.shift();
+  const targetStr = path.join("dump", ...target);
+  target.pop();
+  const targetDir = path.join("dump", ...target);
+
+  await fsAsync.mkdir(targetDir, { recursive: true });
+
+  console.log("Copying " + file.name + " to " + targetStr);
+  const targetStream = fs.createWriteStream(targetStr);
+
+  container.client.download(
+    {
+      container,
+      remote: file.name,
+      stream: targetStream,
+    } as any,
+  );
+
+  return new Promise((resolve, reject) => {
+    targetStream.on("error", reject);
+    targetStream.on("success", resolve);
+  });
 }
 
 async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, container: pkgcloud.storage.Container) {
@@ -138,7 +159,6 @@ async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHa
   })
 }
 
-const STORED_CONTAINERS: { [key: string]: string } = {};
 async function copyDataOf(row: ISQLTableRowValue, root: Root, pkgcloudUploadContainers: PkgCloudContainers, domain: string) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
@@ -147,19 +167,20 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, pkgcloudUploadCont
 
   let idUsed = row.container_id;
   let container = pkgcloudUploadContainers[idUsed];
-  if (!container && typeof STORED_CONTAINERS[idUsed] === "undefined") {
-    console.log(colors.yellow("The expected container " + idUsed + " for this object does not exist in your configuration"));
-    // TODO request a container translation
-  } else if (STORED_CONTAINERS[idUsed]) {
-    idUsed = STORED_CONTAINERS[idUsed];
-    container = pkgcloudUploadContainers[idUsed];
+  if (!container) {
+    console.log(
+      colors.red(
+        "The expected container " +
+        idUsed +
+        " for this object does not exist in your configuration as such files cannot be copied"
+      )
+    );
+    return;
   }
 
-  if (container) {
-    console.log(colors.yellow("Using: ") + idUsed);
-    await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
-    await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
-  }
+  console.log(colors.yellow("Using: ") + idUsed);
+  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
+  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
 }
 
 /**
@@ -252,31 +273,37 @@ export default async function dump(version: string, knex: Knex, root: Root) {
     exists = false;
   }
 
-  let continueWithProcessing = true;
-  if (!exists) {
-    console.log(colors.yellow(`A dump folder hasn't been determined`));
+  try {
+    let continueWithProcessing = true;
+    if (!exists) {
+      console.log(colors.yellow(`A dump folder hasn't been determined`));
 
-    await fsAsync.mkdir("dump", { recursive: true });
-  } else {
-    continueWithProcessing = await yesno("Saving the dump will override the previous content, proceed?...");
-  }
-
-  if (continueWithProcessing) {
-    console.log("emiting " + colors.green("dump/dump.json"));
-    await fsAsync.writeFile("dump/dump.json", JSON.stringify(final, null, 2));
-
-    for (const row of final) {
-      await copyDataOf(
-        row,
-        root,
-        pkgcloudUploadContainers,
-        version === "development" ?
-          config.developmentHostname :
-          config.productionHostname
-      );
+      await fsAsync.mkdir("dump", { recursive: true });
+    } else {
+      continueWithProcessing = await yesno("Saving the dump will override the previous content, proceed?...");
+      await fsAsync.rmdir("dump", { recursive: true });
+      await fsAsync.mkdir("dump", { recursive: true });
     }
-  }
 
-  // say it's all done
-  console.log(colors.green("All done..."));
+    if (continueWithProcessing) {
+      console.log("emiting " + colors.green("dump/dump.json"));
+      await fsAsync.writeFile("dump/dump.json", JSON.stringify(final, null, 2));
+
+      for (const row of final) {
+        await copyDataOf(
+          row,
+          root,
+          pkgcloudUploadContainers,
+          version === "development" ?
+            config.developmentHostname :
+            config.productionHostname
+        );
+      }
+    }
+
+    // say it's all done
+    console.log(colors.green("All done..."));
+  } catch (err) {
+    console.log(colors.red(err.stack));
+  }
 };
