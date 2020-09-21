@@ -20,6 +20,7 @@ import { buildIndexes } from "./build-index";
 import { IDBConfigRawJSONDataType } from "../config";
 import { prepareExtensions } from "./extensions";
 import dump from "./dump";
+import loadDump from "./load-dump";
 
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
@@ -87,7 +88,7 @@ export default async function build(version: string, action: "build" | "dump" | 
   if (action === "dump") {
     return dump(version, knex, root);
   } else if (action === "load-dump") {
-    return;
+    return loadDump(version, knex, root);
   }
 
   let isCorrupted = false;

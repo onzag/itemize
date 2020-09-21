@@ -9,28 +9,30 @@ import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
 import Knex from "knex";
-// @ts-nocheck
-import Confirm from "prompt-confirm";
 
 import Root from "../base/Root";
-import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
-import { config } from "process";
-import { getContainerPromisified, PkgCloudClients, PkgCloudContainers } from "../server";
+import { getPkgCloudContainers, PkgCloudContainers } from "../server";
 import pkgcloud from "pkgcloud";
-
-const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
 const fsAsync = fs.promises;
 
-interface IDumpMap {
-  [modPath: string]: boolean | Array<number | [number, string]> | {
-    [idefPath: string]: boolean | Array<number | [number, string]>
-  };
+export interface IDumpMap {
+  dump: boolean | {
+    [modPath: string]: boolean | Array<number | [number, string]> | {
+      [idefPath: string]: boolean | Array<number | [number, string]>
+    };
+  },
+  loadDump?: {
+    containerBasedOnProperties?: string[];
+    primaryContainerId: string;
+    fallbackContainerId: string;
+  },
 }
 
 async function dumpFromIdef(knex: Knex, root: Root, idef: ItemDefinition, specifics?: Array<number | [number, string]>): Promise<ISQLTableRowValue[]> {
@@ -202,53 +204,28 @@ export default async function dump(version: string, knex: Knex, root: Root) {
     await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
   );
 
-  const pkgcloudStorageClients: PkgCloudClients = {};
-  const pkgcloudUploadContainers: PkgCloudContainers = {};
-  if (sensitiveConfig.openstackContainers) {
-    await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-      const containerData = sensitiveConfig.openstackContainers[containerIdX];
-      pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
-        provider: "openstack",
-        username: containerData.username,
-        keystoneAuthVersion: 'v3',
-        region: containerData.region,
-        domainId: containerData.domainId, //default
-        domainName: containerData.domainName,
-        password: containerData.password,
-        authUrl: containerData.authUrl,
-      } as any);
-      let prefix = config.containersHostnamePrefixes[containerIdX];
-      if (!prefix) {
-        process.exit(1);
-      }
-      if (prefix.indexOf("/") !== 0) {
-        prefix = "https://" + prefix;
-      }
-      pkgcloudUploadContainers[containerIdX] = {
-        prefix,
-        container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-      };
-    }));
-  }
+  const { pkgcloudUploadContainers} = await getPkgCloudContainers(config, sensitiveConfig);
 
   console.log(`Loaded ${Object.keys(pkgcloudUploadContainers).length} storage containers: ` +
     colors.yellow(Object.keys(pkgcloudUploadContainers).join(", ")));
 
   const dumpMap: IDumpMap = dumpfile ? JSON.parse(dumpfile) : null;
 
+  const dumpEverything = !dumpMap ? true : dumpMap.dump === true;
+
   let final: ISQLTableRowValue[] = [];
-  if (dumpMap) {
-    for (const key of Object.keys(dumpMap)) {
+  if (dumpMap && !dumpEverything && typeof dumpMap.dump !== "boolean") {
+    for (const key of Object.keys(dumpMap.dump)) {
       const mod = root.getModuleFor(key.split("/"));
-      const value = dumpMap[key];
+      const value = dumpMap.dump[key];
       if (value === true) {
         final = final.concat(await dumpFromModule(knex, root, mod));
       } else if (Array.isArray(value)) {
         final = final.concat(await dumpFromModule(knex, root, mod, value));
       } else if (value !== false) {
-        for (const idefKey of Object.keys(dumpMap[key])) {
+        for (const idefKey of Object.keys(dumpMap.dump[key])) {
           const idef = mod.getItemDefinitionFor(idefKey.split("/"));
-          const idefValue = dumpMap[key][idefKey];
+          const idefValue = dumpMap.dump[key][idefKey];
 
           if (idefValue === true) {
             final = final.concat(await dumpFromIdef(knex, root, idef));
@@ -258,7 +235,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
         }
       }
     }
-  } else {
+  } else if (dumpEverything) {
     for (const rootModule of root.getAllModules()) {
       final = final.concat(await dumpAllFromModuleRecursive(knex, root, rootModule));
     }

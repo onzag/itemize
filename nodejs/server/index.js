@@ -87,6 +87,43 @@ function getContainerPromisified(client, containerName) {
     });
 }
 exports.getContainerPromisified = getContainerPromisified;
+async function getPkgCloudContainers(config, sensitiveConfig) {
+    const pkgcloudStorageClients = {};
+    const pkgcloudUploadContainers = {};
+    if (sensitiveConfig.openstackContainers) {
+        await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
+            const containerData = sensitiveConfig.openstackContainers[containerIdX];
+            pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
+                provider: "openstack",
+                username: containerData.username,
+                keystoneAuthVersion: 'v3',
+                region: containerData.region,
+                domainId: containerData.domainId,
+                domainName: containerData.domainName,
+                password: containerData.password,
+                authUrl: containerData.authUrl,
+            });
+            exports.logger && exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
+            let prefix = config.containersHostnamePrefixes[containerIdX];
+            if (!prefix) {
+                exports.logger && exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for container in '" + containerIdX + "'");
+                throw new Error("Could not find prefix for container in " + containerIdX);
+            }
+            if (prefix.indexOf("/") !== 0) {
+                prefix = "https://" + prefix;
+            }
+            pkgcloudUploadContainers[containerIdX] = {
+                prefix,
+                container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+            };
+        }));
+    }
+    return {
+        pkgcloudStorageClients,
+        pkgcloudUploadContainers,
+    };
+}
+exports.getPkgCloudContainers = getPkgCloudContainers;
 /**
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules
@@ -291,36 +328,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         // due to a bug in the types the create client function is missing
         // domainId and domainName
         exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
-        const pkgcloudStorageClients = {};
-        const pkgcloudUploadContainers = {};
-        if (sensitiveConfig.openstackContainers) {
-            await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-                const containerData = sensitiveConfig.openstackContainers[containerIdX];
-                pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
-                    provider: "openstack",
-                    username: containerData.username,
-                    keystoneAuthVersion: 'v3',
-                    region: containerData.region,
-                    domainId: containerData.domainId,
-                    domainName: containerData.domainName,
-                    password: containerData.password,
-                    authUrl: containerData.authUrl,
-                });
-                exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
-                let prefix = config.containersHostnamePrefixes[containerIdX];
-                if (!prefix) {
-                    exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for SEO in '" + containerIdX + "'");
-                    process.exit(1);
-                }
-                if (prefix.indexOf("/") !== 0) {
-                    prefix = "https://" + prefix;
-                }
-                pkgcloudUploadContainers[containerIdX] = {
-                    prefix,
-                    container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-                };
-            }));
-        }
+        const { pkgcloudStorageClients, pkgcloudUploadContainers } = await getPkgCloudContainers(config, sensitiveConfig);
         if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
             exports.logger.info("initializeServer: cleaning storage");
             await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {

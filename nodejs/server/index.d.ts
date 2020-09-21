@@ -100,6 +100,10 @@ export interface IServerCustomizationDataType {
  * @param containerName the container name
  */
 export declare function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container>;
+export declare function getPkgCloudContainers(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): Promise<{
+    pkgcloudStorageClients: PkgCloudClients;
+    pkgcloudUploadContainers: PkgCloudContainers;
+}>;
 /**
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules

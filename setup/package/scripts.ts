@@ -16,7 +16,7 @@ export default {
 
   "setup": "itemize setup",
   "build-data": "itemize build-data",
-  "build-database": "itemize build-database",
+  "build-database": "INSTANCE_MODE=BUILD_DATABASE itemize build-database",
   "get-deployable": "itemize get-deployable",
   "start-dev-environment": "itemize start-dev-environment",
   "stop-dev-environment": "itemize stop-dev-environment",

@@ -22,6 +22,7 @@ const sql_1 = require("../base/Root/sql");
 const build_index_1 = require("./build-index");
 const extensions_1 = require("./extensions");
 const dump_1 = __importDefault(require("./dump"));
+const load_dump_1 = __importDefault(require("./load-dump"));
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const fsAsync = fs_1.default.promises;
 /**
@@ -72,7 +73,7 @@ async function build(version, action = "build") {
         return dump_1.default(version, knex, root);
     }
     else if (action === "load-dump") {
-        return;
+        return load_dump_1.default(version, knex, root);
     }
     let isCorrupted = false;
     try {

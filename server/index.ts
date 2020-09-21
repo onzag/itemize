@@ -90,7 +90,7 @@ export const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEA
 /**
  * Contains all the pkgcloud clients connection for every container id
  */
-export type PkgCloudClients = {[containerId: string]: pkgcloud.storage.Client};
+export type PkgCloudClients = { [containerId: string]: pkgcloud.storage.Client };
 /**
  * Contains all the pkgcloud containers for every container id
  */
@@ -177,6 +177,49 @@ export function getContainerPromisified(client: pkgcloud.storage.Client, contain
       }
     });
   });
+}
+
+export async function getPkgCloudContainers(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
+  const pkgcloudStorageClients: PkgCloudClients = {};
+  const pkgcloudUploadContainers: PkgCloudContainers = {};
+  if (sensitiveConfig.openstackContainers) {
+    await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
+      const containerData = sensitiveConfig.openstackContainers[containerIdX];
+      pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
+        provider: "openstack",
+        username: containerData.username,
+        keystoneAuthVersion: 'v3',
+        region: containerData.region,
+        domainId: containerData.domainId, //default
+        domainName: containerData.domainName,
+        password: containerData.password,
+        authUrl: containerData.authUrl,
+      } as any);
+
+      logger && logger.info(
+        "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
+      );
+      let prefix = config.containersHostnamePrefixes[containerIdX];
+      if (!prefix) {
+        logger && logger.error(
+          "initializeServer [SERIOUS]: Could not find prefix for container in '" + containerIdX + "'",
+        );
+        throw new Error("Could not find prefix for container in " + containerIdX);
+      }
+      if (prefix.indexOf("/") !== 0) {
+        prefix = "https://" + prefix;
+      }
+      pkgcloudUploadContainers[containerIdX] = {
+        prefix,
+        container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
+      };
+    }));
+  }
+
+  return {
+    pkgcloudStorageClients,
+    pkgcloudUploadContainers,
+  }
 }
 
 /**
@@ -341,7 +384,7 @@ export async function initializeServer(
       const setPromisified = promisify(redisClient.set).bind(redisClient);
 
       const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
-      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE) || null;
+      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE) || null;
       const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
       await flushAllPromisified();
       if (serverDataStr) {
@@ -423,7 +466,7 @@ export async function initializeServer(
             password: seoContainerData.password,
             authUrl: seoContainerData.authUrl,
           } as any);
-    
+
           let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
           if (!prefix) {
             logger.error(
@@ -460,41 +503,7 @@ export async function initializeServer(
       "initializeServer: initializing openstack pkgcloud objectstorage clients",
     );
 
-    const pkgcloudStorageClients: PkgCloudClients = {};
-    const pkgcloudUploadContainers: PkgCloudContainers = {};
-    if (sensitiveConfig.openstackContainers) {
-      await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-        const containerData = sensitiveConfig.openstackContainers[containerIdX];
-        pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
-          provider: "openstack",
-          username: containerData.username,
-          keystoneAuthVersion: 'v3',
-          region: containerData.region,
-          domainId: containerData.domainId, //default
-          domainName: containerData.domainName,
-          password: containerData.password,
-          authUrl: containerData.authUrl,
-        } as any);
-
-        logger.info(
-          "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
-        );
-        let prefix = config.containersHostnamePrefixes[containerIdX];
-        if (!prefix) {
-          logger.error(
-            "initializeServer [SERIOUS]: Could not find prefix for SEO in '" + containerIdX + "'",
-          );
-          process.exit(1);
-        }
-        if (prefix.indexOf("/") !== 0) {
-          prefix = "https://" + prefix;
-        }
-        pkgcloudUploadContainers[containerIdX] = {
-          prefix,
-          container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-        };
-      }));
-    }
+    const { pkgcloudStorageClients, pkgcloudUploadContainers} = await getPkgCloudContainers(config, sensitiveConfig);
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
@@ -545,7 +554,7 @@ export async function initializeServer(
         serverData = JSON.parse(serverDataStr);
       }
     }
-    
+
     logger.info(
       "initializeServer: initializing cache instance",
     );
