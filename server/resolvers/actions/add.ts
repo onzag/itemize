@@ -99,6 +99,11 @@ export async function addItemDefinition(
         message: "Theres no unversioned value for this version creation",
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
+    } else if (unversionedValue.type !== itemDefinition.getQualifiedPathName()) {
+      throw new EndpointError({
+        message: "The unversioned version is not of the same type as what is being attempted to create",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
     }
     itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as number, true);
   } else if (resolverArgs.args.version) {

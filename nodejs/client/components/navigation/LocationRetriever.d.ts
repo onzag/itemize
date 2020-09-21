@@ -1,4 +1,5 @@
 /// <reference types="react" />
+/// <reference types="styled-jsx" />
 import { Location } from "history";
 interface ILocationRetrieverProps {
     children: (location: Location<any>) => React.ReactElement;

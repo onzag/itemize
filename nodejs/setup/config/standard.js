@@ -4,7 +4,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.standardConfigSetup = void 0;
 const read_1 = require("../read");
 const imported_resources_1 = require("../../imported-resources");
 /**

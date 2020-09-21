@@ -8,7 +8,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Menu = void 0;
 const react_1 = __importDefault(require("react"));
 const Link_1 = __importDefault(require("../../../components/navigation/Link"));
 const mui_core_1 = require("../../mui-core");

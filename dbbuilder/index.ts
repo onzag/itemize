@@ -19,6 +19,7 @@ import { ISQLSchemaDefinitionType, getSQLTablesSchemaForRoot } from "../base/Roo
 import { buildIndexes } from "./build-index";
 import { IDBConfigRawJSONDataType } from "../config";
 import { prepareExtensions } from "./extensions";
+import dump from "./dump";
 
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
@@ -36,7 +37,7 @@ export function yesno(question: string) {
 /**
  * Actually runs the build
  */
-export default async function build(version: string) {
+export default async function build(version: string, action: "build" | "dump" | "load-dump" = "build") {
   // Retrieve the config for the database
   let configToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
   const dbConfig: IDBConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(
@@ -66,6 +67,29 @@ export default async function build(version: string) {
     connection: dbConnectionKnexConfig,
   });
 
+  // parse the data
+  let data: any;
+  try {
+    data = JSON.parse(await fsAsync.readFile(
+      path.join("dist", "data", "build.all.json"),
+      "utf8",
+    ));
+  } catch {
+    data = JSON.parse(await fsAsync.readFile(
+      "build.all.json",
+      "utf8",
+    ));
+  }
+
+  // build the root from that data
+  const root = new Root(data);
+
+  if (action === "dump") {
+    return dump(version, knex, root);
+  } else if (action === "load-dump") {
+    return;
+  }
+
   let isCorrupted = false;
   try {
     isCorrupted = JSON.parse(await fsAsync.readFile("db-status.corruption.json", "utf-8"));
@@ -77,23 +101,6 @@ export default async function build(version: string) {
   let actual: ISQLSchemaDefinitionType;
 
   if (!isCorrupted) {
-    // parse the data
-    let data: any;
-    try {
-      data = JSON.parse(await fsAsync.readFile(
-        path.join("dist", "data", "build.all.json"),
-        "utf8",
-      ));
-    } catch {
-      data = JSON.parse(await fsAsync.readFile(
-        "build.all.json",
-        "utf8",
-      ));
-    }
-
-    // build the root from that data
-    const root = new Root(data);
-
     // let's get the result by progressively building on top of it
     optimal = getSQLTablesSchemaForRoot(knex, root);
 

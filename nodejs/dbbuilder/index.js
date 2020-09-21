@@ -9,7 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.showErrorStackAndLogMessage = exports.yesno = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const safe_1 = __importDefault(require("colors/safe"));
@@ -22,6 +21,7 @@ const build_foreign_key_1 = require("./build-foreign-key");
 const sql_1 = require("../base/Root/sql");
 const build_index_1 = require("./build-index");
 const extensions_1 = require("./extensions");
+const dump_1 = __importDefault(require("./dump"));
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const fsAsync = fs_1.default.promises;
 /**
@@ -36,7 +36,7 @@ exports.yesno = yesno;
 /**
  * Actually runs the build
  */
-async function build(version) {
+async function build(version, action = "build") {
     // Retrieve the config for the database
     let configToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
     const dbConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", configToUse), "utf8"));
@@ -58,6 +58,22 @@ async function build(version) {
         debug: true,
         connection: dbConnectionKnexConfig,
     });
+    // parse the data
+    let data;
+    try {
+        data = JSON.parse(await fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"));
+    }
+    catch {
+        data = JSON.parse(await fsAsync.readFile("build.all.json", "utf8"));
+    }
+    // build the root from that data
+    const root = new Root_1.default(data);
+    if (action === "dump") {
+        return dump_1.default(version, knex, root);
+    }
+    else if (action === "load-dump") {
+        return;
+    }
     let isCorrupted = false;
     try {
         isCorrupted = JSON.parse(await fsAsync.readFile("db-status.corruption.json", "utf-8"));
@@ -68,16 +84,6 @@ async function build(version) {
     let optimal;
     let actual;
     if (!isCorrupted) {
-        // parse the data
-        let data;
-        try {
-            data = JSON.parse(await fsAsync.readFile(path_1.default.join("dist", "data", "build.all.json"), "utf8"));
-        }
-        catch {
-            data = JSON.parse(await fsAsync.readFile("build.all.json", "utf8"));
-        }
-        // build the root from that data
-        const root = new Root_1.default(data);
         // let's get the result by progressively building on top of it
         optimal = sql_1.getSQLTablesSchemaForRoot(knex, root);
         // Retrieve the past migration configuration

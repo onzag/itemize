@@ -13,5 +13,5 @@ export declare function yesno(question: string): any;
 /**
  * Actually runs the build
  */
-export default function build(version: string): Promise<void>;
+export default function build(version: string, action?: "build" | "dump" | "load-dump"): Promise<void>;
 export declare function showErrorStackAndLogMessage(err: Error): void;

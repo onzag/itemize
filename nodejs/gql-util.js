@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.flattenRawGQLValueOrFields = exports.deepMerge = exports.requestFieldsAreContained = void 0;
 /**
  * Checks whether a subset is contained within other subset of
  * request fields or a value, preferably use against other request fields

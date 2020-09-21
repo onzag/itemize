@@ -4,7 +4,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NanoSecondComposedDate = void 0;
 // the composed precision of the nanodate, basically how much more precision
 // we need over millisecond precision
 const NanoSecondComposedDatePrecision = 6; // +3 of the millisecond precision makes a 9 aka nanoseconds

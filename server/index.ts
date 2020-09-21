@@ -167,7 +167,7 @@ export interface IServerCustomizationDataType {
  * @param client the client to use
  * @param containerName the container name
  */
-function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container> {
+export function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container> {
   return new Promise((resolve, reject) => {
     client.getContainer(containerName, (err, container) => {
       if (err) {

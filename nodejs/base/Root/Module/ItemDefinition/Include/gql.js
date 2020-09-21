@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGQLFieldsDefinitionForInclude = void 0;
 const constants_1 = require("../../../../../constants");
 const graphql_1 = require("graphql");
 const gql_1 = require("../PropertyDefinition/gql");

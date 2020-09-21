@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PropertyDefinitionSearchInterfacesPrefixesList = exports.PropertyDefinitionSearchInterfacesPrefixes = exports.PropertyDefinitionSearchInterfacesType = void 0;
 const constants_1 = require("../../../../../constants");
 /**
  * These are all the 4 interfaces

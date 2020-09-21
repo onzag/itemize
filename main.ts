@@ -65,8 +65,9 @@ const actionRegistry: {
     description: "Builds the database (warning you must run build-data before this) " +
     "pass the argument development or production in order to specify which config to use " +
     "if using a development environment, remember to run start-development-environment",
-    usage: "itemize build-database [development|production]",
+    usage: "itemize build-database [development|production] (build|dump|load-dump)",
     needsArgs: 1,
+    arbitraryArgs: true,
   },
 };
 

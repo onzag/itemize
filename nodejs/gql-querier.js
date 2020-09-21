@@ -8,7 +8,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gqlQuery = exports.buildGqlMutation = exports.buildGqlQuery = exports.GQLVar = exports.GQLEnum = exports.GQLRaw = exports.GQLQuery = void 0;
 const stream_1 = require("stream");
 const form_data_1 = __importDefault(require("form-data"));
 const node_fetch_1 = __importDefault(require("node-fetch"));

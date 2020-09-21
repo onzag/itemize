@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addItemDefinitionFn = exports.addItemDefinition = void 0;
 const __1 = require("../../");
 const ItemDefinition_1 = require("../../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../basic");
@@ -60,6 +59,12 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         if (!unversionedValue) {
             throw new errors_1.EndpointError({
                 message: "Theres no unversioned value for this version creation",
+                code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
+            });
+        }
+        else if (unversionedValue.type !== itemDefinition.getQualifiedPathName()) {
+            throw new errors_1.EndpointError({
+                message: "The unversioned version is not of the same type as what is being attempted to create",
                 code: constants_1.ENDPOINT_ERRORS.FORBIDDEN,
             });
         }

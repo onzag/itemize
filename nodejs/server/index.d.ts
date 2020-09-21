@@ -95,6 +95,12 @@ export interface IServerCustomizationDataType {
     customTriggers?: ITriggerRegistry;
 }
 /**
+ * Provides the pkgloud client container from ovh
+ * @param client the client to use
+ * @param containerName the container name
+ */
+export declare function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container>;
+/**
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules
  * @param custom the customization details

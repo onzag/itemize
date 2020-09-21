@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processRoot = exports.processModule = exports.processPropertyDefinition = exports.processInclude = exports.processItemDefinition = void 0;
 require("source-map-support/register");
 /**
  * Cleans up build data from

@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildSearchModeConditionalRuleSet = exports.getConversionRulesetId = void 0;
 const search_mode_1 = require("../PropertyDefinition/search-mode");
 /**
  * Gives the id for a property that would be referred to in search mode

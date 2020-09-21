@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.collect = void 0;
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const basic_1 = require("../resolvers/basic");
 const server_1 = require("../../server");
