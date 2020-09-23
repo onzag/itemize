@@ -47,7 +47,7 @@ async function removeFolderFor(uploadsContainer, mainPath) {
                 });
             }
             else {
-                console.log("No files found");
+                console.log("No files found to delete");
                 resolve();
             }
         });
@@ -62,6 +62,7 @@ exports.removeFolderFor = removeFolderFor;
  * @param remotePath the remote path we are expected to copy at
  */
 async function copyFilesFor(uploadsContainer, localPath, remotePath) {
+    console.log("Copying files for: " + remotePath);
     // now we try to read the directory, note how we use try
     // the reason is that our directory might not exist as all
     // because this function might be requested with copying files for eg.
@@ -90,22 +91,23 @@ async function copyFilesFor(uploadsContainer, localPath, remotePath) {
                     remote: remoteFilePath,
                 });
                 // and a read stream for our local
-                const readStream = fs_1.default.createReadStream(localPath);
+                const readStream = fs_1.default.createReadStream(localFilePath);
                 // and we pipe it!
                 readStream.pipe(writeStream);
-                // now we can return this promise
-                return new Promise((resolve, reject) => {
+                // now we can await for that file to be done
+                await (new Promise((resolve, reject) => {
                     writeStream.on("finish", () => {
                         console.log("Wrote: " + remoteFilePath);
                         resolve();
                     });
                     writeStream.on("error", reject);
-                });
+                }));
             }
         }
     }
     catch {
         // no such file or directory, we don't have files for it
+        console.log("No files found to copy at " + localPath);
     }
 }
 exports.copyFilesFor = copyFilesFor;
@@ -117,13 +119,13 @@ exports.copyFilesFor = copyFilesFor;
 const CACHED_SCHEMAS = {};
 /**
  * Performs the dump loading
- * @param version either development or production
+ * @param configVersion either development or production
  * @param knex the knex database connection
  * @param root the root
  */
-async function loadDump(version, knex, root) {
+async function loadDump(configVersion, knex, root) {
     // we need these configurations
-    const sensitiveConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`), "utf8"));
+    const sensitiveConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", configVersion === "development" ? "index.sensitive.json" : `index.${configVersion}.sensitive.json`), "utf8"));
     const config = JSON.parse(await fsAsync.readFile(path_1.default.join("config", "index.json"), "utf8"));
     const dumpConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", "dump.json"), "utf8"));
     // and the upload containers
@@ -195,7 +197,7 @@ async function loadDump(version, knex, root) {
                 version,
             });
             // and store that in this variable
-            const exists = !!result.length;
+            const exists = !!result;
             // now by default it will insert files if it doesn't exist
             // as that means this script will not ask questions, overriding is however
             // another situation
@@ -315,10 +317,13 @@ async function loadDump(version, knex, root) {
             // and now for the files
             if (shouldInsertFiles) {
                 // we got to get the hostname
-                const hostname = version === "development" ? config.developmentHostname : config.productionHostname;
+                const hostname = configVersion === "development" ? config.developmentHostname : config.productionHostname;
                 // this is the path where things are meant to be
                 const resultIdefBasePath = path_1.default.join(idef.getQualifiedPathName(), row.id + "." + (row.version || ""));
                 const resultModBasePath = path_1.default.join(mod.getQualifiedPathName(), row.id + "." + (row.version || ""));
+                // this is the path for local
+                const resultLocalIdefPath = path_1.default.join("dump", resultIdefBasePath);
+                const resultLocalModPath = path_1.default.join("dump", resultModBasePath);
                 // and this is where we are meant to store them, almost the same, other than for the hostname
                 const resultRemoteIdefPath = path_1.default.join(hostname, resultIdefBasePath);
                 const resultRemoteModPath = path_1.default.join(hostname, resultModBasePath);
@@ -345,8 +350,8 @@ async function loadDump(version, knex, root) {
                     }
                     else {
                         // and copy the files
-                        await copyFilesFor(targetContainer.container, resultIdefBasePath, resultRemoteIdefPath);
-                        await copyFilesFor(targetContainer.container, resultModBasePath, resultRemoteModPath);
+                        await copyFilesFor(targetContainer.container, resultLocalIdefPath, resultRemoteIdefPath);
+                        await copyFilesFor(targetContainer.container, resultLocalModPath, resultRemoteModPath);
                     }
                 }
             }
@@ -359,6 +364,8 @@ async function loadDump(version, knex, root) {
     catch (err) {
         // we messed up something
         console.log(safe_1.default.red(err.stack));
+        // close the database connection
+        knex.destroy();
     }
 }
 exports.default = loadDump;

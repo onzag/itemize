@@ -19,11 +19,11 @@ export declare function removeFolderFor(uploadsContainer: pkgcloud.storage.Conta
  * @param localPath the local path we are currently working with, must be a folder
  * @param remotePath the remote path we are expected to copy at
  */
-export declare function copyFilesFor(uploadsContainer: pkgcloud.storage.Container, localPath: string, remotePath: string): Promise<unknown>;
+export declare function copyFilesFor(uploadsContainer: pkgcloud.storage.Container, localPath: string, remotePath: string): Promise<void>;
 /**
  * Performs the dump loading
- * @param version either development or production
+ * @param configVersion either development or production
  * @param knex the knex database connection
  * @param root the root
  */
-export default function loadDump(version: string, knex: Knex, root: Root): Promise<void>;
+export default function loadDump(configVersion: string, knex: Knex, root: Root): Promise<void>;

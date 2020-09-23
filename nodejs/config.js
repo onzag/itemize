@@ -252,10 +252,10 @@ exports.dumpConfigSchema = {
                 primaryContainerId: {
                     type: "string",
                 },
-                required: [
-                    "primaryContainerId",
-                ],
             },
+            required: [
+                "primaryContainerId",
+            ],
         }
     },
 };

@@ -159,6 +159,16 @@ async function copyAllFilesFor(config, target, source, previousOptions, onceDone
 }
 async function srcSetup(arg) {
     console.log(colors_1.default.bgGreen("SOURCE SETUP"));
+    let exists = true;
+    try {
+        await fsAsync.access("src", fs_1.default.constants.F_OK);
+    }
+    catch (e) {
+        exists = false;
+    }
+    if (exists && !(await read_1.confirm("Would you like to re-setup the sources?"))) {
+        return arg;
+    }
     let options = await copyAllFilesFor(arg.standardConfig, "src", path_1.default.join(__dirname, "..", "..", "..", "setup", "src", "ts-files"), null);
     options = await copyAllFilesFor(arg.standardConfig, path_1.default.dirname(arg.standardConfig.entry), path_1.default.join(__dirname, "..", "..", "..", "setup", "src", "schema-files"), options, async () => {
         if (!arg.standardConfig.entry.endsWith("/root") &&

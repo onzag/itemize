@@ -365,6 +365,8 @@ async function dump(version, knex, root) {
     catch (err) {
         // something bad happened
         console.log(safe_1.default.red(err.stack));
+        // close the database connection
+        knex.destroy();
     }
 }
 exports.default = dump;

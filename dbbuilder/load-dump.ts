@@ -55,7 +55,7 @@ export async function removeFolderFor(
           }
         });
       } else {
-        console.log("No files found");
+        console.log("No files found to delete");
         resolve();
       }
     });
@@ -74,6 +74,8 @@ export async function copyFilesFor(
   localPath: string,
   remotePath: string,
 ) {
+  console.log("Copying files for: " + remotePath);
+
   // now we try to read the directory, note how we use try
   // the reason is that our directory might not exist as all
   // because this function might be requested with copying files for eg.
@@ -105,22 +107,23 @@ export async function copyFilesFor(
         });
 
         // and a read stream for our local
-        const readStream = fs.createReadStream(localPath);
+        const readStream = fs.createReadStream(localFilePath);
         // and we pipe it!
         readStream.pipe(writeStream);
 
-        // now we can return this promise
-        return new Promise((resolve, reject) => {
+        // now we can await for that file to be done
+        await (new Promise((resolve, reject) => {
           writeStream.on("finish", () => {
             console.log("Wrote: " + remoteFilePath);
             resolve();
           });
           writeStream.on("error", reject);
-        });
+        }));
       }
     }
   } catch {
     // no such file or directory, we don't have files for it
+    console.log("No files found to copy at " + localPath);
   }
 }
 
@@ -135,14 +138,14 @@ const CACHED_SCHEMAS: {
 
 /**
  * Performs the dump loading
- * @param version either development or production
+ * @param configVersion either development or production
  * @param knex the knex database connection
  * @param root the root
  */
-export default async function loadDump(version: string, knex: Knex, root: Root) {
+export default async function loadDump(configVersion: string, knex: Knex, root: Root) {
   // we need these configurations
   const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(
-    await fsAsync.readFile(path.join("config", version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`), "utf8"),
+    await fsAsync.readFile(path.join("config", configVersion === "development" ? "index.sensitive.json" : `index.${configVersion}.sensitive.json`), "utf8"),
   );
 
   const config: IConfigRawJSONDataType = JSON.parse(
@@ -237,7 +240,7 @@ export default async function loadDump(version: string, knex: Knex, root: Root) 
       });
 
       // and store that in this variable
-      const exists = !!result.length;
+      const exists = !!result;
       // now by default it will insert files if it doesn't exist
       // as that means this script will not ask questions, overriding is however
       // another situation
@@ -372,11 +375,15 @@ export default async function loadDump(version: string, knex: Knex, root: Root) 
       // and now for the files
       if (shouldInsertFiles) {
         // we got to get the hostname
-        const hostname = version === "development" ? config.developmentHostname : config.productionHostname;
+        const hostname = configVersion === "development" ? config.developmentHostname : config.productionHostname;
 
         // this is the path where things are meant to be
         const resultIdefBasePath = path.join(idef.getQualifiedPathName(), row.id + "." + (row.version || ""));
         const resultModBasePath = path.join(mod.getQualifiedPathName(), row.id + "." + (row.version || ""));
+
+        // this is the path for local
+        const resultLocalIdefPath = path.join("dump", resultIdefBasePath);
+        const resultLocalModPath = path.join("dump", resultModBasePath);
 
         // and this is where we are meant to store them, almost the same, other than for the hostname
         const resultRemoteIdefPath = path.join(hostname, resultIdefBasePath);
@@ -404,8 +411,8 @@ export default async function loadDump(version: string, knex: Knex, root: Root) 
             console.log("Could not retrieve a container for: " + colors.yellow(targetContainerId));
           } else {
             // and copy the files
-            await copyFilesFor(targetContainer.container, resultIdefBasePath, resultRemoteIdefPath);
-            await copyFilesFor(targetContainer.container, resultModBasePath, resultRemoteModPath);
+            await copyFilesFor(targetContainer.container, resultLocalIdefPath, resultRemoteIdefPath);
+            await copyFilesFor(targetContainer.container, resultLocalModPath, resultRemoteModPath);
           }
         }
       }
@@ -419,5 +426,7 @@ export default async function loadDump(version: string, knex: Knex, root: Root) 
   } catch (err) {
     // we messed up something
     console.log(colors.red(err.stack));
+    // close the database connection
+    knex.destroy();
   }
 }

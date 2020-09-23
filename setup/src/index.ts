@@ -220,6 +220,18 @@ async function copyAllFilesFor(
 }
 export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupConfigType> {
   console.log(colors.bgGreen("SOURCE SETUP"));
+
+  let exists = true;
+  try {
+    await fsAsync.access("src", fs.constants.F_OK);
+  } catch (e) {
+    exists = false;
+  }
+
+  if (exists && !(await confirm("Would you like to re-setup the sources?"))) {
+    return arg;
+  }
+
   let options = await copyAllFilesFor(
     arg.standardConfig,
     "src",

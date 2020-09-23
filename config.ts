@@ -575,10 +575,10 @@ export const dumpConfigSchema = {
         primaryContainerId: {
           type: "string",
         },
-        required: [
-          "primaryContainerId",
-        ],
       },
+      required: [
+        "primaryContainerId",
+      ],
     }
   },
 }

@@ -419,5 +419,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
   } catch (err) {
     // something bad happened
     console.log(colors.red(err.stack));
+    // close the database connection
+    knex.destroy();
   }
 }

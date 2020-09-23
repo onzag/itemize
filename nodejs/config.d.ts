@@ -500,8 +500,8 @@ export declare const dumpConfigSchema: {
                 primaryContainerId: {
                     type: string;
                 };
-                required: string[];
             };
+            required: string[];
         };
     };
 };
