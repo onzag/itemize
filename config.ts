@@ -110,7 +110,7 @@ export interface IConfigRawJSONDataType {
    * The hostname used in production mode, used to avoid SEO hijacking
    */
   productionHostname: string;
-  
+
   /**
    * Uploads info, maps countries to containers id
    * "*" asterisk represents a special match that will match all the non-matching
@@ -140,6 +140,72 @@ export interface ISensitiveConfigOpenstackContainerType {
   domainName: string;
   authUrl: string;
   containerName: string;
+}
+
+/**
+ * Specification to dump specific item definitions
+ */
+export interface IDumpSpecificIdefInfoType {
+  /**
+   * The item definition path inside the module
+   * if it's a boolean dump all of the items
+   * if it's an array with number, or number string, dump the specific id, id,version combo
+   */
+  [idefPath: string]: boolean | Array<number | [number, string]>
+}
+
+/**
+ * Specification to dump specific modules
+ */
+export interface IDumpSpecificModInfoType {
+  /**
+   * The module path as module/submodule
+   * if it's a boolean dump all
+   * if it's an array with number, or number string, dump the specific id, version combo
+   * otherwise dump only specific item definition types
+   */
+  [modPath: string]: boolean | Array<number | [number, string]> | IDumpSpecificIdefInfoType;
+}
+
+/**
+ * A structure that specifies how files are to be dumped
+ * and then reloaded
+ */
+export interface IDumpConfigRawJSONDataType {
+  /**
+   * Specifies the dump process
+   * If it's a boolean, dump all, otherwse
+   * we only dump specific modules
+   */
+  save: boolean | IDumpSpecificModInfoType,
+
+  /**
+   * Specifies how the dump is to be loaded
+   */
+  load: {
+    /**
+     * Map previous containers that have been dumped to new
+     * containers, the previous container id mapper has priority over
+     * the version mapper, it will try to get one
+     * from the list in order of priority
+     */
+    previousContainerIdMapper?: {
+      [containerId: string]: string[];
+    },
+    /**
+     * Specifies a container based on a version, it will try to get one
+     * from the list in order of priority
+     */
+    versionMapper?: {
+      [version: string]: string[];
+    },
+    /**
+     * If none of the version mappers nor the previous container id mappers match
+     * and the previous container id is not found in the current configuration
+     * this container will be used instead
+     */
+    primaryContainerId: string;
+  },
 }
 
 /**
@@ -411,6 +477,113 @@ export const rawSensitiveConfigSchema = {
 };
 
 /**
+ * A json validating schema for the dump configuration
+ */
+export const dumpConfigSchema = {
+  type: "object",
+  properties: {
+    save: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "object",
+          additionalProperties: {
+            anyOf: [
+              {
+                type: "boolean",
+              },
+              {
+                type: "array",
+                items: {
+                  type: "number",
+                },
+              },
+              {
+                type: "array",
+                maxItems: 2,
+                minItems: 2,
+                items: {
+                  anyOf: [
+                    {
+                      type: "string",
+                    },
+                    {
+                      type: "number",
+                    },
+                  ]
+                },
+              },
+              {
+                type: "object",
+                additionalProperties: {
+                  anyOf: [
+                    {
+                      type: "boolean",
+                    },
+                    {
+                      type: "array",
+                      items: {
+                        type: "number",
+                      },
+                    },
+                    {
+                      type: "array",
+                      maxItems: 2,
+                      minItems: 2,
+                      items: {
+                        anyOf: [
+                          {
+                            type: "string",
+                          },
+                          {
+                            type: "number",
+                          },
+                        ]
+                      },
+                    },
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+    },
+    load: {
+      type: "object",
+      properties: {
+        previousContainerIdMapper: {
+          type: "object",
+          additionalProperties: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+          }
+        },
+        versionMapper: {
+          type: "object",
+          additionalProperties: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+          }
+        },
+        primaryContainerId: {
+          type: "string",
+        },
+        required: [
+          "primaryContainerId",
+        ],
+      },
+    }
+  },
+}
+
+/**
  * A json validating schema for the standard configuration
  */
 export const rawConfigSchema = {
@@ -434,7 +607,7 @@ export const rawConfigSchema = {
         type: "string",
       },
     },
-    dictionaries: {
+    dictionaries: {
       type: "object",
       additionalProperties: {
         type: "string",
@@ -507,14 +680,14 @@ export const rawConfigSchema = {
     productionHostname: {
       type: "string",
     },
-    containersRegionMappers: {
+    containersRegionMappers: {
       type: "object",
       additionalProperties: {
         type: "string",
       },
       minProperties: 1,
     },
-    containersHostnamePrefixes: {
+    containersHostnamePrefixes: {
       type: "object",
       additionalProperties: {
         type: "string",

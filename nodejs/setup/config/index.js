@@ -16,6 +16,7 @@ const sensitive_1 = require("./sensitive");
 const redis_1 = require("./redis");
 const db_1 = require("./db");
 const fs_1 = __importDefault(require("fs"));
+const dump_1 = require("./dump");
 const fsAsync = fs_1.default.promises;
 /**
  * the configuration setup step that builds the config files themselves
@@ -72,6 +73,7 @@ async function configSetup(arg) {
         await read_1.confirm("Would you like to modify the posrgreSQL production configuration?")) {
         newArg.dbConfigProduction = await db_1.dbConfigSetup("production", newArg.dbConfigProduction, newArg.dbConfigDevelopment, packageJSON);
     }
+    newArg.dumpConfig = dump_1.dumpConfigRequest(newArg.dumpConfig, newArg.sensitiveConfigDevelopment);
     return newArg;
 }
 exports.default = configSetup;

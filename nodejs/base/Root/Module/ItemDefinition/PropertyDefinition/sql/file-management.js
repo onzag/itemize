@@ -237,15 +237,16 @@ function processOneFileAndItsSameIDReplacement(newVersion, oldVersion, uploadsCo
 /**
  * Deletes the folder that contains all
  * the file data
+ * @param domain the domain we are working with
  * @param uploadsContainer the container that contains the file
  * @param itemDefinitionOrModule the item definition or module in question
- * @param filesContainerId the transitory id to drop
+ * @param idVersionId the transitory id to drop
  * @returns a void promise from when this is done
  */
-function deleteEverythingInFilesContainerId(uploadsContainer, itemDefinitionOrModule, filesContainerId) {
+function deleteEverythingInFilesContainerId(domain, uploadsContainer, itemDefinitionOrModule, idVersionId) {
     // find the transitory location path
     const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-    const filesContainerPath = path_1.default.join(idefOrModLocationPath, filesContainerId);
+    const filesContainerPath = path_1.default.join(domain, idefOrModLocationPath, idVersionId);
     return removeFolderFor(uploadsContainer, filesContainerPath);
 }
 exports.deleteEverythingInFilesContainerId = deleteEverythingInFilesContainerId;

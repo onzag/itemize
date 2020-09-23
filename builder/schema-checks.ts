@@ -14,7 +14,7 @@ import Traceback from "./Traceback";
 import { SpecialPropertyValueSetSchema } from "../base/Root/Module/ItemDefinition/PropertyDefinition/schema";
 import "source-map-support/register";
 import { rawSensitiveConfigSchema, rawConfigSchema,
-  rawDBConfigSchema, rawRedisConfigSchema } from "../config";
+  rawDBConfigSchema, rawRedisConfigSchema, dumpConfigSchema } from "../config";
 
 const ajv = new Ajv();
 
@@ -67,6 +67,12 @@ export const checkConfig =
  */
 export const checkDBConfig =
   ajv.compile(rawDBConfigSchema);
+
+/**
+ * Check raw dump config
+ */
+export const checkDumpConfig =
+  ajv.compile(dumpConfigSchema);
 
 /**
  * Check redis config

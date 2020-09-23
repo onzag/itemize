@@ -47,7 +47,7 @@ exports.extractOneConfig = extractOneConfig;
  */
 async function extractConfigAndBuildNumber() {
     // index.json CHECKING /////////////////////////
-    let standardConfigCheckerCallback = (data, traceback) => {
+    const standardConfigCheckerCallback = (data, traceback) => {
         // let's check the fallback values, first if the country is a valid country
         if (!imported_resources_1.countries[data.fallbackCountryCode]) {
             throw new Error_1.default("Invalid fallback country code", traceback.newTraceToBit("fallbackCountryCode"));
@@ -61,14 +61,47 @@ async function extractConfigAndBuildNumber() {
         if (!data.supportedLanguages.includes(data.fallbackLanguage)) {
             throw new Error_1.default("Invalid fallback language which is not in the list of supported", traceback.newTraceToBit("fallbackLanguage"));
         }
+        if (!data.containersRegionMappers["*"]) {
+            throw new Error_1.default("The containers regions mappers is missing the asterisk (*) property", traceback.newTraceToBit("containersRegionMappers"));
+        }
+        Object.keys(data.containersRegionMappers).forEach((regions) => {
+            const target = data.containersRegionMappers[regions];
+            if (regions !== "*") {
+                const countriesForRegion = regions.split(",").map((c) => c.trim());
+                countriesForRegion.forEach((c) => {
+                    if (!imported_resources_1.countries[c]) {
+                        throw new Error_1.default("Invalid country code " + c, traceback.newTraceToBit("containersRegionMappers").newTraceToBit(regions));
+                    }
+                });
+            }
+            if (!data.containersHostnamePrefixes[target]) {
+                console.warn("There's no container hostname prefix specified for " + target +
+                    " but it's mentioned in regions " + regions +
+                    " as such file support is unavailable for such container");
+            }
+            else {
+                if (data.containersHostnamePrefixes[target].startsWith("http") ||
+                    data.containersHostnamePrefixes[target].startsWith("//:")) {
+                    throw new Error_1.default("Invalid container hostname prefix, a protocol shouldn't be provided, https assumed", traceback.newTraceToBit("containersHostnamePrefixes").newTraceToBit(target));
+                }
+            }
+        });
     };
     const standardConfig = await extractOneConfig(schema_checks_1.checkConfig, "index", null, false, standardConfigCheckerCallback);
-    const sensitiveConfig = await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", null, true);
-    await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", "production", true);
+    const sensitiveConfigCheckerCallback = (data, traceback) => {
+        Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
+            if (!data.openstackContainers[containerId]) {
+                throw new Error_1.default("Could not find container information for container " + containerId + " in sensitive config", traceback.newTraceToBit("openstackContainers"));
+            }
+        });
+    };
+    const sensitiveConfig = await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", null, true, sensitiveConfigCheckerCallback);
+    await extractOneConfig(schema_checks_1.checkSensitiveConfig, "index", "production", true, sensitiveConfigCheckerCallback);
     const redisConfig = await extractOneConfig(schema_checks_1.checkRedisConfig, "redis", null, true);
     await extractOneConfig(schema_checks_1.checkRedisConfig, "redis", "production", true);
     const dbConfig = await extractOneConfig(schema_checks_1.checkDBConfig, "db", null, true);
     await extractOneConfig(schema_checks_1.checkDBConfig, "db", "production", true);
+    await extractOneConfig(schema_checks_1.checkDumpConfig, "dump", null, false);
     return {
         standard: standardConfig,
         sensitive: sensitiveConfig,

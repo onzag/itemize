@@ -353,19 +353,21 @@ function processOneFileAndItsSameIDReplacement(
 /**
  * Deletes the folder that contains all
  * the file data
+ * @param domain the domain we are working with
  * @param uploadsContainer the container that contains the file
  * @param itemDefinitionOrModule the item definition or module in question
- * @param filesContainerId the transitory id to drop
+ * @param idVersionId the transitory id to drop
  * @returns a void promise from when this is done
  */
 export function deleteEverythingInFilesContainerId(
+  domain: string,
   uploadsContainer: pkgcloud.storage.Container,
   itemDefinitionOrModule: ItemDefinition | Module,
-  filesContainerId: string,
+  idVersionId: string,
 ): Promise<void> {
   // find the transitory location path
   const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
-  const filesContainerPath = path.join(idefOrModLocationPath, filesContainerId);
+  const filesContainerPath = path.join(domain, idefOrModLocationPath, idVersionId);
 
   return removeFolderFor(uploadsContainer, filesContainerPath);
 }

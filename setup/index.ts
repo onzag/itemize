@@ -6,7 +6,7 @@
 
 import colors from "colors";
 import dockerSetup from "./docker";
-import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IDumpConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import fs from "fs";
 import path from "path";
 import configSetup from "./config";
@@ -31,6 +31,7 @@ export interface ISetupConfigType {
   sensitiveConfigProduction: ISensitiveConfigRawJSONDataType;
   dbConfigProduction: IDBConfigRawJSONDataType;
   redisConfigProduction: IRedisConfigRawJSONDataType;
+  dumpConfig: IDumpConfigRawJSONDataType;
 }
 
 /**
@@ -98,6 +99,7 @@ export default async function setup(...onlyNames: string[]) {
   await ensureConfigDirectory();
 
   const standardConfig: IConfigRawJSONDataType = await readConfigFile("index.json");
+  const dumpConfig: IDumpConfigRawJSONDataType = await readConfigFile("dump.json");
   const sensitiveConfigDevelopment: ISensitiveConfigRawJSONDataType = await readConfigFile("index.sensitive.json");
   const dbConfigDevelopment: IDBConfigRawJSONDataType = await readConfigFile("db.sensitive.json");
   const redisConfigDevelopment: IRedisConfigRawJSONDataType = await readConfigFile("redis.sensitive.json");
@@ -113,6 +115,7 @@ export default async function setup(...onlyNames: string[]) {
     sensitiveConfigProduction,
     dbConfigProduction,
     redisConfigProduction,
+    dumpConfig,
   };
 
   for (const step of stepsInOrder) {
@@ -123,6 +126,7 @@ export default async function setup(...onlyNames: string[]) {
   }
 
   await writeConfigFile("index.json", arg.standardConfig, standardConfig);
+  await writeConfigFile("dump.json", arg.dumpConfig, dumpConfig);
   await writeConfigFile("index.sensitive.json", arg.sensitiveConfigDevelopment, sensitiveConfigDevelopment);
   await writeConfigFile("db.sensitive.json", arg.dbConfigDevelopment, dbConfigDevelopment);
   await writeConfigFile("redis.sensitive.json", arg.redisConfigDevelopment, redisConfigDevelopment);

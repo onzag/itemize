@@ -13,6 +13,7 @@ import { sensitiveConfigSetup } from "./sensitive";
 import { redisConfigSetup } from "./redis";
 import { dbConfigSetup } from "./db";
 import fs from "fs";
+import { dumpConfigRequest } from "./dump";
 const fsAsync = fs.promises;
 
 /**
@@ -122,6 +123,11 @@ export default async function configSetup(arg: ISetupConfigType): Promise<ISetup
       packageJSON,
     );
   }
+
+  newArg.dumpConfig = dumpConfigRequest(
+    newArg.dumpConfig,
+    newArg.sensitiveConfigDevelopment,
+  );
 
   return newArg;
 }

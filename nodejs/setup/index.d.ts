@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  */
-import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IDumpConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 /**
  * Contains all the configuration file information in a single
  * area for utility reasons
@@ -16,6 +16,7 @@ export interface ISetupConfigType {
     sensitiveConfigProduction: ISensitiveConfigRawJSONDataType;
     dbConfigProduction: IDBConfigRawJSONDataType;
     redisConfigProduction: IRedisConfigRawJSONDataType;
+    dumpConfig: IDumpConfigRawJSONDataType;
 }
 /**
  * Runs the setup, check out the main.ts function to see

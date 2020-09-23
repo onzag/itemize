@@ -37,6 +37,10 @@ export declare const checkConfig: Ajv.ValidateFunction;
  */
 export declare const checkDBConfig: Ajv.ValidateFunction;
 /**
+ * Check raw dump config
+ */
+export declare const checkDumpConfig: Ajv.ValidateFunction;
+/**
  * Check redis config
  */
 export declare const checkRedisConfig: Ajv.ValidateFunction;

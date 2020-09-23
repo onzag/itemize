@@ -133,7 +133,9 @@ Open your favorite browser and go to `localhost:8000` it should be up and runnin
 
 After you have gotten the files for the project you will need the config files, the config files are not included in source control, as such you need to get them in a different way since they contain sensitive information.
 
-After that you should run `npm run build` and then you might start a dev environment via `npm run start-dev-environment development` and if required you should run `npm run build-database development` and then start a dev server via `npm run start-dev-server`
+After that you should run `npm run build` and then you might start a dev environment via `npm run start-dev-environment development` and if required you should run `npm run build-database development`, if your project has a `dump` folder which includes the databse dump that might be necessary to make the database function you will have to import those dumps using `npm run build-database development load-dump`
+
+Then start a dev server via `npm run start-dev-server`
 
 ## Additional Steps
 
@@ -205,4 +207,4 @@ The development build is protected by default, so it can't be easily accessed un
 
 ## Start hacking
 
-Now you know all the basic initialization steps, you should now follow the [Developing Flow](./tutorial.md) which will explain how to create a airbnb like website using itemize.
+Now you know all the basic initialization steps, you should now follow the [Tutorial](./tutorial.md) which will explain how to create a airbnb like website using itemize.

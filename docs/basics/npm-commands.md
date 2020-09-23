@@ -30,11 +30,23 @@ Runs both tsc, webpack, webpack-dev and build-data combined giving a new buildnu
 
 Builds the data of the app for the many languages and spawns a new version of the app, note that for this new data to be loaded the server needs to be reloaded; as the old data is often kept in memory (but not all!), this means that there might be inconsistencies with new and old data, so once you rebuild the data it is recommended to restart the server, the client will then detect this change and request an update.
 
-## npm run build-database [development|production]
+## npm run build-database [development|production] (dump|load-dump)
 
 Do not run this command before running build-data as this command requires the data to have been built in order to read the resulting files and decide how to build (or rebuild) the database, this is a very delicate process so ensure to have saved copies of your database before doing this in case of corruption.
 
 the development or production arguments is what is used to decide which databse to connect, yes, you can update the database remotely using this script.
+
+### with dump
+
+It will use the `dump.json` config as a reference in order to dump database data into the dump folder, this information "IS" supposed to be committed into source control, this is mainly to dump information that is meant to be used by the interface, by default the `dump.json` will dump all the fragments of the CMS module.
+
+This command can be dangerous as you can leak information (password hashes included) if you dump the wrong parts.
+
+### with load-dump
+
+It will use the `dump.json` config file as a reference in order to load an existant dump folder information, this is a standard part of the setup step of already existant projects, it will load information and set it up in the new database. If you are running this command as a way to update you will have to reset your server and all your instances, which is the logical thing to do if you are updating, as this writes directly to the database and will not inform any client.
+
+This command can be dangerous as it can destroy the database, so use with caution
 
 ## npm run get-deployable [development|production] [(INSTANCE_GROUP_ID)] [full|standard|slim|(comma separated list of services)]
 

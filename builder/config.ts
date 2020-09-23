@@ -10,7 +10,7 @@ import path from "path";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IRedisConfigRawJSONDataType, IDBConfigRawJSONDataType } from "../config";
 import Traceback from "./Traceback";
 import CheckUpError from "./Error";
-import { ajvCheck, checkConfig, checkSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
+import { ajvCheck, checkConfig, checkDumpConfig, checkSensitiveConfig, checkDBConfig, checkRedisConfig } from "./schema-checks";
 import { countries, currencies } from "../imported-resources";
 import jsonMap from "json-source-map";
 import Ajv from "ajv";
@@ -76,7 +76,7 @@ export async function extractOneConfig<T>(
  */
 export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfigType> {
   // index.json CHECKING /////////////////////////
-  let standardConfigCheckerCallback = (data: IConfigRawJSONDataType, traceback: Traceback) => {
+  const standardConfigCheckerCallback = (data: IConfigRawJSONDataType, traceback: Traceback) => {
     // let's check the fallback values, first if the country is a valid country
     if (!countries[data.fallbackCountryCode]) {
       throw new CheckUpError(
@@ -101,16 +101,66 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
         traceback.newTraceToBit("fallbackLanguage"),
       );
     }
+
+    if (!data.containersRegionMappers["*"]) {
+      throw new CheckUpError(
+        "The containers regions mappers is missing the asterisk (*) property",
+        traceback.newTraceToBit("containersRegionMappers"),
+      );
+    }
+
+    Object.keys(data.containersRegionMappers).forEach((regions) => {
+      const target = data.containersRegionMappers[regions];
+      if (regions !== "*") {
+        const countriesForRegion = regions.split(",").map((c) => c.trim());
+        countriesForRegion.forEach((c) => {
+          if (!countries[c]) {
+            throw new CheckUpError(
+              "Invalid country code " + c,
+              traceback.newTraceToBit("containersRegionMappers").newTraceToBit(regions),
+            );
+          }
+        });
+      }
+
+      if (!data.containersHostnamePrefixes[target]) {
+        console.warn(
+          "There's no container hostname prefix specified for " + target +
+          " but it's mentioned in regions " + regions +
+          " as such file support is unavailable for such container"
+        );
+      } else {
+        if (
+          data.containersHostnamePrefixes[target].startsWith("http") ||
+          data.containersHostnamePrefixes[target].startsWith("//:")
+        ) {
+          throw new CheckUpError(
+            "Invalid container hostname prefix, a protocol shouldn't be provided, https assumed",
+            traceback.newTraceToBit("containersHostnamePrefixes").newTraceToBit(target),
+          );
+        }
+      }
+    });
   };
   const standardConfig = await extractOneConfig<IConfigRawJSONDataType>(
     checkConfig, "index", null, false, standardConfigCheckerCallback,
   );
 
+  const sensitiveConfigCheckerCallback = (data: ISensitiveConfigRawJSONDataType, traceback: Traceback) => {
+    Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
+      if (!data.openstackContainers[containerId]) {
+        throw new CheckUpError(
+          "Could not find container information for container " + containerId + " in sensitive config",
+          traceback.newTraceToBit("openstackContainers"),
+        );
+      }
+    });
+  };
   const sensitiveConfig = await extractOneConfig<ISensitiveConfigRawJSONDataType>(
-    checkSensitiveConfig, "index", null, true,
+    checkSensitiveConfig, "index", null, true, sensitiveConfigCheckerCallback,
   );
   await extractOneConfig(
-    checkSensitiveConfig, "index", "production", true,
+    checkSensitiveConfig, "index", "production", true, sensitiveConfigCheckerCallback,
   );
 
   const redisConfig = await extractOneConfig<IRedisConfigRawJSONDataType>(
@@ -125,6 +175,10 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
   );
   await extractOneConfig(
     checkDBConfig, "db", "production", true,
+  );
+
+  await extractOneConfig(
+    checkDumpConfig, "dump", null, false,
   );
 
   return {

@@ -54,12 +54,13 @@ export declare function processSingleFileFor(newValue: IGQLFile, oldValue: IGQLF
 /**
  * Deletes the folder that contains all
  * the file data
+ * @param domain the domain we are working with
  * @param uploadsContainer the container that contains the file
  * @param itemDefinitionOrModule the item definition or module in question
- * @param filesContainerId the transitory id to drop
+ * @param idVersionId the transitory id to drop
  * @returns a void promise from when this is done
  */
-export declare function deleteEverythingInFilesContainerId(uploadsContainer: pkgcloud.storage.Container, itemDefinitionOrModule: ItemDefinition | Module, filesContainerId: string): Promise<void>;
+export declare function deleteEverythingInFilesContainerId(domain: string, uploadsContainer: pkgcloud.storage.Container, itemDefinitionOrModule: ItemDefinition | Module, idVersionId: string): Promise<void>;
 export declare function removeFolderFor(uploadsContainer: pkgcloud.storage.Container, mainPath: string): Promise<void>;
 /**
  * Uploads a file in a given upload container

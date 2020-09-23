@@ -565,7 +565,7 @@ class Cache {
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
             if (someFilesInItemDef) {
                 if (containerExists) {
-                    await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
                 }
                 else {
                     _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available", {
@@ -575,7 +575,7 @@ class Cache {
             }
             if (someFilesInModule) {
                 if (containerExists) {
-                    await file_management_1.deleteEverythingInFilesContainerId(this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
                 }
                 else {
                     _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available", {

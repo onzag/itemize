@@ -878,6 +878,7 @@ export class Cache {
       if (someFilesInItemDef) {
         if (containerExists) {
           await deleteEverythingInFilesContainerId(
+            this.domain,
             this.uploadsContainers[containerId].container,
             itemDefinition,
             id + "." + (specifiedVersion || null),
@@ -894,6 +895,7 @@ export class Cache {
       if (someFilesInModule) {
         if (containerExists) {
           await deleteEverythingInFilesContainerId(
+            this.domain,
             this.uploadsContainers[containerId].container,
             itemDefinition.getParentModule(),
             id + "." + (specifiedVersion || null),

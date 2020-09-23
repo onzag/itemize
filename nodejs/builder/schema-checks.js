@@ -53,6 +53,10 @@ exports.checkConfig = ajv.compile(config_1.rawConfigSchema);
  */
 exports.checkDBConfig = ajv.compile(config_1.rawDBConfigSchema);
 /**
+ * Check raw dump config
+ */
+exports.checkDumpConfig = ajv.compile(config_1.dumpConfigSchema);
+/**
  * Check redis config
  */
 exports.checkRedisConfig = ajv.compile(config_1.rawRedisConfigSchema);

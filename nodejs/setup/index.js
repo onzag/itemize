@@ -68,6 +68,7 @@ async function setup(...onlyNames) {
     console.log(colors_1.default.bgGreen("INITIALIZING SETUP"));
     await ensureConfigDirectory();
     const standardConfig = await readConfigFile("index.json");
+    const dumpConfig = await readConfigFile("dump.json");
     const sensitiveConfigDevelopment = await readConfigFile("index.sensitive.json");
     const dbConfigDevelopment = await readConfigFile("db.sensitive.json");
     const redisConfigDevelopment = await readConfigFile("redis.sensitive.json");
@@ -82,6 +83,7 @@ async function setup(...onlyNames) {
         sensitiveConfigProduction,
         dbConfigProduction,
         redisConfigProduction,
+        dumpConfig,
     };
     for (const step of stepsInOrder) {
         if (onlyNames.length && !onlyNames.includes(step.name)) {
@@ -90,6 +92,7 @@ async function setup(...onlyNames) {
         arg = await step.fn(arg);
     }
     await writeConfigFile("index.json", arg.standardConfig, standardConfig);
+    await writeConfigFile("dump.json", arg.dumpConfig, dumpConfig);
     await writeConfigFile("index.sensitive.json", arg.sensitiveConfigDevelopment, sensitiveConfigDevelopment);
     await writeConfigFile("db.sensitive.json", arg.dbConfigDevelopment, dbConfigDevelopment);
     await writeConfigFile("redis.sensitive.json", arg.redisConfigDevelopment, redisConfigDevelopment);

@@ -83,6 +83,30 @@ Itemize is extremely efficient and freezes and ties resources to buildnumbers us
 
 Disruption should be minimal, having offline support the users should not even notice and just get a sudden app outdated message; or otherwise the app will automatically update on next restart.
 
+## Making a dump
+
+If your web app is highly dynamic and can be modified in real time (which is endorsed via the usage of fragments), you might want to make a dump so that when you spin your application in another computer with another database (and/or) another set of openstack containers this information is not lost, for that you might want to setup a dumpfile, the `dump.json` file is encountered in the config folder, by default it dumps all fragments, if you want to understand or modify what is dumped you might want to check the [Dump Configuration](./basics/configuration.md#dump-configuration) be warned that you run the risk of dumping data that you might not want dumped otherwise.
+
+The dump is meant to go alongside the source control, this allows to replicate the application state of the things you want, for example, usually in itemize we endorse that your hero is a fragment of id 1 and version it into as many languages as you support, as a developer you might not have any interest on designing this fragment, however the signature of the element to load in the place where the hero goes has to be specified; if you don't dump this fragment, and you spin a new instance of the server with a clean database, no fragments will be available and as such you will get a "this item can't be found" error, because there's no fragment with id 1.
+
+Going towards the CMS and adding the fragments manually can be a pain, because that means copying the raw HTML in the CMS, and yet the CMS rich text editor of choice (for example itemize comes with quill by default in its fast prototyping module which cannot copy/paste fragments) so you are stuck, and there might be hundreds of fragments, and reinserting these in every instance you spin is not helpful; as such you would use the dump for this.
+
+The dump will replicate and fetch images, and files and then patch a new server instance with that information, this dump is meant to go to source control, so don't dump critical information, as even passwords will be dumped; you should dump what is necessary for your application to look right, and you might get new dumps from the designers once their job on the CMS is done, reload them, and such, this allows to split the job, and modify the website in real time without changing the codebase.
+
+Note that dumps are tied to your database and schema shape, while itemize will do its best to make the new information fit, you might encounter issues, so dumping and loading dumps is a risky process.
+
+To create a dump.
+
+`npm run build-database development dump`
+
+You might create a dump from the production database as well, so you fetch the last state of your app as the designers have made it:
+
+`npm run build-database production dump`
+
+To load a dump that you have fetch, into the development database as well as into the namespace for development of the openstack containers:
+
+`npm run build-database development load-dump`
+
 ## Itemize Developing Flow
 
 If you are an itemize itself developer, you might need to make changes to the itemize library itself, this is not an easy feat, but this should provide insight on how to achieve just that.

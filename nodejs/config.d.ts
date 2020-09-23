@@ -134,6 +134,68 @@ export interface ISensitiveConfigOpenstackContainerType {
     containerName: string;
 }
 /**
+ * Specification to dump specific item definitions
+ */
+export interface IDumpSpecificIdefInfoType {
+    /**
+     * The item definition path inside the module
+     * if it's a boolean dump all of the items
+     * if it's an array with number, or number string, dump the specific id, id,version combo
+     */
+    [idefPath: string]: boolean | Array<number | [number, string]>;
+}
+/**
+ * Specification to dump specific modules
+ */
+export interface IDumpSpecificModInfoType {
+    /**
+     * The module path as module/submodule
+     * if it's a boolean dump all
+     * if it's an array with number, or number string, dump the specific id, version combo
+     * otherwise dump only specific item definition types
+     */
+    [modPath: string]: boolean | Array<number | [number, string]> | IDumpSpecificIdefInfoType;
+}
+/**
+ * A structure that specifies how files are to be dumped
+ * and then reloaded
+ */
+export interface IDumpConfigRawJSONDataType {
+    /**
+     * Specifies the dump process
+     * If it's a boolean, dump all, otherwse
+     * we only dump specific modules
+     */
+    save: boolean | IDumpSpecificModInfoType;
+    /**
+     * Specifies how the dump is to be loaded
+     */
+    load: {
+        /**
+         * Map previous containers that have been dumped to new
+         * containers, the previous container id mapper has priority over
+         * the version mapper, it will try to get one
+         * from the list in order of priority
+         */
+        previousContainerIdMapper?: {
+            [containerId: string]: string[];
+        };
+        /**
+         * Specifies a container based on a version, it will try to get one
+         * from the list in order of priority
+         */
+        versionMapper?: {
+            [version: string]: string[];
+        };
+        /**
+         * If none of the version mappers nor the previous container id mappers match
+         * and the previous container id is not found in the current configuration
+         * this container will be used instead
+         */
+        primaryContainerId: string;
+    };
+}
+/**
  * The sensitive information
  */
 export interface ISensitiveConfigRawJSONDataType {
@@ -339,6 +401,109 @@ export declare const rawSensitiveConfigSchema: {
     };
     additionalProperties: boolean;
     required: string[];
+};
+/**
+ * A json validating schema for the dump configuration
+ */
+export declare const dumpConfigSchema: {
+    type: string;
+    properties: {
+        save: {
+            anyOf: ({
+                type: string;
+                additionalProperties?: undefined;
+            } | {
+                type: string;
+                additionalProperties: {
+                    anyOf: ({
+                        type: string;
+                        items?: undefined;
+                        maxItems?: undefined;
+                        minItems?: undefined;
+                        additionalProperties?: undefined;
+                    } | {
+                        type: string;
+                        items: {
+                            type: string;
+                            anyOf?: undefined;
+                        };
+                        maxItems?: undefined;
+                        minItems?: undefined;
+                        additionalProperties?: undefined;
+                    } | {
+                        type: string;
+                        maxItems: number;
+                        minItems: number;
+                        items: {
+                            anyOf: {
+                                type: string;
+                            }[];
+                            type?: undefined;
+                        };
+                        additionalProperties?: undefined;
+                    } | {
+                        type: string;
+                        additionalProperties: {
+                            anyOf: ({
+                                type: string;
+                                items?: undefined;
+                                maxItems?: undefined;
+                                minItems?: undefined;
+                            } | {
+                                type: string;
+                                items: {
+                                    type: string;
+                                    anyOf?: undefined;
+                                };
+                                maxItems?: undefined;
+                                minItems?: undefined;
+                            } | {
+                                type: string;
+                                maxItems: number;
+                                minItems: number;
+                                items: {
+                                    anyOf: {
+                                        type: string;
+                                    }[];
+                                    type?: undefined;
+                                };
+                            })[];
+                        };
+                        items?: undefined;
+                        maxItems?: undefined;
+                        minItems?: undefined;
+                    })[];
+                };
+            })[];
+        };
+        load: {
+            type: string;
+            properties: {
+                previousContainerIdMapper: {
+                    type: string;
+                    additionalProperties: {
+                        type: string;
+                        items: {
+                            type: string;
+                        };
+                    };
+                };
+                versionMapper: {
+                    type: string;
+                    additionalProperties: {
+                        type: string;
+                        items: {
+                            type: string;
+                        };
+                    };
+                };
+                primaryContainerId: {
+                    type: string;
+                };
+                required: string[];
+            };
+        };
+    };
 };
 /**
  * A json validating schema for the standard configuration

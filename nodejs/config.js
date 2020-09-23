@@ -154,6 +154,112 @@ exports.rawSensitiveConfigSchema = {
     ],
 };
 /**
+ * A json validating schema for the dump configuration
+ */
+exports.dumpConfigSchema = {
+    type: "object",
+    properties: {
+        save: {
+            anyOf: [
+                {
+                    type: "boolean",
+                },
+                {
+                    type: "object",
+                    additionalProperties: {
+                        anyOf: [
+                            {
+                                type: "boolean",
+                            },
+                            {
+                                type: "array",
+                                items: {
+                                    type: "number",
+                                },
+                            },
+                            {
+                                type: "array",
+                                maxItems: 2,
+                                minItems: 2,
+                                items: {
+                                    anyOf: [
+                                        {
+                                            type: "string",
+                                        },
+                                        {
+                                            type: "number",
+                                        },
+                                    ]
+                                },
+                            },
+                            {
+                                type: "object",
+                                additionalProperties: {
+                                    anyOf: [
+                                        {
+                                            type: "boolean",
+                                        },
+                                        {
+                                            type: "array",
+                                            items: {
+                                                type: "number",
+                                            },
+                                        },
+                                        {
+                                            type: "array",
+                                            maxItems: 2,
+                                            minItems: 2,
+                                            items: {
+                                                anyOf: [
+                                                    {
+                                                        type: "string",
+                                                    },
+                                                    {
+                                                        type: "number",
+                                                    },
+                                                ]
+                                            },
+                                        },
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+        },
+        load: {
+            type: "object",
+            properties: {
+                previousContainerIdMapper: {
+                    type: "object",
+                    additionalProperties: {
+                        type: "array",
+                        items: {
+                            type: "string",
+                        },
+                    }
+                },
+                versionMapper: {
+                    type: "object",
+                    additionalProperties: {
+                        type: "array",
+                        items: {
+                            type: "string",
+                        },
+                    }
+                },
+                primaryContainerId: {
+                    type: "string",
+                },
+                required: [
+                    "primaryContainerId",
+                ],
+            },
+        }
+    },
+};
+/**
  * A json validating schema for the standard configuration
  */
 exports.rawConfigSchema = {
