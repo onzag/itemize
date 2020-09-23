@@ -120,6 +120,12 @@ export interface IConfigRawJSONDataType {
     containersHostnamePrefixes: {
         [containerId: string]: string;
     };
+    /**
+     * Special custom configuration
+     */
+    custom?: {
+        [customKey: string]: any;
+    };
 }
 /**
  * The sensitive openstack container information
@@ -267,6 +273,12 @@ export interface ISensitiveConfigRawJSONDataType {
      * interface
      */
     devKey: string;
+    /**
+     * Custom information added to the sensitive config
+     */
+    custom?: {
+        [customKey: string]: any;
+    };
 }
 /**
  * The database config
@@ -397,6 +409,10 @@ export declare const rawSensitiveConfigSchema: {
         };
         seoContainerID: {
             type: string;
+        };
+        custom: {
+            type: string;
+            additionalProperties: {};
         };
     };
     additionalProperties: boolean;
@@ -607,6 +623,10 @@ export declare const rawConfigSchema: {
             additionalProperties: {
                 type: string;
             };
+        };
+        custom: {
+            type: string;
+            additionalProperties: {};
         };
     };
     additionalProperties: boolean;

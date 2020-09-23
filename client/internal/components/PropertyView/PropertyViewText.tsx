@@ -59,6 +59,68 @@ export const ALLOWED_CLASSES_PREFIXES = [
 ];
 
 /**
+ * Template events that are supported these
+ * exist as data-on-[event]="{{event}}"
+ */
+export const SUPPORTED_TEMPLATE_EVENTS = [
+  "click",
+  "blur",
+  "focus",
+  "input",
+  "keydown",
+  "keypress",
+  "keyup",
+  "mousedown",
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseover",
+  "mouseout",
+  "mouseup",
+  "mousewheel",
+  "touchstart",
+  "touchmove",
+  "touchend",
+  "touchcancel",
+  "wheel",
+];
+
+/**
+ * Styles that might pop in when using templates
+ * exist as data-[supportedTemplateStyle]-style="position:absolute;"
+ */
+export const SUPPORTED_TEMPLATE_STYLES = [
+  "hover",
+  "active",
+];
+
+/**
+ * Modify the content of the children based on
+ * the template args
+ */
+export const SUPPORTED_CONTENT_MODIFIERS = [
+  "text",
+  "html",
+];
+
+/**
+ * Custom handlers to modify the information within the system
+ * use args
+ */
+export const SUPPORTED_HANDLERS = [
+  "ui",
+];
+
+/**
+ * This is what a handler expects out of the template
+ */
+export interface ICustomUITemplateHandler {
+  initialize: (bareNode: HTMLElement) => HTMLElement;
+  load?: (customNode: HTMLElement) => void;
+  unload?: (customNode: HTMLElement) => void;
+}
+
+/**
  * clean all attributes in a html element
  * @param node the node to clean for
  */
@@ -222,6 +284,20 @@ export function propertyViewPostProcessingHook(
       node.removeAttribute("style");
     }
   }
+
+  SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
+    const templateEventStyle = node.dataset[attr + "Style"];
+    if (templateEventStyle) {
+      const removeStyle =
+        templateEventStyle.indexOf("javascript") !== -1 ||
+        templateEventStyle.indexOf("http") !== -1 ||
+        templateEventStyle.indexOf("://") !== -1 ||
+        templateEventStyle.indexOf("fixed") !== -1;
+      if (removeStyle) {
+        delete node.dataset[attr + "Style"];
+      }
+    }
+  });
 
   const classList = node.classList;
   if (classList) {

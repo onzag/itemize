@@ -41,6 +41,34 @@ export declare const ALLOWED_CLASSES: string[];
  */
 export declare const ALLOWED_CLASSES_PREFIXES: string[];
 /**
+ * Template events that are supported these
+ * exist as data-on-[event]="{{event}}"
+ */
+export declare const SUPPORTED_TEMPLATE_EVENTS: string[];
+/**
+ * Styles that might pop in when using templates
+ * exist as data-[supportedTemplateStyle]-style="position:absolute;"
+ */
+export declare const SUPPORTED_TEMPLATE_STYLES: string[];
+/**
+ * Modify the content of the children based on
+ * the template args
+ */
+export declare const SUPPORTED_CONTENT_MODIFIERS: string[];
+/**
+ * Custom handlers to modify the information within the system
+ * use args
+ */
+export declare const SUPPORTED_HANDLERS: string[];
+/**
+ * This is what a handler expects out of the template
+ */
+export interface ICustomUITemplateHandler {
+    initialize: (bareNode: HTMLElement) => HTMLElement;
+    load?: (customNode: HTMLElement) => void;
+    unload?: (customNode: HTMLElement) => void;
+}
+/**
  * The postprocessing hook that cleans and sets the attributes
  * right for the rich text in order to follow the standards
  * given by the text-specs.md file

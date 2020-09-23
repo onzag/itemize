@@ -10,8 +10,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const PropertyViewText_1 = require("../../../internal/components/PropertyView/PropertyViewText");
 const react_1 = __importDefault(require("react"));
 const util_1 = require("../../../../util");
+const deep_equal_1 = __importDefault(require("deep-equal"));
 /**
  * The current intersection observer
  */
@@ -141,7 +143,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
         this.divref = react_1.default.createRef();
         this.cheapdiv = util_1.DOMWindow.document.createElement("div");
         this.state = {
-            html: this.getHTML(props.children),
+            html: this.getHTML(props.children, props.disableLinks, props.isTemplate, props.disableHTMLTemplating, props.templateArgs),
         };
     }
     /**
@@ -149,7 +151,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
      * that is going to be rendered instead for the inner html
      * @param html
      */
-    getHTML(html) {
+    getHTML(html, disableLinks, isTemplate, disableHTMLTemplating, templateArgs) {
         // with no html it's null
         if (!html) {
             return null;
@@ -161,7 +163,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
         // so first we get all the images
         this.cheapdiv.querySelectorAll("img").forEach((img) => {
             let a = null;
-            if (!this.props.disableLinks) {
+            if (!disableLinks) {
                 // this will wrap our image, for SEO purposes as well as to
                 // have a click to it
                 a = util_1.DOMWindow.document.createElement("a");
@@ -180,7 +182,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 img.dataset.sizes = img.sizes;
                 img.removeAttribute("sizes");
             }
-            if (!this.props.disableLinks) {
+            if (!disableLinks) {
                 // now we replace the img with the a link
                 img.parentNode.replaceChild(a, img);
                 // and add the image inside the a link
@@ -194,6 +196,43 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 iframe.removeAttribute("src");
             }
         });
+        if (isTemplate) {
+            this.cheapdiv.querySelectorAll("[data-ui-handler]").forEach((node) => {
+                const handlerToUseKey = node.getAttribute("data-ui-handler");
+                const handler = this.props.templateArgs[handlerToUseKey];
+                if (typeof handler === "undefined") {
+                    // we do not log because this will hit the server side, the client side will see it anyway
+                    // console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
+                }
+                else if (handler && handler.initialize && typeof handler.initialize === "function") {
+                    const resultNode = handler.initialize(node);
+                    resultNode.setAttribute("data-ui-handler", handlerToUseKey);
+                    node.parentElement.replaceChild(resultNode, node);
+                }
+            });
+            this.cheapdiv.querySelectorAll("[data-text]").forEach((node) => {
+                const textKey = node.getAttribute("data-text");
+                const text = this.props.templateArgs[textKey];
+                if (typeof text === "string" && text !== null) {
+                    // we do not log because this will hit the server side
+                }
+                else {
+                    node.textContent = text;
+                }
+            });
+            if (!disableHTMLTemplating) {
+                this.cheapdiv.querySelectorAll("[data-html]").forEach((node) => {
+                    const htmlKey = node.getAttribute("data-html");
+                    const html = this.props.templateArgs[htmlKey];
+                    if (typeof html === "string" && html !== null) {
+                        // we do not log because this will hit the server side
+                    }
+                    else {
+                        node.innerHTML = html;
+                    }
+                });
+            }
+        }
         // and return the fresh inner html
         return this.cheapdiv.innerHTML;
     }
@@ -218,9 +257,9 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
      * updates the html
      * @param html the html to update for
      */
-    updateHTML(html) {
+    updateHTML(html, disableLinks, isTemplate, disableHTMLTemplating, templateArgs) {
         this.setState({
-            html: this.getHTML(html),
+            html: this.getHTML(html, disableLinks, isTemplate, disableHTMLTemplating, templateArgs),
         });
     }
     /**
@@ -256,22 +295,108 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
         // if there are no old school listeners this function will do nothing as none is listening
         triggerOldSchoolListeners();
     }
+    attachTemplateListeners() {
+        PropertyViewText_1.SUPPORTED_TEMPLATE_EVENTS.forEach((eventKey) => {
+            this.divref.current.querySelectorAll("[data-on-" + eventKey + "]").forEach((node) => {
+                const functionToCall = node.getAttribute("data-on-" + eventKey);
+                let processedFunctionToCall = functionToCall.trim();
+                const fn = this.props.templateArgs[processedFunctionToCall];
+                if (typeof fn === "undefined") {
+                    console.warn("Listener does not match a function to call in template at data-on-" + eventKey + "=" + JSON.stringify(functionToCall));
+                }
+                else if (typeof fn !== "function" && fn !== null) {
+                    console.warn("Listener is not an actual function but rather " +
+                        (typeof fn) +
+                        " at data-on-" + eventKey + "=" + JSON.stringify(functionToCall));
+                }
+                else if (fn !== null) {
+                    this.divref.current.addEventListener(eventKey, fn);
+                }
+            });
+        });
+        this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node) => {
+            const handlerToUseKey = node.getAttribute("data-ui-handler");
+            const handler = this.props.templateArgs[handlerToUseKey];
+            if (typeof handler === "undefined") {
+                console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
+            }
+            else if (handler && handler.load) {
+                handler.load(node);
+            }
+        });
+        this.divref.current.querySelectorAll("[data-hover-style]").forEach((node) => {
+            const styleToUse = node.getAttribute("data-hover-style");
+            const originalStyle = node.getAttribute("style");
+            node.addEventListener("moouseover", () => {
+                node.setAttribute("style", styleToUse);
+            });
+            node.addEventListener("mouseleave", () => {
+            });
+        });
+        this.divref.current.querySelectorAll("[data-active-style]").forEach((node) => {
+            const styleToUse = node.getAttribute("data-active-style");
+            const originalStyle = node.getAttribute("style");
+            const setStyle = () => {
+                node.setAttribute("style", styleToUse);
+            };
+            const rmStyle = () => {
+                if (originalStyle) {
+                    node.setAttribute("style", originalStyle);
+                }
+                else {
+                    node.removeAttribute("style");
+                }
+            };
+            node.addEventListener("touchstart", setStyle);
+            node.addEventListener("touchend", rmStyle);
+            node.addEventListener("mousedown", setStyle);
+            node.addEventListener("mouseup", rmStyle);
+        });
+    }
+    dropOldHandlers() {
+        this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node) => {
+            const handlerToUseKey = node.getAttribute("data-ui-handler");
+            const handler = this.props.templateArgs[handlerToUseKey];
+            if (typeof handler === "undefined") {
+                console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
+            }
+            else if (handler && handler.unload) {
+                handler.unload(node);
+            }
+        });
+    }
     componentDidMount() {
         // we prepare all the lazy loader stuff which might make our things
         // go with loading=lazy
         this.prepareLazyLoader();
         // and attach the events for the stuff
         this.attachEvents();
+        if (this.props.isTemplate) {
+            this.attachTemplateListeners();
+        }
     }
     componentDidUpdate() {
         // on any update we do the same as we only really update when the html changes
         // any other updates are denied
         this.prepareLazyLoader();
         this.attachEvents();
+        if (this.props.isTemplate) {
+            this.attachTemplateListeners();
+        }
+    }
+    componentWillUnmount() {
+        if (this.props.isTemplate) {
+            this.dropOldHandlers();
+        }
     }
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.children !== this.props.children) {
-            this.updateHTML(nextProps.children);
+        if (nextProps.children !== this.props.children ||
+            nextProps.disableLinks !== this.props.disableLinks ||
+            nextProps.isTemplate !== this.props.isTemplate ||
+            nextProps.disableHTMLTemplating !== this.props.disableHTMLTemplating ||
+            !deep_equal_1.default(nextProps.templateArgs, this.props.templateArgs)) {
+            this.dropOldHandlers();
+            this.updateHTML(nextProps.children, nextProps.disableLinks, nextProps.isTemplate, nextProps.disableHTMLTemplating, nextProps.templateArgs);
         }
         // see only when the html changes
         return this.state.html !== nextState.html;
@@ -298,7 +423,7 @@ function PropertyViewTextRenderer(props) {
         return react_1.default.createElement(NullComponent, Object.assign({}, nullArgs));
     }
     if (props.isRichText) {
-        return (react_1.default.createElement(PropertyViewRichTextViewer, { disableLinks: !!props.args.disableLinks }, props.currentValue));
+        return (react_1.default.createElement(PropertyViewRichTextViewer, { disableLinks: !!props.args.disableLinks, isTemplate: !!props.args.makeTemplate, templateArgs: props.args.templateArgs, disableHTMLTemplating: !!props.args.disableHTMLTemplating }, props.currentValue));
     }
     else if (props.subtype === "plain") {
         return (react_1.default.createElement("div", { className: "plain-text" }, props.currentValue));

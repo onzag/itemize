@@ -207,4 +207,4 @@ The development build is protected by default, so it can't be easily accessed un
 
 ## Start hacking
 
-Now you know all the basic initialization steps, you should now follow the [Tutorial](./tutorial.md) which will explain how to create a airbnb like website using itemize.
+Now you know all the basic initialization steps, you should now follow one of the [Tutorials](../tutorials/README.md) which will explain how to create a airbnb like website using itemize.

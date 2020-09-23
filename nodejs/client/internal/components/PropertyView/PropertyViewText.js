@@ -39,6 +39,55 @@ exports.ALLOWED_CLASSES_PREFIXES = [
     "rich-text--", "container-", "custom-",
 ];
 /**
+ * Template events that are supported these
+ * exist as data-on-[event]="{{event}}"
+ */
+exports.SUPPORTED_TEMPLATE_EVENTS = [
+    "click",
+    "blur",
+    "focus",
+    "input",
+    "keydown",
+    "keypress",
+    "keyup",
+    "mousedown",
+    "mouseenter",
+    "mouseleave",
+    "mousemove",
+    "mouseover",
+    "mouseout",
+    "mouseup",
+    "mousewheel",
+    "touchstart",
+    "touchmove",
+    "touchend",
+    "touchcancel",
+    "wheel",
+];
+/**
+ * Styles that might pop in when using templates
+ * exist as data-[supportedTemplateStyle]-style="position:absolute;"
+ */
+exports.SUPPORTED_TEMPLATE_STYLES = [
+    "hover",
+    "active",
+];
+/**
+ * Modify the content of the children based on
+ * the template args
+ */
+exports.SUPPORTED_CONTENT_MODIFIERS = [
+    "text",
+    "html",
+];
+/**
+ * Custom handlers to modify the information within the system
+ * use args
+ */
+exports.SUPPORTED_HANDLERS = [
+    "ui",
+];
+/**
  * clean all attributes in a html element
  * @param node the node to clean for
  */
@@ -166,6 +215,18 @@ function propertyViewPostProcessingHook(relatedProperty, currentFiles, supportsI
             node.removeAttribute("style");
         }
     }
+    exports.SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
+        const templateEventStyle = node.dataset[attr + "Style"];
+        if (templateEventStyle) {
+            const removeStyle = templateEventStyle.indexOf("javascript") !== -1 ||
+                templateEventStyle.indexOf("http") !== -1 ||
+                templateEventStyle.indexOf("://") !== -1 ||
+                templateEventStyle.indexOf("fixed") !== -1;
+            if (removeStyle) {
+                delete node.dataset[attr + "Style"];
+            }
+        }
+    });
     const classList = node.classList;
     if (classList) {
         classList.forEach((className) => {

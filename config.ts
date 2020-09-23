@@ -127,6 +127,12 @@ export interface IConfigRawJSONDataType {
   containersHostnamePrefixes: {
     [containerId: string]: string;
   };
+  /**
+   * Special custom configuration
+   */
+  custom?: {
+    [customKey: string]: any;
+  }
 }
 
 /**
@@ -280,6 +286,12 @@ export interface ISensitiveConfigRawJSONDataType {
    * interface
    */
   devKey: string;
+  /**
+   * Custom information added to the sensitive config
+   */
+  custom?: {
+    [customKey: string]: any;
+  }
 }
 
 /**
@@ -457,6 +469,10 @@ export const rawSensitiveConfigSchema = {
     },
     seoContainerID: {
       type: "string",
+    },
+    custom: {
+      type: "object",
+      additionalProperties: {}
     },
   },
   additionalProperties: false,
@@ -692,6 +708,10 @@ export const rawConfigSchema = {
       additionalProperties: {
         type: "string",
       },
+    },
+    custom: {
+      type: "object",
+      additionalProperties: {}
     },
   },
   additionalProperties: false,

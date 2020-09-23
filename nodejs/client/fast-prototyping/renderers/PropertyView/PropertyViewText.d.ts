@@ -13,6 +13,9 @@ import React from "react";
 interface IPropertyViewRichTextViewerProps {
     disableLinks: boolean;
     children?: string;
+    isTemplate?: boolean;
+    disableHTMLTemplating?: boolean;
+    templateArgs?: any;
 }
 /**
  * The rich text viewer state
@@ -47,7 +50,7 @@ export declare class PropertyViewRichTextViewer extends React.Component<IPropert
      * that is going to be rendered instead for the inner html
      * @param html
      */
-    getHTML(html: string): string;
+    getHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableHTMLTemplating: boolean, templateArgs: any): string;
     /**
      * Prepares the lazy loader, runs on mounting or changing
      */
@@ -56,13 +59,16 @@ export declare class PropertyViewRichTextViewer extends React.Component<IPropert
      * updates the html
      * @param html the html to update for
      */
-    updateHTML(html: string): void;
+    updateHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableHTMLTemplating: boolean, templateArgs: any): void;
     /**
      * Attach the events that are required for lazyloading
      */
     attachEvents(): void;
+    attachTemplateListeners(): void;
+    dropOldHandlers(): void;
     componentDidMount(): void;
     componentDidUpdate(): void;
+    componentWillUnmount(): void;
     shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState): boolean;
     render(): JSX.Element;
 }

@@ -66,8 +66,7 @@ Feel free to use them they won't pollute the environment; in fact src, srcset, a
 
 ### Handling
 
-For handling you should read the mediaProperty current value to find the file with the data-src-id and generate an appropiate
-src, sizes and srcset
+For handling you should read the mediaProperty current value to find the file with the data-src-id and generate an appropiate src, sizes and srcset
 
 ### Custom Renderers
 
@@ -75,17 +74,13 @@ When creating your own renderer view or entry, you should already have the src, 
 files that already existed even if they are stripped in the actually saved HTML as the handler will actually regenerate them; however
 for any new created content you must manually create the image structure; the server will recognize these.
 
-Do not bother removing the src, srcset nor sizes for sending; this will be done automatically by the server side itself, it won't serve
-them.
+Do not bother removing the src, srcset nor sizes for sending; this will be done automatically by the server side itself, it won't serve them.
 
-Other properties will also be removed, such as loading; so feel free to implement them in the renderer, it won't affect other clients
-only the spec here is allowed.
+Other properties will also be removed, such as loading; so feel free to implement them in the renderer, it won't affect other clients only the spec here is allowed.
 
 ### CSS
 
-In order to keep images property with a proper placeholder that takes the same exact size, this css is what is recommended
-into your rich text form, this will ensure that there's a div that takes as much space as your image, so not to have bad
-experience scrolling
+In order to keep images property with a proper placeholder that takes the same exact size, this css is what is recommended into your rich text form, this will ensure that there's a div that takes as much space as your image, so not to have bad experience scrolling
 
 ```scss
 .image {
@@ -198,8 +193,7 @@ Files can be inserted into the document and work similarly to images
 </span>
 ```
 
-As these are meant to be synced to the file data itself, open the file by using event listeners, a data-src property is also
-allowed and will be cleared
+As these are meant to be synced to the file data itself, open the file by using event listeners, a data-src property is also allowed and will be cleared
 
 ```html
 <span class="file" contenteditable="false" data-src="blob:xxxxxx" data-src-id="FILE2132131231231" spellcheck="false">
@@ -219,8 +213,7 @@ There are not really any forbidden attributes for the file
 
 ### CSS
 
-Files really don't need any css pattern to be properly functional as intended, just give them a nice style, the structure
-given is just to ensure consistency
+Files really don't need any css pattern to be properly functional as intended, just give them a nice style, the structure given is just to ensure consistency
 
 ## Custom Styles
 
@@ -260,6 +253,79 @@ however since any user could be allowed to use this you can only have this work 
 
 And this is how you might create custom styles
 
+## Templating
+
+Templating should be supported in your view and should follow a spec, this is the recommended spec to follow and the one that itemize viewer supports by default, templating might be modified via its args
+
+Templating is simple and it's not meant to be a full solution to everything, templates should be used sparsely, they are simple and not optimized and rather limited
+
+### Text and HTML templating
+
+In order to setup a html template with a name do it this way
+
+```html
+<span data-text="userName">NAME OF THE USER HERE</span>
+```
+
+This means that the content of the span should be replaced, via textContent method using the variable for userName that is given via the arguments, html templating is also supported, but it's dangerous, the standard itemize viewer supports disabling of the HTML setting if not necessary even if templating is enabled
+
+```html
+<span data-html="userDescription">DESCRIPTION OF THE USER HERE</span>
+```
+
+### Style templating
+
+Two types of style templating are supported, and only available for templates "data-hover-style" and "data-active-style" both will replace the style attribute value when the actions are given
+
+Similar security policies apply from the style tag.
+
+```html
+<span data-style-hover="background-color: red">Hover me for red</span>
+```
+
+If style templating isn't enough as it's honestly very limiting you should definetely use a rich extension via the class attribute
+
+### Event handling
+
+It's totally possible to pass events to these templates to functions can be called externally, the supported events are:
+
+ - click
+ - blur
+ - focus
+ - input
+ - keydown
+ - keypress
+ - keyup
+ - mousedown
+ - mouseenter
+ - mouseleave
+ - mousemove
+ - mouseover
+ - mouseout
+ - mouseup
+ - mousewheel
+ - touchstart
+ - touchmove
+ - touchend
+ - touchcancel
+ - wheel
+
+These events are added like this
+
+```html
+<div class="rich-text--button" data-on-click="handler">click me</div>
+```
+
+Where handler should be defined in the arguments for it to call
+
+### Totally custom UI handlers
+
+A custom UI Handler can be defined via
+
+```html
+<div class="">
+```
+
 ## Containers
 
 Containers are simply components with the class `container` to it and might have anything under them, this might allow for custom styles
@@ -288,3 +354,23 @@ It will also remove classes that it doesn't consider valid, as such you should p
 These will not be stripped from the sanitizer.
 
 The sanitizer will strip anything that it considers harmful; this should be done in the renderer, a good approach to creating feature rich components could be to use something such as `<div class="custom-mycustomcomponent" data-info="SOME_JSON"></div>"` and you might implement it differently in the view renderer vs the entry renderer, eg. the entry renderer just display a black box whereas the view renderer displays a rich component.
+
+Most of the times you might think of a custom component to create custom logic functionality (eg. you have your own custom dynamic interactive objects) you might be better off using a custom UI handler or templating, these are natively supported by the itemize fast prototyping renderer as they are in the spec for example, let's say you want to make a button that pops up something and has custom text in it
+
+```html
+<div class="rich-text--button" data-on-click="openPopUp" data-text="openPopUpText">click me</div>
+```
+
+This is a better solution than
+
+```html
+<div class="custom-button"></div>
+```
+
+And then having to use a whole custom view renderer to handle this custom type, even if you need complex functionality the handlers should have your back on it via
+
+```html
+<div class="rich-text--very-complex-form" data-ui-handler="customHandler"></div>
+```
+
+And then passing the handler to the arg, check out [Templating](./templating.md) for information of how to fully implement templates or [Custom Text Components](./custom-text-components.md) for explanation on how to create custom rich text components that deviate from the spec defined here.

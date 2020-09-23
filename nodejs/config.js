@@ -136,6 +136,10 @@ exports.rawSensitiveConfigSchema = {
         seoContainerID: {
             type: "string",
         },
+        custom: {
+            type: "object",
+            additionalProperties: {}
+        },
     },
     additionalProperties: false,
     required: [
@@ -368,6 +372,10 @@ exports.rawConfigSchema = {
             additionalProperties: {
                 type: "string",
             },
+        },
+        custom: {
+            type: "object",
+            additionalProperties: {}
         },
     },
     additionalProperties: false,
