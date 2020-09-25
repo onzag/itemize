@@ -17,7 +17,7 @@ import {
   PREFIX_TRADITIONAL_SEARCH,
   ORDERBY_RULE,
 } from "../../../constants";
-import { GraphQLList, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType } from "graphql";
+import { GraphQLList, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType, GraphQLString } from "graphql";
 import Module from ".";
 import { getGQLFieldsDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/gql";
 import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefinition } from "./ItemDefinition/gql";
@@ -226,6 +226,9 @@ export function getGQLQueryFieldsForModule(
         },
         offset: {
           type: GraphQLNonNull(GraphQLInt),
+        },
+        last_record_date: {
+          type: GraphQLString,
         },
       },
       description: "A traditional array of results for the result list with search data",

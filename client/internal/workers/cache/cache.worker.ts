@@ -622,12 +622,16 @@ export default class CacheWorker {
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
       const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
-      await this.db.put(SEARCHES_TABLE_NAME, {
-        ...currentValue,
-        lastRecordDate: newLastRecordDate,
-        value: currentValue.value.concat(newRecords),
-        allResultsPreloaded: false,
-      }, storeKeyName);
+      // there might not be a current value, eg. if for some reason cache policy was set to none and yet
+      // there was a listen policy for it, or if otherwise the data got somehow corrupted
+      if (currentValue) {
+        await this.db.put(SEARCHES_TABLE_NAME, {
+          ...currentValue,
+          lastRecordDate: newLastRecordDate,
+          value: currentValue.value.concat(newRecords),
+          allResultsPreloaded: false,
+        }, storeKeyName);
+      }
     } catch {
       return false;
     }

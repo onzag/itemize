@@ -1756,6 +1756,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             fields: requestedSearchFields,
             itemDefinition: this.props.itemDefinitionInstance,
             cachePolicy: options.cachePolicy || "none",
+            listenPolicy: options.listenPolicy || options.cachePolicy || "none",
             createdBy: options.createdBy || null,
             orderBy: options.orderBy || {
                 created_at: {
@@ -1772,7 +1773,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             parentedBy,
         }, {
             remoteListener: this.props.remoteListener,
-            preventStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
+            preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
             onSearchUpdated: this.onSearchReload,
         });
         const searchId = uuid_1.default.v4();

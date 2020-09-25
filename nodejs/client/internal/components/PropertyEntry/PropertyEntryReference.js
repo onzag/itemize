@@ -160,6 +160,7 @@ class PropertyEntryReference extends react_1.default.Component {
             createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
             parentedBy: null,
             cachePolicy: "none",
+            listenPolicy: "none",
             token: this.props.tokenData.token,
             itemDefinition: idef.getSearchModeCounterpart(),
             traditional: true,
@@ -167,6 +168,7 @@ class PropertyEntryReference extends react_1.default.Component {
             limit: !loadAll ? 6 : (limit || 50),
             language: this.props.language,
             versionFilter: filterByLanguage ? this.props.language : null,
+            waitAndMerge: true,
         }, null);
         // these nulls which represent the listener are only truly used for the
         // cached searches, we don't use that here

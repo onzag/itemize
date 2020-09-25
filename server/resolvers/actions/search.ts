@@ -242,7 +242,7 @@ export async function searchModule(
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
-    null;
+    [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
   const count = (countResult[0] && countResult[0].count) || null;
   if (traditional) {
@@ -316,9 +316,10 @@ export async function searchModule(
           return valueToProvide.toReturnToUser;
         }),
       ),
+      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
-      count, 
+      count,
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -576,7 +577,7 @@ export async function searchItemDefinition(
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
-    null;
+    [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
   const count = (countResult[0] && countResult[0].count) || null;
   if (traditional) {
@@ -649,6 +650,7 @@ export async function searchItemDefinition(
           return valueToProvide.toReturnToUser;
         })
       ),
+      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 

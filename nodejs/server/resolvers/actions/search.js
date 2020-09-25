@@ -154,7 +154,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
     // return using the base result, and only using the id
     const baseResult = (generalFields.results || generalFields.records) ?
         (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :
-        null;
+        [];
     const countResult = generalFields.count ? (await countQuery) : null;
     const count = (countResult[0] && countResult[0].count) || null;
     if (traditional) {
@@ -209,6 +209,7 @@ async function searchModule(appData, resolverArgs, mod, traditional) {
                 }
                 return valueToProvide.toReturnToUser;
             })),
+            last_record_date: findLastRecordDateCheatMethod(baseResult),
             limit,
             offset,
             count,
@@ -383,7 +384,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
     // return using the base result, and only using the id
     const baseResult = (generalFields.results || generalFields.records) ?
         (await searchQuery).map(version_null_value_1.convertVersionsIntoNullsWhenNecessary) :
-        null;
+        [];
     const countResult = generalFields.count ? (await countQuery) : null;
     const count = (countResult[0] && countResult[0].count) || null;
     if (traditional) {
@@ -437,6 +438,7 @@ async function searchItemDefinition(appData, resolverArgs, resolverItemDefinitio
                 }
                 return valueToProvide.toReturnToUser;
             })),
+            last_record_date: findLastRecordDateCheatMethod(baseResult),
             limit,
             offset,
             count,

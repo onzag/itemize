@@ -168,6 +168,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
+  listenPolicy?: "by-owner" | "by-parent" | "none";
   traditional?: boolean;
   limit: number;
   offset: number;
@@ -2797,6 +2798,7 @@ export class ActualItemDefinitionProvider extends
       fields: requestedSearchFields,
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
+      listenPolicy: options.listenPolicy || options.cachePolicy || "none",
       createdBy: options.createdBy || null,
       orderBy: options.orderBy || {
         created_at: {
@@ -2813,7 +2815,7 @@ export class ActualItemDefinitionProvider extends
       parentedBy,
     }, {
       remoteListener: this.props.remoteListener,
-      preventStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
+      preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
       onSearchUpdated: this.onSearchReload,
     });
 

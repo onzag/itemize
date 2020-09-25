@@ -21,6 +21,7 @@ import {
   PREFIX_TRADITIONAL_SEARCH,
   IOrderByRuleType,
   ENDPOINT_ERRORS,
+  UNSPECIFIED_OWNER,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum } from "../../gql-querier";
@@ -858,6 +859,53 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
   return result;
 }
 
+type resolveRejectPromiseHandle = (resolve: (arg: IRunSearchQueryResult) => void, reject: (err: Error) => void) => void;
+
+const WAIT_AND_MERGE_CB_KEY_MAP: {
+  [key: string]: IRunSearchQueryArg;
+} = {};
+const WAIT_AND_MERGE_CB_LIST: {
+  [key: string]: Array<resolveRejectPromiseHandle>;
+} = {};
+
+interface IRunSearchQueryArg {
+  args: IGQLArgs,
+  fields: IGQLRequestFields,
+  itemDefinition: ItemDefinition,
+  orderBy: IOrderByRuleType;
+  createdBy: number;
+  parentedBy: {
+    itemDefinition: ItemDefinition,
+    id: number,
+    version: string,
+  };
+  cachePolicy: "by-owner" | "by-parent" | "none",
+  listenPolicy: "by-owner" | "by-parent" | "none",
+  traditional: boolean,
+  limit: number,
+  offset: number,
+  token: string,
+  language: string,
+  versionFilter?: string,
+  waitAndMerge?: boolean,
+}
+
+interface IRunSearchQuerySearchOptions {
+  remoteListener: RemoteListener,
+  onSearchUpdated: () => void,
+  preventCacheStaleFeeback: boolean,
+}
+
+interface IRunSearchQueryResult {
+  error: EndpointErrorType,
+  results?: IGQLValue[],
+  records: IGQLSearchRecord[],
+  count: number,
+  limit: number,
+  offset: number,
+  knownLastRecordDate: string,
+}
+
 /**
  * Runs the surprisingly complex search query
  * @param arg the arg for the search operation
@@ -873,6 +921,18 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
  * if cachePolicy is by-owner otherwise null
  * @param arg.parentedBy in order to filter by parenting, should be present
  * if cachePolicy is by-parent otherwise null
+ * @param arg.cachePolicy either "by-owner" (must specify createdBy) or "by-parent" (must specify parented-by) or
+ * otherwise "none", this will make it so that searches are ran in the cache rather than querying the
+ * endpoint, they will be ran inside the cache worker; this means the capabilities of search are limited
+ * compared to running them right into the endpoint, but that means searches can be performed offline
+ * as well as many results be cached, eg. a list of messages; cache policy is a very powerful
+ * option. Remember that offset must be 0, as we need to cache the latest result.
+ * @param arg.listenPolicy similar to cache policy takes the values of "by-owner", "by-parent" or "none", it will listen
+ * for changes in order to make it for realtime updates; this is very powerful when used in combination with cache policy and
+ * keeping the same values because that means realtime offline first search results, you might however decide not to use
+ * a cachePolicy, but this is more expensive than without it, as it will redo the search, whereas when in combination with
+ * cachePolicy that is of the same value, a diffing mechanism will be applied and the server won't be re-requested as the cache
+ * is patched with the new records
  * @param arg.traditional a traditional search, doesn't support any cache policy
  * @param arg.limit the limit to limit by, this should be less or equal to the limit
  * that you can get search results (for traditional) or search records (for standard)
@@ -882,53 +942,37 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
  * @param arg.language the language for dictionary purposes
  * @param arg.versionFilter an optional filter to filter by a given version so only
  * items matching a version appear
- * @param searchCacheOptions the search cache options used and required for by-owner
- * and by-parent searches
- * @param searchCacheOptions.remoteListener the remote listener object
- * @param searchCacheOptions.onSearchUpdated the function to trigger once the cache policy
+ * @param arg.waitAndMerge waits for other search requests that have the same signature and
+ * merges the response from the server, this is invalid if cachePolicy is any other than none
+ * @param searchOptions the search options used and required for cache based searches or
+ * listen based searches
+ * @param searchOptions.remoteListener the remote listener object
+ * @param searchOptions.onSearchUpdated the function to trigger once the cache policy
  * has indicated records have been added
- * @param searchCacheOptions.preventStaleFeeback when a search query is re-ran data might
+ * @param searchOptions.preventCacheStaleFeeback when a search query is re-ran data might
  * be considered stale, but we might not want to run a feedback request for this search, this
  * happens when the search upated gets called, an then it will re-run the search, since there was
  * a window of time, dataMightBeStale is true, and it might ask feedback, for something it just
- * modified, this variable can always be false for 100% consistency
+ * modified, this variable can always be false for 100% consistency; this is only useful when
+ * cache policy is either by-owner or by parent
  * @returns a promise with the error, results (for traditional), the records, the count
  * which might me larger than the number of records, however the record length should
  * be equal to the limit, and the offset given
  */
 export async function runSearchQueryFor(
-  arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
-    itemDefinition: ItemDefinition,
-    orderBy: IOrderByRuleType;
-    createdBy: number;
-    parentedBy: {
-      itemDefinition: ItemDefinition,
-      id: number,
-      version: string,
-    };
-    cachePolicy: "by-owner" | "by-parent" | "none",
-    traditional: boolean,
-    limit: number,
-    offset: number,
-    token: string,
-    language: string,
-    versionFilter?: string,
-  },
-  searchCacheOptions: {
-    remoteListener: RemoteListener,
-    onSearchUpdated: () => void,
-    preventStaleFeeback: boolean,
-  },
-): Promise<{
-  error: EndpointErrorType,
-  results?: IGQLValue[],
-  records: IGQLSearchRecord[],
-  count: number,
-  limit: number,
-  offset: number,
-}> {
+  arg: IRunSearchQueryArg,
+  searchOptions: IRunSearchQuerySearchOptions,
+): Promise<IRunSearchQueryResult> {
+  if (arg.listenPolicy === "by-owner" && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
+    throw new Error("Listen policy is by-owner yet there's no creator specified");
+  } else if (arg.listenPolicy === "by-parent" && !arg.parentedBy) {
+    throw new Error("Listen policy is by-parent yet there's no parent specified");
+  }
+
+  if (arg.waitAndMerge && arg.cachePolicy === "none") {
+    // TODO implement wait and merge
+  }
+
   const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
     arg.itemDefinition.getParentModule().getQualifiedPathName() :
     arg.itemDefinition.getQualifiedPathName());
@@ -958,6 +1002,8 @@ export async function runSearchQueryFor(
   searchArgs.limit = arg.limit;
   searchArgs.offset = arg.offset;
 
+  let knownLastRecordDate: string = null;
+
   let gqlValue: IGQLEndpointValue;
   // if we are in a search with
   // a cache policy then we should be able
@@ -973,10 +1019,14 @@ export async function runSearchQueryFor(
   ) {
     if (arg.traditional) {
       throw new Error("Cache policy is set yet search mode is traditional");
-    }
-    if (arg.offset !== 0) {
+    } else if (arg.offset !== 0) {
       throw new Error("Cache policy is set yet the offset is not 0");
+    } else if (arg.cachePolicy === "by-owner" && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
+      throw new Error("Cache policy is by-owner yet there's no creator specified");
+    } else if (arg.cachePolicy === "by-parent" && !arg.parentedBy) {
+      throw new Error("Cache policy is by-parent yet there's no parent specified");
     }
+
     const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
     const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
       standardCounterpart.getParentModule().getQualifiedPathName() :
@@ -992,38 +1042,25 @@ export async function runSearchQueryFor(
       arg.cachePolicy,
       standardCounterpartModule.getMaxSearchResults(),
     );
+
+    // last record date of the given record
+    // might be null, if no records
+    knownLastRecordDate = cacheWorkerGivenSearchValue.lastRecordDate;
+
     // note that this value doesn't contain the count, it contains
     // the limit and the offset but not the count that is because
     // the count is considered irrelevant for these cache values
     gqlValue = cacheWorkerGivenSearchValue.gqlValue;
     if (gqlValue && gqlValue.data) {
-      if (arg.cachePolicy === "by-owner") {
-        searchCacheOptions.remoteListener.addOwnedSearchListenerFor(
-          standardCounterpartQualifiedName,
-          arg.createdBy,
-          cacheWorkerGivenSearchValue.lastRecordDate,
-          searchCacheOptions.onSearchUpdated,
-        );
-      } else {
-        searchCacheOptions.remoteListener.addParentedSearchListenerFor(
-          standardCounterpartQualifiedName,
-          arg.parentedBy.itemDefinition.getQualifiedPathName(),
-          arg.parentedBy.id,
-          arg.parentedBy.version || null,
-          cacheWorkerGivenSearchValue.lastRecordDate,
-          searchCacheOptions.onSearchUpdated,
-        );
-      }
-
-      if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchCacheOptions.preventStaleFeeback) {
+      if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchOptions.preventCacheStaleFeeback) {
         if (arg.cachePolicy === "by-owner") {
-          searchCacheOptions.remoteListener.requestOwnedSearchFeedbackFor({
+          searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             createdBy: arg.createdBy,
             knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
           });
         } else {
-          searchCacheOptions.remoteListener.requestParentedSearchFeedbackFor({
+          searchOptions.remoteListener.requestParentedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
             parentId: arg.parentedBy.id,
@@ -1047,12 +1084,18 @@ export async function runSearchQueryFor(
         count: {},
         limit: {},
         offset: {},
+        last_record_date: {},
       },
     });
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
     gqlValue = await gqlQuery(query);
+
+    const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+    if (data) {
+      knownLastRecordDate = data.last_record_date as string;
+    }
   } else {
     const query = buildGqlQuery({
       name: queryName,
@@ -1062,12 +1105,47 @@ export async function runSearchQueryFor(
         count: {},
         limit: {},
         offset: {},
+        last_record_date: {},
       },
     });
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
     gqlValue = await gqlQuery(query);
+
+    const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+    if (data) {
+      knownLastRecordDate = data.last_record_date as string;
+    }
+  }
+
+  const data = gqlValue.data && gqlValue.data[queryName];
+  const limit: number = (data && data.limit as number) || null;
+  const offset: number = (data && data.offset as number) || null;
+  let count: number = (data && data.count as number) || null;
+
+  if (gqlValue && gqlValue.data && arg.listenPolicy !== "none") {
+    const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
+    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
+    if (arg.listenPolicy === "by-owner") {
+      searchOptions.remoteListener.addOwnedSearchListenerFor(
+        standardCounterpartQualifiedName,
+        arg.createdBy,
+        knownLastRecordDate,
+        searchOptions.onSearchUpdated,
+      );
+    } else if (arg.listenPolicy === "by-parent") {
+      searchOptions.remoteListener.addParentedSearchListenerFor(
+        standardCounterpartQualifiedName,
+        arg.parentedBy.itemDefinition.getQualifiedPathName(),
+        arg.parentedBy.id,
+        arg.parentedBy.version || null,
+        knownLastRecordDate,
+        searchOptions.onSearchUpdated,
+      );
+    }
   }
 
   // now we got to check for errors
@@ -1078,10 +1156,6 @@ export async function runSearchQueryFor(
     error = gqlValue.errors[0].extensions;
   }
 
-  const data = gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName];
-  const limit: number = (data && data.limit as number) || null;
-  const offset: number = (data && data.offset as number) || null;
-  let count: number = (data && data.count as number) || null;
   if (!arg.traditional) {
     const records: IGQLSearchRecord[] = (
       data && data.records
@@ -1103,6 +1177,7 @@ export async function runSearchQueryFor(
       limit,
       offset,
       count,
+      knownLastRecordDate,
     };
   } else {
     const records: IGQLSearchRecord[] = (
@@ -1121,6 +1196,7 @@ export async function runSearchQueryFor(
       limit,
       offset,
       count,
+      knownLastRecordDate,
     };
   }
 }

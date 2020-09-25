@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import { GraphQLOutputType, GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInt, GraphQLInputObjectType } from "graphql";
+import { GraphQLOutputType, GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInt, GraphQLInputObjectType, GraphQLString } from "graphql";
 import {
   PREFIX_GET,
   RESERVED_GETTER_PROPERTIES,
@@ -350,6 +350,9 @@ export function getGQLQueryFieldsForItemDefinition(
         },
         offset: {
           type: GraphQLNonNull(GraphQLInt),
+        },
+        last_record_date: {
+          type: GraphQLString,
         },
       },
       description: "A traditional array of results for the result list with search data",

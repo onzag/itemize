@@ -231,6 +231,7 @@ export default class PropertyEntryReference
       createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
       parentedBy: null,
       cachePolicy: "none",
+      listenPolicy: "none",
       token: this.props.tokenData.token,
       itemDefinition: idef.getSearchModeCounterpart(),
       traditional: true,
@@ -238,6 +239,7 @@ export default class PropertyEntryReference
       limit: !loadAll ? 6 : (limit || 50),
       language: this.props.language,
       versionFilter: filterByLanguage ? this.props.language : null,
+      waitAndMerge: true,
     }, null);
     // these nulls which represent the listener are only truly used for the
     // cached searches, we don't use that here

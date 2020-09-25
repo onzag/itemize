@@ -48,6 +48,7 @@ export interface IGQLSearchResultsContainer {
     count: number;
     limit: number;
     offset: number;
+    last_record_date: string;
 }
 /**
  * This is how a graphql file is meant

@@ -572,6 +572,8 @@ function convertOrderByRule(orderBy) {
     });
     return result;
 }
+const WAIT_AND_MERGE_CB_KEY_MAP = {};
+const WAIT_AND_MERGE_CB_LIST = {};
 /**
  * Runs the surprisingly complex search query
  * @param arg the arg for the search operation
@@ -587,6 +589,18 @@ function convertOrderByRule(orderBy) {
  * if cachePolicy is by-owner otherwise null
  * @param arg.parentedBy in order to filter by parenting, should be present
  * if cachePolicy is by-parent otherwise null
+ * @param arg.cachePolicy either "by-owner" (must specify createdBy) or "by-parent" (must specify parented-by) or
+ * otherwise "none", this will make it so that searches are ran in the cache rather than querying the
+ * endpoint, they will be ran inside the cache worker; this means the capabilities of search are limited
+ * compared to running them right into the endpoint, but that means searches can be performed offline
+ * as well as many results be cached, eg. a list of messages; cache policy is a very powerful
+ * option. Remember that offset must be 0, as we need to cache the latest result.
+ * @param arg.listenPolicy similar to cache policy takes the values of "by-owner", "by-parent" or "none", it will listen
+ * for changes in order to make it for realtime updates; this is very powerful when used in combination with cache policy and
+ * keeping the same values because that means realtime offline first search results, you might however decide not to use
+ * a cachePolicy, but this is more expensive than without it, as it will redo the search, whereas when in combination with
+ * cachePolicy that is of the same value, a diffing mechanism will be applied and the server won't be re-requested as the cache
+ * is patched with the new records
  * @param arg.traditional a traditional search, doesn't support any cache policy
  * @param arg.limit the limit to limit by, this should be less or equal to the limit
  * that you can get search results (for traditional) or search records (for standard)
@@ -596,21 +610,33 @@ function convertOrderByRule(orderBy) {
  * @param arg.language the language for dictionary purposes
  * @param arg.versionFilter an optional filter to filter by a given version so only
  * items matching a version appear
- * @param searchCacheOptions the search cache options used and required for by-owner
- * and by-parent searches
- * @param searchCacheOptions.remoteListener the remote listener object
- * @param searchCacheOptions.onSearchUpdated the function to trigger once the cache policy
+ * @param arg.waitAndMerge waits for other search requests that have the same signature and
+ * merges the response from the server, this is invalid if cachePolicy is any other than none
+ * @param searchOptions the search options used and required for cache based searches or
+ * listen based searches
+ * @param searchOptions.remoteListener the remote listener object
+ * @param searchOptions.onSearchUpdated the function to trigger once the cache policy
  * has indicated records have been added
- * @param searchCacheOptions.preventStaleFeeback when a search query is re-ran data might
+ * @param searchOptions.preventCacheStaleFeeback when a search query is re-ran data might
  * be considered stale, but we might not want to run a feedback request for this search, this
  * happens when the search upated gets called, an then it will re-run the search, since there was
  * a window of time, dataMightBeStale is true, and it might ask feedback, for something it just
- * modified, this variable can always be false for 100% consistency
+ * modified, this variable can always be false for 100% consistency; this is only useful when
+ * cache policy is either by-owner or by parent
  * @returns a promise with the error, results (for traditional), the records, the count
  * which might me larger than the number of records, however the record length should
  * be equal to the limit, and the offset given
  */
-async function runSearchQueryFor(arg, searchCacheOptions) {
+async function runSearchQueryFor(arg, searchOptions) {
+    if (arg.listenPolicy === "by-owner" && !arg.createdBy || arg.createdBy === constants_1.UNSPECIFIED_OWNER) {
+        throw new Error("Listen policy is by-owner yet there's no creator specified");
+    }
+    else if (arg.listenPolicy === "by-parent" && !arg.parentedBy) {
+        throw new Error("Listen policy is by-parent yet there's no parent specified");
+    }
+    if (arg.waitAndMerge && arg.cachePolicy === "none") {
+        // TODO implement wait and merge
+    }
     const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
         arg.itemDefinition.getParentModule().getQualifiedPathName() :
         arg.itemDefinition.getQualifiedPathName());
@@ -630,6 +656,7 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
     searchArgs.order_by = convertOrderByRule(arg.orderBy);
     searchArgs.limit = arg.limit;
     searchArgs.offset = arg.offset;
+    let knownLastRecordDate = null;
     let gqlValue;
     // if we are in a search with
     // a cache policy then we should be able
@@ -644,8 +671,14 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
         if (arg.traditional) {
             throw new Error("Cache policy is set yet search mode is traditional");
         }
-        if (arg.offset !== 0) {
+        else if (arg.offset !== 0) {
             throw new Error("Cache policy is set yet the offset is not 0");
+        }
+        else if (arg.cachePolicy === "by-owner" && !arg.createdBy || arg.createdBy === constants_1.UNSPECIFIED_OWNER) {
+            throw new Error("Cache policy is by-owner yet there's no creator specified");
+        }
+        else if (arg.cachePolicy === "by-parent" && !arg.parentedBy) {
+            throw new Error("Cache policy is by-parent yet there's no parent specified");
         }
         const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
         const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
@@ -653,27 +686,24 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
             standardCounterpart.getQualifiedPathName());
         const standardCounterpartModule = standardCounterpart.getParentModule();
         const cacheWorkerGivenSearchValue = await cache_1.default.instance.runCachedSearch(queryName, searchArgs, constants_1.PREFIX_GET_LIST + standardCounterpartQualifiedName, arg.token, arg.language.split("-")[0], arg.fields, arg.cachePolicy, standardCounterpartModule.getMaxSearchResults());
+        // last record date of the given record
+        // might be null, if no records
+        knownLastRecordDate = cacheWorkerGivenSearchValue.lastRecordDate;
         // note that this value doesn't contain the count, it contains
         // the limit and the offset but not the count that is because
         // the count is considered irrelevant for these cache values
         gqlValue = cacheWorkerGivenSearchValue.gqlValue;
         if (gqlValue && gqlValue.data) {
-            if (arg.cachePolicy === "by-owner") {
-                searchCacheOptions.remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, arg.createdBy, cacheWorkerGivenSearchValue.lastRecordDate, searchCacheOptions.onSearchUpdated);
-            }
-            else {
-                searchCacheOptions.remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, arg.parentedBy.itemDefinition.getQualifiedPathName(), arg.parentedBy.id, arg.parentedBy.version || null, cacheWorkerGivenSearchValue.lastRecordDate, searchCacheOptions.onSearchUpdated);
-            }
-            if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchCacheOptions.preventStaleFeeback) {
+            if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchOptions.preventCacheStaleFeeback) {
                 if (arg.cachePolicy === "by-owner") {
-                    searchCacheOptions.remoteListener.requestOwnedSearchFeedbackFor({
+                    searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
                         qualifiedPathName: standardCounterpartQualifiedName,
                         createdBy: arg.createdBy,
                         knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
                     });
                 }
                 else {
-                    searchCacheOptions.remoteListener.requestParentedSearchFeedbackFor({
+                    searchOptions.remoteListener.requestParentedSearchFeedbackFor({
                         qualifiedPathName: standardCounterpartQualifiedName,
                         parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
                         parentId: arg.parentedBy.id,
@@ -698,11 +728,16 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
                 count: {},
                 limit: {},
                 offset: {},
+                last_record_date: {},
             },
         });
         // now we get the gql value using the gql query function
         // and this function will always run using the network
         gqlValue = await gql_querier_1.gqlQuery(query);
+        const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+        if (data) {
+            knownLastRecordDate = data.last_record_date;
+        }
     }
     else {
         const query = gql_querier_1.buildGqlQuery({
@@ -713,11 +748,32 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
                 count: {},
                 limit: {},
                 offset: {},
+                last_record_date: {},
             },
         });
         // now we get the gql value using the gql query function
         // and this function will always run using the network
         gqlValue = await gql_querier_1.gqlQuery(query);
+        const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+        if (data) {
+            knownLastRecordDate = data.last_record_date;
+        }
+    }
+    const data = gqlValue.data && gqlValue.data[queryName];
+    const limit = (data && data.limit) || null;
+    const offset = (data && data.offset) || null;
+    let count = (data && data.count) || null;
+    if (gqlValue && gqlValue.data && arg.listenPolicy !== "none") {
+        const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
+        const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+            standardCounterpart.getParentModule().getQualifiedPathName() :
+            standardCounterpart.getQualifiedPathName());
+        if (arg.listenPolicy === "by-owner") {
+            searchOptions.remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, arg.createdBy, knownLastRecordDate, searchOptions.onSearchUpdated);
+        }
+        else if (arg.listenPolicy === "by-parent") {
+            searchOptions.remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, arg.parentedBy.itemDefinition.getQualifiedPathName(), arg.parentedBy.id, arg.parentedBy.version || null, knownLastRecordDate, searchOptions.onSearchUpdated);
+        }
     }
     // now we got to check for errors
     let error = null;
@@ -725,10 +781,6 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
         // if the server itself returned an error, we use that error
         error = gqlValue.errors[0].extensions;
     }
-    const data = gqlValue.data && gqlValue.data[queryName] && gqlValue.data[queryName];
-    const limit = (data && data.limit) || null;
-    const offset = (data && data.offset) || null;
-    let count = (data && data.count) || null;
     if (!arg.traditional) {
         const records = (data && data.records) || null;
         // sometimes count is not there, this happens when using the cached search
@@ -746,6 +798,7 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
             limit,
             offset,
             count,
+            knownLastRecordDate,
         };
     }
     else {
@@ -762,6 +815,7 @@ async function runSearchQueryFor(arg, searchCacheOptions) {
             limit,
             offset,
             count,
+            knownLastRecordDate,
         };
     }
 }

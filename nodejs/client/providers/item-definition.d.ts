@@ -113,6 +113,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
         version?: string;
     };
     cachePolicy?: "by-owner" | "by-parent" | "none";
+    listenPolicy?: "by-owner" | "by-parent" | "none";
     traditional?: boolean;
     limit: number;
     offset: number;

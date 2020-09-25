@@ -274,6 +274,9 @@ function getGQLQueryFieldsForItemDefinition(itemDefinition, resolvers) {
                 offset: {
                     type: graphql_1.GraphQLNonNull(graphql_1.GraphQLInt),
                 },
+                last_record_date: {
+                    type: graphql_1.GraphQLString,
+                },
             },
             description: "A traditional array of results for the result list with search data",
         });
