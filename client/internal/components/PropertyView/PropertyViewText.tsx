@@ -285,19 +285,21 @@ export function propertyViewPostProcessingHook(
     }
   }
 
-  SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
-    const templateEventStyle = node.dataset[attr + "Style"];
-    if (templateEventStyle) {
-      const removeStyle =
-        templateEventStyle.indexOf("javascript") !== -1 ||
-        templateEventStyle.indexOf("http") !== -1 ||
-        templateEventStyle.indexOf("://") !== -1 ||
-        templateEventStyle.indexOf("fixed") !== -1;
-      if (removeStyle) {
-        delete node.dataset[attr + "Style"];
+  if (node.dataset) {
+    SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
+      const templateEventStyle = node.dataset[attr + "Style"];
+      if (templateEventStyle) {
+        const removeStyle =
+          templateEventStyle.indexOf("javascript") !== -1 ||
+          templateEventStyle.indexOf("http") !== -1 ||
+          templateEventStyle.indexOf("://") !== -1 ||
+          templateEventStyle.indexOf("fixed") !== -1;
+        if (removeStyle) {
+          delete node.dataset[attr + "Style"];
+        }
       }
-    }
-  });
+    });
+  }
 
   const classList = node.classList;
   if (classList) {

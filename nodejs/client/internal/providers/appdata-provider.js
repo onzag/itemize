@@ -7,6 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataProvider = exports.DataContext = void 0;
 const react_1 = __importDefault(require("react"));
 /**
  * The data context provides the root as well as remote listener and whether

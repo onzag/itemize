@@ -9,6 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildHTML = void 0;
 const util_1 = require("../util");
 const safe_1 = __importDefault(require("colors/safe"));
 const html_minifier_1 = __importDefault(require("html-minifier"));
