@@ -106,13 +106,13 @@ class ItemizeImageBlot extends BlockEmbed {
     static value(node) {
         const style = node.getAttribute("style");
         // container
-        const container = node.querySelector("image-container");
+        const container = node.querySelector(".image-container");
         if (!container) {
             return null;
         }
         // might be null
         const containerStyle = container.getAttribute("style");
-        const imgPad = node.querySelector("image-pad");
+        const imgPad = node.querySelector(".image-pad");
         if (!imgPad) {
             return null;
         }

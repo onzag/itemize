@@ -145,7 +145,7 @@ class ItemizeImageBlot extends BlockEmbed {
     const style = node.getAttribute("style");
 
     // container
-    const container = node.querySelector("image-container") as HTMLDivElement;
+    const container = node.querySelector(".image-container") as HTMLDivElement;
     if (!container) {
       return null;
     }
@@ -153,7 +153,7 @@ class ItemizeImageBlot extends BlockEmbed {
     // might be null
     const containerStyle = container.getAttribute("style");
 
-    const imgPad = node.querySelector("image-pad") as HTMLDivElement;
+    const imgPad = node.querySelector(".image-pad") as HTMLDivElement;
     if (!imgPad) {
       return null;
     }
