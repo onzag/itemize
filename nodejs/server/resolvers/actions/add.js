@@ -301,7 +301,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         ...gqlValue,
     };
     if (moduleTrigger) {
-        moduleTrigger({
+        await moduleTrigger({
             appData,
             itemDefinition: itemDefinition,
             module: mod,
@@ -320,7 +320,7 @@ async function addItemDefinition(appData, resolverArgs, resolverItemDefinition) 
         });
     }
     if (itemDefinitionTrigger) {
-        itemDefinitionTrigger({
+        await itemDefinitionTrigger({
             appData,
             itemDefinition: itemDefinition,
             module: mod,

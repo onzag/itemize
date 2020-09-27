@@ -51,6 +51,10 @@ export function defaultTriggerForbiddenFunction(message: string) {
   });
 }
 
+export function defaultTriggerWaitForPromiseFunction() {
+  return;
+}
+
 export function defaultTriggerInvalidForbiddenFunction(message: string) {
   logger.error(
     "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED",

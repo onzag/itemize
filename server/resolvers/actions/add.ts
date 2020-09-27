@@ -436,7 +436,7 @@ export async function addItemDefinition(
   if (
     moduleTrigger
   ) {
-    moduleTrigger({
+    await moduleTrigger({
       appData,
       itemDefinition: itemDefinition,
       module: mod,
@@ -455,7 +455,7 @@ export async function addItemDefinition(
     });
   }
   if (itemDefinitionTrigger) {
-    itemDefinitionTrigger({
+    await itemDefinitionTrigger({
       appData,
       itemDefinition: itemDefinition,
       module: mod,

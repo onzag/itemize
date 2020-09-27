@@ -16,6 +16,7 @@ export interface IServerSideTokenDataType {
     customData?: any;
 }
 export declare function defaultTriggerForbiddenFunction(message: string): void;
+export declare function defaultTriggerWaitForPromiseFunction(): void;
 export declare function defaultTriggerInvalidForbiddenFunction(message: string): void;
 /**
  * Given a token, it validates and provides the role information
