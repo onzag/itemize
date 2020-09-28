@@ -1925,6 +1925,7 @@ export default class ItemDefinition {
 
     // so now we check if it can be parented
     let canBeParentedBy = false;
+
     // now we check if we even have rules for parenting
     if (this.rawData.canBeParentedBy) {
       canBeParentedBy = this.rawData.canBeParentedBy.some((parentPossibility) => {

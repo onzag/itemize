@@ -133,7 +133,7 @@ const itemDefinitionReferenceSchema = {
         module: {
             type: "string",
         },
-        definition: {
+        itemDefinition: {
             type: "string",
         },
     },
@@ -239,7 +239,7 @@ exports.default = {
         },
         canBeParentedBy: {
             type: "array",
-            itemDefinition: itemDefinitionReferenceSchema,
+            items: itemDefinitionReferenceSchema,
             minItems: 1,
         },
         mustBeParented: {

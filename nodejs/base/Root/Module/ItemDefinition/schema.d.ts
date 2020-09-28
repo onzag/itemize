@@ -236,13 +236,13 @@ declare const _default: {
         };
         canBeParentedBy: {
             type: string;
-            itemDefinition: {
+            items: {
                 type: string;
                 properties: {
                     module: {
                         type: string;
                     };
-                    definition: {
+                    itemDefinition: {
                         type: string;
                     };
                 };
