@@ -589,6 +589,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         if (prevProps.mountId !== this.props.mountId) {
             this.runDismountOn(prevProps);
         }
+        // expensive but necessary
+        if (this.props.onStateChange && !deep_equal_1.default(this.state.itemDefinitionState, prevState.itemDefinitionState)) {
+            this.props.onStateChange(this.state.itemDefinitionState);
+        }
     }
     reloadListener() {
         if (!this.isCMounted) {
@@ -1608,6 +1612,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         });
     }
     async search(options) {
+        if (options.listenPolicy === "by-owner-realtime" || options.listenPolicy === "by-parent-realtime") {
+            // TODO implement
+            throw new Error("Not implemented: " + options.listenPolicy);
+        }
         // had issues with pollution as other functions
         // were calling search and passing a second argument
         // causing initial automatic to be true
@@ -1752,12 +1760,19 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             };
         }
         const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null);
+        let cacheListenPolicy = options.listenPolicy || options.cachePolicy || "none";
+        // TODO uncomment when implemented listen policy of realtime
+        // if (cacheListenPolicy === "by-owner-realtime") {
+        //   cacheListenPolicy = "by-owner";
+        // } else if (cacheListenPolicy === "by-parent-realtime") {
+        //   cacheListenPolicy = "by-parent";
+        // }
         const { results, records, count, limit, offset, error, } = await gql_client_util_1.runSearchQueryFor({
             args: argumentsForQuery,
             fields: requestedSearchFields,
             itemDefinition: this.props.itemDefinitionInstance,
             cachePolicy: options.cachePolicy || "none",
-            listenPolicy: options.listenPolicy || options.cachePolicy || "none",
+            listenPolicy: cacheListenPolicy,
             createdBy: options.createdBy || null,
             orderBy: options.orderBy || {
                 created_at: {

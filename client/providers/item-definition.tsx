@@ -168,7 +168,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
-  listenPolicy?: "by-owner" | "by-parent" | "none";
+  listenPolicy?: "by-owner-realtime" | "by-parent-realtime" | "by-owner" | "by-parent" | "none";
   traditional?: boolean;
   limit: number;
   offset: number;
@@ -492,6 +492,12 @@ export interface IItemDefinitionProviderProps {
    * Callback triggers on delete
    */
   onDelete?: (data: IBasicActionResponse) => void;
+  /**
+   * On state change, triggers when the item definition internal
+   * state changes for whatever reason use with care as
+   * it makes the execution slower
+   */
+  onStateChange?: (state: IItemDefinitionStateType) => void;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -1300,6 +1306,11 @@ export class ActualItemDefinitionProvider extends
       prevProps.mountId !== this.props.mountId
     ) {
       this.runDismountOn(prevProps);
+    }
+
+    // expensive but necessary
+    if (this.props.onStateChange && !equals(this.state.itemDefinitionState, prevState.itemDefinitionState)) {
+      this.props.onStateChange(this.state.itemDefinitionState);
     }
   }
 
@@ -2621,6 +2632,11 @@ export class ActualItemDefinitionProvider extends
   public async search(
     options: IActionSearchOptions,
   ): Promise<IActionResponseWithSearchResults> {
+    if (options.listenPolicy === "by-owner-realtime" || options.listenPolicy === "by-parent-realtime") {
+      // TODO implement
+      throw new Error("Not implemented: " + options.listenPolicy);
+    }
+
     // had issues with pollution as other functions
     // were calling search and passing a second argument
     // causing initial automatic to be true
@@ -2786,6 +2802,14 @@ export class ActualItemDefinitionProvider extends
       this.props.forVersion || null,
     );
 
+    let cacheListenPolicy = options.listenPolicy || options.cachePolicy || "none";
+    // TODO uncomment when implemented listen policy of realtime
+    // if (cacheListenPolicy === "by-owner-realtime") {
+    //   cacheListenPolicy = "by-owner";
+    // } else if (cacheListenPolicy === "by-parent-realtime") {
+    //   cacheListenPolicy = "by-parent";
+    // }
+
     const {
       results,
       records,
@@ -2798,7 +2822,7 @@ export class ActualItemDefinitionProvider extends
       fields: requestedSearchFields,
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
-      listenPolicy: options.listenPolicy || options.cachePolicy || "none",
+      listenPolicy: cacheListenPolicy,
       createdBy: options.createdBy || null,
       orderBy: options.orderBy || {
         created_at: {

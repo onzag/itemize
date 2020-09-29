@@ -113,7 +113,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
         version?: string;
     };
     cachePolicy?: "by-owner" | "by-parent" | "none";
-    listenPolicy?: "by-owner" | "by-parent" | "none";
+    listenPolicy?: "by-owner-realtime" | "by-parent-realtime" | "by-owner" | "by-parent" | "none";
     traditional?: boolean;
     limit: number;
     offset: number;
@@ -331,6 +331,12 @@ export interface IItemDefinitionProviderProps {
      * Callback triggers on delete
      */
     onDelete?: (data: IBasicActionResponse) => void;
+    /**
+     * On state change, triggers when the item definition internal
+     * state changes for whatever reason use with care as
+     * it makes the execution slower
+     */
+    onStateChange?: (state: IItemDefinitionStateType) => void;
 }
 interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
     tokenData: ITokenContextType;
