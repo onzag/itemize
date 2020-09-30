@@ -197,7 +197,6 @@ interface IRunSearchQueryArg {
         version: string;
     };
     cachePolicy: "by-owner" | "by-parent" | "none";
-    listenPolicy: "by-owner" | "by-parent" | "none";
     traditional: boolean;
     limit: number;
     offset: number;
@@ -208,7 +207,6 @@ interface IRunSearchQueryArg {
 }
 interface IRunSearchQuerySearchOptions {
     remoteListener: RemoteListener;
-    onSearchUpdated: () => void;
     preventCacheStaleFeeback: boolean;
 }
 interface IRunSearchQueryResult {
@@ -241,12 +239,6 @@ interface IRunSearchQueryResult {
  * compared to running them right into the endpoint, but that means searches can be performed offline
  * as well as many results be cached, eg. a list of messages; cache policy is a very powerful
  * option. Remember that offset must be 0, as we need to cache the latest result.
- * @param arg.listenPolicy similar to cache policy takes the values of "by-owner", "by-parent" or "none", it will listen
- * for changes in order to make it for realtime updates; this is very powerful when used in combination with cache policy and
- * keeping the same values because that means realtime offline first search results, you might however decide not to use
- * a cachePolicy, but this is more expensive than without it, as it will redo the search, whereas when in combination with
- * cachePolicy that is of the same value, a diffing mechanism will be applied and the server won't be re-requested as the cache
- * is patched with the new records
  * @param arg.traditional a traditional search, doesn't support any cache policy
  * @param arg.limit the limit to limit by, this should be less or equal to the limit
  * that you can get search results (for traditional) or search records (for standard)

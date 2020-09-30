@@ -1612,10 +1612,6 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         });
     }
     async search(options) {
-        if (options.listenPolicy === "by-owner-realtime" || options.listenPolicy === "by-parent-realtime") {
-            // TODO implement
-            throw new Error("Not implemented: " + options.listenPolicy);
-        }
         // had issues with pollution as other functions
         // were calling search and passing a second argument
         // causing initial automatic to be true
@@ -1760,19 +1756,18 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             };
         }
         const stateOfSearch = this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null);
-        let cacheListenPolicy = options.listenPolicy || options.cachePolicy || "none";
-        // TODO uncomment when implemented listen policy of realtime
-        // if (cacheListenPolicy === "by-owner-realtime") {
-        //   cacheListenPolicy = "by-owner";
-        // } else if (cacheListenPolicy === "by-parent-realtime") {
-        //   cacheListenPolicy = "by-parent";
-        // }
-        const { results, records, count, limit, offset, error, } = await gql_client_util_1.runSearchQueryFor({
+        const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
+        if (listenPolicy === "by-owner" && !options.createdBy || options.createdBy === constants_1.UNSPECIFIED_OWNER) {
+            throw new Error("Listen policy is by-owner yet there's no creator specified");
+        }
+        else if (listenPolicy === "by-parent" && !parentedBy) {
+            throw new Error("Listen policy is by-parent yet there's no parent specified");
+        }
+        const { results, records, count, limit, offset, error, knownLastRecordDate, } = await gql_client_util_1.runSearchQueryFor({
             args: argumentsForQuery,
             fields: requestedSearchFields,
             itemDefinition: this.props.itemDefinitionInstance,
             cachePolicy: options.cachePolicy || "none",
-            listenPolicy: cacheListenPolicy,
             createdBy: options.createdBy || null,
             orderBy: options.orderBy || {
                 created_at: {
@@ -1790,8 +1785,18 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         }, {
             remoteListener: this.props.remoteListener,
             preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
-            onSearchUpdated: this.onSearchReload,
         });
+        if (!error && listenPolicy !== "none") {
+            const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+                standardCounterpart.getParentModule().getQualifiedPathName() :
+                standardCounterpart.getQualifiedPathName());
+            if (listenPolicy === "by-owner") {
+                this.props.remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, options.createdBy, knownLastRecordDate, this.onSearchReload);
+            }
+            else if (listenPolicy === "by-parent") {
+                this.props.remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, parentedBy.itemDefinition.getQualifiedPathName(), parentedBy.id, parentedBy.version || null, knownLastRecordDate, this.onSearchReload);
+            }
+        }
         const searchId = uuid_1.default.v4();
         if (error) {
             const searchState = {

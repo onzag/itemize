@@ -231,7 +231,6 @@ export default class PropertyEntryReference
       createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
       parentedBy: null,
       cachePolicy: "none",
-      listenPolicy: "none",
       token: this.props.tokenData.token,
       itemDefinition: idef.getSearchModeCounterpart(),
       traditional: true,

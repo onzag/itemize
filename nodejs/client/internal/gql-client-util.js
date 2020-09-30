@@ -596,12 +596,6 @@ const WAIT_AND_MERGE_CB_LIST = {};
  * compared to running them right into the endpoint, but that means searches can be performed offline
  * as well as many results be cached, eg. a list of messages; cache policy is a very powerful
  * option. Remember that offset must be 0, as we need to cache the latest result.
- * @param arg.listenPolicy similar to cache policy takes the values of "by-owner", "by-parent" or "none", it will listen
- * for changes in order to make it for realtime updates; this is very powerful when used in combination with cache policy and
- * keeping the same values because that means realtime offline first search results, you might however decide not to use
- * a cachePolicy, but this is more expensive than without it, as it will redo the search, whereas when in combination with
- * cachePolicy that is of the same value, a diffing mechanism will be applied and the server won't be re-requested as the cache
- * is patched with the new records
  * @param arg.traditional a traditional search, doesn't support any cache policy
  * @param arg.limit the limit to limit by, this should be less or equal to the limit
  * that you can get search results (for traditional) or search records (for standard)
@@ -629,12 +623,6 @@ const WAIT_AND_MERGE_CB_LIST = {};
  * be equal to the limit, and the offset given
  */
 async function runSearchQueryFor(arg, searchOptions) {
-    if (arg.listenPolicy === "by-owner" && !arg.createdBy || arg.createdBy === constants_1.UNSPECIFIED_OWNER) {
-        throw new Error("Listen policy is by-owner yet there's no creator specified");
-    }
-    else if (arg.listenPolicy === "by-parent" && !arg.parentedBy) {
-        throw new Error("Listen policy is by-parent yet there's no parent specified");
-    }
     if (arg.waitAndMerge && arg.cachePolicy === "none") {
         // TODO implement wait and merge
     }
@@ -764,18 +752,6 @@ async function runSearchQueryFor(arg, searchOptions) {
     const limit = (data && data.limit) || null;
     const offset = (data && data.offset) || null;
     let count = (data && data.count) || null;
-    if (gqlValue && gqlValue.data && arg.listenPolicy !== "none") {
-        const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
-        const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-            standardCounterpart.getParentModule().getQualifiedPathName() :
-            standardCounterpart.getQualifiedPathName());
-        if (arg.listenPolicy === "by-owner") {
-            searchOptions.remoteListener.addOwnedSearchListenerFor(standardCounterpartQualifiedName, arg.createdBy, knownLastRecordDate, searchOptions.onSearchUpdated);
-        }
-        else if (arg.listenPolicy === "by-parent") {
-            searchOptions.remoteListener.addParentedSearchListenerFor(standardCounterpartQualifiedName, arg.parentedBy.itemDefinition.getQualifiedPathName(), arg.parentedBy.id, arg.parentedBy.version || null, knownLastRecordDate, searchOptions.onSearchUpdated);
-        }
-    }
     // now we got to check for errors
     let error = null;
     if (gqlValue.errors) {

@@ -160,7 +160,6 @@ class PropertyEntryReference extends react_1.default.Component {
             createdBy: onlyCreatedBySelf ? this.props.tokenData.id : null,
             parentedBy: null,
             cachePolicy: "none",
-            listenPolicy: "none",
             token: this.props.tokenData.token,
             itemDefinition: idef.getSearchModeCounterpart(),
             traditional: true,
