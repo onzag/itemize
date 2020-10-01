@@ -19,7 +19,6 @@ const _1 = require(".");
 const token_1 = require("./token");
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
-const NODE_ENV = process.env.NODE_ENV;
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -598,10 +597,23 @@ class Cache {
         };
         try {
             if (dropAllVersions) {
-                const allVersionsDropped = await this.knex(moduleTable).delete().where({
-                    id,
-                    type: selfTable,
-                }).returning("version");
+                const allVersionsDropped = await this.knex.transaction(async (transactionKnex) => {
+                    const allVersionsDroppedInternal = await transactionKnex(moduleTable).delete().where({
+                        id,
+                        type: selfTable,
+                    }).returning(["version", "parent_id", "parent_type", "parent_version", "created_by"]);
+                    await Promise.all(allVersionsDroppedInternal.map(async (row) => {
+                        await transactionKnex(constants_1.DELETED_REGISTRY_IDENTIFIER).insert({
+                            id,
+                            version: version || "",
+                            type: selfTable,
+                            created_by: row.created_by || null,
+                            parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+                            transaction_time: transactionKnex.fn.now(),
+                        });
+                    }));
+                    return allVersionsDroppedInternal;
+                });
                 allVersionsDropped.forEach((row) => {
                     // this version can be null (aka empty string)
                     const retrievedVersion = row.version || null;
@@ -610,12 +622,23 @@ class Cache {
                 });
             }
             else {
-                // we run this, not even required to do it as a transaction
-                // because the index in the item definition cascades
-                await this.knex(moduleTable).delete().where({
-                    id,
-                    version: version || "",
-                    type: selfTable,
+                await this.knex.transaction(async (transactionKnex) => {
+                    // we run this
+                    // because the index in the item definition cascades
+                    const rows = await transactionKnex(moduleTable).delete().where({
+                        id,
+                        version: version || "",
+                        type: selfTable,
+                    }).returning(["parent_id", "parent_type", "parent_version", "created_by"]);
+                    const row = rows[0];
+                    await transactionKnex(constants_1.DELETED_REGISTRY_IDENTIFIER).insert({
+                        id,
+                        version: version || "",
+                        type: selfTable,
+                        created_by: row.created_by || null,
+                        parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+                        transaction_time: transactionKnex.fn.now(),
+                    });
                 });
                 // we don't want to await any of this
                 deleteFilesInContainer(version);

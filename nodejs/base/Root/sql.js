@@ -30,7 +30,49 @@ function getSQLTablesSchemaForRoot(knex, root) {
             factor: {
                 type: "float"
             }
-        }
+        },
+        [constants_1.DELETED_REGISTRY_IDENTIFIER]: {
+            reg_id: {
+                type: "serial",
+                notNull: true,
+                index: {
+                    id: "PRIMARY_KEY",
+                    type: "primary",
+                    level: 0,
+                },
+            },
+            id: {
+                type: "integer",
+                notNull: true,
+            },
+            version: {
+                type: "text",
+                notNull: true,
+            },
+            type: {
+                type: "text",
+                notNull: true
+            },
+            created_by: {
+                type: "integer",
+                index: {
+                    id: constants_1.CREATED_BY_INDEX,
+                    level: 0,
+                    type: "btree",
+                }
+            },
+            parenting_id: {
+                type: "text",
+                index: {
+                    id: constants_1.PARENT_INDEX,
+                    level: 0,
+                    type: "btree",
+                }
+            },
+            transaction_time: {
+                type: "datetime",
+            },
+        },
     };
     root.getAllModules().forEach((cModule) => {
         // add together the schemas of all the modules

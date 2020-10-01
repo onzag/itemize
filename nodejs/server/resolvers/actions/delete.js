@@ -39,7 +39,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
     // gather the created_by and blocked_at to check the rights
     // of the user
     let userId;
-    let contentId;
+    let containerId;
     const wholeSqlStoredValue = await basic_1.runPolicyCheck({
         policyTypes: ["delete"],
         itemDefinition,
@@ -69,7 +69,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             if (itemDefinition.isOwnerObjectId()) {
                 userId = content.id;
             }
-            contentId = content.content_id;
+            containerId = content.container_id;
             // if the content is blocked, and our role has no special access
             // to moderation fields, then this content cannot be removed
             // from the website, no matter what
@@ -148,7 +148,7 @@ async function deleteItemDefinition(appData, resolverArgs, itemDefinition) {
             });
         }
     }
-    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, !resolverArgs.args.version, contentId, resolverArgs.args.listener_uuid || null);
+    await appData.cache.requestDelete(itemDefinition, resolverArgs.args.id, resolverArgs.args.version, !resolverArgs.args.version, containerId, resolverArgs.args.listener_uuid || null);
     if (moduleTrigger) {
         // we execute the trigger
         await moduleTrigger({
@@ -264,7 +264,7 @@ async function deletePossibleChildrenOf(appData, itemDefinition, id, version) {
             // and ask for results from the module table, where parents do match this
             let results;
             try {
-                results = await appData.knex.select(["id", "version", "type", "content_id"]).from(mod.getQualifiedPathName()).where({
+                results = await appData.knex.select(["id", "version", "type", "container_id"]).from(mod.getQualifiedPathName()).where({
                     parent_id: id,
                     parent_version: version || "",
                     parent_type: idefQualified,
@@ -290,7 +290,7 @@ async function deletePossibleChildrenOf(appData, itemDefinition, id, version) {
                     const deleteItemDefinition = appData.root.registry[r.type];
                     try {
                         // and request a delete on it
-                        await appData.cache.requestDelete(deleteItemDefinition, r.id, r.version || null, false, r.content_id, null);
+                        await appData.cache.requestDelete(deleteItemDefinition, r.id, r.version || null, false, r.container_id, null);
                     }
                     catch (err) {
                         __1.logger.error("deletePossibleChildrenOf (ORPHANED): Failed to delete an orphan", {

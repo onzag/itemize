@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAX_REMOTE_LISTENERS_PER_SOCKET = exports.SERVER_MAPPING_TIME = exports.SERVER_DATA_MIN_UPDATE_TIME = exports.CACHED_CURRENCY_LAYER_RESPONSE = exports.CURRENCY_FACTORS_IDENTIFIER = exports.SERVER_USER_KICK_IDENTIFIER = exports.SERVER_DATA_IDENTIFIER = exports.PROTECTED_RESOURCES = exports.UNSPECIFIED_OWNER = exports.UNIT_SUBTYPES = exports.MODERATION_FIELDS = exports.GUEST_METAROLE = exports.ANYONE_LOGGED_METAROLE = exports.ANYONE_METAROLE = exports.OWNER_METAROLE = exports.RESERVED_ADD_PROPERTIES = exports.RESERVED_GETTER_LIST_PROPERTIES = exports.RESERVED_CHANGE_PROPERTIES = exports.RESERVED_GETTER_PROPERTIES = exports.RESERVED_MODULE_SEARCH_PROPERTIES = exports.RESERVED_IDEF_SEARCH_PROPERTIES = exports.ORDERBY_RULE = exports.ORDERBY_NULLS_PRIORITY = exports.ORDERBY_RULE_DIRECTION = exports.SEARCH_RECORDS_CONTAINER_GQL = exports.SEARCH_RECORD_INPUT_GQL = exports.SEARCH_RECORD_GQL = exports.DATE_FORMAT = exports.TIME_FORMAT = exports.DATETIME_FORMAT = exports.POLICY_OPTIONAL_I18N = exports.POLICY_REQUIRED_I18N = exports.POLICY_PREFIXES = exports.PREFIX_DELETE = exports.PREFIX_EDIT = exports.PREFIX_ADD = exports.PREFIX_GET_LIST = exports.PREFIX_GET = exports.PREFIX_TRADITIONAL_SEARCH = exports.PREFIX_SEARCH = exports.EXCLUSION_STATE_SUFFIX = exports.ITEM_DEFINITION_PREFIX = exports.SEARCH_MODE_MODULE_PREFIX = exports.MODULE_PREFIX = exports.INCLUDE_PREFIX = exports.SQL_CONSTRAINT_PREFIX = exports.PREFIXED_CONCAT = exports.SUFFIX_BUILD = exports.PREFIX_BUILD = exports.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME = exports.CONNECTOR_SQL_COLUMN_ID_FK_NAME = exports.RESERVED_BASE_PROPERTIES_SQL = exports.COMBINED_INDEX = exports.PARENT_INDEX = exports.CREATED_BY_INDEX = exports.CREATED_AT_INDEX = exports.RESERVED_BASE_PROPERTIES = exports.STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = exports.EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = exports.LOCATION_SEARCH_I18N = exports.CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = exports.CLASSIC_SEARCH_RANGED_I18N = exports.CLASSIC_SEARCH_OPTIONAL_I18N = exports.CLASSIC_OPTIONAL_I18N = exports.REDUCED_SEARCH_BASE_I18N = exports.REDUCED_BASE_I18N = exports.CLASSIC_SEARCH_BASE_I18N = exports.CLASSIC_BASE_I18N = exports.ROOT_REQUIRED_LOCALE_I18N = exports.LOCALE_I18N = exports.ENDPOINT_ERRORS = exports.LAST_RICH_TEXT_CHANGE_LENGTH = exports.MEMCACHED_DESTRUCTION_MARKERS_LOCATION = exports.DESTRUCTION_MARKERS_LOCATION = exports.ITEM_CALLOUT_EXCLUDED_I18N = exports.ITEM_OPTIONAL_I18N = exports.ITEM_CAN_BE_EXCLUDED_I18N = exports.MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY = exports.MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = exports.MODULE_AND_ITEM_DEF_I18N = exports.FILE_SUPPORTED_IMAGE_TYPES = exports.MAX_SEARCH_FIELD_SIZE = exports.MAX_SEARCH_RECORDS_FALLBACK = exports.MAX_SEARCH_RESULTS_FALLBACK = exports.MAX_FIELD_SIZE = exports.MAX_FILE_TOTAL_BATCH_COUNT = exports.MAX_FILE_BATCH_COUNT = exports.MAX_FILE_SIZE = exports.MAX_RAW_TEXT_LENGTH = exports.MAX_STRING_LENGTH = exports.MIN_SUPPORTED_YEAR = exports.MAX_SUPPORTED_YEAR = exports.MIN_SUPPORTED_REAL = exports.MAX_SUPPORTED_REAL = exports.MAX_DECIMAL_COUNT = exports.MIN_SUPPORTED_INTEGER = exports.MAX_SUPPORTED_INTEGER = void 0;
+exports.MAX_REMOTE_LISTENERS_PER_SOCKET = exports.SERVER_MAPPING_TIME = exports.SERVER_DATA_MIN_UPDATE_TIME = exports.CACHED_CURRENCY_LAYER_RESPONSE = exports.DELETED_REGISTRY_IDENTIFIER = exports.CURRENCY_FACTORS_IDENTIFIER = exports.SERVER_USER_KICK_IDENTIFIER = exports.SERVER_DATA_IDENTIFIER = exports.PROTECTED_RESOURCES = exports.UNSPECIFIED_OWNER = exports.UNIT_SUBTYPES = exports.MODERATION_FIELDS = exports.GUEST_METAROLE = exports.ANYONE_LOGGED_METAROLE = exports.ANYONE_METAROLE = exports.OWNER_METAROLE = exports.RESERVED_ADD_PROPERTIES = exports.RESERVED_GETTER_LIST_PROPERTIES = exports.RESERVED_CHANGE_PROPERTIES = exports.RESERVED_GETTER_PROPERTIES = exports.RESERVED_MODULE_SEARCH_PROPERTIES = exports.RESERVED_IDEF_SEARCH_PROPERTIES = exports.ORDERBY_RULE = exports.ORDERBY_NULLS_PRIORITY = exports.ORDERBY_RULE_DIRECTION = exports.SEARCH_RECORDS_CONTAINER_GQL = exports.SEARCH_RECORD_INPUT_GQL = exports.SEARCH_RECORD_GQL = exports.DATE_FORMAT = exports.TIME_FORMAT = exports.DATETIME_FORMAT = exports.POLICY_OPTIONAL_I18N = exports.POLICY_REQUIRED_I18N = exports.POLICY_PREFIXES = exports.PREFIX_DELETE = exports.PREFIX_EDIT = exports.PREFIX_ADD = exports.PREFIX_GET_LIST = exports.PREFIX_GET = exports.PREFIX_TRADITIONAL_SEARCH = exports.PREFIX_SEARCH = exports.EXCLUSION_STATE_SUFFIX = exports.ITEM_DEFINITION_PREFIX = exports.SEARCH_MODE_MODULE_PREFIX = exports.MODULE_PREFIX = exports.INCLUDE_PREFIX = exports.SQL_CONSTRAINT_PREFIX = exports.PREFIXED_CONCAT = exports.SUFFIX_BUILD = exports.PREFIX_BUILD = exports.CONNECTOR_SQL_COLUMN_VERSION_FK_NAME = exports.CONNECTOR_SQL_COLUMN_ID_FK_NAME = exports.RESERVED_BASE_PROPERTIES_SQL = exports.COMBINED_INDEX = exports.PARENT_INDEX = exports.CREATED_BY_INDEX = exports.CREATED_AT_INDEX = exports.RESERVED_BASE_PROPERTIES = exports.STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = exports.EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES = exports.LOCATION_SEARCH_I18N = exports.CLASSIC_SEARCH_RANGED_OPTIONAL_I18N = exports.CLASSIC_SEARCH_RANGED_I18N = exports.CLASSIC_SEARCH_OPTIONAL_I18N = exports.CLASSIC_OPTIONAL_I18N = exports.REDUCED_SEARCH_BASE_I18N = exports.REDUCED_BASE_I18N = exports.CLASSIC_SEARCH_BASE_I18N = exports.CLASSIC_BASE_I18N = exports.ROOT_REQUIRED_LOCALE_I18N = exports.LOCALE_I18N = exports.ENDPOINT_ERRORS = exports.LAST_RICH_TEXT_CHANGE_LENGTH = exports.MEMCACHED_DESTRUCTION_MARKERS_LOCATION = exports.DESTRUCTION_MARKERS_LOCATION = exports.ITEM_CALLOUT_EXCLUDED_I18N = exports.ITEM_OPTIONAL_I18N = exports.ITEM_CAN_BE_EXCLUDED_I18N = exports.MODULE_AND_ITEM_DEF_CUSTOM_I18N_KEY = exports.MODULE_AND_ITEM_DEF_I18N_SEARCHABLE = exports.MODULE_AND_ITEM_DEF_I18N = exports.FILE_SUPPORTED_IMAGE_TYPES = exports.MAX_SEARCH_FIELD_SIZE = exports.MAX_SEARCH_RECORDS_FALLBACK = exports.MAX_SEARCH_RESULTS_FALLBACK = exports.MAX_FIELD_SIZE = exports.MAX_FILE_TOTAL_BATCH_COUNT = exports.MAX_FILE_BATCH_COUNT = exports.MAX_FILE_SIZE = exports.MAX_RAW_TEXT_LENGTH = exports.MAX_STRING_LENGTH = exports.MIN_SUPPORTED_YEAR = exports.MAX_SUPPORTED_YEAR = exports.MIN_SUPPORTED_REAL = exports.MAX_SUPPORTED_REAL = exports.MAX_DECIMAL_COUNT = exports.MIN_SUPPORTED_INTEGER = exports.MAX_SUPPORTED_INTEGER = void 0;
 const graphql_1 = require("graphql");
 // DATA ATTRIBUTES
 /**
@@ -489,27 +489,39 @@ exports.RESERVED_BASE_PROPERTIES_SQL = (combinedIndexes, addedIndexes) => ({
     },
     parent_id: {
         type: "integer",
-        index: (combinedIndexes.includes("parent_id") || addedIndexes.includes("parent_id")) ? {
-            id: combinedIndexes.includes("parent_id") ? exports.COMBINED_INDEX : exports.PARENT_INDEX,
+        index: combinedIndexes.includes("parent_id") ? {
+            id: exports.COMBINED_INDEX,
             type: "btree",
-            level: combinedIndexes.includes("parent_id") ? combinedIndexes.indexOf("parent_id") : 0,
-        } : null,
+            level: combinedIndexes.indexOf("parent_id"),
+        } : {
+            id: exports.PARENT_INDEX,
+            type: "btree",
+            level: 0,
+        },
     },
     parent_version: {
         type: "string",
-        index: (combinedIndexes.includes("parent_version") || addedIndexes.includes("parent_version")) ? {
-            id: combinedIndexes.includes("parent_version") ? exports.COMBINED_INDEX : exports.PARENT_INDEX,
+        index: combinedIndexes.includes("parent_version") ? {
+            id: exports.COMBINED_INDEX,
             type: "btree",
-            level: combinedIndexes.includes("parent_version") ? combinedIndexes.indexOf("parent_version") : 1,
-        } : null,
+            level: combinedIndexes.indexOf("parent_version"),
+        } : {
+            id: exports.PARENT_INDEX,
+            type: "btree",
+            level: 1,
+        },
     },
     parent_type: {
         type: "string",
-        index: (combinedIndexes.includes("parent_type") || addedIndexes.includes("parent_type")) ? {
-            id: combinedIndexes.includes("parent_type") ? exports.COMBINED_INDEX : exports.PARENT_INDEX,
+        index: combinedIndexes.includes("parent_type") ? {
+            id: exports.COMBINED_INDEX,
             type: "btree",
-            level: combinedIndexes.includes("parent_type") ? combinedIndexes.indexOf("parent_type") : 2,
-        } : null,
+            level: combinedIndexes.indexOf("parent_type"),
+        } : {
+            id: exports.PARENT_INDEX,
+            type: "btree",
+            level: 2,
+        },
     },
     container_id: {
         type: "string",
@@ -527,11 +539,15 @@ exports.RESERVED_BASE_PROPERTIES_SQL = (combinedIndexes, addedIndexes) => ({
     created_by: {
         type: "integer",
         notNull: true,
-        index: (combinedIndexes.includes("created_by") || addedIndexes.includes("created_by")) ? {
-            id: combinedIndexes.includes("created_by") ? exports.COMBINED_INDEX : exports.CREATED_BY_INDEX,
+        index: combinedIndexes.includes("created_by") ? {
+            id: exports.COMBINED_INDEX,
             type: "btree",
-            level: combinedIndexes.includes("created_by") ? combinedIndexes.indexOf("created_by") : 0,
-        } : null,
+            level: combinedIndexes.indexOf("created_by"),
+        } : {
+            id: exports.CREATED_BY_INDEX,
+            type: "btree",
+            level: 0,
+        },
     },
     edited_at: {
         type: "datetime",
@@ -1055,6 +1071,10 @@ exports.SERVER_USER_KICK_IDENTIFIER = "SERVER_KICK";
  * factor information
  */
 exports.CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
+/**
+ * An identifier for the deleted table information stuff
+ */
+exports.DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
 /**
  * An identifier for caching the currency layer api response
  * for currency conversion in redis

@@ -344,7 +344,9 @@ async function runGetQueryFor(arg) {
     });
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    const gqlValue = await gql_querier_1.gqlQuery(query);
+    const gqlValue = await gql_querier_1.gqlQuery(query, {
+        merge: arg.waitAndMerge,
+    });
     // now we got to check for errors
     let error = null;
     if (gqlValue.errors) {
@@ -419,7 +421,9 @@ async function runDeleteQueryFor(arg) {
     });
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    const gqlValue = await gql_querier_1.gqlQuery(query);
+    const gqlValue = await gql_querier_1.gqlQuery(query, {
+        merge: arg.waitAndMerge,
+    });
     // now we got to check for errors
     let error = null;
     if (gqlValue.errors) {
@@ -477,7 +481,9 @@ async function runAddQueryFor(arg) {
     });
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    const gqlValue = await gql_querier_1.gqlQuery(query);
+    const gqlValue = await gql_querier_1.gqlQuery(query, {
+        merge: arg.waitAndMerge,
+    });
     // now we got to check for errors
     let error = null;
     if (gqlValue.errors) {
@@ -532,7 +538,9 @@ async function runEditQueryFor(arg) {
     });
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    const gqlValue = await gql_querier_1.gqlQuery(query);
+    const gqlValue = await gql_querier_1.gqlQuery(query, {
+        merge: arg.waitAndMerge,
+    });
     // now we got to check for errors
     let error = null;
     if (gqlValue.errors) {
@@ -722,7 +730,9 @@ async function runSearchQueryFor(arg, searchOptions) {
         });
         // now we get the gql value using the gql query function
         // and this function will always run using the network
-        gqlValue = await gql_querier_1.gqlQuery(query);
+        gqlValue = await gql_querier_1.gqlQuery(query, {
+            merge: arg.waitAndMerge,
+        });
         const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
         if (data) {
             knownLastRecordDate = data.last_record_date;
@@ -742,7 +752,9 @@ async function runSearchQueryFor(arg, searchOptions) {
         });
         // now we get the gql value using the gql query function
         // and this function will always run using the network
-        gqlValue = await gql_querier_1.gqlQuery(query);
+        gqlValue = await gql_querier_1.gqlQuery(query, {
+            merge: arg.waitAndMerge,
+        });
         const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
         if (data) {
             knownLastRecordDate = data.last_record_date;

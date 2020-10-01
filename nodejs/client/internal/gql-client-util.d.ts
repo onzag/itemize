@@ -88,6 +88,7 @@ export declare function runGetQueryFor(arg: {
     language: string;
     token: string;
     cacheStore: boolean;
+    waitAndMerge?: boolean;
 }): Promise<{
     error: EndpointErrorType;
     value: IGQLValue;
@@ -118,6 +119,7 @@ export declare function runDeleteQueryFor(arg: {
     language: string;
     listenerUUID: string;
     cacheStore: boolean;
+    waitAndMerge?: boolean;
 }): Promise<{
     error: EndpointErrorType;
 }>;
@@ -151,6 +153,7 @@ export declare function runAddQueryFor(arg: {
     forId: number;
     forVersion: string;
     containerId: string;
+    waitAndMerge?: boolean;
 }): Promise<{
     error: EndpointErrorType;
     value: IGQLValue;
@@ -180,6 +183,7 @@ export declare function runEditQueryFor(arg: {
     version: string;
     listenerUUID: string;
     cacheStore: boolean;
+    waitAndMerge?: boolean;
 }): Promise<{
     error: EndpointErrorType;
     value: IGQLValue;

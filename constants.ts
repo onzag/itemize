@@ -531,27 +531,39 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
   },
   parent_id: {
     type: "integer",
-    index: (combinedIndexes.includes("parent_id") || addedIndexes.includes("parent_id")) ? {
-      id: combinedIndexes.includes("parent_id") ? COMBINED_INDEX : PARENT_INDEX,
+    index: combinedIndexes.includes("parent_id") ? {
+      id: COMBINED_INDEX,
       type: "btree",
-      level: combinedIndexes.includes("parent_id") ? combinedIndexes.indexOf("parent_id") : 0,
-    } : null,
+      level: combinedIndexes.indexOf("parent_id"),
+    } : {
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 0,
+    },
   },
   parent_version: {
     type: "string",
-    index: (combinedIndexes.includes("parent_version") || addedIndexes.includes("parent_version")) ? {
-      id: combinedIndexes.includes("parent_version") ? COMBINED_INDEX : PARENT_INDEX,
+    index: combinedIndexes.includes("parent_version") ? {
+      id: COMBINED_INDEX,
       type: "btree",
-      level: combinedIndexes.includes("parent_version") ? combinedIndexes.indexOf("parent_version") : 1,
-    } : null,
+      level: combinedIndexes.indexOf("parent_version"),
+    } : {
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 1,
+    },
   },
   parent_type: {
     type: "string",
-    index: (combinedIndexes.includes("parent_type") || addedIndexes.includes("parent_type")) ? {
-      id: combinedIndexes.includes("parent_type") ? COMBINED_INDEX : PARENT_INDEX,
+    index: combinedIndexes.includes("parent_type") ? {
+      id: COMBINED_INDEX,
       type: "btree",
-      level: combinedIndexes.includes("parent_type") ? combinedIndexes.indexOf("parent_type") : 2,
-    } : null,
+      level: combinedIndexes.indexOf("parent_type"),
+    } : {
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 2,
+    },
   },
   container_id: {
     type: "string",
@@ -569,11 +581,15 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
   created_by: {
     type: "integer",
     notNull: true,
-    index: (combinedIndexes.includes("created_by") || addedIndexes.includes("created_by")) ? {
-      id: combinedIndexes.includes("created_by") ? COMBINED_INDEX : CREATED_BY_INDEX,
+    index: combinedIndexes.includes("created_by") ? {
+      id: COMBINED_INDEX,
       type: "btree",
-      level: combinedIndexes.includes("created_by") ? combinedIndexes.indexOf("created_by") : 0,
-    } : null,
+      level: combinedIndexes.indexOf("created_by"),
+    } : {
+      id: CREATED_BY_INDEX,
+      type: "btree",
+      level: 0,
+    },
   },
   edited_at: {
     type: "datetime",
@@ -1130,6 +1146,11 @@ export const SERVER_USER_KICK_IDENTIFIER = "SERVER_KICK";
  * factor information
  */
 export const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS"
+
+/**
+ * An identifier for the deleted table information stuff
+ */
+export const DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
 
 /**
  * An identifier for caching the currency layer api response

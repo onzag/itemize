@@ -7,7 +7,7 @@
 
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
-import { CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
+import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX } from "../../constants";
 import Knex from "knex";
 
 export interface ISQLTableIndexType {
@@ -137,7 +137,49 @@ export function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDef
       factor: {
         type: "float"
       }
-    }
+    },
+    [DELETED_REGISTRY_IDENTIFIER]: {
+      reg_id: {
+        type: "serial",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 0,
+        },
+      },
+      id: {
+        type: "integer",
+        notNull: true,
+      },
+      version: {
+        type: "text",
+        notNull: true,
+      },
+      type: {
+        type: "text",
+        notNull: true
+      },
+      created_by: {
+        type: "integer",
+        index: {
+          id: CREATED_BY_INDEX,
+          level: 0,
+          type: "btree",
+        }
+      },
+      parenting_id: {
+        type: "text",
+        index: {
+          id: PARENT_INDEX,
+          level: 0,
+          type: "btree",
+        }
+      },
+      transaction_time: {
+        type: "datetime",
+      },
+    },
   };
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules

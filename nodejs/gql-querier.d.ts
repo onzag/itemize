@@ -133,6 +133,7 @@ export interface IGQLEndpointValue {
         extensions: EndpointErrorType;
     }>;
 }
+declare type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
 /**
  * Graphql helper class in order to build proper form data
  * queries and mutations to the grapqhl api refer to
@@ -152,11 +153,33 @@ export declare class GQLQuery {
      */
     private foundUnprocessedArgFiles;
     /**
+     * list of listeners
+     */
+    private listeners;
+    /**
      * Build a graphql query
      * @param type query or mutation
      * @param queries the queries that we want to execute
      */
     constructor(type: "query" | "mutation", queries: IGQLQueryObj[]);
+    /**
+     * Check whether it's mergable
+     */
+    isMergableWith(query: GQLQuery): boolean;
+    private isNameMergableWith;
+    /**
+     * Merge with it
+     * @param query the query to merge with
+     */
+    mergeWith(query: GQLQuery): void;
+    /**
+     * inform a reply to the query in case this has event listeners to that
+     */
+    informReply(reply: IGQLEndpointValue): void;
+    /**
+     * add a listener for when a reply is informed
+     */
+    addEventListenerOnReplyInformed(listener: IGQLQueryListenerType): void;
     /**
      * Provides the operations part of the formdata field in json form
      * @returns the formdata for the operations
@@ -253,8 +276,14 @@ export declare function buildGqlMutation(...mutations: IGQLQueryObj[]): GQLQuery
 /**
  * Executes a graphql query
  * @param query the query to run
- * @param host a host, required when running in NodeJS
+ * @param options.host a host, required when running in NodeJS
+ * @param options.merge whether to merge graphql queries in one, adds delay to the queries, might be unwanted
+ * @param options.mergeMS how many ms of delay to add, default 70
  * @returns a promise for a graphql endpoint value
  */
-export declare function gqlQuery(query: GQLQuery, host?: string): Promise<IGQLEndpointValue>;
+export declare function gqlQuery(query: GQLQuery, options?: {
+    host?: string;
+    merge?: boolean;
+    mergeMS?: number;
+}): Promise<IGQLEndpointValue>;
 export {};

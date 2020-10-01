@@ -9,6 +9,8 @@ import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
 import { ENDPOINT_ERRORS } from "./constants";
+import equals from "deep-equal";
+import { requestFieldsAreContained } from "./gql-util";
 
 /**
  * Search results as they are provided
@@ -149,6 +151,8 @@ export interface IGQLEndpointValue {
   }>;
 }
 
+type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
+
 /**
  * Graphql helper class in order to build proper form data
  * queries and mutations to the grapqhl api refer to
@@ -167,6 +171,10 @@ export class GQLQuery {
    * Files that have been found that are unprocessed
    */
   private foundUnprocessedArgFiles: IGQLFile[];
+  /**
+   * list of listeners
+   */
+  private listeners: IGQLQueryListenerType[] = [];
 
   /**
    * Build a graphql query
@@ -192,6 +200,85 @@ export class GQLQuery {
       }
       return query;
     });
+  }
+
+  /**
+   * Check whether it's mergable
+   */
+  public isMergableWith(query: GQLQuery) {
+    if (query.type !== this.type) {
+      return false;
+    }
+
+    // check for file collision
+    const collapsingFiles = this.foundUnprocessedArgFiles.some((uf) => {
+      return !!query.foundUnprocessedArgFiles.find((suf) => suf.id === uf.id);
+    });
+
+    if (collapsingFiles) {
+      return false;
+    }
+
+    // check for collapsing names
+    const collapsingNames = this.processedQueries.filter((q) => {
+      return query.processedQueries.find((sq) => {
+        q.name === sq.name;
+      });
+    });
+
+    if (collapsingNames.length === 0) {
+      return true;
+    } else {
+      return collapsingNames.some((n) => !this.isNameMergableWith(n, query));
+    }
+  }
+
+  private isNameMergableWith(ourValue: IGQLQueryObj, query: GQLQuery) {
+    const theirValue = query.processedQueries.find((q) => q.name === name);
+
+    if (!equals(ourValue.args, theirValue.args)) {
+      return false;
+    }
+
+    if (
+      requestFieldsAreContained(ourValue.fields, theirValue.fields) ||
+      requestFieldsAreContained(theirValue.fields, ourValue.fields)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Merge with it
+   * @param query the query to merge with
+   */
+  public mergeWith(query: GQLQuery) {
+    this.foundUnprocessedArgFiles = this.foundUnprocessedArgFiles.concat(query.foundUnprocessedArgFiles);
+
+    query.processedQueries.forEach((q) => {
+      const foundIndex = this.processedQueries.findIndex((sq) => sq.name === q.name);
+      if (foundIndex === -1) {
+        this.processedQueries.push(q);
+      } else if (requestFieldsAreContained(this.processedQueries[foundIndex].fields, q.fields)) {
+        this.processedQueries[foundIndex].fields = q.fields;
+      }
+    });
+  }
+
+  /**
+   * inform a reply to the query in case this has event listeners to that
+   */
+  public informReply(reply: IGQLEndpointValue) {
+    this.listeners.forEach((l) => l(reply));
+  }
+
+  /**
+   * add a listener for when a reply is informed
+   */
+  public addEventListenerOnReplyInformed(listener: IGQLQueryListenerType ) {
+    this.listeners.push(listener);
   }
 
   /**
@@ -503,13 +590,67 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return new GQLQuery("mutation", mutations);
 }
 
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+const QUERIES_IN_WAITING: GQLQuery[] = [];
+
 /**
  * Executes a graphql query
  * @param query the query to run
- * @param host a host, required when running in NodeJS
+ * @param options.host a host, required when running in NodeJS
+ * @param options.merge whether to merge graphql queries in one, adds delay to the queries, might be unwanted
+ * @param options.mergeMS how many ms of delay to add, default 70
  * @returns a promise for a graphql endpoint value
  */
-export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQLEndpointValue> {
+export async function gqlQuery(query: GQLQuery, options?: {
+  host?: string;
+  merge?: boolean;
+  mergeMS?: number;
+}): Promise<IGQLEndpointValue> {
+  const host = (options && options.host) || "";
+  const merge = options && options.merge;
+
+  // if we are in browser context and we have no host
+  if (typeof fetch === "undefined" && !host) {
+    throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
+  }
+
+  // if we are allowed to merge and not concerned with full speed but rather full optimal
+  if (merge) {
+    // let's check all the queries that are in the same situation
+    const queryThatCanMergeWith = QUERIES_IN_WAITING.find((q) => {
+      return q.isMergableWith(query);
+    });
+
+    // if we find one, cool, let's merge with it
+    if (queryThatCanMergeWith) {
+      // we do so
+      queryThatCanMergeWith.mergeWith(query);
+      // and now we are concerned in how to receive the answer
+      // from that same query as a reply for this one
+      return new Promise((resolve) => {
+        // we use the listener as the resolve
+        queryThatCanMergeWith.addEventListenerOnReplyInformed(resolve);
+      });
+      // we do not execute, we have ended
+    } else {
+      // otherwise we are first, we add this query to the query list
+      // so it can be edited in need
+      QUERIES_IN_WAITING.push(query);
+      // wait a couple of milliseconds
+      await wait((options && options.mergeMS) || 70);
+      // and then take us away from the waiting list, we are about to execute
+      const index = QUERIES_IN_WAITING.findIndex((q) => q === query);
+      if (index !== -1) {
+        QUERIES_IN_WAITING.splice(index, 1);
+      }
+    }
+  }
+
   // building the form data
   const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
   // append this stuff to the form data
@@ -523,11 +664,7 @@ export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQL
   // the fetch we need to use
   const fetchToUse = typeof fetch !== "undefined" ? fetch : fetchNode;
 
-  // if we are in browser context and we have no host
-  if (typeof fetch === "undefined" && !host) {
-    throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
-  }
-
+  let reply: IGQLEndpointValue;
   // now we try
   try {
     const value = await fetchToUse(host + "/graphql", {
@@ -535,9 +672,9 @@ export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQL
       cache: "no-cache",
       body: formData as any,
     });
-    return await value.json();
+    reply = await value.json();
   } catch (err) {
-    return {
+    reply = {
       data: null,
       errors: [
         {
@@ -549,4 +686,7 @@ export async function gqlQuery(query: GQLQuery, host: string = ""): Promise<IGQL
       ],
     };
   }
+
+  query.informReply(reply);
+  return reply;
 }

@@ -13,6 +13,8 @@ const stream_1 = require("stream");
 const form_data_1 = __importDefault(require("form-data"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const constants_1 = require("./constants");
+const deep_equal_1 = __importDefault(require("deep-equal"));
+const gql_util_1 = require("./gql-util");
 /**
  * Graphql helper class in order to build proper form data
  * queries and mutations to the grapqhl api refer to
@@ -25,6 +27,10 @@ class GQLQuery {
      * @param queries the queries that we want to execute
      */
     constructor(type, queries) {
+        /**
+         * list of listeners
+         */
+        this.listeners = [];
         this.type = type;
         this.foundUnprocessedArgFiles = [];
         this.findFilesAndProcessArgs = this.findFilesAndProcessArgs.bind(this);
@@ -38,6 +44,72 @@ class GQLQuery {
             }
             return query;
         });
+    }
+    /**
+     * Check whether it's mergable
+     */
+    isMergableWith(query) {
+        if (query.type !== this.type) {
+            return false;
+        }
+        // check for file collision
+        const collapsingFiles = this.foundUnprocessedArgFiles.some((uf) => {
+            return !!query.foundUnprocessedArgFiles.find((suf) => suf.id === uf.id);
+        });
+        if (collapsingFiles) {
+            return false;
+        }
+        // check for collapsing names
+        const collapsingNames = this.processedQueries.filter((q) => {
+            return query.processedQueries.find((sq) => {
+                q.name === sq.name;
+            });
+        });
+        if (collapsingNames.length === 0) {
+            return true;
+        }
+        else {
+            return collapsingNames.some((n) => !this.isNameMergableWith(n, query));
+        }
+    }
+    isNameMergableWith(ourValue, query) {
+        const theirValue = query.processedQueries.find((q) => q.name === name);
+        if (!deep_equal_1.default(ourValue.args, theirValue.args)) {
+            return false;
+        }
+        if (gql_util_1.requestFieldsAreContained(ourValue.fields, theirValue.fields) ||
+            gql_util_1.requestFieldsAreContained(theirValue.fields, ourValue.fields)) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Merge with it
+     * @param query the query to merge with
+     */
+    mergeWith(query) {
+        this.foundUnprocessedArgFiles = this.foundUnprocessedArgFiles.concat(query.foundUnprocessedArgFiles);
+        query.processedQueries.forEach((q) => {
+            const foundIndex = this.processedQueries.findIndex((sq) => sq.name === q.name);
+            if (foundIndex === -1) {
+                this.processedQueries.push(q);
+            }
+            else if (gql_util_1.requestFieldsAreContained(this.processedQueries[foundIndex].fields, q.fields)) {
+                this.processedQueries[foundIndex].fields = q.fields;
+            }
+        });
+    }
+    /**
+     * inform a reply to the query in case this has event listeners to that
+     */
+    informReply(reply) {
+        this.listeners.forEach((l) => l(reply));
+    }
+    /**
+     * add a listener for when a reply is informed
+     */
+    addEventListenerOnReplyInformed(listener) {
+        this.listeners.push(listener);
     }
     /**
      * Provides the operations part of the formdata field in json form
@@ -315,13 +387,58 @@ function buildGqlMutation(...mutations) {
     return new GQLQuery("mutation", mutations);
 }
 exports.buildGqlMutation = buildGqlMutation;
+function wait(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+const QUERIES_IN_WAITING = [];
 /**
  * Executes a graphql query
  * @param query the query to run
- * @param host a host, required when running in NodeJS
+ * @param options.host a host, required when running in NodeJS
+ * @param options.merge whether to merge graphql queries in one, adds delay to the queries, might be unwanted
+ * @param options.mergeMS how many ms of delay to add, default 70
  * @returns a promise for a graphql endpoint value
  */
-async function gqlQuery(query, host = "") {
+async function gqlQuery(query, options) {
+    const host = (options && options.host) || "";
+    const merge = options && options.merge;
+    // if we are in browser context and we have no host
+    if (typeof fetch === "undefined" && !host) {
+        throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
+    }
+    // if we are allowed to merge and not concerned with full speed but rather full optimal
+    if (merge) {
+        // let's check all the queries that are in the same situation
+        const queryThatCanMergeWith = QUERIES_IN_WAITING.find((q) => {
+            return q.isMergableWith(query);
+        });
+        // if we find one, cool, let's merge with it
+        if (queryThatCanMergeWith) {
+            // we do so
+            queryThatCanMergeWith.mergeWith(query);
+            // and now we are concerned in how to receive the answer
+            // from that same query as a reply for this one
+            return new Promise((resolve) => {
+                // we use the listener as the resolve
+                queryThatCanMergeWith.addEventListenerOnReplyInformed(resolve);
+            });
+            // we do not execute, we have ended
+        }
+        else {
+            // otherwise we are first, we add this query to the query list
+            // so it can be edited in need
+            QUERIES_IN_WAITING.push(query);
+            // wait a couple of milliseconds
+            await wait((options && options.mergeMS) || 70);
+            // and then take us away from the waiting list, we are about to execute
+            const index = QUERIES_IN_WAITING.findIndex((q) => q === query);
+            if (index !== -1) {
+                QUERIES_IN_WAITING.splice(index, 1);
+            }
+        }
+    }
     // building the form data
     const formData = typeof FormData !== "undefined" ? new FormData() : new form_data_1.default();
     // append this stuff to the form data
@@ -333,10 +450,7 @@ async function gqlQuery(query, host = "") {
     });
     // the fetch we need to use
     const fetchToUse = typeof fetch !== "undefined" ? fetch : node_fetch_1.default;
-    // if we are in browser context and we have no host
-    if (typeof fetch === "undefined" && !host) {
-        throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
-    }
+    let reply;
     // now we try
     try {
         const value = await fetchToUse(host + "/graphql", {
@@ -344,10 +458,10 @@ async function gqlQuery(query, host = "") {
             cache: "no-cache",
             body: formData,
         });
-        return await value.json();
+        reply = await value.json();
     }
     catch (err) {
-        return {
+        reply = {
             data: null,
             errors: [
                 {
@@ -359,5 +473,7 @@ async function gqlQuery(query, host = "") {
             ],
         };
     }
+    query.informReply(reply);
+    return reply;
 }
 exports.gqlQuery = gqlQuery;

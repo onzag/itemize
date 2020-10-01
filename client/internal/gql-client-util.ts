@@ -440,6 +440,7 @@ export async function runGetQueryFor(
     language: string,
     token: string,
     cacheStore: boolean,
+    waitAndMerge?: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -509,7 +510,9 @@ export async function runGetQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query);
+  const gqlValue = await gqlQuery(query, {
+    merge: arg.waitAndMerge,
+  });
 
   // now we got to check for errors
   let error: EndpointErrorType = null;
@@ -595,6 +598,7 @@ export async function runDeleteQueryFor(
     language: string,
     listenerUUID: string,
     cacheStore: boolean,
+    waitAndMerge?: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -621,7 +625,9 @@ export async function runDeleteQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query);
+  const gqlValue = await gqlQuery(query, {
+    merge: arg.waitAndMerge,
+  });
 
   // now we got to check for errors
   let error: EndpointErrorType = null;
@@ -678,6 +684,7 @@ export async function runAddQueryFor(
     forId: number,
     forVersion: string,
     containerId: string,
+    waitAndMerge?: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -714,7 +721,9 @@ export async function runAddQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query);
+  const gqlValue = await gqlQuery(query, {
+    merge: arg.waitAndMerge,
+  });
 
   // now we got to check for errors
   let error: EndpointErrorType = null;
@@ -774,6 +783,7 @@ export async function runEditQueryFor(
     version: string,
     listenerUUID: string,
     cacheStore: boolean,
+    waitAndMerge?: boolean,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -805,7 +815,9 @@ export async function runEditQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query);
+  const gqlValue = await gqlQuery(query, {
+    merge: arg.waitAndMerge,
+  });
 
   // now we got to check for errors
   let error: EndpointErrorType = null;
@@ -1076,7 +1088,9 @@ export async function runSearchQueryFor(
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    gqlValue = await gqlQuery(query);
+    gqlValue = await gqlQuery(query, {
+      merge: arg.waitAndMerge,
+    });
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
     if (data) {
@@ -1097,7 +1111,9 @@ export async function runSearchQueryFor(
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    gqlValue = await gqlQuery(query);
+    gqlValue = await gqlQuery(query, {
+      merge: arg.waitAndMerge,
+    });
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
     if (data) {

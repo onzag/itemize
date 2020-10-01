@@ -627,6 +627,10 @@ export declare const SERVER_USER_KICK_IDENTIFIER = "SERVER_KICK";
  */
 export declare const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS";
 /**
+ * An identifier for the deleted table information stuff
+ */
+export declare const DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
+/**
  * An identifier for caching the currency layer api response
  * for currency conversion in redis
  */
