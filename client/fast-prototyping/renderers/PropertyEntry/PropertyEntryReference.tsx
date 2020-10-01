@@ -25,6 +25,7 @@ import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
+import equals from "deep-equal";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -234,7 +235,23 @@ class ActualPropertyEntryReferenceRenderer
     }
 
     if (this.props.args.selectField) {
-      this.props.loadAllPossibleValues(this.props.args.selectField);
+      this.props.loadAllPossibleValues(
+        this.props.args.selectField,
+        this.props.args.preventIds,
+        this.props.args.preventEqualityWithProperties,
+      );
+    }
+  }
+
+  public componentDidUpdate(prevProps: IPropertyEntryReferenceRendererWithStylesProps) {
+    if (
+      !equals(prevProps.args.preventIds, this.props.args.preventIds) ||
+      !equals(this.props.args.preventEqualityWithProperties, this.props.args.preventEqualityWithProperties)
+    ) {
+      this.props.refilterPossibleValues(
+        this.props.args.preventIds,
+        this.props.args.preventEqualityWithProperties,
+      );
     }
   }
 
@@ -282,7 +299,7 @@ class ActualPropertyEntryReferenceRenderer
       autosuggestOverride.method === "type"
     ) {
       // we call the change of search
-      this.props.onChangeSearch(value);
+      this.props.onChangeSearch(value, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
     }
   }
 
@@ -516,7 +533,7 @@ class ActualPropertyEntryReferenceRenderer
    */
   public onSuggestionsFetchRequested(arg: {value: string, reason: string}) {
     if (arg.reason !== "input-focused") {
-      this.props.onChangeSearch(arg.value);
+      this.props.onChangeSearch(arg.value, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
     }
   }
 

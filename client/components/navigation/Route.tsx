@@ -15,9 +15,20 @@ import { Route as RouterRoute, RouteProps } from "react-router-dom";
  */
 export default function Route(props: RouteProps) {
   // first we check and add the trailing slash if missing
-  let urlDefined = props.path;
-  if (urlDefined[0] !== "/") {
-    urlDefined = "/" + urlDefined;
+  let newPathAttr: string | string[];
+  if (Array.isArray(props.path)) {
+    newPathAttr = props.path.map((urlD) => {
+      if (urlD[0] !== "/") {
+        return "/:__lang/" + urlD;
+      }
+      return "/:__lang" + urlD;
+    });
+  } else {
+    if (props.path[0] !== "/") {
+      newPathAttr = "/:__lang/" + props.path;
+    } else {
+      newPathAttr = "/:__lang" + props.path;
+    }
   }
 
   // and then we build the route on it, note the path
@@ -25,5 +36,5 @@ export default function Route(props: RouteProps) {
   // in any circumstance, the lang is diresgarded, as well
   // use the AppLanguageRetriever instead to get the language
   // there might be delays and the url is not always accurate
-  return <RouterRoute {...props} path={`/:__lang${urlDefined}`}/>;
+  return <RouterRoute {...props} path={newPathAttr}/>;
 }

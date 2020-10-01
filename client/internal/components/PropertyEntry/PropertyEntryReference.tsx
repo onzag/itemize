@@ -27,8 +27,9 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
   currentFindError: EndpointErrorType;
   currentSearchError: EndpointErrorType;
 
-  onChangeSearch: (str: string) => void;
-  loadAllPossibleValues: (limit: number) => void;
+  onChangeSearch: (str: string, preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
+  loadAllPossibleValues: (limit: number, preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
+  refilterPossibleValues: (preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
   onSelect: (option: IPropertyEntryReferenceOption) => void;
   onCancel: () => void;
   dismissSearchError: () => void;
@@ -49,6 +50,9 @@ export default class PropertyEntryReference
   private currentlyFindingValueFor: [number, string];
 
   private lastCachedSearch: IPropertyEntryReferenceOption[];
+  private lastCachedSearchPreventedProperties: PropertyDefinition[];
+  private lastCachedSearchPreventedPropertiesIds: string[];
+  private lastCachedSearchPreventedIds: number[];
 
   private isUnmounted = false;
 
@@ -64,6 +68,8 @@ export default class PropertyEntryReference
 
     this.onChangeSearch = this.onChangeSearch.bind(this);
     this.loadAllPossibleValues = this.loadAllPossibleValues.bind(this);
+    this.refilterPossibleValues = this.refilterPossibleValues.bind(this);
+    this.refilter = this.refilter.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.search = this.search.bind(this);
@@ -75,7 +81,9 @@ export default class PropertyEntryReference
   }
 
   public changeListener(id: number, version: string) {
+    // we check that the change occured in our own version
     if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+      // trigger an onchange event that the results are no longer valid
       this.props.onChange(null, "");
     }
   }
@@ -99,6 +107,9 @@ export default class PropertyEntryReference
   public componentWillUnmount() {
     this.isUnmounted = true;
     this.removeListeners();
+    if (this.lastCachedSearchPreventedProperties) {
+      this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+    }
   }
 
   public toggleListener(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props, fn: string) {
@@ -131,6 +142,18 @@ export default class PropertyEntryReference
     });
   }
 
+  public addPreventEqualityWithPropertiesListener(properties: PropertyDefinition[]) {
+    properties.forEach((p) => {
+      p.addChangeListener(this.refilter);
+    });
+  }
+
+  public removePreventEqualityWithPropertiesListener(properties: PropertyDefinition[]) {
+    properties.forEach((p) => {
+      p.removeChangeListener(this.refilter);
+    });
+  }
+
   public addListeners(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props) {
     this.toggleListener(props, "removeChangeListener");
   }
@@ -139,7 +162,7 @@ export default class PropertyEntryReference
     this.toggleListener(props, "addChangeListener");
   }
 
-  public async search(loadAll?: boolean, limit?: number) {
+  public async search(loadAll?: boolean, limit?: number, preventIds?: number[], preventEqualityWithProperties?: string[]) {
     const strToSearchForValue = this.props.state.internalValue || "";
     const [idef, dProp, sProp] = this.getSpecialData();
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
@@ -147,7 +170,7 @@ export default class PropertyEntryReference
     const fields: IGQLRequestFields = {
       id: {},
       DATA: {
-        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
+        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
       }
     } as IGQLRequestFields;
 
@@ -186,7 +209,7 @@ export default class PropertyEntryReference
       } else {
         applicableId = pId;
       }
-      
+
       // now the value we will use will depend on the type of condition we have here
       const valueToUse = propertySet[pId];
       // if it's an exact value we just paste it in the arg
@@ -252,6 +275,24 @@ export default class PropertyEntryReference
       return;
     }
 
+    const actualPreventIds: number[] = (preventIds || []).filter((id) => id !== null);
+    if (preventEqualityWithProperties) {
+      preventEqualityWithProperties.forEach((p) => {
+        const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
+        const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
+        if (typeof value === "number") {
+          actualPreventIds.push(value);
+        } else if (value !== null) {
+          console.warn(
+            "Attempted to perform a reference property equality with a property of type " +
+            typeof value +
+            " whose id is " +
+            p
+          );
+        }
+      });
+    }
+
     // we get the options and sort alphabetically
     const options: IPropertyEntryReferenceOption[] = result.results.map((r) => (
       {
@@ -259,26 +300,34 @@ export default class PropertyEntryReference
         id: (r && r.id) as number,
       }
     )).sort((a: IPropertyEntryReferenceOption, b: IPropertyEntryReferenceOption) => {
-      if(a.text < b.text) { return -1; }
-      if(a.text > b.text) { return 1; }
+      if (a.text < b.text) { return -1; }
+      if (a.text > b.text) { return 1; }
       return 0;
     });
 
     this.lastCachedSearch = options;
+    this.lastCachedSearchPreventedIds = preventIds;
+    if (!equals(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
+      this.lastCachedSearchPreventedProperties &&
+        this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+      this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
+      this.lastCachedSearchPreventedPropertiesIds = preventEqualityWithProperties;
+      this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+    }
 
     // this can happen if the search is cancelled before the user has finished typing
     // resulting in an unset value that might be in the searchbox at the end
     if (this.props.state.value === null || isNaN(this.props.state.value as number)) {
       const foundInList = options.find((o) => o.text === (this.props.state.internalValue || ""));
       if (foundInList) {
-        this.props.onChange(foundInList.id, (this.props.state.internalValue || "")); 
+        this.props.onChange(foundInList.id, (this.props.state.internalValue || ""));
       }
     }
 
     if (!this.isUnmounted) {
       this.setState({
         currentSearchError: null,
-        currentOptions: options,
+        currentOptions: !actualPreventIds.length ? options : options.filter((v) => !actualPreventIds.includes(v.id)),
         currentOptionsVersion: filterByLanguage ? this.props.language : null,
       });
     }
@@ -347,7 +396,7 @@ export default class PropertyEntryReference
     ) {
       return;
     }
-    
+
     const ssrValue = this.getSSRFoundValue(forId, forVersion);
     if (ssrValue) {
       this.props.onChange(
@@ -374,7 +423,7 @@ export default class PropertyEntryReference
 
     const fields: IGQLRequestFields = {
       DATA: {
-        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
+        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
       }
     } as IGQLRequestFields;
 
@@ -416,16 +465,77 @@ export default class PropertyEntryReference
     );
   }
 
-  public loadAllPossibleValues(limit: number) {
-    this.search(true, limit);
+  public loadAllPossibleValues(limit: number, preventIds?: number[], preventEqualityWithProperties?: string[]) {
+    this.search(true, limit, preventIds, preventEqualityWithProperties);
   }
 
-  public onChangeSearch(str: string) {
+  public refilter(id: number, version: string) {
+    // we check that the change occured in our own version
+    if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+      this.refilterPossibleValues(this.lastCachedSearchPreventedIds, this.lastCachedSearchPreventedPropertiesIds)
+    }
+  }
+
+  public refilterPossibleValues(preventIds?: number[], preventEqualityWithProperties?: string[]) {
+    if (!this.lastCachedSearch) {
+      return;
+    }
+
+    // first we need the standard form not of our target item definition
+    // but rather the one we are currently working within, hence the difference
+    let stdSelfIdef = this.props.itemDefinition;
+    // if we are in search mode
+    if (this.props.itemDefinition.isInSearchMode()) {
+      // the standard counterpart needs to be fetched
+      stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
+    }
+
+    const actualPreventIds: number[] = (preventIds || []).filter((id) => id !== null);
+    if (preventEqualityWithProperties) {
+      preventEqualityWithProperties.forEach((p) => {
+        const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
+        const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
+        if (typeof value === "number") {
+          actualPreventIds.push(value);
+        } else if (value !== null) {
+          console.warn(
+            "Attempted to perform a reference property equality with a property of type " +
+            typeof value +
+            " whose id is " +
+            p
+          );
+        }
+      });
+    }
+
+    this.lastCachedSearchPreventedIds = preventIds;
+    if (!equals(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
+      this.lastCachedSearchPreventedProperties &&
+        this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+      this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
+      this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+      this.lastCachedSearchPreventedPropertiesIds = preventEqualityWithProperties;
+    }
+
+    if (actualPreventIds.length) {
+      const newCurrentOptions = this.lastCachedSearch.filter((v) => {
+        return !actualPreventIds.includes(v.id);
+      });
+
+      if (!equals(this.state.currentOptions, newCurrentOptions)) {
+        this.setState({
+          currentOptions: newCurrentOptions,
+        });
+      }
+    }
+  }
+
+  public onChangeSearch(str: string, preventIds?: number[], preventEqualityWithProperties?: string[]) {
     let value: number = str.trim().length ? NaN : null;
     let foundInList = this.state.currentOptions.find((o) => o.text === str);
     if (!foundInList && this.lastCachedSearch) {
       foundInList = this.lastCachedSearch.find((o) => o.text === str);
-    } 
+    }
     if (foundInList) {
       value = foundInList.id;
     }
@@ -433,7 +543,9 @@ export default class PropertyEntryReference
     this.props.onChange(value, str);
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(
-      this.search,
+      () => {
+        this.search(false, null, preventIds, preventEqualityWithProperties);
+      },
       600,
     );
   }
@@ -448,6 +560,13 @@ export default class PropertyEntryReference
       currentOptionsVersion: null,
       currentSearchError: null,
     });
+    this.lastCachedSearchPreventedIds = null;
+
+    if (this.lastCachedSearchPreventedProperties) {
+      this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+    }
+    this.lastCachedSearchPreventedProperties = null;
+    this.lastCachedSearchPreventedPropertiesIds = null;
   }
 
   public dismissSearchError() {
@@ -543,7 +662,7 @@ export default class PropertyEntryReference
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryReferenceRendererProps = {
       propertyId: this.props.property.getId(),
-  
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,
@@ -571,6 +690,7 @@ export default class PropertyEntryReference
 
       onChangeSearch: this.onChangeSearch,
       loadAllPossibleValues: this.loadAllPossibleValues,
+      refilterPossibleValues: this.refilterPossibleValues,
       onSelect: this.onSelect,
       onCancel: this.onCancel,
       dismissSearchError: this.dismissSearchError,
@@ -584,6 +704,6 @@ export default class PropertyEntryReference
       onRestore: this.props.onRestore,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />
   }
 }

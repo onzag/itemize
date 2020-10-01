@@ -1567,11 +1567,7 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
-    if (this.stateValue[mergedID] !== newValue) {
-      this.listeners.forEach((listener) => {
-        listener(id || null, version || null, newActualValue);
-      });
-    }
+    const valueDiffers = this.stateValue[mergedID] !== newValue;
 
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
@@ -1585,6 +1581,12 @@ export default class PropertyDefinition {
     delete this.stateLastCachedWithExternal[mergedID];
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
+
+    if (valueDiffers) {
+      this.listeners.forEach((listener) => {
+        listener(id || null, version || null, newActualValue);
+      });
+    }
   }
 
   /**
