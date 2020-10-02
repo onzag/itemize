@@ -227,6 +227,7 @@ class ActualPropertyEntryReferenceRenderer
     this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
+    this.onChangeBySelect = this.onChangeBySelect.bind(this);
   }
 
   public componentDidMount() {
@@ -272,6 +273,23 @@ class ActualPropertyEntryReferenceRenderer
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
     this.onChange(e);
+  }
+
+  /**
+   * Change used with the select element
+   * @param value the value it's given
+   * we ignore the internal value which is always null
+   * for that renderer
+   */
+  public onChangeBySelect(
+    value: number,
+  ) {
+    if (value === null) {
+      this.props.onChange(null, null);
+    } else {
+      const option = this.props.currentOptions.find((o) => o.id === value);
+      this.props.onSelect(option);
+    }
   }
 
   /**
@@ -582,7 +600,7 @@ class ActualPropertyEntryReferenceRenderer
         icon={this.props.icon}
         disabled={this.props.disabled}
         autoFocus={this.props.autoFocus}
-        onChange={this.props.onChange}
+        onChange={this.onChangeBySelect}
         onRestore={this.props.onRestore}
         nullValue={nullValue}
         isNullable={this.props.isNullable}

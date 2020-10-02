@@ -18,6 +18,7 @@ import { IncludeContext } from "../../providers/include";
 import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../../../util";
 import { IGQLFile } from "../../../gql-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
+import equals from "deep-equal";
 
 /**
  * The base interface, all entry, read, view, set contain these attributes
@@ -385,19 +386,31 @@ export function EntryViewReadSet(
 
                       // this is the proper onchange function
                       const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
-                        itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                        let valueBeforeUpdate: PropertyDefinitionSupportedType;
                         if (props.onEntryDrivenChange) {
+                          valueBeforeUpdate =
+                            property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                        }
+                        itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                        if (props.onEntryDrivenChange && !equals(valueBeforeUpdate, newValue)) {
                           props.onEntryDrivenChange(newValue);
                         }
                       };
 
                       // and the on restore function
                       const onRestore = () => {
+                        let valueBeforeUpdate: PropertyDefinitionSupportedType;
+                        if (props.onEntryDrivenChange) {
+                          valueBeforeUpdate =
+                            property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                        }
                         itemDefinitionContextualValue.onPropertyRestore(property);
                         if (props.onEntryDrivenChange) {
                           const value =
                             property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
-                          props.onEntryDrivenChange(value);
+                          if (!equals(valueBeforeUpdate, value)) {
+                            props.onEntryDrivenChange(value);
+                          }
                         }
                       }
 

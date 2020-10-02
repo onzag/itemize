@@ -39,6 +39,7 @@ const PropertySetter_1 = __importDefault(require("../../internal/components/Prop
 const include_1 = require("../../providers/include");
 const util_1 = require("../../../util");
 const config_provider_1 = require("../../internal/providers/config-provider");
+const deep_equal_1 = __importDefault(require("deep-equal"));
 /**
  * This is a legit function that takes all the props in order to pipe them
  * to the proper handler
@@ -178,17 +179,29 @@ function EntryViewReadSet(props, type) {
             }
             // this is the proper onchange function
             const onChange = (newValue, internalValue) => {
-                itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                let valueBeforeUpdate;
                 if (props.onEntryDrivenChange) {
+                    valueBeforeUpdate =
+                        property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                }
+                itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                if (props.onEntryDrivenChange && !deep_equal_1.default(valueBeforeUpdate, newValue)) {
                     props.onEntryDrivenChange(newValue);
                 }
             };
             // and the on restore function
             const onRestore = () => {
+                let valueBeforeUpdate;
+                if (props.onEntryDrivenChange) {
+                    valueBeforeUpdate =
+                        property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                }
                 itemDefinitionContextualValue.onPropertyRestore(property);
                 if (props.onEntryDrivenChange) {
                     const value = property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
-                    props.onEntryDrivenChange(value);
+                    if (!deep_equal_1.default(valueBeforeUpdate, value)) {
+                        props.onEntryDrivenChange(value);
+                    }
                 }
             };
             // and now for whether it's poked, by default it's false

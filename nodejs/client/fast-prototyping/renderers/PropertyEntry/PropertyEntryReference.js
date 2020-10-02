@@ -182,6 +182,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
         this.renderAutosuggestSuggestion = this.renderAutosuggestSuggestion.bind(this);
         this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
         this.getSuggestionValue = this.getSuggestionValue.bind(this);
+        this.onChangeBySelect = this.onChangeBySelect.bind(this);
     }
     componentDidMount() {
         if (this.props.autoFocus && this.inputRef) {
@@ -211,6 +212,21 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
      */
     onChangeByHTMLEvent(e) {
         this.onChange(e);
+    }
+    /**
+     * Change used with the select element
+     * @param value the value it's given
+     * we ignore the internal value which is always null
+     * for that renderer
+     */
+    onChangeBySelect(value) {
+        if (value === null) {
+            this.props.onChange(null, null);
+        }
+        else {
+            const option = this.props.currentOptions.find((o) => o.id === value);
+            this.props.onSelect(option);
+        }
     }
     /**
      * the change event that triggers in the autosuggest mode
@@ -392,7 +408,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             i18nValue: this.props.i18nUnspecified,
             value: null,
         };
-        return (react_1.default.createElement(PropertyEntrySelect_1.default, { values: values, canRestore: this.props.canRestore, currentAppliedValue: this.props.currentAppliedValue, currentI18nValue: this.props.currentTextualValue, currentValid: this.props.currentValid, currentValue: this.props.currentValue, currentInternalValue: this.props.currentInternalValue, currentInvalidReason: this.props.currentInvalidReason, rtl: this.props.rtl, propertyId: this.props.propertyId, placeholder: this.props.placeholder, args: this.props.args, label: this.props.label, icon: this.props.icon, disabled: this.props.disabled, autoFocus: this.props.autoFocus, onChange: this.props.onChange, onRestore: this.props.onRestore, nullValue: nullValue, isNullable: this.props.isNullable, isNumeric: true }));
+        return (react_1.default.createElement(PropertyEntrySelect_1.default, { values: values, canRestore: this.props.canRestore, currentAppliedValue: this.props.currentAppliedValue, currentI18nValue: this.props.currentTextualValue, currentValid: this.props.currentValid, currentValue: this.props.currentValue, currentInternalValue: this.props.currentInternalValue, currentInvalidReason: this.props.currentInvalidReason, rtl: this.props.rtl, propertyId: this.props.propertyId, placeholder: this.props.placeholder, args: this.props.args, label: this.props.label, icon: this.props.icon, disabled: this.props.disabled, autoFocus: this.props.autoFocus, onChange: this.onChangeBySelect, onRestore: this.props.onRestore, nullValue: nullValue, isNullable: this.props.isNullable, isNumeric: true }));
     }
     /**
      * render function
