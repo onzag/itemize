@@ -112,7 +112,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 												{(i18nAltPlaceholder: string) => (
 													<Entry
 														id="username"
-														onChange={actioner.dismissError}
+														onEntryDrivenChange={actioner.dismissError}
 														showAsInvalid={!!actioner.error}
 														ignoreErrors={true}
 														altLabel={i18nAltLabel}
@@ -124,7 +124,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 											</I18nRead>
 										)}
 									</I18nRead>
-									<Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
+									<Entry id="password" onEntryDrivenChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
 									<ProgressingElement
 										isProgressing={actioner.isLoggingIn}

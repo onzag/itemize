@@ -50,8 +50,10 @@ export interface IPropertyBaseWithRendererProps<RendererPropsType> extends IProp
 export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWithRendererProps<RendererPropsType> {
     /**
      * an optional function to get the value as the property changes
+     * these changes are given by the entry and do not come when
+     * the property change due to an external force
      */
-    onChange?: (value: PropertyDefinitionSupportedType) => void;
+    onEntryDrivenChange?: (value: PropertyDefinitionSupportedType) => void;
     /**
      * make it seem as invalid, allows displaying an entry property as invalid
      */

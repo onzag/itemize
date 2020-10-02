@@ -178,14 +178,18 @@ function EntryViewReadSet(props, type) {
             }
             // this is the proper onchange function
             const onChange = (newValue, internalValue) => {
-                if (props.onChange) {
-                    props.onChange(newValue);
-                }
                 itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                if (props.onEntryDrivenChange) {
+                    props.onEntryDrivenChange(newValue);
+                }
             };
             // and the on restore function
             const onRestore = () => {
                 itemDefinitionContextualValue.onPropertyRestore(property);
+                if (props.onEntryDrivenChange) {
+                    const value = property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                    props.onEntryDrivenChange(value);
+                }
             };
             // and now for whether it's poked, by default it's false
             let isPoked = false;

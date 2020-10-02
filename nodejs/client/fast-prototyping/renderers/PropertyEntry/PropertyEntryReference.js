@@ -16,6 +16,7 @@ const react_autosuggest_1 = __importDefault(require("react-autosuggest"));
 const match_1 = __importDefault(require("autosuggest-highlight/match"));
 const parse_1 = __importDefault(require("autosuggest-highlight/parse"));
 const PropertyEntrySelect_1 = __importDefault(require("./PropertyEntrySelect"));
+const deep_equal_1 = __importDefault(require("deep-equal"));
 /**
  * A simple helper function that says when it should show invalid
  * @param props the renderer props
@@ -187,7 +188,13 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
             this.inputRef.focus();
         }
         if (this.props.args.selectField) {
-            this.props.loadAllPossibleValues(this.props.args.selectField);
+            this.props.loadAllPossibleValues(this.props.args.selectField, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
+        }
+    }
+    componentDidUpdate(prevProps) {
+        if (!deep_equal_1.default(prevProps.args.preventIds, this.props.args.preventIds) ||
+            !deep_equal_1.default(this.props.args.preventEqualityWithProperties, this.props.args.preventEqualityWithProperties)) {
+            this.props.refilterPossibleValues(this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
         }
     }
     /**
@@ -224,7 +231,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
         if (value !== this.props.currentTextualValue &&
             autosuggestOverride.method === "type") {
             // we call the change of search
-            this.props.onChangeSearch(value);
+            this.props.onChangeSearch(value, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
         }
     }
     /**
@@ -359,7 +366,7 @@ class ActualPropertyEntryReferenceRenderer extends react_1.default.Component {
      */
     onSuggestionsFetchRequested(arg) {
         if (arg.reason !== "input-focused") {
-            this.props.onChangeSearch(arg.value);
+            this.props.onChangeSearch(arg.value, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
         }
     }
     render() {

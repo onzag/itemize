@@ -119,7 +119,7 @@ function getFieldsAndArgs(options) {
         if (options.propertiesForArgs && options.propertiesForArgs.length) {
             options.propertiesForArgs.forEach((pId) => {
                 const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
-                const currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id);
+                const currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id === pId);
                 const currentValue = currentOverride ? currentOverride.value : pd.getCurrentValue(options.forId || null, options.forVersion || null);
                 if (options.differingPropertiesOnlyForArgs) {
                     const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);

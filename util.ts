@@ -14,6 +14,36 @@ import Include from "./base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
 
 /**
+ * @ignore
+ */
+const TIMED_FN_WAIT_LIST: {
+  [id: string]: NodeJS.Timeout;
+} = {};
+
+type TimedExecutedFn = () => void;
+
+/**
+ * Delays the execution of a function by given milliseconds
+ * ensure these do not stack together
+ * @param fn the function in question
+ * @param id the id to use
+ * @param ms the milliseconds delay before submitting
+ * @returns a function without parameters
+ */
+export function delayedExecutionFn(fn: any, id: string, ms: number): TimedExecutedFn {
+  return () => {
+    if (TIMED_FN_WAIT_LIST[id]) {
+      clearTimeout(TIMED_FN_WAIT_LIST[id]);
+    }
+  
+    TIMED_FN_WAIT_LIST[id] = setTimeout(() => {
+      delete TIMED_FN_WAIT_LIST[id];
+      fn();
+    }, ms);
+  }
+}
+
+/**
  * capitalizes a string
  * @param str the string to capitalize
  */

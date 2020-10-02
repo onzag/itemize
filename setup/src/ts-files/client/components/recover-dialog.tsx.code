@@ -84,7 +84,7 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
 								<form>
 									<Entry
 										id="email"
-										onChange={actioner.dismissStatefulError}
+										onEntryDrivenChange={actioner.dismissStatefulError}
 										showAsInvalid={!!actioner.statefulError}
 										hideDescription={true}
 										icon={<AlernateEmailIcon/>}

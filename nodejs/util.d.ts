@@ -8,6 +8,16 @@ import { IGQLFile } from "./gql-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
 import Include from "./base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
+declare type TimedExecutedFn = () => void;
+/**
+ * Delays the execution of a function by given milliseconds
+ * ensure these do not stack together
+ * @param fn the function in question
+ * @param id the id to use
+ * @param ms the milliseconds delay before submitting
+ * @returns a function without parameters
+ */
+export declare function delayedExecutionFn(fn: any, id: string, ms: number): TimedExecutedFn;
 /**
  * capitalizes a string
  * @param str the string to capitalize
@@ -102,3 +112,4 @@ export declare function fileArrayURLAbsoluter(domain: string, containerHostnameP
 }, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition, cacheable: boolean): IGQLFile[];
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);
 export declare const DOMPurify: createDOMPurify.DOMPurifyI;
+export {};

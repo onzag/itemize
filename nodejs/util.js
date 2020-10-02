@@ -8,11 +8,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DOMPurify = exports.DOMWindow = exports.fileArrayURLAbsoluter = exports.fileURLAbsoluter = exports.getLocalizedDateTimeFormat = exports.getLocalizedDateFormat = exports.getLocalizedTimeFormat = exports.localeReplacerToArray = exports.localeReplacer = exports.mimeTypeToExtension = exports.checkFileInAccepts = exports.processAccepts = exports.escapeStringRegexp = exports.capitalize = void 0;
+exports.DOMPurify = exports.DOMWindow = exports.fileArrayURLAbsoluter = exports.fileURLAbsoluter = exports.getLocalizedDateTimeFormat = exports.getLocalizedDateFormat = exports.getLocalizedTimeFormat = exports.localeReplacerToArray = exports.localeReplacer = exports.mimeTypeToExtension = exports.checkFileInAccepts = exports.processAccepts = exports.escapeStringRegexp = exports.capitalize = exports.delayedExecutionFn = void 0;
 const moment_1 = __importDefault(require("moment"));
 const jsdom_1 = require("jsdom");
 const dompurify_1 = __importDefault(require("dompurify"));
 const constants_1 = require("./constants");
+/**
+ * @ignore
+ */
+const TIMED_FN_WAIT_LIST = {};
+/**
+ * Delays the execution of a function by given milliseconds
+ * ensure these do not stack together
+ * @param fn the function in question
+ * @param id the id to use
+ * @param ms the milliseconds delay before submitting
+ * @returns a function without parameters
+ */
+function delayedExecutionFn(fn, id, ms) {
+    return () => {
+        if (TIMED_FN_WAIT_LIST[id]) {
+            clearTimeout(TIMED_FN_WAIT_LIST[id]);
+        }
+        TIMED_FN_WAIT_LIST[id] = setTimeout(() => {
+            delete TIMED_FN_WAIT_LIST[id];
+            fn();
+        }, ms);
+    };
+}
+exports.delayedExecutionFn = delayedExecutionFn;
 /**
  * capitalizes a string
  * @param str the string to capitalize

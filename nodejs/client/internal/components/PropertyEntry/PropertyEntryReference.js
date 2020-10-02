@@ -20,6 +20,8 @@ class PropertyEntryReference extends react_1.default.Component {
         };
         this.onChangeSearch = this.onChangeSearch.bind(this);
         this.loadAllPossibleValues = this.loadAllPossibleValues.bind(this);
+        this.refilterPossibleValues = this.refilterPossibleValues.bind(this);
+        this.refilter = this.refilter.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.search = this.search.bind(this);
@@ -29,7 +31,9 @@ class PropertyEntryReference extends react_1.default.Component {
         this.changeListener = this.changeListener.bind(this);
     }
     changeListener(id, version) {
+        // we check that the change occured in our own version
         if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+            // trigger an onchange event that the results are no longer valid
             this.props.onChange(null, "");
         }
     }
@@ -45,6 +49,9 @@ class PropertyEntryReference extends react_1.default.Component {
     componentWillUnmount() {
         this.isUnmounted = true;
         this.removeListeners();
+        if (this.lastCachedSearchPreventedProperties) {
+            this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+        }
     }
     toggleListener(props = this.props, fn) {
         const propertySet = props.property.getSpecialProperty("referencedFilteringPropertySet") || {};
@@ -71,13 +78,23 @@ class PropertyEntryReference extends react_1.default.Component {
             }
         });
     }
+    addPreventEqualityWithPropertiesListener(properties) {
+        properties.forEach((p) => {
+            p.addChangeListener(this.refilter);
+        });
+    }
+    removePreventEqualityWithPropertiesListener(properties) {
+        properties.forEach((p) => {
+            p.removeChangeListener(this.refilter);
+        });
+    }
     addListeners(props = this.props) {
         this.toggleListener(props, "removeChangeListener");
     }
     removeListeners(props = this.props) {
         this.toggleListener(props, "addChangeListener");
     }
-    async search(loadAll, limit) {
+    async search(loadAll, limit, preventIds, preventEqualityWithProperties) {
         const strToSearchForValue = this.props.state.internalValue || "";
         const [idef, dProp, sProp] = this.getSpecialData();
         const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
@@ -179,6 +196,22 @@ class PropertyEntryReference extends react_1.default.Component {
             }
             return;
         }
+        const actualPreventIds = (preventIds || []).filter((id) => id !== null);
+        if (preventEqualityWithProperties) {
+            preventEqualityWithProperties.forEach((p) => {
+                const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
+                const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
+                if (typeof value === "number") {
+                    actualPreventIds.push(value);
+                }
+                else if (value !== null) {
+                    console.warn("Attempted to perform a reference property equality with a property of type " +
+                        typeof value +
+                        " whose id is " +
+                        p);
+                }
+            });
+        }
         // we get the options and sort alphabetically
         const options = result.results.map((r) => ({
             text: (r && r.DATA && r.DATA[dProp.getId()]).toString(),
@@ -193,6 +226,14 @@ class PropertyEntryReference extends react_1.default.Component {
             return 0;
         });
         this.lastCachedSearch = options;
+        this.lastCachedSearchPreventedIds = preventIds;
+        if (!deep_equal_1.default(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
+            this.lastCachedSearchPreventedProperties &&
+                this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+            this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
+            this.lastCachedSearchPreventedPropertiesIds = preventEqualityWithProperties;
+            this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+        }
         // this can happen if the search is cancelled before the user has finished typing
         // resulting in an unset value that might be in the searchbox at the end
         if (this.props.state.value === null || isNaN(this.props.state.value)) {
@@ -204,7 +245,7 @@ class PropertyEntryReference extends react_1.default.Component {
         if (!this.isUnmounted) {
             this.setState({
                 currentSearchError: null,
-                currentOptions: options,
+                currentOptions: !actualPreventIds.length ? options : options.filter((v) => !actualPreventIds.includes(v.id)),
                 currentOptionsVersion: filterByLanguage ? this.props.language : null,
             });
         }
@@ -302,10 +343,63 @@ class PropertyEntryReference extends react_1.default.Component {
         }
         this.props.onChange(forId, pMatch.toString());
     }
-    loadAllPossibleValues(limit) {
-        this.search(true, limit);
+    loadAllPossibleValues(limit, preventIds, preventEqualityWithProperties) {
+        this.search(true, limit, preventIds, preventEqualityWithProperties);
     }
-    onChangeSearch(str) {
+    refilter(id, version) {
+        // we check that the change occured in our own version
+        if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
+            this.refilterPossibleValues(this.lastCachedSearchPreventedIds, this.lastCachedSearchPreventedPropertiesIds);
+        }
+    }
+    refilterPossibleValues(preventIds, preventEqualityWithProperties) {
+        if (!this.lastCachedSearch) {
+            return;
+        }
+        // first we need the standard form not of our target item definition
+        // but rather the one we are currently working within, hence the difference
+        let stdSelfIdef = this.props.itemDefinition;
+        // if we are in search mode
+        if (this.props.itemDefinition.isInSearchMode()) {
+            // the standard counterpart needs to be fetched
+            stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
+        }
+        const actualPreventIds = (preventIds || []).filter((id) => id !== null);
+        if (preventEqualityWithProperties) {
+            preventEqualityWithProperties.forEach((p) => {
+                const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
+                const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
+                if (typeof value === "number") {
+                    actualPreventIds.push(value);
+                }
+                else if (value !== null) {
+                    console.warn("Attempted to perform a reference property equality with a property of type " +
+                        typeof value +
+                        " whose id is " +
+                        p);
+                }
+            });
+        }
+        this.lastCachedSearchPreventedIds = preventIds;
+        if (!deep_equal_1.default(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
+            this.lastCachedSearchPreventedProperties &&
+                this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+            this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
+            this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+            this.lastCachedSearchPreventedPropertiesIds = preventEqualityWithProperties;
+        }
+        if (actualPreventIds.length) {
+            const newCurrentOptions = this.lastCachedSearch.filter((v) => {
+                return !actualPreventIds.includes(v.id);
+            });
+            if (!deep_equal_1.default(this.state.currentOptions, newCurrentOptions)) {
+                this.setState({
+                    currentOptions: newCurrentOptions,
+                });
+            }
+        }
+    }
+    onChangeSearch(str, preventIds, preventEqualityWithProperties) {
         let value = str.trim().length ? NaN : null;
         let foundInList = this.state.currentOptions.find((o) => o.text === str);
         if (!foundInList && this.lastCachedSearch) {
@@ -316,7 +410,9 @@ class PropertyEntryReference extends react_1.default.Component {
         }
         this.props.onChange(value, str);
         clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(this.search, 600);
+        this.searchTimeout = setTimeout(() => {
+            this.search(false, null, preventIds, preventEqualityWithProperties);
+        }, 600);
     }
     onSelect(option) {
         this.props.onChange(option.id, option.text);
@@ -327,6 +423,12 @@ class PropertyEntryReference extends react_1.default.Component {
             currentOptionsVersion: null,
             currentSearchError: null,
         });
+        this.lastCachedSearchPreventedIds = null;
+        if (this.lastCachedSearchPreventedProperties) {
+            this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+        }
+        this.lastCachedSearchPreventedProperties = null;
+        this.lastCachedSearchPreventedPropertiesIds = null;
     }
     dismissSearchError() {
         this.setState({
@@ -416,6 +518,7 @@ class PropertyEntryReference extends react_1.default.Component {
             canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
             onChangeSearch: this.onChangeSearch,
             loadAllPossibleValues: this.loadAllPossibleValues,
+            refilterPossibleValues: this.refilterPossibleValues,
             onSelect: this.onSelect,
             onCancel: this.onCancel,
             dismissSearchError: this.dismissSearchError,

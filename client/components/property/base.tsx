@@ -63,8 +63,10 @@ export interface IPropertyBaseWithRendererProps<RendererPropsType> extends IProp
 export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWithRendererProps<RendererPropsType> {
   /**
    * an optional function to get the value as the property changes
+   * these changes are given by the entry and do not come when
+   * the property change due to an external force
    */
-  onChange?: (value: PropertyDefinitionSupportedType) => void;
+  onEntryDrivenChange?: (value: PropertyDefinitionSupportedType) => void;
   /**
    * make it seem as invalid, allows displaying an entry property as invalid
    */
@@ -383,15 +385,20 @@ export function EntryViewReadSet(
 
                       // this is the proper onchange function
                       const onChange = (newValue: PropertyDefinitionSupportedType, internalValue?: any) => {
-                        if (props.onChange) {
-                          props.onChange(newValue);
-                        }
                         itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                        if (props.onEntryDrivenChange) {
+                          props.onEntryDrivenChange(newValue);
+                        }
                       };
 
                       // and the on restore function
                       const onRestore = () => {
                         itemDefinitionContextualValue.onPropertyRestore(property);
+                        if (props.onEntryDrivenChange) {
+                          const value =
+                            property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                          props.onEntryDrivenChange(value);
+                        }
                       }
 
                       // and now for whether it's poked, by default it's false
