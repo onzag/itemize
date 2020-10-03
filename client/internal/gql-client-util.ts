@@ -967,10 +967,6 @@ export async function runSearchQueryFor(
   arg: IRunSearchQueryArg,
   searchOptions: IRunSearchQuerySearchOptions,
 ): Promise<IRunSearchQueryResult> {
-  if (arg.waitAndMerge && arg.cachePolicy === "none") {
-    // TODO implement wait and merge
-  }
-
   const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
     arg.itemDefinition.getParentModule().getQualifiedPathName() :
     arg.itemDefinition.getQualifiedPathName());

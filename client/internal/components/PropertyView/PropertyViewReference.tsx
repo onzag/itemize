@@ -205,6 +205,7 @@ export default class PropertyViewReference
       cacheStore: false,
       token: this.props.tokenData.token,
       itemDefinition: idef,
+      waitAndMerge: true,
     });
 
     if (

@@ -34,6 +34,7 @@ class GQLQuery {
         this.type = type;
         this.foundUnprocessedArgFiles = [];
         this.findFilesAndProcessArgs = this.findFilesAndProcessArgs.bind(this);
+        this.isNameMergableWith = this.isNameMergableWith.bind(this);
         // we take all the queries and try to extract the args
         this.processedQueries = queries.map((query) => {
             if (query.args) {
@@ -62,18 +63,18 @@ class GQLQuery {
         // check for collapsing names
         const collapsingNames = this.processedQueries.filter((q) => {
             return query.processedQueries.find((sq) => {
-                q.name === sq.name;
+                return q.name === sq.name;
             });
         });
         if (collapsingNames.length === 0) {
             return true;
         }
         else {
-            return collapsingNames.some((n) => !this.isNameMergableWith(n, query));
+            return collapsingNames.every((n) => this.isNameMergableWith(n, query));
         }
     }
     isNameMergableWith(ourValue, query) {
-        const theirValue = query.processedQueries.find((q) => q.name === name);
+        const theirValue = query.processedQueries.find((q) => q.name === ourValue.name);
         if (!deep_equal_1.default(ourValue.args, theirValue.args)) {
             return false;
         }

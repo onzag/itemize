@@ -143,6 +143,7 @@ class PropertyViewReference extends react_1.default.Component {
             cacheStore: false,
             token: this.props.tokenData.token,
             itemDefinition: idef,
+            waitAndMerge: true,
         });
         if (this.currentlyFindingValueFor &&
             this.currentlyFindingValueFor[0] === forId &&
