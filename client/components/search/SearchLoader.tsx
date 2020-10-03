@@ -234,7 +234,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // now by default it's nothing like this
     this.state = {
       currentlySearching: [],
-      searchFields: {},
+      searchFields: null,
       currentSearchRecords: [],
       error: null,
     };
@@ -248,9 +248,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps) {
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-    props.searchResults.forEach((r) => {
-      const id = r.id as number;
-      const version = (r.version || null) as string;
+    (props.searchRecords || []).forEach((r) => {
+      const id = r.id ;
+      const version = r.version || null;
       const itemDefintionInQuestion = root.registry[r.type as string] as ItemDefinition;
       const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
       if (currentValue) {

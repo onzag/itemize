@@ -30,7 +30,7 @@ class ActualSearchLoader extends react_1.default.Component {
         // now by default it's nothing like this
         this.state = {
             currentlySearching: [],
-            searchFields: {},
+            searchFields: null,
             currentSearchRecords: [],
             error: null,
         };
@@ -44,9 +44,9 @@ class ActualSearchLoader extends react_1.default.Component {
     }
     ensureCleanupOfOldSearchResults(props) {
         const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-        props.searchResults.forEach((r) => {
+        (props.searchRecords || []).forEach((r) => {
             const id = r.id;
-            const version = (r.version || null);
+            const version = r.version || null;
             const itemDefintionInQuestion = root.registry[r.type];
             const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
             if (currentValue) {
