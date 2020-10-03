@@ -1005,6 +1005,10 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
                 // this will affect other instances that didn't dismount
                 props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
+                if (props.itemDefinitionInstance.isInSearchMode()) {
+                    props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+                    props.itemDefinitionInstance.triggerListeners("search-change", props.forId || null, props.forVersion || null);
+                }
             }
             else {
                 this.cleanWithProps(props, props.cleanOnDismount, "success", false);

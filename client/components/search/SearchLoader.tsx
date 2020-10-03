@@ -8,7 +8,7 @@
 import React from "react";
 import { ItemDefinitionContext, SearchItemDefinitionValueContext, IItemDefinitionProviderProps } from "../../providers/item-definition";
 import equals from "deep-equal";
-import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
@@ -31,8 +31,35 @@ interface IItemDefinitionProviderPropsWithKey extends
  * how to populate it, aka its own item definition and the provider props
  */
 interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
+  /**
+   * The provider properties used to instantiate your own item definition
+   * data
+   */
   providerProps: IItemDefinitionProviderPropsWithKey;
+  /**
+   * The item definition that was found
+   */
   itemDefinition: ItemDefinition;
+  /**
+   * Be careful when calling this function in a non traditional mode
+   * this is because it might still be loading and the value
+   * might not be applied yet, check the isSearching propery
+   * and ensure to cal this getAppliedValue only when
+   * isSearching is false, because otherwise you might get
+   * nulls or other data you might not wish
+   * 
+   * you might prefer to use the searchResult if you are sure
+   * you are using traditional search, howevever the applied
+   * value is certain to work in any mode
+   * 
+   * The applied value might be null if no value applied
+   */
+  getAppliedValue: () => IItemDefinitionGQLValueType;
+  /**
+   * The search result that you have retrieved, only avaliable in
+   * traditional mode
+   */
+  searchResult?: IGQLValue;
 }
 
 /**
@@ -45,6 +72,15 @@ export interface ISearchLoaderArg {
    * search and this search only
    */
   searchId: string;
+  /**
+   * Whether it's currently searching for that given search id
+   * this variable can be very useful to check for applied values
+   * if you are doing your own custom logic and not using traditional search
+   * once the isSearching variable is set to false, all the applied values
+   * for the given page are ensured to be there, this is also true for
+   * traditional search
+   */
+  isSearching: boolean;
   /**
    * the search records are records that allow to be requested
    * as well as organized, partial information of a search result
@@ -193,6 +229,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     this.dismissError = this.dismissError.bind(this);
     this.refreshPage = this.refreshPage.bind(this);
+    this.getRawSearchResults = this.getRawSearchResults.bind(this);
 
     // now by default it's nothing like this
     this.state = {
@@ -206,6 +243,25 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // on mounting we call a refresh of the page
     this.refreshPage();
   }
+  public getRawSearchResults() {
+    return this.props.searchResults;
+  }
+  public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps) {
+    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+    props.searchResults.forEach((r) => {
+      const id = r.id as number;
+      const version = (r.version || null) as string;
+      const itemDefintionInQuestion = root.registry[r.type as string] as ItemDefinition;
+      const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
+      if (currentValue) {
+        itemDefintionInQuestion.cleanValueFor(id, version);
+        itemDefintionInQuestion.triggerListeners("change", id, version);
+      }
+    });
+  }
+  public componentWillUnmount() {
+    this.ensureCleanupOfOldSearchResults(this.props);
+  }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     // on update we must seek what the current page is to
     // see if something changes
@@ -215,6 +271,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     if (
       prevProps.searchId !== this.props.searchId
     ) {
+      if (prevProps.searchResults && prevProps.cleanOnDismount) {
+        this.ensureCleanupOfOldSearchResults(prevProps);
+      }
       if (this.props.searchResults) {
         this.loadSearchResults();
       }
@@ -608,6 +667,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
               const itemDefinition = this.props.itemDefinitionInstance
                 .getParentModule().getParentRoot().registry[searchRecord.type] as ItemDefinition;
 
+              // fird the search result information, if any, for the given record
+              const searchResult = (this.props.searchResults && this.props.searchResults
+                .find((r) => r.id === searchRecord.id && r.version === r.version)) || null;
+
               // and we add something called the provider props, which explains how to instantiate
               // a item definition provider so that it's in sync with this seach and loads what this search
               // says, while it's possible to come with it manually, this makes it easier
@@ -627,6 +690,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   disableExternalChecks: this.props.disableExternalChecks,
                 },
                 itemDefinition,
+                searchResult,
+                getAppliedValue: () => {
+                  return itemDefinition.getGQLAppliedValue(searchRecord.id, searchRecord.version || null);
+                },
               };
             }),
             pageCount,
@@ -638,6 +705,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             dismissError: this.dismissError,
             refreshPage: this.refreshPage,
             searchId: this.props.searchId,
+            isSearching: this.state.currentlySearching.length !== 0,
           })
         }
       </SearchItemDefinitionValueContext.Provider>

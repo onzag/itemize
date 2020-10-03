@@ -26,6 +26,7 @@ class ActualSearchLoader extends react_1.default.Component {
         super(props);
         this.dismissError = this.dismissError.bind(this);
         this.refreshPage = this.refreshPage.bind(this);
+        this.getRawSearchResults = this.getRawSearchResults.bind(this);
         // now by default it's nothing like this
         this.state = {
             currentlySearching: [],
@@ -38,12 +39,34 @@ class ActualSearchLoader extends react_1.default.Component {
         // on mounting we call a refresh of the page
         this.refreshPage();
     }
+    getRawSearchResults() {
+        return this.props.searchResults;
+    }
+    ensureCleanupOfOldSearchResults(props) {
+        const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+        props.searchResults.forEach((r) => {
+            const id = r.id;
+            const version = (r.version || null);
+            const itemDefintionInQuestion = root.registry[r.type];
+            const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
+            if (currentValue) {
+                itemDefintionInQuestion.cleanValueFor(id, version);
+                itemDefintionInQuestion.triggerListeners("change", id, version);
+            }
+        });
+    }
+    componentWillUnmount() {
+        this.ensureCleanupOfOldSearchResults(this.props);
+    }
     componentDidUpdate(prevProps) {
         // on update we must seek what the current page is to
         // see if something changes
         let currentPage = this.props.currentPage;
         // if this is a new search
         if (prevProps.searchId !== this.props.searchId) {
+            if (prevProps.searchResults && prevProps.cleanOnDismount) {
+                this.ensureCleanupOfOldSearchResults(prevProps);
+            }
             if (this.props.searchResults) {
                 this.loadSearchResults();
             }
@@ -345,6 +368,9 @@ class ActualSearchLoader extends react_1.default.Component {
                 // of the record
                 const itemDefinition = this.props.itemDefinitionInstance
                     .getParentModule().getParentRoot().registry[searchRecord.type];
+                // fird the search result information, if any, for the given record
+                const searchResult = (this.props.searchResults && this.props.searchResults
+                    .find((r) => r.id === searchRecord.id && r.version === r.version)) || null;
                 // and we add something called the provider props, which explains how to instantiate
                 // a item definition provider so that it's in sync with this seach and loads what this search
                 // says, while it's possible to come with it manually, this makes it easier
@@ -364,6 +390,10 @@ class ActualSearchLoader extends react_1.default.Component {
                         disableExternalChecks: this.props.disableExternalChecks,
                     },
                     itemDefinition,
+                    searchResult,
+                    getAppliedValue: () => {
+                        return itemDefinition.getGQLAppliedValue(searchRecord.id, searchRecord.version || null);
+                    },
                 };
             }),
             pageCount,
@@ -375,6 +405,7 @@ class ActualSearchLoader extends react_1.default.Component {
             dismissError: this.dismissError,
             refreshPage: this.refreshPage,
             searchId: this.props.searchId,
+            isSearching: this.state.currentlySearching.length !== 0,
         })));
     }
 }

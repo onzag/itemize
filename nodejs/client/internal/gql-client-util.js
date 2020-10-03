@@ -631,9 +631,6 @@ const WAIT_AND_MERGE_CB_LIST = {};
  * be equal to the limit, and the offset given
  */
 async function runSearchQueryFor(arg, searchOptions) {
-    if (arg.waitAndMerge && arg.cachePolicy === "none") {
-        // TODO implement wait and merge
-    }
     const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
         arg.itemDefinition.getParentModule().getQualifiedPathName() :
         arg.itemDefinition.getQualifiedPathName());
