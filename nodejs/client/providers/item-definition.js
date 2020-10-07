@@ -809,6 +809,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             token: this.props.tokenData.token,
             language: this.props.localeData.language,
             cacheStore: this.props.longTermCaching,
+            waitAndMerge: this.props.waitAndMerge,
         });
         if (!error) {
             // we apply the value, whatever we have gotten this will affect all the instances
@@ -1500,6 +1501,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                     version: submitForVersion || null,
                     listenerUUID: this.props.remoteListener.getUUID(),
                     cacheStore: this.props.longTermCaching,
+                    waitAndMerge: options.waitAndMerge,
                 });
                 value = totalValues.value;
                 error = totalValues.error;
@@ -1546,6 +1548,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
                 cacheStore: this.props.longTermCaching,
                 forId: submitForId || null,
                 forVersion: submitForVersion || null,
+                waitAndMerge: options.waitAndMerge,
                 containerId,
             });
             value = totalValues.value;
@@ -1786,6 +1789,7 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
             limit: options.limit,
             offset: options.offset,
             parentedBy,
+            waitAndMerge: options.waitAndMerge,
         }, {
             remoteListener: this.props.remoteListener,
             preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,

@@ -91,6 +91,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     inBehalfOf?: number;
     propertyOverrides?: IPropertyOverride[];
     includeOverrides?: IIncludeOverride[];
+    waitAndMerge?: boolean;
 }
 export interface IActionDeleteOptions extends IActionCleanOptions {
     policies?: PolicyPathType[];
@@ -119,6 +120,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     limit: number;
     offset: number;
     storeResultsInNavigation?: string;
+    waitAndMerge?: boolean;
 }
 export interface IPokeElementsType {
     properties: string[];
@@ -312,6 +314,11 @@ export interface IItemDefinitionProviderProps {
      * avoids running loadValue
      */
     avoidLoading?: boolean;
+    /**
+     * loads using the slow method but it can be more efficient
+     * as it will load values with a timeout
+     */
+    waitAndMerge?: boolean;
     /**
      * allows insertion of the parent context within the children
      */

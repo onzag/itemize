@@ -144,6 +144,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   inBehalfOf?: number;
   propertyOverrides?: IPropertyOverride[];
   includeOverrides?: IIncludeOverride[];
+  waitAndMerge?: boolean;
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
@@ -174,6 +175,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   limit: number;
   offset: number;
   storeResultsInNavigation?: string;
+  waitAndMerge?: boolean;
 }
 
 export interface IPokeElementsType {
@@ -473,6 +475,11 @@ export interface IItemDefinitionProviderProps {
    * avoids running loadValue
    */
   avoidLoading?: boolean;
+  /**
+   * loads using the slow method but it can be more efficient
+   * as it will load values with a timeout
+   */
+  waitAndMerge?: boolean;
   /**
    * allows insertion of the parent context within the children
    */
@@ -1585,6 +1592,7 @@ export class ActualItemDefinitionProvider extends
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       cacheStore: this.props.longTermCaching,
+      waitAndMerge: this.props.waitAndMerge,
     });
 
     if (!error) {
@@ -2490,6 +2498,7 @@ export class ActualItemDefinitionProvider extends
           version: submitForVersion || null,
           listenerUUID: this.props.remoteListener.getUUID(),
           cacheStore: this.props.longTermCaching,
+          waitAndMerge: options.waitAndMerge,
         });
         value = totalValues.value;
         error = totalValues.error;
@@ -2534,6 +2543,7 @@ export class ActualItemDefinitionProvider extends
         cacheStore: this.props.longTermCaching,
         forId: submitForId || null,
         forVersion: submitForVersion || null,
+        waitAndMerge: options.waitAndMerge,
         containerId,
       });
       value = totalValues.value;
@@ -2838,6 +2848,7 @@ export class ActualItemDefinitionProvider extends
       limit: options.limit,
       offset: options.offset,
       parentedBy,
+      waitAndMerge: options.waitAndMerge,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,

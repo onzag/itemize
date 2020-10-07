@@ -118,7 +118,7 @@ export interface IGQLRequestFields {
 /**
  * Single arg, can take many shapes
  */
-type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchRecord | IGQLArgs;
+type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchRecord | IGQLArgs;
 
 /**
  * The args field
@@ -148,10 +148,12 @@ export interface IGQLEndpointValue {
   };
   errors?: Array<{
     extensions: EndpointErrorType,
+    // might be null, global errors
+    path?: string[];
   }>;
 }
 
-type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
+type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
 
 /**
  * Graphql helper class in order to build proper form data
@@ -174,7 +176,7 @@ export class GQLQuery {
   /**
    * list of listeners
    */
-  private listeners: IGQLQueryListenerType[] = [];
+  private listeners: IGQLQueryListenerType[] = [];
 
   /**
    * Build a graphql query
@@ -220,23 +222,11 @@ export class GQLQuery {
       return false;
     }
 
-    // check for collapsing names
-    const collapsingNames = this.processedQueries.filter((q) => {
-      return query.processedQueries.find((sq) => {
-        return q.name === sq.name;
-      });
-    });
-
-    if (collapsingNames.length === 0) {
-      return true;
-    } else {
-      return collapsingNames.every((n) => this.isNameMergableWith(n, query));
-    }
+    // we deny queries with aliases, we can't merge with them for sure
+    return !query.processedQueries.some((q) => q.alias);
   }
 
-  private isNameMergableWith(ourValue: IGQLQueryObj, query: GQLQuery) {
-    const theirValue = query.processedQueries.find((q) => q.name === ourValue.name);
-
+  private isNameMergableWith(ourValue: IGQLQueryObj, theirValue: IGQLQueryObj) {
     if (!equals(ourValue.args, theirValue.args)) {
       return false;
     }
@@ -254,16 +244,39 @@ export class GQLQuery {
   /**
    * Merge with it
    * @param query the query to merge with
+   * @returns a list of aliases to remap the results from to the given name
    */
-  public mergeWith(query: GQLQuery) {
+  public mergeWith(query: GQLQuery): [string, string][] {
     this.foundUnprocessedArgFiles = this.foundUnprocessedArgFiles.concat(query.foundUnprocessedArgFiles);
 
-    query.processedQueries.forEach((q) => {
+    return query.processedQueries.map((q) => {
       const foundIndex = this.processedQueries.findIndex((sq) => sq.name === q.name);
       if (foundIndex === -1) {
         this.processedQueries.push(q);
-      } else if (requestFieldsAreContained(this.processedQueries[foundIndex].fields, q.fields)) {
-        this.processedQueries[foundIndex].fields = q.fields;
+        return [q.name, q.name];
+      } else {
+        const isNameMergable = this.isNameMergableWith(this.processedQueries[foundIndex], q);
+
+        if (isNameMergable) {
+          if (requestFieldsAreContained(this.processedQueries[foundIndex].fields, q.fields)) {
+            this.processedQueries[foundIndex].fields = q.fields;
+          }
+
+          return [this.processedQueries[foundIndex].alias || q.name, q.name];
+        } else {
+          const queryClone = {...q};
+          const usedAliases = this.processedQueries.map(q => q.alias);
+          let id: number = 2;
+          let newAlias = queryClone.name + "_" + id;
+          while (usedAliases.includes(newAlias)) {
+            id++;
+            newAlias = queryClone.name + "_" + id;
+          }
+          queryClone.alias = newAlias;
+
+          this.processedQueries.push(queryClone);
+          return [newAlias, q.name];
+        }
       }
     });
   }
@@ -278,7 +291,7 @@ export class GQLQuery {
   /**
    * add a listener for when a reply is informed
    */
-  public addEventListenerOnReplyInformed(listener: IGQLQueryListenerType ) {
+  public addEventListenerOnReplyInformed(listener: IGQLQueryListenerType) {
     this.listeners.push(listener);
   }
 
@@ -298,7 +311,7 @@ export class GQLQuery {
    * file form that will map the variables to the form data
    */
   public getMap() {
-    const map: {[id: string]: [string]} = {};
+    const map: { [id: string]: [string] } = {};
     this.getAttachments().forEach((foundFile) => {
       map[foundFile.id] = ["variables." + foundFile.id];
     });
@@ -426,6 +439,10 @@ export interface IGQLQueryObj {
    */
   name: string;
   /**
+   * The graphql alias
+   */
+  alias?: string;
+  /**
    * The arguments to use
    */
   args?: IGQLArgs;
@@ -551,6 +568,10 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
   queryStr += "{";
   // and we go for those queries
   queries.forEach((q) => {
+    // add the alias if any
+    if (q.alias) {
+      queryStr += q.alias + ":";
+    }
     // add the specific query
     queryStr += q.name;
     // if we have args we add them eg.
@@ -560,10 +581,10 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
     }
     // and if we have fields we add them too
     if (q.fields && Object.keys(q.fields).length) {
-      queryStr += buildFields(q.fields);
+      queryStr += buildFields(q.fields) + ",";
     } else {
       // otherwise we end there
-      queryStr += ";";
+      queryStr += ",";
     }
     // expect something like mutation(arg1: Upload!, arg2: Upload!){something(file: $arg1){request{fields}};}
   });
@@ -591,7 +612,7 @@ export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
   return new GQLQuery("mutation", mutations);
 }
 
-function wait(ms: number): Promise<void> {
+function wait(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -630,12 +651,40 @@ export async function gqlQuery(query: GQLQuery, options?: {
     // if we find one, cool, let's merge with it
     if (queryThatCanMergeWith) {
       // we do so
-      queryThatCanMergeWith.mergeWith(query);
+      const remapper = queryThatCanMergeWith.mergeWith(query);
       // and now we are concerned in how to receive the answer
       // from that same query as a reply for this one
       return new Promise((resolve) => {
         // we use the listener as the resolve
-        queryThatCanMergeWith.addEventListenerOnReplyInformed(resolve);
+        queryThatCanMergeWith.addEventListenerOnReplyInformed((response) => {
+          // once we get the response we need to remap
+          const newResponse: IGQLEndpointValue = {
+            data: {},
+          };
+          remapper.forEach((rs) => {
+            const alias = rs[0];
+            const origName = rs[1];
+
+            newResponse.data[origName] = response.data[alias];
+
+            if (response.errors) {
+              response.errors.forEach((e) => {
+                if (!e.path || e.path[0] === alias) {
+                  const newError = {...e};
+                  if (newError.path) {
+                    newError.path = [origName];
+                  }
+                  if (newResponse.errors) {
+                    newResponse.errors = [];
+                  }
+                  newResponse.errors.push(newError);
+                }
+              });
+            }
+
+            resolve(newResponse);
+          });
+        });
       });
       // we do not execute, we have ended
     } else {
@@ -643,7 +692,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
       // so it can be edited in need
       QUERIES_IN_WAITING.push(query);
       // wait a couple of milliseconds
-      await wait((options && options.mergeMS) || 70);
+      await wait((options && options.mergeMS) || 70);
       // and then take us away from the waiting list, we are about to execute
       const index = QUERIES_IN_WAITING.findIndex((q) => q === query);
       if (index !== -1) {

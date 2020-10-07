@@ -131,6 +131,7 @@ export interface IGQLEndpointValue {
     };
     errors?: Array<{
         extensions: EndpointErrorType;
+        path?: string[];
     }>;
 }
 declare type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
@@ -170,8 +171,9 @@ export declare class GQLQuery {
     /**
      * Merge with it
      * @param query the query to merge with
+     * @returns a list of aliases to remap the results from to the given name
      */
-    mergeWith(query: GQLQuery): void;
+    mergeWith(query: GQLQuery): [string, string][];
     /**
      * inform a reply to the query in case this has event listeners to that
      */
@@ -226,6 +228,10 @@ export interface IGQLQueryObj {
      * The grapqhl query name
      */
     name: string;
+    /**
+     * The graphql alias
+     */
+    alias?: string;
     /**
      * The arguments to use
      */
