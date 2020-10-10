@@ -6,7 +6,7 @@
  */
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { IActionResponseWithSearchResults, IActionCleanOptions, IActionSearchOptions } from "../../providers/item-definition";
+import { IActionResponseWithSearchResults, IActionCleanOptions, IActionSearchOptions } from "../../providers/item";
 import { IGQLSearchRecord } from "../../../gql-querier";
 /**
  * This is what the search actioner callback receives as argument

@@ -13,7 +13,7 @@ import React from "react";
 import { TokenContext } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
-import { ItemDefinitionContext, IItemDefinitionContextType } from "../../providers/item-definition";
+import { ItemContext, IItemContextType } from "../../providers/item";
 import equals from "deep-equal";
 
 /**
@@ -84,7 +84,7 @@ interface IUserActionerProps {
  */
 interface IActualUserActionerProps extends IUserActionerProps {
   token: string;
-  userContext: IItemDefinitionContextType;
+  userContext: IItemContextType;
 }
 
 /**
@@ -374,14 +374,14 @@ export default function UserActioner(props: IUserActionerProps) {
     <TokenContext.Consumer>
       {
         (tokenContext) => (
-          <ItemDefinitionContext.Consumer>
+          <ItemContext.Consumer>
             {
               // as well as an item definition context to read our password and email fields
-              (itemDefinitionContext) => {
-                return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemDefinitionContext}/>
+              (itemContext) => {
+                return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemContext}/>
               }
             }
-          </ItemDefinitionContext.Consumer>
+          </ItemContext.Consumer>
         )
       }
     </TokenContext.Consumer>

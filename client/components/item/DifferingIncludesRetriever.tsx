@@ -6,8 +6,8 @@
 
 import React from "react";
 import {
-  ItemDefinitionContext,
-} from "../../providers/item-definition";
+  ItemContext,
+} from "../../providers/item";
 import { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 import equals from "deep-equal";
 
@@ -80,12 +80,12 @@ class OptimizerDifferingIncludesRetriever extends React.Component<IOptimizerDiff
 export default function DifferingIncludesRetriever(props: IDifferingIncludesRetrieverProps) {
   // for that we need to use the item definition context
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => {
+    <ItemContext.Consumer>{
+      (itemContext) => {
         // so now we get the final includes, we loop
         const finalIncludes = props.mainIncludes.map((mainInclude: string) => {
           // now we try to get the state from it
-          const includeData = itemDefinitionContext.state.includes.find(i => i.includeId === mainInclude);
+          const includeData = itemContext.state.includes.find(i => i.includeId === mainInclude);
           // if there's no such state, we don't know, return null
           if (!includeData) {
             return null;
@@ -93,7 +93,7 @@ export default function DifferingIncludesRetriever(props: IDifferingIncludesRetr
           // let's check the exclusion state vs the applied
           const exclusionStateDiffers = includeData.stateExclusion !== includeData.stateExclusionApplied;
           // let's get the include and all the sinking properties
-          const include = itemDefinitionContext.idef.getIncludeFor(mainInclude);
+          const include = itemContext.idef.getIncludeFor(mainInclude);
           const allSinkingProperties = include.getSinkingPropertiesIds();
 
           // now if the exclusion state is different to the applied and it went either from
@@ -127,7 +127,7 @@ export default function DifferingIncludesRetriever(props: IDifferingIncludesRetr
           // to try to get the differing properties
           const differingProperties = allSinkingProperties.filter((mainProperty: string) => {
             // first we get the property state from the state itself
-            const propertyData = includeData.itemDefinitionState.properties.find(p => p.propertyId === mainProperty);
+            const propertyData = includeData.itemState.properties.find(p => p.propertyId === mainProperty);
             // if we have none, return false from the filter, as we can't tell
             if (!propertyData) {
               return false;
@@ -164,6 +164,6 @@ export default function DifferingIncludesRetriever(props: IDifferingIncludesRetr
           <OptimizerDifferingIncludesRetriever children={props.children} differingIncludes={finalIncludes}/>
         );
       }
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   )
 }

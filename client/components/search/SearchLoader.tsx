@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { ItemDefinitionContext, SearchItemDefinitionValueContext, IItemDefinitionProviderProps } from "../../providers/item-definition";
+import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
 import equals from "deep-equal";
 import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
@@ -21,8 +21,8 @@ import { RemoteListener } from "../../internal/app/remote-listener";
 /**
  * The property for the provider but with the key and no children
  */
-interface IItemDefinitionProviderPropsWithKey extends
-  Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
+interface IItemProviderPropsWithKey extends
+  Pick<IItemProviderProps, Exclude<keyof IItemProviderProps, 'children'>> {
   key: string;
 }
 
@@ -35,7 +35,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
    * The provider properties used to instantiate your own item definition
    * data
    */
-  providerProps: IItemDefinitionProviderPropsWithKey;
+  providerProps: IItemProviderPropsWithKey;
   /**
    * The item definition that was found
    */
@@ -651,7 +651,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // we are currently searching and our search fields that we are searching for
     // so the item definition provider knows this and aborts loading values needlessly
     return (
-      <SearchItemDefinitionValueContext.Provider
+      <SearchItemValueContext.Provider
         value={
           {
             currentlySearching: this.state.currentlySearching,
@@ -708,7 +708,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             isSearching: this.state.currentlySearching.length !== 0,
           })
         }
-      </SearchItemDefinitionValueContext.Provider>
+      </SearchItemValueContext.Provider>
     );
   }
 }
@@ -726,29 +726,29 @@ export default function SearchLoader(props: ISearchLoaderProps) {
           <TokenContext.Consumer>
             {
               (tokenData) => (
-                <ItemDefinitionContext.Consumer>{
-                  (itemDefinitionContext) => (
+                <ItemContext.Consumer>{
+                  (itemContext) => (
                     <ActualSearchLoader
                       {...props}
-                      itemDefinitionInstance={itemDefinitionContext.idef}
-                      remoteListener={itemDefinitionContext.remoteListener}
-                      searchId={itemDefinitionContext.searchId}
-                      searchWasRestored={itemDefinitionContext.searchWasRestored}
-                      searchRecords={itemDefinitionContext.searchRecords}
-                      searchResults={itemDefinitionContext.searchResults}
-                      searchCount={itemDefinitionContext.searchCount}
-                      searchOffset={itemDefinitionContext.searchOffset}
-                      searchLimit={itemDefinitionContext.searchLimit}
-                      searchOwner={itemDefinitionContext.searchOwner}
-                      searchShouldCache={itemDefinitionContext.searchShouldCache}
-                      searchRequestedIncludes={itemDefinitionContext.searchRequestedIncludes}
-                      searchRequestedProperties={itemDefinitionContext.searchRequestedProperties}
-                      searchFields={itemDefinitionContext.searchFields}
+                      itemDefinitionInstance={itemContext.idef}
+                      remoteListener={itemContext.remoteListener}
+                      searchId={itemContext.searchId}
+                      searchWasRestored={itemContext.searchWasRestored}
+                      searchRecords={itemContext.searchRecords}
+                      searchResults={itemContext.searchResults}
+                      searchCount={itemContext.searchCount}
+                      searchOffset={itemContext.searchOffset}
+                      searchLimit={itemContext.searchLimit}
+                      searchOwner={itemContext.searchOwner}
+                      searchShouldCache={itemContext.searchShouldCache}
+                      searchRequestedIncludes={itemContext.searchRequestedIncludes}
+                      searchRequestedProperties={itemContext.searchRequestedProperties}
+                      searchFields={itemContext.searchFields}
                       tokenData={tokenData}
                       localeData={localeData}
                     />
                   )
-                }</ItemDefinitionContext.Consumer>
+                }</ItemContext.Consumer>
               )
             }
           </TokenContext.Consumer>

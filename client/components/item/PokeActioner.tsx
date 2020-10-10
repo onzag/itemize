@@ -8,11 +8,11 @@
 
 import React from "react";
 import {
-  ItemDefinitionContext,
-  IItemDefinitionContextType,
+  ItemContext,
+  IItemContextType,
   IActionCleanOptions,
   IPokeElementsType,
-} from "../../providers/item-definition";
+} from "../../providers/item";
 import equals from "deep-equal";
 import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
@@ -81,7 +81,7 @@ interface IPokeActionerProps {
  * The actual props for the actual actioner
  */
 interface IActualPokeActionerProps extends IPokeActionerProps {
-  itemDefinitionContext: IItemDefinitionContextType;
+  itemContext: IItemContextType;
 }
 
 /**
@@ -137,14 +137,14 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
   public shouldComponentUpdate(nextProps: IActualPokeActionerProps) {
     // it only updates when these changes, as all the other information is virtually unecessary
     return nextProps.children !== this.props.children ||
-      !equals(nextProps.itemDefinitionContext.pokedElements, this.props.itemDefinitionContext.pokedElements) ||
-      !equals(nextProps.itemDefinitionContext.state, this.props.itemDefinitionContext.state)
+      !equals(nextProps.itemContext.pokedElements, this.props.itemContext.pokedElements) ||
+      !equals(nextProps.itemContext.state, this.props.itemContext.state)
   }
   public render() {
     // first we check all the properties from the elements to poke
     const hasInvalidToPokeProperty = this.props.elementsToPoke.properties.some((pId) => {
       // try to find the state
-      const propertyState = this.props.itemDefinitionContext.state.properties.find(pstate => pstate.propertyId === pId);
+      const propertyState = this.props.itemContext.state.properties.find(pstate => pstate.propertyId === pId);
       if (!propertyState) {
         return false;
       }
@@ -154,19 +154,19 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
 
     // we do the same with includes
     const hasInvalidToPokeInclude =this.props.elementsToPoke.includes.some((iId) => {
-      if (!this.props.itemDefinitionContext.state.includes) {
+      if (!this.props.itemContext.state.includes) {
         return false;
       }
-      const includeState = this.props.itemDefinitionContext.state.includes.find((istate) => istate.includeId === iId);
+      const includeState = this.props.itemContext.state.includes.find((istate) => istate.includeId === iId);
       if (!includeState) {
         return false;
       }
-      return includeState.itemDefinitionState.properties.some((pstate) => pstate.invalidReason);
+      return includeState.itemState.properties.some((pstate) => pstate.invalidReason);
     });
 
     // as well as policies
     const hasInvalidToPokePolicy =this.props.elementsToPoke.policies.some((ppath) => {
-      const policyTypeSpace = this.props.itemDefinitionContext.state.policies[ppath[0]];
+      const policyTypeSpace = this.props.itemContext.state.policies[ppath[0]];
       if (!policyTypeSpace) {
         return false;
       }
@@ -184,11 +184,11 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
         hasInvalidToPokeInclude={hasInvalidToPokeInclude}
         hasInvalidToPokeProperty={hasInvalidToPokeProperty}
         hasInvalidToPokePolicy={hasInvalidToPokePolicy}
-        pokedElements={this.props.itemDefinitionContext.pokedElements}
+        pokedElements={this.props.itemContext.pokedElements}
         elementsToPoke={this.props.elementsToPoke}
-        unpoke={this.props.itemDefinitionContext.unpoke}
-        poke={this.props.itemDefinitionContext.poke}
-        clean={this.props.itemDefinitionContext.clean}
+        unpoke={this.props.itemContext.unpoke}
+        poke={this.props.itemContext.poke}
+        clean={this.props.itemContext.clean}
       />
     );
   }
@@ -204,10 +204,10 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
  */
 export default function PokeActioner(props: IPokeActionerProps) {
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => (
-        <ActualPokeActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
+    <ItemContext.Consumer>{
+      (itemContext) => (
+        <ActualPokeActioner {...props} itemContext={itemContext}/>
       )
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   );
 }

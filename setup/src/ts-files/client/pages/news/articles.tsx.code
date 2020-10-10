@@ -3,7 +3,7 @@ import React from "react";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 
 /**
  * Displays a list of articles and allows these to be searched by the user

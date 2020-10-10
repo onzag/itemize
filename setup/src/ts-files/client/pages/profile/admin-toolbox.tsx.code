@@ -1,7 +1,7 @@
 import React from "react";
 
 import Entry from "@onzag/itemize/client/components/property/Entry";
-import SubmitActioner from "@onzag/itemize/client/components/item-definition/SubmitActioner";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
 import { Divider, withStyles, WithStyles, createStyles, DoneOutlineIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";

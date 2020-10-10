@@ -7,7 +7,7 @@
 
 import PokeActioner from "./PokeActioner";
 import React from "react";
-import { IPokeElementsType } from "../../providers/item-definition";
+import { IPokeElementsType } from "../../providers/item";
 import equals from "deep-equal";
 
 /**

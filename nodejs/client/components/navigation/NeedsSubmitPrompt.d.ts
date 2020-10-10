@@ -5,9 +5,9 @@
  * @packageDocumentation
  */
 import React from "react";
-import { ISubmitActionerInfoArgType } from "../item-definition/SubmitActioner";
+import { ISubmitActionerInfoArgType } from "../item/SubmitActioner";
 import { PromptDialogComponent } from "./Prompt";
-import { IActionSubmitOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions } from "../../providers/item";
 import { EndpointErrorType } from "../../../base/errors";
 /**
  * The props for the needs submit

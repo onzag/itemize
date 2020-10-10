@@ -30,7 +30,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EntryViewReadSet = void 0;
 const react_1 = __importDefault(require("react"));
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const search_interfaces_1 = require("../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces");
 const constants_1 = require("../../../constants");
 const PropertyView_1 = __importStar(require("../../internal/components/PropertyView"));
@@ -49,10 +49,10 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
  */
 function EntryViewReadSet(props, type) {
     // so we return
-    return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContextualValue) => {
+    return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContextualValue) => {
         // so we need to be in an item definition contextual value
         // because otherwise we just can't get the property we need
-        if (!itemDefinitionContextualValue) {
+        if (!itemContextualValue) {
             throw new Error("The Entry/View/Read/Set must be in a ItemDefinitionProvider context");
         }
         // now we need the actual id, because search variants
@@ -71,9 +71,9 @@ function EntryViewReadSet(props, type) {
         const property = !isMetaProperty ? (includeContextualValue ?
             includeContextualValue.include.getSinkingPropertyFor(actualId) :
             ((props.policyType && props.policyName) ?
-                itemDefinitionContextualValue.idef
+                itemContextualValue.idef
                     .getPropertyDefinitionForPolicy(props.policyType, props.policyName, actualId) :
-                itemDefinitionContextualValue.idef
+                itemContextualValue.idef
                     .getPropertyDefinitionFor(actualId, true))) : null;
         // now we need to get the property state
         let propertyState = null;
@@ -83,27 +83,27 @@ function EntryViewReadSet(props, type) {
             if (includeContextualValue) {
                 // this might be null if the state is excluded, which makes the property state
                 // be null and unknown
-                if (includeContextualValue.state.itemDefinitionState) {
-                    propertyState = includeContextualValue.state.itemDefinitionState.properties
+                if (includeContextualValue.state.itemState) {
+                    propertyState = includeContextualValue.state.itemState.properties
                         .find((p) => p.propertyId === actualId);
                 }
             }
             else if (props.policyType && props.policyName) {
                 // otherwise if we refer to a policy
-                propertyState = itemDefinitionContextualValue.state
+                propertyState = itemContextualValue.state
                     .policies[props.policyType][props.policyName]
                     .find((p) => p.propertyId === actualId);
             }
             else {
                 // otherwise
                 propertyState =
-                    itemDefinitionContextualValue.state.properties.find((p) => p.propertyId === actualId);
+                    itemContextualValue.state.properties.find((p) => p.propertyId === actualId);
             }
         }
         // now we need to get the container id, the container id refers to where the data was stored
         // in the server side information container, we might have one already
-        const containerId = (itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
-            itemDefinitionContextualValue.state.gqlOriginalFlattenedValue.container_id) || null;
+        const containerId = (itemContextualValue.state.gqlOriginalFlattenedValue &&
+            itemContextualValue.state.gqlOriginalFlattenedValue.container_id) || null;
         // so now we can start in conditional rendering
         if (type === "read") {
             // so if we have a property state (which will not exist in meta properties)
@@ -118,10 +118,10 @@ function EntryViewReadSet(props, type) {
                     // and as such we absolute the files so that their urls
                     // are indeed proper, being a read operation, there's no risk on it
                     if (!propertyDescription.gqlList) {
-                        return props.children(util_1.fileURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
+                        return props.children(util_1.fileURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemContextualValue.idef, itemContextualValue.forId, itemContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
                     }
                     else {
-                        return props.children(util_1.fileArrayURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemDefinitionContextualValue.idef, itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
+                        return props.children(util_1.fileArrayURLAbsoluter(domain, config.containersHostnamePrefixes, props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value, itemContextualValue.idef, itemContextualValue.forId, itemContextualValue.forVersion, containerId, includeContextualValue && includeContextualValue.include, property, !!props.cacheFiles), propertyState);
                     }
                 }
                 // otherwise we just call the function as it is
@@ -130,8 +130,8 @@ function EntryViewReadSet(props, type) {
             // if we are talking a meta property
             if (isMetaProperty) {
                 // the grapqhl value we get
-                let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
-                    itemDefinitionContextualValue.state.gqlOriginalFlattenedValue[actualId];
+                let gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
+                    itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
                 // if it's undefined we give null
                 if (typeof gqlValue === "undefined") {
                     gqlValue = null;
@@ -147,13 +147,13 @@ function EntryViewReadSet(props, type) {
             // now in the case of these, we have special considerations
             if (propertyState) {
                 // if we have a state it's simple, and we pass these values into it
-                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, itemDefinition: itemDefinitionContextualValue.idef, useAppliedValue: props.useAppliedValue, cacheFiles: props.cacheFiles }));
+                return (react_1.default.createElement(PropertyView_1.default, { include: includeContextualValue && includeContextualValue.include, property: property, state: propertyState, capitalize: props.capitalize, renderer: props.renderer, containerId: containerId, rendererArgs: props.rendererArgs, forId: itemContextualValue.forId, forVersion: itemContextualValue.forVersion, itemDefinition: itemContextualValue.idef, useAppliedValue: props.useAppliedValue, cacheFiles: props.cacheFiles }));
             }
             // if we have a meta property nevertheless
             if (isMetaProperty) {
                 // we need to read its value
-                let gqlValue = itemDefinitionContextualValue.state.gqlOriginalFlattenedValue &&
-                    itemDefinitionContextualValue.state.gqlOriginalFlattenedValue[actualId];
+                let gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
+                    itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
                 if (typeof gqlValue === "undefined") {
                     gqlValue = null;
                 }
@@ -182,9 +182,9 @@ function EntryViewReadSet(props, type) {
                 let valueBeforeUpdate;
                 if (props.onEntryDrivenChange) {
                     valueBeforeUpdate =
-                        property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                        property.getCurrentValue(itemContextualValue.forId, itemContextualValue.forVersion);
                 }
-                itemDefinitionContextualValue.onPropertyChange(property, newValue, internalValue);
+                itemContextualValue.onPropertyChange(property, newValue, internalValue);
                 if (props.onEntryDrivenChange && !deep_equal_1.default(valueBeforeUpdate, newValue)) {
                     props.onEntryDrivenChange(newValue);
                 }
@@ -194,11 +194,11 @@ function EntryViewReadSet(props, type) {
                 let valueBeforeUpdate;
                 if (props.onEntryDrivenChange) {
                     valueBeforeUpdate =
-                        property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                        property.getCurrentValue(itemContextualValue.forId, itemContextualValue.forVersion);
                 }
-                itemDefinitionContextualValue.onPropertyRestore(property);
+                itemContextualValue.onPropertyRestore(property);
                 if (props.onEntryDrivenChange) {
-                    const value = property.getCurrentValue(itemDefinitionContextualValue.forId, itemDefinitionContextualValue.forVersion);
+                    const value = property.getCurrentValue(itemContextualValue.forId, itemContextualValue.forVersion);
                     if (!deep_equal_1.default(valueBeforeUpdate, value)) {
                         props.onEntryDrivenChange(value);
                     }
@@ -209,24 +209,24 @@ function EntryViewReadSet(props, type) {
             // now we search for it, so for a policy we search in the pokedElements
             // to see if it's there
             if (props.policyType) {
-                isPoked = !!itemDefinitionContextualValue.pokedElements.policies.find(pElement => pElement[0] === props.policyType &&
+                isPoked = !!itemContextualValue.pokedElements.policies.find(pElement => pElement[0] === props.policyType &&
                     pElement[1] === props.policyName &&
                     pElement[2] === property.getId());
             }
             else if (includeContextualValue) {
                 // for the includes we do something similar as well
-                isPoked = !!itemDefinitionContextualValue.pokedElements.includes.find((iId) => {
+                isPoked = !!itemContextualValue.pokedElements.includes.find((iId) => {
                     return iId === includeContextualValue.include.getId();
                 });
             }
             else {
                 // and for a specific property
-                isPoked = !!itemDefinitionContextualValue.pokedElements.properties.find((pId) => {
+                isPoked = !!itemContextualValue.pokedElements.properties.find((pId) => {
                     return pId === property.getId();
                 });
             }
             // and then we can return the property entry in all its glory
-            return (react_1.default.createElement(PropertyEntry_1.default, { itemDefinition: itemDefinitionContextualValue.idef, injectSubmitBlockPromise: itemDefinitionContextualValue.injectSubmitBlockPromise, include: (includeContextualValue && includeContextualValue.include) || null, property: property, state: propertyState, onChange: onChange, onRestore: onRestore, forceInvalid: props.showAsInvalid, containerId: containerId, icon: props.icon, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, poked: isPoked, renderer: props.renderer, rendererArgs: props.rendererArgs, hideDescription: props.hideDescription, altDescription: props.altDescription, altLabel: props.altLabel, altPlaceholder: props.altPlaceholder, ignoreErrors: props.ignoreErrors, autoFocus: props.autoFocus, prefillWith: props.prefillWith, referenceFilteringSet: props.referenceFilteringSet, cacheFiles: props.cacheFiles }));
+            return (react_1.default.createElement(PropertyEntry_1.default, { itemDefinition: itemContextualValue.idef, injectSubmitBlockPromise: itemContextualValue.injectSubmitBlockPromise, include: (includeContextualValue && includeContextualValue.include) || null, property: property, state: propertyState, onChange: onChange, onRestore: onRestore, forceInvalid: props.showAsInvalid, containerId: containerId, icon: props.icon, forId: itemContextualValue.forId, forVersion: itemContextualValue.forVersion, poked: isPoked, renderer: props.renderer, rendererArgs: props.rendererArgs, hideDescription: props.hideDescription, altDescription: props.altDescription, altLabel: props.altLabel, altPlaceholder: props.altPlaceholder, ignoreErrors: props.ignoreErrors, autoFocus: props.autoFocus, prefillWith: props.prefillWith, referenceFilteringSet: props.referenceFilteringSet, cacheFiles: props.cacheFiles }));
         }
         else {
             // property has no state it must be hidden
@@ -234,7 +234,7 @@ function EntryViewReadSet(props, type) {
                 return null;
             }
             // so we return the propery setter
-            return (react_1.default.createElement(PropertySetter_1.default, { property: property, onEnforce: itemDefinitionContextualValue.onPropertyEnforce, onClearEnforcement: itemDefinitionContextualValue.onPropertyClearEnforce, forId: itemDefinitionContextualValue.forId, forVersion: itemDefinitionContextualValue.forVersion, value: props.value }));
+            return (react_1.default.createElement(PropertySetter_1.default, { property: property, onEnforce: itemContextualValue.onPropertyEnforce, onClearEnforcement: itemContextualValue.onPropertyClearEnforce, forId: itemContextualValue.forId, forVersion: itemContextualValue.forVersion, value: props.value }));
         }
     }))))));
 }

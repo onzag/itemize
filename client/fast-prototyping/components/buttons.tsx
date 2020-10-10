@@ -6,14 +6,14 @@
  */
 
 import React, { useState } from "react";
-import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item";
 import { ProgressingElement } from "./util";
-import SubmitActioner from "../../components/item-definition/SubmitActioner";
+import SubmitActioner from "../../components/item/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
 import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
 import { Button, PropTypes } from "../mui-core";
-import DeleteActioner from "../../components/item-definition/DeleteActioner";
+import DeleteActioner from "../../components/item/DeleteActioner";
 
 /**
  * A redirect function called on the success event

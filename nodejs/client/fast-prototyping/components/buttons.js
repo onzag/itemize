@@ -31,12 +31,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteButton = exports.SearchButton = exports.SubmitButton = void 0;
 const react_1 = __importStar(require("react"));
 const util_1 = require("./util");
-const SubmitActioner_1 = __importDefault(require("../../components/item-definition/SubmitActioner"));
+const SubmitActioner_1 = __importDefault(require("../../components/item/SubmitActioner"));
 const navigation_1 = require("../../components/navigation");
 const I18nRead_1 = __importDefault(require("../../components/localization/I18nRead"));
 const SearchActioner_1 = __importDefault(require("../../components/search/SearchActioner"));
 const mui_core_1 = require("../mui-core");
-const DeleteActioner_1 = __importDefault(require("../../components/item-definition/DeleteActioner"));
+const DeleteActioner_1 = __importDefault(require("../../components/item/DeleteActioner"));
 /**
  * Provides a very useful submit button that extends via the submit
  * actioner and it's fully functional; needs to be in an item

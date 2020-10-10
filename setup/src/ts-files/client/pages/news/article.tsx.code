@@ -3,8 +3,8 @@ import React from "react";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider, NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
-import { ItemDefinitionLoader } from "@onzag/itemize/client/fast-prototyping/components/item-definition-loader";
+import { ItemDefinitionProvider, NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import View from "@onzag/itemize/client/components/property/View";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
@@ -122,7 +122,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 	return (
 		<Container maxWidth="md" className={props.classes.container}>
 			<Paper className={props.classes.paper}>
-				<ItemDefinitionLoader fullWidth={true}>
+				<ItemLoader fullWidth={true}>
 					<div className={props.classes.headerImageContainer}>
 						<View
 							id="summary_image"
@@ -203,7 +203,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 						</div>
 						<View id="content"/>
 					</div>
-				</ItemDefinitionLoader>
+				</ItemLoader>
 			</Paper>
 		</Container>
 	);

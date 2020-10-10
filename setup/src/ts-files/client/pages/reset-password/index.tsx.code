@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 import UserActioner, { IUserActionerArg } from "@onzag/itemize/client/components/user/UserActioner";
 import { localizedRedirectTo } from "@onzag/itemize/client/components/navigation";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
@@ -9,7 +9,7 @@ import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
-import { ItemDefinitionLoader } from "@onzag/itemize/client/fast-prototyping/components/item-definition-loader";
+import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { createStyles, withStyles, WithStyles, Typography,
 	Paper, Container, Divider, Button, DoneIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
@@ -101,14 +101,14 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 										</TitleSetter>
 										<Container maxWidth="md" className={props.classes.container}>
 											<Paper className={props.classes.paper}>
-												<ItemDefinitionLoader>
+												<ItemLoader>
 													<Avatar size="large" fullWidth={true} hideFlag={true}/>
 													<Reader id="username">
 														{(username: string) => (
 															<Typography variant="h4" className={props.classes.username}>{username}</Typography>
 														)}
 													</Reader>
-												</ItemDefinitionLoader>
+												</ItemLoader>
 												<Divider className={props.classes.divider} />
 												<Typography variant="h6" className={props.classes.recoverTitle}>{i18nResetPassword}</Typography>
 												<I18nRead id="reset_password_field_alt_label">

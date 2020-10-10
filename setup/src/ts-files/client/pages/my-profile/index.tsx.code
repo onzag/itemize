@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 import Redirect from "@onzag/itemize/client/components/navigation/Redirect";
 import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";

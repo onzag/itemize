@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon,
   ImportantDevicesIcon, LibraryBooksIcon, HomeIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
-import { ItemDefinitionProvider } from "../../../providers/item-definition";
+import { ItemDefinitionProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";
 import { Buttons } from "./buttons";
 import { ExternalDialogs } from "./external-dialogs";

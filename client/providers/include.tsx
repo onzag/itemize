@@ -1,6 +1,6 @@
 import React from "react";
 import Include, { IIncludeState } from "../../base/Root/Module/ItemDefinition/Include";
-import { ItemDefinitionContext } from "./item-definition";
+import { ItemContext } from "./item";
 import equals from "deep-equal";
 
 export interface IIncludeContext {
@@ -44,11 +44,11 @@ class ActualIncludeProvider extends React.Component<IActualIncludeProviderProps,
 
 export function IncludeProvider(props: IIncludeProviderProps) {
   return (
-    <ItemDefinitionContext.Consumer>
+    <ItemContext.Consumer>
       {
-        (itemDefinitionContextualValue) => {
-          const includeState = itemDefinitionContextualValue.state.includes.find((i) => i.includeId === props.item);
-          const includeObject = itemDefinitionContextualValue.idef.getIncludeFor(props.item);
+        (itemContextualValue) => {
+          const includeState = itemContextualValue.state.includes.find((i) => i.includeId === props.item);
+          const includeObject = itemContextualValue.idef.getIncludeFor(props.item);
           return (
             <ActualIncludeProvider include={includeObject} state={includeState}>
               {props.children}
@@ -56,6 +56,6 @@ export function IncludeProvider(props: IIncludeProviderProps) {
           );
         }
       }
-    </ItemDefinitionContext.Consumer>
+    </ItemContext.Consumer>
   );
 }

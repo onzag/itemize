@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 import React from "react";
-import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item";
 import { PropTypes } from "../mui-core";
 /**
  * A redirect function called on the success event

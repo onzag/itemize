@@ -5,7 +5,7 @@ import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Route from "@onzag/itemize/client/components/navigation/Route";
 import { localizedRedirectTo } from "@onzag/itemize/client/components/navigation";
-import { NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { NoStateItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 
 import { AppBar, Tabs, Tab } from "@onzag/itemize/client/fast-prototyping/mui-core";
 

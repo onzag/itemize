@@ -15,7 +15,7 @@ import AppLanguageRetriever from "../../../components/localization/AppLanguageRe
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead, { II18nReadProps } from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
-import { NoStateItemDefinitionProvider } from "../../../providers/item-definition";
+import { NoStateItemDefinitionProvider } from "../../../providers/item";
 
 /**
  * The menu styles

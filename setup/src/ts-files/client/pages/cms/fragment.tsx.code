@@ -1,17 +1,17 @@
 import React from "react";
 
-import { ItemDefinitionProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
-import SubmitActioner from "@onzag/itemize/client/components/item-definition/SubmitActioner";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
 import { Paper, createStyles, withStyles, WithStyles,
 	Container, TextField, Box, Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ItemDefinitionLoader } from "@onzag/itemize/client/fast-prototyping/components/item-definition-loader";
+import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 
 /**
  * The fragment styles
@@ -112,10 +112,10 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 							</Paper>
 
 							<Paper className={props.classes.paper2}>
-								<ItemDefinitionLoader>
+								<ItemLoader>
 									<Typography variant="h4"><View id="title" /></Typography>
 									<View id="content" />
-								</ItemDefinitionLoader>
+								</ItemLoader>
 							</Paper>
 
 						</Container>

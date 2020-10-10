@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { withStyles, WithStyles, Theme, createStyles, Typography, IconButton, CircularProgress, RefreshIcon } from "../mui-core";
-import NItemDefinitionLoader from "../../components/item-definition/ItemDefinitionLoader";
+import { withStyles, WithStyles, createStyles, Typography, IconButton, CircularProgress, RefreshIcon } from "../mui-core";
+import NItemLoader from "../../components/item/ItemLoader";
 import { DelayDisplay } from "../../components/util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
@@ -41,7 +41,7 @@ const itemDefinitionLoaderStyles = createStyles({
 /**
  * the props for the item definition loader
  */
-interface ItemDefinitionLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> {
+interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> {
   /**
    * An id to pass to the i18n reader for not found
    * defaults to "error.NOT_FOUND"
@@ -89,9 +89,9 @@ interface ItemDefinitionLoaderProps extends WithStyles<typeof itemDefinitionLoad
  * @param props the loader props
  * @returns a react component
  */
-export const ItemDefinitionLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemDefinitionLoaderProps) => {
+export const ItemLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemLoaderProps) => {
   return (
-    <NItemDefinitionLoader>
+    <NItemLoader>
       {(arg) => {
         const notFound = arg.notFound;
         const blocked = arg.blocked;
@@ -146,6 +146,6 @@ export const ItemDefinitionLoader = withStyles(itemDefinitionLoaderStyles)((prop
           {props.children}
         </div>;
       }}
-    </NItemDefinitionLoader>
+    </NItemLoader>
   )
 });

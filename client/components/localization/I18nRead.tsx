@@ -7,7 +7,7 @@
 
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
-import { ItemDefinitionContext } from "../../providers/item-definition";
+import { ItemContext } from "../../providers/item";
 import { localeReplacerToArray, localeReplacer } from "../../../util";
 import { IncludeContext } from "../../providers/include";
 import { ModuleContext } from "../../providers/module";
@@ -343,9 +343,9 @@ export default function I18nRead(props: II18nReadProps) {
           <ModuleContext.Consumer>
             {
               (moduleContextualValue) => (
-                <ItemDefinitionContext.Consumer>
+                <ItemContext.Consumer>
                   {
-                    (itemDefinitionContextualValue) => (
+                    (itemContextualValue) => (
                       <IncludeContext.Consumer>
                         {
                           (includeContext) => (
@@ -353,7 +353,7 @@ export default function I18nRead(props: II18nReadProps) {
                               {...props}
                               localeContext={localeContext}
                               mod={moduleContextualValue && moduleContextualValue.mod}
-                              idef={itemDefinitionContextualValue && itemDefinitionContextualValue.idef}
+                              idef={itemContextualValue && itemContextualValue.idef}
                               include={includeContext && includeContext.include}
                             />
                           )
@@ -361,7 +361,7 @@ export default function I18nRead(props: II18nReadProps) {
                       </IncludeContext.Consumer>
                     )
                   }
-                </ItemDefinitionContext.Consumer>
+                </ItemContext.Consumer>
               )
             }
           </ModuleContext.Consumer>

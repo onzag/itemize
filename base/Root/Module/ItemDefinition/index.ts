@@ -280,7 +280,7 @@ export interface IPoliciesStateType {
 /**
  * Represents the whole item definition state
  */
-export interface IItemDefinitionStateType {
+export interface IItemStateType {
   /**
    * The module this item definition resides (name only)
    */
@@ -1187,7 +1187,7 @@ export default class ItemDefinition {
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
     excludePolicies?: boolean,
-  ): IItemDefinitionStateType {
+  ): IItemStateType {
     const properties = onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true)
         .getStateNoExternalChecking(id, version, emulateExternalChecking)) :
@@ -1257,7 +1257,7 @@ export default class ItemDefinition {
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
     excludePolicies?: boolean,
-  ): Promise<IItemDefinitionStateType> {
+  ): Promise<IItemStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
       onlyIncludeProperties.map((p) => this.getPropertyDefinitionFor(p, true).getState(id, version)) :
       this.getAllPropertyDefinitionsAndExtensions().map((pd) => {
@@ -1306,7 +1306,7 @@ export default class ItemDefinition {
   public applyState(
     id: number,
     version: string,
-    state: IItemDefinitionStateType,
+    state: IItemStateType,
   ) {
     state.properties.forEach((p) => {
       const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
@@ -1316,7 +1316,7 @@ export default class ItemDefinition {
     state.includes.forEach((i) => {
       const iInIdef = this.getIncludeFor(i.includeId);
       iInIdef.setExclusionState(id, version, i.exclusionState);
-      i.itemDefinitionState.properties.forEach((p) => {
+      i.itemState.properties.forEach((p) => {
         const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
         pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
       });

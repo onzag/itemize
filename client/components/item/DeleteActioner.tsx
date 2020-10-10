@@ -10,12 +10,12 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
-  ItemDefinitionContext,
-  IItemDefinitionContextType,
+  ItemContext,
+  IItemContextType,
   IActionCleanOptions,
   IActionDeleteOptions,
   IBasicActionResponse,
-} from "../../providers/item-definition";
+} from "../../providers/item";
 
 /**
  * The actioner arg contains the properties that are useful
@@ -68,7 +68,7 @@ interface IDeleteActionerProps {
  * data
  */
 interface IActualDeleteActionerProps extends IDeleteActionerProps {
-  itemDefinitionContext: IItemDefinitionContextType;
+  itemContext: IItemContextType;
 }
 
 /**
@@ -78,19 +78,19 @@ interface IActualDeleteActionerProps extends IDeleteActionerProps {
 class ActualDeleteActioner extends React.Component<IActualDeleteActionerProps> {
   public shouldComponentUpdate(nextProps: IActualDeleteActionerProps) {
     return nextProps.children !== this.props.children ||
-      nextProps.itemDefinitionContext.deleteError !== this.props.itemDefinitionContext.deleteError ||
-      nextProps.itemDefinitionContext.deleting !== this.props.itemDefinitionContext.deleting ||
-      nextProps.itemDefinitionContext.deleted !== this.props.itemDefinitionContext.deleted;
+      nextProps.itemContext.deleteError !== this.props.itemContext.deleteError ||
+      nextProps.itemContext.deleting !== this.props.itemContext.deleting ||
+      nextProps.itemContext.deleted !== this.props.itemContext.deleted;
   }
   public render() {
     return this.props.children({
-      deleteError: this.props.itemDefinitionContext.deleteError,
-      deleting: this.props.itemDefinitionContext.deleting,
-      deleted: this.props.itemDefinitionContext.deleted,
-      delete: this.props.itemDefinitionContext.delete,
-      dismissError: this.props.itemDefinitionContext.dismissDeleteError,
-      dismissDeleted: this.props.itemDefinitionContext.dismissDeleted,
-      clean: this.props.itemDefinitionContext.clean,
+      deleteError: this.props.itemContext.deleteError,
+      deleting: this.props.itemContext.deleting,
+      deleted: this.props.itemContext.deleted,
+      delete: this.props.itemContext.delete,
+      dismissError: this.props.itemContext.dismissDeleteError,
+      dismissDeleted: this.props.itemContext.dismissDeleted,
+      clean: this.props.itemContext.clean,
     });
   }
 }
@@ -104,10 +104,10 @@ class ActualDeleteActioner extends React.Component<IActualDeleteActionerProps> {
  */
 export default function DeleteActioner(props: IDeleteActionerProps) {
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => (
-        <ActualDeleteActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
+    <ItemContext.Consumer>{
+      (itemContext) => (
+        <ActualDeleteActioner {...props} itemContext={itemContext}/>
       )
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   );
 }

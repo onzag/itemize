@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 /**
  * The actual class that does the search heavy lifting
@@ -20,20 +20,20 @@ class ActualSearchActioner extends react_1.default.Component {
         // so we only update if we have different, searchError, searching status, or our searchRecords are
         // inherently different
         return nextProps.children !== this.props.children ||
-            nextProps.itemDefinitionContext.searchError !== this.props.itemDefinitionContext.searchError ||
-            nextProps.itemDefinitionContext.searching !== this.props.itemDefinitionContext.searching ||
-            !deep_equal_1.default(nextProps.itemDefinitionContext.searchRecords, this.props.itemDefinitionContext.searchRecords);
+            nextProps.itemContext.searchError !== this.props.itemContext.searchError ||
+            nextProps.itemContext.searching !== this.props.itemContext.searching ||
+            !deep_equal_1.default(nextProps.itemContext.searchRecords, this.props.itemContext.searchRecords);
     }
     render() {
         // and we pass it as the actioner
         return this.props.children({
-            searchError: this.props.itemDefinitionContext.searchError,
-            searching: this.props.itemDefinitionContext.searching,
-            searchRecords: this.props.itemDefinitionContext.searchRecords,
-            search: this.props.itemDefinitionContext.search,
-            clean: this.props.itemDefinitionContext.clean,
-            dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,
-            dismissSearchError: this.props.itemDefinitionContext.dismissSearchError,
+            searchError: this.props.itemContext.searchError,
+            searching: this.props.itemContext.searching,
+            searchRecords: this.props.itemContext.searchRecords,
+            search: this.props.itemContext.search,
+            clean: this.props.itemContext.clean,
+            dismissSearchResults: this.props.itemContext.dismissSearchResults,
+            dismissSearchError: this.props.itemContext.dismissSearchError,
         });
     }
 }
@@ -45,6 +45,6 @@ class ActualSearchActioner extends react_1.default.Component {
  * @returns a react element
  */
 function SearchActioner(props) {
-    return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchActioner, Object.assign({}, props, { itemDefinitionContext: itemDefinitionContext })))));
+    return (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContext) => (react_1.default.createElement(ActualSearchActioner, Object.assign({}, props, { itemContext: itemContext })))));
 }
 exports.default = SearchActioner;

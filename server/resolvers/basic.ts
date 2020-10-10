@@ -9,7 +9,7 @@ import {
   RESERVED_BASE_PROPERTIES,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
-import ItemDefinition, { IItemDefinitionStateType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
@@ -757,7 +757,7 @@ export async function serverSideCheckItemDefinitionAgainst(
   referredParentOfInclude?: ItemDefinition,
 ) {
   // we get the current value of the item definition instance
-  let currentValue: IItemDefinitionStateType;
+  let currentValue: IItemStateType;
   try {
     currentValue = await itemDefinition.getState(id, version);
   } catch (err) {

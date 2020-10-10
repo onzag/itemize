@@ -1,5 +1,5 @@
 import React from "react";
-import { IActionSubmitOptions } from "@onzag/itemize/client/providers/item-definition";
+import { IActionSubmitOptions } from "@onzag/itemize/client/providers/item";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 import Entry from "@onzag/itemize/client/components/property/Entry";
@@ -8,13 +8,13 @@ import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import UserActioner from "@onzag/itemize/client/components/user/UserActioner";
 // tslint:disable-next-line: import-spacing
 import DifferingPropertiesRetriever from
-	"@onzag/itemize/client/components/item-definition/DifferingPropertiesRetriever";
+	"@onzag/itemize/client/components/item/DifferingPropertiesRetriever";
 
 import { Button, Box, Paper, createStyles, withStyles, WithStyles,
 	Divider, Theme, DoneIcon, DoneOutlineIcon, MailIcon,
 	Alert, AlertTitle, FaceIcon,
 	ErrorIcon, AccountCircleIcon, AlernateEmailIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
-import { ItemDefinitionLoader } from "@onzag/itemize/client/fast-prototyping/components/item-definition-loader";
+import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 import { CountryPicker } from "@onzag/itemize/client/fast-prototyping/components/country-picker";
 import { CurrencyPicker } from "@onzag/itemize/client/fast-prototyping/components/currency-picker";
@@ -135,7 +135,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 	((props: WithStyles<typeof currentUserProfileStandardInfoStyles>) => {
 		return (
 			<Paper className={props.classes.paper}>
-				<ItemDefinitionLoader>
+				<ItemLoader>
 					<Entry
 						id="profile_picture"
 						renderer={AvatarRenderer}
@@ -300,7 +300,7 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 							}}
 						</DifferingPropertiesRetriever>
 					</Box>
-				</ItemDefinitionLoader>
+				</ItemLoader>
 			</Paper>
 		);
 	});

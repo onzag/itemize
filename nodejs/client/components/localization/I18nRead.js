@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.I18nReadInternalOptimized = void 0;
 const react_1 = __importDefault(require("react"));
 const locale_provider_1 = require("../../internal/providers/locale-provider");
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const util_1 = require("../../../util");
 const include_1 = require("../../providers/include");
 const module_1 = require("../../providers/module");
@@ -198,6 +198,6 @@ exports.I18nReadInternalOptimized = I18nReadInternalOptimized;
  * @returns a react node
  */
 function I18nRead(props) {
-    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => (react_1.default.createElement(I18nReadInternalOptimized, Object.assign({}, props, { localeContext: localeContext, mod: moduleContextualValue && moduleContextualValue.mod, idef: itemDefinitionContextualValue && itemDefinitionContextualValue.idef, include: includeContext && includeContext.include })))))))))));
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => (react_1.default.createElement(I18nReadInternalOptimized, Object.assign({}, props, { localeContext: localeContext, mod: moduleContextualValue && moduleContextualValue.mod, idef: itemContextualValue && itemContextualValue.idef, include: includeContext && includeContext.include })))))))))));
 }
 exports.default = I18nRead;

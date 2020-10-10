@@ -220,7 +220,7 @@ export interface IPoliciesStateType {
 /**
  * Represents the whole item definition state
  */
-export interface IItemDefinitionStateType {
+export interface IItemStateType {
     /**
      * The module this item definition resides (name only)
      */
@@ -641,7 +641,7 @@ export default class ItemDefinition {
      * @param excludePolicies excludes all the policies state
      * @retrns the item definition state without extenral checks
      */
-    getStateNoExternalChecking(id: number, version: string, emulateExternalChecking?: boolean, onlyIncludeProperties?: string[], onlyIncludeIncludes?: string[], excludePolicies?: boolean): IItemDefinitionStateType;
+    getStateNoExternalChecking(id: number, version: string, emulateExternalChecking?: boolean, onlyIncludeProperties?: string[], onlyIncludeIncludes?: string[], excludePolicies?: boolean): IItemStateType;
     /**
      * provides the structure of the current item
      * as it is currently, the reason this is more efficient
@@ -658,8 +658,8 @@ export default class ItemDefinition {
      * @param excludePolicies excludes all the policies state bit
      * @returns a promise for the item definition state
      */
-    getState(id: number, version: string, onlyIncludeProperties?: string[], onlyIncludeIncludes?: string[], excludePolicies?: boolean): Promise<IItemDefinitionStateType>;
-    applyState(id: number, version: string, state: IItemDefinitionStateType): void;
+    getState(id: number, version: string, onlyIncludeProperties?: string[], onlyIncludeIncludes?: string[], excludePolicies?: boolean): Promise<IItemStateType>;
+    applyState(id: number, version: string, state: IItemStateType): void;
     /**
      * Applies a value from graphql to the item definition state
      * @param id the id that this state is for (can be null)

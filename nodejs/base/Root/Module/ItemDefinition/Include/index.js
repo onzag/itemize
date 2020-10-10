@@ -365,7 +365,7 @@ class Include {
             canExclusionBeSet: this.canExclusionBeSet(id, version),
             includeId: this.getId(),
             itemDefinitionName: this.getItemDefinitionName(),
-            itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
+            itemState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
                 this.itemDefinition.getStateNoExternalChecking(id, version, emulateExternalChecking, this.rawData.sinkIn || [], [], true),
             stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
             stateExclusionModified: this.stateExclusionModified[mergedID] || false,
@@ -387,7 +387,7 @@ class Include {
             canExclusionBeSet: this.canExclusionBeSet(id, version),
             includeId: this.getId(),
             itemDefinitionName: this.getItemDefinitionName(),
-            itemDefinitionState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
+            itemState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
                 (await this.itemDefinition.getState(id, version, this.rawData.sinkIn || [], [], true)),
             stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
             stateExclusionModified: this.stateExclusionModified[mergedID] || false,

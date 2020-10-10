@@ -1,6 +1,6 @@
 // import React from "react";
 // import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
-// import { ItemDefinitionContext } from "../providers/item-definition";
+// import { ItemContext } from "../providers/item";
 // import IncludeExclusionSwitch from "../base/IncludeExclusionSwitch";
 // import IncludeCalloutWarning from "../base/IncludeCalloutWarning";
 // import { IncludeContext } from "../../providers/include";
@@ -11,9 +11,9 @@
 
 // export function ExclusionSwitch(props: IExclusionSwitchProps) {
 //   return (
-//     <ItemDefinitionContext.Consumer>
+//     <ItemContext.Consumer>
 //       {
-//         (itemDefinitionContextualValue) => (
+//         (itemContextualValue) => (
 //           <IncludeContext.Consumer>
 //             {
 //               (includeContextualValue) => {
@@ -25,7 +25,7 @@
 //                   if (props.onChange) {
 //                     props.onChange(includeContextualValue.include, newExclusionState);
 //                   }
-//                   itemDefinitionContextualValue.onIncludeSetExclusionState(
+//                   itemContextualValue.onIncludeSetExclusionState(
 //                     includeContextualValue.include, newExclusionState,
 //                   );
 //                 };
@@ -35,8 +35,8 @@
 //                     include={includeContextualValue.include}
 //                     state={includeContextualValue.state}
 //                     onChange={onChange}
-//                     forId={itemDefinitionContextualValue.forId}
-//                     forVersion={itemDefinitionContextualValue.forVersion}
+//                     forId={itemContextualValue.forId}
+//                     forVersion={itemContextualValue.forVersion}
 //                   />
 //                 );
 //               }
@@ -44,7 +44,7 @@
 //           </IncludeContext.Consumer>
 //         )
 //       }
-//     </ItemDefinitionContext.Consumer>
+//     </ItemContext.Consumer>
 //   );
 // }
 

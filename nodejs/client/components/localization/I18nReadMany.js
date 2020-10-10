@@ -35,7 +35,7 @@ const I18nRead_1 = __importStar(require("./I18nRead"));
 const locale_provider_1 = require("../../internal/providers/locale-provider");
 const appdata_provider_1 = require("../../internal/providers/appdata-provider");
 const module_1 = require("../../providers/module");
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const include_1 = require("../../providers/include");
 /**
  * The internal read many functionality, somewhat less refined
@@ -45,11 +45,11 @@ const include_1 = require("../../providers/include");
  * @param localeContext the locale context (always available)
  * @param dataContext data context for root data app access (available for errors)
  * @param moduleContextualValue module context (avaiable for standard display if exists)
- * @param itemDefinitionContextualValue item definition context (avaiable for standard display if exists)
+ * @param itemContextualValue item definition context (avaiable for standard display if exists)
  * @param includeContext include context (avaiable for standard display if exists)
  * @param props the actual read many props
  */
-function i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props) {
+function i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props) {
     // so we build the args based on the component required, note how
     // we use the internal optimized instead
     const args = props.data.map((toProvideProps) => {
@@ -59,7 +59,7 @@ function i18nReadManyInternal(localeContext, dataContext, moduleContextualValue,
             return (react_1.default.createElement(I18nReadError_1.I18nReadErrorInternalOptimized, Object.assign({ localeContext: localeContext, root: dataContext.value }, toProvidePropsAsErrorProps)));
         }
         else {
-            return (react_1.default.createElement(I18nRead_1.I18nReadInternalOptimized, Object.assign({ localeContext: localeContext, mod: moduleContextualValue && moduleContextualValue.mod, idef: itemDefinitionContextualValue && itemDefinitionContextualValue.idef, include: includeContext && includeContext.include }, toProvidePropsAsStdProps)));
+            return (react_1.default.createElement(I18nRead_1.I18nReadInternalOptimized, Object.assign({ localeContext: localeContext, mod: moduleContextualValue && moduleContextualValue.mod, idef: itemContextualValue && itemContextualValue.idef, include: includeContext && includeContext.include }, toProvidePropsAsStdProps)));
         }
     });
     // and pass that to the children
@@ -99,14 +99,14 @@ function I18nReadMany(props) {
     }
     else if (!hasError) {
         // if it doesn't have an error we don't need the data context
-        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
-            return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
+            return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemContextualValue, includeContext, props);
         }))))))));
     }
     else {
         // otherwise we need everything
-        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (dataContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
-            return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
+        return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeContext) => (react_1.default.createElement(appdata_provider_1.DataContext.Consumer, null, (dataContext) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (moduleContextualValue) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => (react_1.default.createElement(include_1.IncludeContext.Consumer, null, (includeContext) => {
+            return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props);
         }))))))))));
     }
 }

@@ -7,8 +7,8 @@
 import React from "react";
 import equals from "deep-equal";
 import {
-  ItemDefinitionContext,
-} from "../../providers/item-definition";
+  ItemContext,
+} from "../../providers/item";
 
 /**
  * The props for the differing properties retriever element
@@ -61,16 +61,16 @@ class OptimizerDifferingPropertiesRetriever extends React.Component<IOptimizerDi
 export default function DifferingPropertiesRetriever(props: IDifferingPropertiesRetrieverProps) {
   // first we need the item definition context
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => {
+    <ItemContext.Consumer>{
+      (itemContext) => {
         const finalProperties = props.mainProperties.filter((mainProperty: string) => {
-          const propertyData = itemDefinitionContext.state.properties.find(p => p.propertyId === mainProperty);
+          const propertyData = itemContext.state.properties.find(p => p.propertyId === mainProperty);
           if (!propertyData) {
             return false;
           }
-          const property = itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true);
-          return !itemDefinitionContext.idef.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual({
-            itemDefinition: itemDefinitionContext.idef,
+          const property = itemContext.idef.getPropertyDefinitionFor(mainProperty, true);
+          return !itemContext.idef.getPropertyDefinitionFor(mainProperty, true).getPropertyDefinitionDescription().localEqual({
+            itemDefinition: itemContext.idef,
             include: null,
             property,
             id: property.getId(),
@@ -83,6 +83,6 @@ export default function DifferingPropertiesRetriever(props: IDifferingProperties
           <OptimizerDifferingPropertiesRetriever finalProperties={finalProperties} children={props.children}/>
         );
       }
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   )
 }

@@ -10,9 +10,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const SubmitActioner_1 = __importDefault(require("../item-definition/SubmitActioner"));
-const DifferingPropertiesRetriever_1 = __importDefault(require("../item-definition/DifferingPropertiesRetriever"));
-const DifferingIncludesRetriever_1 = __importDefault(require("../item-definition/DifferingIncludesRetriever"));
+const SubmitActioner_1 = __importDefault(require("../item/SubmitActioner"));
+const DifferingPropertiesRetriever_1 = __importDefault(require("../item/DifferingPropertiesRetriever"));
+const DifferingIncludesRetriever_1 = __importDefault(require("../item/DifferingIncludesRetriever"));
 const Prompt_1 = __importDefault(require("./Prompt"));
 /**
  * The needs submit prompt component allows to check for changes in an item definition

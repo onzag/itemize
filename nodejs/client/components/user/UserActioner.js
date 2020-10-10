@@ -16,7 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const token_provider_1 = require("../../internal/providers/token-provider");
 const gql_querier_1 = require("../../../gql-querier");
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 ;
 /**
@@ -255,10 +255,10 @@ class ActualUserActioner extends react_1.default.Component {
  */
 function UserActioner(props) {
     // we need the token context to get the currently logge user token
-    return (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenContext) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, 
+    return (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenContext) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, 
     // as well as an item definition context to read our password and email fields
-    (itemDefinitionContext) => {
-        return react_1.default.createElement(ActualUserActioner, Object.assign({}, props, { token: tokenContext.token, userContext: itemDefinitionContext }));
+    (itemContext) => {
+        return react_1.default.createElement(ActualUserActioner, Object.assign({}, props, { token: tokenContext.token, userContext: itemContext }));
     }))));
 }
 exports.default = UserActioner;

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IncludeProvider = exports.IncludeContext = void 0;
 const react_1 = __importDefault(require("react"));
-const item_definition_1 = require("./item-definition");
+const item_1 = require("./item");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 exports.IncludeContext = react_1.default.createContext(null);
 // tslint:disable-next-line: max-classes-per-file
@@ -23,9 +23,9 @@ class ActualIncludeProvider extends react_1.default.Component {
     }
 }
 function IncludeProvider(props) {
-    return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => {
-        const includeState = itemDefinitionContextualValue.state.includes.find((i) => i.includeId === props.item);
-        const includeObject = itemDefinitionContextualValue.idef.getIncludeFor(props.item);
+    return (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => {
+        const includeState = itemContextualValue.state.includes.find((i) => i.includeId === props.item);
+        const includeObject = itemContextualValue.idef.getIncludeFor(props.item);
         return (react_1.default.createElement(ActualIncludeProvider, { include: includeObject, state: includeState }, props.children));
     }));
 }

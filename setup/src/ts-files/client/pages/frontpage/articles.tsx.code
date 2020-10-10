@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider, ParentItemDefinitionContextProvider } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider, ParentItemContextProvider } from "@onzag/itemize/client/providers/item";
 import SearchLoader from "@onzag/itemize/client/components/search/SearchLoader";
 import View from "@onzag/itemize/client/components/property/View";
 import Reader from "@onzag/itemize/client/components/property/Reader";
@@ -246,9 +246,9 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 																			<Box className={props.classes.publisherInfoDetailsBox}>
 																				<Typography variant="body1"><View id="username" /></Typography>
 																				<Typography variant="body2">
-																					<ParentItemDefinitionContextProvider>
+																					<ParentItemContextProvider>
 																						<View id="created_at" rendererArgs={{ dateFormat: "LLL" }} />
-																					</ParentItemDefinitionContextProvider>
+																					</ParentItemContextProvider>
 																				</Typography>
 																			</Box>
 																		</Box>

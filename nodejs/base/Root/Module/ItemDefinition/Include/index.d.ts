@@ -6,7 +6,7 @@
  *
  * @packageDocumentation
  */
-import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "..";
+import ItemDefinition, { IItemStateType, ItemDefinitionIOActions } from "..";
 import { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
@@ -45,7 +45,7 @@ export interface IIncludeState {
     /**
      * The item definition state it contains (not its parent)
      */
-    itemDefinitionState: IItemDefinitionStateType;
+    itemState: IItemStateType;
     /**
      * The state specified exclusion state by the user or another interaction
      */

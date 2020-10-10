@@ -10,7 +10,7 @@ import { II18nReadProps } from "./I18nRead";
 import { ILocaleContextType } from "../../internal/providers/locale-provider";
 import { IDataContextType } from "../../internal/providers/appdata-provider";
 import { IModuleContextType } from "../../providers/module";
-import { IItemDefinitionContextType } from "../../providers/item-definition";
+import { IItemContextType } from "../../providers/item";
 import { IIncludeContext } from "../../providers/include";
 /**
  * The props for the read many
@@ -37,11 +37,11 @@ interface Ii18nReadManyProps {
  * @param localeContext the locale context (always available)
  * @param dataContext data context for root data app access (available for errors)
  * @param moduleContextualValue module context (avaiable for standard display if exists)
- * @param itemDefinitionContextualValue item definition context (avaiable for standard display if exists)
+ * @param itemContextualValue item definition context (avaiable for standard display if exists)
  * @param includeContext include context (avaiable for standard display if exists)
  * @param props the actual read many props
  */
-export declare function i18nReadManyInternal(localeContext: ILocaleContextType, dataContext: IDataContextType, moduleContextualValue: IModuleContextType, itemDefinitionContextualValue: IItemDefinitionContextType, includeContext: IIncludeContext, props: Ii18nReadManyProps): React.ReactNode;
+export declare function i18nReadManyInternal(localeContext: ILocaleContextType, dataContext: IDataContextType, moduleContextualValue: IModuleContextType, itemContextualValue: IItemContextType, includeContext: IIncludeContext, props: Ii18nReadManyProps): React.ReactNode;
 /**
  * The read many component which allows to read many i18n data at once
  * @param props the props

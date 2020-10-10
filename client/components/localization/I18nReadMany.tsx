@@ -11,7 +11,7 @@ import I18nRead, { II18nReadProps, I18nReadInternalOptimized } from "./I18nRead"
 import { ILocaleContextType, LocaleContext } from "../../internal/providers/locale-provider";
 import { DataContext, IDataContextType } from "../../internal/providers/appdata-provider";
 import { IModuleContextType, ModuleContext } from "../../providers/module";
-import { IItemDefinitionContextType, ItemDefinitionContext } from "../../providers/item-definition";
+import { IItemContextType, ItemContext } from "../../providers/item";
 import { IIncludeContext, IncludeContext } from "../../providers/include";
 
 /**
@@ -40,7 +40,7 @@ interface Ii18nReadManyProps {
  * @param localeContext the locale context (always available)
  * @param dataContext data context for root data app access (available for errors)
  * @param moduleContextualValue module context (avaiable for standard display if exists)
- * @param itemDefinitionContextualValue item definition context (avaiable for standard display if exists)
+ * @param itemContextualValue item definition context (avaiable for standard display if exists)
  * @param includeContext include context (avaiable for standard display if exists)
  * @param props the actual read many props
  */
@@ -48,7 +48,7 @@ export function i18nReadManyInternal(
   localeContext: ILocaleContextType,
   dataContext: IDataContextType,
   moduleContextualValue: IModuleContextType,
-  itemDefinitionContextualValue: IItemDefinitionContextType,
+  itemContextualValue: IItemContextType,
   includeContext: IIncludeContext,
   props: Ii18nReadManyProps,
 ) {
@@ -70,7 +70,7 @@ export function i18nReadManyInternal(
         <I18nReadInternalOptimized
           localeContext={localeContext}
           mod={moduleContextualValue && moduleContextualValue.mod}
-          idef={itemDefinitionContextualValue && itemDefinitionContextualValue.idef}
+          idef={itemContextualValue && itemContextualValue.idef}
           include={includeContext && includeContext.include}
           {...toProvidePropsAsStdProps}
         />
@@ -143,19 +143,19 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
             <ModuleContext.Consumer>
               {
                 (moduleContextualValue) => (
-                  <ItemDefinitionContext.Consumer>
+                  <ItemContext.Consumer>
                     {
-                      (itemDefinitionContextualValue) => (
+                      (itemContextualValue) => (
                         <IncludeContext.Consumer>
                           {
                             (includeContext) => {
-                              return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
+                              return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemContextualValue, includeContext, props);
                             }
                           }
                         </IncludeContext.Consumer>
                       )
                     }
-                  </ItemDefinitionContext.Consumer>
+                  </ItemContext.Consumer>
                 )
               }
             </ModuleContext.Consumer>
@@ -175,19 +175,19 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
                   <ModuleContext.Consumer>
                     {
                       (moduleContextualValue) => (
-                        <ItemDefinitionContext.Consumer>
+                        <ItemContext.Consumer>
                           {
-                            (itemDefinitionContextualValue) => (
+                            (itemContextualValue) => (
                               <IncludeContext.Consumer>
                                 {
                                   (includeContext) => {
-                                    return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemDefinitionContextualValue, includeContext, props);
+                                    return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props);
                                   }
                                 }
                               </IncludeContext.Consumer>
                             )
                           }
-                        </ItemDefinitionContext.Consumer>
+                        </ItemContext.Consumer>
                       )
                     }
                   </ModuleContext.Consumer>

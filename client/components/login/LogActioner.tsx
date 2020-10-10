@@ -9,7 +9,7 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
-import { ItemDefinitionContext, IItemDefinitionContextType } from "../../providers/item-definition";
+import { ItemContext, IItemContextType } from "../../providers/item";
 import { MAX_SUPPORTED_INTEGER } from "../../../constants";
 
 /**
@@ -66,7 +66,7 @@ interface ILogActionerProps {
  */
 interface IActualLogActionerProps extends ILogActionerProps {
   tokenContextValue: ITokenContextType;
-  itemDefinitionContextualValue: IItemDefinitionContextType;
+  itemContextualValue: IItemContextType;
 }
 
 /**
@@ -87,8 +87,8 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     return nextProps.children !== this.props.children ||
       nextProps.tokenContextValue.isLoggingIn !== this.props.tokenContextValue.isLoggingIn ||
       nextProps.tokenContextValue.error !== this.props.tokenContextValue.error ||
-      nextProps.itemDefinitionContextualValue.submitError !== this.props.itemDefinitionContextualValue.submitError ||
-      nextProps.itemDefinitionContextualValue.submitting !== this.props.itemDefinitionContextualValue.submitting;
+      nextProps.itemContextualValue.submitError !== this.props.itemContextualValue.submitError ||
+      nextProps.itemContextualValue.submitting !== this.props.itemContextualValue.submitting;
   }
   public cleanUnsafeFields(addDelay?: boolean) {
     // so if we add delay we just call this same function 300ms later
@@ -99,19 +99,19 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
 
     // so now we need to get the password property
     const passwordPdef =
-      this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
+      this.props.itemContextualValue.idef.getPropertyDefinitionFor("password", false);
 
     // and clean its value
     passwordPdef.cleanValueFor(
-      this.props.itemDefinitionContextualValue.forId,
-      this.props.itemDefinitionContextualValue.forVersion,
+      this.props.itemContextualValue.forId,
+      this.props.itemContextualValue.forVersion,
     );
 
     // and then we trigger the change listeners in the context we are
-    this.props.itemDefinitionContextualValue.idef.triggerListeners(
+    this.props.itemContextualValue.idef.triggerListeners(
       "change",
-      this.props.itemDefinitionContextualValue.forId,
-      this.props.itemDefinitionContextualValue.forVersion,
+      this.props.itemContextualValue.forId,
+      this.props.itemContextualValue.forVersion,
     );
   }
 
@@ -126,9 +126,9 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     error: EndpointErrorType;
   }> {
     // so we read from the property, the state values
-    const username = this.props.itemDefinitionContextualValue.state.properties
+    const username = this.props.itemContextualValue.state.properties
       .find((pv) => pv.propertyId === "username");
-    const password = this.props.itemDefinitionContextualValue.state.properties
+    const password = this.props.itemContextualValue.state.properties
       .find((pv) => pv.propertyId === "password");
 
     // if we don't have any of these
@@ -177,11 +177,11 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     // we need to retrieve the session id property in order to botch a change event
     // as if it was the UI
     const sessionIdProperty =
-      this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("session_id", false);
+      this.props.itemContextualValue.idef.getPropertyDefinitionFor("session_id", false);
     // now we trigger the change
-    this.props.itemDefinitionContextualValue.onPropertyChange(sessionIdProperty, newSessionId, null);
+    this.props.itemContextualValue.onPropertyChange(sessionIdProperty, newSessionId, null);
     // and we submit now
-    const result = await this.props.itemDefinitionContextualValue.submit({
+    const result = await this.props.itemContextualValue.submit({
       properties: ["session_id"],
     });
     // if we don't get an error we call logout
@@ -201,13 +201,13 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     error: EndpointErrorType;
   }> {
     // we nee to check that there's no forId user
-    if (this.props.itemDefinitionContextualValue.forId) {
-      throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemDefinitionContextualValue.forId);
+    if (this.props.itemContextualValue.forId) {
+      throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemContextualValue.forId);
     }
 
     // basically we trigger the submit from the contextual value so that the idef
     // performs the CREATE action
-    const result = await this.props.itemDefinitionContextualValue.submit({
+    const result = await this.props.itemContextualValue.submit({
       properties: ["username", "password", "app_language", "app_country", "app_currency"],
     });
 
@@ -230,7 +230,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
    */
   public dismissError() {
     this.props.tokenContextValue.dismissError();
-    this.props.itemDefinitionContextualValue.dismissSubmitError();
+    this.props.itemContextualValue.dismissSubmitError();
   }
 
   /**
@@ -242,7 +242,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
     let signup: () => any;
     let logoutAll: () => any;
     const dismissError = this.dismissError;
-    if (!this.props.tokenContextValue.isLoggingIn && !this.props.itemDefinitionContextualValue.submitting) {
+    if (!this.props.tokenContextValue.isLoggingIn && !this.props.itemContextualValue.submitting) {
       login = this.login;
       logout = this.logout;
       signup = this.signup;
@@ -259,10 +259,10 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
       signup,
       logout,
       logoutAll,
-      error: this.props.tokenContextValue.error || this.props.itemDefinitionContextualValue.submitError,
+      error: this.props.tokenContextValue.error || this.props.itemContextualValue.submitError,
       dismissError,
       cleanUnsafeFields: this.cleanUnsafeFields,
-      isLoggingIn: this.props.tokenContextValue.isLoggingIn || this.props.itemDefinitionContextualValue.submitting,
+      isLoggingIn: this.props.tokenContextValue.isLoggingIn || this.props.itemContextualValue.submitting,
     });
     return output;
   }
@@ -281,10 +281,10 @@ export function LogActioner(props: ILogActionerProps) {
       {
         (tokenContextValue) => {
           return (
-            <ItemDefinitionContext.Consumer>
+            <ItemContext.Consumer>
               {
-                (itemDefinitionContextualValue) => {
-                  if (!itemDefinitionContextualValue) {
+                (itemContextualValue) => {
+                  if (!itemContextualValue) {
                     throw new Error("The LogActioner must be in a ItemDefinitionProvider context");
                   }
 
@@ -292,12 +292,12 @@ export function LogActioner(props: ILogActionerProps) {
                     <ActualLogActioner
                       {...props}
                       tokenContextValue={tokenContextValue}
-                      itemDefinitionContextualValue={itemDefinitionContextualValue}
+                      itemContextualValue={itemContextualValue}
                     />
                   );
                 }
               }
-            </ItemDefinitionContext.Consumer>
+            </ItemContext.Consumer>
           );
         }
       }

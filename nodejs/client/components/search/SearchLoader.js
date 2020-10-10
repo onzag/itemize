@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const constants_1 = require("../../../constants");
 const cache_1 = __importDefault(require("../../internal/workers/cache"));
@@ -359,7 +359,7 @@ class ActualSearchLoader extends react_1.default.Component {
         // now we return, for that we must make a new provider context with what
         // we are currently searching and our search fields that we are searching for
         // so the item definition provider knows this and aborts loading values needlessly
-        return (react_1.default.createElement(item_definition_1.SearchItemDefinitionValueContext.Provider, { value: {
+        return (react_1.default.createElement(item_1.SearchItemValueContext.Provider, { value: {
                 currentlySearching: this.state.currentlySearching,
                 searchFields: this.state.searchFields,
             } }, this.props.children({
@@ -415,6 +415,6 @@ class ActualSearchLoader extends react_1.default.Component {
  * @returns a react component
  */
 function SearchLoader(props) {
-    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { itemDefinitionInstance: itemDefinitionContext.idef, remoteListener: itemDefinitionContext.remoteListener, searchId: itemDefinitionContext.searchId, searchWasRestored: itemDefinitionContext.searchWasRestored, searchRecords: itemDefinitionContext.searchRecords, searchResults: itemDefinitionContext.searchResults, searchCount: itemDefinitionContext.searchCount, searchOffset: itemDefinitionContext.searchOffset, searchLimit: itemDefinitionContext.searchLimit, searchOwner: itemDefinitionContext.searchOwner, searchShouldCache: itemDefinitionContext.searchShouldCache, searchRequestedIncludes: itemDefinitionContext.searchRequestedIncludes, searchRequestedProperties: itemDefinitionContext.searchRequestedProperties, searchFields: itemDefinitionContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
+    return (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContext) => (react_1.default.createElement(ActualSearchLoader, Object.assign({}, props, { itemDefinitionInstance: itemContext.idef, remoteListener: itemContext.remoteListener, searchId: itemContext.searchId, searchWasRestored: itemContext.searchWasRestored, searchRecords: itemContext.searchRecords, searchResults: itemContext.searchResults, searchCount: itemContext.searchCount, searchOffset: itemContext.searchOffset, searchLimit: itemContext.searchLimit, searchOwner: itemContext.searchOwner, searchShouldCache: itemContext.searchShouldCache, searchRequestedIncludes: itemContext.searchRequestedIncludes, searchRequestedProperties: itemContext.searchRequestedProperties, searchFields: itemContext.searchFields, tokenData: tokenData, localeData: localeData })))))))));
 }
 exports.default = SearchLoader;

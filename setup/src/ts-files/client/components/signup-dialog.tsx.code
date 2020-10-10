@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";

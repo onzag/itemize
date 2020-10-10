@@ -3,7 +3,7 @@ import { CurrentUserProfileStandardInfo } from "./standard-info";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
-import SubmitActioner from "@onzag/itemize/client/components/item-definition/SubmitActioner";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
 import { Button, Container, createStyles, WithStyles, withStyles,
 	Box, Typography, ExitToAppIcon, ArrowBackIcon} from "@onzag/itemize/client/fast-prototyping/mui-core";

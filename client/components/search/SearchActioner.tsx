@@ -8,12 +8,12 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
-  ItemDefinitionContext,
+  ItemContext,
   IActionResponseWithSearchResults,
-  IItemDefinitionContextType,
+  IItemContextType,
   IActionCleanOptions,
   IActionSearchOptions,
-} from "../../providers/item-definition";
+} from "../../providers/item";
 import equals from "deep-equal";
 import { IGQLSearchRecord } from "../../../gql-querier";
 
@@ -63,7 +63,7 @@ interface ISearchActionerProps {
  * the actual needs a bit more information about the context its in
  */
 interface IActualSearchActionerProps extends ISearchActionerProps {
-  itemDefinitionContext: IItemDefinitionContextType;
+  itemContext: IItemContextType;
 }
 
 /**
@@ -74,20 +74,20 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
     // so we only update if we have different, searchError, searching status, or our searchRecords are
     // inherently different
     return nextProps.children !== this.props.children ||
-      nextProps.itemDefinitionContext.searchError !== this.props.itemDefinitionContext.searchError ||
-      nextProps.itemDefinitionContext.searching !== this.props.itemDefinitionContext.searching ||
-      !equals(nextProps.itemDefinitionContext.searchRecords, this.props.itemDefinitionContext.searchRecords);
+      nextProps.itemContext.searchError !== this.props.itemContext.searchError ||
+      nextProps.itemContext.searching !== this.props.itemContext.searching ||
+      !equals(nextProps.itemContext.searchRecords, this.props.itemContext.searchRecords);
   }
   public render() {
     // and we pass it as the actioner
     return this.props.children({
-      searchError: this.props.itemDefinitionContext.searchError,
-      searching: this.props.itemDefinitionContext.searching,
-      searchRecords: this.props.itemDefinitionContext.searchRecords,
-      search: this.props.itemDefinitionContext.search,
-      clean: this.props.itemDefinitionContext.clean,
-      dismissSearchResults: this.props.itemDefinitionContext.dismissSearchResults,
-      dismissSearchError: this.props.itemDefinitionContext.dismissSearchError,
+      searchError: this.props.itemContext.searchError,
+      searching: this.props.itemContext.searching,
+      searchRecords: this.props.itemContext.searchRecords,
+      search: this.props.itemContext.search,
+      clean: this.props.itemContext.clean,
+      dismissSearchResults: this.props.itemContext.dismissSearchResults,
+      dismissSearchError: this.props.itemContext.dismissSearchError,
     });
   }
 }
@@ -101,10 +101,10 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
  */
 export default function SearchActioner(props: ISearchActionerProps) {
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => (
-        <ActualSearchActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
+    <ItemContext.Consumer>{
+      (itemContext) => (
+        <ActualSearchActioner {...props} itemContext={itemContext}/>
       )
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   );
 }

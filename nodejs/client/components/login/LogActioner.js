@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogActioner = void 0;
 const react_1 = __importDefault(require("react"));
 const token_provider_1 = require("../../internal/providers/token-provider");
-const item_definition_1 = require("../../providers/item-definition");
+const item_1 = require("../../providers/item");
 const constants_1 = require("../../../constants");
 /**
  * The actual log actioner itself
@@ -32,8 +32,8 @@ class ActualLogActioner extends react_1.default.Component {
         return nextProps.children !== this.props.children ||
             nextProps.tokenContextValue.isLoggingIn !== this.props.tokenContextValue.isLoggingIn ||
             nextProps.tokenContextValue.error !== this.props.tokenContextValue.error ||
-            nextProps.itemDefinitionContextualValue.submitError !== this.props.itemDefinitionContextualValue.submitError ||
-            nextProps.itemDefinitionContextualValue.submitting !== this.props.itemDefinitionContextualValue.submitting;
+            nextProps.itemContextualValue.submitError !== this.props.itemContextualValue.submitError ||
+            nextProps.itemContextualValue.submitting !== this.props.itemContextualValue.submitting;
     }
     cleanUnsafeFields(addDelay) {
         // so if we add delay we just call this same function 300ms later
@@ -42,11 +42,11 @@ class ActualLogActioner extends react_1.default.Component {
             return;
         }
         // so now we need to get the password property
-        const passwordPdef = this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("password", false);
+        const passwordPdef = this.props.itemContextualValue.idef.getPropertyDefinitionFor("password", false);
         // and clean its value
-        passwordPdef.cleanValueFor(this.props.itemDefinitionContextualValue.forId, this.props.itemDefinitionContextualValue.forVersion);
+        passwordPdef.cleanValueFor(this.props.itemContextualValue.forId, this.props.itemContextualValue.forVersion);
         // and then we trigger the change listeners in the context we are
-        this.props.itemDefinitionContextualValue.idef.triggerListeners("change", this.props.itemDefinitionContextualValue.forId, this.props.itemDefinitionContextualValue.forVersion);
+        this.props.itemContextualValue.idef.triggerListeners("change", this.props.itemContextualValue.forId, this.props.itemContextualValue.forVersion);
     }
     /**
      * Performs the login
@@ -55,9 +55,9 @@ class ActualLogActioner extends react_1.default.Component {
      */
     async login(cleanWhenSuccessful = true) {
         // so we read from the property, the state values
-        const username = this.props.itemDefinitionContextualValue.state.properties
+        const username = this.props.itemContextualValue.state.properties
             .find((pv) => pv.propertyId === "username");
-        const password = this.props.itemDefinitionContextualValue.state.properties
+        const password = this.props.itemContextualValue.state.properties
             .find((pv) => pv.propertyId === "password");
         // if we don't have any of these
         if (!username) {
@@ -98,11 +98,11 @@ class ActualLogActioner extends react_1.default.Component {
         const newSessionId = Math.floor(Math.random() * Math.floor(constants_1.MAX_SUPPORTED_INTEGER));
         // we need to retrieve the session id property in order to botch a change event
         // as if it was the UI
-        const sessionIdProperty = this.props.itemDefinitionContextualValue.idef.getPropertyDefinitionFor("session_id", false);
+        const sessionIdProperty = this.props.itemContextualValue.idef.getPropertyDefinitionFor("session_id", false);
         // now we trigger the change
-        this.props.itemDefinitionContextualValue.onPropertyChange(sessionIdProperty, newSessionId, null);
+        this.props.itemContextualValue.onPropertyChange(sessionIdProperty, newSessionId, null);
         // and we submit now
-        const result = await this.props.itemDefinitionContextualValue.submit({
+        const result = await this.props.itemContextualValue.submit({
             properties: ["session_id"],
         });
         // if we don't get an error we call logout
@@ -117,12 +117,12 @@ class ActualLogActioner extends react_1.default.Component {
      */
     async signup(cleanWhenSuccessful = true) {
         // we nee to check that there's no forId user
-        if (this.props.itemDefinitionContextualValue.forId) {
-            throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemDefinitionContextualValue.forId);
+        if (this.props.itemContextualValue.forId) {
+            throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemContextualValue.forId);
         }
         // basically we trigger the submit from the contextual value so that the idef
         // performs the CREATE action
-        const result = await this.props.itemDefinitionContextualValue.submit({
+        const result = await this.props.itemContextualValue.submit({
             properties: ["username", "password", "app_language", "app_country", "app_currency"],
         });
         // now if there's no error
@@ -142,7 +142,7 @@ class ActualLogActioner extends react_1.default.Component {
      */
     dismissError() {
         this.props.tokenContextValue.dismissError();
-        this.props.itemDefinitionContextualValue.dismissSubmitError();
+        this.props.itemContextualValue.dismissSubmitError();
     }
     /**
      * Classic render
@@ -153,7 +153,7 @@ class ActualLogActioner extends react_1.default.Component {
         let signup;
         let logoutAll;
         const dismissError = this.dismissError;
-        if (!this.props.tokenContextValue.isLoggingIn && !this.props.itemDefinitionContextualValue.submitting) {
+        if (!this.props.tokenContextValue.isLoggingIn && !this.props.itemContextualValue.submitting) {
             login = this.login;
             logout = this.logout;
             signup = this.signup;
@@ -170,10 +170,10 @@ class ActualLogActioner extends react_1.default.Component {
             signup,
             logout,
             logoutAll,
-            error: this.props.tokenContextValue.error || this.props.itemDefinitionContextualValue.submitError,
+            error: this.props.tokenContextValue.error || this.props.itemContextualValue.submitError,
             dismissError,
             cleanUnsafeFields: this.cleanUnsafeFields,
-            isLoggingIn: this.props.tokenContextValue.isLoggingIn || this.props.itemDefinitionContextualValue.submitting,
+            isLoggingIn: this.props.tokenContextValue.isLoggingIn || this.props.itemContextualValue.submitting,
         });
         return output;
     }
@@ -187,11 +187,11 @@ class ActualLogActioner extends react_1.default.Component {
  */
 function LogActioner(props) {
     return (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenContextValue) => {
-        return (react_1.default.createElement(item_definition_1.ItemDefinitionContext.Consumer, null, (itemDefinitionContextualValue) => {
-            if (!itemDefinitionContextualValue) {
+        return (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => {
+            if (!itemContextualValue) {
                 throw new Error("The LogActioner must be in a ItemDefinitionProvider context");
             }
-            return (react_1.default.createElement(ActualLogActioner, Object.assign({}, props, { tokenContextValue: tokenContextValue, itemDefinitionContextualValue: itemDefinitionContextualValue })));
+            return (react_1.default.createElement(ActualLogActioner, Object.assign({}, props, { tokenContextValue: tokenContextValue, itemContextualValue: itemContextualValue })));
         }));
     }));
 }

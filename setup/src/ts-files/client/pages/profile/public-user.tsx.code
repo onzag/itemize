@@ -8,7 +8,7 @@ import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRet
 
 import { Container, createStyles, WithStyles, withStyles,
 	Typography, Paper, Theme, Tooltip, Card, VerifiedUserIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
-import { ItemDefinitionLoader } from "@onzag/itemize/client/fast-prototyping/components/item-definition-loader";
+import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 
 import { AdminToolbox } from "./admin-toolbox";
 import { Avatar } from "../../components/avatar";
@@ -68,7 +68,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)(
 			<>
 				<Container maxWidth="md" className={props.classes.container}>
 					<Paper className={props.classes.paper}>
-						<ItemDefinitionLoader>
+						<ItemLoader>
 							<Avatar size="large" hideFlag={true} fullWidth={true} />
 							<Reader id="e_validated">
 								{(eValidated: boolean) => (
@@ -91,7 +91,7 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)(
 									</Reader>
 								)}
 							</Reader>
-						</ItemDefinitionLoader>
+						</ItemLoader>
 						<Reader id="app_country">
 							{(country: string) => {
 								if (!country) {

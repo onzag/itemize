@@ -1,6 +1,6 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemDefinitionStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
@@ -187,12 +187,12 @@ export interface IPokeElementsType {
 /**
  * The whole item definition context
  */
-export interface IItemDefinitionContextType {
+export interface IItemContextType {
   // the item definition in question
   idef: ItemDefinition;
   // the state of this item definition that has
   // been pulled and calculated from this item definition
-  state: IItemDefinitionStateType;
+  state: IItemStateType;
   // the id of which it was pulled from, this might be
   // null
   forId: number;
@@ -336,7 +336,7 @@ export interface IItemDefinitionContextType {
   remoteListener: RemoteListener;
 
   // an injected parent context if available
-  injectedParentContext: IItemDefinitionContextType;
+  injectedParentContext: IItemContextType;
 
   // inject a promise that blocks the submit process, this is currently
   // not used anywhere but was introduced as a means of blocking submitting
@@ -344,18 +344,18 @@ export interface IItemDefinitionContextType {
   injectSubmitBlockPromise: (arg: Promise<any>) => void;
 }
 
-export interface ISearchItemDefinitionValueContextType {
+export interface ISearchItemValueContextType {
   currentlySearching: IGQLSearchRecord[];
   searchFields: any;
 }
 
 // This is the context that will serve it
-export const ItemDefinitionContext = React.createContext<IItemDefinitionContextType>(null);
-export const SearchItemDefinitionValueContext = React.createContext<ISearchItemDefinitionValueContextType>(null);
+export const ItemContext = React.createContext<IItemContextType>(null);
+export const SearchItemValueContext = React.createContext<ISearchItemValueContextType>(null);
 
 // Now we pass on the provider, this is what the developer
 // is actually expected to fill
-export interface IItemDefinitionProviderProps {
+export interface IItemProviderProps {
   /**
    * children that will be feed into the context
    */
@@ -511,12 +511,12 @@ export interface IItemDefinitionProviderProps {
    * state changes for whatever reason use with care as
    * it makes the execution slower
    */
-  onStateChange?: (state: IItemDefinitionStateType) => void;
+  onStateChange?: (state: IItemStateType) => void;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
 // taken from the contexts that this is expected to run under
-interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProps {
+interface IActualItemProviderProps extends IItemProviderProps {
   // token data to get the current user id, and role, for requests
   tokenData: ITokenContextType;
   // locale data for, well.... localization, nah it's actually to setup the language
@@ -532,16 +532,16 @@ interface IActualItemDefinitionProviderProps extends IItemDefinitionProviderProp
   // server side
   remoteListener: RemoteListener;
   // the searching context to pull values from
-  searchContext: ISearchItemDefinitionValueContextType;
+  searchContext: ISearchItemValueContextType;
   // injected parent context
-  injectedParentContext: IItemDefinitionContextType;
+  injectedParentContext: IItemContextType;
   // config
   config: IConfigRawJSONDataType;
   // only available when supporting search from navigation
   location?: Location<any>;
 }
 
-interface IActualItemDefinitionProviderSearchState {
+interface IActualItemProviderSearchState {
   searchError: EndpointErrorType;
   searching: boolean;
   searchRecords: IGQLSearchRecord[];
@@ -560,9 +560,9 @@ interface IActualItemDefinitionProviderSearchState {
 
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
-interface IActualItemDefinitionProviderState extends IActualItemDefinitionProviderSearchState {
+interface IActualItemProviderState extends IActualItemProviderSearchState {
   searchWasRestored: boolean;
-  itemDefinitionState: IItemDefinitionStateType;
+  itemState: IItemStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
   notFound: boolean;
@@ -584,8 +584,8 @@ interface IActualItemDefinitionProviderState extends IActualItemDefinitionProvid
 /**
  * Here it is, the mighty
  */
-export class ActualItemDefinitionProvider extends
-  React.Component<IActualItemDefinitionProviderProps, IActualItemDefinitionProviderState> {
+export class ActualItemProvider extends
+  React.Component<IActualItemProviderProps, IActualItemProviderState> {
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
@@ -658,21 +658,21 @@ export class ActualItemDefinitionProvider extends
   // not match, so we need to make it be the state of the
   // item definition itself, so we make a check using the qualified name
   public static getDerivedStateFromProps(
-    props: IActualItemDefinitionProviderProps,
-    state: IActualItemDefinitionProviderState,
-  ): Partial<IActualItemDefinitionProviderState> {
+    props: IActualItemProviderProps,
+    state: IActualItemProviderState,
+  ): Partial<IActualItemProviderState> {
     // it is effective to do it here, so we use the state qualified name and the
     // idef qualified name to check, also the id in question matters to
     // normally we don't want to recalculate states in every render because
     // that is hugely inefficient, it would make the code simpler, but no
     // this needs to run fast, as it's already pretty resource intensive
     if (
-      props.itemDefinitionQualifiedName !== state.itemDefinitionState.itemDefQualifiedName ||
-      (props.forId || null) !== (state.itemDefinitionState.forId || null)
+      props.itemDefinitionQualifiedName !== state.itemState.itemDefQualifiedName ||
+      (props.forId || null) !== (state.itemState.forId || null)
     ) {
       // note how we pass the optimization flags
       return {
-        itemDefinitionState: props.itemDefinitionInstance.getStateNoExternalChecking(
+        itemState: props.itemDefinitionInstance.getStateNoExternalChecking(
           props.forId || null,
           props.forVersion || null,
           !props.disableExternalChecks,
@@ -706,7 +706,7 @@ export class ActualItemDefinitionProvider extends
   // the list of submit block promises
   private submitBlockPromises: Array<Promise<any>> = [];
 
-  constructor(props: IActualItemDefinitionProviderProps) {
+  constructor(props: IActualItemProviderProps) {
     super(props);
 
     // Just binding all the functions to ensure their context is defined
@@ -767,7 +767,7 @@ export class ActualItemDefinitionProvider extends
       CacheWorkerInstance.instance.setupVersion((window as any).BUILD_NUMBER);
     }
   }
-  public setupInitialState(): IActualItemDefinitionProviderState {
+  public setupInitialState(): IActualItemProviderState {
     // the value might already be available in memory, this is either because it was loaded
     // by another instance or because of SSR during the initial render
     const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(
@@ -802,7 +802,7 @@ export class ActualItemDefinitionProvider extends
       isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
     }
 
-    let searchState: IActualItemDefinitionProviderSearchState = {
+    let searchState: IActualItemProviderSearchState = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -842,7 +842,7 @@ export class ActualItemDefinitionProvider extends
     return {
       // same we get the initial state, without checking it externally and passing
       // all the optimization flags
-      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
@@ -919,7 +919,7 @@ export class ActualItemDefinitionProvider extends
       }
     }
   }
-  public installSetters(props: IActualItemDefinitionProviderProps = this.props) {
+  public installSetters(props: IActualItemProviderProps = this.props) {
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
@@ -927,7 +927,7 @@ export class ActualItemDefinitionProvider extends
       });
     }
   }
-  public removeSetters(props: IActualItemDefinitionProviderProps = this.props) {
+  public removeSetters(props: IActualItemProviderProps = this.props) {
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
@@ -935,7 +935,7 @@ export class ActualItemDefinitionProvider extends
       });
     }
   }
-  public installPrefills(props: IActualItemDefinitionProviderProps = this.props) {
+  public installPrefills(props: IActualItemProviderProps = this.props) {
     if (props.prefills) {
       props.prefills.forEach((prefill) => {
         const property = getPropertyForSetter(prefill, props.itemDefinitionInstance);
@@ -1055,8 +1055,8 @@ export class ActualItemDefinitionProvider extends
     }
   }
   public shouldComponentUpdate(
-    nextProps: IActualItemDefinitionProviderProps,
-    nextState: IActualItemDefinitionProviderState,
+    nextProps: IActualItemProviderProps,
+    nextState: IActualItemProviderState,
   ) {
     // so first things first, we want to keep it efficient
     // so let's check if first we updated into something
@@ -1089,8 +1089,8 @@ export class ActualItemDefinitionProvider extends
       !equals(nextProps.injectedParentContext, this.props.injectedParentContext);
   }
   public async componentDidUpdate(
-    prevProps: IActualItemDefinitionProviderProps,
-    prevState: IActualItemDefinitionProviderState,
+    prevProps: IActualItemProviderProps,
+    prevState: IActualItemProviderState,
   ) {
     if (
       prevProps.location &&
@@ -1238,7 +1238,7 @@ export class ActualItemDefinitionProvider extends
       // we set the value given we have changed the forId with the new optimization flags
       if (!this.isUnmounted) {
         this.setState({
-          itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+          itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
             this.props.forId || null,
             this.props.forVersion || null,
             !this.props.disableExternalChecks,
@@ -1323,8 +1323,8 @@ export class ActualItemDefinitionProvider extends
     }
 
     // expensive but necessary
-    if (this.props.onStateChange && !equals(this.state.itemDefinitionState, prevState.itemDefinitionState)) {
-      this.props.onStateChange(this.state.itemDefinitionState);
+    if (this.props.onStateChange && !equals(this.state.itemState, prevState.itemState)) {
+      this.props.onStateChange(this.state.itemState);
     }
   }
 
@@ -1354,7 +1354,7 @@ export class ActualItemDefinitionProvider extends
       return;
     }
 
-    let searchState: IActualItemDefinitionProviderSearchState = {
+    let searchState: IActualItemProviderSearchState = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -1406,7 +1406,7 @@ export class ActualItemDefinitionProvider extends
 
     // we basically just upgrade the state
     this.setState({
-      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
@@ -1721,7 +1721,7 @@ export class ActualItemDefinitionProvider extends
   public async setStateToCurrentValueWithExternalChecking(currentUpdateId: number) {
     // so when we want to externally check we first run the external check
     // using the normal get state function which runs async
-    const newItemDefinitionState = await this.props.itemDefinitionInstance.getState(
+    const newItemState = await this.props.itemDefinitionInstance.getState(
       this.props.forId || null,
       this.props.forVersion || null,
       this.props.itemDefinitionInstance.isInSearchMode() ?
@@ -1741,7 +1741,7 @@ export class ActualItemDefinitionProvider extends
       // we set the state to the new state
       if (!this.isUnmounted) {
         this.setState({
-          itemDefinitionState: newItemDefinitionState,
+          itemState: newItemState,
         });
       }
       // and trigger change listeners, all but our listener
@@ -1861,7 +1861,7 @@ export class ActualItemDefinitionProvider extends
       this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
     }
   }
-  public runDismountOn(props: IActualItemDefinitionProviderProps = this.props) {
+  public runDismountOn(props: IActualItemProviderProps = this.props) {
     // when unmounting we check our optimization flags to see
     // if we are expecting to clean up the memory cache
     if (props.cleanOnDismount) {
@@ -1903,7 +1903,7 @@ export class ActualItemDefinitionProvider extends
       );
     }
   }
-  public checkItemDefinitionStateValidity(
+  public checkItemStateValidity(
     options: {
       properties: string[],
       includes?: string[],
@@ -1916,7 +1916,7 @@ export class ActualItemDefinitionProvider extends
     // and return whether it's invalid
     const allIncludedPropertiesValid = options.properties.every((pId) => {
       // first lets try to get the state for the current state if any
-      let p = this.state.itemDefinitionState.properties.find((p) => p.propertyId === pId);
+      let p = this.state.itemState.properties.find((p) => p.propertyId === pId);
       // in some situations, say when we try to manually submit a property this property might not be avaliable
       // in the state but yet still exist within the item definition itself
       if (!p) {
@@ -1962,13 +1962,13 @@ export class ActualItemDefinitionProvider extends
     }
 
     const allIncludedIncludesAreValid = !options.includes ? true : options.includes.every((iId) => {
-      const i = this.state.itemDefinitionState.includes.find((i) => i.includeId === iId);
+      const i = this.state.itemState.includes.find((i) => i.includeId === iId);
       // and now we get the sinking property ids
       const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
       const sinkingPropertyIds = include.getSinkingPropertiesIds();
 
       // and we extract the state only if it's a sinking property
-      return i.itemDefinitionState.properties.every((p) => {
+      return i.itemState.properties.every((p) => {
         if (!sinkingPropertyIds.includes(p.propertyId)) {
           return true;
         }
@@ -2009,7 +2009,7 @@ export class ActualItemDefinitionProvider extends
 
     return options.policies.every((pKeys) => {
       const [policyType, policyName, propertyId] = pKeys;
-      const propertyInPolicy = this.state.itemDefinitionState.policies[policyType][policyName]
+      const propertyInPolicy = this.state.itemState.policies[policyType][policyName]
         .find((p: IPropertyDefinitionState) => p.propertyId === propertyId);
       return propertyInPolicy.valid;
     });
@@ -2058,7 +2058,7 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const isValid = this.checkItemDefinitionStateValidity({
+    const isValid = this.checkItemStateValidity({
       properties: [],
       ...options,
     });
@@ -2172,7 +2172,7 @@ export class ActualItemDefinitionProvider extends
     );
   }
   public cleanWithProps(
-    props: IActualItemDefinitionProviderProps,
+    props: IActualItemProviderProps,
     options: IActionCleanOptions,
     state: "success" | "fail",
     avoidTriggeringUpdate?: boolean,
@@ -2397,7 +2397,7 @@ export class ActualItemDefinitionProvider extends
       return null;
     }
 
-    const isValid = this.checkItemDefinitionStateValidity(options);
+    const isValid = this.checkItemStateValidity(options);
     const pokedElements = {
       properties: options.properties,
       includes: options.includes || [],
@@ -2635,7 +2635,7 @@ export class ActualItemDefinitionProvider extends
     }
 
     this.setState({
-      itemDefinitionState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
         this.props.forId || null,
         this.props.forVersion || null,
         !this.props.disableExternalChecks,
@@ -2675,7 +2675,7 @@ export class ActualItemDefinitionProvider extends
     const propertiesForArgs = getPropertyListForSearchMode(options.searchByProperties, standardCounterpart);
 
     // now we use this function to check that everything is valid
-    const isValid = this.checkItemDefinitionStateValidity({
+    const isValid = this.checkItemStateValidity({
       properties: propertiesForArgs,
       includes: options.searchByIncludes || [],
     });
@@ -3107,8 +3107,8 @@ export class ActualItemDefinitionProvider extends
     this.search(this.lastOptionsUsedForSearch);
   }
   public removePossibleSearchListeners(
-    props: IActualItemDefinitionProviderProps = this.props,
-    state: IActualItemDefinitionProviderState = this.state,
+    props: IActualItemProviderProps = this.props,
+    state: IActualItemProviderState = this.state,
   ) {
     if (props.itemDefinitionInstance.isInSearchMode()) {
       const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
@@ -3220,7 +3220,7 @@ export class ActualItemDefinitionProvider extends
       this.props.forVersion &&
       this.state.notFound
     ) {
-      const newProps: IItemDefinitionProviderProps = {
+      const newProps: IItemProviderProps = {
         ...this.props,
         loadUnversionedFallback: false,
         forVersion: null,
@@ -3232,10 +3232,10 @@ export class ActualItemDefinitionProvider extends
     }
 
     return (
-      <ItemDefinitionContext.Provider
+      <ItemContext.Provider
         value={{
           idef: this.props.itemDefinitionInstance,
-          state: this.state.itemDefinitionState,
+          state: this.state.itemState,
           onPropertyChange: this.onPropertyChange,
           onPropertyRestore: this.onPropertyRestore,
           onIncludeSetExclusionState: this.onIncludeSetExclusionState,
@@ -3293,12 +3293,12 @@ export class ActualItemDefinitionProvider extends
         }}
       >
         {this.props.children}
-      </ItemDefinitionContext.Provider>
+      </ItemContext.Provider>
     );
   }
 }
 
-export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
+export function ItemDefinitionProvider(props: IItemProviderProps) {
   return (
     <ConfigContext.Consumer>
       {(config) => (
@@ -3311,7 +3311,7 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                     <ModuleContext.Consumer>
                       {
                         (data) => (
-                          <SearchItemDefinitionValueContext.Consumer>
+                          <SearchItemValueContext.Consumer>
                             {(searchContext) => {
                               if (!data) {
                                 throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
@@ -3349,28 +3349,28 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                                   return (
                                     <LocationRetriever>
                                       {(location) => (
-                                        <ItemDefinitionContext.Consumer>{
+                                        <ItemContext.Consumer>{
                                           (value) => (
-                                            <ActualItemDefinitionProvider
+                                            <ActualItemProvider
                                               {...actualProps}
                                               injectedParentContext={value}
                                               location={location}
                                             />
                                           )
-                                        }</ItemDefinitionContext.Consumer>
+                                        }</ItemContext.Consumer>
                                       )}
                                     </LocationRetriever>
                                   );
                                 } else {
                                   return (
-                                    <ItemDefinitionContext.Consumer>{
+                                    <ItemContext.Consumer>{
                                       (value) => (
-                                        <ActualItemDefinitionProvider
+                                        <ActualItemProvider
                                           {...actualProps}
                                           injectedParentContext={value}
                                         />
                                       )
-                                    }</ItemDefinitionContext.Consumer>
+                                    }</ItemContext.Consumer>
                                   );
                                 }
                               }
@@ -3379,7 +3379,7 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                                 return (
                                   <LocationRetriever>
                                     {(location) => (
-                                      <ActualItemDefinitionProvider
+                                      <ActualItemProvider
                                         {...actualProps}
                                         injectedParentContext={null}
                                         location={location}
@@ -3389,14 +3389,14 @@ export function ItemDefinitionProvider(props: IItemDefinitionProviderProps) {
                                 );
                               } else {
                                 return (
-                                  <ActualItemDefinitionProvider
+                                  <ActualItemProvider
                                     {...actualProps}
                                     injectedParentContext={null}
                                   />
                                 );
                               }
                             }}
-                          </SearchItemDefinitionValueContext.Consumer>
+                          </SearchItemValueContext.Consumer>
                         )
                       }
                     </ModuleContext.Consumer>
@@ -3428,13 +3428,13 @@ class ActualNoStateItemDefinitionProvider extends React.Component<IActualNoState
   }
   public render() {
     return (
-      <ItemDefinitionContext.Provider
+      <ItemContext.Provider
         value={{
           idef: this.props.itemDefinitionInstance,
         } as any}
       >
         {this.props.children}
-      </ItemDefinitionContext.Provider>
+      </ItemContext.Provider>
     );
   }
 }
@@ -3469,14 +3469,14 @@ export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProvi
   )
 }
 
-export function ParentItemDefinitionContextProvider(props: { children: React.ReactNode }) {
+export function ParentItemContextProvider(props: { children: React.ReactNode }) {
   return (
-    <ItemDefinitionContext.Consumer>
+    <ItemContext.Consumer>
       {(value) => (
-        <ItemDefinitionContext.Provider value={value.injectedParentContext}>
+        <ItemContext.Provider value={value.injectedParentContext}>
           {props.children}
-        </ItemDefinitionContext.Provider>
+        </ItemContext.Provider>
       )}
-    </ItemDefinitionContext.Consumer>
+    </ItemContext.Consumer>
   )
 }

@@ -10,12 +10,12 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
-  ItemDefinitionContext,
+  ItemContext,
   IActionResponseWithId,
-  IItemDefinitionContextType,
+  IItemContextType,
   IActionSubmitOptions,
   IActionCleanOptions,
-} from "../../providers/item-definition";
+} from "../../providers/item";
 
 /**
  * The actioner arg contains the properties that are useful
@@ -68,7 +68,7 @@ interface ISubmitActionerProps {
  * data
  */
 interface IActualSubmitActionerProps extends ISubmitActionerProps {
-  itemDefinitionContext: IItemDefinitionContextType;
+  itemContext: IItemContextType;
 }
 
 /**
@@ -78,19 +78,19 @@ interface IActualSubmitActionerProps extends ISubmitActionerProps {
 class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps> {
   public shouldComponentUpdate(nextProps: IActualSubmitActionerProps) {
     return nextProps.children !== this.props.children ||
-      nextProps.itemDefinitionContext.submitError !== this.props.itemDefinitionContext.submitError ||
-      nextProps.itemDefinitionContext.submitting !== this.props.itemDefinitionContext.submitting ||
-      nextProps.itemDefinitionContext.submitted !== this.props.itemDefinitionContext.submitted;
+      nextProps.itemContext.submitError !== this.props.itemContext.submitError ||
+      nextProps.itemContext.submitting !== this.props.itemContext.submitting ||
+      nextProps.itemContext.submitted !== this.props.itemContext.submitted;
   }
   public render() {
     return this.props.children({
-      submitError: this.props.itemDefinitionContext.submitError,
-      submitting: this.props.itemDefinitionContext.submitting,
-      submitted: this.props.itemDefinitionContext.submitted,
-      submit: this.props.itemDefinitionContext.submit,
-      dismissError: this.props.itemDefinitionContext.dismissSubmitError,
-      dismissSubmitted: this.props.itemDefinitionContext.dismissSubmitted,
-      clean: this.props.itemDefinitionContext.clean,
+      submitError: this.props.itemContext.submitError,
+      submitting: this.props.itemContext.submitting,
+      submitted: this.props.itemContext.submitted,
+      submit: this.props.itemContext.submit,
+      dismissError: this.props.itemContext.dismissSubmitError,
+      dismissSubmitted: this.props.itemContext.dismissSubmitted,
+      clean: this.props.itemContext.clean,
     });
   }
 }
@@ -107,10 +107,10 @@ class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps> {
  */
 export default function SubmitActioner(props: ISubmitActionerProps) {
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => (
-        <ActualSubmitActioner {...props} itemDefinitionContext={itemDefinitionContext}/>
+    <ItemContext.Consumer>{
+      (itemContext) => (
+        <ActualSubmitActioner {...props} itemContext={itemContext}/>
       )
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   );
 }

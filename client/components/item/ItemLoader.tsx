@@ -9,16 +9,16 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
-  ItemDefinitionContext,
+  ItemContext,
   IBasicActionResponse,
-  IItemDefinitionContextType,
-} from "../../providers/item-definition";
+  IItemContextType,
+} from "../../providers/item";
 
 /**
  * The arg that is passed to the children, which allows
  * for the conditional rendering
  */
-export interface IItemDefinitionLoaderInfoArgType {
+export interface IItemLoaderInfoArgType {
   /**
    * Whether it is ready and loaded
    */
@@ -53,43 +53,43 @@ export interface IItemDefinitionLoaderInfoArgType {
 /**
  * The item definition loader itself props
  */
-interface IItemDefinitionLoaderProps {
-  children: (arg: IItemDefinitionLoaderInfoArgType) => React.ReactNode;
+interface IItemLoaderProps {
+  children: (arg: IItemLoaderInfoArgType) => React.ReactNode;
 }
 
 /**
  * The actual item definition loader props which allows for optimization and contains
  * the item definition context
  */
-interface IActualItemDefinitionLoaderProps extends IItemDefinitionLoaderProps {
-  itemDefinitionContext: IItemDefinitionContextType;
+interface IActualItemLoaderProps extends IItemLoaderProps {
+  itemContext: IItemContextType;
 }
 
 /**
  * Class that actually does the item definition loader conditional logic and optimizes
  */
-class ActualItemDefinitionLoader extends React.Component<IActualItemDefinitionLoaderProps> {
-  public shouldComponentUpdate(nextProps: IActualItemDefinitionLoaderProps) {
+class ActualItemLoader extends React.Component<IActualItemLoaderProps> {
+  public shouldComponentUpdate(nextProps: IActualItemLoaderProps) {
     // so we only render if any of our logical rendering attributes differ
-    return nextProps.itemDefinitionContext.loadError !== this.props.itemDefinitionContext.loadError ||
+    return nextProps.itemContext.loadError !== this.props.itemContext.loadError ||
       nextProps.children !== this.props.children ||
-      nextProps.itemDefinitionContext.blocked !== this.props.itemDefinitionContext.blocked ||
-      nextProps.itemDefinitionContext.blockedButDataAccessible !==
-        this.props.itemDefinitionContext.blockedButDataAccessible ||
-      nextProps.itemDefinitionContext.notFound !== this.props.itemDefinitionContext.notFound ||
-      nextProps.itemDefinitionContext.loading !== this.props.itemDefinitionContext.loading ||
-      nextProps.itemDefinitionContext.loaded !== this.props.itemDefinitionContext.loaded;
+      nextProps.itemContext.blocked !== this.props.itemContext.blocked ||
+      nextProps.itemContext.blockedButDataAccessible !==
+        this.props.itemContext.blockedButDataAccessible ||
+      nextProps.itemContext.notFound !== this.props.itemContext.notFound ||
+      nextProps.itemContext.loading !== this.props.itemContext.loading ||
+      nextProps.itemContext.loaded !== this.props.itemContext.loaded;
   }
   public render() {
     return this.props.children(
       {
-        loaded: this.props.itemDefinitionContext.loaded,
-        loading: this.props.itemDefinitionContext.loading,
-        notFound: this.props.itemDefinitionContext.notFound,
-        blocked: this.props.itemDefinitionContext.blocked,
-        hasBlockedAccess: this.props.itemDefinitionContext.blockedButDataAccessible,
-        error: this.props.itemDefinitionContext.loadError,
-        reload: this.props.itemDefinitionContext.reload,
+        loaded: this.props.itemContext.loaded,
+        loading: this.props.itemContext.loading,
+        notFound: this.props.itemContext.notFound,
+        blocked: this.props.itemContext.blocked,
+        hasBlockedAccess: this.props.itemContext.blockedButDataAccessible,
+        error: this.props.itemContext.loadError,
+        reload: this.props.itemContext.reload,
       },
     );
   }
@@ -101,12 +101,12 @@ class ActualItemDefinitionLoader extends React.Component<IActualItemDefinitionLo
  * rendering conditions depending on the loading state, should use mostly if a forId
  * is specified as that requires loading
  */
-export default function ItemDefinitionLoader(props: IItemDefinitionLoaderProps) {
+export default function ItemLoader(props: IItemLoaderProps) {
   return (
-    <ItemDefinitionContext.Consumer>{
-      (itemDefinitionContext) => (
-        <ActualItemDefinitionLoader {...props} itemDefinitionContext={itemDefinitionContext}/>
+    <ItemContext.Consumer>{
+      (itemContext) => (
+        <ActualItemLoader {...props} itemContext={itemContext}/>
       )
-    }</ItemDefinitionContext.Consumer>
+    }</ItemContext.Consumer>
   );
 }

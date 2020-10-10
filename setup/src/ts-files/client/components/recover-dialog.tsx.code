@@ -1,7 +1,7 @@
 import React from "react";
 
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item-definition";
+import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
 import UserActioner from "@onzag/itemize/client/components/user/UserActioner";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Entry from "@onzag/itemize/client/components/property/Entry";

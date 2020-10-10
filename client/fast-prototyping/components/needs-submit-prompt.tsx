@@ -10,7 +10,7 @@ import ONeedsSubmitPrompt from "../../components/navigation/NeedsSubmitPrompt";
 import { Dialog } from "./dialog";
 import { Button, Typography, WithStyles, createStyles, withStyles, Theme, DoneIcon, CloseIcon } from "../mui-core";
 import { EndpointErrorType } from "../../../base/errors";
-import { IActionSubmitOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions } from "../../providers/item";
 import { ProgressingElement } from "./util";
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";

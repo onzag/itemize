@@ -17,7 +17,7 @@ const AppLanguageRetriever_1 = __importDefault(require("../../../components/loca
 const UserDataRetriever_1 = __importDefault(require("../../../components/user/UserDataRetriever"));
 const I18nRead_1 = __importDefault(require("../../../components/localization/I18nRead"));
 const LocationReader_1 = __importDefault(require("../../../components/navigation/LocationReader"));
-const item_definition_1 = require("../../../providers/item-definition");
+const item_1 = require("../../../providers/item");
 /**
  * The menu styles
  */
@@ -56,7 +56,7 @@ function buildEntryFromList(entries, className, role) {
             // it's done like this, with a no state as we don't need the state
             i18nNodeInfo =
                 (react_1.default.createElement(module_1.ModuleProvider, { module: entry.module },
-                    react_1.default.createElement(item_definition_1.NoStateItemDefinitionProvider, { itemDefinition: entry.idef },
+                    react_1.default.createElement(item_1.NoStateItemDefinitionProvider, { itemDefinition: entry.idef },
                         react_1.default.createElement(I18nRead_1.default, Object.assign({}, entry.i18nProps)))));
             // with only the module itself
         }

@@ -5,14 +5,14 @@
  * @packageDocumentation
  */
 /// <reference types="react" />
-import { IItemDefinitionProviderProps } from "../../providers/item-definition";
+import { IItemProviderProps } from "../../providers/item";
 import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { IGQLSearchRecord, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 /**
  * The property for the provider but with the key and no children
  */
-interface IItemDefinitionProviderPropsWithKey extends Pick<IItemDefinitionProviderProps, Exclude<keyof IItemDefinitionProviderProps, 'children'>> {
+interface IItemProviderPropsWithKey extends Pick<IItemProviderProps, Exclude<keyof IItemProviderProps, 'children'>> {
     key: string;
 }
 /**
@@ -24,7 +24,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
      * The provider properties used to instantiate your own item definition
      * data
      */
-    providerProps: IItemDefinitionProviderPropsWithKey;
+    providerProps: IItemProviderPropsWithKey;
     /**
      * The item definition that was found
      */

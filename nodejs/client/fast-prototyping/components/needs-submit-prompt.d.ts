@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 import React from "react";
-import { IActionSubmitOptions } from "../../providers/item-definition";
+import { IActionSubmitOptions } from "../../providers/item";
 /**
  * The props of the needs submit prompt
  */

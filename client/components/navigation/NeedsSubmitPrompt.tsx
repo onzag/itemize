@@ -6,11 +6,11 @@
  */
 
 import React from "react";
-import SubmitActioner, { ISubmitActionerInfoArgType } from "../item-definition/SubmitActioner";
-import DifferingPropertiesRetriever from "../item-definition/DifferingPropertiesRetriever";
-import DifferingIncludesRetriever from "../item-definition/DifferingIncludesRetriever";
+import SubmitActioner, { ISubmitActionerInfoArgType } from "../item/SubmitActioner";
+import DifferingPropertiesRetriever from "../item/DifferingPropertiesRetriever";
+import DifferingIncludesRetriever from "../item/DifferingIncludesRetriever";
 import Prompt, { PromptDialogComponent } from "./Prompt";
-import { IActionSubmitOptions, IActionResponseWithId } from "../../providers/item-definition";
+import { IActionSubmitOptions, IActionResponseWithId } from "../../providers/item";
 import { EndpointErrorType } from "../../../base/errors";
 
 /**

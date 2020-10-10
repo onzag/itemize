@@ -754,7 +754,7 @@ class ItemDefinition {
         state.includes.forEach((i) => {
             const iInIdef = this.getIncludeFor(i.includeId);
             iInIdef.setExclusionState(id, version, i.exclusionState);
-            i.itemDefinitionState.properties.forEach((p) => {
+            i.itemState.properties.forEach((p) => {
                 const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
                 pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
             });
