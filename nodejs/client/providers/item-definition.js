@@ -2068,6 +2068,17 @@ class ActualItemDefinitionProvider extends react_1.default.Component {
         });
     }
     render() {
+        if (this.props.loadUnversionedFallback &&
+            this.props.forId &&
+            this.props.forVersion &&
+            this.state.notFound) {
+            const newProps = {
+                ...this.props,
+                loadUnversionedFallback: false,
+                forVersion: null,
+            };
+            return (react_1.default.createElement(ItemDefinitionProvider, Object.assign({}, newProps)));
+        }
         return (react_1.default.createElement(exports.ItemDefinitionContext.Provider, { value: {
                 idef: this.props.itemDefinitionInstance,
                 state: this.state.itemDefinitionState,

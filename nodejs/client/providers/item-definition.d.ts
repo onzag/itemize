@@ -221,6 +221,12 @@ export interface IItemDefinitionProviderProps {
      */
     forVersion?: string;
     /**
+     * Loads the unversioned version if the version
+     * given is not found since every value must have
+     * an unversioned primary form
+     */
+    loadUnversionedFallback?: boolean;
+    /**
      * this is an important flag, if ownership is assumed this means
      * that when automatic fetching of properties it will do so assuming
      * the current user is the owner, so OWNER rules pass, put an example,

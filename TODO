@@ -1,3 +1,15 @@
+SITE
+ - Deploy onzasystems
+
 TECH
 
-Add a upgrade role functionality in the triggers themselves, so that triggers can upgrade the role
+- Refactor the ItemDefintion in places to Item, eg. the provider and the fast prototyping, as well as triggers
+so that it is renamed
+- Add a script called pgdump.sh and pgload.sh which calls pg_dump and creates a tar of the entire database as a backup
+this should exist in the deployment
+- Modify the way the search works, using last_modified rather than created_at as the exposed property and use the deleted
+list in order to change everything in how realtime updates work, both in the cache worker and the traditional search
+- Improve the way the security is managed in the schema, somehow we need to be able to make the metaroles work simply
+
+DOCS
+- Write more of the docs
