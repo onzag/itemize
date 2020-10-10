@@ -198,41 +198,7 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
             }
         });
         if (isTemplate) {
-            this.cheapdiv.querySelectorAll("[data-ui-handler]").forEach((node) => {
-                const handlerToUseKey = node.getAttribute("data-ui-handler");
-                const handler = this.props.templateArgs[handlerToUseKey];
-                if (typeof handler === "undefined") {
-                    // we do not log because this will hit the server side, the client side will see it anyway
-                    // console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
-                }
-                else if (handler && handler.initialize && typeof handler.initialize === "function") {
-                    const resultNode = handler.initialize(node);
-                    resultNode.setAttribute("data-ui-handler", handlerToUseKey);
-                    node.parentElement.replaceChild(resultNode, node);
-                }
-            });
-            this.cheapdiv.querySelectorAll("[data-text]").forEach((node) => {
-                const textKey = node.getAttribute("data-text");
-                const text = this.props.templateArgs[textKey];
-                if (typeof text === "string" && text !== null) {
-                    // we do not log because this will hit the server side
-                }
-                else {
-                    node.textContent = text;
-                }
-            });
-            if (!disableHTMLTemplating) {
-                this.cheapdiv.querySelectorAll("[data-html]").forEach((node) => {
-                    const htmlKey = node.getAttribute("data-html");
-                    const html = this.props.templateArgs[htmlKey];
-                    if (typeof html === "string" && html !== null) {
-                        // we do not log because this will hit the server side
-                    }
-                    else {
-                        node.innerHTML = html;
-                    }
-                });
-            }
+            util_1.processTemplateInitialization(this.cheapdiv, disableHTMLTemplating, this.props.templateArgs, this.props.templateArgs, []);
         }
         // and return the fresh inner html
         return this.cheapdiv.innerHTML;
@@ -316,13 +282,18 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
             });
         });
         this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node) => {
-            const handlerToUseKey = node.getAttribute("data-ui-handler");
+            const handlerToUseKey = node.dataset.uiHandler;
             const handler = this.props.templateArgs[handlerToUseKey];
             if (typeof handler === "undefined") {
                 console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
             }
             else if (handler && handler.load) {
-                handler.load(node);
+                const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
+                let contextArgsToUse = this.props.templateArgs;
+                handlerContextPath.forEach((key) => {
+                    contextArgsToUse = contextArgsToUse[key];
+                });
+                handler.load(node, util_1.DOMWindow, contextArgsToUse, this.props.templateArgs);
             }
         });
         this.divref.current.querySelectorAll("[data-hover-style]").forEach((node) => {
@@ -332,6 +303,12 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
                 node.setAttribute("style", styleToUse);
             });
             node.addEventListener("mouseleave", () => {
+                if (originalStyle) {
+                    node.setAttribute("style", originalStyle);
+                }
+                else {
+                    node.removeAttribute("style");
+                }
             });
         });
         this.divref.current.querySelectorAll("[data-active-style]").forEach((node) => {
@@ -356,13 +333,18 @@ class PropertyViewRichTextViewer extends react_1.default.Component {
     }
     dropOldHandlers() {
         this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node) => {
-            const handlerToUseKey = node.getAttribute("data-ui-handler");
+            const handlerToUseKey = node.dataset.uiHandler;
             const handler = this.props.templateArgs[handlerToUseKey];
             if (typeof handler === "undefined") {
                 console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
             }
             else if (handler && handler.unload) {
-                handler.unload(node);
+                const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
+                let contextArgsToUse = this.props.templateArgs;
+                handlerContextPath.forEach((key) => {
+                    contextArgsToUse = contextArgsToUse[key];
+                });
+                handler.unload(node, util_1.DOMWindow, contextArgsToUse, this.props.templateArgs);
             }
         });
     }

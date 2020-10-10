@@ -12,7 +12,7 @@ import {
   SUPPORTED_TEMPLATE_EVENTS,
 } from "../../../internal/components/PropertyView/PropertyViewText";
 import React from "react";
-import { DOMWindow } from "../../../../util";
+import { DOMWindow, processTemplateInitialization } from "../../../../util";
 import equals from "deep-equal";
 
 /**
@@ -247,43 +247,13 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     });
 
     if (isTemplate) {
-      this.cheapdiv.querySelectorAll("[data-ui-handler]").forEach((node: HTMLElement) => {
-        const handlerToUseKey = node.getAttribute("data-ui-handler");
-        const handler: ICustomUITemplateHandler = this.props.templateArgs[handlerToUseKey];
-  
-        if (typeof handler === "undefined") {
-          // we do not log because this will hit the server side, the client side will see it anyway
-          // console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
-        } else if (handler && handler.initialize && typeof handler.initialize === "function") {
-          const resultNode = handler.initialize(node);
-          resultNode.setAttribute("data-ui-handler", handlerToUseKey);
-          node.parentElement.replaceChild(resultNode, node);
-        }
-      });
-
-      this.cheapdiv.querySelectorAll("[data-text]").forEach((node: HTMLElement) => {
-        const textKey = node.getAttribute("data-text");
-        const text: string = this.props.templateArgs[textKey];
-  
-        if (typeof text === "string" && text !== null) {
-          // we do not log because this will hit the server side
-        } else {
-          node.textContent = text;
-        }
-      });
-
-      if (!disableHTMLTemplating) {
-        this.cheapdiv.querySelectorAll("[data-html]").forEach((node: HTMLElement) => {
-          const htmlKey = node.getAttribute("data-html");
-          const html: string = this.props.templateArgs[htmlKey];
-    
-          if (typeof html === "string" && html !== null) {
-            // we do not log because this will hit the server side
-          } else {
-            node.innerHTML = html;
-          }
-        });
-      }
+      processTemplateInitialization(
+        this.cheapdiv,
+        disableHTMLTemplating,
+        this.props.templateArgs,
+        this.props.templateArgs,
+        [],
+      );
     }
 
     // and return the fresh inner html
@@ -361,7 +331,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       this.divref.current.querySelectorAll("[data-on-" + eventKey + "]").forEach((node: HTMLElement) => {
         const functionToCall = node.getAttribute("data-on-" + eventKey);
         let processedFunctionToCall = functionToCall.trim();
-        
+
         const fn = this.props.templateArgs[processedFunctionToCall];
         if (typeof fn === "undefined") {
           console.warn("Listener does not match a function to call in template at data-on-" + eventKey + "=" + JSON.stringify(functionToCall));
@@ -378,13 +348,18 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     });
 
     this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node: HTMLElement) => {
-      const handlerToUseKey = node.getAttribute("data-ui-handler");
+      const handlerToUseKey = node.dataset.uiHandler;
       const handler: ICustomUITemplateHandler = this.props.templateArgs[handlerToUseKey];
 
       if (typeof handler === "undefined") {
         console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
       } else if (handler && handler.load) {
-        handler.load(node);
+        const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
+        let contextArgsToUse = this.props.templateArgs;
+        handlerContextPath.forEach((key: string | number) => {
+          contextArgsToUse = contextArgsToUse[key];
+        });
+        handler.load(node, DOMWindow, contextArgsToUse, this.props.templateArgs);
       }
     });
 
@@ -397,7 +372,11 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       });
 
       node.addEventListener("mouseleave", () => {
-        
+        if (originalStyle) {
+          node.setAttribute("style", originalStyle);
+        } else {
+          node.removeAttribute("style");
+        }
       });
     });
 
@@ -405,7 +384,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       const styleToUse = node.getAttribute("data-active-style");
       const originalStyle = node.getAttribute("style");
 
-      const setStyle =  () => {
+      const setStyle = () => {
         node.setAttribute("style", styleToUse);
       };
       const rmStyle = () => {
@@ -424,13 +403,18 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
   public dropOldHandlers() {
     this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node: HTMLElement) => {
-      const handlerToUseKey = node.getAttribute("data-ui-handler");
+      const handlerToUseKey = node.dataset.uiHandler;
       const handler: ICustomUITemplateHandler = this.props.templateArgs[handlerToUseKey];
 
       if (typeof handler === "undefined") {
         console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
       } else if (handler && handler.unload) {
-        handler.unload(node);
+        const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
+        let contextArgsToUse = this.props.templateArgs;
+        handlerContextPath.forEach((key: string | number) => {
+          contextArgsToUse = contextArgsToUse[key];
+        });
+        handler.unload(node, DOMWindow, contextArgsToUse, this.props.templateArgs);
       }
     });
   }

@@ -12,6 +12,7 @@ import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Modul
 import { PropertyDefinitionSupportedFilesType, IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { imageSrcSetRetriever } from "../../../components/util";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { DOMWindow } from "jsdom";
 
 /**
  * The property view renderer props as it requires the properties
@@ -115,9 +116,9 @@ export const SUPPORTED_HANDLERS = [
  * This is what a handler expects out of the template
  */
 export interface ICustomUITemplateHandler {
-  initialize: (bareNode: HTMLElement) => HTMLElement;
-  load?: (customNode: HTMLElement) => void;
-  unload?: (customNode: HTMLElement) => void;
+  initialize: (bareNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => HTMLElement;
+  load?: (customNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => void;
+  unload?: (customNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => void;
 }
 
 /**

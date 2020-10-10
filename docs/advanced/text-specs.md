@@ -1,14 +1,16 @@
 # Text Specs
 
-The standard rich text editor can use its own configuration but by default it is
+This file represents the text specification for itemize that should allow to create feature rich applicaitons as well as templates using its own form, the text specs represent fully valid HTML.
+
+The purpose of the text specs being this meaningful is to provide a design platform in order to separate programming work from design work
 
 ## Text
 
-If there is no text, and no other sort of visible media, nor spaces the value should be null
+The text is represented as a string, however null is also a valid value, this is for when there's no text (as in an empty string); for such the value should be null and is considered equivalent to null
 
 ## Images
 
-During edition if there is a image the image should be formed in this form
+Any images that are added to the text should be compounded like this
 
 ```html
 <div class="image">
@@ -20,8 +22,7 @@ During edition if there is a image the image should be formed in this form
 </div>
 ```
 
-The attributes src, srcset and sizes might be added but they will be removed by the server side this means this
-is still valid and appropiate.
+However the attributes `src`, `srcset` and `sizes` might be added as well and it's considered valid and it can be submitted to the server side with these attributes in place, but they will be removed by such server side
 
 ```html
 <div class="image">
@@ -33,11 +34,13 @@ is still valid and appropiate.
 </div>
 ```
 
-However once saved all src, srcset and sizes references will be removed
+The breakdown can be given like this the `div.image` represents the begining of an image, and the `div.image-container` is next as it's what actually contains the image, the `div.image-pad` class contains the valid style with a given padding this padding represents the relative height to ratio for the given image, 
+
+This is the "standard" form itemize recommends to format images as the rich text editor will be able to handle these, and it will able to load them lazily without affecting the layout, as the fast prototyping viewer does, however the viewer also supports standalone images.
 
 ### Standalone images
 
-While images are mainly meant to be setup as specified, images are also allowed to be standalone, as such this is valid as well.
+While images are by default meant to be setup as specified, images are also allowed to be standalone, as such this is valid as well.
 
 ```html
 <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
@@ -52,7 +55,14 @@ You might wrap them up inside a custom container, a standard container or anythi
 </div>
 ```
 
-### Forbidden attributes
+### Attributes
+
+ - `alt` represents the alt text
+ - `data-src-height` represents the height of the image in pixels
+ - `data-src-width` represents the width of the image in pixels
+ - `data-src-id` represents the given id of the file in its media property, text can be correlated to a media property and this is where it extracts its file content from, since images can have many sizes and represent many types of file; specifying a source directly via the text specification is not truly allowed
+
+### Forbidden Attributes
 
 These attributes can be used but they are removed by the server side for security reasons
 
@@ -66,7 +76,7 @@ Feel free to use them they won't pollute the environment; in fact src, srcset, a
 
 ### Handling
 
-For handling you should read the mediaProperty current value to find the file with the data-src-id and generate an appropiate src, sizes and srcset
+For handling you should read the mediaProperty current value to find the file with the data-src-id and generate an appropiate src, sizes and srcset the handler of itemize does this by default and provides the html with these values populated already
 
 ### Custom Renderers
 
@@ -74,7 +84,9 @@ When creating your own renderer view or entry, you should already have the src, 
 files that already existed even if they are stripped in the actually saved HTML as the handler will actually regenerate them; however
 for any new created content you must manually create the image structure; the server will recognize these.
 
-Do not bother removing the src, srcset nor sizes for sending; this will be done automatically by the server side itself, it won't serve them.
+It is recommended to copy the fast prototyping renderer in the itemize source at `client/fast-prototyping/renderers` and find the respective renderer to replicate since these renderers can be complex, but wanting to add custom behaviour in the renderer itself might prove to require this, since the handlers don't do much to the text data.
+
+Do not bother removing the src, srcset nor sizes for sending or any of the forbidden attributes; this will be done automatically by the server side itself, it won't serve them; the parameters of the sanitazation of the client and the server differ a little bit, the client is more strict, and the handler takes care of this, however it's good to understand what is going on.
 
 Other properties will also be removed, such as loading; so feel free to implement them in the renderer, it won't affect other clients only the spec here is allowed.
 
@@ -105,7 +117,7 @@ In order to keep images property with a proper placeholder that takes the same e
 
 ## Videos
 
-Videos are loaded via iframes, either from youtube or vimeo
+Videos are loaded via iframes, either from youtube or vimeo; by the text specs right now only those two clients are currently allowed, for security reasons, since `src` is a forbidden attribute.
 
 ### Youtube
 
@@ -140,7 +152,7 @@ client side, as such.
 </div>
 ```
 
-This prevents iframes linking from any strange source that is not allowed
+This prevents iframes linking from any strange source that is not allowed, the list of forbidden attributes that affect iframes is
 
  - src
  - loading
@@ -179,7 +191,7 @@ A recommended css is, in order to have a good aspect ratio
 
 ## Files
 
-Files can be inserted into the document and work similarly to images
+Files can be inserted into the document and work similarly to images, however containing more information, this is the default form a file takes according to the text specification
 
 ```html
 <span class="file" contenteditable="false" data-src-id="FILE2132131231231" spellcheck="false">
@@ -209,11 +221,21 @@ As these are meant to be synced to the file data itself, open the file by using 
 
 ### Forbidden Attributes
 
-There are not really any forbidden attributes for the file
+There are not really any forbidden attributes for the file that affect them directly out of the forbidden list
 
 ### CSS
 
 Files really don't need any css pattern to be properly functional as intended, just give them a nice style, the structure given is just to ensure consistency
+
+## Containers
+
+Containers are simply components with the class `container` to it and might have anything under them, this might allow for custom styles
+
+```html
+<div class="container" style="background-color: red;">
+  <p>hello</p>
+</div>
+```
 
 ## Custom Styles
 
@@ -251,11 +273,15 @@ however since any user could be allowed to use this you can only have this work 
 </div>
 ```
 
-And this is how you might create custom styles
+In this example `content` represents the name of the property where the html is hold, and its parent contains the class trusted, as such the classes under this style are allowed to execute.
+
+Note that the sanitizer will remove any class that doesn't start with `rich-text--` but even insecure users can write these `rich-text--` classes which is why you should have a `trusted` environment which is important for the proper display.
 
 ## Templating
 
 Templating should be supported in your view and should follow a spec, this is the recommended spec to follow and the one that itemize viewer supports by default, templating might be modified via its args
+
+Templating is not meant to be something used for entries, it is mainly for views, the editor can support templating by allowing it to write templates, but it's not supposed to render them, as they are templates, however the viewer might take template attributes and convert them in what they are supposed to be seen as, do not modify or change the value of a text with the output of a template as this will cause corruption.
 
 Templating is simple and it's not meant to be a full solution to everything, templates should be used sparsely, they are simple and not optimized and rather limited
 
@@ -318,23 +344,120 @@ These events are added like this
 
 Where handler should be defined in the arguments for it to call
 
-### Totally custom UI handlers
+### Update context
 
-A custom UI Handler can be defined via
+The template gets a context that it is working with to gets its values, by default it is the template args that are given to the renderer, however it should be possible to dive deep into the object itself by using `data-context` in order to update the context that we are working with eg. suppose the template args are
 
-```html
-<div class="">
+```json
+{
+  "name": "kitten",
+  "fullName": {
+    "first": "kitty",
+    "last": "cat",
+  },
+}
 ```
 
-## Containers
-
-Containers are simply components with the class `container` to it and might have anything under them, this might allow for custom styles
+We can update the context in order to access the full name properties
 
 ```html
-<div class="container" style="background-color: red;">
-  <p>hello</p>
+<div data-context="fullName" data-text="first">first name</div>
+```
+
+The data context affects the children
+
+```html
+<div data-context="fullName">
+  <span data-text="first">fist name</span>
+  <span data-text="last">last name</span>
 </div>
 ```
+
+Note how contexts are not very flexible as a way to access variables, this is because itemize templating and text specs are supposed to be simple and not very powerful as it is not supposed to be a full fledged templating solution, rather as a tool for the designer to build the site, the developer should make the template args as simple as possible for the designer to use.
+
+Contexts can indeed stack.
+
+### For loops
+
+It is possible to make for loops within the templating engine by using `data-for-each` this will cause a context update for example suppose the following data
+
+```json
+{
+  "animals": [
+    {
+      "name": "kitten",
+    },
+    {
+      "name": "doggy",
+    },
+    {
+      "name": "sheep",
+    },
+    {
+      "name": "horse",
+    }
+  ]
+}
+```
+
+In order to make a for loop for the given template you would have to do the following
+
+```html
+<ul>
+  <li data-for-each="animals" data-text="name">NAME OF THE ANIMAL</li>
+</ul>
+```
+
+Because this also represents a context update of the template, the children of this for loop now have the new context and have no access to the animals variable anymore, but rather conform a new context.
+
+### Complete UI Handler
+
+Text in templating mode can provide a whole custom ui handler for the given component, a whole complete UI handler allows for full modification and control over a given node and it's given by `data-ui-handler` where the value is one of the values given by the templating object
+
+```html
+<div data-ui-handler="myRepeatHandler" data-amount="10"><span>repeat</span></div>
+```
+
+UI handlers are complex and in the template object are expected to take the form of an UI handler such as
+
+```typescript
+// we are defining a handler called my repeat handler
+// which will repeat its children a given amount of times
+const myRepeatHandler: ICustomUITemplateHandler = {
+  /**
+   * The initialization function gets called at the start
+   * of the ui handler taking place
+   * 
+   * Yes UI handlers can have access to the rootArgs, where
+   * templateArgs are the current context args
+   */
+  initialize(bareNode, DOMWindow, templateArgs, rootArgs) {
+    // the bare node is the node before anything has happened to it
+    // so we fetch the data from it and do the repeat
+    const amountToRepeat = parseInt(bareNode.dataset.amount) || 2;
+    const childrenToRepeat = bareNode.childNodes[0];
+    bareNode.removeChild(childrenToRepeat);
+    for (let i = 0; i < amountToRepeat; i++) {
+      bareNode.appendChild(childrenToRepeat.cloneNode(true));
+    }
+
+    // now we return our new custom node, in this case it is the
+    // same bare node, but with our children repeated
+    return bareNode;
+  },
+  load(customNode, DOMWindow, templateArgs, rootArgs) {
+    // when we load
+    customNode.addEventListener("click", () => {
+      alert(localeReplacer(rootArgs["i18nItWasRepeated"], parseInt(bareNode.dataset.amount) || 2));
+    });
+  },
+  unload(customNode, DOMWindow, templateArgs, rootArgs) {
+    alert(rootArgs["i18nUnloading"])
+  }
+}
+```
+
+Note that UI handlers are handled by the renderer, so if you are writting your own custom renderer you will have to support this functionality if you want to fully support itemize text specifications, the fast prototying view renderer supports templating already
 
 ## Custom Components
 
@@ -348,6 +471,7 @@ Feel free to implement your own custom components but be wary of the sanitizer, 
 
 It will also remove classes that it doesn't consider valid, as such you should prefix any class with the following prefixes
 
+ - `rich-text--` these are used for rich text styling, so it's better for them not to be used for other reasons.
  - `container-` (eg. container-background, container-special, container-text); not to be confused with the standard container, these are custom made whereas the standard container has nothing in it.
  - `custom-` (eg. custom-math, custom-whatever)
 

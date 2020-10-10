@@ -8,6 +8,7 @@ import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { IPropertyDefinitionSupportedSingleFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { DOMWindow } from "jsdom";
 /**
  * The property view renderer props as it requires the properties
  * note that this renderer is only used for html and plain, but not for the default
@@ -64,9 +65,9 @@ export declare const SUPPORTED_HANDLERS: string[];
  * This is what a handler expects out of the template
  */
 export interface ICustomUITemplateHandler {
-    initialize: (bareNode: HTMLElement) => HTMLElement;
-    load?: (customNode: HTMLElement) => void;
-    unload?: (customNode: HTMLElement) => void;
+    initialize: (bareNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => HTMLElement;
+    load?: (customNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => void;
+    unload?: (customNode: HTMLElement, DOMWindow: DOMWindow | Window, contextArgs: any, rootArgs: any) => void;
 }
 /**
  * The postprocessing hook that cleans and sets the attributes

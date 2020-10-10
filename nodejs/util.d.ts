@@ -112,4 +112,24 @@ export declare function fileArrayURLAbsoluter(domain: string, containerHostnameP
 }, files: IGQLFile[], itemDefinition: ItemDefinition, id: number, version: string, containerId: string, include: Include, property: PropertyDefinition, cacheable: boolean): IGQLFile[];
 export declare const DOMWindow: import("jsdom").DOMWindow | (Window & typeof globalThis);
 export declare const DOMPurify: createDOMPurify.DOMPurifyI;
+/**
+ * Processes the intialization of a template, by processing
+ * the child nodes of a given node
+ * @param node the node we are working with
+ * @param disableHTMLTemplating whether to disable data-html
+ * @param templateArgsContext the template args we are currently working with
+ * @param rootTemplateArgs the template args of the root
+ * @param templateArgsPath the template args of the path
+ */
+export declare function processTemplateInitialization(node: HTMLElement, disableHTMLTemplating: boolean, templateArgsContext: any, rootTemplateArgs: any, templateArgsPath: string[]): void;
+/**
+ * Performs a simple template rendering
+ * from a string based HTML template based on the text specs
+ * of itemize, there's no sanitization, no processing of files
+ * simple and raw templating process
+ *
+ * @param template the template in question
+ * @param args the arguments
+ */
+export declare function renderTemplate(template: string, args: any): string;
 export {};
