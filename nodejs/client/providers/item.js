@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParentItemContextProvider = exports.NoStateItemDefinitionProvider = exports.ItemDefinitionProvider = exports.ActualItemProvider = exports.SearchItemValueContext = exports.ItemContext = void 0;
+exports.ParentItemContextProvider = exports.NoStateItemProvider = exports.ItemProvider = exports.ActualItemProvider = exports.SearchItemValueContext = exports.ItemContext = void 0;
 const react_1 = __importDefault(require("react"));
 const locale_provider_1 = require("../internal/providers/locale-provider");
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
@@ -2077,7 +2077,7 @@ class ActualItemProvider extends react_1.default.Component {
                 loadUnversionedFallback: false,
                 forVersion: null,
             };
-            return (react_1.default.createElement(ItemDefinitionProvider, Object.assign({}, newProps)));
+            return (react_1.default.createElement(ItemProvider, Object.assign({}, newProps)));
         }
         return (react_1.default.createElement(exports.ItemContext.Provider, { value: {
                 idef: this.props.itemDefinitionInstance,
@@ -2140,10 +2140,10 @@ class ActualItemProvider extends react_1.default.Component {
     }
 }
 exports.ActualItemProvider = ActualItemProvider;
-function ItemDefinitionProvider(props) {
+function ItemProvider(props) {
     return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (localeData) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (data) => (react_1.default.createElement(exports.SearchItemValueContext.Consumer, null, (searchContext) => {
         if (!data) {
-            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+            throw new Error("The ItemProvider must be inside a ModuleProvider context");
         }
         let valueFor;
         if (props.itemDefinition) {
@@ -2189,8 +2189,8 @@ function ItemDefinitionProvider(props) {
         }
     }))))))))));
 }
-exports.ItemDefinitionProvider = ItemDefinitionProvider;
-class ActualNoStateItemDefinitionProvider extends react_1.default.Component {
+exports.ItemProvider = ItemProvider;
+class ActualNoStateItemProvider extends react_1.default.Component {
     shouldComponentUpdate(nextProps) {
         return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName ||
             nextProps.children !== this.props.children;
@@ -2201,10 +2201,10 @@ class ActualNoStateItemDefinitionProvider extends react_1.default.Component {
             } }, this.props.children));
     }
 }
-function NoStateItemDefinitionProvider(props) {
+function NoStateItemProvider(props) {
     return (react_1.default.createElement(module_1.ModuleContext.Consumer, null, (data) => {
         if (!data) {
-            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+            throw new Error("The ItemProvider must be inside a ModuleProvider context");
         }
         let valueFor;
         if (props.itemDefinition) {
@@ -2215,10 +2215,10 @@ function NoStateItemDefinitionProvider(props) {
         else {
             valueFor = data.mod.getPropExtensionItemDefinition();
         }
-        return (react_1.default.createElement(ActualNoStateItemDefinitionProvider, Object.assign({ itemDefinitionInstance: valueFor, itemDefinitionQualifiedName: valueFor.getQualifiedPathName() }, props)));
+        return (react_1.default.createElement(ActualNoStateItemProvider, Object.assign({ itemDefinitionInstance: valueFor, itemDefinitionQualifiedName: valueFor.getQualifiedPathName() }, props)));
     }));
 }
-exports.NoStateItemDefinitionProvider = NoStateItemDefinitionProvider;
+exports.NoStateItemProvider = NoStateItemProvider;
 function ParentItemContextProvider(props) {
     return (react_1.default.createElement(exports.ItemContext.Consumer, null, (value) => (react_1.default.createElement(exports.ItemContext.Provider, { value: value.injectedParentContext }, props.children))));
 }

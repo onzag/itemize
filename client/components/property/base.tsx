@@ -198,7 +198,7 @@ export function EntryViewReadSet(
                     // so we need to be in an item definition contextual value
                     // because otherwise we just can't get the property we need
                     if (!itemContextualValue) {
-                      throw new Error("The Entry/View/Read/Set must be in a ItemDefinitionProvider context");
+                      throw new Error("The Entry/View/Read/Set must be in a ItemProvider context");
                     }
 
                     // now we need the actual id, because search variants

@@ -3227,7 +3227,7 @@ export class ActualItemProvider extends
       }
 
       return (
-        <ItemDefinitionProvider {...newProps}/>
+        <ItemProvider {...newProps}/>
       );
     }
 
@@ -3298,7 +3298,7 @@ export class ActualItemProvider extends
   }
 }
 
-export function ItemDefinitionProvider(props: IItemProviderProps) {
+export function ItemProvider(props: IItemProviderProps) {
   return (
     <ConfigContext.Consumer>
       {(config) => (
@@ -3314,7 +3314,7 @@ export function ItemDefinitionProvider(props: IItemProviderProps) {
                           <SearchItemValueContext.Consumer>
                             {(searchContext) => {
                               if (!data) {
-                                throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+                                throw new Error("The ItemProvider must be inside a ModuleProvider context");
                               }
                               let valueFor: ItemDefinition;
                               if (props.itemDefinition) {
@@ -3411,18 +3411,18 @@ export function ItemDefinitionProvider(props: IItemProviderProps) {
   );
 }
 
-interface INoStateItemDefinitionProviderProps {
+interface INoStateItemProviderProps {
   itemDefinition?: string;
   children?: React.ReactNode;
 }
 
-interface IActualNoStateItemDefinitionProviderProps extends INoStateItemDefinitionProviderProps {
+interface IActualNoStateItemProviderProps extends INoStateItemProviderProps {
   itemDefinitionInstance: ItemDefinition;
   itemDefinitionQualifiedName: string;
 }
 
-class ActualNoStateItemDefinitionProvider extends React.Component<IActualNoStateItemDefinitionProviderProps> {
-  public shouldComponentUpdate(nextProps: IActualNoStateItemDefinitionProviderProps) {
+class ActualNoStateItemProvider extends React.Component<IActualNoStateItemProviderProps> {
+  public shouldComponentUpdate(nextProps: IActualNoStateItemProviderProps) {
     return nextProps.itemDefinitionQualifiedName !== this.props.itemDefinitionQualifiedName ||
       nextProps.children !== this.props.children;
   }
@@ -3439,13 +3439,13 @@ class ActualNoStateItemDefinitionProvider extends React.Component<IActualNoState
   }
 }
 
-export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProviderProps) {
+export function NoStateItemProvider(props: INoStateItemProviderProps) {
   return (
     <ModuleContext.Consumer>
       {
         (data) => {
           if (!data) {
-            throw new Error("The ItemDefinitionProvider must be inside a ModuleProvider context");
+            throw new Error("The ItemProvider must be inside a ModuleProvider context");
           }
           let valueFor: ItemDefinition;
           if (props.itemDefinition) {
@@ -3457,7 +3457,7 @@ export function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProvi
           }
 
           return (
-            <ActualNoStateItemDefinitionProvider
+            <ActualNoStateItemProvider
               itemDefinitionInstance={valueFor}
               itemDefinitionQualifiedName={valueFor.getQualifiedPathName()}
               {...props}

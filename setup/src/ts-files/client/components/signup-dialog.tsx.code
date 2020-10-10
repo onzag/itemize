@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
@@ -86,7 +86,7 @@ function runManyFunctions(functions: Array<() => void>)<0>{
  */
 export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
 	return (
-		<ItemDefinitionProvider
+		<ItemProvider
 			itemDefinition="user"
 			properties={[
 				"username",
@@ -205,6 +205,6 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 					</I18nRead>
 				)}
 			</LogActioner>
-		</ItemDefinitionProvider>
+		</ItemProvider>
 	);
 });

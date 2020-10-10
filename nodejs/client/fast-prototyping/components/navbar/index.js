@@ -95,7 +95,7 @@ exports.Navbar = mui_core_1.withStyles(navbarStyles)((props) => {
                         react_1.default.createElement(outdated_text_1.OutdatedText, { onClick: setIsOutdatedDialogAllowedToBeOpen.bind(this, true) }))),
                 react_1.default.createElement("div", { className: props.classes.container },
                     react_1.default.createElement(UserDataRetriever_1.default, null, (user) => react_1.default.createElement(module_1.ModuleProvider, { module: "users" },
-                        react_1.default.createElement(item_1.ItemDefinitionProvider, { itemDefinition: "user", forId: user.id, disableExternalChecks: true, assumeOwnership: true, properties: props.avatarContextProperties, longTermCaching: true, markForDestructionOnLogout: true },
+                        react_1.default.createElement(item_1.ItemProvider, { itemDefinition: "user", forId: user.id, disableExternalChecks: true, assumeOwnership: true, properties: props.avatarContextProperties, longTermCaching: true, markForDestructionOnLogout: true },
                             react_1.default.createElement(buttons_1.Buttons, { excludeLanguagePicker: props.excludeLanguagePicker, LoginDialog: props.LoginDialog, SignupDialog: props.SignupDialog, RecoverDialog: props.RecoverDialog, AvatarComponent: props.AvatarComponent, avatarProps: props.avatarProps }),
                             react_1.default.createElement(external_dialogs_1.ExternalDialogs, null))))))),
         react_1.default.createElement("div", { className: props.classes.appBarSpacer }),

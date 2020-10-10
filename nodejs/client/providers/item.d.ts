@@ -522,12 +522,12 @@ export declare class ActualItemProvider extends React.Component<IActualItemProvi
     unpoke(): void;
     render(): JSX.Element;
 }
-export declare function ItemDefinitionProvider(props: IItemProviderProps): JSX.Element;
-interface INoStateItemDefinitionProviderProps {
+export declare function ItemProvider(props: IItemProviderProps): JSX.Element;
+interface INoStateItemProviderProps {
     itemDefinition?: string;
     children?: React.ReactNode;
 }
-export declare function NoStateItemDefinitionProvider(props: INoStateItemDefinitionProviderProps): JSX.Element;
+export declare function NoStateItemProvider(props: INoStateItemProviderProps): JSX.Element;
 export declare function ParentItemContextProvider(props: {
     children: React.ReactNode;
 }): JSX.Element;

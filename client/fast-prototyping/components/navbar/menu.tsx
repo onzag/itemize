@@ -15,7 +15,7 @@ import AppLanguageRetriever from "../../../components/localization/AppLanguageRe
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead, { II18nReadProps } from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
-import { NoStateItemDefinitionProvider } from "../../../providers/item";
+import { NoStateItemProvider } from "../../../providers/item";
 
 /**
  * The menu styles
@@ -121,9 +121,9 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
       i18nNodeInfo =
         (
           <ModuleProvider module={entry.module}>
-            <NoStateItemDefinitionProvider itemDefinition={entry.idef}>
+            <NoStateItemProvider itemDefinition={entry.idef}>
               <I18nRead {...entry.i18nProps} />
-            </NoStateItemDefinitionProvider>
+            </NoStateItemProvider>
           </ModuleProvider>
         );
 

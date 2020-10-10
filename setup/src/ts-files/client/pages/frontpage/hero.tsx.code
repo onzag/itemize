@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import View from "@onzag/itemize/client/components/property/View";
 import AppLanguageRetriever from "@onzag/itemize/client/components/localization/AppLanguageRetriever";
 
@@ -34,7 +34,7 @@ export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) 
 			<ModuleProvider module="cms">
 				<AppLanguageRetriever>
 					{(languageData) => (
-						<ItemDefinitionProvider
+						<ItemProvider
 							itemDefinition="fragment"
 							forId={1}
 							forVersion={languageData.currentLanguage.code}
@@ -50,7 +50,7 @@ export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) 
 							<ItemLoader>
 								<View id="content" />
 							</ItemLoader>
-						</ItemDefinitionProvider>
+						</ItemProvider>
 					)}
 				</AppLanguageRetriever>
 			</ModuleProvider>

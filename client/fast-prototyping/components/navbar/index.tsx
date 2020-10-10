@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon,
   ImportantDevicesIcon, LibraryBooksIcon, HomeIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
-import { ItemDefinitionProvider } from "../../../providers/item";
+import { ItemProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";
 import { Buttons } from "./buttons";
 import { ExternalDialogs } from "./external-dialogs";
@@ -139,7 +139,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
           <div className={props.classes.container}>
             <UserDataRetriever>
               {(user) => <ModuleProvider module="users">
-                <ItemDefinitionProvider
+                <ItemProvider
                   itemDefinition="user"
                   forId={user.id}
                   disableExternalChecks={true}
@@ -157,7 +157,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                     avatarProps={props.avatarProps}
                   />
                   <ExternalDialogs/>
-                </ItemDefinitionProvider>
+                </ItemProvider>
               </ModuleProvider>}
             </UserDataRetriever>
           </div>

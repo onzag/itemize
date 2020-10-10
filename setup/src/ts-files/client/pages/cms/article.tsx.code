@@ -1,5 +1,5 @@
 import React from "react";
-import { ItemDefinitionProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
+import { ItemProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
@@ -82,7 +82,7 @@ export const Article = withStyles(articleStyles)((props: WithStyles<typeof artic
 				};
 
 				return (
-					<ItemDefinitionProvider
+					<ItemProvider
 						itemDefinition="article"
 						properties={[
 							"title",
@@ -190,7 +190,7 @@ export const Article = withStyles(articleStyles)((props: WithStyles<typeof artic
 							)}
 						</SubmitActioner>
 
-					</ItemDefinitionProvider>);
+					</ItemProvider>);
 			}}
 		</LocationStateReader>
 	);

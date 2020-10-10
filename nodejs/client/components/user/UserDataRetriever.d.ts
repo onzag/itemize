@@ -19,7 +19,7 @@ interface IUserDataRetrieverProps {
  * id might be null, and role can be the GUEST_METAROLE in such case
  *
  * If you need more information about the user you should use the item definition
- * provider under this data retriever, aka ModuleProvider for users, ItemDefinitionProvider for
+ * provider under this data retriever, aka ModuleProvider for users, ItemProvider for
  * user, forId the id used here; then you might read things like email and username
  *
  * remember to put assumeOwnership as true, while it has little effect, given that there are no

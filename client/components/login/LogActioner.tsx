@@ -133,9 +133,9 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
 
     // if we don't have any of these
     if (!username) {
-      throw new Error("The LogActioner ItemDefinitionProvider context state does not contain an username property");
+      throw new Error("The LogActioner ItemProvider context state does not contain an username property");
     } else if (!password) {
-      throw new Error("The LogActioner ItemDefinitionProvider context state does not contain an password property");
+      throw new Error("The LogActioner ItemProvider context state does not contain an password property");
     }
 
     // now we need such actual values
@@ -285,7 +285,7 @@ export function LogActioner(props: ILogActionerProps) {
               {
                 (itemContextualValue) => {
                   if (!itemContextualValue) {
-                    throw new Error("The LogActioner must be in a ItemDefinitionProvider context");
+                    throw new Error("The LogActioner must be in a ItemProvider context");
                   }
 
                   return (

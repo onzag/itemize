@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
@@ -42,7 +42,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 			{(userData) => {
 				return (
 					<ModuleProvider module="users">
-						<ItemDefinitionProvider
+						<ItemProvider
 							itemDefinition="user"
 							properties={[
 								"password",
@@ -133,7 +133,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 									/>
 								)}
 							</SubmitActioner>
-						</ItemDefinitionProvider>
+						</ItemProvider>
 					</ModuleProvider>
 				);
 			}}

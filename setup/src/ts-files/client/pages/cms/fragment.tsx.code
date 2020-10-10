@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ItemDefinitionProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
+import { ItemProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
@@ -50,7 +50,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 					}, true);
 				};
 				return (
-					<ItemDefinitionProvider
+					<ItemProvider
 						itemDefinition="fragment"
 						properties={[
 							"title",
@@ -141,7 +141,7 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 							)}
 						</SubmitActioner>
 
-					</ItemDefinitionProvider>);
+					</ItemProvider>);
 			}}
 		</LocationStateReader>
 	);

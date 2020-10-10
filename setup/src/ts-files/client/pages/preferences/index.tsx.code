@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box,
 	NotificationsIcon, MenuBookIcon, DoneOutlineIcon, PersonPinIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
@@ -47,7 +47,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 				];
 				return (
 					<ModuleProvider module="users">
-						<ItemDefinitionProvider
+						<ItemProvider
 							itemDefinition="user"
 							properties={properties}
 							forId={userData.id}
@@ -123,7 +123,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 									</React.Fragment>
 								)}
 							</SubmitActioner>
-						</ItemDefinitionProvider>
+						</ItemProvider>
 					</ModuleProvider>
 				);
 			}}

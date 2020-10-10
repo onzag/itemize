@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider, ParentItemContextProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider, ParentItemContextProvider } from "@onzag/itemize/client/providers/item";
 import SearchLoader from "@onzag/itemize/client/components/search/SearchLoader";
 import View from "@onzag/itemize/client/components/property/View";
 import Reader from "@onzag/itemize/client/components/property/Reader";
@@ -167,7 +167,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 				<ModuleProvider module="cms">
 					<AppLanguageRetriever>
 						{(languageData) => (
-							<ItemDefinitionProvider
+							<ItemProvider
 								itemDefinition="article"
 								searchCounterpart={true}
 								setters={[
@@ -203,7 +203,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 									{(loader) => {
 										return loader.searchRecords.map((searchRecord) => {
 											return (
-												<ItemDefinitionProvider {...searchRecord.providerProps}>
+												<ItemProvider {...searchRecord.providerProps}>
 													<Link to={`/news/${searchRecord.id}`} as="div" className={props.classes.articleContainer}>
 														<div className={props.classes.articleImageContainer}>
 															<View
@@ -226,7 +226,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 														<Reader id="created_by">
 															{(createdBy: number) => (
 																<ModuleProvider module="users">
-																	<ItemDefinitionProvider
+																	<ItemProvider
 																		itemDefinition="user"
 																		forId={createdBy}
 																		static="TOTAL"
@@ -252,12 +252,12 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 																				</Typography>
 																			</Box>
 																		</Box>
-																	</ItemDefinitionProvider>
+																	</ItemProvider>
 																</ModuleProvider>
 															)}
 														</Reader>
 													</Link>
-												</ItemDefinitionProvider>
+												</ItemProvider>
 											);
 										});
 									}}
@@ -269,7 +269,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 										</Button>
 									</Link>
 								</div>
-							</ItemDefinitionProvider>
+							</ItemProvider>
 						)}
 					</AppLanguageRetriever>
 				</ModuleProvider>

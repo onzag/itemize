@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 
@@ -39,7 +39,7 @@ export function Profile(props: IProfileProps)<0>{
 	];
 	return (
 		<ModuleProvider module="users">
-			<ItemDefinitionProvider
+			<ItemProvider
 				itemDefinition="user"
 				properties={properties}
 				forId={currentUserId}
@@ -56,7 +56,7 @@ export function Profile(props: IProfileProps)<0>{
 					}}
 				</I18nRead>
 				<PublicUserProfile />
-			</ItemDefinitionProvider>
+			</ItemProvider>
 		</ModuleProvider>
 	);
 }

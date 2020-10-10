@@ -61,10 +61,10 @@ class ActualLogActioner extends react_1.default.Component {
             .find((pv) => pv.propertyId === "password");
         // if we don't have any of these
         if (!username) {
-            throw new Error("The LogActioner ItemDefinitionProvider context state does not contain an username property");
+            throw new Error("The LogActioner ItemProvider context state does not contain an username property");
         }
         else if (!password) {
-            throw new Error("The LogActioner ItemDefinitionProvider context state does not contain an password property");
+            throw new Error("The LogActioner ItemProvider context state does not contain an password property");
         }
         // now we need such actual values
         const usernameValue = username.value;
@@ -189,7 +189,7 @@ function LogActioner(props) {
     return (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenContextValue) => {
         return (react_1.default.createElement(item_1.ItemContext.Consumer, null, (itemContextualValue) => {
             if (!itemContextualValue) {
-                throw new Error("The LogActioner must be in a ItemDefinitionProvider context");
+                throw new Error("The LogActioner must be in a ItemProvider context");
             }
             return (react_1.default.createElement(ActualLogActioner, Object.assign({}, props, { tokenContextValue: tokenContextValue, itemContextualValue: itemContextualValue })));
         }));

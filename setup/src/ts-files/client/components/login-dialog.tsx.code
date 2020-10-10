@@ -1,7 +1,7 @@
 import React from "react";
 
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Entry from "@onzag/itemize/client/components/property/Entry";
@@ -80,7 +80,7 @@ function runManyFunctions(functions: Array<() => void>)<0>{
  */
 export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
 	return (
-		<ItemDefinitionProvider
+		<ItemProvider
 			itemDefinition="user"
 			disableExternalChecks={true}
 			properties={["username", "password"]}
@@ -185,6 +185,6 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 					</I18nRead>
 				)}
 			</LogActioner>
-		</ItemDefinitionProvider>
+		</ItemProvider>
 	);
 });

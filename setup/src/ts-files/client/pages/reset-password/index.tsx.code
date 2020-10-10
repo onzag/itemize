@@ -1,6 +1,6 @@
 import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { ItemDefinitionProvider } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import UserActioner, { IUserActionerArg } from "@onzag/itemize/client/components/user/UserActioner";
 import { localizedRedirectTo } from "@onzag/itemize/client/components/navigation";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
@@ -79,7 +79,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 
 				return (
 					<ModuleProvider module="users">
-						<ItemDefinitionProvider
+						<ItemProvider
 							itemDefinition="user"
 							properties={[
 								"username",
@@ -172,7 +172,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 									</>
 								)}
 							</I18nRead>
-						</ItemDefinitionProvider>
+						</ItemProvider>
 					</ModuleProvider>
 				);
 			}}
