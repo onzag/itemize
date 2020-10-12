@@ -419,6 +419,10 @@ export default class ItemDefinition {
      */
     private stateInternal;
     /**
+     * The cleans being blocked and by whom
+     */
+    private cleansBlocked;
+    /**
      * Build a new ItemDefinition instance
      * @param rawJSON the raw json form
      * @param parentModule the parent module instance
@@ -692,14 +696,37 @@ export default class ItemDefinition {
      */
     getAppliedValueOwnerIfAny(id: number, version: string): number;
     /**
+     * Forces an item definition to be unable to clean its value
+     * from memory, and rather perform a restoration to the original
+     * value when requested to do so, use removeBlockCleanFor in order
+     * to release this blockage, this blockage is used by the UI threads
+     * in order to tell another UI component that it expects to use that
+     * value so please avoid cleaning it
+     *
+     * @param id the id
+     * @param version the version
+     * @param blockId the block identifier
+     */
+    addBlockCleanFor(id: number, version: string, blockId: string): void;
+    /**
+     * Removes the blockage of the clean
+     *
+     * @param id the id
+     * @param version the version
+     * @param blockId the given blockage id
+     */
+    removeBlockCleanFor(id: number, version: string, blockId: string): void;
+    /**
      * Wipes down a value and its state and everything out of memory
      * this might not be important in the client side but very important
      * in the server side, not cleaning the memory can become a memory leak
      * @param id the id of the state
      * @param version the version of the state
      * @param excludeExtensions whether to include the extensions of the parent
+     * @returns a boolean where true refers to whether it was cleaned and false it was restored
+     * because the cleaning was blocked from performing
      */
-    cleanValueFor(id: number, version: string, excludeExtensions?: boolean): void;
+    cleanValueFor(id: number, version: string, excludeExtensions?: boolean): boolean;
     /**
      * Checks whether given the state id, there is an applied
      * value for it

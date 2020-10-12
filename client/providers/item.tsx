@@ -99,27 +99,114 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
 export type PolicyPathType = [string, string, string];
 
 export interface IActionCleanOptions {
+  /**
+   * Cleans the value of a policy back to null
+   */
   policiesToCleanOnSuccess?: PolicyPathType[];
+  /**
+   * Cleans the value of a policy back to null
+   */
   policiesToCleanOnAny?: PolicyPathType[];
+  /**
+   * Cleans the value of a policy back to null
+   */
   policiesToCleanOnFailure?: PolicyPathType[];
-  propertiesToCleanOnSuccess?: string[];
-  propertiesToCleanOnAny?: string[];
-  propertiesToCleanOnFailure?: string[];
+  /**
+   * Restores the value of a property back to its applied value
+   * or null if it doesn't have such
+   */
   propertiesToRestoreOnSuccess?: string[];
+  /**
+   * Restores the value of a property back to its applied value
+   * or null if it doesn't have such
+   */
   propertiesToRestoreOnAny?: string[];
+  /**
+   * Restores the value of a property back to its applied value
+   * or null if it doesn't have such
+   */
   propertiesToRestoreOnFailure?: string[];
-  includesToCleanOnSuccess?: string[];
-  includesToCleanOnAny?: string[];
-  includesToCleanOnFailure?: string[];
+  /**
+   * Restores the value of an include back to its applied value
+   * or null if it doesn't have such
+   */
   includesToRestoreOnSuccess?: string[];
+  /**
+   * Restores the value of an include back to its applied value
+   * or null if it doesn't have such
+   */
   includesToRestoreOnAny?: string[];
+  /**
+   * Restores the value of an include back to its applied value
+   * or null if it doesn't have such
+   */
   includesToRestoreOnFailure?: string[];
+  /**
+   * Makes all properties unpoked (invalid won't show)
+   */
   unpokeAfterSuccess?: boolean;
+  /**
+   * Makes all properties unpoked (invalid won't show)
+   */
   unpokeAfterAny?: boolean;
+  /**
+   * Makes all properties unpoked (invalid won't show)
+   */
   unpokeAfterFailure?: boolean;
+  /**
+   * cleans the search results
+   */
   cleanSearchResultsOnSuccess?: boolean;
+  /**
+   * cleans the search results
+   */
   cleanSearchResultsOnAny?: boolean;
+  /**
+   * cleans the search results
+   */
   cleanSearchResultsOnFailure?: boolean;
+  /**
+   * Restores the state on success back to its applied value
+   * this will be a clean if no applied value exists
+   */
+  restoreStateOnSuccess?: boolean;
+  /**
+   * Restores the state on success back to its applied value
+   * this will be a clean if no applied value exists
+   */
+  restoreStateOnAny?: boolean;
+  /**
+   * Restores the state on success back to its applied value
+   * this will be a clean if no applied value exists
+   */
+  restoreStateOnFailure?: boolean;
+  /**
+   * Warning, clean state on success might not clean anything
+   * if the cleaning is blocked from happening, this is because
+   * other item provider is expecting to use the same value
+   * always use propertiesToRestoreOn* in order to strip critical
+   * data (eg. passwords) clean state is used for a memory relief
+   * and itemize might decide that it's better not to provide it
+   */
+  cleanStateOnSuccess?: boolean;
+  /**
+   * Warning, clean state on success might not clean anything
+   * if the cleaning is blocked from happening, this is because
+   * other item provider is expecting to use the same value
+   * always use propertiesToRestoreOn* in order to strip critical
+   * data (eg. passwords) clean state is used for a memory relief
+   * and itemize might decide that it's better not to provide it
+   */
+  cleanStateOnFailure?: boolean;
+  /**
+   * Warning, clean state on success might not clean anything
+   * if the cleaning is blocked from happening, this is because
+   * other item provider is expecting to use the same value
+   * always use propertiesToRestoreOn* in order to strip critical
+   * data (eg. passwords) clean state is used for a memory relief
+   * and itemize might decide that it's better not to provide it
+   */
+  cleanStateOnAny?: boolean;
 }
 
 /**
@@ -702,6 +789,8 @@ export class ActualItemProvider extends
   // event this is just to that when the reload is executed these
   // options are used
   private lastOptionsUsedForSearch: IActionSearchOptions;
+  // this is the id used for block cleaning
+  private blockIdClean: string;
 
   // the list of submit block promises
   private submitBlockPromises: Array<Promise<any>> = [];
@@ -745,6 +834,8 @@ export class ActualItemProvider extends
     this.installSetters = this.installSetters.bind(this);
     this.removeSetters = this.removeSetters.bind(this);
     this.installPrefills = this.installPrefills.bind(this);
+    this.blockCleanup = this.blockCleanup.bind(this);
+    this.releaseCleanupBlock = this.releaseCleanupBlock.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
@@ -754,6 +845,7 @@ export class ActualItemProvider extends
 
     if (typeof document !== "undefined") {
       this.setupListeners();
+      this.blockCleanup();
     }
 
     // we get the initial state
@@ -766,6 +858,22 @@ export class ActualItemProvider extends
       // as you can see this function might run several times per instance
       // but that's okay, all next runs get ignored
       CacheWorkerInstance.instance.setupVersion((window as any).BUILD_NUMBER);
+    }
+  }
+  public blockCleanup(props: IActualItemProviderProps = this.props) {
+    if (props.forId) {
+      if (!this.blockIdClean) {
+        this.blockIdClean = uuid.v4();
+      }
+      this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+    }
+  }
+  public releaseCleanupBlock(props: IActualItemProviderProps = this.props) {
+    if (props.forId) {
+      if (!this.blockIdClean) {
+        this.blockIdClean = uuid.v4();
+      }
+      this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
     }
   }
   public setupInitialState(): IActualItemProviderState {
@@ -1130,6 +1238,11 @@ export class ActualItemProvider extends
       !equals(this.props.prefills, prevProps.prefills) ||
       uniqueIDChanged ||
       itemDefinitionWasUpdated;
+
+    if (itemDefinitionWasUpdated || uniqueIDChanged) {
+      this.releaseCleanupBlock(prevProps);
+      this.blockCleanup();
+    }
 
     // if the mark for destruction has changed in a meaningful way
     // we recheck it
@@ -1897,7 +2010,8 @@ export class ActualItemProvider extends
         props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
         // this will affect other instances that didn't dismount
         props.itemDefinitionInstance.triggerListeners(
-          "change", props.forId || null, props.forVersion || null);
+          "change", props.forId || null, props.forVersion || null,
+        );
 
         if (props.itemDefinitionInstance.isInSearchMode()) {
           props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
@@ -1910,6 +2024,7 @@ export class ActualItemProvider extends
   }
   public componentWillUnmount() {
     this.isUnmounted = true;
+    this.releaseCleanupBlock();
     this.unSetupListeners();
     this.runDismountOn();
   }
@@ -2224,52 +2339,6 @@ export class ActualItemProvider extends
     let needsUpdate: boolean = false;
     let needsSearchUpdate: boolean = false;
 
-    // CLEANING PROPERTIES
-    const cleanupPropertyFn = (ptc: string) => {
-      props.itemDefinitionInstance
-        .getPropertyDefinitionFor(ptc, true).cleanValueFor(props.forId || null,
-          props.forVersion || null);
-    };
-    if (
-      options.propertiesToCleanOnSuccess && state === "success"
-    ) {
-      let propertiesToClean = options.propertiesToCleanOnSuccess;
-      if (props.itemDefinitionInstance.isInSearchMode()) {
-        propertiesToClean = getPropertyListForSearchMode(
-          propertiesToClean,
-          props.itemDefinitionInstance.getStandardCounterpart()
-        );
-      }
-      propertiesToClean.forEach(cleanupPropertyFn);
-      needsUpdate = true;
-    }
-    if (
-      options.propertiesToCleanOnAny
-    ) {
-      let propertiesToClean = options.propertiesToCleanOnAny;
-      if (props.itemDefinitionInstance.isInSearchMode()) {
-        propertiesToClean = getPropertyListForSearchMode(
-          propertiesToClean,
-          props.itemDefinitionInstance.getStandardCounterpart()
-        );
-      }
-      propertiesToClean.forEach(cleanupPropertyFn);
-      needsUpdate = true;
-    }
-    if (
-      options.propertiesToCleanOnFailure && state === "fail"
-    ) {
-      let propertiesToClean = options.propertiesToCleanOnFailure;
-      if (props.itemDefinitionInstance.isInSearchMode()) {
-        propertiesToClean = getPropertyListForSearchMode(
-          propertiesToClean,
-          props.itemDefinitionInstance.getStandardCounterpart()
-        );
-      }
-      propertiesToClean.forEach(cleanupPropertyFn);
-      needsUpdate = true;
-    }
-
     // RESTORING PROPERTIES
     const restorePropertyFn = (ptr: string) => {
       props.itemDefinitionInstance
@@ -2316,30 +2385,6 @@ export class ActualItemProvider extends
       needsUpdate = true;
     }
 
-    // CLEANING INCLUDES
-    const cleanupIncludeFn = (itc: string) => {
-      props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(props.forId || null,
-        props.forVersion || null);
-    };
-    if (
-      options.includesToCleanOnSuccess && state === "success"
-    ) {
-      options.includesToCleanOnSuccess.forEach(cleanupIncludeFn);
-      needsUpdate = true;
-    }
-    if (
-      options.includesToCleanOnAny
-    ) {
-      options.includesToCleanOnAny.forEach(cleanupIncludeFn);
-      needsUpdate = true;
-    }
-    if (
-      options.includesToCleanOnFailure && state === "fail"
-    ) {
-      options.includesToCleanOnFailure.forEach(cleanupPropertyFn);
-      needsUpdate = true;
-    }
-
     // RESTORING INCLUDES
     const restoreIncludeFn = (itr: string) => {
       props.itemDefinitionInstance
@@ -2362,6 +2407,23 @@ export class ActualItemProvider extends
       options.includesToRestoreOnFailure && state === "fail"
     ) {
       options.includesToRestoreOnFailure.forEach(restoreIncludeFn);
+      needsUpdate = true;
+    }
+
+    // CLEANING STATE
+    if (
+      options.cleanStateOnAny ||
+      (options.cleanStateOnFailure && state === "fail") ||
+      (options.cleanStateOnSuccess && state === "success")
+    ) {
+      props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
+      needsUpdate = true;
+    } else if (
+      options.restoreStateOnAny ||
+      (options.restoreStateOnFailure && state === "fail") ||
+      (options.restoreStateOnSuccess && state === "success")
+    ) {
+      props.itemDefinitionInstance.restoreValueFor(props.forId || null, props.forVersion || null);
       needsUpdate = true;
     }
 

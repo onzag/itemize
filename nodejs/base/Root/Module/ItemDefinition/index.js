@@ -166,6 +166,7 @@ class ItemDefinition {
         this.stateHasAppliedValueTo = {};
         this.stateGQLAppliedValue = {};
         this.stateInternal = {};
+        this.cleansBlocked = {};
         if (!init) {
             this.propertyDefinitions && this.propertyDefinitions.forEach((p) => p.cleanState());
             this.childDefinitions && this.childDefinitions.forEach((cd) => cd.cleanState());
@@ -858,16 +859,62 @@ class ItemDefinition {
         return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || constants_1.UNSPECIFIED_OWNER);
     }
     /**
+     * Forces an item definition to be unable to clean its value
+     * from memory, and rather perform a restoration to the original
+     * value when requested to do so, use removeBlockCleanFor in order
+     * to release this blockage, this blockage is used by the UI threads
+     * in order to tell another UI component that it expects to use that
+     * value so please avoid cleaning it
+     *
+     * @param id the id
+     * @param version the version
+     * @param blockId the block identifier
+     */
+    addBlockCleanFor(id, version, blockId) {
+        const mergedID = id + "." + (version || "");
+        if (this.cleansBlocked[mergedID]) {
+            this.cleansBlocked[mergedID].push(blockId);
+        }
+        else {
+            this.cleansBlocked[mergedID] = [blockId];
+        }
+    }
+    /**
+     * Removes the blockage of the clean
+     *
+     * @param id the id
+     * @param version the version
+     * @param blockId the given blockage id
+     */
+    removeBlockCleanFor(id, version, blockId) {
+        const mergedID = id + "." + (version || "");
+        if (this.cleansBlocked[mergedID]) {
+            const newValue = this.cleansBlocked[mergedID].filter((v) => v === blockId);
+            if (newValue.length === 0) {
+                delete this.cleansBlocked[mergedID];
+            }
+            else {
+                this.cleansBlocked[mergedID] = newValue;
+            }
+        }
+    }
+    /**
      * Wipes down a value and its state and everything out of memory
      * this might not be important in the client side but very important
      * in the server side, not cleaning the memory can become a memory leak
      * @param id the id of the state
      * @param version the version of the state
      * @param excludeExtensions whether to include the extensions of the parent
+     * @returns a boolean where true refers to whether it was cleaned and false it was restored
+     * because the cleaning was blocked from performing
      */
     cleanValueFor(id, version, excludeExtensions) {
-        // delete all from memory
         const mergedID = id + "." + (version || "");
+        if (this.cleansBlocked[mergedID]) {
+            this.restoreValueFor(id, version, excludeExtensions);
+            return false;
+        }
+        // delete all from memory
         delete this.stateHasAppliedValueTo[mergedID];
         delete this.stateGQLAppliedValue[mergedID];
         delete this.stateInternal[mergedID];
@@ -883,6 +930,7 @@ class ItemDefinition {
         this.getAllIncludes().forEach((include) => {
             include.cleanValueFor(id, version);
         });
+        return true;
     }
     /**
      * Checks whether given the state id, there is an applied

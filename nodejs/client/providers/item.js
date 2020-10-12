@@ -151,6 +151,8 @@ class ActualItemProvider extends react_1.default.Component {
         this.installSetters = this.installSetters.bind(this);
         this.removeSetters = this.removeSetters.bind(this);
         this.installPrefills = this.installPrefills.bind(this);
+        this.blockCleanup = this.blockCleanup.bind(this);
+        this.releaseCleanupBlock = this.releaseCleanupBlock.bind(this);
         // first we setup the listeners, this includes the on change listener that would make
         // the entire app respond to actions, otherwise the fields might as well be disabled
         // we do this here to avoid useless callback changes as the listeners are not ready
@@ -158,6 +160,7 @@ class ActualItemProvider extends react_1.default.Component {
         this.installPrefills();
         if (typeof document !== "undefined") {
             this.setupListeners();
+            this.blockCleanup();
         }
         // we get the initial state
         this.state = this.setupInitialState();
@@ -190,6 +193,22 @@ class ActualItemProvider extends react_1.default.Component {
             };
         }
         return null;
+    }
+    blockCleanup(props = this.props) {
+        if (props.forId) {
+            if (!this.blockIdClean) {
+                this.blockIdClean = uuid_1.default.v4();
+            }
+            this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+        }
+    }
+    releaseCleanupBlock(props = this.props) {
+        if (props.forId) {
+            if (!this.blockIdClean) {
+                this.blockIdClean = uuid_1.default.v4();
+            }
+            this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+        }
     }
     setupInitialState() {
         // the value might already be available in memory, this is either because it was loaded
@@ -458,6 +477,10 @@ class ActualItemProvider extends react_1.default.Component {
         const didSomethingThatInvalidatedPrefills = !deep_equal_1.default(this.props.prefills, prevProps.prefills) ||
             uniqueIDChanged ||
             itemDefinitionWasUpdated;
+        if (itemDefinitionWasUpdated || uniqueIDChanged) {
+            this.releaseCleanupBlock(prevProps);
+            this.blockCleanup();
+        }
         // if the mark for destruction has changed in a meaningful way
         // we recheck it
         if (this.props.markForDestructionOnLogout &&
@@ -1038,6 +1061,7 @@ class ActualItemProvider extends react_1.default.Component {
     }
     componentWillUnmount() {
         this.isUnmounted = true;
+        this.releaseCleanupBlock();
         this.unSetupListeners();
         this.runDismountOn();
     }
@@ -1294,35 +1318,6 @@ class ActualItemProvider extends react_1.default.Component {
         }
         let needsUpdate = false;
         let needsSearchUpdate = false;
-        // CLEANING PROPERTIES
-        const cleanupPropertyFn = (ptc) => {
-            props.itemDefinitionInstance
-                .getPropertyDefinitionFor(ptc, true).cleanValueFor(props.forId || null, props.forVersion || null);
-        };
-        if (options.propertiesToCleanOnSuccess && state === "success") {
-            let propertiesToClean = options.propertiesToCleanOnSuccess;
-            if (props.itemDefinitionInstance.isInSearchMode()) {
-                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
-            }
-            propertiesToClean.forEach(cleanupPropertyFn);
-            needsUpdate = true;
-        }
-        if (options.propertiesToCleanOnAny) {
-            let propertiesToClean = options.propertiesToCleanOnAny;
-            if (props.itemDefinitionInstance.isInSearchMode()) {
-                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
-            }
-            propertiesToClean.forEach(cleanupPropertyFn);
-            needsUpdate = true;
-        }
-        if (options.propertiesToCleanOnFailure && state === "fail") {
-            let propertiesToClean = options.propertiesToCleanOnFailure;
-            if (props.itemDefinitionInstance.isInSearchMode()) {
-                propertiesToClean = getPropertyListForSearchMode(propertiesToClean, props.itemDefinitionInstance.getStandardCounterpart());
-            }
-            propertiesToClean.forEach(cleanupPropertyFn);
-            needsUpdate = true;
-        }
         // RESTORING PROPERTIES
         const restorePropertyFn = (ptr) => {
             props.itemDefinitionInstance
@@ -1352,22 +1347,6 @@ class ActualItemProvider extends react_1.default.Component {
             propertiesToRestore.forEach(restorePropertyFn);
             needsUpdate = true;
         }
-        // CLEANING INCLUDES
-        const cleanupIncludeFn = (itc) => {
-            props.itemDefinitionInstance.getIncludeFor(itc).cleanValueFor(props.forId || null, props.forVersion || null);
-        };
-        if (options.includesToCleanOnSuccess && state === "success") {
-            options.includesToCleanOnSuccess.forEach(cleanupIncludeFn);
-            needsUpdate = true;
-        }
-        if (options.includesToCleanOnAny) {
-            options.includesToCleanOnAny.forEach(cleanupIncludeFn);
-            needsUpdate = true;
-        }
-        if (options.includesToCleanOnFailure && state === "fail") {
-            options.includesToCleanOnFailure.forEach(cleanupPropertyFn);
-            needsUpdate = true;
-        }
         // RESTORING INCLUDES
         const restoreIncludeFn = (itr) => {
             props.itemDefinitionInstance
@@ -1383,6 +1362,19 @@ class ActualItemProvider extends react_1.default.Component {
         }
         if (options.includesToRestoreOnFailure && state === "fail") {
             options.includesToRestoreOnFailure.forEach(restoreIncludeFn);
+            needsUpdate = true;
+        }
+        // CLEANING STATE
+        if (options.cleanStateOnAny ||
+            (options.cleanStateOnFailure && state === "fail") ||
+            (options.cleanStateOnSuccess && state === "success")) {
+            props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
+            needsUpdate = true;
+        }
+        else if (options.restoreStateOnAny ||
+            (options.restoreStateOnFailure && state === "fail") ||
+            (options.restoreStateOnSuccess && state === "success")) {
+            props.itemDefinitionInstance.restoreValueFor(props.forId || null, props.forVersion || null);
             needsUpdate = true;
         }
         // CLEANING POLICIES, POLICIES CAN'T BE RESTORED

@@ -106,7 +106,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 												i18nId="change_password"
 												options={{
 													properties: ["password"],
-													propertiesToCleanOnSuccess: ["password"],
+													propertiesToRestoreOnSuccess: ["password"],
 													policies: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
 													policiesToCleanOnSuccess: [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]],
 													unpokeAfterAny: true,

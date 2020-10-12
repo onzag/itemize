@@ -90,7 +90,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 							forId={userId}
 							mountId="reset-password"
 							cleanOnDismount={{
-								propertiesToCleanOnAny: ["password"],
+								propertiesToRestoreOnAny: ["password"],
 							}}
 						>
 							<I18nRead id="reset_password" capitalize={true}>

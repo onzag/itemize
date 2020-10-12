@@ -47,27 +47,114 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
 }
 export declare type PolicyPathType = [string, string, string];
 export interface IActionCleanOptions {
+    /**
+     * Cleans the value of a policy back to null
+     */
     policiesToCleanOnSuccess?: PolicyPathType[];
+    /**
+     * Cleans the value of a policy back to null
+     */
     policiesToCleanOnAny?: PolicyPathType[];
+    /**
+     * Cleans the value of a policy back to null
+     */
     policiesToCleanOnFailure?: PolicyPathType[];
-    propertiesToCleanOnSuccess?: string[];
-    propertiesToCleanOnAny?: string[];
-    propertiesToCleanOnFailure?: string[];
+    /**
+     * Restores the value of a property back to its applied value
+     * or null if it doesn't have such
+     */
     propertiesToRestoreOnSuccess?: string[];
+    /**
+     * Restores the value of a property back to its applied value
+     * or null if it doesn't have such
+     */
     propertiesToRestoreOnAny?: string[];
+    /**
+     * Restores the value of a property back to its applied value
+     * or null if it doesn't have such
+     */
     propertiesToRestoreOnFailure?: string[];
-    includesToCleanOnSuccess?: string[];
-    includesToCleanOnAny?: string[];
-    includesToCleanOnFailure?: string[];
+    /**
+     * Restores the value of an include back to its applied value
+     * or null if it doesn't have such
+     */
     includesToRestoreOnSuccess?: string[];
+    /**
+     * Restores the value of an include back to its applied value
+     * or null if it doesn't have such
+     */
     includesToRestoreOnAny?: string[];
+    /**
+     * Restores the value of an include back to its applied value
+     * or null if it doesn't have such
+     */
     includesToRestoreOnFailure?: string[];
+    /**
+     * Makes all properties unpoked (invalid won't show)
+     */
     unpokeAfterSuccess?: boolean;
+    /**
+     * Makes all properties unpoked (invalid won't show)
+     */
     unpokeAfterAny?: boolean;
+    /**
+     * Makes all properties unpoked (invalid won't show)
+     */
     unpokeAfterFailure?: boolean;
+    /**
+     * cleans the search results
+     */
     cleanSearchResultsOnSuccess?: boolean;
+    /**
+     * cleans the search results
+     */
     cleanSearchResultsOnAny?: boolean;
+    /**
+     * cleans the search results
+     */
     cleanSearchResultsOnFailure?: boolean;
+    /**
+     * Restores the state on success back to its applied value
+     * this will be a clean if no applied value exists
+     */
+    restoreStateOnSuccess?: boolean;
+    /**
+     * Restores the state on success back to its applied value
+     * this will be a clean if no applied value exists
+     */
+    restoreStateOnAny?: boolean;
+    /**
+     * Restores the state on success back to its applied value
+     * this will be a clean if no applied value exists
+     */
+    restoreStateOnFailure?: boolean;
+    /**
+     * Warning, clean state on success might not clean anything
+     * if the cleaning is blocked from happening, this is because
+     * other item provider is expecting to use the same value
+     * always use propertiesToRestoreOn* in order to strip critical
+     * data (eg. passwords) clean state is used for a memory relief
+     * and itemize might decide that it's better not to provide it
+     */
+    cleanStateOnSuccess?: boolean;
+    /**
+     * Warning, clean state on success might not clean anything
+     * if the cleaning is blocked from happening, this is because
+     * other item provider is expecting to use the same value
+     * always use propertiesToRestoreOn* in order to strip critical
+     * data (eg. passwords) clean state is used for a memory relief
+     * and itemize might decide that it's better not to provide it
+     */
+    cleanStateOnFailure?: boolean;
+    /**
+     * Warning, clean state on success might not clean anything
+     * if the cleaning is blocked from happening, this is because
+     * other item provider is expecting to use the same value
+     * always use propertiesToRestoreOn* in order to strip critical
+     * data (eg. passwords) clean state is used for a memory relief
+     * and itemize might decide that it's better not to provide it
+     */
+    cleanStateOnAny?: boolean;
 }
 /**
  * The options for submitting,
@@ -465,8 +552,11 @@ export declare class ActualItemProvider extends React.Component<IActualItemProvi
     private updateTimeout;
     private lastUpdateId;
     private lastOptionsUsedForSearch;
+    private blockIdClean;
     private submitBlockPromises;
     constructor(props: IActualItemProviderProps);
+    blockCleanup(props?: IActualItemProviderProps): void;
+    releaseCleanupBlock(props?: IActualItemProviderProps): void;
     setupInitialState(): IActualItemProviderState;
     injectSubmitBlockPromise(p: Promise<any>): void;
     markForDestruction(): void;
