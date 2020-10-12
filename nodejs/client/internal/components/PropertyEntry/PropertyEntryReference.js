@@ -38,13 +38,13 @@ class PropertyEntryReference extends react_1.default.Component {
         }
     }
     componentDidMount() {
+        this.addListeners();
         if (this.props.state.value &&
             !this.props.state.internalValue &&
             !this.props.state.enforced) {
             const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
             this.findCurrentStrValue(this.props.state.value, filterByLanguage ? this.props.language : null);
         }
-        this.addListeners();
     }
     componentWillUnmount() {
         this.isUnmounted = true;

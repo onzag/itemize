@@ -44,6 +44,11 @@ interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> 
      */
     msWaitedToShowLoadingAnimation?: number;
     /**
+     * Whether the children must wait until the item definition component is fully loaded
+     * in order to mount
+     */
+    childrenMustWaitUntilItsLoaded?: boolean;
+    /**
      * The children inside, this data will not be shown if an error
      * not found, or blocked; but it will if loading, so basically a wireframe
      * is there
@@ -59,5 +64,5 @@ interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> 
  * @param props the loader props
  * @returns a react component
  */
-export declare const ItemLoader: React.ComponentType<Pick<ItemLoaderProps, "children" | "fullWidth" | "notFoundMessageI18nId" | "blockedMessageI18nId" | "notFoundImage" | "blockedImage" | "errorImage" | "msWaitedToShowLoadingAnimation"> & import("@material-ui/styles").StyledComponentProps<"container" | "flexingContainer" | "circularProgress" | "fullWidthContainer">>;
+export declare const ItemLoader: React.ComponentType<Pick<ItemLoaderProps, "children" | "fullWidth" | "notFoundMessageI18nId" | "blockedMessageI18nId" | "notFoundImage" | "blockedImage" | "errorImage" | "msWaitedToShowLoadingAnimation" | "childrenMustWaitUntilItsLoaded"> & import("@material-ui/styles").StyledComponentProps<"container" | "flexingContainer" | "circularProgress" | "fullWidthContainer">>;
 export {};

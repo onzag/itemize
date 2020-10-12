@@ -86,6 +86,6 @@ exports.ItemLoader = mui_core_1.withStyles(itemDefinitionLoaderStyles)((props) =
                 react_1.default.createElement(util_1.DelayDisplay, { duration: props.msWaitedToShowLoadingAnimation || 700 },
                     react_1.default.createElement(mui_core_1.CircularProgress, { className: props.classes.circularProgress })) :
                 null,
-            props.children);
+            props.childrenMustWaitUntilItsLoaded && arg.loading ? null : props.children);
     }));
 });

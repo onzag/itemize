@@ -38,6 +38,7 @@ export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) 
 							itemDefinition="fragment"
 							forId={1}
 							forVersion={languageData.currentLanguage.code}
+							loadUnversionedFallback={true}
 							longTermCaching={true}
 							properties={
 								[

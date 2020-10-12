@@ -89,6 +89,8 @@ export default class PropertyEntryReference
   }
 
   public componentDidMount() {
+    this.addListeners();
+
     if (
       this.props.state.value &&
       !this.props.state.internalValue &&
@@ -100,8 +102,6 @@ export default class PropertyEntryReference
         filterByLanguage ? this.props.language : null,
       );
     }
-
-    this.addListeners();
   }
 
   public componentWillUnmount() {

@@ -73,6 +73,11 @@ interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> 
    */
   msWaitedToShowLoadingAnimation?: number;
   /**
+   * Whether the children must wait until the item definition component is fully loaded
+   * in order to mount
+   */
+  childrenMustWaitUntilItsLoaded?: boolean;
+  /**
    * The children inside, this data will not be shown if an error
    * not found, or blocked; but it will if loading, so basically a wireframe
    * is there
@@ -143,7 +148,7 @@ export const ItemLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemLoa
             </DelayDisplay> :
             null
           }
-          {props.children}
+          {props.childrenMustWaitUntilItsLoaded && arg.loading ? null : props.children}
         </div>;
       }}
     </NItemLoader>

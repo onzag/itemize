@@ -924,7 +924,7 @@ class PropertyDefinition {
             }
         }
         const mergedID = id + "." + (version || "");
-        const valueDiffers = this.stateValue[mergedID] !== newValue;
+        const valueDiffers = !deep_equal_1.default(this.stateValue[mergedID], newValue);
         // note that the value is set and never check
         this.stateValue[mergedID] = newActualValue;
         this.stateValueModified[mergedID] = true;
@@ -970,10 +970,10 @@ class PropertyDefinition {
         // however if it's true, we need to check the manually set variable
         // in order to know where the value comes from
         const mergedID = id + "." + (version || "");
+        let currentValue = this.stateValue[mergedID] || null;
         // two conditions apply, now we need to check if it differs
         if (doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
             this.stateValueHasBeenManuallySet[mergedID]) {
-            const currentValue = this.stateValue[mergedID];
             const newValue = value;
             // The two of them are equal which means the internal value
             // is most likely just the same thing so we won't mess with it
@@ -1000,6 +1000,12 @@ class PropertyDefinition {
         delete this.stateLastCachedWithExternal[mergedID];
         delete this.stateLastCached[mergedIDWithoutExternal1];
         delete this.stateLastCached[mergedIDWithoutExternal2];
+        const valueDiffers = !deep_equal_1.default(this.stateValue[mergedID] || null, currentValue);
+        if (valueDiffers) {
+            this.listeners.forEach((listener) => {
+                listener(id || null, version || null, this.stateValue[mergedID] || null);
+            });
+        }
     }
     /**
      * Frees the memory of stored values in a given slot id however
