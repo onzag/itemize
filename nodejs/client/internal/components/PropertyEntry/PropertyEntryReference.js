@@ -32,9 +32,10 @@ class PropertyEntryReference extends react_1.default.Component {
     }
     changeListener(id, version) {
         // we check that the change occured in our own version
-        if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
-            // trigger an onchange event that the results are no longer valid
-            this.props.onChange(null, "");
+        if (this.lastSearchId &&
+            (id || null) === (this.props.forId || null) &&
+            (version || null) === (this.props.forVersion || null)) {
+            this.search(this.lastSearchArgumentLoadAll, this.lastSearchArgumentLimit, this.lastSearchArgumentPreventIds, this.lastSearchArgumentPreventEqualityWithProperties);
         }
     }
     componentDidMount() {
@@ -73,8 +74,8 @@ class PropertyEntryReference extends react_1.default.Component {
                 let actualReferredProperty = stdSelfIdef.getPropertyDefinitionFor(referredProperty, true);
                 if (this.props.itemDefinition.isInSearchMode()) {
                     actualReferredProperty = this.props.itemDefinition.getPropertyDefinitionFor(search_mode_1.getConversionIds(actualReferredProperty.rawData)[0], true);
-                    actualReferredProperty[fn](this.changeListener);
                 }
+                actualReferredProperty[fn](this.changeListener);
             }
         });
     }
@@ -89,12 +90,18 @@ class PropertyEntryReference extends react_1.default.Component {
         });
     }
     addListeners(props = this.props) {
-        this.toggleListener(props, "removeChangeListener");
-    }
-    removeListeners(props = this.props) {
         this.toggleListener(props, "addChangeListener");
     }
+    removeListeners(props = this.props) {
+        this.toggleListener(props, "removeChangeListener");
+    }
     async search(loadAll, limit, preventIds, preventEqualityWithProperties) {
+        const searchId = (new Date()).getTime();
+        this.lastSearchId = searchId;
+        this.lastSearchArgumentLoadAll = loadAll;
+        this.lastSearchArgumentLimit = limit;
+        this.lastSearchArgumentPreventIds = preventIds;
+        this.lastSearchArgumentPreventEqualityWithProperties = preventEqualityWithProperties;
         const strToSearchForValue = this.props.state.internalValue || "";
         const [idef, dProp, sProp] = this.getSpecialData();
         const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
@@ -189,16 +196,18 @@ class PropertyEntryReference extends react_1.default.Component {
         // these nulls which represent the listener are only truly used for the
         // cached searches, we don't use that here
         if (result.error) {
-            if (!this.isUnmounted) {
+            if (!this.isUnmounted && this.lastSearchId === searchId) {
                 this.setState({
                     currentSearchError: result.error,
                 });
             }
             return;
         }
-        const actualPreventIds = (preventIds || []).filter((id) => id !== null);
-        if (preventEqualityWithProperties) {
-            preventEqualityWithProperties.forEach((p) => {
+        // the reason we use the last rather than from the argument is that
+        // we might have gotten a refilter we were doing the search
+        const actualPreventIds = (this.lastSearchArgumentPreventIds || []).filter((id) => id !== null);
+        if (this.lastSearchArgumentPreventEqualityWithProperties) {
+            this.lastSearchArgumentPreventEqualityWithProperties.forEach((p) => {
                 const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
                 const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
                 if (typeof value === "number") {
@@ -225,14 +234,16 @@ class PropertyEntryReference extends react_1.default.Component {
             }
             return 0;
         });
-        this.lastCachedSearch = options;
-        this.lastCachedSearchPreventedIds = preventIds;
-        if (!deep_equal_1.default(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
-            this.lastCachedSearchPreventedProperties &&
-                this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
-            this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
-            this.lastCachedSearchPreventedPropertiesIds = preventEqualityWithProperties;
-            this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+        if (this.lastSearchId === searchId) {
+            this.lastCachedSearch = options;
+            this.lastCachedSearchPreventedIds = this.lastSearchArgumentPreventIds;
+            if (!deep_equal_1.default(this.lastCachedSearchPreventedPropertiesIds, this.lastSearchArgumentPreventEqualityWithProperties)) {
+                this.lastCachedSearchPreventedProperties &&
+                    this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+                this.lastCachedSearchPreventedProperties = (this.lastSearchArgumentPreventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
+                this.lastCachedSearchPreventedPropertiesIds = this.lastSearchArgumentPreventEqualityWithProperties;
+                this.addPreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
+            }
         }
         // this can happen if the search is cancelled before the user has finished typing
         // resulting in an unset value that might be in the searchbox at the end
@@ -242,7 +253,7 @@ class PropertyEntryReference extends react_1.default.Component {
                 this.props.onChange(foundInList.id, (this.props.state.internalValue || ""));
             }
         }
-        if (!this.isUnmounted) {
+        if (!this.isUnmounted && this.lastSearchId === searchId) {
             this.setState({
                 currentSearchError: null,
                 currentOptions: !actualPreventIds.length ? options : options.filter((v) => !actualPreventIds.includes(v.id)),
@@ -353,6 +364,8 @@ class PropertyEntryReference extends react_1.default.Component {
         }
     }
     refilterPossibleValues(preventIds, preventEqualityWithProperties) {
+        this.lastSearchArgumentPreventIds = preventIds;
+        this.lastSearchArgumentPreventEqualityWithProperties = preventEqualityWithProperties;
         if (!this.lastCachedSearch) {
             return;
         }

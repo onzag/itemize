@@ -123,6 +123,7 @@ class ActualItemProvider extends react_1.default.Component {
         this.loadValue = this.loadValue.bind(this);
         this.delete = this.delete.bind(this);
         this.changeListener = this.changeListener.bind(this);
+        this.loadListener = this.loadListener.bind(this);
         this.changeSearchListener = this.changeSearchListener.bind(this);
         this.reloadListener = this.reloadListener.bind(this);
         this.submit = this.submit.bind(this);
@@ -366,6 +367,7 @@ class ActualItemProvider extends react_1.default.Component {
     setupListeners() {
         /// first the change listener that checks for every change event that happens with the state
         this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+        this.props.itemDefinitionInstance.addListener("load", this.props.forId || null, this.props.forVersion || null, this.loadListener);
         // the search change listener
         if (this.props.itemDefinitionInstance.isInSearchMode()) {
             this.props.itemDefinitionInstance.addListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
@@ -392,6 +394,7 @@ class ActualItemProvider extends react_1.default.Component {
         this.removePossibleSearchListeners();
         // here we just remove the listeners that we have setup
         this.props.itemDefinitionInstance.removeListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+        this.props.itemDefinitionInstance.removeListener("load", this.props.forId || null, this.props.forVersion || null, this.loadListener);
         if (this.props.itemDefinitionInstance.isInSearchMode()) {
             this.props.itemDefinitionInstance.removeListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
         }
@@ -506,6 +509,7 @@ class ActualItemProvider extends react_1.default.Component {
                 uniqueIDChanged) {
                 // we need to remove the old listeners
                 prevProps.itemDefinitionInstance.removeListener("change", prevProps.forId || null, prevProps.forVersion || null, this.changeListener);
+                prevProps.itemDefinitionInstance.removeListener("load", prevProps.forId || null, prevProps.forVersion || null, this.loadListener);
                 if (prevProps.itemDefinitionInstance.isInSearchMode()) {
                     prevProps.itemDefinitionInstance.removeListener("search-change", prevProps.forId || null, prevProps.forVersion || null, this.changeSearchListener);
                 }
@@ -516,6 +520,7 @@ class ActualItemProvider extends react_1.default.Component {
                 }
                 // add the new listeners
                 this.props.itemDefinitionInstance.addListener("change", this.props.forId || null, this.props.forVersion || null, this.changeListener);
+                this.props.itemDefinitionInstance.addListener("load", this.props.forId || null, this.props.forVersion || null, this.loadListener);
                 if (this.props.itemDefinitionInstance.isInSearchMode()) {
                     this.props.itemDefinitionInstance.addListener("search-change", this.props.forId || null, this.props.forVersion || null, this.changeSearchListener);
                 }
@@ -666,11 +671,26 @@ class ActualItemProvider extends react_1.default.Component {
         this.setState({
             itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
                 getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),
-            // we do this because eg. the search relies on triggering the change listener
-            // no notify that things aren't loading anymore
-            loading: false,
             // also search might do this, and it's true anyway
             notFound: isNotFound,
+        });
+    }
+    loadListener() {
+        if (this.isUnmounted) {
+            return;
+        }
+        else if (!this.isCMounted) {
+            if (this.mountCbFns.indexOf(this.loadListener) === -1) {
+                this.mountCbFns.push(this.loadListener);
+            }
+            return;
+        }
+        // we basically just upgrade the state
+        this.setState({
+            // we do this because eg. the search relies on triggering the load listener
+            // no notify that things aren't loading anymore
+            loading: false,
+            loaded: true,
         });
     }
     async loadValue(denyCache) {

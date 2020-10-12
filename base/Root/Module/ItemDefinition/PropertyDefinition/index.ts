@@ -7,7 +7,7 @@
 
 import ItemDefinition, { ItemDefinitionIOActions } from "..";
 import ConditionalRuleSet,
-  { IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
+{ IConditionalRuleSetRawJSONDataType } from "../ConditionalRuleSet";
 import {
   ANYONE_METAROLE,
   OWNER_METAROLE,
@@ -568,7 +568,7 @@ export default class PropertyDefinition {
         }
       }
 
-    // Otherwise if we are adding the file info, but it's not an array
+      // Otherwise if we are adding the file info, but it's not an array
     } else if (definition.gqlAddFileToFields) {
       // we get is casted as a file
       const valueAsIGQLFile: IGQLFile = value as unknown as IGQLFile;
@@ -586,16 +586,16 @@ export default class PropertyDefinition {
         ((typeof valueAsIGQLFile.metadata !== "string" || valueAsIGQLFile.metadata.length > 128) && valueAsIGQLFile !== null) ||
         // or file is too large
         valueAsIGQLFile.size > MAX_FILE_SIZE ||
-          // or the source is not null and not undefined
-          // and it's not a promise and it's not a file
-          (
-            valueAsIGQLFile.src !== null &&
-            typeof valueAsIGQLFile.src !== "undefined" &&
-            !(valueAsIGQLFile.src as Promise<any>).then && (
-              typeof File === "undefined" ||
-              !(valueAsIGQLFile.src instanceof File)
-            )
+        // or the source is not null and not undefined
+        // and it's not a promise and it's not a file
+        (
+          valueAsIGQLFile.src !== null &&
+          typeof valueAsIGQLFile.src !== "undefined" &&
+          !(valueAsIGQLFile.src as Promise<any>).then && (
+            typeof File === "undefined" ||
+            !(valueAsIGQLFile.src instanceof File)
           )
+        )
       ) {
         // This means it's an invalid IGQL file structure
         return PropertyInvalidReason.INVALID_VALUE;
@@ -603,7 +603,7 @@ export default class PropertyDefinition {
     }
 
     if (propertyDefinitionRaw.pattern && typeof value === "string") {
-      const regxp = CACHED_REGEXP[propertyDefinitionRaw.pattern] || new RegExp(propertyDefinitionRaw.pattern);
+      const regxp = CACHED_REGEXP[propertyDefinitionRaw.pattern] || new RegExp(propertyDefinitionRaw.pattern);
       if (!CACHED_REGEXP[propertyDefinitionRaw.pattern]) {
         CACHED_REGEXP[propertyDefinitionRaw.pattern] = regxp;
       }
@@ -644,19 +644,19 @@ export default class PropertyDefinition {
       valueToCheck < propertyDefinitionRaw.min
     ) {
       return PropertyInvalidReason.TOO_SMALL;
-    // TOO_LARGE check
+      // TOO_LARGE check
     } else if (
       typeof propertyDefinitionRaw.max !== "undefined" &&
       valueToCheck > propertyDefinitionRaw.max
     ) {
       return PropertyInvalidReason.TOO_LARGE;
-    // TO_SMALL check again but lenght based
+      // TO_SMALL check again but lenght based
     } else if (
       typeof propertyDefinitionRaw.minLength !== "undefined" &&
       (valueToCheck as string).length < propertyDefinitionRaw.minLength
     ) {
       return PropertyInvalidReason.TOO_SMALL;
-    // Now time to count decimals
+      // Now time to count decimals
     } else if (
       typeof propertyDefinitionRaw.maxDecimalCount !== "undefined" ||
       typeof propertyDefinitionRaw.minDecimalCount !== "undefined"
@@ -665,7 +665,7 @@ export default class PropertyDefinition {
       // we split the value to string
       const splittedDecimals =
         valueToCheck
-        .toString().split(".");
+          .toString().split(".");
 
       // now we count the decimals
       if (
@@ -726,7 +726,7 @@ export default class PropertyDefinition {
         count > propertyDefinitionRaw.maxLength
       ) {
         return PropertyInvalidReason.TOO_LARGE;
-      // also with the minimum
+        // also with the minimum
       } else if (
         typeof propertyDefinitionRaw.minLength !== "undefined" &&
         count < propertyDefinitionRaw.minLength
@@ -978,17 +978,17 @@ export default class PropertyDefinition {
           // if the global super enforced value failed, we check for
           // the slotted value
           typeof this.stateSuperEnforcedValue[mergedID] !== "undefined" ?
-          this.stateSuperEnforcedValue[mergedID] :
+            this.stateSuperEnforcedValue[mergedID] :
 
-          // otherwise in other cases we check the enforced value
-          // which has priority
-          (typeof this.rawData.enforcedValue !== "undefined" ?
-            this.rawData.enforcedValue :
-            // otherwise we go to for evaluating the enforced values
-            // or give undefined if nothing is found
-            (this.enforcedValues.find((ev) => {
-              return ev.if.evaluate(id, version);
-            }) || {value: undefined}).value)
+            // otherwise in other cases we check the enforced value
+            // which has priority
+            (typeof this.rawData.enforcedValue !== "undefined" ?
+              this.rawData.enforcedValue :
+              // otherwise we go to for evaluating the enforced values
+              // or give undefined if nothing is found
+              (this.enforcedValues.find((ev) => {
+                return ev.if.evaluate(id, version);
+              }) || { value: undefined }).value)
         );
 
       // if we get one
@@ -1459,7 +1459,7 @@ export default class PropertyDefinition {
 
     const mergedID = id + "." + (version || "");
     this.stateSuperEnforcedValue[mergedID] = actualValue;
-    
+
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";
     const mergedIDWithoutExternal2 = mergedID + ".f";
@@ -1567,7 +1567,7 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
-    const valueDiffers = !equals(this.stateValue[mergedID], newValue);
+    const valueDiffers = this.listeners.length && !equals(this.stateValue[mergedID], newValue);
 
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
@@ -1615,9 +1615,9 @@ export default class PropertyDefinition {
   ) {
     if (modifiedState === false && value !== null) {
       console.warn("You have set the modified state of a property as false, which means this" +
-      " property (" + this.rawData.id + ") has never been touched by the user/computer, yet the value specified (" +
-      JSON.stringify(value) + ")" +
-      " was not null, this means that the property is in a null state that defaults to the property default yet it is not null");
+        " property (" + this.rawData.id + ") has never been touched by the user/computer, yet the value specified (" +
+        JSON.stringify(value) + ")" +
+        " was not null, this means that the property is in a null state that defaults to the property default yet it is not null");
     }
     // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers
     // is false, then we don't care and apply the value
@@ -1658,11 +1658,13 @@ export default class PropertyDefinition {
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
 
-    const valueDiffers = !equals(this.stateValue[mergedID] || null, currentValue);
-    if (valueDiffers) {
-      this.listeners.forEach((listener) => {
-        listener(id || null, version || null, this.stateValue[mergedID] || null);
-      });
+    if (this.listeners.length) {
+      const valueDiffers = !equals(this.stateValue[mergedID] || null, currentValue);
+      if (valueDiffers) {
+        this.listeners.forEach((listener) => {
+          listener(id || null, version || null, this.stateValue[mergedID] || null);
+        });
+      }
     }
   }
 
@@ -1712,7 +1714,7 @@ export default class PropertyDefinition {
         true,
         false,
       );
-    // otherwise restoring is literally clearing
+      // otherwise restoring is literally clearing
     } else {
       this.cleanValueFor(id, version);
     }
@@ -1917,7 +1919,7 @@ export default class PropertyDefinition {
    * Provides the specific valid values of the given property
    * @returns a boolean
    */
-  public getSpecificValidValues() {
+  public getSpecificValidValues() {
     return this.rawData.values;
   }
 
@@ -2120,14 +2122,14 @@ export default class PropertyDefinition {
     // first we get all the roles that have the access
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // so if ANYONE_METAROLE is included we have access
-    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || 
-    (rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
-    (
-      // or if OWNER_METAROLE is included and our user matches our owner user
-      // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
-      // because null === null in the case of eg. GUEST_METAROLE
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+      (rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+      (
+        // or if OWNER_METAROLE is included and our user matches our owner user
+        // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+        // because null === null in the case of eg. GUEST_METAROLE
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     // if no access then null
     if (!hasAccess) {
@@ -2160,12 +2162,12 @@ export default class PropertyDefinition {
     // so if ANYONE_METAROLE is included we have access
     const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
       rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      // or if OWNER_METAROLE is included and our user matches our owner user
-      // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
-      // because null === null in the case of eg. GUEST_METAROLE
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+    ) || (
+        // or if OWNER_METAROLE is included and our user matches our owner user
+        // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+        // because null === null in the case of eg. GUEST_METAROLE
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     // if we don't have access and we are requested to throw an error
     if (!hasAccess && throwError) {
@@ -2185,8 +2187,8 @@ export default class PropertyDefinition {
       if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
         // this is the bit we add
         errorMessage += ", this error might have been avoided if an owner had" +
-        " been specified which matched yourself as there's a self rule, if performing a search" +
-        " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+          " been specified which matched yourself as there's a self rule, if performing a search" +
+          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
       }
 
       // and we throw the error
@@ -2204,7 +2206,7 @@ export default class PropertyDefinition {
    * Gets the raw data of the property
    * @returns the json form
    */
-  public toJSON() {
+  public toJSON() {
     return this.rawData;
   }
 

@@ -481,6 +481,7 @@ export declare class ActualItemProvider extends React.Component<IActualItemProvi
     reloadListener(): void;
     changeSearchListener(): void;
     changeListener(): void;
+    loadListener(): void;
     loadValue(denyCache?: boolean): Promise<IActionResponseWithValue>;
     loadValueCompleted(value: ILoadCompletedPayload): IActionResponseWithValue;
     setStateToCurrentValueWithExternalChecking(currentUpdateId: number): Promise<void>;

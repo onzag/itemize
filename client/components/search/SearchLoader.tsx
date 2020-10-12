@@ -332,6 +332,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       // and then we trigger the change listener for all the instances
       itemDefintionInQuestion.triggerListeners("change", sr.id as number, sr.version as string);
+      itemDefintionInQuestion.triggerListeners("load", sr.id as number, sr.version as string);
     });
   }
   public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
@@ -475,11 +476,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
           // and then we trigger the change listener for all the instances
           itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
+          itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
         } else {
           // otherwise if it was indeed null, we clean the value
           itemDefintionInQuestion.cleanValueFor(cr.forId, cr.forVersion);
           // and also trigger change
           itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
+          itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
         }
 
         // and then we ask for feedback for this using our
@@ -570,6 +573,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             // we clean the thing and trigger the listeners
             itemDefintionInQuestion.cleanValueFor(forId, forVersion);
             itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
+            itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
           } else {
             // otherwise we will see, first the search fields we used
             let mergedQueryFields = this.props.searchFields;
@@ -607,6 +611,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
             // and trigger the listeners for change
             itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
+            itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
           }
         });
       }

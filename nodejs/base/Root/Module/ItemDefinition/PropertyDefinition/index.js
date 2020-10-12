@@ -924,7 +924,7 @@ class PropertyDefinition {
             }
         }
         const mergedID = id + "." + (version || "");
-        const valueDiffers = !deep_equal_1.default(this.stateValue[mergedID], newValue);
+        const valueDiffers = this.listeners.length && !deep_equal_1.default(this.stateValue[mergedID], newValue);
         // note that the value is set and never check
         this.stateValue[mergedID] = newActualValue;
         this.stateValueModified[mergedID] = true;
@@ -1000,11 +1000,13 @@ class PropertyDefinition {
         delete this.stateLastCachedWithExternal[mergedID];
         delete this.stateLastCached[mergedIDWithoutExternal1];
         delete this.stateLastCached[mergedIDWithoutExternal2];
-        const valueDiffers = !deep_equal_1.default(this.stateValue[mergedID] || null, currentValue);
-        if (valueDiffers) {
-            this.listeners.forEach((listener) => {
-                listener(id || null, version || null, this.stateValue[mergedID] || null);
-            });
+        if (this.listeners.length) {
+            const valueDiffers = !deep_equal_1.default(this.stateValue[mergedID] || null, currentValue);
+            if (valueDiffers) {
+                this.listeners.forEach((listener) => {
+                    listener(id || null, version || null, this.stateValue[mergedID] || null);
+                });
+            }
         }
     }
     /**

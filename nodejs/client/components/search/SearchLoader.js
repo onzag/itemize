@@ -106,6 +106,7 @@ class ActualSearchLoader extends react_1.default.Component {
             itemDefintionInQuestion.applyValue(sr.id, sr.version, sr, false, this.props.searchFields, true);
             // and then we trigger the change listener for all the instances
             itemDefintionInQuestion.triggerListeners("change", sr.id, sr.version);
+            itemDefintionInQuestion.triggerListeners("load", sr.id, sr.version);
         });
     }
     async loadValues(currentSearchRecords) {
@@ -217,12 +218,14 @@ class ActualSearchLoader extends react_1.default.Component {
                     itemDefintionInQuestion.applyValue(cr.forId, cr.forVersion, cr.cachedResult.value, false, cr.cachedResult.fields, true);
                     // and then we trigger the change listener for all the instances
                     itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
+                    itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
                 }
                 else {
                     // otherwise if it was indeed null, we clean the value
                     itemDefintionInQuestion.cleanValueFor(cr.forId, cr.forVersion);
                     // and also trigger change
                     itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
+                    itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
                 }
                 // and then we ask for feedback for this using our
                 // remote listener, as the item definition provider not having loaded
@@ -297,6 +300,7 @@ class ActualSearchLoader extends react_1.default.Component {
                         // we clean the thing and trigger the listeners
                         itemDefintionInQuestion.cleanValueFor(forId, forVersion);
                         itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
+                        itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
                     }
                     else {
                         // otherwise we will see, first the search fields we used
@@ -316,6 +320,7 @@ class ActualSearchLoader extends react_1.default.Component {
                         itemDefintionInQuestion.applyValue(valueToApply.id, valueToApply.version, valueToApply, false, mergedQueryFields, true);
                         // and trigger the listeners for change
                         itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
+                        itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
                     }
                 });
             }

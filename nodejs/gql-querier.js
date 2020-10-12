@@ -80,21 +80,36 @@ class GQLQuery {
      */
     mergeWith(query) {
         this.foundUnprocessedArgFiles = this.foundUnprocessedArgFiles.concat(query.foundUnprocessedArgFiles);
+        // first we find all the processed queries we have gotten that we are meant to merge
         return query.processedQueries.map((q) => {
-            const foundIndex = this.processedQueries.findIndex((sq) => sq.name === q.name);
-            if (foundIndex === -1) {
+            // now we try to find the query with the same name as ours
+            const matchingQueries = this.processedQueries.map((sq, index) => ({
+                processedQuery: sq,
+                index,
+            })).filter((v) => v.processedQuery.name === q.name);
+            // if we don't find one, we are good to go
+            if (matchingQueries.length === 0) {
+                // just add it there
                 this.processedQueries.push(q);
                 return [q.name, q.name];
             }
             else {
-                const isNameMergable = this.isNameMergableWith(this.processedQueries[foundIndex], q);
-                if (isNameMergable) {
-                    if (gql_util_1.requestFieldsAreContained(this.processedQueries[foundIndex].fields, q.fields)) {
-                        this.processedQueries[foundIndex].fields = q.fields;
+                let mergeId = null;
+                // otherwise let's check if we can merge with some of them
+                const itMerged = matchingQueries.some((matchingQuery) => {
+                    const isNameMergable = this.isNameMergableWith(matchingQuery.processedQuery, q);
+                    if (isNameMergable) {
+                        if (gql_util_1.requestFieldsAreContained(matchingQuery.processedQuery.fields, q.fields)) {
+                            this.processedQueries[matchingQuery.index].fields = q.fields;
+                        }
+                        mergeId = [matchingQuery.processedQuery.alias || matchingQuery.processedQuery.name, q.name];
+                        return true;
                     }
-                    return [this.processedQueries[foundIndex].alias || q.name, q.name];
-                }
-                else {
+                    return false;
+                });
+                // so we couldn't find anything to merge
+                if (!itMerged) {
+                    // So we create a new entire entry for this
                     const queryClone = { ...q };
                     const usedAliases = this.processedQueries.map(q => q.alias);
                     let id = 2;
@@ -106,6 +121,9 @@ class GQLQuery {
                     queryClone.alias = newAlias;
                     this.processedQueries.push(queryClone);
                     return [newAlias, q.name];
+                }
+                else {
+                    return mergeId;
                 }
             }
         });

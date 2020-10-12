@@ -35,6 +35,11 @@ interface IPropertyEntryReferenceState {
 export default class PropertyEntryReference extends React.Component<IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>, IPropertyEntryReferenceState> {
     private searchTimeout;
     private currentlyFindingValueFor;
+    private lastSearchId;
+    private lastSearchArgumentLoadAll;
+    private lastSearchArgumentLimit;
+    private lastSearchArgumentPreventIds;
+    private lastSearchArgumentPreventEqualityWithProperties;
     private lastCachedSearch;
     private lastCachedSearchPreventedProperties;
     private lastCachedSearchPreventedPropertiesIds;
