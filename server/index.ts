@@ -19,7 +19,6 @@ import { customUserTriggers } from "./user/triggers";
 import { setupIPStack, IPStack } from "./services/ipstack";
 import { setupMailgun } from "./services/mailgun";
 import Mailgun from "mailgun-js";
-import pkgcloud from "pkgcloud";
 import { setupHere, Here } from "./services/here";
 import { promisify } from "util";
 
@@ -33,10 +32,10 @@ import { ILocaleContextType } from "../client/internal/providers/locale-provider
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
-import { removeFolderFor } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
+import { CloudClient, ICloudClients } from "./cloud";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -88,20 +87,6 @@ const fsAsync = fs.promises;
 export const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express();
 
 /**
- * Contains all the pkgcloud clients connection for every container id
- */
-export type PkgCloudClients = { [containerId: string]: pkgcloud.storage.Client };
-/**
- * Contains all the pkgcloud containers for every container id
- */
-export type PkgCloudContainers = {
-  [containerId: string]: {
-    prefix: string,
-    container: pkgcloud.storage.Container,
-  }
-};
-
-/**
  * Specifies the SSR configuration for the multiple pages
  */
 export interface ISSRConfig {
@@ -141,8 +126,7 @@ export interface IAppDataType {
   ipStack: IPStack,
   here: Here,
   mailgun: Mailgun.Mailgun;
-  pkgcloudStorageClients: PkgCloudClients;
-  pkgcloudUploadContainers: PkgCloudContainers;
+  cloudClients: ICloudClients;
   customUserTokenQuery: any;
   logger: winston.Logger;
 }
@@ -162,43 +146,27 @@ export interface IServerCustomizationDataType {
   customTriggers?: ITriggerRegistry;
 }
 
-/**
- * Provides the pkgloud client container from ovh
- * @param client the client to use
- * @param containerName the container name
- */
-export function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container> {
-  return new Promise((resolve, reject) => {
-    client.getContainer(containerName, (err, container) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(container);
-      }
-    });
-  });
-}
+export async function getCloudClients(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
+  const cloudClients: ICloudClients = {};
+  if (sensitiveConfig.localContainer) {
+    let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
+    if (!prefix) {
+      logger && logger.error(
+        "initializeServer [SERIOUS]: Could not find prefix for local container '" + sensitiveConfig.localContainer + "'",
+      );
+      throw new Error("Could not find prefix for local container " + sensitiveConfig.localContainer);
+    }
+    if (prefix.indexOf("/") !== 0) {
+      prefix = "https://" + prefix;
+    }
+    const localClient = new CloudClient(sensitiveConfig.localContainer, prefix);
+    localClient.setAsLocal();
+    cloudClients[sensitiveConfig.localContainer] = localClient;
+  }
 
-export async function getPkgCloudContainers(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
-  const pkgcloudStorageClients: PkgCloudClients = {};
-  const pkgcloudUploadContainers: PkgCloudContainers = {};
   if (sensitiveConfig.openstackContainers) {
     await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
       const containerData = sensitiveConfig.openstackContainers[containerIdX];
-      pkgcloudStorageClients[containerIdX] = pkgcloud.storage.createClient({
-        provider: "openstack",
-        username: containerData.username,
-        keystoneAuthVersion: 'v3',
-        region: containerData.region,
-        domainId: containerData.domainId, //default
-        domainName: containerData.domainName,
-        password: containerData.password,
-        authUrl: containerData.authUrl,
-      } as any);
-
-      logger && logger.info(
-        "initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX,
-      );
       let prefix = config.containersHostnamePrefixes[containerIdX];
       if (!prefix) {
         logger && logger.error(
@@ -209,17 +177,24 @@ export async function getPkgCloudContainers(config: IConfigRawJSONDataType, sens
       if (prefix.indexOf("/") !== 0) {
         prefix = "https://" + prefix;
       }
-      pkgcloudUploadContainers[containerIdX] = {
-        prefix,
-        container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-      };
+  
+      const client = new CloudClient(containerIdX, prefix);
+      await client.setAsOpenstack({
+        provider: "openstack",
+        username: containerData.username,
+        keystoneAuthVersion: 'v3',
+        region: containerData.region,
+        domainId: containerData.domainId, //default
+        domainName: containerData.domainName,
+        password: containerData.password,
+        authUrl: containerData.authUrl,
+      }, containerData.containerName);
+
+      cloudClients[containerIdX] = client;
     }));
   }
 
-  return {
-    pkgcloudStorageClients,
-    pkgcloudUploadContainers,
-  }
+  return cloudClients;
 }
 
 /**
@@ -450,23 +425,13 @@ export async function initializeServer(
         logger.info(
           "initializeServer: initializing SEO configuration",
         );
-        const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
-        if (!seoContainerData) {
+        const openStackSEOContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
+        const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
+        if (!openStackSEOContainerData && !isLocalInstead) {
           logger.error(
             "initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'",
           );
         } else {
-          const seoContainerClient = pkgcloud.storage.createClient({
-            provider: "openstack",
-            username: seoContainerData.username,
-            keystoneAuthVersion: 'v3',
-            region: seoContainerData.region,
-            domainId: seoContainerData.domainId, //default
-            domainName: seoContainerData.domainName,
-            password: seoContainerData.password,
-            authUrl: seoContainerData.authUrl,
-          } as any);
-
           let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
           if (!prefix) {
             logger.error(
@@ -477,10 +442,25 @@ export async function initializeServer(
           if (prefix.indexOf("/") !== 0) {
             prefix = "https://" + prefix;
           }
-          const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
+          const cloudClient = new CloudClient(sensitiveConfig.seoContainerID, prefix);
+          if (isLocalInstead) {
+            cloudClient.setAsLocal();
+          } else {
+            await cloudClient.setAsOpenstack({
+              provider: "openstack",
+              username: openStackSEOContainerData.username,
+              keystoneAuthVersion: 'v3',
+              region: openStackSEOContainerData.region,
+              domainId: openStackSEOContainerData.domainId, //default
+              domainName: openStackSEOContainerData.domainName,
+              password: openStackSEOContainerData.password,
+              authUrl: openStackSEOContainerData.authUrl,
+            }, openStackSEOContainerData.containerName);
+          }
+
           const seoGenerator = new SEOGenerator(
             seoConfig.seoRules,
-            seoContainer,
+            cloudClient,
             knex,
             root,
             prefix,
@@ -503,26 +483,26 @@ export async function initializeServer(
       "initializeServer: initializing openstack pkgcloud objectstorage clients",
     );
 
-    const { pkgcloudStorageClients, pkgcloudUploadContainers} = await getPkgCloudContainers(config, sensitiveConfig);
+    const cloudClients = await getCloudClients(config, sensitiveConfig);
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
         "initializeServer: cleaning storage",
       );
 
-      await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
+      await Promise.all(Object.keys(cloudClients).map(async (containerId) => {
         if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
           logger.info(
             "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
           );
-          const container = pkgcloudUploadContainers[containerId];
-          await removeFolderFor(container.container, "sitemaps/" + domain);
+          const client = cloudClients[containerId];
+          await client.removeFolder("sitemaps/" + domain);
         } else {
           logger.info(
             "initializeServer: cleaning " + containerId + " data for " + domain,
           );
-          const container = pkgcloudUploadContainers[containerId];
-          await removeFolderFor(container.container, domain);
+          const client = cloudClients[containerId];
+          await client.removeFolder(domain);
         }
       }));
 
@@ -558,7 +538,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, domain, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, cloudClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -640,8 +620,7 @@ export async function initializeServer(
       ipStack,
       here,
       mailgun,
-      pkgcloudStorageClients,
-      pkgcloudUploadContainers,
+      cloudClients,
 
       logger,
 

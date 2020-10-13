@@ -14,12 +14,11 @@ import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../../constants";
 import { runImageConversions } from "./image-conversions";
 import { IGQLFile } from "../../../../../../gql-querier";
-import pkgcloud from "pkgcloud";
 import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
 import { logger } from "../../../../../../server";
 import Module from "../../..";
-import https from "https";
+import { CloudClient } from "../../../../../../server/cloud";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -31,8 +30,7 @@ const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LE
  * file value
  * @param newValues the new values as a list
  * @param oldValues the old values that this came from
- * @param uploadsContainer the upload container to uploads file for, or delete for
- * @param uploadsPrefix the uploads prefix of such container
+ * @param uploadsClient the uploads client
  * @param itemDefinitionOrModule the item definition or module (for prop extension) these values are related to
  * @param include the include this values are related to
  * @param propertyDefinition the property (must be of type file)
@@ -42,8 +40,7 @@ const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LE
 export function processFileListFor(
   newValues: IGQLFile[],
   oldValues: IGQLFile[],
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -71,8 +68,7 @@ export function processFileListFor(
     return processOneFileAndItsSameIDReplacement(
       newValue,
       relativeOldValue,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       itemDefinitionOrModule,
       include,
@@ -84,8 +80,7 @@ export function processFileListFor(
     return processOneFileAndItsSameIDReplacement(
       null,
       removedValue,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       itemDefinitionOrModule,
       include,
@@ -127,8 +122,7 @@ export function processFileListFor(
 export function processSingleFileFor(
   newValue: IGQLFile,
   oldValue: IGQLFile,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -141,8 +135,7 @@ export function processSingleFileFor(
     return processOneFileAndItsSameIDReplacement(
       newValue,
       oldValue,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       itemDefinitionOrModule,
       include,
@@ -155,8 +148,7 @@ export function processSingleFileFor(
     const initialStepOutput = processOneFileAndItsSameIDReplacement(
       null,
       oldValue,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       itemDefinitionOrModule,
       include,
@@ -166,8 +158,7 @@ export function processSingleFileFor(
     const secondStepOutput = processOneFileAndItsSameIDReplacement(
       newValue,
       null,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       itemDefinitionOrModule,
       include,
@@ -187,8 +178,7 @@ export function processSingleFileFor(
  * Processes a single file that is to be changed, that is, their ids is equal
  * @param newVersion the new version of the file with the same id (or null, removes)
  * @param oldVersion the old version of the file with the same id (or null, creates)
- * @param uploadsContainer the upload container to uploads file for or delete for
- * @param uploadsPrefix the uploads prefix of such container
+ * @param uploadsClient the upload client
  * @param itemDefinitionOrModule the item definition or module (for prop extensions) this field is related to
  * @param include the include (or null)
  * @param propertyDefinition the property
@@ -198,8 +188,7 @@ export function processSingleFileFor(
 function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
   oldVersion: IGQLFile,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -217,7 +206,7 @@ function processOneFileAndItsSameIDReplacement(
         // however we must still check
         // is there an old version actually?
         if (oldVersion) {
-          if (!uploadsContainer) {
+          if (!uploadsClient) {
             logger.warn(
               "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
             );
@@ -233,7 +222,7 @@ function processOneFileAndItsSameIDReplacement(
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
             const fileLocationPath = path.join(propertyLocationPath, oldVersion.id);
             try {
-              await removeFolderFor(uploadsContainer, fileLocationPath);
+              await uploadsClient.removeFolder(fileLocationPath);
             } catch (err) {
               logger.error(
                 "processOneFileAndItsSameIDReplacement: could not remove folder at in " + fileLocationPath,
@@ -316,7 +305,7 @@ function processOneFileAndItsSameIDReplacement(
   return {
     value,
     consumeStreams: async (propertyLocationId: string) => {
-      if (!uploadsContainer) {
+      if (!uploadsClient) {
         logger.warn(
           "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
         );
@@ -340,8 +329,7 @@ function processOneFileAndItsSameIDReplacement(
       await addFileFor(
         filePath,
         curatedFileName,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         valueWithStream,
         propertyDefinition,
@@ -354,14 +342,14 @@ function processOneFileAndItsSameIDReplacement(
  * Deletes the folder that contains all
  * the file data
  * @param domain the domain we are working with
- * @param uploadsContainer the container that contains the file
+ * @param uploadsClient the uploads client
  * @param itemDefinitionOrModule the item definition or module in question
  * @param idVersionId the transitory id to drop
  * @returns a void promise from when this is done
  */
 export function deleteEverythingInFilesContainerId(
   domain: string,
-  uploadsContainer: pkgcloud.storage.Container,
+  uploadsClient: CloudClient,
   itemDefinitionOrModule: ItemDefinition | Module,
   idVersionId: string,
 ): Promise<void> {
@@ -369,36 +357,7 @@ export function deleteEverythingInFilesContainerId(
   const idefOrModLocationPath = itemDefinitionOrModule.getQualifiedPathName();
   const filesContainerPath = path.join(domain, idefOrModLocationPath, idVersionId);
 
-  return removeFolderFor(uploadsContainer, filesContainerPath);
-}
-
-export async function removeFolderFor(
-  uploadsContainer: pkgcloud.storage.Container,
-  mainPath: string,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    CAN_LOG_DEBUG && logger.debug("removeFolderFor: Deleting folder for", {mainPath});
-
-    (uploadsContainer as any).getFiles({
-      prefix: mainPath,
-    }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
-      if (err) {
-        reject(err);
-      } else if (files && files.length) {
-        CAN_LOG_DEBUG && logger.debug("removeFolderFor: Bulk deleting", {files});
-        (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      } else {
-        CAN_LOG_DEBUG && logger.debug("removeFolderFor: Could not find any files");
-        resolve();
-      }
-    });
-  });
+  return uploadsClient.removeFolder(filesContainerPath);
 }
 
 /**
@@ -408,8 +367,7 @@ export async function removeFolderFor(
  * all the way to the property definition id, module, etc...
  * @param curatedFileName the file name that is being used currently for the file, with all
  * special invalid characters escaped
- * @param uploadsContainer the upload container to uploads file for
- * @param uploadsPrefix the uploads prefix of such container
+ * @param uploadsClient the uploads client
  * @param value the value that we are storing (this value must contain a stream)
  * @param propertyDefinition the property definition for this
  * @returns a void promise
@@ -417,8 +375,7 @@ export async function removeFolderFor(
 async function addFileFor(
   mainFilePath: string,
   curatedFileName: string,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
@@ -441,16 +398,14 @@ async function addFileFor(
       mainFilePath,
       curatedFileName,
       value.type,
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       domain,
       propertyDefinition,
     );
   } else {
     // otherwise we just pipe the file
     await sqlUploadPipeFile(
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       stream,
       domain,
       path.join(mainFilePath, curatedFileName),
@@ -460,15 +415,13 @@ async function addFileFor(
 
 /**
  * Uploads a file in a given upload container
- * @param uploadsContainer the uploads container
- * @param uploadsPrefix the uploads prefix of this container
+ * @param uploadsClient the uploads client
  * @param readStream the read stream of the file
  * @param remote the remote name this file is uploaded as, it's whole path
  * @returns a void promise
  */
 export async function sqlUploadPipeFile(
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   readStream: ReadStream | sharp.Sharp,
   domain: string,
   remote: string,
@@ -477,54 +430,5 @@ export async function sqlUploadPipeFile(
 
   CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Uploading", {path: finalLocation});
 
-  // we make a write stream to the uploads container
-  const writeStream = uploadsContainer.client.upload({
-    container: uploadsContainer as any,
-    remote: finalLocation,
-  });
-  // and pipe our read stream
-  readStream.pipe(writeStream);
-
-  // return a promise for it
-  return new Promise((resolve, reject) => {
-    writeStream.on("finish", () => {
-      CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Finished uploading", {path: finalLocation});
-      // we call the verify resource is ready function
-      verifyResourceIsReady(
-        new URL(uploadsPrefix + finalLocation),
-        resolve,
-      );
-    });
-    writeStream.on("error", reject);
-  });
-}
-
-/**
- * Verifies whether a given uploaded resource is actually ready, as
- * containers, might have been done uploading but are not ready to serve
- * the file itself
- * @param url the url to verify
- * @param done the callback once it's done
- */
-function verifyResourceIsReady(url: URL, done: () => void) {
-  // so we get the url string value, for debugging purposes
-  const strURL = url.toString();
-  CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Verifying readiness of " + strURL);
-
-  // now we use https to call and do a head request to check the status
-  https.get({
-    method: "HEAD",
-    host: url.host,
-    path: url.pathname,
-  }, (resp) => {
-    // status is succesful
-    if (resp.statusCode === 200 || resp.statusCode === 0) {
-      CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Verification succeed " + strURL);
-      done();
-    } else {
-      // otherwise we wait 100 milliseconds, and recursively execute until it's ready
-      CAN_LOG_DEBUG && logger.debug("verifyResourceIsReady: Resource is not yet ready " + strURL);
-      setTimeout(verifyResourceIsReady.bind(null, url, done), 100);
-    }
-  });
+  await uploadsClient.upload(finalLocation, readStream, true);
 }

@@ -90,7 +90,7 @@ async function extractConfigAndBuildNumber() {
     const standardConfig = await extractOneConfig(schema_checks_1.checkConfig, "index", null, false, standardConfigCheckerCallback);
     const sensitiveConfigCheckerCallback = (data, traceback) => {
         Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
-            if (!data.openstackContainers[containerId]) {
+            if (!data.openstackContainers[containerId] && data.localContainer !== containerId) {
                 throw new Error_1.default("Could not find container information for container " + containerId + " in sensitive config", traceback.newTraceToBit("openstackContainers"));
             }
         });

@@ -17,8 +17,8 @@ import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
-import pkgcloud from "pkgcloud";
 import Module from "../../..";
+import { CloudClient } from "../../../../../../server/cloud";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -311,8 +311,7 @@ export function convertGQLValueToSQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   dictionary: string,
 ): ISQLStreamComposedTableRowValue {
@@ -346,8 +345,7 @@ export function convertGQLValueToSQLValueForProperty(
       const processedValue = processFileListFor(
         newValue,
         oldValue,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         itemDefinition || mod,
         include,
@@ -359,8 +357,7 @@ export function convertGQLValueToSQLValueForProperty(
       const processedValue = processSingleFileFor(
         newValue,
         oldValue,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         itemDefinition || mod,
         include,

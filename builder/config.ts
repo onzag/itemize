@@ -148,7 +148,7 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
 
   const sensitiveConfigCheckerCallback = (data: ISensitiveConfigRawJSONDataType, traceback: Traceback) => {
     Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
-      if (!data.openstackContainers[containerId]) {
+      if (!data.openstackContainers[containerId] && data.localContainer !== containerId) {
         throw new CheckUpError(
           "Could not find container information for container " + containerId + " in sensitive config",
           traceback.newTraceToBit("openstackContainers"),

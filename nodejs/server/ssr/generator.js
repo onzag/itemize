@@ -243,10 +243,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         etag += "-" + collectionSignature.replace(/\s/g, "_");
     }
     etag = JSON.stringify(etag);
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-    console.log(ifNoneMatch);
-    console.log(etag);
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     if (!collectionFailed &&
         ifNoneMatch &&
         // this actually even would check the buildnumber
@@ -263,7 +259,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             res.setHeader("Cache-Control", "public, max-age=0");
         }
         res.status(304).end();
-        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         root.cleanState();
         appData.rootPool.release(root);
         return;

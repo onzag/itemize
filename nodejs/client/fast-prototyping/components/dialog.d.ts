@@ -46,11 +46,11 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
 /**
  * The dialog itself, non-responsive and rather generic
  */
-declare const Dialog: React.ComponentType<Pick<IDialogProps, "title" | "open" | "children" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">>;
+declare const Dialog: React.ComponentType<Pick<IDialogProps, "title" | "children" | "open" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">>;
 /**
  * This is a responsive version of the dialog
  * it's able to go in fullscreen mode automatically
  * takes all the other props
  */
-declare const DialogResponsive: React.ComponentType<(Pick<Pick<IDialogProps, "title" | "open" | "children" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">, "title" | "open" | "children" | "className" | "classes" | "innerRef" | "onClose" | "buttons"> & Partial<import("@material-ui/core").WithMobileDialog>) | (Pick<React.PropsWithChildren<Pick<IDialogProps, "title" | "open" | "children" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">>, "title" | "open" | "children" | "className" | "classes" | "innerRef" | "onClose" | "buttons"> & Partial<import("@material-ui/core").WithMobileDialog>)>;
+declare const DialogResponsive: React.ComponentType<(Pick<Pick<IDialogProps, "title" | "children" | "open" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">, "title" | "children" | "open" | "className" | "classes" | "innerRef" | "onClose" | "buttons"> & Partial<import("@material-ui/core").WithMobileDialog>) | (Pick<React.PropsWithChildren<Pick<IDialogProps, "title" | "children" | "open" | "className" | "fullScreen" | "onClose" | "buttons"> & import("@material-ui/styles").StyledComponentProps<"title" | "content" | "paper" | "appbar" | "actions">>, "title" | "children" | "open" | "className" | "classes" | "innerRef" | "onClose" | "buttons"> & Partial<import("@material-ui/core").WithMobileDialog>)>;
 export { DialogResponsive, Dialog };

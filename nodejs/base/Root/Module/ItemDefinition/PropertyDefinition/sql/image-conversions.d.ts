@@ -8,7 +8,7 @@
 /// <reference types="node" />
 import PropertyDefinition from "..";
 import { ReadStream } from "fs";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../../../../server/cloud";
 /**
  * Runs the image conversions and stores them in the specified location
  * @param imageStream the read stream that contains the image
@@ -20,4 +20,4 @@ import pkgcloud from "pkgcloud";
  * @param propDef the property definition that this refers to
  * @returns a void promise for when this is done
  */
-export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, propDef: PropertyDefinition): Promise<void>;
+export declare function runImageConversions(imageStream: ReadStream, filePath: string, fileName: string, fileMimeType: string, uploadsClient: CloudClient, domain: string, propDef: PropertyDefinition): Promise<void>;

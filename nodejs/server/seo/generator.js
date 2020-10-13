@@ -21,7 +21,7 @@ class SEOGenerator {
     /**
      * Buillds a new seo generator
      * @param rules the seo rules
-     * @param container the openstack container that contains the xml files
+     * @param cloudClient the cloud client with the XML files
      * @param knex the knex instance
      * @param root the root for definitions
      * @param prefix the prefix for the openstack container
@@ -29,11 +29,11 @@ class SEOGenerator {
      * @param hostname the hostname that we are creating sitemaps for
      * @param pingGoogle whether to ping google once we have updated our sitemaps
      */
-    constructor(rules, container, knex, root, prefix, supportedLanguages, hostname, pingGoogle) {
+    constructor(rules, cloudClient, knex, root, prefix, supportedLanguages, hostname, pingGoogle) {
         this.primaryIndex = null;
         this.mainIndex = null;
         this.cache = {};
-        this.container = container;
+        this.cloudClient = cloudClient;
         this.knex = knex;
         this.root = root;
         this.prefix = prefix;
@@ -275,19 +275,8 @@ class SEOGenerator {
      */
     async writeFile(data, target) {
         index_1.logger.info("SEOGenerator.writeFile: Attempting to write file at: " + target);
-        const writeStream = this.container.client.upload({
-            container: this.container,
-            remote: target,
-        });
         const readStream = stream_1.Readable.from(data);
-        readStream.pipe(writeStream);
-        return new Promise((resolve, reject) => {
-            writeStream.on("finish", () => {
-                CAN_LOG_DEBUG && index_1.logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
-                resolve();
-            });
-            writeStream.on("error", reject);
-        });
+        await this.cloudClient.upload(target, readStream);
     }
     /**
      * Converts a JSON sitemap type to a xml type

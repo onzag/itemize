@@ -1,4 +1,3 @@
-import pkgcloud from "pkgcloud";
 import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOParametrizer } from ".";
 import https from "https";
 import { logger } from "../index";
@@ -10,6 +9,7 @@ import { escapeStringRegexp } from "../../util";
 import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
+import { CloudClient } from "../cloud";
 
 const NO_SEO = process.env.NO_SEO === "true";
 
@@ -31,7 +31,7 @@ interface ISEOPreResult {
 export class SEOGenerator {
   private root: Root;
   private knex: Knex;
-  private container: pkgcloud.storage.Container;
+  private cloudClient: CloudClient;
   private prefix: string;
   private rules: ISEORuleSet;
   private supportedLanguages: string[];
@@ -45,7 +45,7 @@ export class SEOGenerator {
   /**
    * Buillds a new seo generator
    * @param rules the seo rules
-   * @param container the openstack container that contains the xml files
+   * @param cloudClient the cloud client with the XML files
    * @param knex the knex instance
    * @param root the root for definitions
    * @param prefix the prefix for the openstack container
@@ -55,7 +55,7 @@ export class SEOGenerator {
    */
   constructor(
     rules: ISEORuleSet,
-    container: pkgcloud.storage.Container,
+    cloudClient: CloudClient,
     knex: Knex,
     root: Root,
     prefix: string,
@@ -63,7 +63,7 @@ export class SEOGenerator {
     hostname: string,
     pingGoogle: boolean,
   ) {
-    this.container = container;
+    this.cloudClient = cloudClient;
     this.knex = knex;
     this.root = root;
     this.prefix = prefix;
@@ -365,20 +365,11 @@ export class SEOGenerator {
   private async writeFile(data: string, target: string): Promise<void> {
     logger.info("SEOGenerator.writeFile: Attempting to write file at: " + target);
 
-    const writeStream = this.container.client.upload({
-      container: this.container as any,
-      remote: target,
-    });
     const readStream = Readable.from(data);
-    readStream.pipe(writeStream);
-
-    return new Promise((resolve, reject) => {
-      writeStream.on("finish", () => {
-        CAN_LOG_DEBUG && logger.debug("SEOGenerator.writeFile: Finished uploading " + target);
-        resolve();
-      });
-      writeStream.on("error", reject);
-    });
+    await this.cloudClient.upload(
+      target,
+      readStream,
+    );
   }
 
   /**

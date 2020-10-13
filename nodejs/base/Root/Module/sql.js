@@ -159,8 +159,7 @@ exports.getSQLTablesSchemaForModule = getSQLTablesSchemaForModule;
  * @param mod the module in question
  * @param data the graphql data
  * @param oldData the old stored value for this module
- * @param uploadsContainer the uploads container from openstack
- * @param uploadsPrefix the uploads prefix of the container
+ * @param uploadsClient the uploads client
  * @param dictionary the postgresql dictionary
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -171,7 +170,7 @@ exports.getSQLTablesSchemaForModule = getSQLTablesSchemaForModule;
  * in a partial field value, don't use partial fields to create
  * @returns the composed row value with the consume streams function
  */
-function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, partialFields) {
+function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData, uploadsClient, domain, dictionary, partialFields) {
     // first we create the row value
     const result = {};
     const consumeStreamsFns = [];
@@ -180,7 +179,7 @@ function convertGQLValueToSQLValueForModule(knex, serverData, mod, data, oldData
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, mod, null, null, pd, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary);
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, mod, null, null, pd, data, oldData, uploadsClient, domain, dictionary);
             Object.assign(result, addedFieldsByProperty.value);
             consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }

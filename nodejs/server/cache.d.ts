@@ -13,8 +13,9 @@ import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import { PkgCloudContainers, IServerDataType } from ".";
+import { IServerDataType } from ".";
 import { ISensitiveConfigRawJSONDataType } from "../config";
+import { ICloudClients } from "./cloud";
 /**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
@@ -25,7 +26,7 @@ export declare class Cache {
     private redisClient;
     private domain;
     private knex;
-    private uploadsContainers;
+    private cloudClients;
     private root;
     private serverData;
     private listener;
@@ -41,7 +42,7 @@ export declare class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient: RedisClient, knex: Knex, sensitiveConfig: ISensitiveConfigRawJSONDataType, uploadsContainers: PkgCloudContainers, domain: string, root: Root, initialServerData: IServerDataType);
+    constructor(redisClient: RedisClient, knex: Knex, sensitiveConfig: ISensitiveConfigRawJSONDataType, cloudClients: ICloudClients, domain: string, root: Root, initialServerData: IServerDataType);
     /**
      * Sets the listener for the remote interaction with the clients
      * that are connected, this listener is what informs the client of updates

@@ -30,9 +30,9 @@ import {
   buildSQLQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
-import Knex, { QueryBuilder } from "knex";
+import Knex from "knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../../server/cloud";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -281,8 +281,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
@@ -307,8 +306,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
         pd,
         data,
         oldData,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         dictionary,
       );
@@ -337,8 +335,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
         include,
         data,
         oldData,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         dictionary,
         innerPartialFields,

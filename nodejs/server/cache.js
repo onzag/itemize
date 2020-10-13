@@ -40,12 +40,12 @@ class Cache {
      * @param knex the knex instance
      * @param root the root of itemize
      */
-    constructor(redisClient, knex, sensitiveConfig, uploadsContainers, domain, root, initialServerData) {
+    constructor(redisClient, knex, sensitiveConfig, cloudClients, domain, root, initialServerData) {
         this.memoryCache = {};
         this.redisClient = redisClient;
         this.knex = knex;
         this.root = root;
-        this.uploadsContainers = uploadsContainers;
+        this.cloudClients = cloudClients;
         this.serverData = initialServerData;
         this.sensitiveConfig = sensitiveConfig;
         this.domain = domain;
@@ -171,12 +171,12 @@ class Cache {
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestCreation: requesting creation for " + selfTable + " at module " +
             moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary);
-        const containerExists = containerId && this.uploadsContainers[containerId];
+        const containerExists = containerId && this.cloudClients[containerId];
         // now we extract the SQL information for both item definition table
         // and the module table, this value is database ready, and hence needs
         // knex and the dictionary to convert fields that need it
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, value, null, containerExists ? this.cloudClients[containerId] : null, this.domain, dictionary);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), value, null, containerExists ? this.cloudClients[containerId] : null, this.domain, dictionary);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // this data is added every time when creating
@@ -416,14 +416,14 @@ class Cache {
                 partialUpdateFields[arg] = update[arg];
             }
         });
-        const containerExists = containerId && this.uploadsContainers[containerId];
+        const containerExists = containerId && this.cloudClients[containerId];
         // and we now build both queries for updating
         // we are telling by setting the partialFields variable
         // that we only want the editingFields to be returned
         // into the SQL value, this is valid in here because
         // we don't want things to be defaulted in the query
-        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
-        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerExists ? this.uploadsContainers[containerId].container : null, containerExists ? this.uploadsContainers[containerId].prefix : null, this.domain, dictionary, partialUpdateFields);
+        const sqlIdefDataComposed = sql_1.convertGQLValueToSQLValueForItemDefinition(this.knex, this.serverData, itemDefinition, update, currentValue, containerExists ? this.cloudClients[containerId] : null, this.domain, dictionary, partialUpdateFields);
+        const sqlModDataComposed = sql_2.convertGQLValueToSQLValueForModule(this.knex, this.serverData, itemDefinition.getParentModule(), update, currentValue, containerExists ? this.cloudClients[containerId] : null, this.domain, dictionary, partialUpdateFields);
         const sqlModData = sqlModDataComposed.value;
         const sqlIdefData = sqlIdefDataComposed.value;
         // now we check if we are updating anything at all
@@ -556,7 +556,7 @@ class Cache {
         const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
         CAN_LOG_DEBUG && _1.logger.debug("Cache.requestDelete: requesting delete for " + selfTable + " at module " +
             moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions);
-        const containerExists = containerId && this.uploadsContainers[containerId];
+        const containerExists = containerId && this.cloudClients[containerId];
         let deleteFilesInContainer = async (specifiedVersion) => {
             const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
@@ -564,7 +564,7 @@ class Cache {
                 .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
             if (someFilesInItemDef) {
                 if (containerExists) {
-                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.uploadsContainers[containerId].container, itemDefinition, id + "." + (specifiedVersion || null));
+                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.cloudClients[containerId], itemDefinition, id + "." + (specifiedVersion || null));
                 }
                 else {
                     _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available", {
@@ -574,7 +574,7 @@ class Cache {
             }
             if (someFilesInModule) {
                 if (containerExists) {
-                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.uploadsContainers[containerId].container, itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
+                    await file_management_1.deleteEverythingInFilesContainerId(this.domain, this.cloudClients[containerId], itemDefinition.getParentModule(), id + "." + (specifiedVersion || null));
                 }
                 else {
                     _1.logger.warn("Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available", {

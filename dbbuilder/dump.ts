@@ -17,8 +17,8 @@ import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
-import { getPkgCloudContainers, PkgCloudContainers } from "../server";
-import pkgcloud from "pkgcloud";
+import { getCloudClients } from "../server";
+import { CloudClient, ICloudClients } from "../server/cloud";
 
 const fsAsync = fs.promises;
 
@@ -173,51 +173,6 @@ async function dumpAllFromModuleRecursive(knex: Knex, root: Root, mod: Module): 
 }
 
 /**
- * Fetches a file from a given upload container that is already defined and stores it locally
- * @param container the container in question
- * @param file the file
- */
-async function getFile(container: pkgcloud.storage.Container, file: pkgcloud.storage.File) {
-  // first our file comes with the hosname.com/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-  // we split it!
-  const target = file.name.split("/");
-
-  // this will remove the hostname leaving it as MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-  target.shift();
-  // and now it is dump/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-  const targetStr = path.join("dump", ...target);
-
-  // this removes the filename
-  target.pop();
-  // so now it is MOD_something__IDEF_else/1.version/property/FILE121231231
-  const targetDir = path.join("dump", ...target);
-
-  // we need to ensure that directory
-  await fsAsync.mkdir(targetDir, { recursive: true });
-
-  // and now we got to download the files and copy them there, that might take a while
-  console.log("Copying " + file.name + " to " + targetStr);
-
-  // we create a stream for the target, dump/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-  const targetStream = fs.createWriteStream(targetStr);
-
-  // and download into that stream
-  container.client.download(
-    {
-      container,
-      remote: file.name,
-      stream: targetStream,
-    } as any,
-  );
-
-  // return a promise off it
-  return new Promise((resolve, reject) => {
-    targetStream.on("error", reject);
-    targetStream.on("success", resolve);
-  });
-}
-
-/**
  * Performs a copy where everything that is contained as data for a given file is copied
  * and donwloaded into the dump folder
  * @param domain the domain eg. mysite.com
@@ -225,37 +180,23 @@ async function getFile(container: pkgcloud.storage.Container, file: pkgcloud.sto
  * in their own location for propextensions
  * @param idVersionHandle the id and version handle, as a string, this means 1.version or 1. alone... it's basically both of them
  * concatenated and separated by a dot
- * @param container the container in question
+ * @param client the cloud client
  */
-async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, container: pkgcloud.storage.Container) {
-  // so we return a new promise
-  return new Promise((resolve, reject) => {
-    // get all the files, and build where we are seeking for them
-    (container as any).getFiles({
-      prefix: domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
-    }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
-      // and now we can ask for all these files
-      if (err) {
-        reject(err);
-      } else if (files && files.length) {
-        // we get them as a bunch
-        return Promise.all(files.map(f => getFile(container, f)));
-      } else {
-        console.log("No files found on " + domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/");
-        resolve();
-      }
-    });
-  })
+async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, client: CloudClient) {
+  await client.dumpEntireFolder(
+    domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
+    "dump",
+  );
 }
 
 /**
  * Performs the copy of the data that is necessary for a given row
  * @param row the row in question
  * @param root the root
- * @param pkgcloudUploadContainers all the upload containers
+ * @param cloudClients all the cloud clients
  * @param domain the domain in question
  */
-async function copyDataOf(row: ISQLTableRowValue, root: Root, pkgcloudUploadContainers: PkgCloudContainers, domain: string) {
+async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: ICloudClients, domain: string) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
   // so we need the idef and the module
@@ -264,8 +205,8 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, pkgcloudUploadCont
 
   // and now we'll see our container and download the data from there
   let idUsed = row.container_id;
-  let container = pkgcloudUploadContainers[idUsed];
-  if (!container) {
+  let client = cloudClients[idUsed];
+  if (!client) {
     console.log(
       colors.red(
         "The expected container " +
@@ -280,8 +221,8 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, pkgcloudUploadCont
   console.log(colors.yellow("Using: ") + idUsed);
 
   // and now we can attempt to copy the data for it
-  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
-  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
+  await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
+  await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
 }
 
 /**
@@ -306,11 +247,11 @@ export default async function dump(version: string, knex: Knex, root: Root) {
   );
 
   // and our pkgcloud containers
-  const { pkgcloudUploadContainers } = await getPkgCloudContainers(config, sensitiveConfig);
+  const cloudClients = await getCloudClients(config, sensitiveConfig);
 
   // we can specify we have loaded them
-  console.log(`Loaded ${Object.keys(pkgcloudUploadContainers).length} storage containers: ` +
-    colors.yellow(Object.keys(pkgcloudUploadContainers).join(", ")));
+  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
+    colors.yellow(Object.keys(cloudClients).join(", ")));
 
   // and now we can start dumping
   let final: ISQLTableRowValue[] = [];
@@ -406,7 +347,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
         await copyDataOf(
           row,
           root,
-          pkgcloudUploadContainers,
+          cloudClients,
           version === "development" ?
             config.developmentHostname :
             config.productionHostname

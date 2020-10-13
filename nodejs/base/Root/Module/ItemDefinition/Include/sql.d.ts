@@ -10,7 +10,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowV
 import Knex from "knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../../../server/cloud";
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
@@ -42,10 +42,7 @@ export declare function convertSQLValueToGQLValueForInclude(knex: Knex, serverDa
  * @param include the include in question
  * @param data the graphql data value
  * @param oldData the old graphql data value that used to be stored for that include
- * @param uploadsContainer the uploads container that is used to store data for this
- * include
- * @param uploadsPrefix the prefix of the uploads container that is used to do
- * https requests given a path
+ * @param uploadsClient the uploads client
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -56,7 +53,7 @@ export declare function convertSQLValueToGQLValueForInclude(knex: Knex, serverDa
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export declare function convertGQLValueToSQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForInclude(knex: Knex, serverData: any, itemDefinition: ItemDefinition, include: Include, data: IGQLArgs, oldData: IGQLValue, uploadsClient: CloudClient, domain: string, dictionary: string, partialFields?: any): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an include
  * @param knex the knex instance

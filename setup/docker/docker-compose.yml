@@ -6,6 +6,7 @@ services:
         volumes: 
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
+            - ./uploads:/home/node/app/uploads
         depends_on:
             - redis
         environment:
@@ -20,6 +21,7 @@ services:
         volumes: 
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
+            - ./uploads:/home/node/app/uploads
         depends_on:
             - redis
             - pgsql
@@ -43,6 +45,7 @@ services:
         volumes:
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
+            - ./uploads:/home/node/app/uploads
         environment: 
             - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=EXTENDED

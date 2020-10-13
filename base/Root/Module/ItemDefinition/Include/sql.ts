@@ -18,7 +18,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowV
 import Knex from "knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../../../server/cloud";
 
 /**
  * Provides the table bit that is necessary to store include data
@@ -129,10 +129,7 @@ export function convertSQLValueToGQLValueForInclude(
  * @param include the include in question
  * @param data the graphql data value
  * @param oldData the old graphql data value that used to be stored for that include
- * @param uploadsContainer the uploads container that is used to store data for this
- * include
- * @param uploadsPrefix the prefix of the uploads container that is used to do
- * https requests given a path
+ * @param uploadsClient the uploads client
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -150,8 +147,7 @@ export function convertGQLValueToSQLValueForInclude(
   include: Include,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   dictionary: string,
   partialFields?: any,
@@ -192,8 +188,7 @@ export function convertGQLValueToSQLValueForInclude(
           sinkingProperty,
           data[include.getQualifiedIdentifier()] as IGQLValue,
           (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
-          uploadsContainer,
-          uploadsPrefix,
+          uploadsClient,
           domain,
           dictionary,
         );

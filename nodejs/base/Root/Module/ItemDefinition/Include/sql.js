@@ -94,10 +94,7 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * @param include the include in question
  * @param data the graphql data value
  * @param oldData the old graphql data value that used to be stored for that include
- * @param uploadsContainer the uploads container that is used to store data for this
- * include
- * @param uploadsPrefix the prefix of the uploads container that is used to do
- * https requests given a path
+ * @param uploadsClient the uploads client
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -108,7 +105,7 @@ exports.convertSQLValueToGQLValueForInclude = convertSQLValueToGQLValueForInclud
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, partialFields) {
+function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsClient, domain, dictionary, partialFields) {
     // the exclusion state in the graphql information should be included in
     // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
     const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
@@ -132,7 +129,7 @@ function convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, i
                 // are an object within there, we pass that, as all the info should be
                 // there, the prefix then represents the fact, we want all the added properties
                 // to be prefixed with what we are giving, in this case ITEM_wheel_
-                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, uploadsContainer, uploadsPrefix, domain, dictionary);
+                const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, include, sinkingProperty, data[include.getQualifiedIdentifier()], (oldData && oldData[include.getQualifiedIdentifier()]) || null, uploadsClient, domain, dictionary);
                 Object.assign(result, addedFieldsByProperty.value);
                 consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
             }

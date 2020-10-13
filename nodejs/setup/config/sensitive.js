@@ -111,6 +111,13 @@ async function sensitiveConfigSetup(version, currentConfig, referenceConfig) {
             ]
         },
         {
+            variableName: "localContainer",
+            message: "You can define a local container, a local container is only truly usable in a single cluster, and it's not recommended for production builds",
+            defaultValue: "MAIN",
+            hidden: false,
+            nullifyFalseValues: true,
+        },
+        {
             variableName: "defaultContainerID",
             message: "of all the previous containers id which one is used by default for internal usage only when no country specified",
             defaultValue: "MAIN",

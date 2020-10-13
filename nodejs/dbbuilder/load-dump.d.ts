@@ -5,21 +5,15 @@
  */
 import Knex from "knex";
 import Root from "../base/Root";
-import pkgcloud from "pkgcloud";
-/**
- * Removes a folder from the given openstack container
- * @param uploadsContainer the container in question
- * @param mainPath the path we are deleting for
- */
-export declare function removeFolderFor(uploadsContainer: pkgcloud.storage.Container, mainPath: string): Promise<void>;
+import { CloudClient } from "../server/cloud";
 /**
  * Copy the local files from the dump into the container by sending
- * them via openstack client
- * @param uploadsContainer the container
+ * them via the cloud client
+ * @param uploadClient the cloud client
  * @param localPath the local path we are currently working with, must be a folder
  * @param remotePath the remote path we are expected to copy at
  */
-export declare function copyFilesFor(uploadsContainer: pkgcloud.storage.Container, localPath: string, remotePath: string): Promise<void>;
+export declare function copyFilesFor(uploadClient: CloudClient, localPath: string, remotePath: string): Promise<void>;
 /**
  * Performs the dump loading
  * @param configVersion either development or production

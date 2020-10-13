@@ -11,7 +11,6 @@ import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../conf
 import { ITriggerRegistry } from "./resolvers/triggers";
 import { IPStack } from "./services/ipstack";
 import Mailgun from "mailgun-js";
-import pkgcloud from "pkgcloud";
 import { Here } from "./services/here";
 import winston from "winston";
 import "winston-daily-rotate-file";
@@ -21,23 +20,9 @@ import { ILocaleContextType } from "../client/internal/providers/locale-provider
 import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { ISEORuleSet } from "./seo";
+import { ICloudClients } from "./cloud";
 export declare const logger: winston.Logger;
 export declare const app: import("express-serve-static-core").Express;
-/**
- * Contains all the pkgcloud clients connection for every container id
- */
-export declare type PkgCloudClients = {
-    [containerId: string]: pkgcloud.storage.Client;
-};
-/**
- * Contains all the pkgcloud containers for every container id
- */
-export declare type PkgCloudContainers = {
-    [containerId: string]: {
-        prefix: string;
-        container: pkgcloud.storage.Container;
-    };
-};
 /**
  * Specifies the SSR configuration for the multiple pages
  */
@@ -76,8 +61,7 @@ export interface IAppDataType {
     ipStack: IPStack;
     here: Here;
     mailgun: Mailgun.Mailgun;
-    pkgcloudStorageClients: PkgCloudClients;
-    pkgcloudUploadContainers: PkgCloudContainers;
+    cloudClients: ICloudClients;
     customUserTokenQuery: any;
     logger: winston.Logger;
 }
@@ -94,16 +78,7 @@ export interface IServerCustomizationDataType {
     customRouter?: (appData: IAppDataType) => express.Router;
     customTriggers?: ITriggerRegistry;
 }
-/**
- * Provides the pkgloud client container from ovh
- * @param client the client to use
- * @param containerName the container name
- */
-export declare function getContainerPromisified(client: pkgcloud.storage.Client, containerName: string): Promise<pkgcloud.storage.Container>;
-export declare function getPkgCloudContainers(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): Promise<{
-    pkgcloudStorageClients: PkgCloudClients;
-    pkgcloudUploadContainers: PkgCloudContainers;
-}>;
+export declare function getCloudClients(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): Promise<ICloudClients>;
 /**
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules

@@ -25,9 +25,10 @@ import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefi
 import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
-import { logger, PkgCloudContainers, IServerDataType } from ".";
+import { logger, IServerDataType } from ".";
 import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
+import { ICloudClients } from "./cloud";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -48,7 +49,7 @@ export class Cache {
   private redisClient: RedisClient;
   private domain: string;
   private knex: Knex;
-  private uploadsContainers: PkgCloudContainers;
+  private cloudClients: ICloudClients;
   private root: Root;
   private serverData: IServerDataType;
   private listener: Listener;
@@ -73,7 +74,7 @@ export class Cache {
     redisClient: RedisClient,
     knex: Knex,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
-    uploadsContainers: PkgCloudContainers,
+    cloudClients: ICloudClients,
     domain: string,
     root: Root,
     initialServerData: IServerDataType
@@ -81,7 +82,7 @@ export class Cache {
     this.redisClient = redisClient;
     this.knex = knex;
     this.root = root;
-    this.uploadsContainers = uploadsContainers;
+    this.cloudClients = cloudClients;
     this.serverData = initialServerData;
     this.sensitiveConfig = sensitiveConfig;
     this.domain = domain;
@@ -250,7 +251,7 @@ export class Cache {
       moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
 
-    const containerExists = containerId && this.uploadsContainers[containerId];
+    const containerExists = containerId && this.cloudClients[containerId];
 
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready, and hence needs
@@ -261,8 +262,7 @@ export class Cache {
       itemDefinition,
       value,
       null,
-      containerExists ? this.uploadsContainers[containerId].container : null,
-      containerExists ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.cloudClients[containerId] : null,
       this.domain,
       dictionary,
     );
@@ -272,8 +272,7 @@ export class Cache {
       itemDefinition.getParentModule(),
       value,
       null,
-      containerExists ? this.uploadsContainers[containerId].container : null,
-      containerExists ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.cloudClients[containerId] : null,
       this.domain,
       dictionary,
     );
@@ -641,7 +640,7 @@ export class Cache {
       }
     });
 
-    const containerExists = containerId && this.uploadsContainers[containerId];
+    const containerExists = containerId && this.cloudClients[containerId];
 
     // and we now build both queries for updating
     // we are telling by setting the partialFields variable
@@ -654,8 +653,7 @@ export class Cache {
       itemDefinition,
       update,
       currentValue,
-      containerExists ? this.uploadsContainers[containerId].container : null,
-      containerExists ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.cloudClients[containerId] : null,
       this.domain,
       dictionary,
       partialUpdateFields,
@@ -666,8 +664,7 @@ export class Cache {
       itemDefinition.getParentModule(),
       update,
       currentValue,
-      containerExists ? this.uploadsContainers[containerId].container : null,
-      containerExists ? this.uploadsContainers[containerId].prefix : null,
+      containerExists ? this.cloudClients[containerId] : null,
       this.domain,
       dictionary,
       partialUpdateFields,
@@ -866,7 +863,7 @@ export class Cache {
       moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
     );
 
-    const containerExists = containerId && this.uploadsContainers[containerId];
+    const containerExists = containerId && this.cloudClients[containerId];
 
     let deleteFilesInContainer = async (specifiedVersion: string) => {
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
@@ -877,7 +874,7 @@ export class Cache {
         if (containerExists) {
           await deleteEverythingInFilesContainerId(
             this.domain,
-            this.uploadsContainers[containerId].container,
+            this.cloudClients[containerId],
             itemDefinition,
             id + "." + (specifiedVersion || null),
           );
@@ -894,7 +891,7 @@ export class Cache {
         if (containerExists) {
           await deleteEverythingInFilesContainerId(
             this.domain,
-            this.uploadsContainers[containerId].container,
+            this.cloudClients[containerId],
             itemDefinition.getParentModule(),
             id + "." + (specifiedVersion || null),
           );

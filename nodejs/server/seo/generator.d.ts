@@ -1,11 +1,11 @@
-import pkgcloud from "pkgcloud";
 import { ISEORuleSet } from ".";
 import Knex from "knex";
 import Root from "../../base/Root";
+import { CloudClient } from "../cloud";
 export declare class SEOGenerator {
     private root;
     private knex;
-    private container;
+    private cloudClient;
     private prefix;
     private rules;
     private supportedLanguages;
@@ -17,7 +17,7 @@ export declare class SEOGenerator {
     /**
      * Buillds a new seo generator
      * @param rules the seo rules
-     * @param container the openstack container that contains the xml files
+     * @param cloudClient the cloud client with the XML files
      * @param knex the knex instance
      * @param root the root for definitions
      * @param prefix the prefix for the openstack container
@@ -25,7 +25,7 @@ export declare class SEOGenerator {
      * @param hostname the hostname that we are creating sitemaps for
      * @param pingGoogle whether to ping google once we have updated our sitemaps
      */
-    constructor(rules: ISEORuleSet, container: pkgcloud.storage.Container, knex: Knex, root: Root, prefix: string, supportedLanguages: string[], hostname: string, pingGoogle: boolean);
+    constructor(rules: ISEORuleSet, cloudClient: CloudClient, knex: Knex, root: Root, prefix: string, supportedLanguages: string[], hostname: string, pingGoogle: boolean);
     /**
      * Run the seo generator mechanism, usually run once a day
      */

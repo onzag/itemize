@@ -10,7 +10,7 @@ import ItemDefinition from ".";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../../sql";
 import Knex from "knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../../server/cloud";
 /**
  * Provides the table that is necesary to include this item definition as a whole
  * that is, this represents a whole table, that is necessary for this item to
@@ -69,7 +69,7 @@ export declare function convertSQLValueToGQLValueForItemDefinition(knex: Knex, s
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsContainer: pkgcloud.storage.Container, uploadsPrefix: string, domain: string, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
+export declare function convertGQLValueToSQLValueForItemDefinition(knex: Knex, serverData: any, itemDefinition: ItemDefinition, data: IGQLArgs, oldData: IGQLValue, uploadsClient: CloudClient, domain: string, dictionary: string, partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue): ISQLStreamComposedTableRowValue;
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches

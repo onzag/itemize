@@ -10,8 +10,8 @@ import PropertyDefinition from "..";
 import sharp from "sharp";
 import { ReadStream } from "fs";
 import path from "path";
-import pkgcloud from "pkgcloud";
 import { sqlUploadPipeFile } from "./file-management";
+import { CloudClient } from "../../../../../../server/cloud";
 
 /**
  * this is what we get as a result from
@@ -116,8 +116,7 @@ export async function runImageConversions(
   filePath: string,
   fileName: string,
   fileMimeType: string,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   propDef: PropertyDefinition,
 ): Promise<void> {
@@ -128,8 +127,7 @@ export async function runImageConversions(
   // we use that for svg types, no need to convert
   if (fileMimeType === "image/svg+xml") {
     await sqlUploadPipeFile(
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       imageStream,
       domain,
       originalImageFilePath,
@@ -202,16 +200,14 @@ export async function runImageConversions(
       }).rotate().flatten({background: {r: 255, g: 255, b: 255, alpha: 1}}).jpeg();
 
     return sqlUploadPipeFile(
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       outputPipeline,
       domain,
       outputFileName,
     );
   }).concat([
     sqlUploadPipeFile(
-      uploadsContainer,
-      uploadsPrefix,
+      uploadsClient,
       imageStream,
       domain,
       originalImageFilePath,

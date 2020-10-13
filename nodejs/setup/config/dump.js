@@ -26,14 +26,14 @@ function dumpConfigRequest(currentConfig, sensitiveConfig) {
             // No openstack containers defined
             !sensitiveConfig.openstackContainers ?
                 // then it's main
-                "MAIN" :
+                (sensitiveConfig.localContainer || "MAIN") :
                 (
                 // main in the openstack container list
                 sensitiveConfig.openstackContainers["MAIN"] ?
                     // so it is main
                     "MAIN" :
                     // pick the first container you find, nothing found, then main
-                    Object.keys(sensitiveConfig.openstackContainers)[0] || "MAIN"),
+                    Object.keys(sensitiveConfig.openstackContainers)[0] || sensitiveConfig.localContainer || "MAIN"),
         },
     };
 }

@@ -14,63 +14,63 @@ import { IConfigRawJSONDataType, IDumpConfigRawJSONDataType, ISensitiveConfigRaw
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { ISQLTableDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { yesno } from ".";
-import { getPkgCloudContainers } from "../server";
 import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../server/cloud";
+import { getCloudClients } from "../server";
 
 const fsAsync = fs.promises;
 
-/**
- * Removes a folder from the given openstack container
- * @param uploadsContainer the container in question
- * @param mainPath the path we are deleting for
- */
-export async function removeFolderFor(
-  uploadsContainer: pkgcloud.storage.Container,
-  mainPath: string,
-): Promise<void> {
-  console.log("Deleting existing files for: " + mainPath);
+// /**
+//  * Removes a folder from the given openstack container
+//  * @param uploadsClient the uploadsClient
+//  * @param mainPath the path we are deleting for
+//  */
+// export async function removeFolderFor(
+//   uploadsContainer: pkgcloud.storage.Container,
+//   mainPath: string,
+// ): Promise<void> {
+//   console.log("Deleting existing files for: " + mainPath);
 
-  // we return a promise for this
-  return new Promise((resolve, reject) => {
-    // need to get all the files
-    (uploadsContainer as any).getFiles({
-      prefix: mainPath,
-    }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
-      // if we get an error
-      if (err) {
-        reject(err);
-      } else if (files && files.length) {
+//   // we return a promise for this
+//   return new Promise((resolve, reject) => {
+//     // need to get all the files
+//     (uploadsContainer as any).getFiles({
+//       prefix: mainPath,
+//     }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
+//       // if we get an error
+//       if (err) {
+//         reject(err);
+//       } else if (files && files.length) {
 
-        // now we can delete the files in bulk
-        console.log("bulk deleting " + files.length + " files");
+//         // now we can delete the files in bulk
+//         console.log("bulk deleting " + files.length + " files");
 
-        // by calling this
-        (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      } else {
-        console.log("No files found to delete");
-        resolve();
-      }
-    });
-  });
-}
+//         // by calling this
+//         (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
+//           if (err) {
+//             reject(err);
+//           } else {
+//             resolve();
+//           }
+//         });
+//       } else {
+//         console.log("No files found to delete");
+//         resolve();
+//       }
+//     });
+//   });
+// }
 
 /**
  * Copy the local files from the dump into the container by sending
- * them via openstack client
- * @param uploadsContainer the container
+ * them via the cloud client
+ * @param uploadClient the cloud client
  * @param localPath the local path we are currently working with, must be a folder
  * @param remotePath the remote path we are expected to copy at
  */
 export async function copyFilesFor(
-  uploadsContainer: pkgcloud.storage.Container,
+  uploadClient: CloudClient,
   localPath: string,
   remotePath: string,
 ) {
@@ -97,28 +97,12 @@ export async function copyFilesFor(
       // if it's a directory
       if (stat.isDirectory()) {
         // Recurse
-        await copyFilesFor(uploadsContainer, localFilePath, remoteFilePath);
+        await copyFilesFor(uploadClient, localFilePath, remoteFilePath);
       } else {
-
-        // otherwise we have found a file, we need a write stream for the remote
-        const writeStream = uploadsContainer.client.upload({
-          container: uploadsContainer as any,
-          remote: remoteFilePath,
-        });
-
         // and a read stream for our local
         const readStream = fs.createReadStream(localFilePath);
         // and we pipe it!
-        readStream.pipe(writeStream);
-
-        // now we can await for that file to be done
-        await (new Promise((resolve, reject) => {
-          writeStream.on("finish", () => {
-            console.log("Wrote: " + remoteFilePath);
-            resolve();
-          });
-          writeStream.on("error", reject);
-        }));
+        await uploadClient.upload(remoteFilePath, readStream);
       }
     }
   } catch {
@@ -157,11 +141,11 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
   );
 
   // and the upload containers
-  const { pkgcloudUploadContainers } = await getPkgCloudContainers(config, sensitiveConfig);
+  const cloudClients = await getCloudClients(config, sensitiveConfig);
 
   // inform the users
-  console.log(`Loaded ${Object.keys(pkgcloudUploadContainers).length} storage containers: ` +
-    colors.yellow(Object.keys(pkgcloudUploadContainers).join(", ")));
+  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
+    colors.yellow(Object.keys(cloudClients).join(", ")));
 
   // now we need to find our dump
   let dumpContents: string = null;
@@ -207,9 +191,9 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
         // now if our current target container is not in our
         // supported list, and we have a primary container that is
         if (
-          !pkgcloudUploadContainers[targetContainerId] &&
+          !cloudClients[targetContainerId] &&
           dumpConfig.load.primaryContainerId &&
-          pkgcloudUploadContainers[dumpConfig.load.primaryContainerId]
+          cloudClients[dumpConfig.load.primaryContainerId]
         ) {
           // use that one
           targetContainerId = dumpConfig.load.primaryContainerId;
@@ -220,7 +204,7 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
           // and we will try to find in the array in order an available container id
           const originalContainerId = targetContainerId;
           targetContainerId = dumpConfig.load.versionMapper[version].find((c) => {
-            return !!pkgcloudUploadContainers[c];
+            return !!cloudClients[c];
           }) || originalContainerId;
         }
 
@@ -228,7 +212,7 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
         if (dumpConfig.load.previousContainerIdMapper && dumpConfig.load.previousContainerIdMapper[row.container_id]) {
           const originalContainerId = targetContainerId;
           targetContainerId = dumpConfig.load.previousContainerIdMapper[row.container_id].find((c) => {
-            return !!pkgcloudUploadContainers[c];
+            return !!cloudClients[c];
           }) || originalContainerId;
         }
       }
@@ -392,27 +376,27 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
         // if there's a container id where this information is already stored
         if (foundContainerId) {
           // we got to get that container
-          const container = pkgcloudUploadContainers[foundContainerId];
+          const client = cloudClients[foundContainerId];
           // maybe?
-          if (!container) {
-            console.log("Could not retrieve a container for: " + colors.yellow(foundContainerId));
+          if (!client) {
+            console.log("Could not retrieve a client for: " + colors.yellow(foundContainerId));
           } else {
             // and delete everything in the remote, just in case, as there might be conflicts
-            await removeFolderFor(container.container, resultRemoteIdefPath);
-            await removeFolderFor(container.container, resultRemoteModPath);
+            await client.removeFolder(resultRemoteIdefPath);
+            await client.removeFolder(resultRemoteModPath);
           }
         }
 
         // otherwise we have to store the files
         if (targetContainerId) {
           // and now we go in
-          const targetContainer = pkgcloudUploadContainers[targetContainerId];
-          if (!targetContainer) {
-            console.log("Could not retrieve a container for: " + colors.yellow(targetContainerId));
+          const targetClient = cloudClients[targetContainerId];
+          if (!targetClient) {
+            console.log("Could not retrieve a client for: " + colors.yellow(targetContainerId));
           } else {
             // and copy the files
-            await copyFilesFor(targetContainer.container, resultLocalIdefPath, resultRemoteIdefPath);
-            await copyFilesFor(targetContainer.container, resultLocalModPath, resultRemoteModPath);
+            await copyFilesFor(targetClient, resultLocalIdefPath, resultRemoteIdefPath);
+            await copyFilesFor(targetClient, resultLocalModPath, resultRemoteModPath);
           }
         }
       }

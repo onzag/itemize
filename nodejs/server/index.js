@@ -20,7 +20,6 @@ const triggers_1 = require("./resolvers/triggers");
 const triggers_2 = require("./user/triggers");
 const ipstack_1 = require("./services/ipstack");
 const mailgun_1 = require("./services/mailgun");
-const pkgcloud_1 = __importDefault(require("pkgcloud"));
 const here_1 = require("./services/here");
 const util_1 = require("util");
 const winston_1 = __importDefault(require("winston"));
@@ -28,9 +27,9 @@ require("winston-daily-rotate-file");
 const dbbuilder_1 = __importDefault(require("../dbbuilder"));
 const global_manager_1 = require("./global-manager");
 const rootpool_1 = require("./rootpool");
-const file_management_1 = require("../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management");
 const generator_1 = require("./seo/generator");
 const initialize_1 = require("./initialize");
+const cloud_1 = require("./cloud");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -69,41 +68,24 @@ pg_1.types.setTypeParser(DATE_OID, (val) => val);
 const fsAsync = fs_1.default.promises;
 // now in order to build the database in the cheat mode, we don't need express
 exports.app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
-/**
- * Provides the pkgloud client container from ovh
- * @param client the client to use
- * @param containerName the container name
- */
-function getContainerPromisified(client, containerName) {
-    return new Promise((resolve, reject) => {
-        client.getContainer(containerName, (err, container) => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(container);
-            }
-        });
-    });
-}
-exports.getContainerPromisified = getContainerPromisified;
-async function getPkgCloudContainers(config, sensitiveConfig) {
-    const pkgcloudStorageClients = {};
-    const pkgcloudUploadContainers = {};
+async function getCloudClients(config, sensitiveConfig) {
+    const cloudClients = {};
+    if (sensitiveConfig.localContainer) {
+        let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
+        if (!prefix) {
+            exports.logger && exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for local container '" + sensitiveConfig.localContainer + "'");
+            throw new Error("Could not find prefix for local container " + sensitiveConfig.localContainer);
+        }
+        if (prefix.indexOf("/") !== 0) {
+            prefix = "https://" + prefix;
+        }
+        const localClient = new cloud_1.CloudClient(sensitiveConfig.localContainer, prefix);
+        localClient.setAsLocal();
+        cloudClients[sensitiveConfig.localContainer] = localClient;
+    }
     if (sensitiveConfig.openstackContainers) {
         await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
             const containerData = sensitiveConfig.openstackContainers[containerIdX];
-            pkgcloudStorageClients[containerIdX] = pkgcloud_1.default.storage.createClient({
-                provider: "openstack",
-                username: containerData.username,
-                keystoneAuthVersion: 'v3',
-                region: containerData.region,
-                domainId: containerData.domainId,
-                domainName: containerData.domainName,
-                password: containerData.password,
-                authUrl: containerData.authUrl,
-            });
-            exports.logger && exports.logger.info("initializeServer: retrieving container " + containerData.containerName + " in container id " + containerIdX);
             let prefix = config.containersHostnamePrefixes[containerIdX];
             if (!prefix) {
                 exports.logger && exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for container in '" + containerIdX + "'");
@@ -112,18 +94,23 @@ async function getPkgCloudContainers(config, sensitiveConfig) {
             if (prefix.indexOf("/") !== 0) {
                 prefix = "https://" + prefix;
             }
-            pkgcloudUploadContainers[containerIdX] = {
-                prefix,
-                container: await getContainerPromisified(pkgcloudStorageClients[containerIdX], containerData.containerName),
-            };
+            const client = new cloud_1.CloudClient(containerIdX, prefix);
+            await client.setAsOpenstack({
+                provider: "openstack",
+                username: containerData.username,
+                keystoneAuthVersion: 'v3',
+                region: containerData.region,
+                domainId: containerData.domainId,
+                domainName: containerData.domainName,
+                password: containerData.password,
+                authUrl: containerData.authUrl,
+            }, containerData.containerName);
+            cloudClients[containerIdX] = client;
         }));
     }
-    return {
-        pkgcloudStorageClients,
-        pkgcloudUploadContainers,
-    };
+    return cloudClients;
 }
-exports.getPkgCloudContainers = getPkgCloudContainers;
+exports.getCloudClients = getCloudClients;
 /**
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules
@@ -292,21 +279,12 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
             if (seoConfig && sensitiveConfig.seoContainerID) {
                 exports.logger.info("initializeServer: initializing SEO configuration");
-                const seoContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
-                if (!seoContainerData) {
+                const openStackSEOContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
+                const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
+                if (!openStackSEOContainerData && !isLocalInstead) {
                     exports.logger.error("initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");
                 }
                 else {
-                    const seoContainerClient = pkgcloud_1.default.storage.createClient({
-                        provider: "openstack",
-                        username: seoContainerData.username,
-                        keystoneAuthVersion: 'v3',
-                        region: seoContainerData.region,
-                        domainId: seoContainerData.domainId,
-                        domainName: seoContainerData.domainName,
-                        password: seoContainerData.password,
-                        authUrl: seoContainerData.authUrl,
-                    });
                     let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
                     if (!prefix) {
                         exports.logger.error("initializeServer [SERIOUS]: Could not find prefix for SEO in '" + sensitiveConfig.seoContainerID + "'");
@@ -315,8 +293,23 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                     if (prefix.indexOf("/") !== 0) {
                         prefix = "https://" + prefix;
                     }
-                    const seoContainer = await getContainerPromisified(seoContainerClient, seoContainerData.containerName);
-                    const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, seoContainer, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
+                    const cloudClient = new cloud_1.CloudClient(sensitiveConfig.seoContainerID, prefix);
+                    if (isLocalInstead) {
+                        cloudClient.setAsLocal();
+                    }
+                    else {
+                        await cloudClient.setAsOpenstack({
+                            provider: "openstack",
+                            username: openStackSEOContainerData.username,
+                            keystoneAuthVersion: 'v3',
+                            region: openStackSEOContainerData.region,
+                            domainId: openStackSEOContainerData.domainId,
+                            domainName: openStackSEOContainerData.domainName,
+                            password: openStackSEOContainerData.password,
+                            authUrl: openStackSEOContainerData.authUrl,
+                        }, openStackSEOContainerData.containerName);
+                    }
+                    const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, cloudClient, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
                     manager.setSEOGenerator(seoGenerator);
                 }
             }
@@ -328,19 +321,19 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         // due to a bug in the types the create client function is missing
         // domainId and domainName
         exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
-        const { pkgcloudStorageClients, pkgcloudUploadContainers } = await getPkgCloudContainers(config, sensitiveConfig);
+        const cloudClients = await getCloudClients(config, sensitiveConfig);
         if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
             exports.logger.info("initializeServer: cleaning storage");
-            await Promise.all(Object.keys(pkgcloudUploadContainers).map(async (containerId) => {
+            await Promise.all(Object.keys(cloudClients).map(async (containerId) => {
                 if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
                     exports.logger.info("initializeServer: cleaning " + containerId + " sitemaps for " + domain);
-                    const container = pkgcloudUploadContainers[containerId];
-                    await file_management_1.removeFolderFor(container.container, "sitemaps/" + domain);
+                    const client = cloudClients[containerId];
+                    await client.removeFolder("sitemaps/" + domain);
                 }
                 else {
                     exports.logger.info("initializeServer: cleaning " + containerId + " data for " + domain);
-                    const container = pkgcloudUploadContainers[containerId];
-                    await file_management_1.removeFolderFor(container.container, domain);
+                    const client = cloudClients[containerId];
+                    await client.removeFolder(domain);
                 }
             }));
             process.exit(0);
@@ -366,7 +359,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             }
         }
         exports.logger.info("initializeServer: initializing cache instance");
-        const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, pkgcloudUploadContainers, domain, root, serverData);
+        const cache = new cache_1.Cache(redisClient, knex, sensitiveConfig, cloudClients, domain, root, serverData);
         exports.logger.info("initializeServer: creating server");
         const server = http_1.default.createServer(exports.app);
         exports.logger.info("initializeServer: setting up websocket socket.io listener");
@@ -416,8 +409,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             ipStack,
             here,
             mailgun,
-            pkgcloudStorageClients,
-            pkgcloudUploadContainers,
+            cloudClients,
             logger: exports.logger,
             // assigned later during rest setup
             customUserTokenQuery: null,

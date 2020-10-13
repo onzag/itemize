@@ -205,7 +205,7 @@ exports.convertSQLValueToGQLValueForItemDefinition = convertSQLValueToGQLValueFo
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefinition, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, partialFields) {
+function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefinition, data, oldData, uploadsClient, domain, dictionary, partialFields) {
     // first we create the row value
     const result = {};
     const consumeStreamsFns = [];
@@ -214,7 +214,7 @@ function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefini
         // partialFields set
         if ((partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
             !partialFields) {
-            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, null, pd, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary);
+            const addedFieldsByProperty = sql_1.convertGQLValueToSQLValueForProperty(knex, serverData, itemDefinition.getParentModule(), itemDefinition, null, pd, data, oldData, uploadsClient, domain, dictionary);
             Object.assign(result, addedFieldsByProperty.value);
             consumeStreamsFns.push(addedFieldsByProperty.consumeStreams);
         }
@@ -227,7 +227,7 @@ function convertGQLValueToSQLValueForItemDefinition(knex, serverData, itemDefini
         if ((partialFields && typeof partialFields[includeNameInPartialFields] !== "undefined") ||
             !partialFields) {
             const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
-            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsContainer, uploadsPrefix, domain, dictionary, innerPartialFields);
+            const addedFieldsByInclude = sql_2.convertGQLValueToSQLValueForInclude(knex, serverData, itemDefinition, include, data, oldData, uploadsClient, domain, dictionary, innerPartialFields);
             Object.assign(result, addedFieldsByInclude.value);
             consumeStreamsFns.push(addedFieldsByInclude.consumeStreams);
         }

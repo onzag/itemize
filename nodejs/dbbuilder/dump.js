@@ -156,41 +156,6 @@ async function dumpAllFromModuleRecursive(knex, root, mod) {
     return final;
 }
 /**
- * Fetches a file from a given upload container that is already defined and stores it locally
- * @param container the container in question
- * @param file the file
- */
-async function getFile(container, file) {
-    // first our file comes with the hosname.com/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-    // we split it!
-    const target = file.name.split("/");
-    // this will remove the hostname leaving it as MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-    target.shift();
-    // and now it is dump/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-    const targetStr = path_1.default.join("dump", ...target);
-    // this removes the filename
-    target.pop();
-    // so now it is MOD_something__IDEF_else/1.version/property/FILE121231231
-    const targetDir = path_1.default.join("dump", ...target);
-    // we need to ensure that directory
-    await fsAsync.mkdir(targetDir, { recursive: true });
-    // and now we got to download the files and copy them there, that might take a while
-    console.log("Copying " + file.name + " to " + targetStr);
-    // we create a stream for the target, dump/MOD_something__IDEF_else/1.version/property/FILE121231231/file_something.jpg
-    const targetStream = fs_1.default.createWriteStream(targetStr);
-    // and download into that stream
-    container.client.download({
-        container,
-        remote: file.name,
-        stream: targetStream,
-    });
-    // return a promise off it
-    return new Promise((resolve, reject) => {
-        targetStream.on("error", reject);
-        targetStream.on("success", resolve);
-    });
-}
-/**
  * Performs a copy where everything that is contained as data for a given file is copied
  * and donwloaded into the dump folder
  * @param domain the domain eg. mysite.com
@@ -198,46 +163,27 @@ async function getFile(container, file) {
  * in their own location for propextensions
  * @param idVersionHandle the id and version handle, as a string, this means 1.version or 1. alone... it's basically both of them
  * concatenated and separated by a dot
- * @param container the container in question
+ * @param client the cloud client
  */
-async function copyDataAt(domain, qualifiedPathName, idVersionHandle, container) {
-    // so we return a new promise
-    return new Promise((resolve, reject) => {
-        // get all the files, and build where we are seeking for them
-        container.getFiles({
-            prefix: domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
-        }, (err, files) => {
-            // and now we can ask for all these files
-            if (err) {
-                reject(err);
-            }
-            else if (files && files.length) {
-                // we get them as a bunch
-                return Promise.all(files.map(f => getFile(container, f)));
-            }
-            else {
-                console.log("No files found on " + domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/");
-                resolve();
-            }
-        });
-    });
+async function copyDataAt(domain, qualifiedPathName, idVersionHandle, client) {
+    await client.dumpEntireFolder(domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/", "dump");
 }
 /**
  * Performs the copy of the data that is necessary for a given row
  * @param row the row in question
  * @param root the root
- * @param pkgcloudUploadContainers all the upload containers
+ * @param cloudClients all the cloud clients
  * @param domain the domain in question
  */
-async function copyDataOf(row, root, pkgcloudUploadContainers, domain) {
+async function copyDataOf(row, root, cloudClients, domain) {
     console.log("dumping files of: " + safe_1.default.green(row.type + " " + row.id + " " + row.version));
     // so we need the idef and the module
     const idef = root.registry[row.type];
     const mod = idef.getParentModule();
     // and now we'll see our container and download the data from there
     let idUsed = row.container_id;
-    let container = pkgcloudUploadContainers[idUsed];
-    if (!container) {
+    let client = cloudClients[idUsed];
+    if (!client) {
         console.log(safe_1.default.red("The expected container " +
             idUsed +
             " for this object does not exist in your configuration as such files cannot be copied"));
@@ -246,8 +192,8 @@ async function copyDataOf(row, root, pkgcloudUploadContainers, domain) {
     // we can log this what container we are using
     console.log(safe_1.default.yellow("Using: ") + idUsed);
     // and now we can attempt to copy the data for it
-    await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
-    await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), container.container);
+    await copyDataAt(domain, mod.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
+    await copyDataAt(domain, idef.getQualifiedPathName(), row.id + "." + (row.version || ""), client);
 }
 /**
  * Actually runs the dump
@@ -261,10 +207,10 @@ async function dump(version, knex, root) {
     const config = JSON.parse(await fsAsync.readFile(path_1.default.join("config", "index.json"), "utf8"));
     const dumpConfig = JSON.parse(await fsAsync.readFile(path_1.default.join("config", "dump.json"), "utf8"));
     // and our pkgcloud containers
-    const { pkgcloudUploadContainers } = await server_1.getPkgCloudContainers(config, sensitiveConfig);
+    const cloudClients = await server_1.getCloudClients(config, sensitiveConfig);
     // we can specify we have loaded them
-    console.log(`Loaded ${Object.keys(pkgcloudUploadContainers).length} storage containers: ` +
-        safe_1.default.yellow(Object.keys(pkgcloudUploadContainers).join(", ")));
+    console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
+        safe_1.default.yellow(Object.keys(cloudClients).join(", ")));
     // and now we can start dumping
     let final = [];
     // if we have a config, that actually specifies something
@@ -354,7 +300,7 @@ async function dump(version, knex, root) {
             // and now we need to fetch all these files for the dump
             for (const row of final) {
                 // so we pass them one at a time
-                await copyDataOf(row, root, pkgcloudUploadContainers, version === "development" ?
+                await copyDataOf(row, root, cloudClients, version === "development" ?
                     config.developmentHostname :
                     config.productionHostname);
             }

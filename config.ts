@@ -250,6 +250,10 @@ export interface ISensitiveConfigRawJSONDataType {
     [containerId: string]: ISensitiveConfigOpenstackContainerType,
   };
   /**
+   * A local container (if any)
+   */
+  localContainer: string;
+  /**
    * The default container id used when required, eg. creating an admin
    */
   defaultContainerID: string;

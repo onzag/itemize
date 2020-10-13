@@ -208,7 +208,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       });
 
       result += "Sitemap: " +
-        appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix +
+        appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() +
         "sitemaps/" + hostname + "/index.xml";
     }
 
@@ -217,7 +217,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
   if (!NO_SEO) {
     app.get("/sitemap.xml", (req, res) => {
-      res.redirect(appData.pkgcloudUploadContainers[appData.sensitiveConfig.seoContainerID].prefix + "sitemaps/" + hostname + "/index.xml")
+      res.redirect(appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() + "sitemaps/" + hostname + "/index.xml")
     });
   }
 

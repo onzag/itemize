@@ -21,7 +21,7 @@ import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
 import Knex from "knex";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
-import pkgcloud from "pkgcloud";
+import { CloudClient } from "../../../server/cloud";
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -184,8 +184,7 @@ export function getSQLTablesSchemaForModule(knex: Knex, mod: Module): ISQLSchema
  * @param mod the module in question
  * @param data the graphql data
  * @param oldData the old stored value for this module
- * @param uploadsContainer the uploads container from openstack
- * @param uploadsPrefix the uploads prefix of the container
+ * @param uploadsClient the uploads client
  * @param dictionary the postgresql dictionary
  * @param partialFields fields to make a partial value rather than a total
  * value, note that we don't recommend using partial fields in order to create
@@ -202,8 +201,7 @@ export function convertGQLValueToSQLValueForModule(
   mod: Module,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsContainer: pkgcloud.storage.Container,
-  uploadsPrefix: string,
+  uploadsClient: CloudClient,
   domain: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
@@ -228,8 +226,7 @@ export function convertGQLValueToSQLValueForModule(
         pd,
         data,
         oldData,
-        uploadsContainer,
-        uploadsPrefix,
+        uploadsClient,
         domain,
         dictionary,
       );
