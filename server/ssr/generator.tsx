@@ -113,7 +113,7 @@ export async function ssrGenerator(
   // that the client recieved, eg. the client is using development or production builds and we activate
   // only if it matches our NODE_ENV, this means that in development mode, with development builds there is SSR
   // but not with production builds, and vice-versa
-  const SSRIsDisabledInThisMode = 
+  const SSRIsDisabledInThisMode =
     NO_SSR ||
     (mode === "development" && !developmentISSSRMode) ||
     (mode === "production" && developmentISSSRMode);
@@ -214,7 +214,7 @@ export async function ssrGenerator(
         userAfterValidate.token = tokenData.token;
         userAfterValidate.role = tokenData.role;
       } catch (err) {
-  
+
       }
     }
 
@@ -249,7 +249,7 @@ export async function ssrGenerator(
             collectionPoint[1] === "user" &&
             collectionPoint[2] === appliedRule.forUser.id &&
             collectionPoint[3] === null
-          );
+        );
         if (!isFindingCurrentUser) {
           appliedRule.collect = [...appliedRule.collect, ["users", "user", appliedRule.forUser.id, null]];
         }
@@ -267,7 +267,7 @@ export async function ssrGenerator(
   let lastModified = new Date(parseInt(appData.buildnumber));
 
   // now we try to collect if we are asked to collect data
-  if (appliedRule.collect) {
+  if (appliedRule.collect) {
     // so we start collecting
     const collectionResults: ICollectionResult[] = await Promise.all(
       appliedRule.collect.map(collect.bind(null, root, appData, appliedRule)),
@@ -282,7 +282,7 @@ export async function ssrGenerator(
   }
 
   // now we need to collect the resources
-  const resources: {[key: string]: string} = {};
+  const resources: { [key: string]: string } = {};
   if (appliedRule.collectResources) {
     try {
       await Promise.all(appliedRule.collectResources.map(async (src) => {
@@ -313,7 +313,14 @@ export async function ssrGenerator(
     res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
     res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
     res.setHeader("ETag", etag);
-    res.setHeader("Cache-Control", "public, max-age=0");
+
+    // for individual users the cache control is then
+    // set to private
+    if (appliedRule.forUser && appliedRule.forUser.id) {
+      res.setHeader("Cache-Control", "private");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=0");
+    }
     res.status(304).end();
 
     root.cleanState();
@@ -333,6 +340,13 @@ export async function ssrGenerator(
       res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
       res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
       res.setHeader("ETag", etag);
+      // for individual users the cache control is then
+      // set to private
+      if (appliedRule.forUser && appliedRule.forUser.id) {
+        res.setHeader("Cache-Control", "private");
+      } else {
+        res.setHeader("Cache-Control", "public, max-age=0");
+      }
       // we are done just serve what is in memory and the chicken is done
       res.setHeader("content-type", "text/html; charset=utf-8");
       res.end(memoizedAnswer.value.html);
@@ -342,7 +356,7 @@ export async function ssrGenerator(
       appData.rootPool.release(root);
       return;
     }
-  } 
+  }
 
   // now we calculate the og fields that are final, given they can be functions
   // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
@@ -369,7 +383,7 @@ export async function ssrGenerator(
   // now we calculate the same way title and description
   const finalTitle = (typeof appliedRule.title === "string" || !appliedRule.title) ?
     appliedRule.title as string : appliedRule.title(queries, config);
-  const finalDescription = (typeof appliedRule.description === "string"  || !appliedRule.title) ?
+  const finalDescription = (typeof appliedRule.description === "string" || !appliedRule.title) ?
     appliedRule.description as string : appliedRule.description(queries, config);
 
   // and we start replacing from the HTML itself, note how these things might have returned null for some
@@ -400,7 +414,7 @@ export async function ssrGenerator(
     const ssr: ISSRContextType = {
       queries,
       resources,
-      user: appliedRule.forUser,
+      user: appliedRule.forUser,
       title: finalTitle,
       currencyFactors: appData.cache.getServerData()[CURRENCY_FACTORS_IDENTIFIER],
     };
@@ -504,7 +518,7 @@ export async function ssrGenerator(
       // and also our collected data
       finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
     }
-    
+
     // we add that
     newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
   }
@@ -526,6 +540,13 @@ export async function ssrGenerator(
     res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
     res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
     res.setHeader("ETag", etag);
+    // for individual users the cache control is then
+    // set to private
+    if (appliedRule.forUser && appliedRule.forUser.id) {
+      res.setHeader("Cache-Control", "private");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=0");
+    }
   }
   res.end(newHTML);
 

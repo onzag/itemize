@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringSQLStrSearch = exports.stringSQLSearch = void 0;
 const search_interfaces_1 = require("../search-interfaces");
 const string_1 = require("../types/string");
 /**

@@ -551,6 +551,10 @@ export class SEOGenerator {
             query.where("created_at", ">", querySince);
           }
 
+          if (!rule.collectAllVersions) {
+            query.where("version", "");
+          }
+
           query.where("blocked_at", null).orderBy("created_at", "desc");
         }
 

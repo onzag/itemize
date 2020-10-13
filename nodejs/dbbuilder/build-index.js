@@ -9,7 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildIndexes = void 0;
 const safe_1 = __importDefault(require("colors/safe"));
 const v5_1 = __importDefault(require("uuid/v5"));
 const _1 = require(".");

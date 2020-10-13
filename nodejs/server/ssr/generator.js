@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ssrGenerator = void 0;
 const __1 = require("..");
 const react_1 = __importDefault(require("react"));
 const constants_1 = require("../../constants");
@@ -244,6 +243,10 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         etag += "-" + collectionSignature.replace(/\s/g, "_");
     }
     etag = JSON.stringify(etag);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    console.log(ifNoneMatch);
+    console.log(etag);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     if (!collectionFailed &&
         ifNoneMatch &&
         // this actually even would check the buildnumber
@@ -251,8 +254,16 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
         res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
         res.setHeader("ETag", etag);
-        res.setHeader("Cache-Control", "public, max-age=0");
+        // for individual users the cache control is then
+        // set to private
+        if (appliedRule.forUser && appliedRule.forUser.id) {
+            res.setHeader("Cache-Control", "private");
+        }
+        else {
+            res.setHeader("Cache-Control", "public, max-age=0");
+        }
         res.status(304).end();
+        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         root.cleanState();
         appData.rootPool.release(root);
         return;
@@ -267,6 +278,14 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
             res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
             res.setHeader("ETag", etag);
+            // for individual users the cache control is then
+            // set to private
+            if (appliedRule.forUser && appliedRule.forUser.id) {
+                res.setHeader("Cache-Control", "private");
+            }
+            else {
+                res.setHeader("Cache-Control", "public, max-age=0");
+            }
             // we are done just serve what is in memory and the chicken is done
             res.setHeader("content-type", "text/html; charset=utf-8");
             res.end(memoizedAnswer.value.html);
@@ -430,6 +449,14 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         res.setHeader("Last-Modified", moment_1.default(lastModified).utc().locale("en").format(DATE_RFC2822));
         res.setHeader("Date", moment_1.default().utc().locale("en").format(DATE_RFC2822));
         res.setHeader("ETag", etag);
+        // for individual users the cache control is then
+        // set to private
+        if (appliedRule.forUser && appliedRule.forUser.id) {
+            res.setHeader("Cache-Control", "private");
+        }
+        else {
+            res.setHeader("Cache-Control", "public, max-age=0");
+        }
     }
     res.end(newHTML);
     // clean and release, it's done!!!

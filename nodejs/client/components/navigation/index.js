@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.goBack = exports.localizedRedirectTo = exports.redirectTo = exports.setHistoryQSState = exports.setHistoryState = void 0;
 const __1 = require("../..");
 /**
  * Allows to set the history state to a new state

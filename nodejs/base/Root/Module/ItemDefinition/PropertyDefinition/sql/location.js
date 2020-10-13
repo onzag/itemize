@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.locationSQLBtreeIndexable = exports.locationSQLSSCacheEqual = exports.locationSQLEqual = exports.locationSQLOrderBy = exports.locationSQLSearch = exports.locationSQLOut = exports.locationSQLIn = exports.locationSQL = void 0;
 const constants_1 = require("../../../../../../constants");
 const search_interfaces_1 = require("../search-interfaces");
 /**

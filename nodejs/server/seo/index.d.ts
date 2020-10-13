@@ -13,6 +13,7 @@ export interface ISEOCollectedResult {
 export interface ISEORule {
     crawable: boolean;
     collect?: Array<[string, string]>;
+    collectAllVersions?: boolean;
     parametrize?: (...args: ISEOCollectedResult[]) => ISEOParametrizer[];
 }
 export interface ISEORuleSet {

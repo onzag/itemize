@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.customUserTriggers = void 0;
 const triggers_1 = require("../resolvers/triggers");
 const constants_1 = require("../../constants");
 const errors_1 = require("../../base/errors");

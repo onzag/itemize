@@ -8,7 +8,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParentedSearchFeedbackRequestSchema = exports.PARENTED_SEARCH_FEEDBACK_REQUEST = exports.OwnedSearchFeedbackRequestSchema = exports.OWNED_SEARCH_FEEDBACK_REQUEST = exports.ParentedSearchUnregisterRequestSchema = exports.PARENTED_SEARCH_UNREGISTER_REQUEST = exports.OwnedSearchUnregisterRequestSchema = exports.OWNED_SEARCH_UNREGISTER_REQUEST = exports.ParentedSearchRegisterRequestSchema = exports.PARENTED_SEARCH_REGISTER_REQUEST = exports.OwnedSearchRegisterRequestSchema = exports.OWNED_SEARCH_REGISTER_REQUEST = exports.FeedbackRequestSchema = exports.FEEDBACK_REQUEST = exports.UnregisterRequestSchema = exports.UNREGISTER_REQUEST = exports.RegisterRequestSchema = exports.REGISTER_REQUEST = exports.IdentifyRequestSchema = exports.IDENTIFY_REQUEST = exports.PARENTED_SEARCH_RECORDS_ADDED_EVENT = exports.OWNED_SEARCH_RECORDS_ADDED_EVENT = exports.CHANGED_FEEEDBACK_EVENT = exports.KICKED_EVENT = exports.IDENTIFIED_EVENT = exports.ERROR_EVENT = exports.CURRENCY_FACTORS_UPDATED_EVENT = exports.BUILDNUMBER_EVENT = void 0;
 // EVENTS
 /**
  * The build number event is an event streamed from the

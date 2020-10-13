@@ -8,11 +8,11 @@ import { WithStyles } from "../mui-core";
 /**
  * The item definition loader styles
  */
-declare const itemDefinitionLoaderStyles: Record<"container" | "flexingContainer" | "circularProgress" | "fullWidthContainer", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;
+declare const ItemLoaderStyles: Record<"container" | "flexingContainer" | "circularProgress" | "fullWidthContainer", import("@material-ui/styles").CSSProperties | import("@material-ui/styles").CreateCSSProperties<{}> | ((props: {}) => import("@material-ui/styles").CreateCSSProperties<{}>)>;
 /**
  * the props for the item definition loader
  */
-interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> {
+interface ItemLoaderProps extends WithStyles<typeof ItemLoaderStyles> {
     /**
      * An id to pass to the i18n reader for not found
      * defaults to "error.NOT_FOUND"

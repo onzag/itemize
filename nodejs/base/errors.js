@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EndpointError = void 0;
 /**
  * An instance version of the error that contains
  * the raw object data of the error

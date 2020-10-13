@@ -9,7 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rendererContext = void 0;
 const PropertyEntryField_1 = __importDefault(require("./PropertyEntry/PropertyEntryField"));
 const PropertyEntryFile_1 = __importDefault(require("./PropertyEntry/PropertyEntryFile"));
 const PropertyEntryBoolean_1 = __importDefault(require("./PropertyEntry/PropertyEntryBoolean"));

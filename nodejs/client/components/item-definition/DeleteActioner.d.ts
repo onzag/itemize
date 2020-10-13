@@ -8,7 +8,7 @@
  */
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
-import { IActionCleanOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item-definition";
+import { IActionCleanOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item";
 /**
  * The actioner arg contains the properties that are useful
  * for doing the conditional logic for deleting

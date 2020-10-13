@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildColumn = void 0;
 const typesForceSpecific = [
     "timestamp",
     "date",

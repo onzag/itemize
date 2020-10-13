@@ -14,7 +14,7 @@ import I18nReadError from "../../components/localization/I18nReadError";
 /**
  * The item definition loader styles
  */
-const itemDefinitionLoaderStyles = createStyles({
+const ItemLoaderStyles = createStyles({
   container: {
     position: "relative",
   },
@@ -41,7 +41,7 @@ const itemDefinitionLoaderStyles = createStyles({
 /**
  * the props for the item definition loader
  */
-interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> {
+interface ItemLoaderProps extends WithStyles<typeof ItemLoaderStyles> {
   /**
    * An id to pass to the i18n reader for not found
    * defaults to "error.NOT_FOUND"
@@ -94,7 +94,7 @@ interface ItemLoaderProps extends WithStyles<typeof itemDefinitionLoaderStyles> 
  * @param props the loader props
  * @returns a react component
  */
-export const ItemLoader = withStyles(itemDefinitionLoaderStyles)((props: ItemLoaderProps) => {
+export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) => {
   return (
     <NItemLoader>
       {(arg) => {
