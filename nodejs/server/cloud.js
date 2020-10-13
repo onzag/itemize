@@ -98,7 +98,22 @@ class CloudClient {
             });
         }
         else {
-            // TODO local upload
+            const targetPath = remote.split("/");
+            if (targetPath[0] === "") {
+                targetPath.shift();
+            }
+            const fileName = targetPath.pop();
+            await fsAsync.mkdir(path_1.default.join("uploads", ...targetPath), {
+                recursive: true,
+            });
+            const writeStream = fs_1.default.createWriteStream(path_1.default.join("uploads", ...targetPath, fileName));
+            readStream.pipe(writeStream);
+            return new Promise((resolve, reject) => {
+                writeStream.on("finish", () => {
+                    resolve();
+                });
+                writeStream.on("error", reject);
+            });
         }
     }
     async removeFolder(mainPath) {
@@ -130,7 +145,19 @@ class CloudClient {
             });
         }
         else {
-            // TODO local remove folder
+            CAN_LOG_DEBUG && _1.logger && _1.logger.debug("CloudClient.removeFolderFor: Deleting folder for", { mainPath });
+            const targetPath = mainPath.split("/");
+            if (targetPath[0] === "") {
+                targetPath.shift();
+            }
+            try {
+                await fsAsync.rmdir(path_1.default.join("uploads", ...targetPath), {
+                    recursive: true,
+                });
+            }
+            catch {
+                CAN_LOG_DEBUG && _1.logger && _1.logger.debug("CloudClient.removeFolder: Could not find any local files");
+            }
         }
     }
     async downloadPkgCloudFile(file, localTarget) {

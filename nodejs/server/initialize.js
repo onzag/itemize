@@ -147,6 +147,18 @@ function initializeApp(appData, custom) {
     _1.app.get("/sw.production.js", (req, res) => {
         res.sendFile(path_1.default.resolve(path_1.default.join("dist", "data", "service-worker.production.js")));
     });
+    if (appData.sensitiveConfig.localContainer) {
+        _1.logger.warn("initializeApp: Initializing an uploads endpoint for the cluster");
+        _1.app.use("/uploads", express_1.default.static("uploads", {
+            cacheControl: true,
+            maxAge: 0,
+            immutable: true,
+            etag: true,
+            dotfiles: "allow",
+            lastModified: true,
+            index: false,
+        }));
+    }
     const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
     _1.app.get("/robots.txt", (req, res) => {
         res.setHeader("content-type", "text/plain; charset=utf-8");

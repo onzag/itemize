@@ -254,15 +254,25 @@ export function cacheableQSLoader(url: string, recheck?: boolean) {
   if (url.indexOf("blob:") === 0) {
     return url;
   }
+
+  let toParseURL = url;
+  let isLocal = url[0] === "/";
+  if (isLocal) {
+    // a hack to make the url parse properly
+    toParseURL = "local:" + toParseURL;
+  }
+
   // now we can rebuild the url
-  const newURL = new URL(url);
+  const newURL = new URL(toParseURL);
   newURL.searchParams.append("sw-cacheable", "true");
   if (recheck) {
     newURL.searchParams.append("sw-recheck", "true");
   }
 
   // and return it as a string
-  return newURL.toString();
+  const urlStr = newURL.toString();
+  // we need to remove the local thing
+  return isLocal ? urlStr.substr(6) : urlStr;
 }
 
 /**

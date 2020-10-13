@@ -468,6 +468,9 @@ export const rawSensitiveConfigSchema = {
         ],
       },
     },
+    localContainer: {
+      type: "string",
+    },
     defaultContainerID: {
       type: "string",
     },

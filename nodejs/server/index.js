@@ -320,7 +320,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
         }
         // due to a bug in the types the create client function is missing
         // domainId and domainName
-        exports.logger.info("initializeServer: initializing openstack pkgcloud objectstorage clients");
+        exports.logger.info("initializeServer: initializing cloud clients");
         const cloudClients = await getCloudClients(config, sensitiveConfig);
         if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
             exports.logger.info("initializeServer: cleaning storage");

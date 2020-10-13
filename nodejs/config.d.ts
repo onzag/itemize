@@ -408,6 +408,9 @@ export declare const rawSensitiveConfigSchema: {
                 required: string[];
             };
         };
+        localContainer: {
+            type: string;
+        };
         defaultContainerID: {
             type: string;
         };

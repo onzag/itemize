@@ -144,7 +144,7 @@ async function runImageConversions(imageStream, filePath, fileName, fileMimeType
         }).rotate().flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
         return file_management_1.sqlUploadPipeFile(uploadsClient, outputPipeline, domain, outputFileName);
     }).concat([
-        file_management_1.sqlUploadPipeFile(uploadsClient, imageStream, domain, originalImageFilePath),
+        file_management_1.sqlUploadPipeFile(uploadsClient, conversionPipeline.clone(), domain, originalImageFilePath),
     ]);
     // now we pipe the image read stream to the conversion pipeline
     // that will run the conversions

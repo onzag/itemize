@@ -130,6 +130,9 @@ exports.rawSensitiveConfigSchema = {
                 ],
             },
         },
+        localContainer: {
+            type: "string",
+        },
         defaultContainerID: {
             type: "string",
         },

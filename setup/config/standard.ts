@@ -163,9 +163,10 @@ export async function standardConfigSetup(
         variableName: "containersHostnamePrefixes",
         type: "strobject",
         message: "Now you need to specify the container region mappers, as a comma separated list of values for the given containers "+
-        "the values must be an url (without protocol) where the upload files are hosted for the given container",
+        "the values must be an url (without protocol) where the upload files are hosted for the given container, if you trail the url " +
+        "with a / it specifies a url that is in our own domain",
         defaultValue: {
-          "MAIN": "storage.cloud.com/v1/AUTH_XXXXXXXXXXXXXXXXXXXXX/MyObjectStorageContainerExample"
+          "MAIN": "/uploads"
         },
       },
     ],

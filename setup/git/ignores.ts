@@ -17,6 +17,8 @@ export default [
   "/logs",
   // the deployments folder for when the get-deployable script is created
   "/deployments",
+  // uploads folder
+  "/uploads",
   // the nom token itself
   ".npm-token",
   // the npm debug log

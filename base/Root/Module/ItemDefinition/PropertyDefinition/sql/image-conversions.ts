@@ -208,7 +208,7 @@ export async function runImageConversions(
   }).concat([
     sqlUploadPipeFile(
       uploadsClient,
-      imageStream,
+      conversionPipeline.clone(),
       domain,
       originalImageFilePath,
     ),

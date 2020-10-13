@@ -179,6 +179,25 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
+  if (appData.sensitiveConfig.localContainer) {
+    logger.warn(
+      "initializeApp: Initializing an uploads endpoint for the cluster",
+    );
+
+    app.use(
+      "/uploads",
+      express.static("uploads", {
+        cacheControl: true,
+        maxAge: 0,
+        immutable: true,
+        etag: true,
+        dotfiles: "allow",
+        lastModified: true,
+        index: false,
+      })
+    );
+  }
+
   const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
   app.get("/robots.txt", (req, res) => {
     res.setHeader("content-type", "text/plain; charset=utf-8");
@@ -187,7 +206,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       res.end("user-agent = *\ndisallow: /\n");
       return;
     }
-  
+
     let result: string = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
       "disallow: /rest/currency-factors\ndisallow: /graphql\n";
     if (appData.seoConfig) {

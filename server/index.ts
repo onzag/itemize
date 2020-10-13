@@ -480,7 +480,7 @@ export async function initializeServer(
     // due to a bug in the types the create client function is missing
     // domainId and domainName
     logger.info(
-      "initializeServer: initializing openstack pkgcloud objectstorage clients",
+      "initializeServer: initializing cloud clients",
     );
 
     const cloudClients = await getCloudClients(config, sensitiveConfig);

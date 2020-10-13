@@ -168,6 +168,7 @@ export function processSingleFileFor(
     return {
       value: secondStepOutput.value,
       consumeStreams: async (propertyLocationId: string) => {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
       }
     }
@@ -220,7 +221,7 @@ function processOneFileAndItsSameIDReplacement(
             const includeLocationPath = include ?
               path.join(transitoryLocationPath, include.getQualifiedIdentifier()) : transitoryLocationPath;
             const propertyLocationPath = path.join(includeLocationPath, propertyDefinition.getId());
-            const fileLocationPath = path.join(propertyLocationPath, oldVersion.id);
+            const fileLocationPath = path.join(domain, propertyLocationPath, oldVersion.id);
             try {
               await uploadsClient.removeFolder(fileLocationPath);
             } catch (err) {
