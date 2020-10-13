@@ -309,7 +309,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                             authUrl: openStackSEOContainerData.authUrl,
                         }, openStackSEOContainerData.containerName);
                     }
-                    const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, cloudClient, knex, root, prefix, config.supportedLanguages, domain, PING_GOOGLE);
+                    const seoGenerator = new generator_1.SEOGenerator(seoConfig.seoRules, cloudClient, knex, root, config.supportedLanguages, domain, PING_GOOGLE);
                     manager.setSEOGenerator(seoGenerator);
                 }
             }

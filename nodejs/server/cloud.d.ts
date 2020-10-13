@@ -37,5 +37,12 @@ export declare class CloudClient {
     removeFolder(mainPath: string): Promise<void>;
     private downloadPkgCloudFile;
     dumpEntireFolder(source: string, localTarget: string): Promise<unknown>;
+    checkExists(at: string): Promise<boolean>;
+    /**
+     * Runs a get request to retrieve one of those index files
+     * @param at where to run the fetch at
+     */
+    getFileStr(at: string): Promise<string>;
+    getFileJSON(at: string): Promise<any>;
 }
 export {};

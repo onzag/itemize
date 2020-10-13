@@ -29,14 +29,13 @@ class SEOGenerator {
      * @param hostname the hostname that we are creating sitemaps for
      * @param pingGoogle whether to ping google once we have updated our sitemaps
      */
-    constructor(rules, cloudClient, knex, root, prefix, supportedLanguages, hostname, pingGoogle) {
+    constructor(rules, cloudClient, knex, root, supportedLanguages, hostname, pingGoogle) {
         this.primaryIndex = null;
         this.mainIndex = null;
         this.cache = {};
         this.cloudClient = cloudClient;
         this.knex = knex;
         this.root = root;
-        this.prefix = prefix;
         this.rules = rules;
         this.supportedLanguages = supportedLanguages;
         this.hostname = hostname;
@@ -105,7 +104,7 @@ class SEOGenerator {
             // in any sitemap
             let changed = false;
             // now we get our current static file
-            const currentStatic = await this.runGetRequest("sitemaps/" + this.hostname + "/main/static.json");
+            const currentStatic = await this.cloudClient.getFileJSON("sitemaps/" + this.hostname + "/main/static.json");
             // and the new one we are trying to set
             const newStatic = {
                 lastQueried: null,
@@ -162,7 +161,7 @@ class SEOGenerator {
             // are added yet no new dynamic are added
             if (changed && this.pingGoogle) {
                 const googleURL = "https://google.com/ping?sitemap=https://" + this.hostname + "/sitemap.xml";
-                index_1.logger.info("SEOGenerator.runHeadRequest: Pinging google at  " + googleURL);
+                index_1.logger.info("SEOGenerator.run: Pinging google at  " + googleURL);
                 try {
                     https_1.default.get(googleURL, (res) => {
                         if (res.statusCode !== 200 && res.statusCode !== 0) {
@@ -194,79 +193,8 @@ class SEOGenerator {
             });
         }
     }
-    /**
-     * Runs a head request to the container info to see if a resource already
-     * exists or not
-     * @param at the partial url of the resource
-     */
-    async runHeadRequest(at) {
-        return new Promise((resolve, reject) => {
-            const strURL = this.prefix + at;
-            const url = new URL(strURL);
-            try {
-                https_1.default.get({
-                    method: "HEAD",
-                    host: url.host,
-                    path: url.pathname,
-                }, (resp) => {
-                    if (resp.statusCode === 200 || resp.statusCode === 0) {
-                        index_1.logger.info("SEOGenerator.runHeadRequest: Checking succeed " + at);
-                    }
-                    else {
-                        index_1.logger.info("SEOGenerator.runHeadRequest: Checking failed " + at);
-                    }
-                    return resolve(resp.statusCode === 200 || resp.statusCode === 0);
-                });
-            }
-            catch (err) {
-                reject(err);
-            }
-        });
-    }
-    /**
-     * Runs a get request to retrieve one of those index files
-     * @param at where to run the fetch at
-     */
-    async runGetRequest(at) {
-        return new Promise((resolve, reject) => {
-            const strURL = this.prefix + at;
-            const url = new URL(strURL);
-            try {
-                https_1.default.get({
-                    method: "GET",
-                    host: url.host,
-                    path: url.pathname,
-                }, (resp) => {
-                    if (resp.statusCode === 200 || resp.statusCode === 0) {
-                        index_1.logger.info("SEOGenerator.runGetRequest: Retrieving succeed, now parsing " + at);
-                        let data = "";
-                        resp.on("data", (chunk) => {
-                            data += chunk;
-                        });
-                        resp.on("error", (err) => {
-                            reject(err);
-                        });
-                        resp.on("end", () => {
-                            // now that we got the answer, let's use our guess
-                            try {
-                                const parsedData = JSON.parse(data);
-                                resolve(parsedData);
-                            }
-                            catch (err) {
-                                reject(err);
-                            }
-                        });
-                    }
-                    else {
-                        index_1.logger.info("SEOGenerator.runGetRequest: Retrieving failed " + at);
-                        resolve(null);
-                    }
-                });
-            }
-            catch (err) {
-                reject(err);
-            }
-        });
+    async checkExist(at) {
+        return this.cloudClient.checkExists(at);
     }
     /**
      * Writes a file at the specified endpoint
@@ -288,7 +216,7 @@ class SEOGenerator {
      */
     async writeSitemapFile(src, target, prefix, suffix) {
         index_1.logger.info("SEOGenerator.writeSitemapFile: Attempting to write sitemap file at: " + target);
-        await this.writeFile(sitemaps_1.toXML(src, this.hostname, this.prefix, prefix, suffix), target);
+        await this.writeFile(sitemaps_1.toXML(src, this.hostname, this.cloudClient.getPrefix(), prefix, suffix), target);
     }
     async checkIndexFile() {
         if (this.mainIndex) {
@@ -298,7 +226,7 @@ class SEOGenerator {
         // it's in sync
         await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
         // we need to retrieve now the main index based on the json, if it exists
-        this.mainIndex = await this.runGetRequest("sitemaps/" + this.hostname + "/main/index.json");
+        this.mainIndex = await this.cloudClient.getFileJSON("sitemaps/" + this.hostname + "/main/index.json");
         let mainIndexWasNotFound = !this.mainIndex;
         // if we don't have a main index we build a new fresh one from scratch
         if (!this.mainIndex) {
@@ -312,7 +240,7 @@ class SEOGenerator {
         const languagesIndexFound = await Promise.all(this.supportedLanguages.map(async (lang) => {
             return {
                 lang,
-                found: await this.runHeadRequest("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
+                found: await this.checkExist("sitemaps/" + this.hostname + "/" + lang + "/index.xml"),
             };
         }));
         // we use this variable to cache the content of the sitemaps in case
@@ -341,7 +269,7 @@ class SEOGenerator {
                 for (const entryURL of this.mainIndex.entries) {
                     // and fetch it from the target or use our cache
                     const entry = cachedEntries[entryURL] ||
-                        await this.runGetRequest("sitemaps/" + this.hostname + "/main/" + entryURL + ".json");
+                        await this.cloudClient.getFileJSON("sitemaps/" + this.hostname + "/main/" + entryURL + ".json");
                     // and store it in the cache
                     cachedEntries[entryURL] = entry;
                     // now we write that source json as a sitemap xml

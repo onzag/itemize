@@ -41,13 +41,13 @@ class CloudClient {
         return this.id;
     }
     async setAsOpenstack(data, containerName) {
-        _1.logger && _1.logger.info("initializeServer: retrieving openstack container " + containerName + " in container id " + this.id);
+        _1.logger && _1.logger.info("CloudClient.setAsOpenstack: retrieving openstack container " + containerName + " in container id " + this.id);
         this.pkgCloudOpenstackClient = pkgcloud_1.default.storage.createClient(data);
         this.pkgCloudOpenstackContainer = await getContainerPromisified(this.pkgCloudOpenstackClient, containerName);
     }
     setAsLocal() {
         this.isLocal = true;
-        _1.logger && _1.logger.warn("CloudClient: cloud identified with " + this.id + " initialized in local mode, this mode is non-scalable and can only work with 1 cluster");
+        _1.logger && _1.logger.warn("CloudClient.setAsLocal: cloud identified with " + this.id + " initialized in local mode, this mode is non-scalable and can only work with 1 cluster");
     }
     /**
    * Verifies whether a given uploaded resource is actually ready, as
@@ -212,6 +212,99 @@ class CloudClient {
                 });
             });
         }
+    }
+    async checkExists(at) {
+        if (this.pkgCloudOpenstackContainer) {
+            return new Promise((resolve, reject) => {
+                const strURL = path_1.default.join(this.prefix, at);
+                const url = new URL(strURL);
+                try {
+                    https_1.default.get({
+                        method: "HEAD",
+                        host: url.host,
+                        path: url.pathname,
+                    }, (resp) => {
+                        if (resp.statusCode === 200 || resp.statusCode === 0) {
+                            _1.logger && _1.logger.info("CloudClient.checkExists: Checking succeed " + at);
+                        }
+                        else {
+                            _1.logger && _1.logger.info("CloudClient.checkExists: Checking failed " + at);
+                        }
+                        return resolve(resp.statusCode === 200 || resp.statusCode === 0);
+                    });
+                }
+                catch (err) {
+                    reject(err);
+                }
+            });
+        }
+        else {
+            const localPath = path_1.default.join("uploads", at);
+            let exists = true;
+            try {
+                await fsAsync.access(localPath, fs_1.default.constants.F_OK);
+                _1.logger && _1.logger.info("CloudClient.checkExists: Checking succeed " + at);
+            }
+            catch (e) {
+                exists = false;
+                _1.logger && _1.logger.info("CloudClient.checkExists: Checking failed " + at);
+            }
+            return exists;
+        }
+    }
+    /**
+     * Runs a get request to retrieve one of those index files
+     * @param at where to run the fetch at
+     */
+    async getFileStr(at) {
+        if (this.pkgCloudOpenstackContainer) {
+            return new Promise((resolve, reject) => {
+                const strURL = path_1.default.join(this.prefix, at);
+                const url = new URL(strURL);
+                try {
+                    https_1.default.get({
+                        method: "GET",
+                        host: url.host,
+                        path: url.pathname,
+                    }, (resp) => {
+                        if (resp.statusCode === 200 || resp.statusCode === 0) {
+                            _1.logger && _1.logger.info("CloudClient.getFileStr: Retrieving succeed " + at);
+                            let data = "";
+                            resp.on("data", (chunk) => {
+                                data += chunk;
+                            });
+                            resp.on("error", (err) => {
+                                reject(err);
+                            });
+                            resp.on("end", () => {
+                                resolve(data);
+                            });
+                        }
+                        else {
+                            _1.logger.info("CloudClient.getFileStr: Retrieving failed " + at);
+                            resolve(null);
+                        }
+                    });
+                }
+                catch (err) {
+                    reject(err);
+                }
+            });
+        }
+        else {
+            const localPath = path_1.default.join("uploads", at);
+            try {
+                return await fsAsync.readFile(localPath, "utf-8");
+            }
+            catch {
+                _1.logger.info("CloudClient.getFileStr: Retrieving failed " + at);
+                return null;
+            }
+        }
+    }
+    async getFileJSON(at) {
+        const data = await this.getFileStr(at);
+        return JSON.parse(data);
     }
 }
 exports.CloudClient = CloudClient;

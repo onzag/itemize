@@ -68,7 +68,7 @@ export class CloudClient {
 
   public async setAsOpenstack(data: IOpenstackInitializationAttributes, containerName: string) {
     logger && logger.info(
-      "initializeServer: retrieving openstack container " + containerName + " in container id " + this.id,
+      "CloudClient.setAsOpenstack: retrieving openstack container " + containerName + " in container id " + this.id,
     );
 
     this.pkgCloudOpenstackClient = pkgcloud.storage.createClient(data);
@@ -79,7 +79,7 @@ export class CloudClient {
     this.isLocal = true;
 
     logger && logger.warn(
-      "CloudClient: cloud identified with " + this.id + " initialized in local mode, this mode is non-scalable and can only work with 1 cluster",
+      "CloudClient.setAsLocal: cloud identified with " + this.id + " initialized in local mode, this mode is non-scalable and can only work with 1 cluster",
     );
   }
 
@@ -273,5 +273,97 @@ export class CloudClient {
         });
       })
     }
+  }
+
+  public async checkExists(at: string): Promise<boolean> {
+    if (this.pkgCloudOpenstackContainer) {
+      return new Promise((resolve, reject) => {
+        const strURL = path.join(this.prefix, at);
+        const url = new URL(strURL);
+        try {
+          https.get({
+            method: "HEAD",
+            host: url.host,
+            path: url.pathname,
+          }, (resp) => {
+            if (resp.statusCode === 200 || resp.statusCode === 0) {
+              logger && logger.info("CloudClient.checkExists: Checking succeed " + at);
+            } else {
+              logger && logger.info("CloudClient.checkExists: Checking failed " + at);
+            }
+
+            return resolve(resp.statusCode === 200 || resp.statusCode === 0);
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    } else {
+      const localPath = path.join("uploads", at);
+
+      let exists = true;
+      try {
+        await fsAsync.access(localPath, fs.constants.F_OK);
+        logger && logger.info("CloudClient.checkExists: Checking succeed " + at);
+      } catch (e) {
+        exists = false;
+        logger && logger.info("CloudClient.checkExists: Checking failed " + at);
+      }
+
+      return exists;
+    }
+  }
+
+  /**
+   * Runs a get request to retrieve one of those index files
+   * @param at where to run the fetch at
+   */
+  public async getFileStr(at: string): Promise<string> {
+    if (this.pkgCloudOpenstackContainer) {
+      return new Promise((resolve, reject) => {
+        const strURL = path.join(this.prefix, at);
+        const url = new URL(strURL);
+        try {
+          https.get({
+            method: "GET",
+            host: url.host,
+            path: url.pathname,
+          }, (resp) => {
+            if (resp.statusCode === 200 || resp.statusCode === 0) {
+              logger && logger.info("CloudClient.getFileStr: Retrieving succeed " + at);
+              let data = "";
+              resp.on("data", (chunk) => {
+                data += chunk;
+              });
+              resp.on("error", (err) => {
+                reject(err);
+              });
+              resp.on("end", () => {
+                resolve(data);
+              });
+            } else {
+              logger.info("CloudClient.getFileStr: Retrieving failed " + at);
+              resolve(null);
+            }
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    } else {
+      const localPath = path.join("uploads", at);
+
+      try {
+        return await fsAsync.readFile(localPath, "utf-8");
+      } catch {
+        logger.info("CloudClient.getFileStr: Retrieving failed " + at);
+        return null;
+      }
+    }
+  }
+
+  public async getFileJSON(at: string) {
+    const data = await this.getFileStr(at);
+    return JSON.parse(data);
   }
 }

@@ -463,7 +463,6 @@ export async function initializeServer(
             cloudClient,
             knex,
             root,
-            prefix,
             config.supportedLanguages,
             domain,
             PING_GOOGLE,

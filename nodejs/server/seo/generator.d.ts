@@ -6,7 +6,6 @@ export declare class SEOGenerator {
     private root;
     private knex;
     private cloudClient;
-    private prefix;
     private rules;
     private supportedLanguages;
     private hostname;
@@ -25,22 +24,12 @@ export declare class SEOGenerator {
      * @param hostname the hostname that we are creating sitemaps for
      * @param pingGoogle whether to ping google once we have updated our sitemaps
      */
-    constructor(rules: ISEORuleSet, cloudClient: CloudClient, knex: Knex, root: Root, prefix: string, supportedLanguages: string[], hostname: string, pingGoogle: boolean);
+    constructor(rules: ISEORuleSet, cloudClient: CloudClient, knex: Knex, root: Root, supportedLanguages: string[], hostname: string, pingGoogle: boolean);
     /**
      * Run the seo generator mechanism, usually run once a day
      */
     run(): Promise<void>;
-    /**
-     * Runs a head request to the container info to see if a resource already
-     * exists or not
-     * @param at the partial url of the resource
-     */
-    private runHeadRequest;
-    /**
-     * Runs a get request to retrieve one of those index files
-     * @param at where to run the fetch at
-     */
-    private runGetRequest;
+    private checkExist;
     /**
      * Writes a file at the specified endpoint
      * @param data the data to write
