@@ -96,7 +96,6 @@ function processSingleFileFor(newValue, oldValue, uploadsClient, domain, itemDef
         return {
             value: secondStepOutput.value,
             consumeStreams: async (propertyLocationId) => {
-                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
             }
         };

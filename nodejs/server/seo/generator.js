@@ -13,10 +13,6 @@ const moment_1 = __importDefault(require("moment"));
 const stream_1 = require("stream");
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const NO_SEO = process.env.NO_SEO === "true";
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 ;
 class SEOGenerator {
     /**
@@ -33,7 +29,7 @@ class SEOGenerator {
     constructor(rules, cloudClient, knex, root, supportedLanguages, hostname, pingGoogle) {
         this.primaryIndex = null;
         this.mainIndex = null;
-        this.cache = {};
+        this.seoCache = {};
         this.cloudClient = cloudClient;
         this.knex = knex;
         this.root = root;
@@ -71,8 +67,8 @@ class SEOGenerator {
             }
             // now we delete the cache, this is important
             // otherwise it's a memory leak
-            delete this.cache;
-            this.cache = {};
+            delete this.seoCache;
+            this.seoCache = {};
             // now we need to get the urls we have collected
             let totalURLS = [];
             let totalStaticURLS = [];
@@ -291,7 +287,7 @@ class SEOGenerator {
      * @param rule the rule that we are following
      */
     async runFor(key, rule) {
-        index_1.logger.info("Parsing sitemap for urls " + key);
+        index_1.logger.info("SEOGenerator.runFor: Parsing sitemap for urls " + key);
         // if it's not crawable
         if (!rule.crawable) {
             // then nothing to be given
@@ -320,7 +316,7 @@ class SEOGenerator {
                 // so this will be our query
                 let query;
                 // and we will make the query if there's no cached result for it
-                if (!this.cache[cachedKey]) {
+                if (!this.seoCache[cachedKey]) {
                     const splittedModule = collectionPoint[0].split("/");
                     const splittedIdef = collectionPoint[1] && collectionPoint[1].split("/");
                     if (splittedModule[0] === "") {
@@ -351,10 +347,10 @@ class SEOGenerator {
                     query.where("blocked_at", null).orderBy("created_at", "desc");
                 }
                 // otherwise we set by our cache or well, execute the query
-                const collected = this.cache[cachedKey] ||
+                const collected = this.seoCache[cachedKey] ||
                     await query;
                 // and that will be our value for our cache
-                this.cache[cachedKey] = collected;
+                this.seoCache[cachedKey] = collected;
                 // if we got something then we can set our last queried attribute to it
                 if (collected[0]) {
                     lastQueried[lastQueriedKey] = collected[0].created_at;
@@ -367,7 +363,11 @@ class SEOGenerator {
             // now we need the parametrize function, or we use the default
             const parametrize = rule.parametrize || this.defaultParametrizer;
             // and we pass the collected results to see how we parametrize our results
-            const parameters = parametrize(...collectedResults);
+            const parameters = await parametrize({
+                collectedResults,
+                root: this.root,
+                knex: this.knex,
+            });
             // now we fetch our urls
             let urls = [];
             // and the parameters start to loop
@@ -401,14 +401,16 @@ class SEOGenerator {
             static: true,
         };
     }
-    defaultParametrizer(...args) {
+    defaultParametrizer(arg) {
         // this just makes the id an version be the params
-        return args[0].collected.map((r) => ({
-            params: {
-                id: r.id.toString(),
-                version: r.version.toString(),
-            },
-        }));
+        return arg.collectedResults.map((cr) => {
+            return cr.collected.map((r) => ({
+                params: {
+                    id: r.id.toString(),
+                    version: r.version.toString(),
+                },
+            }));
+        }).flat();
     }
 }
 exports.SEOGenerator = SEOGenerator;

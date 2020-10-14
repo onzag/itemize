@@ -12,6 +12,7 @@ export declare class GlobalManager {
     private modNeedsMantenience;
     private serverData;
     private serverDataLastUpdated;
+    private seoGenLastUpdated;
     private currencyLayer;
     private sensitiveConfig;
     private config;

@@ -226,8 +226,9 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
         }
       });
 
+      const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
       result += "Sitemap: " +
-        appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() +
+        prefix + (prefix.endsWith("/") ? "" : "/") + 
         "sitemaps/" + hostname + "/index.xml";
     }
 
@@ -235,8 +236,9 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   });
 
   if (!NO_SEO) {
+    const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
     app.get("/sitemap.xml", (req, res) => {
-      res.redirect(appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() + "sitemaps/" + hostname + "/index.xml")
+      res.redirect(prefix + (prefix.endsWith("/") ? "" : "/") + "sitemaps/" + hostname + "/index.xml")
     });
   }
 

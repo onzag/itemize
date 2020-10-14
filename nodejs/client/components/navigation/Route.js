@@ -35,7 +35,6 @@ function Route(props) {
             newPathAttr = "/:__lang" + props.path;
         }
     }
-    console.log("AAAAAAAAAAAAAAAAAAAAAAA ROUTE TO", props, newPathAttr);
     // and then we build the route on it, note the path
     // we use __lang as the param, unlikely to use
     // in any circumstance, the lang is diresgarded, as well

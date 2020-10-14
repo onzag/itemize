@@ -1,3 +1,5 @@
+import Root from "../../base/Root";
+import Knex from "knex";
 export interface ISEOParametrizer {
     params: {
         [parameter: string]: string;
@@ -14,7 +16,11 @@ export interface ISEORule {
     crawable: boolean;
     collect?: Array<[string, string]>;
     collectAllVersions?: boolean;
-    parametrize?: (...args: ISEOCollectedResult[]) => ISEOParametrizer[];
+    parametrize?: (arg: {
+        collectedResults: ISEOCollectedResult[];
+        root: Root;
+        knex: Knex;
+    }) => ISEOParametrizer[] | Promise<ISEOParametrizer[]>;
 }
 export interface ISEORuleSet {
     [commaSeparatedURLsWithoutLanguage: string]: ISEORule;

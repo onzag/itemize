@@ -35,6 +35,7 @@ export class GlobalManager {
   private modNeedsMantenience: Module[];
   private serverData: IServerDataType;
   private serverDataLastUpdated: number;
+  private seoGenLastUpdated: number;
   private currencyLayer: CurrencyLayer;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private config: IConfigRawJSONDataType;
@@ -207,10 +208,13 @@ export class GlobalManager {
     if (this.seoGenerator) {
       (async () => {
         while (true) {
+          this.seoGenLastUpdated = (new Date()).getTime();
+
+          logger.info("GlobalManager.run: running SEO Generator");
           await this.seoGenerator.run();
     
           const nowTime = (new Date()).getTime();
-          const timeItPassedSinceSeoGenRan = nowTime - this.serverDataLastUpdated;
+          const timeItPassedSinceSeoGenRan = nowTime - this.seoGenLastUpdated;
           const timeUntilSeoGenNeedsToRun = SERVER_MAPPING_TIME - timeItPassedSinceSeoGenRan;
     
           if (timeUntilSeoGenNeedsToRun <= 0) {
@@ -222,6 +226,7 @@ export class GlobalManager {
               }
             );
           } else {
+            logger.info("GlobalManager.run: SEO generator tasked to run in " + timeUntilSeoGenNeedsToRun + "ms");
             await wait(timeUntilSeoGenNeedsToRun);
           }
         }
@@ -229,6 +234,8 @@ export class GlobalManager {
     }
     (async () => {
       while (true) {
+        this.serverDataLastUpdated = (new Date()).getTime();
+
         await this.calculateServerData();
         await this.runOnce();
   
@@ -246,6 +253,7 @@ export class GlobalManager {
             }
           );
         } else {
+          logger.info("GlobalManager.run: Server data and updater tasked to run in " + timeUntilItNeedsToUpdate + "ms");
           await wait(timeUntilItNeedsToUpdate);
         }
       }
@@ -397,11 +405,12 @@ export class GlobalManager {
     // buggy typescript again
   }
   private async calculateServerData() {
+    logger.info("GlobalManager.calculateServerData: Updating server data");
+
     try {
       this.serverData = {
         [CURRENCY_FACTORS_IDENTIFIER]: this.currencyLayer ? await this.currencyLayer.requestCurrencyFactors() : null,
       };
-      this.serverDataLastUpdated = (new Date()).getTime();
       await this.informNewServerData(); 
     } catch (err) {
       logger.error(
@@ -414,6 +423,8 @@ export class GlobalManager {
     }
   }
   private async informNewServerData() {
+    logger.info("GlobalManager.informNewServerData: Updating database with new server data");
+
     // STORE currency factors in the database if available
     // for storing
     if (this.serverData[CURRENCY_FACTORS_IDENTIFIER]) {
@@ -444,6 +455,8 @@ export class GlobalManager {
       }
     }
 
+    logger.info("GlobalManager.informNewServerData: Updating global cache with new server data");
+
     // stringify the server data
     const stringifiedServerData = JSON.stringify(this.serverData);
 
@@ -463,6 +476,8 @@ export class GlobalManager {
         }
       }
     );
+
+    logger.info("GlobalManager.informNewServerData: Informing clusters of new server data");
 
     const redisEvent: IRedisEvent = {
       source: "global",

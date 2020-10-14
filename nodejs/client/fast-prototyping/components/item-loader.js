@@ -48,7 +48,6 @@ const ItemLoaderStyles = mui_core_1.createStyles({
  */
 exports.ItemLoader = mui_core_1.withStyles(ItemLoaderStyles)((props) => {
     return (react_1.default.createElement(ItemLoader_1.default, null, (arg) => {
-        console.log(arg, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         const notFound = arg.notFound;
         const blocked = arg.blocked;
         const hasBlockedAccess = arg.hasBlockedAccess;

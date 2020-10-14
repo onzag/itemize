@@ -185,15 +185,17 @@ function initializeApp(appData, custom) {
                     });
                 }
             });
+            const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
             result += "Sitemap: " +
-                appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() +
+                prefix + (prefix.endsWith("/") ? "" : "/") +
                 "sitemaps/" + hostname + "/index.xml";
         }
         res.end(result);
     });
     if (!NO_SEO) {
+        const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
         _1.app.get("/sitemap.xml", (req, res) => {
-            res.redirect(appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix() + "sitemaps/" + hostname + "/index.xml");
+            res.redirect(prefix + (prefix.endsWith("/") ? "" : "/") + "sitemaps/" + hostname + "/index.xml");
         });
     }
     const router = express_1.default.Router();

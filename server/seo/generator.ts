@@ -13,11 +13,6 @@ import { CloudClient } from "../cloud";
 
 const NO_SEO = process.env.NO_SEO === "true";
 
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
-
 interface ISEOCollectedDataWithCreatedAt extends ISEOCollectedData {
   created_at: string;
 }
@@ -36,10 +31,11 @@ export class SEOGenerator {
   private supportedLanguages: string[];
   private hostname: string;
   private pingGoogle: boolean;
+  private cache: Cache;
 
   private primaryIndex: ISitemapJSONType = null;
   private mainIndex: ISitemapJSONType = null;
-  private cache: { [key: string]: ISEOCollectedDataWithCreatedAt[] } = {};
+  private seoCache: { [key: string]: ISEOCollectedDataWithCreatedAt[] } = {};
 
   /**
    * Buillds a new seo generator
@@ -103,8 +99,8 @@ export class SEOGenerator {
 
       // now we delete the cache, this is important
       // otherwise it's a memory leak
-      delete this.cache;
-      this.cache = {};
+      delete this.seoCache;
+      this.seoCache = {};
 
       // now we need to get the urls we have collected
       let totalURLS: string[] = [];
@@ -406,7 +402,7 @@ export class SEOGenerator {
    * @param rule the rule that we are following
    */
   private async runFor(key: string, rule: ISEORule): Promise<ISEOPreResult> {
-    logger.info("Parsing sitemap for urls " + key);
+    logger.info("SEOGenerator.runFor: Parsing sitemap for urls " + key);
 
     // if it's not crawable
     if (!rule.crawable) {
@@ -443,7 +439,7 @@ export class SEOGenerator {
         let query: Knex.QueryBuilder;
 
         // and we will make the query if there's no cached result for it
-        if (!this.cache[cachedKey]) {
+        if (!this.seoCache[cachedKey]) {
           const splittedModule = collectionPoint[0].split("/");
           const splittedIdef = collectionPoint[1] && collectionPoint[1].split("/");
           if (splittedModule[0] === "") {
@@ -480,11 +476,11 @@ export class SEOGenerator {
 
         // otherwise we set by our cache or well, execute the query
         const collected: ISEOCollectedDataWithCreatedAt[] =
-          this.cache[cachedKey] ||
+          this.seoCache[cachedKey] ||
           await query as ISEOCollectedDataWithCreatedAt[];
 
         // and that will be our value for our cache
-        this.cache[cachedKey] = collected;
+        this.seoCache[cachedKey] = collected;
 
         // if we got something then we can set our last queried attribute to it
         if (collected[0]) {
@@ -500,7 +496,11 @@ export class SEOGenerator {
       // now we need the parametrize function, or we use the default
       const parametrize = rule.parametrize || this.defaultParametrizer;
       // and we pass the collected results to see how we parametrize our results
-      const parameters = parametrize(...collectedResults);
+      const parameters = await parametrize({
+        collectedResults,
+        root: this.root,
+        knex: this.knex,
+      });
 
       // now we fetch our urls
       let urls: string[] = [];
@@ -539,13 +539,17 @@ export class SEOGenerator {
     };
   }
 
-  private defaultParametrizer(...args: ISEOCollectedResult[]): ISEOParametrizer[] {
+  private defaultParametrizer(arg: {
+    collectedResults: ISEOCollectedResult[]
+  }): ISEOParametrizer[] {
     // this just makes the id an version be the params
-    return args[0].collected.map((r) => ({
-      params: {
-        id: r.id.toString(),
-        version: r.version.toString(),
-      },
-    }));
+    return arg.collectedResults.map((cr) => {
+      return cr.collected.map((r) => ({
+        params: {
+          id: r.id.toString(),
+          version: r.version.toString(),
+        },
+      }));
+    }).flat();
   }
 }

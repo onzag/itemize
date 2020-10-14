@@ -10,9 +10,10 @@ export declare class SEOGenerator {
     private supportedLanguages;
     private hostname;
     private pingGoogle;
+    private cache;
     private primaryIndex;
     private mainIndex;
-    private cache;
+    private seoCache;
     /**
      * Buillds a new seo generator
      * @param rules the seo rules
