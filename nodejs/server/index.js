@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initializeServer = exports.getCloudClients = exports.app = exports.logger = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
@@ -279,7 +280,8 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             const manager = new global_manager_1.GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
             if (seoConfig && sensitiveConfig.seoContainerID) {
                 exports.logger.info("initializeServer: initializing SEO configuration");
-                const openStackSEOContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
+                const openStackSEOContainerData = sensitiveConfig.openstackContainers &&
+                    sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
                 const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
                 if (!openStackSEOContainerData && !isLocalInstead) {
                     exports.logger.error("initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'");

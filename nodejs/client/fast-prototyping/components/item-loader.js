@@ -8,6 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ItemLoader = void 0;
 const react_1 = __importDefault(require("react"));
 const mui_core_1 = require("../mui-core");
 const ItemLoader_1 = __importDefault(require("../../components/item/ItemLoader"));
@@ -47,6 +48,7 @@ const ItemLoaderStyles = mui_core_1.createStyles({
  */
 exports.ItemLoader = mui_core_1.withStyles(ItemLoaderStyles)((props) => {
     return (react_1.default.createElement(ItemLoader_1.default, null, (arg) => {
+        console.log(arg, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         const notFound = arg.notFound;
         const blocked = arg.blocked;
         const hasBlockedAccess = arg.hasBlockedAccess;

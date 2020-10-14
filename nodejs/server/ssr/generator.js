@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ssrGenerator = void 0;
 const __1 = require("..");
 const react_1 = __importDefault(require("react"));
 const constants_1 = require("../../constants");
@@ -368,6 +369,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             // for that we try to initialize, which can indeed, fail
             // mainly because calls to ipstack and whatnot which must
             // be consistent
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "FUCKING INITIALIZE");
             serverAppData = await client_1.initializeItemizeApp(appData.ssrConfig.rendererContext, appData.ssrConfig.mainComponent, {
                 appWrapper: appData.ssrConfig.appWrapper,
                 mainWrapper: appData.ssrConfig.mainWrapper,
@@ -416,8 +418,10 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // now we build the app, but we need to put the static router on top
         // as in server mode no router is used so we need this static router to match
         // with SSR
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", req.originalUrl);
         const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.originalUrl }, serverAppData.node));
         // we place such HTML
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "FUCKING RENDER");
         newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
         // but we need the SSR head which includes our hreflang tags
         let finalSSRHead = langHrefLangTags;

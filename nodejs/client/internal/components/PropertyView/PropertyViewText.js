@@ -8,6 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.propertyViewPostProcessingHook = exports.SUPPORTED_HANDLERS = exports.SUPPORTED_CONTENT_MODIFIERS = exports.SUPPORTED_TEMPLATE_STYLES = exports.SUPPORTED_TEMPLATE_EVENTS = exports.ALLOWED_CLASSES_PREFIXES = exports.ALLOWED_CLASSES = exports.PROPERTY_VIEW_SANITIZE_CONFIG = void 0;
 const react_1 = __importDefault(require("react"));
 const util_1 = require("../../../../util");
 const deep_equal_1 = __importDefault(require("deep-equal"));

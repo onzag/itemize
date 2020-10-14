@@ -6,6 +6,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSQLTablesSchemaForRoot = void 0;
 const sql_1 = require("./Module/sql");
 const constants_1 = require("../../constants");
 /**

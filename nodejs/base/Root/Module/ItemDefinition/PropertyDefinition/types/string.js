@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.exactStringSearchSubtypes = void 0;
 const graphql_1 = require("graphql");
 const sql_1 = require("../sql");
 const local_sql_1 = require("../local-sql");

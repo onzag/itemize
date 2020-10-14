@@ -9,6 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.extractConfigAndBuildNumber = exports.extractOneConfig = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const Traceback_1 = __importDefault(require("./Traceback"));
@@ -90,8 +91,8 @@ async function extractConfigAndBuildNumber() {
     const standardConfig = await extractOneConfig(schema_checks_1.checkConfig, "index", null, false, standardConfigCheckerCallback);
     const sensitiveConfigCheckerCallback = (data, traceback) => {
         Object.keys(standardConfig.containersHostnamePrefixes).forEach((containerId) => {
-            if (!data.openstackContainers[containerId] && data.localContainer !== containerId) {
-                throw new Error_1.default("Could not find container information for container " + containerId + " in sensitive config", traceback.newTraceToBit("openstackContainers"));
+            if ((!data.openstackContainers || !data.openstackContainers[containerId]) && data.localContainer !== containerId) {
+                throw new Error_1.default("Could not find container information for container " + containerId + " in sensitive config", data.openstackContainers ? traceback.newTraceToBit("openstackContainers") : traceback);
             }
         });
     };

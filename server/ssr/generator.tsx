@@ -354,6 +354,7 @@ export async function ssrGenerator(
       // remember to clean before release, we don't want to pollute anything
       root.cleanState();
       appData.rootPool.release(root);
+
       return;
     }
   }

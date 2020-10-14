@@ -425,7 +425,8 @@ export async function initializeServer(
         logger.info(
           "initializeServer: initializing SEO configuration",
         );
-        const openStackSEOContainerData = sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
+        const openStackSEOContainerData = sensitiveConfig.openstackContainers &&
+          sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
         const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
         if (!openStackSEOContainerData && !isLocalInstead) {
           logger.error(

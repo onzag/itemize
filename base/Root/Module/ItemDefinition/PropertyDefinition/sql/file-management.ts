@@ -168,7 +168,6 @@ export function processSingleFileFor(
     return {
       value: secondStepOutput.value,
       consumeStreams: async (propertyLocationId: string) => {
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
       }
     }
