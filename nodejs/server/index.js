@@ -31,6 +31,7 @@ const rootpool_1 = require("./rootpool");
 const generator_1 = require("./seo/generator");
 const initialize_1 = require("./initialize");
 const cloud_1 = require("./cloud");
+const mail_1 = require("./mail");
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -40,7 +41,8 @@ const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 // building the logger
-exports.logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston_1.default.createLogger({
+exports.logger = (INSTANCE_MODE === "BUILD_DATABASE" ||
+    INSTANCE_MODE === "LOAD_DATABASE_DUMP") ? null : winston_1.default.createLogger({
     level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
     format: winston_1.default.format.combine(winston_1.default.format.timestamp(), winston_1.default.format.json()),
     transports: [
@@ -68,7 +70,9 @@ pg_1.types.setTypeParser(DATE_OID, (val) => val);
 // we need the async fs
 const fsAsync = fs_1.default.promises;
 // now in order to build the database in the cheat mode, we don't need express
-exports.app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
+exports.app = INSTANCE_MODE === "BUILD_DATABASE" ||
+    INSTANCE_MODE === "LOAD_DATABASE_DUMP" ||
+    INSTANCE_MODE === "CLEAN_STORAGE" ? null : express_1.default();
 async function getCloudClients(config, sensitiveConfig) {
     const cloudClients = {};
     if (sensitiveConfig.localContainer) {
@@ -127,8 +131,8 @@ exports.getCloudClients = getCloudClients;
  */
 async function initializeServer(ssrConfig, seoConfig, custom = {}) {
     // for build database we just build the database
-    if (INSTANCE_MODE === "BUILD_DATABASE") {
-        dbbuilder_1.default(NODE_ENV);
+    if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
+        dbbuilder_1.default(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
         return;
     }
     // now we try to read the basic configuration
@@ -381,6 +385,8 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
                 domain: sensitiveConfig.mailgunDomain,
                 host: sensitiveConfig.mailgunAPIHost,
             }) : null;
+        exports.logger.info("initializeServer: configuring mail service");
+        const mailService = new mail_1.MailService(mailgun, cache, sensitiveConfig);
         if (sensitiveConfig.hereApiKey) {
             exports.logger.info("initializeServer: initializing here maps");
         }
@@ -411,6 +417,7 @@ async function initializeServer(ssrConfig, seoConfig, custom = {}) {
             ipStack,
             here,
             mailgun,
+            mailService,
             cloudClients,
             logger: exports.logger,
             // assigned later during rest setup

@@ -457,7 +457,7 @@ exports.getDictionary = getDictionary;
  * @param sensitiveConfig the sensitive config
  */
 function validateContainerIdIsReal(containerId, sensitiveConfig) {
-    if (!sensitiveConfig.openstackContainers[containerId]) {
+    if (!sensitiveConfig.openstackContainers[containerId] && sensitiveConfig.localContainer !== containerId) {
         throw new errors_1.EndpointError({
             message: "Container id " + containerId + " does not exist",
             code: constants_1.ENDPOINT_ERRORS.UNSPECIFIED,

@@ -12,7 +12,7 @@ import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
-import { capitalize } from "../../util";
+import { capitalize, renderTemplate } from "../../util";
 import { promisify } from "util";
 
 interface RecoverPasswordTokenType {
@@ -454,50 +454,34 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
-        const templateToUse = i18nData.custom.validate_account_template_name;
-        const from = `${i18nData.custom.validate_account_user} <${i18nData.custom.validate_account_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
+        const templateIdToUse = parseInt(i18nData.custom.validate_account_fragment_id, 10);
+
         const to = resultUser.email;
         const subject = capitalize(i18nData.custom.validate_account);
 
-        try {
-          if (!templateToUse) {
-            await appData.mailgun.messages().send({
-              from,
-              to,
-              subject,
-              text: `You do not have a template setup for language ${languageToUse}\n` +
-              `validate_account_link = ${validateLink}\n` +
-              `validate_account = ${capitalize(i18nData.custom.validate_account)}\n` +
-              `validate_account_title = ${capitalize(i18nData.custom.validate_account_title)}\n` +
-              `validate_account_description = ${i18nData.custom.validate_account_description}\n` +
-              `validate_account_activate_button = ${capitalize(i18nData.custom.validate_account_activate_button)}\n` +
-              `validate_account_alt_link = ${capitalize(i18nData.custom.validate_account_alt_link)}`
-            });
-          } else {
-            await appData.mailgun.messages().send({
-              from,
-              to,
-              subject,
-              template: templateToUse,
-              validate_account_link: validateLink,
-              validate_account: capitalize(i18nData.custom.validate_account),
-              validate_account_title: capitalize(i18nData.custom.validate_account_title),
-              validate_account_description: i18nData.custom.validate_account_description,
-              validate_account_activate_button: capitalize(i18nData.custom.validate_account_activate_button),
-              validate_account_alt_link: capitalize(i18nData.custom.validate_account_alt_link),
-            });
+        const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
+
+        const extractedProperties: any = {};
+        Object.keys(resultUser).forEach((p) => {
+          if (typeof resultUser[p] === "string" || typeof resultUser[p] === "number") {
+            extractedProperties[p] = resultUser[p].toString();
           }
-        } catch (err) {
-          logger.error(
-            "customUserQueries.send_validate_email [SERIOUS]: mailgun API failed to deliver the email",
-            {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
-            },
-          );
-          throw err;
-        }
+        });
+
+        await appData.mailService.sendTemplateEmail({
+          fromUsername: i18nData.custom.validate_account_user,
+          fromEmailHandle: i18nData.custom.validate_account_email_user,
+          id: templateIdToUse,
+          version: languageToUse,
+          itemDefinition: fragmentIdef,
+          args: {
+            validate_account_link: validateLink,
+            validate_account_properties: extractedProperties,
+          },
+          property: fragmentIdef.getPropertyDefinitionFor("content", true),
+          subject,
+          to,
+        });
 
         return {
           status: "OK",
@@ -652,53 +636,33 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const resetPasswordLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
           i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
 
-        const templateToUse = i18nData.custom.forgot_password_template_name;
-        const from = `${i18nData.custom.forgot_password_user} <${i18nData.custom.forgot_password_email_user}@${appData.sensitiveConfig.mailgunDomain}>`;
+        const templateIdToUse = parseInt(i18nData.custom.forgot_password_fragment_id, 10);
         const to = resultUser.email;
         const subject = capitalize(i18nData.custom.forgot_password_title);
 
-        try {
-          if (!templateToUse) {
-            await appData.mailgun.messages().send({
-              from,
-              to,
-              subject,
-              text: `You do not have a template setup for language ${languageToUse}\n` +
-              `forgot_password_link = ${resetPasswordLink}\n` +
-              `forgot_password = ${capitalize(i18nData.custom.forgot_password)}\n` +
-              `forgot_password_title = ${capitalize(i18nData.custom.forgot_password_title)}\n` +
-              `forgot_password_description = ${i18nData.custom.forgot_password_description}\n` +
-              `forgot_password_recover_button = ${capitalize(i18nData.custom.forgot_password_recover_button)}\n` +
-              `forgot_password_alt_link = ${capitalize(i18nData.custom.forgot_password_alt_link)}\n` +
-              `forgot_password_username = ${resultUser.username}`
-            });
-          } else {
-            await appData.mailgun.messages().send({
-              from,
-              to,
-              subject,
-              template: templateToUse,
-              forgot_password_link: resetPasswordLink,
-              forgot_password: capitalize(i18nData.custom.forgot_password),
-              forgot_password_title: capitalize(i18nData.custom.forgot_password_title),
-              forgot_password_description: i18nData.custom.forgot_password_description,
-              forgot_password_recover_button: capitalize(i18nData.custom.forgot_password_recover_button),
-              forgot_password_alt_link: capitalize(i18nData.custom.forgot_password_alt_link),
-              forgot_password_username: resultUser.username,
-            });
+        const extractedProperties: any = {};
+        Object.keys(resultUser).forEach((p) => {
+          if (typeof resultUser[p] === "string" || typeof resultUser[p] === "number") {
+            extractedProperties[p] = resultUser[p].toString();
           }
-        } catch (err) {
-          logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: failed to send email via the mailgun API",
-            {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
-              randomId,
-            },
-          );
-          throw err;
-        }
+        });
+
+        const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
+
+        await appData.mailService.sendTemplateEmail({
+          fromUsername: i18nData.custom.validate_account_user,
+          fromEmailHandle: i18nData.custom.validate_account_email_user,
+          id: templateIdToUse,
+          version: languageToUse,
+          itemDefinition: fragmentIdef,
+          args: {
+            forgot_password_link: resetPasswordLink,
+            forgot_password_properties: extractedProperties,
+          },
+          property: fragmentIdef.getPropertyDefinitionFor("content", true),
+          subject,
+          to,
+        });
 
         return {
           status: "OK",

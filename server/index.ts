@@ -36,18 +36,22 @@ import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
 import { CloudClient, ICloudClients } from "./cloud";
+import { MailService } from "./mail";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 
 // building the logger
-export const logger: winston.Logger = INSTANCE_MODE === "BUILD_DATABASE" ? null : winston.createLogger({
+export const logger: winston.Logger = (
+  INSTANCE_MODE === "BUILD_DATABASE" ||
+  INSTANCE_MODE === "LOAD_DATABASE_DUMP"
+) ? null : winston.createLogger({
   level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
   format: winston.format.combine(
     winston.format.timestamp(),
@@ -84,7 +88,10 @@ types.setTypeParser(DATE_OID, (val) => val);
 const fsAsync = fs.promises;
 
 // now in order to build the database in the cheat mode, we don't need express
-export const app = INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "CLEAN_STORAGE" ? null : express();
+export const app =
+  INSTANCE_MODE === "BUILD_DATABASE" ||
+    INSTANCE_MODE === "LOAD_DATABASE_DUMP" ||
+    INSTANCE_MODE === "CLEAN_STORAGE" ? null : express();
 
 /**
  * Specifies the SSR configuration for the multiple pages
@@ -129,6 +136,7 @@ export interface IAppDataType {
   cloudClients: ICloudClients;
   customUserTokenQuery: any;
   logger: winston.Logger;
+  mailService: MailService,
 }
 
 export interface IServerDataType {
@@ -177,7 +185,7 @@ export async function getCloudClients(config: IConfigRawJSONDataType, sensitiveC
       if (prefix.indexOf("/") !== 0) {
         prefix = "https://" + prefix;
       }
-  
+
       const client = new CloudClient(containerIdX, prefix);
       await client.setAsOpenstack({
         provider: "openstack",
@@ -216,8 +224,8 @@ export async function initializeServer(
   custom: IServerCustomizationDataType = {},
 ) {
   // for build database we just build the database
-  if (INSTANCE_MODE === "BUILD_DATABASE") {
-    build(NODE_ENV);
+  if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
+    build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
     return;
   }
 
@@ -581,6 +589,12 @@ export async function initializeServer(
         host: sensitiveConfig.mailgunAPIHost,
       }) : null;
 
+    logger.info(
+      "initializeServer: configuring mail service",
+    );
+
+    const mailService = new MailService(mailgun, cache, sensitiveConfig);
+
     if (sensitiveConfig.hereApiKey) {
       logger.info(
         "initializeServer: initializing here maps",
@@ -620,6 +634,7 @@ export async function initializeServer(
       ipStack,
       here,
       mailgun,
+      mailService,
       cloudClients,
 
       logger,

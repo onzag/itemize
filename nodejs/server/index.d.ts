@@ -21,6 +21,7 @@ import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { ISEORuleSet } from "./seo";
 import { ICloudClients } from "./cloud";
+import { MailService } from "./mail";
 export declare const logger: winston.Logger;
 export declare const app: import("express-serve-static-core").Express;
 /**
@@ -64,6 +65,7 @@ export interface IAppDataType {
     cloudClients: ICloudClients;
     customUserTokenQuery: any;
     logger: winston.Logger;
+    mailService: MailService;
 }
 export interface IServerDataType {
     CURRENCY_FACTORS: {

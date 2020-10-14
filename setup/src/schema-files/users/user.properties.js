@@ -63,10 +63,6 @@ custom.validate_account = activate your account
 custom.validate_account_template_name =
 custom.validate_account_email_user = validate
 custom.validate_account_user = $APPNAME
-custom.validate_account_title = validate your $APPNAME account
-custom.validate_account_description = In order to validate your account so as to be able to receive notifications and recover it you need to click on this button
-custom.validate_account_activate_button = activate
-custom.validate_account_alt_link = alternatively you can click on this link
 custom.validate_account_success = your account has been successfully activated
 custom.validate_account_success_title = success!
 
@@ -75,10 +71,7 @@ custom.forgot_password_template_name =
 custom.forgot_password_email_user = recovery
 custom.forgot_password_user = $APPNAME
 custom.forgot_password_title = recover your $APPNAME account
-custom.forgot_password_description = In order to reset your account you need to click on this link which will log you in, temporarily into your profile, this will allow to change your password
-custom.forgot_password_recover_button = recover account
 custom.forgot_password_link_target = /en/reset-password
-custom.forgot_password_alt_link = alternatively you can click on this link
 
 properties.username.label = username
 properties.username.placeholder = type an username
@@ -203,10 +196,6 @@ custom.validate_account = active su cuenta
 custom.validate_account_template_name =
 custom.validate_account_email_user = activar
 custom.validate_account_user = $APPNAME
-custom.validate_account_title = valide su cuenta de $APPNAME
-custom.validate_account_description = Para poder recuperar su cuenta y poder recibir notificationes debe activar su correo electrónico
-custom.validate_account_activate_button = activar
-custom.validate_account_alt_link = de forma alternativa puede hacer click en éste link
 custom.validate_account_success = su cuenta ha sido activada satisfactoriamente
 custom.validate_account_success_title = ¡validación exitosa!
 
@@ -215,10 +204,7 @@ custom.forgot_password_template_name =
 custom.forgot_password_email_user = recuperar
 custom.forgot_password_user = $APPNAME
 custom.forgot_password_title = recupere su cuenta de $APPNAME
-custom.forgot_password_description = Para recuperar su cuenta haga click en éste link, le permitirá iniciar sesión y podrá cambiar su contraseña
-custom.forgot_password_recover_button = recupere su cuenta
 custom.forgot_password_link_target = /es/reset-password
-custom.forgot_password_alt_link = de forma alternativa puede hacer click en éste link
 
 properties.username.label = nombre de usuario
 properties.username.placeholder = escriba un nombre de usuario

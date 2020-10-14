@@ -209,7 +209,11 @@ async function build(version, buildID, services) {
             "\ndocker-compose -f docker-compose-only-db.yml up; then run the code for accessing the builder" +
             "\ndocker run -it --network " + buildID.replace(/_/g, "").toLowerCase() +
             "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
-            " -e INSTANCE_MODE=BUILD_DATABASE app:latest";
+            " -e INSTANCE_MODE=BUILD_DATABASE app:latest" +
+            "\nalso if you need to load dumps remember to run:" +
+            "\ndocker run it --network " + buildID.replace(/_/g, "").toLowerCase() +
+            "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
+            " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest";
         // the abs path for the pgsql postgis installation we need
         const absPath = path_1.default.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
         await exec_1.execSudo(`docker build -t pgsqlpostgis ${absPath}`, "Itemize Docker Contained PGSQL Postgis Enabled Database");

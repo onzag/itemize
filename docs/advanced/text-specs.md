@@ -299,6 +299,14 @@ This means that the content of the span should be replaced, via textContent meth
 <span data-html="userDescription">DESCRIPTION OF THE USER HERE</span>
 ```
 
+### Href templating
+
+This allows to dinamically set the href property
+
+```html
+<a data-href="userLink">click here</a>
+```
+
 ### Style templating
 
 Two types of style templating are supported, and only available for templates "data-hover-style" and "data-active-style" both will replace the style attribute value when the actions are given

@@ -328,18 +328,29 @@ function processTemplateNodeInitialization(node, disableHTMLTemplating, template
     const textKey = node.dataset.text;
     if (textKey) {
         const text = templateArgsContext[textKey];
-        if (typeof text === "string" && text !== null) {
+        if (typeof text !== "string") {
             // we do not log because this will hit the server side
         }
         else {
             node.textContent = text;
         }
     }
+    // set the href key
+    const hrefKey = node.dataset.href;
+    if (hrefKey) {
+        const href = templateArgsContext[hrefKey];
+        if (typeof href !== "string") {
+            // we do not log because this will hit the server side
+        }
+        else {
+            node.setAttribute("href", href);
+        }
+    }
     // has a HTML handler
     const htmlKey = node.dataset.html;
     if (!disableHTMLTemplating && htmlKey) {
         const html = node[htmlKey];
-        if (typeof html === "string" && html !== null) {
+        if (typeof html !== "string") {
             // we do not log because this will hit the server side
         }
         else {
@@ -414,10 +425,10 @@ function processTemplateInitialization(node, disableHTMLTemplating, templateArgs
                         childNodeASHTMLElement.parentElement.insertBefore(clone, nextSibling);
                     }
                     else {
-                        childNodeASHTMLElement.appendChild(clone);
+                        childNodeASHTMLElement.parentElement.appendChild(clone);
                     }
                     // now we got to update our context path for this specific one
-                    const forEachContextPath = [...templateArgsNewContext, index];
+                    const forEachContextPath = [...templateArgsNewPath, index.toString()];
                     // and now we call for the initialization of this node itself
                     const leaveChildrenNodeChildrenUnhandled = processTemplateNodeInitialization(clone, disableHTMLTemplating, forEachContext, rootTemplateArgs, forEachContextPath);
                     // if we don't expect children to be unhandled
@@ -431,7 +442,7 @@ function processTemplateInitialization(node, disableHTMLTemplating, templateArgs
             }
             else {
                 // otherwise if we have no for loop, we just process the node itself
-                leaveNodeChildrenUnhandled = processTemplateNodeInitialization(childNodeASHTMLElement, disableHTMLTemplating, templateArgsContext, rootTemplateArgs, templateArgsNewPath);
+                leaveNodeChildrenUnhandled = processTemplateNodeInitialization(childNodeASHTMLElement, disableHTMLTemplating, templateArgsNewContext, rootTemplateArgs, templateArgsNewPath);
             }
         }
         // and if we did not decide to leave the children of the node unhandled and

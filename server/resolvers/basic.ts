@@ -555,7 +555,7 @@ export function validateContainerIdIsReal(
   containerId: string,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
 ) {
-  if (!sensitiveConfig.openstackContainers[containerId]) {
+  if (!sensitiveConfig.openstackContainers[containerId] && sensitiveConfig.localContainer !== containerId) {
     throw new EndpointError({
       message: "Container id " + containerId + " does not exist",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
