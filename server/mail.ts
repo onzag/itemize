@@ -23,7 +23,7 @@ export class MailService {
     arg: {
       fromUsername: string,
       fromEmailHandle: string,
-      to: string;
+      to: string | string[];
       subject: string;
       itemDefinition: ItemDefinition;
       property: PropertyDefinition;
@@ -96,6 +96,16 @@ export class MailService {
       } else {
         console.log(mailgunArgs);
       }
+      return;
+    }
+
+    if (mailgunArgs.to === null || (Array.isArray(mailgunArgs) && mailgunArgs.length === 0)) {
+      logger.warn(
+        "MailService.sendTemplateEmail: Attempted to send an email without recepient",
+        {
+          mailgunArgs,
+        },
+      );
       return;
     }
 
