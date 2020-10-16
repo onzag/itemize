@@ -8,7 +8,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.renderTemplate = exports.processTemplateInitialization = exports.DOMPurify = exports.DOMWindow = exports.fileArrayURLAbsoluter = exports.fileURLAbsoluter = exports.getLocalizedDateTimeFormat = exports.getLocalizedDateFormat = exports.getLocalizedTimeFormat = exports.localeReplacerToArray = exports.localeReplacer = exports.mimeTypeToExtension = exports.checkFileInAccepts = exports.processAccepts = exports.escapeStringRegexp = exports.capitalize = exports.delayedExecutionFn = void 0;
 const moment_1 = __importDefault(require("moment"));
 const jsdom_1 = require("jsdom");
 const dompurify_1 = __importDefault(require("dompurify"));

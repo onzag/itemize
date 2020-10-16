@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.capitalize = void 0;
 const util_1 = require("../../../util");
 /**
  * Capitalizes a string, taking into consideration special characters

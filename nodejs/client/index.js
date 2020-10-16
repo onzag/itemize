@@ -7,7 +7,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeItemizeApp = exports.importScript = exports.history = exports.getCookie = exports.COOKIE_EXPIRATION_DATE = void 0;
 // contains some base styles as well as leaflet and quill scss
 require("./internal/theme/base.scss");
 const react_dom_1 = __importDefault(require("react-dom"));

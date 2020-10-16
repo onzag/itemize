@@ -11,7 +11,7 @@ export declare class MailService {
     sendTemplateEmail(arg: {
         fromUsername: string;
         fromEmailHandle: string;
-        to: string;
+        to: string | string[];
         subject: string;
         itemDefinition: ItemDefinition;
         property: PropertyDefinition;

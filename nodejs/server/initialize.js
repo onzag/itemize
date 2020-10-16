@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeApp = void 0;
 const _1 = require(".");
 const express_1 = __importDefault(require("express"));
 const express_graphql_1 = __importDefault(require("express-graphql"));
@@ -167,7 +166,7 @@ function initializeApp(appData, custom) {
             res.end("user-agent = *\ndisallow: /\n");
             return;
         }
-        let result = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
+        let result = "user-agent: *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
             "disallow: /rest/currency-factors\ndisallow: /graphql\n";
         if (appData.seoConfig) {
             Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
@@ -186,7 +185,14 @@ function initializeApp(appData, custom) {
                 }
             });
             const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
-            result += "Sitemap: " +
+            let host = "";
+            if (prefix.startsWith("/")) {
+                host = "https://" +
+                    (process.env.NODE_ENV === "production" ?
+                        appData.config.productionHostname :
+                        appData.config.developmentHostname);
+            }
+            result += "Sitemap: " + host +
                 prefix + (prefix.endsWith("/") ? "" : "/") +
                 "sitemaps/" + hostname + "/index.xml";
         }

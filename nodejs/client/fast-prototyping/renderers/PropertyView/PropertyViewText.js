@@ -10,7 +10,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PropertyViewRichTextViewer = void 0;
 const PropertyViewText_1 = require("../../../internal/components/PropertyView/PropertyViewText");
 const react_1 = __importDefault(require("react"));
 const util_1 = require("../../../../util");

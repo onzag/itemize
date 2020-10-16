@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildSQLQueryForModule = exports.convertSQLValueToGQLValueForModule = exports.convertGQLValueToSQLValueForModule = exports.getSQLTablesSchemaForModule = exports.getSQLTableDefinitionForModule = void 0;
 const constants_1 = require("../../../constants");
 const sql_1 = require("./ItemDefinition/PropertyDefinition/sql");
 const sql_2 = require("./ItemDefinition/sql");

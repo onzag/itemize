@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MailService = void 0;
 const server_1 = require("../server");
 const util_1 = require("../util");
 const USE_FAKE_EMAILS = process.env.FAKE_EMAILS === "true";
@@ -59,8 +58,14 @@ class MailService {
                 });
             }
             else {
-                console.log(mailgunArgs);
+                server_1.logger.info("MailService.sendTemplateEmail: Fake email being sent", mailgunArgs);
             }
+            return;
+        }
+        if (mailgunArgs.to === null || (Array.isArray(mailgunArgs) && mailgunArgs.length === 0)) {
+            server_1.logger.warn("MailService.sendTemplateEmail: Attempted to send an email without recepient", {
+                mailgunArgs,
+            });
             return;
         }
         try {

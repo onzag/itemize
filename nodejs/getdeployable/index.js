@@ -16,6 +16,20 @@ const yaml_1 = __importDefault(require("yaml"));
 const read_1 = require("../setup/read");
 const exec_1 = require("../setup/exec");
 const fsAsync = fs_1.default.promises;
+async function copyDir(src, dest) {
+    await fsAsync.mkdir(dest);
+    const files = await fsAsync.readdir(src);
+    for (let file of files) {
+        const current = await fsAsync.stat(path_1.default.join(src, file));
+        if (current.isDirectory()) {
+            await copyDir(path_1.default.join(src, file), path_1.default.join(dest, file));
+        }
+        else {
+            await fsAsync.copyFile(path_1.default.join(src, file), path_1.default.join(dest, file));
+        }
+    }
+}
+;
 /**
  * Runs the build process, check the main.ts file to see how this is done
  *
@@ -130,12 +144,29 @@ async function build(version, buildID, services) {
         // sensitive configuration file
         console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", sensitiveConfigToUse)));
         await fsAsync.copyFile(path_1.default.join("config", sensitiveConfigToUse), path_1.default.join("deployments", buildID, "config", sensitiveConfigToUse));
+        // dumps if they exist
+        let dumpExists = true;
+        try {
+            await fsAsync.access("dump", fs_1.default.constants.F_OK);
+        }
+        catch (e) {
+            dumpExists = false;
+        }
+        if (dumpExists) {
+            console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "dump")));
+            await copyDir("dump", path_1.default.join("deployments", buildID, "dump"));
+            // sensitive dump file
+            console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "config", "dump.json")));
+            await fsAsync.copyFile(path_1.default.join("config", "dump.json"), path_1.default.join("deployments", buildID, "config", "dump.json"));
+        }
     }
     // and the deployements start.sh file
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "start.sh")));
-    await fsAsync.copyFile("stop.sh", path_1.default.join("deployments", buildID, "start.sh"));
+    await fsAsync.copyFile("start.sh", path_1.default.join("deployments", buildID, "start.sh"));
     console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "stop.sh")));
     await fsAsync.copyFile("stop.sh", path_1.default.join("deployments", buildID, "stop.sh"));
+    console.log("emiting " + safe_1.default.green(path_1.default.join("deployments", buildID, "run.sh")));
+    await fsAsync.copyFile("run.sh", path_1.default.join("deployments", buildID, "run.sh"));
     // finally our nginx file
     if (actualServices.includes("nginx")) {
         // and the deployements start-ssl.sh file
@@ -206,14 +237,17 @@ async function build(version, buildID, services) {
             "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
             "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
             "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
-            "\ndocker-compose -f docker-compose-only-db.yml up; then run the code for accessing the builder" +
-            "\ndocker run -it --network " + buildID.replace(/_/g, "").toLowerCase() +
-            "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
+            "\ndocker-compose -f docker-compose-only-db.yml up -d" +
+            "\nthen run the code for accessing the builder" +
+            "\ndir=${PWD##*/} docker run -it --network \"${dir,,}_default\" ";
+        "-v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
             " -e INSTANCE_MODE=BUILD_DATABASE app:latest" +
             "\nalso if you need to load dumps remember to run:" +
-            "\ndocker run it --network " + buildID.replace(/_/g, "").toLowerCase() +
-            "_default -v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
-            " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest";
+            "\ndir=${PWD##*/} docker run -it --network \"${dir,,}_default\" ";
+        "-v $PWD/config:/home/node/app/config -v $PWD/dump:/home/node/app/dump -e NODE_ENV=" + version +
+            " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest" +
+            "\nstop the database by doing" +
+            "\ndocker-compose down";
         // the abs path for the pgsql postgis installation we need
         const absPath = path_1.default.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
         await exec_1.execSudo(`docker build -t pgsqlpostgis ${absPath}`, "Itemize Docker Contained PGSQL Postgis Enabled Database");

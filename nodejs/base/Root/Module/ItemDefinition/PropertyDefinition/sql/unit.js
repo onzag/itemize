@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unitSQLSSCacheEqual = exports.unitSQLEqual = exports.unitSQLBtreeIndexable = exports.unitSQLOrderBy = exports.unitSQLSearch = exports.unitSQLOut = exports.unitSQLIn = exports.unitSQL = void 0;
 const search_interfaces_1 = require("../search-interfaces");
 /**
  * The unit sql function that specifies the schema

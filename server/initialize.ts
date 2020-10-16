@@ -207,7 +207,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       return;
     }
 
-    let result: string = "user-agent = *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
+    let result: string = "user-agent: *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
       "disallow: /rest/currency-factors\ndisallow: /graphql\n";
     if (appData.seoConfig) {
       Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
@@ -227,7 +227,16 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       });
 
       const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
-      result += "Sitemap: " +
+      let host = "";
+      if (prefix.startsWith("/")) {
+        host = "https://" +
+          (
+            process.env.NODE_ENV === "production" ?
+            appData.config.productionHostname :
+            appData.config.developmentHostname
+          );
+      }
+      result += "Sitemap: " + host +
         prefix + (prefix.endsWith("/") ? "" : "/") + 
         "sitemaps/" + hostname + "/index.xml";
     }

@@ -94,7 +94,10 @@ export class MailService {
           },
         );
       } else {
-        console.log(mailgunArgs);
+        logger.info(
+          "MailService.sendTemplateEmail: Fake email being sent",
+          mailgunArgs,
+        );
       }
       return;
     }

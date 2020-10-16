@@ -8,7 +8,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cache = void 0;
 const constants_1 = require("../constants");
 const version_null_value_1 = require("./version-null-value");
 const sql_1 = require("../base/Root/Module/ItemDefinition/sql");

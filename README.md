@@ -1,12 +1,14 @@
+> :warning: **WARNING**: Project in Alpha
+
 # Itemize
 
 Itemize is a fully featured end to end library powered by react, postgresql, graphql, docker and redis to create fully featured internationalized scalable realtime offline first websites.
 
 The aim of itemize is to make development easier and straightforward, so as to focus the user and what the user wants rather than the technology, the techstack will do all the heavy lifting.
 
-## Alpha
+# Alpha
 
-This library is in alpha and while everything that is described in this document is currently functional as described there might be bugs and issues, the library will be considered ready and polished once it hits version 1.0
+This library is in alpha, it's incomplete, documentation isn't done and might be misleading, and while everything that is described in this document is currently functional as described there might be bugs and issues, undocumented, untested features, the library will be considered ready and polished once it hits version 1.0 which might take until 2021
 
 ## When to use Itemize
 

@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildSearchModeModule = void 0;
 const search_mode_1 = require("./ItemDefinition/search-mode");
 const search_mode_2 = require("./ItemDefinition/PropertyDefinition/search-mode");
 const constants_1 = require("../../../constants");

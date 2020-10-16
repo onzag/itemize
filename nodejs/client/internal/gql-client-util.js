@@ -9,7 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runSearchQueryFor = exports.runEditQueryFor = exports.runAddQueryFor = exports.runDeleteQueryFor = exports.runGetQueryFor = exports.getFieldsAndArgs = void 0;
 const constants_1 = require("../../constants");
 const ItemDefinition_1 = require("../../base/Root/Module/ItemDefinition");
 const gql_querier_1 = require("../../gql-querier");

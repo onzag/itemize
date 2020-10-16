@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prepareExtensions = void 0;
 /**
  * Builds all the foreign keys
  * @param knex the knex instance

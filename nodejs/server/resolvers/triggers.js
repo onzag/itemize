@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mergeTriggerRegistries = exports.IOTriggerActions = void 0;
 var IOTriggerActions;
 (function (IOTriggerActions) {
     IOTriggerActions[IOTriggerActions["CREATE"] = 0] = "CREATE";

@@ -54,6 +54,7 @@ services:
             - LOG_LEVEL=error
             - USING_DOCKER=true
             - NO_SSR=false
+            - FAKE_EMAILS=false
     redis:
         image: redis:latest
         restart: always

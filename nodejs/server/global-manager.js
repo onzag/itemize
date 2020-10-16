@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalManager = void 0;
 const _1 = require(".");
 const constants_1 = require("../constants");
 const currency_layer_1 = require("./services/currency-layer");
