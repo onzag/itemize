@@ -16,7 +16,6 @@ const ssr_provider_1 = require("../../internal/providers/ssr-provider");
 class ActualTitleReader extends react_1.default.Component {
     constructor(props) {
         super(props);
-        this.hasRenderedInitial = false;
     }
     componentDidMount() {
         // we add these global listener to it that do a force update
@@ -27,18 +26,14 @@ class ActualTitleReader extends react_1.default.Component {
         TitleSetter_1.ActualTitleSetter.changedListeners.delete(this);
     }
     render() {
-        // for ssr reasons we need to do this, basically on initial
-        // we would use the SSR given title, document, might honestly not
-        // be available on SSR so we do this logic to keep things
-        // consistent as odd as hacky as this might be
-        if (!this.hasRenderedInitial && this.props.ssrTitle) {
+        // for ssr reasons we need to do this
+        if (typeof document === "undefined") {
             // the server would hit here and not have any issues
+            // in SSR mode, in the server side there should always
+            // be a ssr title set
             return this.props.ssrTitle;
         }
-        // whereas the client after the initial render would do this
-        // even if for the client it is always true and fine to do
-        // this process
-        this.hasRenderedInitial = true;
+        // gives priority to the document title on the force update
         return document.title;
     }
 }

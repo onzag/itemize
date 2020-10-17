@@ -4,30 +4,11 @@
  * are to be managed within itemize for entry
  * @packageDocumentation
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const react_1 = __importStar(require("react"));
+const react_1 = __importDefault(require("react"));
 const PropertyEntryBoolean_1 = __importDefault(require("./PropertyEntryBoolean"));
 const PropertyEntryText_1 = __importDefault(require("./PropertyEntryText"));
 const PropertyEntryDateTime_1 = __importDefault(require("./PropertyEntryDateTime"));
@@ -212,75 +193,80 @@ function defaultCurrencyBugCacher(code) {
  *
  * @param props
  */
-function PropertyEntry(props) {
-    if (props.prefillWith) {
-        react_1.useEffect(() => {
-            props.onChange(props.prefillWith, null);
-        }, []);
+class PropertyEntry extends react_1.default.Component {
+    constructor(props) {
+        super(props);
     }
-    // hidden properties simply do not show, we short circuit here
-    if (props.state.hidden) {
-        return null;
-    }
-    // now we need the type and subtype of the property itself
-    const type = props.property.getType();
-    const subtype = props.property.getSubtype();
-    // First get the handler by the type
-    // so our exception handler, for select, when we have specific valid values
-    let registryEntry = props.property.hasSpecificValidValues() ?
-        selectHandler :
-        handlerRegistry[type];
-    // so now we check for subtype handling, if we got no subtype
-    // at all, we check if we have a default subhandler
-    if (subtype === null && registryEntry.defaultSubhandler) {
-        registryEntry = registryEntry.defaultSubhandler;
-    }
-    else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
-        // also check for a specific subtype handler
-        registryEntry = registryEntry.subhandler[subtype];
-    }
-    // now we can get the element that represents the handler
-    // we will be working with
-    const HandlerElement = registryEntry.handler;
-    // Build the context and render sending the right props
-    return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {
-        // we will always need the renderer and locale context to get this data, first the renderer
-        // that we will be using, it could be a fast prototyping one or whatever
-        // the developer is using, note how the passed renderer holds priority
-        const renderer = props.renderer || renderers[registryEntry.renderer];
-        // now we define the props that our handler will be
-        // requiring in order to create this environemnt
-        // to pass to the renderers
-        const nProps = {
-            // first all the main handler props go in
-            ...props,
-            // now these come from our contexts
-            language: locale.language,
-            i18n: locale.i18n,
-            rtl: locale.rtl,
-            currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
-            country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country),
-            // our new renderer
-            renderer,
-            // and its args
-            rendererArgs: props.rendererArgs || {},
-        };
-        // so now we should check for the contexts that we need
-        if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
-            // first and foremost the static contexts, then the dynamic
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr, config: config })))))))));
+    componentDidMount() {
+        if (this.props.prefillWith) {
+            this.props.onChange(this.props.prefillWith, null);
         }
-        else if (registryEntry.includeConfig) {
-            // same here
-            return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { config: config })))));
+    }
+    render() {
+        // hidden properties simply do not show, we short circuit here
+        if (this.props.state.hidden) {
+            return null;
         }
-        else if (registryEntry.includeTokenDataAndSSR) {
-            // and here
-            return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr })))))));
+        // now we need the type and subtype of the property itself
+        const type = this.props.property.getType();
+        const subtype = this.props.property.getSubtype();
+        // First get the handler by the type
+        // so our exception handler, for select, when we have specific valid values
+        let registryEntry = this.props.property.hasSpecificValidValues() ?
+            selectHandler :
+            handlerRegistry[type];
+        // so now we check for subtype handling, if we got no subtype
+        // at all, we check if we have a default subhandler
+        if (subtype === null && registryEntry.defaultSubhandler) {
+            registryEntry = registryEntry.defaultSubhandler;
         }
-        // if we don't need to read anything else from any other context
-        // we can do this
-        return (react_1.default.createElement(HandlerElement, Object.assign({}, nProps)));
-    })));
+        else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+            // also check for a specific subtype handler
+            registryEntry = registryEntry.subhandler[subtype];
+        }
+        // now we can get the element that represents the handler
+        // we will be working with
+        const HandlerElement = registryEntry.handler;
+        // Build the context and render sending the right props
+        return (react_1.default.createElement(renderer_1.RendererContext.Consumer, null, (renderers) => react_1.default.createElement(locale_provider_1.LocaleContext.Consumer, null, (locale) => {
+            // we will always need the renderer and locale context to get this data, first the renderer
+            // that we will be using, it could be a fast prototyping one or whatever
+            // the developer is using, note how the passed renderer holds priority
+            const renderer = this.props.renderer || renderers[registryEntry.renderer];
+            // now we define the props that our handler will be
+            // requiring in order to create this environemnt
+            // to pass to the renderers
+            const nProps = {
+                // first all the main handler props go in
+                ...this.props,
+                // now these come from our contexts
+                language: locale.language,
+                i18n: locale.i18n,
+                rtl: locale.rtl,
+                currency: imported_resources_1.currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
+                country: imported_resources_1.countries[locale.country] || defaultCountryBugCatcher(locale.country),
+                // our new renderer
+                renderer,
+                // and its args
+                rendererArgs: this.props.rendererArgs || {},
+            };
+            // so now we should check for the contexts that we need
+            if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
+                // first and foremost the static contexts, then the dynamic
+                return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr, config: config })))))))));
+            }
+            else if (registryEntry.includeConfig) {
+                // same here
+                return (react_1.default.createElement(config_provider_1.ConfigContext.Consumer, null, (config) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { config: config })))));
+            }
+            else if (registryEntry.includeTokenDataAndSSR) {
+                // and here
+                return (react_1.default.createElement(ssr_provider_1.SSRContext.Consumer, null, (ssr) => (react_1.default.createElement(token_provider_1.TokenContext.Consumer, null, (tokenData) => (react_1.default.createElement(HandlerElement, Object.assign({}, nProps, { tokenData: tokenData, ssr: ssr })))))));
+            }
+            // if we don't need to read anything else from any other context
+            // we can do this
+            return (react_1.default.createElement(HandlerElement, Object.assign({}, nProps)));
+        })));
+    }
 }
 exports.default = PropertyEntry;

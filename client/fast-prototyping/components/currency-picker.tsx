@@ -118,8 +118,10 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
                 startIcon={<b>{currentCurrency.symbol}</b>}
                 onClick={this.handleButtonSelectClick}
               >
-                {this.props.useCode ? currentCurrency.code : currentCurrency.name}
-                {this.props.useCode ? "" : " " + currentCurrency.code}
+                {
+                  (this.props.useCode ? currentCurrency.code : currentCurrency.name) +
+                  (this.props.useCode ? "" : " " + currentCurrency.code)
+                }
               </Button>
               {menu}
             </React.Fragment>

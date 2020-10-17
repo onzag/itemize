@@ -595,7 +595,7 @@ export declare class ActualItemProvider extends React.Component<IActualItemProvi
     clean(options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     cleanWithProps(props: IActualItemProviderProps, options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean): void;
     submit(options: IActionSubmitOptions): Promise<IActionResponseWithId>;
-    loadSearch(doNotUseState?: boolean, currentSearchId?: string): any;
+    loadSearch(): void;
     search(options: IActionSearchOptions): Promise<IActionResponseWithSearchResults>;
     dismissLoadError(): void;
     dismissDeleteError(): void;

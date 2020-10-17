@@ -365,4 +365,8 @@ export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extend
  *
  * @param props
  */
-export default function PropertyEntry(props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>): JSX.Element;
+export default class PropertyEntry extends React.Component<IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>> {
+    constructor(props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>);
+    componentDidMount(): void;
+    render(): JSX.Element;
+}

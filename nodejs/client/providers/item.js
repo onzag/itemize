@@ -260,12 +260,6 @@ class ActualItemProvider extends react_1.default.Component {
             const state = internalState.state;
             this.props.itemDefinitionInstance.applyState(this.props.forId || null, this.props.forVersion || null, state);
         }
-        if (this.props.loadSearchFromNavigation) {
-            const loadedSearchState = this.loadSearch(true, searchState.searchId);
-            if (loadedSearchState) {
-                searchState = loadedSearchState;
-            }
-        }
         // so the initial setup
         return {
             // same we get the initial state, without checking it externally and passing
@@ -364,6 +358,11 @@ class ActualItemProvider extends react_1.default.Component {
         // now we retrieve the externally checked value
         if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
             this.setStateToCurrentValueWithExternalChecking(null);
+        }
+        // this used to be done in the constructor, but it just happens
+        // that it won't work with SSR
+        if (this.props.loadSearchFromNavigation) {
+            this.loadSearch();
         }
         // the search listener might have triggered during the mount callback,
         // which means this function won't see the new state and won't trigger
@@ -1604,11 +1603,11 @@ class ActualItemProvider extends react_1.default.Component {
         this.props.onSubmit && this.props.onSubmit(result);
         return result;
     }
-    loadSearch(doNotUseState, currentSearchId) {
+    loadSearch() {
         const searchId = (this.props.location.state &&
             this.props.location.state[this.props.loadSearchFromNavigation] &&
             this.props.location.state[this.props.loadSearchFromNavigation].searchId) || null;
-        if (doNotUseState ? searchId === currentSearchId : searchId === this.state.searchId) {
+        if (searchId === this.state.searchId) {
             return null;
         }
         const mustClear = !searchId;
@@ -1620,9 +1619,6 @@ class ActualItemProvider extends react_1.default.Component {
             this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null, true);
         }
         const searchState = mustClear ? null : this.props.location.state[this.props.loadSearchFromNavigation].searchState;
-        if (doNotUseState) {
-            return searchState;
-        }
         this.setState({
             itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null, !this.props.disableExternalChecks, this.props.itemDefinitionInstance.isInSearchMode() ?
                 getPropertyListForSearchMode(this.props.properties || [], this.props.itemDefinitionInstance.getStandardCounterpart()) : this.props.properties || [], this.props.includes || [], !this.props.includePolicies),

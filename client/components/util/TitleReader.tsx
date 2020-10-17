@@ -14,7 +14,6 @@ interface ActualTitleReaderProps {
 }
 
 export class ActualTitleReader extends React.Component<ActualTitleReaderProps, {}> {
-  private hasRenderedInitial: boolean = false;
   constructor(props: ActualTitleReaderProps) {
     super(props);
   }
@@ -27,19 +26,15 @@ export class ActualTitleReader extends React.Component<ActualTitleReaderProps, {
     ActualTitleSetter.changedListeners.delete(this);
   }
   public render() {
-    // for ssr reasons we need to do this, basically on initial
-    // we would use the SSR given title, document, might honestly not
-    // be available on SSR so we do this logic to keep things
-    // consistent as odd as hacky as this might be
-    if (!this.hasRenderedInitial && this.props.ssrTitle) {
+    // for ssr reasons we need to do this
+    if (typeof document === "undefined") {
       // the server would hit here and not have any issues
+      // in SSR mode, in the server side there should always
+      // be a ssr title set
       return this.props.ssrTitle;
     }
 
-    // whereas the client after the initial render would do this
-    // even if for the client it is always true and fine to do
-    // this process
-    this.hasRenderedInitial = true;
+    // gives priority to the document title on the force update
     return document.title;
   }
 }

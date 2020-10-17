@@ -67,9 +67,8 @@ class CurrencyPicker extends react_1.default.Component {
                 "\u00A0-\u00A0",
                 localization_1.capitalize(ac.name))))) : null;
             return (react_1.default.createElement(react_1.default.Fragment, null,
-                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement("b", null, currentCurrency.symbol), onClick: this.handleButtonSelectClick },
-                    this.props.useCode ? currentCurrency.code : currentCurrency.name,
-                    this.props.useCode ? "" : " " + currentCurrency.code),
+                react_1.default.createElement(mui_core_1.Button, { classes: { root: this.props.className }, color: "inherit", startIcon: react_1.default.createElement("b", null, currentCurrency.symbol), onClick: this.handleButtonSelectClick }, (this.props.useCode ? currentCurrency.code : currentCurrency.name) +
+                    (this.props.useCode ? "" : " " + currentCurrency.code)),
                 menu));
         }));
     }

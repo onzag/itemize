@@ -291,45 +291,15 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             return;
         }
     }
-    // now we calculate the og fields that are final, given they can be functions
-    // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
-    const finalOgTitle = root.getStateKey("ogTitle");
-    // the description as well, same thing
-    const finalOgDescription = root.getStateKey("ogDescription");
-    // same for the image but this is special
-    let finalOgImage = root.getStateKey("ogImage");
-    // because if it's a url and og image tags require absolute paths with entire urls
-    // we check if it's an absolute path with no host
-    if (finalOgImage && finalOgImage.startsWith("/")) {
-        // and add the host
-        finalOgImage = `https://${req.get("host")}` + finalOgImage;
-    }
-    else if (finalOgImage && !finalOgImage.includes("://")) {
-        // otherwise we just add the protocol if it was not added
-        finalOgImage = `https://` + finalOgImage;
-    }
-    // now we calculate the same way title and description
-    const finalTitle = root.getStateKey("title");
-    const finalDescription = root.getStateKey("description");
     const i18nData = root.getI18nDataFor(language);
     const i18nAppName = i18nData && i18nData.app_name && util_1.capitalize(i18nData.app_name);
     const i18nAppDescription = i18nData && i18nData.app_description && util_1.capitalize(i18nData.app_description);
     const usedDir = appliedRule.rtl ? "rtl" : "ltr";
-    const usedTitle = finalTitle || i18nAppName || config.appName || "";
-    const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
-    const usedOgTitle = finalOgTitle || usedTitle;
-    const usedOgDescription = finalOgDescription || usedDescription;
-    const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
     // and we start replacing from the HTML itself, note how these things might have returned null for some
     let newHTML = html;
     newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
     newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
     newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
-    newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
-    newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
-    newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
-    newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
-    newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
     // and now the href lang tags
     const langHrefLangTags = appliedRule.languages.map((language) => {
         return `<link rel="alternate" href="https://${req.get("host")}/${language}" hreflang="${language}">`;
@@ -338,6 +308,16 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     // since we cannot really keep it consistent
     if (appliedRule.noData || collectionFailed) {
         // and we go here
+        const usedTitle = i18nAppName || config.appName || "";
+        const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
+        const usedOgTitle = usedTitle;
+        const usedOgDescription = usedDescription;
+        const usedOgImage = "/rest/resource/icons/android-chrome-512x512.png";
+        newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+        newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+        newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+        newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+        newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
         newHTML = newHTML.replace(/\$SSRAPP/g, "");
         newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
         newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
@@ -348,7 +328,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             queries,
             resources,
             user: appliedRule.forUser,
-            title: usedTitle,
+            title: "__SSR_TITLE__",
             currencyFactors: appData.cache.getServerData()[constants_1.CURRENCY_FACTORS_IDENTIFIER],
         };
         let clientSSR = ssr;
@@ -365,8 +345,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                 token: "IN_COOKIE",
             };
         }
-        // we replace the HTML with the SSR information that we are using
-        newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
         // and now we need the server app data
         let serverAppData = null;
         try {
@@ -408,6 +386,16 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
                 errMessage: e.message,
                 appliedRule,
             });
+            const usedTitle = i18nAppName || config.appName || "";
+            const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
+            const usedOgTitle = usedTitle;
+            const usedOgDescription = usedDescription;
+            const usedOgImage = "/rest/resource/icons/android-chrome-512x512.png";
+            newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+            newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+            newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+            newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+            newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
             newHTML = newHTML.replace(/\$SSRAPP/g, "");
             newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
             newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
@@ -423,7 +411,43 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // with SSR
         const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.originalUrl }, serverAppData.node));
         // we place such HTML
-        newHTML = newHTML.replace(/\$SSRAPP/g, server_1.default.renderToStaticMarkup(app));
+        const staticMarkup = server_1.default.renderToStaticMarkup(app);
+        // now we calculate the og fields that are final, given they can be functions
+        // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
+        const finalOgTitle = root.getStateKey("ogTitle");
+        // the description as well, same thing
+        const finalOgDescription = root.getStateKey("ogDescription");
+        // same for the image but this is special
+        let finalOgImage = root.getStateKey("ogImage");
+        // because if it's a url and og image tags require absolute paths with entire urls
+        // we check if it's an absolute path with no host
+        if (finalOgImage && finalOgImage.startsWith("/")) {
+            // and add the host
+            finalOgImage = `https://${req.get("host")}` + finalOgImage;
+        }
+        else if (finalOgImage && !finalOgImage.includes("://")) {
+            // otherwise we just add the protocol if it was not added
+            finalOgImage = `https://` + finalOgImage;
+        }
+        // now we calculate the same way title and description
+        const finalTitle = root.getStateKey("title");
+        const finalDescription = root.getStateKey("description");
+        const usedTitle = finalTitle || i18nAppName || config.appName || "";
+        const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
+        const usedOgTitle = finalOgTitle || usedTitle;
+        const usedOgDescription = finalOgDescription || usedDescription;
+        const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
+        ssr.title = usedTitle;
+        // now we need to make the title match
+        newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup.replace(/__SSR_TITLE__/g, usedTitle));
+        // replace with this information
+        newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+        newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+        newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+        newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+        newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
+        // we replace the HTML with the SSR information that we are using
+        newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(ssr));
         // but we need the SSR head which includes our hreflang tags
         let finalSSRHead = langHrefLangTags;
         if (serverAppData.id) {

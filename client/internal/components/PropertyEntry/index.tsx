@@ -613,143 +613,148 @@ function defaultCurrencyBugCacher(code: string) {
  * 
  * @param props 
  */
-export default function PropertyEntry(
-  props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>,
-) {
-  if (props.prefillWith) {
-    useEffect(() => {
-      props.onChange(props.prefillWith, null);
-    }, []);
+export default class PropertyEntry extends
+  React.Component<IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>> {
+  constructor(props: IPropertyEntryMainHandlerProps<PropertyDefinitionSupportedType, IPropertyEntryRendererProps<PropertyDefinitionSupportedType>>) {
+    super(props);
   }
 
-  // hidden properties simply do not show, we short circuit here
-  if (props.state.hidden) {
-    return null;
+  public componentDidMount() {
+    if (this.props.prefillWith) {
+      this.props.onChange(this.props.prefillWith, null);
+    }
   }
 
-  // now we need the type and subtype of the property itself
-  const type = props.property.getType();
-  const subtype = props.property.getSubtype();
+  public render() {
+    // hidden properties simply do not show, we short circuit here
+    if (this.props.state.hidden) {
+      return null;
+    }
 
-  // First get the handler by the type
-  // so our exception handler, for select, when we have specific valid values
-  let registryEntry: IRendererWholeHandlerType = props.property.hasSpecificValidValues() ?
-    selectHandler :
-    handlerRegistry[type];
+    // now we need the type and subtype of the property itself
+    const type = this.props.property.getType();
+    const subtype = this.props.property.getSubtype();
 
-  // so now we check for subtype handling, if we got no subtype
-  // at all, we check if we have a default subhandler
-  if (subtype === null && registryEntry.defaultSubhandler) {
-    registryEntry = registryEntry.defaultSubhandler;
-  } else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
-    // also check for a specific subtype handler
-    registryEntry = registryEntry.subhandler[subtype];
-  }
+    // First get the handler by the type
+    // so our exception handler, for select, when we have specific valid values
+    let registryEntry: IRendererWholeHandlerType = this.props.property.hasSpecificValidValues() ?
+      selectHandler :
+      handlerRegistry[type];
 
-  // now we can get the element that represents the handler
-  // we will be working with
-  const HandlerElement = registryEntry.handler;
+    // so now we check for subtype handling, if we got no subtype
+    // at all, we check if we have a default subhandler
+    if (subtype === null && registryEntry.defaultSubhandler) {
+      registryEntry = registryEntry.defaultSubhandler;
+    } else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {
+      // also check for a specific subtype handler
+      registryEntry = registryEntry.subhandler[subtype];
+    }
 
-  // Build the context and render sending the right props
-  return (
-    <RendererContext.Consumer>
-      {
-        (renderers) =>
-          <LocaleContext.Consumer>
-            {
-              (locale) => {
+    // now we can get the element that represents the handler
+    // we will be working with
+    const HandlerElement = registryEntry.handler;
 
-                // we will always need the renderer and locale context to get this data, first the renderer
-                // that we will be using, it could be a fast prototyping one or whatever
-                // the developer is using, note how the passed renderer holds priority
-                const renderer: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>> =
-                  props.renderer || renderers[registryEntry.renderer];
+    // Build the context and render sending the right props
+    return (
+      <RendererContext.Consumer>
+        {
+          (renderers) =>
+            <LocaleContext.Consumer>
+              {
+                (locale) => {
 
-                // now we define the props that our handler will be
-                // requiring in order to create this environemnt
-                // to pass to the renderers
-                const nProps = {
-                  // first all the main handler props go in
-                  ...props,
+                  // we will always need the renderer and locale context to get this data, first the renderer
+                  // that we will be using, it could be a fast prototyping one or whatever
+                  // the developer is using, note how the passed renderer holds priority
+                  const renderer: React.ComponentType<IPropertyEntryRendererProps<PropertyDefinitionSupportedType>> =
+                    this.props.renderer || renderers[registryEntry.renderer];
 
-                  // now these come from our contexts
-                  language: locale.language,
-                  i18n: locale.i18n,
-                  rtl: locale.rtl,
-                  currency: currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
-                  country: countries[locale.country] || defaultCountryBugCatcher(locale.country),
+                  // now we define the props that our handler will be
+                  // requiring in order to create this environemnt
+                  // to pass to the renderers
+                  const nProps = {
+                    // first all the main handler props go in
+                    ...this.props,
 
-                  // our new renderer
-                  renderer,
-                  // and its args
-                  rendererArgs: props.rendererArgs || {},
-                };
+                    // now these come from our contexts
+                    language: locale.language,
+                    i18n: locale.i18n,
+                    rtl: locale.rtl,
+                    currency: currencies[locale.currency] || defaultCurrencyBugCacher(locale.currency),
+                    country: countries[locale.country] || defaultCountryBugCatcher(locale.country),
 
-                // so now we should check for the contexts that we need
-                if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
-                  // first and foremost the static contexts, then the dynamic
+                    // our new renderer
+                    renderer,
+                    // and its args
+                    rendererArgs: this.props.rendererArgs || {},
+                  };
+
+                  // so now we should check for the contexts that we need
+                  if (registryEntry.includeConfig && registryEntry.includeTokenDataAndSSR) {
+                    // first and foremost the static contexts, then the dynamic
+                    return (
+                      <ConfigContext.Consumer>
+                        {(config) => (
+                          <SSRContext.Consumer>
+                            {(ssr) => (
+                              <TokenContext.Consumer>
+                                {(tokenData) => (
+                                  <HandlerElement
+                                    {...nProps}
+                                    tokenData={tokenData}
+                                    ssr={ssr}
+                                    config={config}
+                                  />
+                                )}
+                              </TokenContext.Consumer>
+                            )}
+                          </SSRContext.Consumer>
+                        )}
+                      </ConfigContext.Consumer>
+                    );
+                  } else if (registryEntry.includeConfig) {
+                    // same here
+                    return (
+                      <ConfigContext.Consumer>
+                        {(config) => (
+                          <HandlerElement
+                            {...nProps}
+                            config={config}
+                          />
+                        )}
+                      </ConfigContext.Consumer>
+                    );
+                  } else if (registryEntry.includeTokenDataAndSSR) {
+                    // and here
+                    return (
+                      <SSRContext.Consumer>
+                        {(ssr) => (
+                          <TokenContext.Consumer>
+                            {(tokenData) => (
+                              <HandlerElement
+                                {...nProps}
+                                tokenData={tokenData}
+                                ssr={ssr}
+                              />
+                            )}
+                          </TokenContext.Consumer>
+                        )}
+                      </SSRContext.Consumer>
+                    );
+                  }
+
+                  // if we don't need to read anything else from any other context
+                  // we can do this
                   return (
-                    <ConfigContext.Consumer>
-                      {(config) => (
-                        <SSRContext.Consumer>
-                          {(ssr) => (
-                            <TokenContext.Consumer>
-                              {(tokenData) => (
-                                <HandlerElement
-                                  {...nProps}
-                                  tokenData={tokenData}
-                                  ssr={ssr}
-                                  config={config}
-                                />
-                              )}
-                            </TokenContext.Consumer>
-                          )}
-                        </SSRContext.Consumer>
-                      )}
-                    </ConfigContext.Consumer>
-                  );
-                } else if (registryEntry.includeConfig) {
-                  // same here
-                  return (
-                    <ConfigContext.Consumer>
-                      {(config) => (
-                        <HandlerElement
-                          {...nProps}
-                          config={config}
-                        />
-                      )}
-                    </ConfigContext.Consumer>
-                  );
-                } else if (registryEntry.includeTokenDataAndSSR) {
-                  // and here
-                  return (
-                    <SSRContext.Consumer>
-                      {(ssr) => (
-                        <TokenContext.Consumer>
-                          {(tokenData) => (
-                            <HandlerElement
-                              {...nProps}
-                              tokenData={tokenData}
-                              ssr={ssr}
-                            />
-                          )}
-                        </TokenContext.Consumer>
-                      )}
-                    </SSRContext.Consumer>
+                    <HandlerElement
+                      {...nProps}
+                    />
                   );
                 }
-
-                // if we don't need to read anything else from any other context
-                // we can do this
-                return (
-                  <HandlerElement
-                    {...nProps}
-                  />
-                );
               }
-            }
-          </LocaleContext.Consumer>
-      }
-    </RendererContext.Consumer>
-  );
+            </LocaleContext.Consumer>
+        }
+      </RendererContext.Consumer>
+    );
+  }
 }
