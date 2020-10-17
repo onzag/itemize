@@ -302,7 +302,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
     // and now the href lang tags
     const langHrefLangTags = appliedRule.languages.map((language) => {
-        return `<link rel="alternate" href="https://${req.get("host")}/${language}" hreflang="${language}">`;
+        return `<link rel="alternate" href="https://${req.get("host")}${req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`;
     }).join("");
     // if there's no data or the collection has failed, let's not give SSR at all
     // since we cannot really keep it consistent
