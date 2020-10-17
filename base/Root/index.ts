@@ -69,6 +69,10 @@ export interface IRootRawJSONDataType {
   children: IModuleRawJSONDataType[];
 }
 
+interface IRootState {
+  [key: string]: any;
+}
+
 /**
  * This is the root entry leaf
  */
@@ -82,7 +86,8 @@ export default class Root {
   public static getModuleRawFor(
     root: IRootRawJSONDataType,
     name: string[],
-  ): IModuleRawJSONDataType {
+  ): IModuleRawJSONDataType {;
+
     // Search for child items
     // remember children can be of type module or item definition
     // so we got to check
@@ -131,6 +136,13 @@ export default class Root {
   private childModules: Module[];
 
   /**
+   * A root state, normally used in
+   * the server side to store information
+   * in the root about execution
+   */
+  private rootState: IRootState = {}
+
+  /**
    * Builds a root from raw data
    * @param rawJSON the raw json data
    */
@@ -146,8 +158,29 @@ export default class Root {
     });
   }
 
+  /**
+   * Cleans the state of the root as well as all its children
+   */
   public cleanState() {
+    this.rootState = {};
     this.childModules && this.childModules.forEach((cm) => cm.cleanState());
+  }
+
+  /**
+   * Stores a key in the root state
+   * @param key the key to store
+   * @param value the value to store
+   */
+  public setStateKey(key: string, value: any) {
+    this.rootState[key] = value;
+  }
+
+  /**
+   * Returns a given set state key
+   * @param key 
+   */
+  public getStateKey(key: string): any {
+    return this.rootState[key] || null;
   }
 
   /**

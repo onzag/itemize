@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ssrGenerator = void 0;
 const __1 = require("..");
 const react_1 = __importDefault(require("react"));
 const constants_1 = require("../../constants");
@@ -15,6 +16,7 @@ const fs_1 = __importDefault(require("fs"));
 const fsAsync = fs_1.default.promises;
 const path_1 = __importDefault(require("path"));
 const collect_1 = require("./collect");
+const util_1 = require("../../util");
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
@@ -98,19 +100,23 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     // is a valid language... not some made up language also that SSR is not disabled
     // othewise it's meaningless
     let resultRule;
-    if (rule && language && config.supportedLanguages.includes(language) && !SSRIsDisabledInThisMode) {
-        // if it all passes, we get the rule, there are two types, dynamic and already done
-        // if it's dynamic we pass the args, otherwse it is what it is
-        resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
+    if (language && config.supportedLanguages.includes(language) && !SSRIsDisabledInThisMode) {
+        if (typeof rule !== "undefined") {
+            // if it all passes, we get the rule, there are two types, dynamic and already done
+            // if it's dynamic we pass the args, otherwse it is what it is
+            resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
+        }
+        else {
+            // default
+            resultRule = {
+                collect: [],
+                collectResources: [],
+            };
+        }
     }
     else if (!language && !req.query.noredirect) {
         // fake rule to force a redirect
         resultRule = {
-            title: null,
-            ogTitle: null,
-            description: null,
-            ogDescription: null,
-            ogImage: null,
             collect: [],
             collectResources: [],
         };
@@ -127,11 +133,6 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // they'll never hit SSR they'll recieve only this fast memoized option meant for the same buildnumber
         // and they'll get it mainly from the service worker, they won't even bother with the server
         appliedRule = {
-            title: config.appName,
-            description: config.appName,
-            ogTitle: config.appName,
-            ogDescription: config.appName,
-            ogImage: "/rest/resource/icons/android-chrome-512x512.png",
             collect: null,
             collectResources: null,
             // collectSearch: null,
@@ -292,14 +293,11 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
     }
     // now we calculate the og fields that are final, given they can be functions
     // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
-    const finalOgTitle = (typeof appliedRule.ogTitle === "string" || !appliedRule.ogTitle) ?
-        appliedRule.ogTitle : appliedRule.ogTitle(queries, config);
+    const finalOgTitle = root.getStateKey("ogTitle");
     // the description as well, same thing
-    const finalOgDescription = (typeof appliedRule.ogDescription === "string" || !appliedRule.ogDescription) ?
-        appliedRule.ogDescription : appliedRule.ogDescription(queries, config);
+    const finalOgDescription = root.getStateKey("ogDescription");
     // same for the image but this is special
-    let finalOgImage = (typeof appliedRule.ogImage === "string" || !appliedRule.ogImage) ?
-        appliedRule.ogImage : appliedRule.ogImage(queries, config);
+    let finalOgImage = root.getStateKey("ogImage");
     // because if it's a url and og image tags require absolute paths with entire urls
     // we check if it's an absolute path with no host
     if (finalOgImage && finalOgImage.startsWith("/")) {
@@ -311,20 +309,27 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         finalOgImage = `https://` + finalOgImage;
     }
     // now we calculate the same way title and description
-    const finalTitle = (typeof appliedRule.title === "string" || !appliedRule.title) ?
-        appliedRule.title : appliedRule.title(queries, config);
-    const finalDescription = (typeof appliedRule.description === "string" || !appliedRule.title) ?
-        appliedRule.description : appliedRule.description(queries, config);
+    const finalTitle = root.getStateKey("title");
+    const finalDescription = root.getStateKey("description");
+    const i18nData = root.getI18nDataFor(language);
+    const i18nAppName = i18nData && i18nData.app_name && util_1.capitalize(i18nData.app_name);
+    const i18nAppDescription = i18nData && i18nData.app_description && util_1.capitalize(i18nData.app_description);
+    const usedDir = appliedRule.rtl ? "rtl" : "ltr";
+    const usedTitle = finalTitle || i18nAppName || config.appName || "";
+    const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
+    const usedOgTitle = finalOgTitle || usedTitle;
+    const usedOgDescription = finalOgDescription || usedDescription;
+    const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
     // and we start replacing from the HTML itself, note how these things might have returned null for some
     let newHTML = html;
     newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
     newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
-    newHTML = newHTML.replace(/\$SSRDIR/g, appliedRule.rtl ? "rtl" : "ltr");
-    newHTML = newHTML.replace(/\$SSRTITLE/g, finalTitle || "");
-    newHTML = newHTML.replace(/\$SSRDESCR/g, finalDescription || "");
-    newHTML = newHTML.replace(/\$SSROGTITLE/g, finalOgTitle || finalTitle || "");
-    newHTML = newHTML.replace(/\$SSROGDESCR/g, finalOgDescription || finalDescription || "");
-    newHTML = newHTML.replace(/\$SSROGIMG/g, finalOgImage || "");
+    newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
+    newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+    newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+    newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+    newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+    newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
     // and now the href lang tags
     const langHrefLangTags = appliedRule.languages.map((language) => {
         return `<link rel="alternate" href="https://${req.get("host")}/${language}" hreflang="${language}">`;
@@ -343,7 +348,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
             queries,
             resources,
             user: appliedRule.forUser,
-            title: finalTitle,
+            title: usedTitle,
             currencyFactors: appData.cache.getServerData()[constants_1.CURRENCY_FACTORS_IDENTIFIER],
         };
         let clientSSR = ssr;

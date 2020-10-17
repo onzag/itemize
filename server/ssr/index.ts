@@ -1,11 +1,8 @@
 import Root from "../../base/Root";
 import express from "express";
-import { IConfigRawJSONDataType } from "../../config";
+
 // import { IOrderByRuleType, SearchVariants } from "../../constants";
 // import { PropertyDefinitionValueType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-
-// could use ISSRCollectedQueryType[] but this makes the querying more painful than it should
-type ISSRRuleDynamicFn = (collectedValues: any[], config: IConfigRawJSONDataType) => string;
 
 // export interface ISSRSearchPropertySetter {
 //   [property: string]: {
@@ -44,11 +41,6 @@ type ISSRRuleDynamicFn = (collectedValues: any[], config: IConfigRawJSONDataType
 
 // this info should be specified
 export interface ISSRRuleDynamic {
-  title: string | ISSRRuleDynamicFn;
-  description: string | ISSRRuleDynamicFn;
-  ogTitle: string | ISSRRuleDynamicFn;
-  ogDescription: string | ISSRRuleDynamicFn;
-  ogImage: string | ISSRRuleDynamicFn;
   collect: Array<[string, string, number, string]>;
   collectResources: string[];
   // collectSearch: ISSRSearchRule[];

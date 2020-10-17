@@ -14,6 +14,7 @@ import fs from "fs";
 const fsAsync = fs.promises;
 import path from "path";
 import { collect, ICollectionResult } from "./collect";
+import { capitalize } from "../../util";
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
@@ -136,18 +137,21 @@ export async function ssrGenerator(
   // is a valid language... not some made up language also that SSR is not disabled
   // othewise it's meaningless
   let resultRule: ISSRRuleDynamic;
-  if (rule && language && config.supportedLanguages.includes(language) && !SSRIsDisabledInThisMode) {
-    // if it all passes, we get the rule, there are two types, dynamic and already done
-    // if it's dynamic we pass the args, otherwse it is what it is
-    resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
+  if (language && config.supportedLanguages.includes(language) && !SSRIsDisabledInThisMode) {
+    if (typeof rule !== "undefined") {
+      // if it all passes, we get the rule, there are two types, dynamic and already done
+      // if it's dynamic we pass the args, otherwse it is what it is
+      resultRule = typeof rule === "function" ? rule(req, language, root) : rule;
+    } else {
+      // default
+      resultRule = {
+        collect: [],
+        collectResources: [],
+      }
+    }
   } else if (!language && !req.query.noredirect) {
     // fake rule to force a redirect
     resultRule = {
-      title: null,
-      ogTitle: null,
-      description: null,
-      ogDescription: null,
-      ogImage: null,
       collect: [],
       collectResources: [],
     };
@@ -166,11 +170,6 @@ export async function ssrGenerator(
     // they'll never hit SSR they'll recieve only this fast memoized option meant for the same buildnumber
     // and they'll get it mainly from the service worker, they won't even bother with the server
     appliedRule = {
-      title: config.appName,
-      description: config.appName,
-      ogTitle: config.appName,
-      ogDescription: config.appName,
-      ogImage: "/rest/resource/icons/android-chrome-512x512.png",
       collect: null,
       collectResources: null,
       // collectSearch: null,
@@ -361,16 +360,13 @@ export async function ssrGenerator(
 
   // now we calculate the og fields that are final, given they can be functions
   // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
-  const finalOgTitle = (typeof appliedRule.ogTitle === "string" || !appliedRule.ogTitle) ?
-    appliedRule.ogTitle as string : appliedRule.ogTitle(queries, config);
+  const finalOgTitle: string = root.getStateKey("ogTitle");
 
   // the description as well, same thing
-  const finalOgDescription = (typeof appliedRule.ogDescription === "string" || !appliedRule.ogDescription) ?
-    appliedRule.ogDescription as string : appliedRule.ogDescription(queries, config);
+  const finalOgDescription: string = root.getStateKey("ogDescription");
 
   // same for the image but this is special
-  let finalOgImage = (typeof appliedRule.ogImage === "string" || !appliedRule.ogImage) ?
-    appliedRule.ogImage as string : appliedRule.ogImage(queries, config);
+  let finalOgImage: string = root.getStateKey("ogImage");
   // because if it's a url and og image tags require absolute paths with entire urls
   // we check if it's an absolute path with no host
   if (finalOgImage && finalOgImage.startsWith("/")) {
@@ -382,21 +378,30 @@ export async function ssrGenerator(
   }
 
   // now we calculate the same way title and description
-  const finalTitle = (typeof appliedRule.title === "string" || !appliedRule.title) ?
-    appliedRule.title as string : appliedRule.title(queries, config);
-  const finalDescription = (typeof appliedRule.description === "string" || !appliedRule.title) ?
-    appliedRule.description as string : appliedRule.description(queries, config);
+  const finalTitle = root.getStateKey("title");
+  const finalDescription = root.getStateKey("description");
+
+  const i18nData = root.getI18nDataFor(language);
+  const i18nAppName = i18nData && i18nData.app_name && capitalize(i18nData.app_name);
+  const i18nAppDescription = i18nData && i18nData.app_description && capitalize(i18nData.app_description);
+
+  const usedDir = appliedRule.rtl ? "rtl" : "ltr";
+  const usedTitle = finalTitle || i18nAppName || config.appName || "";
+  const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
+  const usedOgTitle = finalOgTitle || usedTitle;
+  const usedOgDescription = finalOgDescription || usedDescription;
+  const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
 
   // and we start replacing from the HTML itself, note how these things might have returned null for some
   let newHTML = html;
   newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
   newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
-  newHTML = newHTML.replace(/\$SSRDIR/g, appliedRule.rtl ? "rtl" : "ltr");
-  newHTML = newHTML.replace(/\$SSRTITLE/g, finalTitle || "");
-  newHTML = newHTML.replace(/\$SSRDESCR/g, finalDescription || "");
-  newHTML = newHTML.replace(/\$SSROGTITLE/g, finalOgTitle || finalTitle || "");
-  newHTML = newHTML.replace(/\$SSROGDESCR/g, finalOgDescription || finalDescription || "");
-  newHTML = newHTML.replace(/\$SSROGIMG/g, finalOgImage || "");
+  newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
+  newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+  newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+  newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+  newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+  newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
 
   // and now the href lang tags
   const langHrefLangTags = appliedRule.languages.map((language: string) => {
@@ -416,7 +421,7 @@ export async function ssrGenerator(
       queries,
       resources,
       user: appliedRule.forUser,
-      title: finalTitle,
+      title: usedTitle,
       currencyFactors: appData.cache.getServerData()[CURRENCY_FACTORS_IDENTIFIER],
     };
 

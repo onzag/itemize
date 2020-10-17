@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.search = exports.DataCorruptionError = void 0;
 const cache_worker_1 = require("./cache.worker");
 const constants_1 = require("../../../../constants");
 const nanodate_1 = require("../../../../nanodate");

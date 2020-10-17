@@ -10,6 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildTables = exports.dropTable = exports.updateTable = exports.createTable = exports.updateColumnInTable = exports.dropExtraColumnInTable = exports.addMissingColumnToTable = void 0;
 const read_1 = __importDefault(require("read"));
 const safe_1 = __importDefault(require("colors/safe"));
 function fastRead(options) {

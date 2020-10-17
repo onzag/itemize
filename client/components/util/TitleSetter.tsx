@@ -7,12 +7,14 @@
 
 import React from "react";
 import { ActualTitleReader } from "./TitleReader";
+import RootRetriever from "../root/RootRetriever";
 
 /**
  * The title setter props, takes a string children
  */
 interface ITitleSetterProps {
   children: string;
+  type?: "document" | "og" | "both",
 }
 
 /**
@@ -26,7 +28,7 @@ let TitleSetterInstanceIsLoaded = false;
  * 
  * Do not have two title setters at once as this would cause an error
  */
-export default class TitleSetter extends React.Component<ITitleSetterProps, {}> {
+export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
   /**
    * Stores title readers to inform them of changes
    */
@@ -50,14 +52,14 @@ export default class TitleSetter extends React.Component<ITitleSetterProps, {}> 
     this.originalTitle = document.title;
     document.title = this.props.children || "";
     if (this.originalTitle !== document.title) {
-      TitleSetter.changedListeners.forEach((listener) => listener());
+      ActualTitleSetter.changedListeners.forEach((listener) => listener());
     }
   }
   public componentDidUpdate(prevProps: ITitleSetterProps) {
     // change the title if we have different titles
     if ((prevProps.children || "") !== (this.props.children || "")) {
       document.title = this.props.children || "";
-      TitleSetter.changedListeners.forEach((listener) => listener());
+      ActualTitleSetter.changedListeners.forEach((listener) => listener());
     }
   }
   public componentWillUnmount() {
@@ -69,5 +71,43 @@ export default class TitleSetter extends React.Component<ITitleSetterProps, {}> 
   public render() {
     // retuns nothing
     return null as React.ReactNode;
+  }
+}
+
+/**
+ * The title setter allows to set the title of the application dinamically
+ * 
+ * If set in the og mode it will not do anything and it does not update the og
+ * dinamically, only the document or both mode does it; the og mode is for server
+ * use only
+ */
+export default class TitleSetter extends React.Component<ITitleSetterProps, {}> {
+  constructor(props: ITitleSetterProps) {
+    super(props);
+  }
+  public render() {
+    if (typeof document === "undefined") {
+      return (
+        <RootRetriever>{
+          (arg) => {
+            if (this.props.type === "og" || !this.props.type || this.props.type === "both") {
+              arg.root.setStateKey("ogTitle", this.props.children);
+            }
+
+            if (this.props.type === "document" || !this.props.type || this.props.type === "both") {
+              arg.root.setStateKey("title", this.props.children);
+            }
+
+            return null;
+          }
+        }</RootRetriever>
+      )
+    } else if (!this.props.type || this.props.type !== "og") {
+      return (
+        <ActualTitleSetter {...this.props} />
+      );
+    }
+
+    return null;
   }
 }

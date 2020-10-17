@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.rawRedisConfigSchema = exports.rawRedisConfigSchemaPart = exports.rawDBConfigSchema = exports.rawConfigSchema = exports.dumpConfigSchema = exports.rawSensitiveConfigSchema = void 0;
 /**
  * A JSON validating schema for the sensitive configuration
  */

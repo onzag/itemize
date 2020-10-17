@@ -41,23 +41,14 @@ initializeServer(
       // as this is for SSR, description, og fields, can be set to whatever there's nothing
       // done for them in the client side
       "/": (req, lang, root) => {
-        // in the client the title is set to the app name
-        const i18nData = root.getI18nDataFor(lang);
         return {
-          title: capitalize(i18nData.app_name),
-          description: i18nData.app_description,
-          ogTitle: capitalize(i18nData.app_name),
-          ogDescription: i18nData.app_description,
-          ogImage: "/rest/resource/icons/android-chrome-512x512.png",
           collect: [
             ["cms", "fragment", 1, lang],
           ],
           collectResources: [],
         };
       },
-      "/profile/:id": (req, lang, root) => {
-        const userIdef = root.getModuleFor(["users"]).getItemDefinitionFor(["user"]);
-        const i18nData = userIdef.getI18nDataFor(lang);
+      "/profile/:id": (req) => {
         const userId = parseInt(req.params.id, 10);
         if (isNaN(userId)) {
           // use the standard this is a path we know nothing
@@ -66,50 +57,6 @@ initializeServer(
           return null;
         }
         return {
-          // this is the same as specified in our page
-          title: capitalize(i18nData.custom.profile),
-
-          // the description includes our user name, so we need to fetch it
-          // by using a collected function callback
-          description: (collectedValues) => {
-            // forbidden access due to role, not found, value has been flagged and blocked by moderator
-            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
-              return null;
-            }
-            return localeReplacer(i18nData.custom.profile_for_description, collectedValues[0].value.DATA.username);
-          },
-          ogTitle: capitalize(i18nData.custom.profile),
-          ogDescription: (collectedValues) => {
-            // forbidden access due to role, not found, value has been flagged and blocked by moderator
-            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
-              return null;
-            }
-            return localeReplacer(i18nData.custom.profile_for_description, collectedValues[0].value.DATA.username);
-          },
-          ogImage: (collectedValues, config) => {
-            // forbidden access due to role, not found, value has been flagged and blocked by moderator
-            if (!collectedValues[0] || !collectedValues[0].value || !collectedValues[0].value.DATA) {
-              return null;
-            }
-            const profilePictureProperty = userIdef.getPropertyDefinitionFor("profile_picture", false);
-            // files need to fetch the absolute url with has to be with the
-            // container they are in, because containers aren't centralized
-            // we need to use this function,
-            const absolutedFile = fileURLAbsoluter(
-              process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname,
-              config.containersHostnamePrefixes,
-              collectedValues[0].value.DATA.profile_picture,
-              userIdef,
-              collectedValues[0].value.id,
-              collectedValues[0].value.version,
-              collectedValues[0].value.container_id,
-              null,
-              profilePictureProperty,
-              false,
-            );
-            // no profile picture, absolutedFile might be null, then set it to the standard icon
-            return (absolutedFile && absolutedFile.url) || "/rest/resource/icons/android-chrome-512x512.png";
-          },
           collect: [
             ["users", "user", userId, null],
           ],

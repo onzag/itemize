@@ -83,11 +83,31 @@ export default class Root {
      */
     private childModules;
     /**
+     * A root state, normally used in
+     * the server side to store information
+     * in the root about execution
+     */
+    private rootState;
+    /**
      * Builds a root from raw data
      * @param rawJSON the raw json data
      */
     constructor(rawJSON: IRootRawJSONDataType);
+    /**
+     * Cleans the state of the root as well as all its children
+     */
     cleanState(): void;
+    /**
+     * Stores a key in the root state
+     * @param key the key to store
+     * @param value the value to store
+     */
+    setStateKey(key: string, value: any): void;
+    /**
+     * Returns a given set state key
+     * @param key
+     */
+    getStateKey(key: string): any;
     /**
      * list all module names it contains
      * @returns an array of string with the module names

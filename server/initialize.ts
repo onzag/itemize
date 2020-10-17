@@ -280,9 +280,11 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   app.get("*", (req, res) => {
     const mode = getMode(appData, req);
     if (mode === "development") {
-      ssrGenerator(req, res, appData.indexDevelopment, appData, mode, null)
+      // because null is a valid rule, it means do not use SSR, we need to
+      // pass undefined instead to tell it to use the default rule
+      ssrGenerator(req, res, appData.indexDevelopment, appData, mode, undefined)
     } else {
-      ssrGenerator(req, res, appData.indexProduction, appData, mode, null);
+      ssrGenerator(req, res, appData.indexProduction, appData, mode, undefined);
     }
   });
 }

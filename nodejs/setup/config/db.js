@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.dbConfigSetup = void 0;
 const read_1 = require("../read");
 /**
  * Will ask for information about the database sensitive file

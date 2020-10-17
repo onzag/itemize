@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MailService = void 0;
 const server_1 = require("../server");
 const util_1 = require("../util");
 const USE_FAKE_EMAILS = process.env.FAKE_EMAILS === "true";

@@ -25,6 +25,12 @@ class Root {
          * uses the qualified name of those
          */
         this.registry = {};
+        /**
+         * A root state, normally used in
+         * the server side to store information
+         * in the root about execution
+         */
+        this.rootState = {};
         // If its not production run the checks
         this.rawData = rawJSON;
         this.childModules = rawJSON.children.map((c) => new Module_1.default(c, this, null));
@@ -40,6 +46,7 @@ class Root {
      * @returns a raw module or null
      */
     static getModuleRawFor(root, name) {
+        ;
         // Search for child items
         // remember children can be of type module or item definition
         // so we got to check
@@ -67,8 +74,27 @@ class Root {
         }
         return finalModule;
     }
+    /**
+     * Cleans the state of the root as well as all its children
+     */
     cleanState() {
+        this.rootState = {};
         this.childModules && this.childModules.forEach((cm) => cm.cleanState());
+    }
+    /**
+     * Stores a key in the root state
+     * @param key the key to store
+     * @param value the value to store
+     */
+    setStateKey(key, value) {
+        this.rootState[key] = value;
+    }
+    /**
+     * Returns a given set state key
+     * @param key
+     */
+    getStateKey(key) {
+        return this.rootState[key] || null;
     }
     /**
      * list all module names it contains

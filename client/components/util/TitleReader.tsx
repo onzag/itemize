@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import TitleSetter from "./TitleSetter";
+import { ActualTitleSetter } from "./TitleSetter";
 import { SSRContext } from "../../internal/providers/ssr-provider";
 
 interface ActualTitleReaderProps {
@@ -20,11 +20,11 @@ export class ActualTitleReader extends React.Component<ActualTitleReaderProps, {
   }
   public componentDidMount() {
     // we add these global listener to it that do a force update
-    TitleSetter.changedListeners.set(this, this.forceUpdate.bind(this));
+    ActualTitleSetter.changedListeners.set(this, this.forceUpdate.bind(this));
   }
   public componentWillUnmount() {
     // then we delete this
-    TitleSetter.changedListeners.delete(this);
+    ActualTitleSetter.changedListeners.delete(this);
   }
   public render() {
     // for ssr reasons we need to do this, basically on initial

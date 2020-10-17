@@ -9,6 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ajvCheck = exports.checkRedisConfig = exports.checkDumpConfig = exports.checkDBConfig = exports.checkConfig = exports.checkSensitiveConfig = exports.checkModuleSchemaValidate = exports.checkSpecialPropertyValueSetSchemaValidate = exports.checkPropertyDefinitionArraySchemaValidate = exports.checkItemDefinitionSchemaValidate = exports.checkRootSchemaValidate = void 0;
 const ajv_1 = __importDefault(require("ajv"));
 const schema_1 = __importDefault(require("../base/Root/schema"));
 const schema_2 = __importDefault(require("../base/Root/Module/ItemDefinition/schema"));

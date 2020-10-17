@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initializeApp = void 0;
 const _1 = require(".");
 const express_1 = __importDefault(require("express"));
 const express_graphql_1 = __importDefault(require("express-graphql"));
@@ -231,10 +232,12 @@ function initializeApp(appData, custom) {
     _1.app.get("*", (req, res) => {
         const mode = mode_1.getMode(appData, req);
         if (mode === "development") {
-            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, null);
+            // because null is a valid rule, it means do not use SSR, we need to
+            // pass undefined instead to tell it to use the default rule
+            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, undefined);
         }
         else {
-            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, null);
+            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, undefined);
         }
     });
 }

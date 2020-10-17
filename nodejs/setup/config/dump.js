@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.dumpConfigRequest = void 0;
 /**
  * Allows to set up the dump configuration information
  * @param currentConfig the current configuration
