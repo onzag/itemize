@@ -7,7 +7,6 @@ import { getCookie } from "../mode";
 import { ISSRContextType, ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { initializeItemizeApp } from "../../client";
 import { StaticRouter } from "react-router-dom";
-import ReactDOMServer from 'react-dom/server';
 import Root from "../../base/Root";
 import Moment from "moment";
 import fs from "fs";
@@ -15,6 +14,9 @@ const fsAsync = fs.promises;
 import path from "path";
 import { collect, ICollectionResult } from "./collect";
 import { capitalize } from "../../util";
+
+// This is a custom react dom build
+const ReactDOMServer = require('@onzag/react-dom/server');
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
@@ -501,7 +503,7 @@ export async function ssrGenerator(
     );
 
     // we place such HTML
-    const staticMarkup = ReactDOMServer.renderToStaticMarkup(app);
+    const staticMarkup = await (ReactDOMServer.renderToStaticMarkup(app) as any);
 
     // now we calculate the og fields that are final, given they can be functions
     // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries

@@ -11,9 +11,9 @@ export default {
   "tsconfig-paths": "^3.9.0",
 
   // peer dependencies
-  "@types/react": "^16.9.35",
+  "@types/react": "^16.9.53",
   "@types/react-dom": "^16.9.8",
-  "react": "^16.13.1",
-  "react-dom": "^16.13.1",
+  "react": "^16.14.0",
+  "react-dom": "^16.14.0",
   "deep-equal": "^1.1.1",
 };

@@ -10,13 +10,14 @@ const constants_1 = require("../../constants");
 const mode_1 = require("../mode");
 const client_1 = require("../../client");
 const react_router_dom_1 = require("react-router-dom");
-const server_1 = __importDefault(require("react-dom/server"));
 const moment_1 = __importDefault(require("moment"));
 const fs_1 = __importDefault(require("fs"));
 const fsAsync = fs_1.default.promises;
 const path_1 = __importDefault(require("path"));
 const collect_1 = require("./collect");
 const util_1 = require("../../util");
+// This is a custom react dom build
+const ReactDOMServer = require('@onzag/react-dom/server');
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
@@ -411,7 +412,7 @@ async function ssrGenerator(req, res, html, appData, mode, rule) {
         // with SSR
         const app = (react_1.default.createElement(react_router_dom_1.StaticRouter, { location: req.originalUrl }, serverAppData.node));
         // we place such HTML
-        const staticMarkup = server_1.default.renderToStaticMarkup(app);
+        const staticMarkup = await ReactDOMServer.renderToStaticMarkup(app);
         // now we calculate the og fields that are final, given they can be functions
         // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
         const finalOgTitle = root.getStateKey("ogTitle");

@@ -1,0 +1,74 @@
+- In order to build react you need node and yarn, so run
+
+yarn
+
+- This is what is needed
+
+yarn build react-dom/server --type=node
+
+
+
+react-dom/src/server/ReactDOMNodeStreamRenderer.js
+
+-  _read(size) {
++  async _read(size) {
+
+-      this.push(this.partialRenderer.read(size));
++      this.push(await this.partialRenderer.read(size));
+
+react-dom/src/server/ReactDOMStringRenderer.js
+
+-export function renderToString(element, options?: ServerOptions) {
++export async function renderToString(element, options?: ServerOptions) {
+
+-    const markup = renderer.read(Infinity);
++    const markup = await renderer.read(Infinity);
+
+-export function renderToStaticMarkup(element, options?: ServerOptions) {
++export async function renderToStaticMarkup(element, options?: ServerOptions) {
+
+-    const markup = renderer.read(Infinity);
++    const markup = await renderer.read(Infinity);
+
+react-dom/src/server/ReactPartialRenderer.js
+
+-function resolve(
++async function resolve(
+
+-    processChild(element, Component);
++    await processChild(element, Component);
+
+-  function processChild(element, Component) {
++  async function processChild(element, Component) {
+
++
++    if (inst.beforeSSRRender) {
++      await inst.beforeSSRRender();
++    }
+     child = inst.render();
+
+-  read(bytes: number): string | null {
++  async read(bytes: number): string | null {
+
+-          outBuffer += this.render(child, frame.context, frame.domNamespace);
++          outBuffer += await this.render(child, frame.context, frame.domNamespace);
+
+-  render(
++  async render(
+
+-      ({child: nextChild, context} = resolve(child, context, this.threadID));
++      ({child: nextChild, context} = await resolve(child, context, this.threadID));
+
+/scripts/rollup/build.js
+
+-  language_in: 'ECMASCRIPT_2015',
+-  language_out: 'ECMASCRIPT5_STRICT',
++  language_in: 'ECMASCRIPT_2017',
++  language_out: 'ECMASCRIPT_2017',
+
+
+
+Before publishing to npm remember to
+
+name: @onzag/react-dom
+version: v16.x.x-custom.y
