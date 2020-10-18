@@ -205,39 +205,14 @@ function initializeApp(appData, custom) {
             res.redirect(prefix + (prefix.endsWith("/") ? "" : "/") + "sitemaps/" + hostname + "/index.xml");
         });
     }
-    const router = express_1.default.Router();
-    Object.keys(appData.ssrConfig.ssrRules).forEach((urlCombo) => {
-        const rule = appData.ssrConfig.ssrRules[urlCombo];
-        urlCombo.split(",").forEach((url) => {
-            const actualURL = url.startsWith("/") ? url : "/" + url;
-            router.get(actualURL, (req, res) => {
-                const mode = mode_1.getMode(appData, req);
-                if (mode === "development") {
-                    generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, rule);
-                }
-                else {
-                    generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, rule);
-                }
-            });
-        });
-    });
-    _1.app.use("/:lang", (req, res, next) => {
-        if (req.params.lang.length !== 2) {
-            next();
-            return;
-        }
-        router(req, res, next);
-    });
     // and now the main index setup
     _1.app.get("*", (req, res) => {
         const mode = mode_1.getMode(appData, req);
         if (mode === "development") {
-            // because null is a valid rule, it means do not use SSR, we need to
-            // pass undefined instead to tell it to use the default rule
-            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode, undefined);
+            generator_1.ssrGenerator(req, res, appData.indexDevelopment, appData, mode);
         }
         else {
-            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode, undefined);
+            generator_1.ssrGenerator(req, res, appData.indexProduction, appData, mode);
         }
     });
 }

@@ -32,6 +32,8 @@ export interface ILangLocalesType {
   };
 }
 
+type RequestManagerFn = (itemDefinition: ItemDefinition, id: number, version: string) => Promise<void>;
+
 /**
  * This is the raw processed form of the root
  */
@@ -140,7 +142,13 @@ export default class Root {
    * the server side to store information
    * in the root about execution
    */
-  private rootState: IRootState = {}
+  private rootState: IRootState = {};
+
+  /**
+   * This is used for SSR and lives in the root
+   * allows the root to request for data
+   */
+  private requestManager: RequestManagerFn = null;
 
   /**
    * Builds a root from raw data
@@ -173,6 +181,14 @@ export default class Root {
    */
   public setStateKey(key: string, value: any) {
     this.rootState[key] = value;
+  }
+
+  public setRequestManager(manager: RequestManagerFn) {
+    this.requestManager = manager;
+  }
+
+  public async callRequestManager(itemDefinition: ItemDefinition, id: number, version: string) {
+    await this.requestManager(itemDefinition, id, version);
   }
 
   /**

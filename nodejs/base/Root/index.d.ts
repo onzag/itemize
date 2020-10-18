@@ -23,6 +23,7 @@ export interface ILangLocalesType {
         rtl: boolean;
     };
 }
+declare type RequestManagerFn = (itemDefinition: ItemDefinition, id: number, version: string) => Promise<void>;
 /**
  * This is the raw processed form of the root
  */
@@ -89,6 +90,11 @@ export default class Root {
      */
     private rootState;
     /**
+     * This is used for SSR and lives in the root
+     * allows the root to request for data
+     */
+    private requestManager;
+    /**
      * Builds a root from raw data
      * @param rawJSON the raw json data
      */
@@ -103,6 +109,8 @@ export default class Root {
      * @param value the value to store
      */
     setStateKey(key: string, value: any): void;
+    setRequestManager(manager: RequestManagerFn): void;
+    callRequestManager(itemDefinition: ItemDefinition, id: number, version: string): Promise<void>;
     /**
      * Returns a given set state key
      * @param key
@@ -144,3 +152,4 @@ export default class Root {
         [key: string]: string;
     };
 }
+export {};

@@ -39,16 +39,9 @@ import express from "express";
 //   };
 // }
 
-// this info should be specified
-export interface ISSRRuleDynamic {
-  collect: Array<[string, string, number, string]>;
-  collectResources: string[];
-  // collectSearch: ISSRSearchRule[];
-}
-
 // this infor can be retrieved via the config and other attributes
 // doesn't need to be specified
-export interface ISSRRule extends ISSRRuleDynamic {
+export interface ISSRRule {
   language: string;
   languages: string[];
   rtl: boolean;
@@ -58,11 +51,4 @@ export interface ISSRRule extends ISSRRuleDynamic {
     role: string;
   };
   noData: boolean;
-  memId: string;
-}
-
-export type ISSRRuleSetCb = (req: express.Request, language: string, root: Root) => ISSRRuleDynamic;
-
-export interface ISSRRuleSet {
-  [commaSeparatedURLsWithoutLanguage: string]: ISSRRuleDynamic | ISSRRuleSetCb;
 }

@@ -611,6 +611,7 @@ export declare class ActualItemProvider extends React.Component<IActualItemProvi
     canEdit(): boolean;
     poke(elements: IPokeElementsType): void;
     unpoke(): void;
+    beforeSSRRender(): Promise<void>;
     render(): JSX.Element;
 }
 export declare function ItemProvider(props: IItemProviderProps): JSX.Element;

@@ -14,7 +14,6 @@ import Mailgun from "mailgun-js";
 import { Here } from "./services/here";
 import winston from "winston";
 import "winston-daily-rotate-file";
-import { ISSRRuleSet } from "./ssr";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/providers/locale-provider";
 import { ICollectorType } from "../client";
@@ -28,7 +27,6 @@ export declare const app: import("express-serve-static-core").Express;
  * Specifies the SSR configuration for the multiple pages
  */
 export interface ISSRConfig {
-    ssrRules: ISSRRuleSet;
     rendererContext: IRendererContext;
     mainComponent: React.ReactElement;
     appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;

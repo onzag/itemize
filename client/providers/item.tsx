@@ -3300,6 +3300,24 @@ export class ActualItemProvider extends
       },
     });
   }
+  public async beforeSSRRender(): Promise<void> {
+    if (
+      this.state.loaded ||
+      this.props.forId === null ||
+      this.props.itemDefinitionInstance.isInSearchMode() ||
+      this.props.itemDefinitionInstance.isExtensionsInstance()
+    ) {
+      return null;
+    }
+
+    // cheesy way to get to the root
+    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+    const id = this.props.forId;
+    const version = this.props.forVersion || null;
+
+    await root.callRequestManager(this.props.itemDefinitionInstance, id, version);
+    this.state = this.setupInitialState();
+  }
   public render() {
     if (
       this.props.loadUnversionedFallback &&

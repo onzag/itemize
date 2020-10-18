@@ -31,6 +31,11 @@ class Root {
          * in the root about execution
          */
         this.rootState = {};
+        /**
+         * This is used for SSR and lives in the root
+         * allows the root to request for data
+         */
+        this.requestManager = null;
         // If its not production run the checks
         this.rawData = rawJSON;
         this.childModules = rawJSON.children.map((c) => new Module_1.default(c, this, null));
@@ -88,6 +93,12 @@ class Root {
      */
     setStateKey(key, value) {
         this.rootState[key] = value;
+    }
+    setRequestManager(manager) {
+        this.requestManager = manager;
+    }
+    async callRequestManager(itemDefinition, id, version) {
+        await this.requestManager(itemDefinition, id, version);
     }
     /**
      * Returns a given set state key
