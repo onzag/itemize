@@ -31,6 +31,9 @@ interface IPropertyViewReferenceState {
   currentStrValue: string;
 }
 
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
+
 /**
  * The property view reference handler, note how unlike most
  * other handlers this handler uses the property view simple renderer
@@ -40,6 +43,7 @@ export default class PropertyViewReference
   extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
 
   private currentlyFindingValueFor: [number, string];
+  private ssrServerOnlyValue: string;
 
   constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>) {
     super(props);
@@ -130,6 +134,12 @@ export default class PropertyViewReference
       return null;
     }
 
+    // Only accept ssr based results when we have loaded this fast
+    const currentTime = (new Date()).getTime();
+    if (currentTime - LOAD_TIME > SSR_GRACE_TIME) {
+      return null;
+    }
+
     // we get our special data
     const [idef, dProp] = this.getSpecialData();
 
@@ -151,6 +161,29 @@ export default class PropertyViewReference
     }
 
     return pMatch.toString();
+  }
+
+  public async beforeSSRRender(): Promise<void> {
+    const id = this.props.useAppliedValue ? this.props.state.stateAppliedValue as number : this.props.state.value as number;
+    if (
+      !id
+    ) {
+      return null;
+    }
+
+    const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
+    const version = filterByLanguage ? this.props.language : null;
+
+    // we get our special data
+    try {
+      const [idef, dProp] = this.getSpecialData();
+      const root = idef.getParentModule().getParentRoot();
+      await root.callRequestManager(idef, id, version);
+
+      this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+    } catch {
+      // ignore the error and move on
+    }
   }
 
   /**
@@ -322,9 +355,9 @@ export default class PropertyViewReference
         internalValue ||
         this.state.currentStrValue ||
         this.getSSRFoundValue(
-          this.props.state.value as number,
+          this.props.useAppliedValue ? this.props.state.stateAppliedValue as number : this.props.state.value as number,
           filterByLanguage ? this.props.language : null,
-        ) || ""
+        ) || this.ssrServerOnlyValue || ""
       );
 
     const RendererElement = this.props.renderer;

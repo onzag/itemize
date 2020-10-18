@@ -8,6 +8,8 @@ const deep_equal_1 = __importDefault(require("deep-equal"));
 const gql_client_util_1 = require("../../../../client/internal/gql-client-util");
 const search_mode_1 = require("../../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode");
 ;
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
 class PropertyEntryReference extends react_1.default.Component {
     constructor(props) {
         super(props);
@@ -285,8 +287,31 @@ class PropertyEntryReference extends react_1.default.Component {
         const sProp = idef.getPropertyDefinitionFor(searchProp, true);
         return [idef, dProp, sProp];
     }
+    async beforeSSRRender() {
+        const id = this.props.state.value;
+        if (!id) {
+            return null;
+        }
+        const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
+        const version = filterByLanguage ? this.props.language : null;
+        // we get our special data
+        try {
+            const [idef, dProp] = this.getSpecialData();
+            const root = idef.getParentModule().getParentRoot();
+            await root.callRequestManager(idef, id, version);
+            this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+        }
+        catch {
+            // ignore the error and move on
+        }
+    }
     getSSRFoundValue(forId, forVersion) {
         if (!forId || !this.props.ssr) {
+            return null;
+        }
+        // Only accept ssr based results when we have loaded this fast
+        const currentTime = (new Date()).getTime();
+        if (currentTime - LOAD_TIME > SSR_GRACE_TIME) {
             return null;
         }
         const [idef, dProp] = this.getSpecialData();
@@ -523,7 +548,7 @@ class PropertyEntryReference extends react_1.default.Component {
             currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
             currentInvalidReason: i18nInvalidReason,
             currentInternalValue: this.props.state.internalValue,
-            currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(this.props.state.value, filterByLanguage ? this.props.language : null) || "",
+            currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(this.props.state.value, filterByLanguage ? this.props.language : null) || this.ssrServerOnlyValue || "",
             currentValueIsFullfilled: !!this.props.state.value,
             currentOptions: this.state.currentOptions,
             currentSearchError: this.state.currentSearchError,

@@ -44,6 +44,7 @@ export default class PropertyEntryReference extends React.Component<IPropertyEnt
     private lastCachedSearchPreventedProperties;
     private lastCachedSearchPreventedPropertiesIds;
     private lastCachedSearchPreventedIds;
+    private ssrServerOnlyValue;
     private isUnmounted;
     constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>);
     changeListener(id: number, version: string): void;
@@ -56,6 +57,7 @@ export default class PropertyEntryReference extends React.Component<IPropertyEnt
     removeListeners(props?: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>): void;
     search(loadAll?: boolean, limit?: number, preventIds?: number[], preventEqualityWithProperties?: string[]): Promise<void>;
     getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition];
+    beforeSSRRender(): Promise<void>;
     getSSRFoundValue(forId: number, forVersion: string): string;
     findCurrentStrValue(forId: number, forVersion: string): Promise<void>;
     loadAllPossibleValues(limit: number, preventIds?: number[], preventEqualityWithProperties?: string[]): void;

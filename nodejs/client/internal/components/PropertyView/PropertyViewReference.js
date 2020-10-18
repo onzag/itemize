@@ -11,6 +11,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const deep_equal_1 = __importDefault(require("deep-equal"));
 const gql_client_util_1 = require("../../../../client/internal/gql-client-util");
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
 /**
  * The property view reference handler, note how unlike most
  * other handlers this handler uses the property view simple renderer
@@ -83,6 +85,11 @@ class PropertyViewReference extends react_1.default.Component {
         if (!forId || !this.props.ssr) {
             return null;
         }
+        // Only accept ssr based results when we have loaded this fast
+        const currentTime = (new Date()).getTime();
+        if (currentTime - LOAD_TIME > SSR_GRACE_TIME) {
+            return null;
+        }
         // we get our special data
         const [idef, dProp] = this.getSpecialData();
         // and try to find a match in the queries that do fit our id and version
@@ -98,6 +105,24 @@ class PropertyViewReference extends react_1.default.Component {
             return null;
         }
         return pMatch.toString();
+    }
+    async beforeSSRRender() {
+        const id = this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value;
+        if (!id) {
+            return null;
+        }
+        const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage");
+        const version = filterByLanguage ? this.props.language : null;
+        // we get our special data
+        try {
+            const [idef, dProp] = this.getSpecialData();
+            const root = idef.getParentModule().getParentRoot();
+            await root.callRequestManager(idef, id, version);
+            this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+        }
+        catch {
+            // ignore the error and move on
+        }
     }
     /**
      * Finds the current string value for the given id and version
@@ -224,7 +249,7 @@ class PropertyViewReference extends react_1.default.Component {
             nullValueLabel :
             (internalValue ||
                 this.state.currentStrValue ||
-                this.getSSRFoundValue(this.props.state.value, filterByLanguage ? this.props.language : null) || "");
+                this.getSSRFoundValue(this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value, filterByLanguage ? this.props.language : null) || this.ssrServerOnlyValue || "");
         const RendererElement = this.props.renderer;
         const rendererArgs = {
             args: this.props.rendererArgs,

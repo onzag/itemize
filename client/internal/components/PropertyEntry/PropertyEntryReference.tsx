@@ -36,6 +36,9 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
   dismissFindError: () => void;
 }
 
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
+
 interface IPropertyEntryReferenceState {
   currentOptions: IPropertyEntryReferenceOption[];
   currentOptionsVersion: string;
@@ -59,6 +62,8 @@ export default class PropertyEntryReference
   private lastCachedSearchPreventedProperties: PropertyDefinition[];
   private lastCachedSearchPreventedPropertiesIds: string[];
   private lastCachedSearchPreventedIds: number[];
+
+  private ssrServerOnlyValue: string;
 
   private isUnmounted = false;
 
@@ -395,10 +400,40 @@ export default class PropertyEntryReference
     return [idef, dProp, sProp];
   }
 
+  public async beforeSSRRender(): Promise<void> {
+    const id = this.props.state.value as number;
+    if (
+      !id
+    ) {
+      return null;
+    }
+
+    const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
+    const version = filterByLanguage ? this.props.language : null;
+
+    // we get our special data
+    try {
+      const [idef, dProp] = this.getSpecialData();
+      const root = idef.getParentModule().getParentRoot();
+      await root.callRequestManager(idef, id, version);
+
+      this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+    } catch {
+      // ignore the error and move on
+    }
+  }
+
   public getSSRFoundValue(forId: number, forVersion: string): string {
     if (!forId || !this.props.ssr) {
       return null;
     }
+
+    // Only accept ssr based results when we have loaded this fast
+    const currentTime = (new Date()).getTime();
+    if (currentTime - LOAD_TIME > SSR_GRACE_TIME) {
+      return null;
+    }
+
     const [idef, dProp] = this.getSpecialData();
     const match =
       this.props.ssr.queries.find((v) => v.idef === idef.getQualifiedPathName() && v.id === forId && v.version === forVersion);
@@ -710,7 +745,7 @@ export default class PropertyEntryReference
       currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(
         this.props.state.value as number,
         filterByLanguage ? this.props.language : null,
-      ) || "",
+      ) || this.ssrServerOnlyValue || "",
       currentValueIsFullfilled: !!this.props.state.value,
       currentOptions: this.state.currentOptions,
       currentSearchError: this.state.currentSearchError,

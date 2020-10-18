@@ -32,6 +32,7 @@ interface IPropertyViewReferenceState {
  */
 export default class PropertyViewReference extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
     private currentlyFindingValueFor;
+    private ssrServerOnlyValue;
     constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>);
     componentDidMount(): void;
     /**
@@ -47,6 +48,7 @@ export default class PropertyViewReference extends React.Component<IPropertyView
      * @returns a string value or null if nothing found
      */
     getSSRFoundValue(forId: number, forVersion: string): string;
+    beforeSSRRender(): Promise<void>;
     /**
      * Finds the current string value for the given id and version
      * @param forId
