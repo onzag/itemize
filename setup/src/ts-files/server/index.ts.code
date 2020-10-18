@@ -36,34 +36,6 @@ import { fileURLAbsoluter } from "@onzag/itemize/util";
 
 initializeServer(
   {
-    ssrRules: {
-      // for the frontpage we must watch out this matches what is setup in the client
-      // as this is for SSR, description, og fields, can be set to whatever there's nothing
-      // done for them in the client side
-      "/": (req, lang, root) => {
-        return {
-          collect: [
-            ["cms", "fragment", 1, lang],
-          ],
-          collectResources: [],
-        };
-      },
-      "/profile/:id": (req) => {
-        const userId = parseInt(req.params.id, 10);
-        if (isNaN(userId)) {
-          // use the standard this is a path we know nothing
-          // about, that means SSR won't be used, the client will
-          // need to handle all itself
-          return null;
-        }
-        return {
-          collect: [
-            ["users", "user", userId, null],
-          ],
-          collectResources: [],
-        };
-      },
-    },
     // These are the same as of the client side
     rendererContext,
     mainComponent: React.createElement(App, null),
