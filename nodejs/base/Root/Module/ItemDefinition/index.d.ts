@@ -723,10 +723,11 @@ export default class ItemDefinition {
      * @param id the id of the state
      * @param version the version of the state
      * @param excludeExtensions whether to include the extensions of the parent
+     * @param force ignores the blockage, will clean anyway
      * @returns a boolean where true refers to whether it was cleaned and false it was restored
      * because the cleaning was blocked from performing
      */
-    cleanValueFor(id: number, version: string, excludeExtensions?: boolean): boolean;
+    cleanValueFor(id: number, version: string, excludeExtensions?: boolean, force?: boolean): boolean;
     /**
      * Checks whether given the state id, there is an applied
      * value for it

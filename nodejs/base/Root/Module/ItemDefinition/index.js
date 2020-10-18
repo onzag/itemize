@@ -835,7 +835,7 @@ class ItemDefinition {
             this.applyValue(id, version, entireValue.rawValue, excludeExtensions, entireValue.requestFields, false);
         }
         else {
-            this.cleanValueFor(id, version, excludeExtensions);
+            this.cleanValueFor(id, version, excludeExtensions, true);
         }
     }
     /**
@@ -889,12 +889,9 @@ class ItemDefinition {
     removeBlockCleanFor(id, version, blockId) {
         const mergedID = id + "." + (version || "");
         if (this.cleansBlocked[mergedID]) {
-            const newValue = this.cleansBlocked[mergedID].filter((v) => v === blockId);
+            const newValue = this.cleansBlocked[mergedID].filter((v) => v !== blockId);
             if (newValue.length === 0) {
                 delete this.cleansBlocked[mergedID];
-            }
-            else {
-                this.cleansBlocked[mergedID] = newValue;
             }
         }
     }
@@ -905,12 +902,13 @@ class ItemDefinition {
      * @param id the id of the state
      * @param version the version of the state
      * @param excludeExtensions whether to include the extensions of the parent
+     * @param force ignores the blockage, will clean anyway
      * @returns a boolean where true refers to whether it was cleaned and false it was restored
      * because the cleaning was blocked from performing
      */
-    cleanValueFor(id, version, excludeExtensions) {
+    cleanValueFor(id, version, excludeExtensions, force) {
         const mergedID = id + "." + (version || "");
-        if (this.cleansBlocked[mergedID]) {
+        if (!force && this.cleansBlocked[mergedID]) {
             this.restoreValueFor(id, version, excludeExtensions);
             return false;
         }

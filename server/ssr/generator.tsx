@@ -363,7 +363,7 @@ export async function ssrGenerator(
 
       ssr.title = usedTitle;
       clientSSR.title = usedTitle;
-      clientSSR.queries = collector.getQueries();
+      clientSSR.queries = collector.getQueries(); 
 
       // now we need to make the title match
       newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup.replace(/__SSR_TITLE__/g, usedTitle));

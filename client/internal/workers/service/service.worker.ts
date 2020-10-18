@@ -80,7 +80,13 @@ self.addEventListener("fetch", (event: any) => {
   const useNetworkFirstStrategy =
     isOurHost &&
     (
-      urlAnalyzed.pathname.indexOf("/rest") !== 0 ||
+      (
+        // enabled if it is not rest
+        urlAnalyzed.pathname.indexOf("/rest") !== 0 &&
+        // enabled if it is not uploads
+        urlAnalyzed.pathname.indexOf("/uploads") !== 0
+      ) ||
+      // or it is our special rest endpoint we enable
       urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0
     );
   // this basically means that we would be serving the response for / for the index response
@@ -91,16 +97,14 @@ self.addEventListener("fetch", (event: any) => {
   const shouldBeCachedIfFound =
     (
       !isOurHost &&
-      (
-        config.cacheableExtHostnames.includes(urlAnalyzed.hostname) ||
-        urlAnalyzed.searchParams.get("sw-cacheable") === "true" ||
-        event.request.headers.get("sw-cacheable") === "true"
-      )
+      config.cacheableExtHostnames.includes(urlAnalyzed.hostname)
     ) ||
-    urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
-    urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0;
+    urlAnalyzed.searchParams.get("sw-cacheable") === "true" ||
+    event.request.headers.get("sw-cacheable") === "true" ||
+    (isOurHost && urlAnalyzed.pathname.indexOf("/rest/resource") === 0) ||
+    (isOurHost && urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0);
 
-  const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true"));
+  const shouldBeRechecked = urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true";
   const acceptHeader = event.request.headers.get("Accept");
   const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
   const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
@@ -160,7 +164,7 @@ self.addEventListener("fetch", (event: any) => {
             await recreatedCache.addAll(urlsToCache);
           }
 
-        // now for the network first logic
+          // now for the network first logic
         } else if (
           useNetworkFirstStrategy &&
           netWorkResponse.status !== 200
@@ -174,11 +178,11 @@ self.addEventListener("fetch", (event: any) => {
             return cached;
           }
 
-        // resources are static, but they are language specific
-        // so we don't really precache those, for example, the
-        // build.en.json files and build.es.json files as well
-        // as all the moment files, the term and conditions and so
-        // on
+          // resources are static, but they are language specific
+          // so we don't really precache those, for example, the
+          // build.en.json files and build.es.json files as well
+          // as all the moment files, the term and conditions and so
+          // on
         } else if (
           shouldBeCachedIfFound &&
           (
@@ -202,14 +206,6 @@ self.addEventListener("fetch", (event: any) => {
 
         return netWorkResponse;
       } catch (err) {
-        if (expectsImage) {
-          try {
-            const imageCachedResponse = await caches.match("/rest/resource/image-fail.svg");
-            return imageCachedResponse;
-          } catch (err) {
-            // Nothing happens
-          }
-        }
         if (
           useNetworkFirstStrategy
         ) {
@@ -222,6 +218,14 @@ self.addEventListener("fetch", (event: any) => {
               console.log("Service worker cache hit for network first request ", event.request.url);
               return cached;
             }
+          } catch (err) {
+            // Nothing happens
+          }
+        }
+        if (expectsImage) {
+          try {
+            const imageCachedResponse = await caches.match("/rest/resource/image-fail.svg");
+            return imageCachedResponse;
           } catch (err) {
             // Nothing happens
           }

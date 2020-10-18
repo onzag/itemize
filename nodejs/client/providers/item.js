@@ -207,7 +207,7 @@ class ActualItemProvider extends react_1.default.Component {
             if (!this.blockIdClean) {
                 this.blockIdClean = uuid_1.default.v4();
             }
-            this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+            this.props.itemDefinitionInstance.removeBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
         }
     }
     setupInitialState() {

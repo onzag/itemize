@@ -59,18 +59,23 @@ self.addEventListener("fetch", (event) => {
     // by not selecting rest we are going for all the paths that should
     // serve the index, but also we include currency factors here
     const useNetworkFirstStrategy = isOurHost &&
-        (urlAnalyzed.pathname.indexOf("/rest") !== 0 ||
+        ((
+        // enabled if it is not rest
+        urlAnalyzed.pathname.indexOf("/rest") !== 0 &&
+            // enabled if it is not uploads
+            urlAnalyzed.pathname.indexOf("/uploads") !== 0) ||
+            // or it is our special rest endpoint we enable
             urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0);
     // this basically means that we would be serving the response for / for the index response
     // rather than whatever the request was pointing too, that means we ignore the request
     const useNetworkFirstStrategyUseThisPathInstead = useNetworkFirstStrategy && urlAnalyzed.pathname.indexOf("/rest") !== 0 ? "/?noredirect=true" : null;
     const shouldBeCachedIfFound = (!isOurHost &&
-        (config.cacheableExtHostnames.includes(urlAnalyzed.hostname) ||
-            urlAnalyzed.searchParams.get("sw-cacheable") === "true" ||
-            event.request.headers.get("sw-cacheable") === "true")) ||
-        urlAnalyzed.pathname.indexOf("/rest/resource") === 0 ||
-        urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0;
-    const shouldBeRechecked = (!isOurHost && (urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true"));
+        config.cacheableExtHostnames.includes(urlAnalyzed.hostname)) ||
+        urlAnalyzed.searchParams.get("sw-cacheable") === "true" ||
+        event.request.headers.get("sw-cacheable") === "true" ||
+        (isOurHost && urlAnalyzed.pathname.indexOf("/rest/resource") === 0) ||
+        (isOurHost && urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0);
+    const shouldBeRechecked = urlAnalyzed.searchParams.get("sw-recheck") === "true" || event.request.headers.get("sw-recheck") === "true";
     const acceptHeader = event.request.headers.get("Accept");
     const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
     const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
@@ -155,15 +160,6 @@ self.addEventListener("fetch", (event) => {
             return netWorkResponse;
         }
         catch (err) {
-            if (expectsImage) {
-                try {
-                    const imageCachedResponse = await caches.match("/rest/resource/image-fail.svg");
-                    return imageCachedResponse;
-                }
-                catch (err) {
-                    // Nothing happens
-                }
-            }
             if (useNetworkFirstStrategy) {
                 try {
                     console.log("network not available, using cached for network first request");
@@ -174,6 +170,15 @@ self.addEventListener("fetch", (event) => {
                         console.log("Service worker cache hit for network first request ", event.request.url);
                         return cached;
                     }
+                }
+                catch (err) {
+                    // Nothing happens
+                }
+            }
+            if (expectsImage) {
+                try {
+                    const imageCachedResponse = await caches.match("/rest/resource/image-fail.svg");
+                    return imageCachedResponse;
                 }
                 catch (err) {
                     // Nothing happens

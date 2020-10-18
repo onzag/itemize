@@ -873,7 +873,7 @@ export class ActualItemProvider extends
       if (!this.blockIdClean) {
         this.blockIdClean = uuid.v4();
       }
-      this.props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+      this.props.itemDefinitionInstance.removeBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
     }
   }
   public setupInitialState(): IActualItemProviderState {

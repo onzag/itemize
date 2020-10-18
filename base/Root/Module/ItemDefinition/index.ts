@@ -1430,7 +1430,7 @@ export default class ItemDefinition {
         false,
       );
     } else {
-      this.cleanValueFor(id, version, excludeExtensions);
+      this.cleanValueFor(id, version, excludeExtensions, true);
     }
   }
 
@@ -1491,11 +1491,9 @@ export default class ItemDefinition {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
-      const newValue = this.cleansBlocked[mergedID].filter((v) => v === blockId);
+      const newValue = this.cleansBlocked[mergedID].filter((v) => v !== blockId);
       if (newValue.length === 0) {
         delete this.cleansBlocked[mergedID];
-      } else {
-        this.cleansBlocked[mergedID] = newValue;
       }
     }
   }
@@ -1507,13 +1505,14 @@ export default class ItemDefinition {
    * @param id the id of the state
    * @param version the version of the state
    * @param excludeExtensions whether to include the extensions of the parent
+   * @param force ignores the blockage, will clean anyway
    * @returns a boolean where true refers to whether it was cleaned and false it was restored
    * because the cleaning was blocked from performing
    */
-  public cleanValueFor(id: number, version: string, excludeExtensions?: boolean): boolean {
+  public cleanValueFor(id: number, version: string, excludeExtensions?: boolean, force?: boolean): boolean {
     const mergedID = id + "." + (version || "");
 
-    if (this.cleansBlocked[mergedID]) {
+    if (!force && this.cleansBlocked[mergedID]) {
       this.restoreValueFor(id, version, excludeExtensions);
       return false;
     }
