@@ -228,47 +228,63 @@ export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupCon
     exists = false;
   }
 
-  if (exists && !(await confirm("Would you like to re-setup the sources?"))) {
-    return arg;
+  let options: IOptionsForProcessingCode = null;
+  if (!exists || (await confirm("Would you like to re-setup the sources?"))) {
+    options = await copyAllFilesFor(
+      arg.standardConfig,
+      "src",
+      path.join(__dirname, "..", "..", "..", "setup", "src", "ts-files"),
+      options,
+    )
+    options = await copyAllFilesFor(
+      arg.standardConfig,
+      path.dirname(arg.standardConfig.entry),
+      path.join(__dirname, "..", "..", "..", "setup", "src", "schema-files"),
+      options,
+      async () => {
+        if (
+          !arg.standardConfig.entry.endsWith("/root") &&
+          !arg.standardConfig.entry.endsWith("/root.json")
+        ) {
+          let newRootFileName = path.basename(arg.standardConfig.entry);
+          if (!newRootFileName.endsWith(".json")) {
+            newRootFileName += ".json";
+          }
+          const newPropertiesFileName = newRootFileName.replace(".json", ".properties");
+          await fsAsync.rename(
+            path.join(path.dirname(arg.standardConfig.entry), "root.json"),
+            path.join(path.dirname(arg.standardConfig.entry), newRootFileName),
+          );
+          await fsAsync.rename(
+            path.join(path.dirname(arg.standardConfig.entry), "root.properties"),
+            path.join(path.dirname(arg.standardConfig.entry), newPropertiesFileName),
+          );
+        }
+      }
+    );
+    await copyAllFilesFor(
+      arg.standardConfig,
+      "resources",
+      path.join(__dirname, "..", "..", "..", "setup", "src", "resource-files"),
+      options,
+    )
   }
 
-  let options = await copyAllFilesFor(
-    arg.standardConfig,
-    "src",
-    path.join(__dirname, "..", "..", "..", "setup", "src", "ts-files"),
-    null,
-  )
-  options = await copyAllFilesFor(
-    arg.standardConfig,
-    path.dirname(arg.standardConfig.entry),
-    path.join(__dirname, "..", "..", "..", "setup", "src", "schema-files"),
-    options,
-    async () => {
-      if (
-        !arg.standardConfig.entry.endsWith("/root") &&
-        !arg.standardConfig.entry.endsWith("/root.json")
-      ) {
-        let newRootFileName = path.basename(arg.standardConfig.entry);
-        if (!newRootFileName.endsWith(".json")) {
-          newRootFileName += ".json";
-        }
-        const newPropertiesFileName = newRootFileName.replace(".json", ".properties");
-        await fsAsync.rename(
-          path.join(path.dirname(arg.standardConfig.entry), "root.json"),
-          path.join(path.dirname(arg.standardConfig.entry), newRootFileName),
-        );
-        await fsAsync.rename(
-          path.join(path.dirname(arg.standardConfig.entry), "root.properties"),
-          path.join(path.dirname(arg.standardConfig.entry), newPropertiesFileName),
-        );
-      }
-    }
-  );
-  await copyAllFilesFor(
-    arg.standardConfig,
-    "resources",
-    path.join(__dirname, "..", "..", "..", "setup", "src", "resource-files"),
-    options,
-  )
+  let testsExists = true;
+  try {
+    await fsAsync.access("tests", fs.constants.F_OK);
+  } catch (e) {
+    testsExists = false;
+  }
+
+  if (!testsExists || (await confirm("Would you like to re-setup the tests sources?"))) {
+    options = await copyAllFilesFor(
+      arg.standardConfig,
+      "tests",
+      path.join(__dirname, "..", "..", "..", "setup", "src", "ts-tests-files"),
+      options,
+    );
+  }
+
   return arg;
 }

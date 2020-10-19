@@ -37,4 +37,8 @@ export default {
 
   // analyze final bundles
   "webpack-bundle-analyzer": "^3.6.1",
+
+  // testing
+  "chai": "^4.2.0",
+  "mocha": "^8.2.0",
 };

@@ -1,0 +1,12 @@
+import { Tester } from "@onzag/itemize/testing";
+
+const HTTPS = process.env.HTTPS === "true" || false;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || "8000";
+
+// You are free to implement your own tests here
+// the default itemize tester will anyway perform a lot of tests
+// and should suffice most cases
+
+const tester = new Tester(HTTPS, HOST, PORT);
+tester.run();

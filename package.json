@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.84",
+  "version": "0.0.85",
   "description": "Itemize",
   "bin": {
     "itemize": "./nodejs/main.js"
@@ -106,12 +106,18 @@
   "peerDependencies": {
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.0.3",
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   }
