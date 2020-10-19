@@ -227,6 +227,7 @@ export class Cache {
    * @param parent.id the parent id
    * @param parent.version the parent version
    * @param parent.type the parent type
+   * @param listenerUUID the listener uuid
    * @returns a total sql combined row value that can be converted into grapqhl
    */
   public async requestCreation(
@@ -241,7 +242,8 @@ export class Cache {
       id: number,
       version: string,
       type: string,
-    }
+    },
+    listenerUUID: string,
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
@@ -462,7 +464,7 @@ export class Cache {
       this.listener.triggerChangedListeners(
         changeEvent,
         sqlValue,
-        null,
+        listenerUUID,
       );
 
       const searchResultForThisValue: IGQLSearchRecord = {

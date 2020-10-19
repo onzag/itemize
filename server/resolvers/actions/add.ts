@@ -405,6 +405,7 @@ export async function addItemDefinition(
       version: gqlValueToConvert.parent_version as string,
       type: gqlValueToConvert.parent_type as string,
     } : null,
+    resolverArgs.args.listener_uuid || null,
   );
 
   CAN_LOG_DEBUG && logger.debug(
