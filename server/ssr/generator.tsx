@@ -4,15 +4,12 @@ import express from "express";
 import { ISSRRule } from ".";
 import { GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 import { getCookie } from "../mode";
-import { ISSRContextType, ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
+import { ISSRContextType } from "../../client/internal/providers/ssr-provider";
 import { initializeItemizeApp } from "../../client";
 import { StaticRouter } from "react-router-dom";
 import Root from "../../base/Root";
 import Moment from "moment";
-import fs from "fs";
-const fsAsync = fs.promises;
-import path from "path";
-import { Collector, ICollectionResult } from "./collect";
+import { Collector } from "./collect";
 import { capitalize } from "../../util";
 
 // This is a custom react dom build
@@ -77,6 +74,7 @@ export async function ssrGenerator(
   // prepare to build etag
   // these etags are different per url on purpose
   let etag: string;
+  let quotedEtag: string;
 
   // for the nossr mode the last modified is when the app was built
   let lastModified = new Date(parseInt(appData.buildnumber));
@@ -98,17 +96,22 @@ export async function ssrGenerator(
       forUser: null,
     }
 
+    // standard etag with an asterisk which means this is the general version
+    // NO SSR is used when this etag comes
     etag = "*." + appData.buildnumber + "." + mode;
     // this is the root form without any language or any means, there's no SSR data to fill
+
+    // etag quoted
+    quotedEtag = JSON.stringify(etag);
 
     if (
       ifNoneMatch &&
       // this actually even would check the buildnumber
-      ifNoneMatch === etag
+      ifNoneMatch === quotedEtag
     ) {
       res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
       res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-      res.setHeader("ETag", etag);
+      res.setHeader("ETag", quotedEtag);
       res.setHeader("Cache-Control", "public, max-age=0");
       res.status(304).end();
       return;
@@ -161,7 +164,8 @@ export async function ssrGenerator(
       forUser: userAfterValidate,
     }
 
-    etag = req.originalUrl + "." + appData.buildnumber + "." + mode;
+    // creating etag for this url
+    etag = appData.buildnumber + "." + mode;
   }
 
   // now we need a root instance, because this will be used
@@ -312,17 +316,18 @@ export async function ssrGenerator(
       // update the last modified and the etag signature
       lastModified = collector.getLastModified();
       etag += "_" + collector.getSignature();
+      quotedEtag = JSON.stringify(etag);
 
       // now here we just happen to be able to short circuit again if the client
       // says that the request can be cached as well
       if (
         ifNoneMatch &&
         // this actually even would check the buildnumber
-        ifNoneMatch === etag
+        ifNoneMatch === quotedEtag
       ) {
         res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
         res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-        res.setHeader("ETag", etag);
+        res.setHeader("ETag", quotedEtag);
         if (appliedRule.forUser && appliedRule.forUser.id) {
           res.setHeader("Cache-Control", "private");
         } else {
@@ -422,7 +427,7 @@ export async function ssrGenerator(
   if (!errorOccured) {
     res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
     res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-    res.setHeader("ETag", etag);
+    res.setHeader("ETag", quotedEtag);
     // for individual users the cache control is then
     // set to private
     if (appliedRule.forUser && appliedRule.forUser.id) {

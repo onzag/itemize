@@ -33,10 +33,6 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
    * Stores title readers to inform them of changes
    */
   static changedListeners = new Map<ActualTitleReader, () => void>();
-  /**
-   * the original title before this was mounted
-   */
-  private originalTitle: string;
 
   constructor(props: ITitleSetterProps) {
     super(props);
@@ -49,9 +45,9 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
     // we mark it as loaded
     TitleSetterInstanceIsLoaded = true;
     // store the original title of the app (which is more often than not the app title)
-    this.originalTitle = document.title;
-    document.title = this.props.children || "";
-    if (this.originalTitle !== document.title) {
+    const newTitle = this.props.children || "";
+    if (newTitle !== document.title) {
+      document.title = newTitle;
       ActualTitleSetter.changedListeners.forEach((listener) => listener());
     }
   }
@@ -63,8 +59,6 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
     }
   }
   public componentWillUnmount() {
-    // restore the title
-    document.title = this.originalTitle;
     // no more loaded
     TitleSetterInstanceIsLoaded = false;
   }

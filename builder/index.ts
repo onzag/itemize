@@ -712,6 +712,10 @@ async function buildItemDefinition(
     if (actualEvaledFileData.versionIsLanguageAndCountry) {
       finalValue.versionIsLanguageAndCountry = actualEvaledFileData.versionIsLanguageAndCountry;
     }
+
+    if (actualEvaledFileData.versioningRoleAccess) {
+      finalValue.versioningRoleAccess = actualEvaledFileData.versioningRoleAccess;
+    }
   }
 
   if (actualEvaledFileData.requestLimiters) {
