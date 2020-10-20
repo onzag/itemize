@@ -10,8 +10,8 @@
   "scripts": {
     "install": "tsc && node ./sass-handler.js"
   },
-  "author": "Edward Gonzalez",
-  "license": "ISC",
+  "author": "Onza Systems - Edward Gonzalez",
+  "license": "AGPL3",
   "dependencies": {
     "@date-io/moment": "^1.3.13",
     "@material-ui/core": "^4.11.0",

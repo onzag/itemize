@@ -1,27 +1,6 @@
-# Itemize License
+# Software License Agreement
 
-> Version 1.0, July 2020
+** Itemize ** - https://github.com/onzag/itemize <br>
+Copyright (c) 2018-2020 [Onza Systems](https://onzasystems.com) Edward González. All rights reserved
 
-> Copyright (C) [2020] Onza Systems
-
-The Itemize library is included in the development project as a dependency, but it's not part of the project source code itself; this means its given within a different license.
-
-> TERMS AND CONDITIONS
-
-1. Usage and Redistribution:
-  1a. You are not allowed to redistribute or use the source code of itemize within other projects that are not in the scope of the current project where this library was bundled or was not agreed upon with the developer.
-  1b. Exposing the server side source code in any form is considered a breach of this license.
-  1c. Your project source itself can however, be completely accessible to the public, however itemize as well as its token must be absent in source control as it can give unauthorized access to the source.
-  1d. You are allowed to modify the source code of itemize for usage within the current product and for personal usage, but it should not breach any of the clauses in this license
-2. The license:
-  2a. By having this license included in the project you have agreed to it by default.
-  2b. This license is bound to change over time.
-3. Products:
-  3a. Products built with itemize can be transferred to others and by doing so they must agree with the contents of this license.
-  3b. Products can be replicated, renamed and copied.
-  3c. Products cannot be transformed into other products.
-
-> GUARANTEES TO THE USER:
-
-1. You are guaranteed access to updates, bugfixes and security upgrades free of charge unless you are in breach of this license.
-2. By agreeing to this license you are not bound to Onza Systems development, and you might continue development of the project on your own by your own personal means.
+Licensed under the terms of [GNU AGPLv3 license](https://www.gnu.org/licenses/agpl-3.0.html)
