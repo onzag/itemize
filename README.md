@@ -113,7 +113,7 @@ Meteor is what comes closest to what itemize is, but while Meteor works best wit
 
  - PostgreSQL with realtime support.
  - Offline First out of the box without configuration.
- - SSR is enabled with very little configuration.
+ - SSR is enabled with no configuration.
  - SEO is enabled with very little configuration.
  - Internationalization is Enforced
  - Automatic currency support and exchange rates
