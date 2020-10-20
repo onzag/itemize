@@ -1,8 +1,8 @@
 import fetchNode from "node-fetch";
-import { expect } from "chai";
 import { ITestingInfoType } from ".";
 import Knex from "knex";
 import redis, { RedisClient } from "redis";
+import { strict as assert } from "assert";
 
 export class ServerTester {
   private info: ITestingInfoType;
@@ -63,7 +63,7 @@ export class ServerTester {
           async function () {
             const request = await fetchNode(fullHost + "/rest/buildnumber");
             const buildnumber = (await request.text()).trim();
-            expect(testingInfo.buildnumber).to.equal(buildnumber);
+            assert.strictEqual(buildnumber, testingInfo.buildnumber, "Buildnumber mismatch");
           }
         );
       });

@@ -23,9 +23,9 @@ And get into it
 
 `npm init`
 
-Install the peer dependencies
+Install the peer dependencies (mocha types are required)
 
-`npm install --save react react-dom @types/react @types/react-dom`
+`npm install --save react react-dom @types/react @types/react-dom @types/mocha`
 
 Install itemize
 

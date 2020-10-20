@@ -18,6 +18,5 @@ export default {
   "deep-equal": "^1.1.1",
 
   // testing peer dependencies
-  "@types/chai": "^4.2.14",
-  "chai": "^4.2.0",
+  "@types/mocha": "^8.0.3",
 };
