@@ -16,7 +16,4 @@ export default {
   "react": "^16.14.0",
   "react-dom": "^16.14.0",
   "deep-equal": "^1.1.1",
-
-  // testing peer dependencies
-  "@types/mocha": "^8.0.3",
 };

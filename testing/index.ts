@@ -1,113 +1,167 @@
-import fs from "fs";
-import path from "path";
-import { ServerTester } from "./server";
-import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
-import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
+import colors from "colors";
 
-const fsAsync = fs.promises;
+/**
+ * Defines a test, and it should be used as an entry
+ * for all subtests
+ */
+export class Test {
+  private itQueue: Array<{
+    label: string;
+    fn: () => PromiseLike<void | string>;
+  }>;
+  private describeQueue: Array<{
+    label: string;
+    test: Test;
+  }>;
 
-const NODE_ENV = process.env.NODE_ENV;
-
-export interface ITestingInfoType {
-  root: Root;
-  config: IConfigRawJSONDataType;
-  sensitiveConfig: ISensitiveConfigRawJSONDataType;
-  dbConfig: IDBConfigRawJSONDataType;
-  redisConfig: IRedisConfigRawJSONDataType;
-  langLocales: ILangLocalesType;
-  buildnumber: string;
-}
-
-export class Tester {
-  private https: boolean;
-  private host: string;
-  private port: number | string;
-
-  constructor(https: boolean, host: string, port: number | string) {
-    this.host = host;
-    this.port = port;
-    this.https = https;
+  /**
+   * Build a brand new instance
+   */
+  construtor() {
+    this.define = this.define.bind(this);
+    this.it = this.it.bind(this);
+    this.execute = this.execute.bind(this);
   }
 
-  run() {
-    const https = this.https;
-    const host = this.host;
-    const port = this.port;
+  /**
+   * Executes before, override this function
+   * it allows you to dinamically add tests as
+   * well
+   * @override
+   */
+  public before(): any | Promise<any> {
+    return null;
+  }
 
-    describe("Itemize Testing", function () {
-      const serverTester = new ServerTester(
-        https,
-        host,
-        port,
-      );
+  /**
+   * Executes during just after before has been executed
+   * @override
+   */
+  public describe(): any | Promise<any> {
+    return null;
+  }
 
-      before(async function () {
-        // first let's read all the configurations
-        let rawBuild: string;
-        let rawConfig: string;
-        let rawSensitiveConfig: string;
-        let rawRedisConfig: string;
-        let rawDbConfig: string;
-        let buildnumber: string;
-        let rawLangLocales: string
+  /**
+   * Executes after everything is done
+   * use for cleanup
+   * @override
+   */
+  public after(): any | Promise<any> {
+    return null;
+  }
 
-        [
-          rawConfig,
-          rawSensitiveConfig,
-          rawRedisConfig,
-          rawDbConfig,
-          rawBuild,
-          rawLangLocales,
-          buildnumber,
-        ] = await Promise.all([
-          fsAsync.readFile(path.join("config", "index.json"), "utf8"),
-          fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "index.sensitive.json" : `index.${NODE_ENV}.sensitive.json`), "utf8"),
-          fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "redis.sensitive.json" : `redis.${NODE_ENV}.sensitive.json`), "utf8"),
-          fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
-          fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
-          fsAsync.readFile(path.join("dist", "data", "lang.json"), "utf8"),
-          fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
-        ]);
-
-        const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
-        const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(rawSensitiveConfig);
-        const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
-        const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
-        const build: IRootRawJSONDataType = JSON.parse(rawBuild);
-        const langLocales: ILangLocalesType = JSON.parse(rawLangLocales);
-
-        Object.keys(redisConfig.cache).forEach((key) => {
-          if (redisConfig.cache[key] === null) {
-            delete redisConfig.cache[key];
-          }
-        });
-        Object.keys(redisConfig.pubSub).forEach((key) => {
-          if (redisConfig.pubSub[key] === null) {
-            delete redisConfig.pubSub[key];
-          }
-        });
-        Object.keys(redisConfig.global).forEach((key) => {
-          if (redisConfig.global[key] === null) {
-            delete redisConfig.global[key];
-          }
-        });
-
-        const root = new Root(build);
-
-        const testingInfo: ITestingInfoType = {
-          root,
-          config,
-          sensitiveConfig,
-          redisConfig,
-          langLocales,
-          dbConfig,
-          buildnumber,
-        }
-
-        serverTester.setup(testingInfo);
-      })
-
-      serverTester.describe.call(this, serverTester);
+  /**
+   * Define a new test
+   * @param label the label for the test
+   * @param test the test instance
+   */
+  public define(label: string, test: Test) {
+    if (!this.describeQueue) {
+      this.describeQueue = [];
+    }
+    this.describeQueue.push({
+      label,
+      test,
     });
+  }
+
+  /**
+   * Define a new assertion
+   * @param label the label for the assertion
+   * @param fn the assetion to execute
+   */
+  public it(label: string, fn: () => PromiseLike<void | string>) {
+    if (!this.itQueue) {
+      this.itQueue = [];
+    }
+    this.itQueue.push({
+      label,
+      fn,
+    });
+  }
+
+  /**
+   * Executes the test
+   * @param level 
+   */
+  private async execute(level: number = 0) {
+    let total: number = 0;
+    let passed: number = 0;
+    let warnings: number = 0;
+
+    const tabs = "\t".repeat(level);
+    const tabsPlus = tabs + "\t";
+
+    try {
+      await this.before.call(this);
+    } catch (err) {
+      console.log(colors.red(err.stack));
+      process.exit(1);
+    }
+
+    try {
+      await this.describe.call(this);
+    } catch (err) {
+      console.log(colors.red(err.stack));
+      process.exit(1);
+    }
+
+    if (this.itQueue) {
+      for (let itAttr of this.itQueue) {
+        total++;
+  
+        try {
+          const warning = await itAttr.fn.call(this);
+          if (warning) {
+            console.log(tabs + colors.yellow("⚠") + " " + colors.gray(itAttr.label));
+            console.log(tabsPlus + warning);
+            warnings++;
+          } else {
+            console.log(tabs + colors.green("✓") + " " + colors.gray(itAttr.label));
+          }
+          passed++;
+        } catch (err) {
+          console.log(tabs + colors.red("✗") + " " + colors.gray(itAttr.label));
+          console.log(tabsPlus + err.message.replace(/\n/g, "\n" + tabsPlus));
+        }
+      }
+    }
+
+    if (this.describeQueue) {
+      for (let testAttr of this.describeQueue) {
+        console.log(tabs + testAttr.label);
+        const results = await testAttr.test.execute.call(testAttr.test, level + 1);
+        total += results.total;
+        passed += results.passed;
+        warnings += results.warnings;
+      }
+    }
+
+    try {
+      await this.after.call(this);
+    } catch (err) {
+      console.log(colors.red(err.stack));
+      process.exit(1);
+    }
+
+    if (level === 0) {
+      console.log(colors.green(passed + " passing"));
+      if (warnings > 0) {
+        console.log(colors.yellow(warnings + " warnings"));
+      }
+
+      const failing = total - passed;
+      if (failing > 0) {
+        console.log(colors.red(failing + " failing"));
+
+        process.exit(1);
+      }
+    }
+
+    return {
+      total,
+      passed,
+      warnings,
+    }
   }
 }

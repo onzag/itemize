@@ -1,4 +1,5 @@
-import { Tester } from "@onzag/itemize/testing";
+const { ItemizeTest } = require("@onzag/itemize/testing/itemize");
+const { Test } = require("@onzag/itemize/testing");
 
 const HTTPS = process.env.HTTPS === "true" || false;
 const HOST = process.env.HOST || "localhost";
@@ -8,5 +9,29 @@ const PORT = process.env.PORT || "8000";
 // the default itemize tester will anyway perform a lot of tests
 // and should suffice most cases
 
-const tester = new Tester(HTTPS, HOST, PORT);
-tester.run();
+class Tests extends Test<0>{
+    //async before() {}
+    describe()<1>{
+        // include a test branch
+        this.define(
+            "Itemize Tests",
+            new ItemizeTest(HTTPS, HOST, PORT)
+        );
+
+        // you might define your own assertions
+        // this.it("Should do a thing", async () => {})
+
+        // Define your own tests here every test extends the test class
+        // the itemize testing library is designed to generate a tree, of dynamic
+        // tests, tests are classes, not files, and form a tree, this class
+        // represents your root test, do not "execute" more than one root test at
+        // a time, as a root test might kill the thread
+
+        // refer to the documentation for more information, prefer the defaults node
+        // https://nodejs.org/api/assert.html library for assertions
+    }
+    //async after() {}
+}
+
+const tests = new Tests();
+tests.execute();
