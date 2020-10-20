@@ -3,7 +3,6 @@ import path from "path";
 import { ServerTester } from "./server";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
-import { before } from "mocha";
 
 const fsAsync = fs.promises;
 
@@ -65,7 +64,6 @@ export class Tester {
           fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "index.sensitive.json" : `index.${NODE_ENV}.sensitive.json`), "utf8"),
           fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "redis.sensitive.json" : `redis.${NODE_ENV}.sensitive.json`), "utf8"),
           fsAsync.readFile(path.join("config", NODE_ENV === "development" ? "db.sensitive.json" : `db.${NODE_ENV}.sensitive.json`), "utf8"),
-          fsAsync.readFile(path.join("dist", "data", "index.html"), "utf8"),
           fsAsync.readFile(path.join("dist", "data", "build.all.json"), "utf8"),
           fsAsync.readFile(path.join("dist", "data", "lang.json"), "utf8"),
           fsAsync.readFile(path.join("dist", "buildnumber"), "utf8"),
@@ -77,6 +75,22 @@ export class Tester {
         const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
         const build: IRootRawJSONDataType = JSON.parse(rawBuild);
         const langLocales: ILangLocalesType = JSON.parse(rawLangLocales);
+
+        Object.keys(redisConfig.cache).forEach((key) => {
+          if (redisConfig.cache[key] === null) {
+            delete redisConfig.cache[key];
+          }
+        });
+        Object.keys(redisConfig.pubSub).forEach((key) => {
+          if (redisConfig.pubSub[key] === null) {
+            delete redisConfig.pubSub[key];
+          }
+        });
+        Object.keys(redisConfig.global).forEach((key) => {
+          if (redisConfig.global[key] === null) {
+            delete redisConfig.global[key];
+          }
+        });
 
         const root = new Root(build);
 
@@ -93,7 +107,7 @@ export class Tester {
         serverTester.setup(testingInfo);
       })
 
-      serverTester.describe();
+      serverTester.describe.call(this, serverTester);
     });
   }
 }

@@ -16,4 +16,8 @@ export default {
   "react": "^16.14.0",
   "react-dom": "^16.14.0",
   "deep-equal": "^1.1.1",
+
+  // testing peer dependencies
+  "@types/chai": "^4.2.14",
+  "chai": "^4.2.0",
 };

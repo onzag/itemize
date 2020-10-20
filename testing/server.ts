@@ -1,6 +1,5 @@
 import fetchNode from "node-fetch";
 import { expect } from "chai";
-import { describe, it, before } from "mocha";
 import { ITestingInfoType } from ".";
 import Knex from "knex";
 import redis, { RedisClient } from "redis";
@@ -11,21 +10,16 @@ export class ServerTester {
   private port: string | number;
   private https: boolean;
   constructor(https: boolean, host: string, port: string | number) {
+    this.host = host;
+    this.https = https;
+    this.port = port;
+
+    this.setup = this.setup.bind(this);
   }
   setup(testingInfo: ITestingInfoType) {
     this.info = testingInfo;
   }
-  public describe() {
-    const testingInfo = this.info;
-    const dbConnectionKnexConfig = {
-      host: this.info.dbConfig.host,
-      port: this.info.dbConfig.port,
-      user: this.info.dbConfig.user,
-      password: this.info.dbConfig.password,
-      database: this.info.dbConfig.database,
-    };
-    const fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
-
+  public describe(__self__: ServerTester) {
     describe("Server", function () {
       let knex: Knex;
       let redisPub: RedisClient;
@@ -35,7 +29,20 @@ export class ServerTester {
       let redisClient: RedisClient;
       let redisGlobalClient: RedisClient;
 
+      let fullHost: string;
+      let testingInfo: ITestingInfoType;
+      
       before(async function () {
+        testingInfo = __self__.info;
+        const dbConnectionKnexConfig = {
+          host: __self__.info.dbConfig.host,
+          port: __self__.info.dbConfig.port,
+          user: __self__.info.dbConfig.user,
+          password: __self__.info.dbConfig.password,
+          database: __self__.info.dbConfig.database,
+        };
+        fullHost = (__self__.https ? "https://" : "http://") + __self__.host + (__self__.port ? ":" + __self__.port : "");
+
         knex = Knex({
           client: "pg",
           debug: process.env.NODE_ENV !== "production",
@@ -53,7 +60,7 @@ export class ServerTester {
       describe("General tests", function () {
         it(
           "Should return the right buildnumber",
-          async function() {
+          async function () {
             const request = await fetchNode(fullHost + "/rest/buildnumber");
             const buildnumber = (await request.text()).trim();
             expect(testingInfo.buildnumber).to.equal(buildnumber);
@@ -63,12 +70,12 @@ export class ServerTester {
 
       after(function () {
         knex.destroy();
-        redisPub.end();
-        redisSub.end();
-        redisLocalPub.end();
-        redisLocalSub.end();
-        redisClient.end();
-        redisGlobalClient.end();
+        redisPub.quit();
+        redisSub.quit();
+        redisLocalPub.quit();
+        redisLocalSub.quit();
+        redisClient.quit();
+        redisGlobalClient.quit();
       })
     });
   }
