@@ -1,16 +1,19 @@
 import fetchNode from "node-fetch";
-import { Test } from ".";
+import { Test } from "..";
 import Knex from "knex";
 import redis, { RedisClient } from "redis";
 import { strict as assert } from "assert";
 import FormDataNode from "form-data";
-import { ITestingInfoType } from "./itemize";
+import { ITestingInfoType } from "../itemize";
+import type { Browser } from "puppeteer";
+import { RobotsTest } from "./robots";
 
 export class ServerTest extends Test {
   private info: ITestingInfoType;
   private host: string;
   private port: string | number;
   private https: boolean;
+  private puppet: Browser;
 
   private knex: Knex;
   private redisPub: RedisClient;
@@ -22,13 +25,14 @@ export class ServerTest extends Test {
 
   private fullHost: string;
 
-  constructor(https: boolean, host: string, port: string | number, info: ITestingInfoType) {
+  constructor(https: boolean, host: string, port: string | number, info: ITestingInfoType, puppet: Browser) {
     super();
 
     this.host = host;
     this.https = https;
     this.port = port;
     this.info = info;
+    this.puppet = puppet;
   }
   public async before() {
     const dbConnectionKnexConfig = {
@@ -57,8 +61,9 @@ export class ServerTest extends Test {
     this.it(
       "Should return the right buildnumber",
       async () => {
-        const request = await fetchNode(this.fullHost + "/rest/buildnumber");
-        const buildnumber = (await request.text()).trim();
+        const response = await fetchNode(this.fullHost + "/rest/buildnumber");
+        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+        const buildnumber = (await response.text()).trim();
         assert.strictEqual(buildnumber, this.info.buildnumber);
       }
     );
@@ -92,7 +97,7 @@ export class ServerTest extends Test {
 
     this.it(
       "Should support formdata protocol in graphql",
-      async function () {
+      async () => {
 
         // building the form data
         const formData = new FormDataNode();
@@ -119,7 +124,12 @@ export class ServerTest extends Test {
           },
         }, "Did not return a ROOT_QUERY");
       }
-    )
+    );
+
+    this.define(
+      "Robots test",
+      new RobotsTest(this.https, this.host, this.port, this.fullHost, this.info),
+    );
   }
 
   public after() {

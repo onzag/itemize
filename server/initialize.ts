@@ -203,7 +203,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     res.setHeader("content-type", "text/plain; charset=utf-8");
 
     if (NO_SEO) {
-      res.end("user-agent = *\ndisallow: /\n");
+      res.end("user-agent: *\ndisallow: /\n");
       return;
     }
 

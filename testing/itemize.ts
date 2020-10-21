@@ -4,6 +4,7 @@ import { ServerTest } from "./server";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { Test } from ".";
+import type { Browser } from "puppeteer";
 
 const fsAsync = fs.promises;
 
@@ -19,19 +20,20 @@ export interface ITestingInfoType {
   buildnumber: string;
 }
 
-
 export class ItemizeTest extends Test {
   private https: boolean;
   private host: string;
   private port: number | string;
   private testingInfo: ITestingInfoType;
+  private puppet: Browser;
 
-  constructor(https: boolean, host: string, port: number | string) {
+  constructor(https: boolean, host: string, port: number | string, puppet: Browser) {
     super();
 
     this.host = host;
     this.port = port;
     this.https = https;
+    this.puppet = puppet;
   }
 
   public async before() {
@@ -98,6 +100,6 @@ export class ItemizeTest extends Test {
   }
 
   public describe() {
-    this.define("Server Tests", new ServerTest(this.https, this.host, this.port, this.testingInfo));
+    this.define("Server Tests", new ServerTest(this.https, this.host, this.port, this.testingInfo, this.puppet));
   }
 }

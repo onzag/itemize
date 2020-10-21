@@ -37,4 +37,8 @@ export default {
 
   // analyze final bundles
   "webpack-bundle-analyzer": "^3.6.1",
+
+  // puppeteer for testing
+  "@types/puppeteer": "^3.0.2",
+  "puppeteer": "^5.3.1",
 };

@@ -1,5 +1,6 @@
 const { ItemizeTest } = require("@onzag/itemize/testing/itemize");
 const { Test } = require("@onzag/itemize/testing");
+const puppeteer = require("puppeteer");
 
 const HTTPS = process.env.HTTPS === "true" || false;
 const HOST = process.env.HOST || "localhost";
@@ -10,7 +11,9 @@ const PORT = process.env.PORT || "8000";
 // and should suffice most cases
 
 class Tests extends Test<0>{
-    //async before() {}
+    async before()<1>{
+        this.puppet = await puppeteer.launch();
+    }
     describe()<1>{
         // include a test branch
         this.define(
@@ -30,7 +33,9 @@ class Tests extends Test<0>{
         // refer to the documentation for more information, prefer the defaults node
         // https://nodejs.org/api/assert.html library for assertions
     }
-    //async after() {}
+    async after()<1>{
+        await this.puppet.close();
+    }
 }
 
 const tests = new Tests();

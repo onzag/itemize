@@ -1,11 +1,11 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.87",
+  "version": "0.0.91",
   "description": "Itemize",
   "bin": {
     "itemize": "./nodejs/main.js"
   },
-  "main": "nodejs/index",
+  "main": "index",
   "types": "nodejs/index",
   "scripts": {
     "install": "tsc && node ./sass-handler.js"
@@ -38,6 +38,7 @@
     "@types/pg": "^7.14.3",
     "@types/pkgcloud": "^1.7.3",
     "@types/properties-reader": "0.0.1",
+    "@types/puppeteer": "^3.0.2",
     "@types/react-autosuggest": "^9.3.13",
     "@types/react-leaflet": "^2.5.2",
     "@types/react-router-dom": "^5.1.5",
