@@ -7,6 +7,8 @@ import { logger, IAppDataType } from "../../server";
 import { UNSPECIFIED_OWNER } from "../../constants";
 import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { ISSRRule } from ".";
+import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
+import { IOTriggerActions } from "../../server/resolvers/triggers";
 
 export interface ICollectionResult {
   lastModified: Date,
@@ -27,6 +29,7 @@ export class Collector {
   } = {};
   private appData: IAppDataType;
   private appliedRule: ISSRRule;
+  private forbiddenSignature: string[] = [];
 
   constructor(appData: IAppDataType, rule: ISSRRule) {
     this.appData = appData;
@@ -36,7 +39,8 @@ export class Collector {
   }
   public getLastModified() {
     let final = new Date(parseInt(this.appData.buildnumber));
-    this.results.forEach((r) => {
+    // filtering items without access rights
+    this.results.filter((r) => r !== null).forEach((r) => {
       // last modified can be null due to it being not found
       if (r.lastModified && r.lastModified.getTime() > final.getTime()) {
         final = r.lastModified;
@@ -45,12 +49,21 @@ export class Collector {
     return final;
   }
   public getQueries() {
-    return this.results.map((r) => r.query);
+    // remove the non-accessible ones
+    return this.results.filter((r) => r !== null).map((r) => r.query);
   }
   public getSignature() {
-    return this.results.map((r) => r.signature).sort((a, b) => {
+    const standard = this.results.filter((r) => r !== null).map((r) => r.signature).sort((a, b) => {
       return a.localeCompare(b);
     }).join(";");
+    const forbiddenBit = this.getForbiddenSignature();
+    return standard + (forbiddenBit ? "_FORBIDDEN_" : "") + forbiddenBit;
+  }
+  public getForbiddenSignature() {
+    return this.forbiddenSignature.join(";");
+  }
+  public hasForbiddenResources() {
+    return this.results.some((r) => r === null);
   }
   public async collect(idef: ItemDefinition, id: number, version: string): Promise<void> {
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
@@ -74,6 +87,7 @@ export class Collector {
     let signature = "NULL";
     let lastModified: Date = null;
     let query: ISSRCollectedQueryType = null;
+    let forbiddenSignatureReason: string = null;
 
     // and we ask the cache for the given value
     let rowValue: ISQLTableRowValue;
@@ -124,33 +138,102 @@ export class Collector {
 
       const valueToReturnToUser = value ? value.toReturnToUser : null;
 
-      // and now we build the query
-      query = {
-        idef: idef.getQualifiedPathName(),
-        id,
-        version,
-        value: valueToReturnToUser,
-        fields: value ? value.requestFields : null,
-      };
+      // now we need to find the triggers
+      const pathOfThisIdef = idef.getAbsolutePath().join("/");
+      const mod = idef.getParentModule();
+      const pathOfThisModule = mod.getPath().join("/");
+      // and extract the triggers from the registry
+      const itemDefinitionTrigger = this.appData.triggers.itemDefinition.io[pathOfThisIdef]
+      const moduleTrigger = this.appData.triggers.module.io[pathOfThisModule];
+
+      let queryWasForbiddenByTriggers = false;
+      if (moduleTrigger || itemDefinitionTrigger) {
+
+        if (moduleTrigger) {
+          await moduleTrigger({
+            appData: this.appData,
+            itemDefinition: idef,
+            module: mod,
+            value: value.actualValue,
+            update: null,
+            extraArgs: {},
+            action: IOTriggerActions.READ,
+            id,
+            version: version || null,
+            user: {
+              role: this.appliedRule.forUser.role,
+              id: this.appliedRule.forUser.id,
+              customData: this.appliedRule.forUser.customData,
+            },
+            forbid: () => {
+              queryWasForbiddenByTriggers = true;
+              forbiddenSignatureReason = "[FORBIDDEN_BY_MOD_TRIGGER]";
+            },
+          });
+        }
+
+        if (itemDefinitionTrigger) {
+          await itemDefinitionTrigger({
+            appData: this.appData,
+            itemDefinition: idef,
+            module: mod,
+            value: value.actualValue,
+            update: null,
+            extraArgs: {},
+            action: IOTriggerActions.READ,
+            id,
+            version: version || null,
+            user: {
+              role: this.appliedRule.forUser.role,
+              id: this.appliedRule.forUser.id,
+              customData: this.appliedRule.forUser.customData,
+            },
+            forbid: () => {
+              queryWasForbiddenByTriggers = true;
+              forbiddenSignatureReason = "[FORBIDDEN_BY_IDEF_TRIGGER]";
+            },
+          });
+        }
+      }
+
+      if (queryWasForbiddenByTriggers) {
+        query = null;
+      } else {
+        // and now we build the query
+        query = {
+          idef: idef.getQualifiedPathName(),
+          id,
+          version,
+          value: valueToReturnToUser,
+          fields: value ? value.requestFields : null,
+        };
+      }
     } else {
+      forbiddenSignatureReason = "[FORBIDDEN_BY_SCHEMA]";
       // means no access to them at all
       query = null;
     }
 
-    const result = {
-      lastModified,
-      signature,
-      query,
-    };
-    this.results.push(result);
-    idef.applyValue(
-      query.id,
-      query.version,
-      query.value,
-      false,
-      query.fields,
-      false,
-    );
+    // no access
+    if (query === null) {
+      this.results.push(null);
+      this.forbiddenSignature.push(mergedID + forbiddenSignatureReason);
+    } else {
+      const result = {
+        lastModified,
+        signature,
+        query,
+      };
+      this.results.push(result);
+      idef.applyValue(
+        query.id,
+        query.version,
+        query.value,
+        false,
+        query.fields,
+        false,
+      );
+    }
 
     this.collectionStatuses[mergedID] = true;
     this.collectionRequestsCbs[mergedID].forEach((r) => r());

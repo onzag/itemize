@@ -125,10 +125,12 @@ export async function ssrGenerator(
       id: number,
       role: string,
       token: string,
+      customData: any,
     } = {
       id: null,
       role: GUEST_METAROLE,
       token: null,
+      customData: null,
     };
 
     // and we get such from the cookie itself
@@ -146,6 +148,7 @@ export async function ssrGenerator(
         userAfterValidate.id = tokenData.id;
         userAfterValidate.token = tokenData.token;
         userAfterValidate.role = tokenData.role;
+        userAfterValidate.customData = tokenData.customData || null;
       } catch (err) {
 
       }
@@ -205,6 +208,8 @@ export async function ssrGenerator(
   // this flags marks whether we can use etags
   // due to an error
   let errorOccured = false;
+  let shouldBe403 = false;
+  let forbiddenSignature: string = null;
 
   // if there's no data let's not give SSR at all
   // since we cannot really keep it consistent
@@ -317,6 +322,10 @@ export async function ssrGenerator(
       lastModified = collector.getLastModified();
       etag += "_" + collector.getSignature();
       quotedEtag = JSON.stringify(etag);
+      shouldBe403 = collector.hasForbiddenResources();
+      if (shouldBe403) {
+        forbiddenSignature = collector.getForbiddenSignature();
+      }
 
       // now here we just happen to be able to short circuit again if the client
       // says that the request can be cached as well
@@ -434,6 +443,13 @@ export async function ssrGenerator(
       res.setHeader("Cache-Control", "private");
     } else {
       res.setHeader("Cache-Control", "public, max-age=0");
+    }
+
+    if (shouldBe403) {
+      if (forbiddenSignature) {
+        res.setHeader("x-forbidden-signature", forbiddenSignature);
+      }
+      res.status(403);
     }
   }
   res.end(newHTML);

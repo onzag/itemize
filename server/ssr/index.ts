@@ -49,6 +49,7 @@ export interface ISSRRule {
     token: string;
     id: number;
     role: string;
+    customData: any;
   };
   noData: boolean;
 }

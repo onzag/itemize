@@ -34,6 +34,20 @@ export class RobotsTest extends Test {
         method: "HEAD",
       }
     );
+    if (response.status === 403) {
+      const forbiddenSignature = response.headers.get("x-forbidden-signature") || "";
+      assert.fail(
+        "Server returned 403, this suggests you are accessing a resource that is forbidden for the public\n" +
+        "Sitemaps are meant for public robots (not logged in) and its URLs should not contain forbidden resources\n" +
+        "Forbidden signature: " + forbiddenSignature
+      );
+    }
+
+    const etag = response.headers.get("etag");
+    if (!etag) {
+      assert.fail("Server did not provide an Etag, this suggests a crash occurred on the server side and it went through a fallback");
+    }
+
     assert.strictEqual(response.status, 200, "Did not return 200 OK");
   }
   public async sitemapChecker(sitemapURL: string) {
@@ -88,7 +102,7 @@ export class RobotsTest extends Test {
         );
       } else {
         this.it(
-          "Provide something at " + urlToUse,
+          "Respond at " + urlToUse,
           this.urlChecker.bind(this, urlToUse),
         );
       }
