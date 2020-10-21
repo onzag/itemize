@@ -63,11 +63,14 @@ export async function ssrGenerator(
   const splittedCookies = cookies ? cookies.split(";").map((c) => c.trim()) : [];
 
   // now we need to wonder whether we will use the SSR itself
-  let willUseSSR = (
+  const willUseSSR = (
     // language specified and property supported and SSR is not disabled
     (language && config.supportedLanguages.includes(language) && !SSRIsDisabledInThisMode) ||
 
-    // No language specified, let's force a redirect
+    // No language specified, let's force a redirect when noredirect is not given
+    // this will cause the server not to give a redirect to the proper language
+    // as in a 302 status to the appropiate language but noredirect is used
+    // by the service worker to fetch a no-ssr file that is totally clean
     (!language && !req.query.noredirect)
   );
 
@@ -113,6 +116,9 @@ export async function ssrGenerator(
       res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
       res.setHeader("ETag", quotedEtag);
       res.setHeader("Cache-Control", "public, max-age=0");
+      if (language && config.supportedLanguages.includes(language)) {
+        res.setHeader("Content-Language", language);
+      }
       res.status(304).end();
       return;
     }
@@ -229,7 +235,6 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
     newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
   } else {
-
     // otherwise with the SSR
     const ssr: ISSRContextType = {
       queries: [],
@@ -342,6 +347,9 @@ export async function ssrGenerator(
         } else {
           res.setHeader("Cache-Control", "public, max-age=0");
         }
+        if (appliedRule.language) {
+          res.setHeader("Content-Language", appliedRule.language);
+        }
         res.status(304).end();
         return;
       }
@@ -443,6 +451,14 @@ export async function ssrGenerator(
       res.setHeader("Cache-Control", "private");
     } else {
       res.setHeader("Cache-Control", "public, max-age=0");
+    }
+
+    if (!appliedRule.noData) {
+      res.setHeader("x-ssr", "true");
+    }
+
+    if (appliedRule.language) {
+      res.setHeader("Content-Language", appliedRule.language);
     }
 
     if (shouldBe403) {

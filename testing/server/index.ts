@@ -3,10 +3,10 @@ import { Test } from "..";
 import Knex from "knex";
 import redis, { RedisClient } from "redis";
 import { strict as assert } from "assert";
-import FormDataNode from "form-data";
 import { ITestingInfoType } from "../itemize";
 import type { Browser } from "puppeteer";
 import { RobotsTest } from "./robots";
+import { GraphqlTest } from "./graphql";
 
 export class ServerTest extends Test {
   private info: ITestingInfoType;
@@ -66,64 +66,73 @@ export class ServerTest extends Test {
         const buildnumber = (await response.text()).trim();
         assert.strictEqual(buildnumber, this.info.buildnumber);
       }
-    );
+    ).quitOnFail();
 
     this.it(
-      "Should have a graphql endpoint",
+      "Should be able to fetch a SSR disabled instance when using noredirect",
       async () => {
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const response = await fetchNode(this.fullHost + "?noredirect", {
+          method: "HEAD",
         });
 
         assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const gqlAnswer = await response.json();
+        const hasSSRHeader = response.headers.has("x-ssr");
 
-        assert.deepStrictEqual(gqlAnswer, {
-          data: {
-            __schema: {
-              queryType: {
-                name: "ROOT_QUERY",
-              },
-            },
-          },
-        }, "Did not return a ROOT_QUERY");
+        if (hasSSRHeader) {
+          assert.fail("The host provided a SSR enabled link when using noredirect");
+        }
       }
     );
 
     this.it(
-      "Should support formdata protocol in graphql",
+      "Should redirect to a supported language when a base URL is specified",
       async () => {
-
-        // building the form data
-        const formData = new FormDataNode();
-        // append this stuff to the form data
-        formData.append("operations", JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }));
-        formData.append("map", "{}");
-
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: formData,
+        const response = await fetchNode(this.fullHost, {
+          method: "HEAD",
+          redirect: "manual",
         });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+        assert.strictEqual(response.status, 302, "Did not return a redirect");
 
-        const gqlAnswer = await response.json();
+        const redirectTo = new URL(response.headers.get("location"));
+        const lang = redirectTo.pathname.split("/")[1];
 
-        assert.deepStrictEqual(gqlAnswer, {
-          data: {
-            __schema: {
-              queryType: {
-                name: "ROOT_QUERY",
-              },
-            },
-          },
-        }, "Did not return a ROOT_QUERY");
+        if (!this.info.config.supportedLanguages.includes(lang)) {
+          assert.fail("Redirected to " + redirectTo + " but " + lang +
+            " is not a supported language: " + this.info.config.supportedLanguages.join(","))
+        }
       }
+    );
+
+    this.info.config.supportedLanguages.forEach((lang) => {
+      this.it(
+        "Should provide results in language " + lang,
+        async () => {
+          const response = await fetchNode(this.fullHost + "/" + lang, {
+            method: "HEAD",
+          });
+
+          assert.strictEqual(response.status, 200, "Did not return 200 OK");
+
+          const headerLang = response.headers.get("content-language");
+          if (!headerLang) {
+            assert.fail("Did not provide a Content-Language header, this means this language is not supported by the server");
+          } else if (headerLang !== lang) {
+            assert.fail("The content language is not equal, expected " + lang + " but got " + headerLang);
+          }
+
+          const ssrHeader = response.headers.get("x-ssr");
+          if (!ssrHeader) {
+            return "The server informed that it did not use SSR for this render"
+          }
+        }
+      );
+    });
+
+    this.define(
+      "Graphql test",
+      new GraphqlTest(this.fullHost, this.info),
     );
 
     this.define(

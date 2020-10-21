@@ -656,6 +656,19 @@ export default class Module {
   }
 
   /**
+   * Provides the live child definitions
+   * recursively, it does not get in Module children
+   * @returns an array of item definitions
+   */
+  public getAllChildDefinitionsRecursive() {
+    let childDefinitions = this.getAllChildItemDefinitions();
+    childDefinitions.forEach((idef) => {
+      childDefinitions = childDefinitions.concat(idef.getChildDefinitionsRecursive());
+    });
+    return childDefinitions;
+  }
+
+  /**
    * Gives the name of this module
    * @returns a string
    */

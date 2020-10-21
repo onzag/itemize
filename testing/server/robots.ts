@@ -28,11 +28,15 @@ export class RobotsTest extends Test {
     this.sitemapChecker = this.sitemapChecker.bind(this);
   }
   public async urlChecker(url: string) {
+    const expectedLanguage = new URL(url);
+    expectedLanguage.pathname.split("/")[1];
+
+    if (!expectedLanguage) {
+      assert.fail("Did not provide a language");
+    }
+
     const response = await fetchNode(
       url,
-      {
-        method: "HEAD",
-      }
     );
     if (response.status === 403) {
       const forbiddenSignature = response.headers.get("x-forbidden-signature") || "";

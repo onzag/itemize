@@ -5,6 +5,7 @@ class ItHandle {
   public fn: () => void | string | PromiseLike<void | string>;
   public isSkippedAllOnFail: boolean = false;
   public isSkippedLayerOnFail: boolean = false;
+  public isQuitted: boolean = false;
 
   constructor(label: string, fn: () => void | string | PromiseLike<void | string>) {
     this.label = label;
@@ -18,6 +19,11 @@ class ItHandle {
 
   public skipLayerOnFail() {
     this.isSkippedLayerOnFail = true;
+    return this;
+  }
+
+  public quitOnFail() {
+    this.isQuitted = true;
     return this;
   }
 }
@@ -35,6 +41,7 @@ export class Test {
   private doSkipNext: boolean = false;
   private doSkipAll: boolean = false;
   private doSkipLayer: boolean = false;
+  private doStop: boolean = false;
 
   /**
    * Build a brand new instance
@@ -47,6 +54,7 @@ export class Test {
     this.skipAll = this.skipAll.bind(this);
     this.skipNext = this.skipNext.bind(this);
     this.skipLayer = this.skipLayer.bind(this);
+    this.quit = this.quit.bind(this);
   }
 
   /**
@@ -133,6 +141,13 @@ export class Test {
     this.doSkipLayer = true;
   }
 
+  /**
+   * Quits this test
+   */
+  public quit() {
+    this.doStop = true;
+  }
+
   private async executeIts(level: number) {
     // reset these as they are only for this layer
     this.doSkipNext = false;
@@ -172,8 +187,15 @@ export class Test {
           if (itAttr.isSkippedLayerOnFail) {
             this.doSkipLayer = true;
           }
+          if (itAttr.isQuitted) {
+            this.doStop = true;
+          }
           console.log(tabs + colors.red("✗") + " " + colors.gray(itAttr.label));
           console.log(tabsPlus + err.message.replace(/\n/g, "\n" + tabsPlus));
+        }
+
+        if (this.doStop) {
+          break;
         }
 
         // check if the it that we just executed added its own
@@ -228,7 +250,7 @@ export class Test {
     passed += itResults.passed;
     warnings += itResults.warnings;
 
-    if (this.describeQueue) {
+    if (!this.doStop && this.describeQueue) {
       for (let testAttr of this.describeQueue) {
         if (this.doSkipAll) {
           console.log(tabs + colors.gray("⦰ [skipped]") + " " + testAttr.label);
@@ -255,7 +277,7 @@ export class Test {
     if (level === 0) {
       console.log(colors.green(passed + " passing"));
       if (warnings > 0) {
-        console.log(colors.yellow(warnings + " warnings"));
+        console.log(colors.yellow(warnings + (warnings === 1 ? " warning" : " warnings")));
       }
 
       const failing = total - passed;
