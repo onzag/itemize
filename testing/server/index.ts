@@ -105,6 +105,34 @@ export class ServerTest extends Test {
       }
     );
 
+    this.it(
+      "Should handle etags",
+      async () => {
+        const language = this.info.config.fallbackLanguage;
+        const response = await fetchNode(this.fullHost + "/" + language, {
+          method: "HEAD",
+          redirect: "manual",
+        });
+
+        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+
+        const etag = response.headers.get("etag");
+        if (!etag) {
+          assert.fail("Did not provide an etag");
+        }
+
+        const responseAgain = await fetchNode(this.fullHost + "/" + language, {
+          method: "HEAD",
+          redirect: "manual",
+          headers: {
+            "if-none-match": etag,
+          },
+        });
+
+        assert.strictEqual(responseAgain.status, 304, "Second request did not return 304");
+      }
+    );
+
     this.info.config.supportedLanguages.forEach((lang) => {
       this.it(
         "Should provide results in language " + lang,

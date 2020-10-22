@@ -34,7 +34,7 @@ class ModuleTest extends Test {
 
     if (this.mod.isSearchable()) {
       this.it(
-        "Should have module level for all 3 GET_LIST, SEARCH and TSEARCH",
+        "Should have module level for all 3 GET_LIST/SEARCH/TSEARCH",
         () => {
           const getListEndpoint = PREFIX_GET_LIST + this.mod.getQualifiedPathName();
           const searchEndpoint = PREFIX_SEARCH + this.mod.getSearchModule().getQualifiedPathName();
@@ -75,7 +75,7 @@ class ModuleTest extends Test {
 
       if (idef.isSearchable()) {
         this.it(
-          "Should have all 3 GET_LIST, SEARCH and TSEARCH endpoints for " + idef.getPath(),
+          "Should have all 3 GET_LIST/SEARCH/TSEARCH endpoints for " + idef.getPath(),
           () => {
             const getListEndpoint = PREFIX_GET_LIST + idef.getQualifiedPathName();
             const searchEndpoint = PREFIX_SEARCH + idef.getSearchModeCounterpart().getQualifiedPathName();
@@ -201,6 +201,16 @@ export class GraphqlTest extends Test {
         }
       }
     ).skipLayerOnFail();
+
+    this.it(
+      "Should have a token endpoint",
+      () => {
+        const foundField = schemaFields.some((f) => f.name === "token");
+        if (!foundField) {
+          assert.fail("Did not find a query endpoint for the token");
+        }
+      }
+    );
 
     const getSchemaFields: ISchemaFieldsGetterFn = () => {
       return {
