@@ -190,6 +190,11 @@ export class Test {
           if (itAttr.isQuitted) {
             this.doStop = true;
           }
+
+          // we remove any children if any added by this queue
+          // as it failed so children won't be executed
+          this.itQueue = null;
+
           console.log(tabs + colors.red("✗") + " " + colors.gray(itAttr.label));
           console.log(tabsPlus + err.message.replace(/\n/g, "\n" + tabsPlus));
         }
@@ -202,16 +207,23 @@ export class Test {
         // sub it steps for itself, this will do that
         // if new it assumptions were added on the fly
         // they will appear as children
-        const subItQueue = await this.executeIts(level + 1);
-        total += subItQueue.total;
-        passed += subItQueue.passed;
-        warnings += subItQueue.warnings;
+        if (this.itQueue && this.itQueue.length) {
+          const thisLayerSkipLayer: boolean = this.doSkipLayer;
+          const thisLayerSkipNext: boolean = this.doSkipNext;
+
+          const subItQueue = await this.executeIts(level + 1);
+          total += subItQueue.total;
+          passed += subItQueue.passed;
+          warnings += subItQueue.warnings;
+
+          // avoid the previous skip layer and skip next to leak in this queue
+          // we restore from this layer
+          // all does leak
+          this.doSkipLayer = thisLayerSkipLayer;
+          this.doSkipNext = thisLayerSkipNext;
+        }
       }
     }
-
-    // reset them back so they do not affect the under layer
-    this.doSkipNext = false;
-    this.doSkipLayer = false;
 
     return {
       total,
@@ -252,8 +264,9 @@ export class Test {
 
     if (!this.doStop && this.describeQueue) {
       for (let testAttr of this.describeQueue) {
-        if (this.doSkipAll) {
+        if (this.doSkipAll || this.doSkipNext || this.doSkipLayer) {
           console.log(tabs + colors.gray("⦰ [skipped]") + " " + testAttr.label);
+          this.doSkipNext = false;
           continue;
         }
 

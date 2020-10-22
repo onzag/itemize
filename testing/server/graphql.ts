@@ -4,17 +4,22 @@ import { strict as assert } from "assert";
 import FormDataNode from "form-data";
 import { ITestingInfoType } from "../itemize";
 import Module from "../../base/Root/Module";
-import { PREFIX_GET, PREFIX_GET_LIST, PREFIX_SEARCH, PREFIX_TRADITIONAL_SEARCH } from "../../constants";
+import { PREFIX_ADD, PREFIX_DELETE, PREFIX_EDIT, PREFIX_GET, PREFIX_GET_LIST, PREFIX_SEARCH, PREFIX_TRADITIONAL_SEARCH } from "../../constants";
 
 type ISchemaFields = Array<{ name: string }>;
+interface IAllSchemaFields {
+  query: ISchemaFields,
+  mutation: ISchemaFields,
+}
+type ISchemaFieldsGetterFn = () => IAllSchemaFields;
 
 class ModuleTest extends Test {
   private info: ITestingInfoType;
   private fullHost: string;
   private mod: Module;
-  private getSchemaFields: () => ISchemaFields;
+  private getSchemaFields: ISchemaFieldsGetterFn;
 
-  constructor(fullHost: string, info: ITestingInfoType, mod: Module, getSchemaFields: () => ISchemaFields) {
+  constructor(fullHost: string, info: ITestingInfoType, mod: Module, getSchemaFields: ISchemaFieldsGetterFn) {
     super();
 
     this.fullHost = fullHost;
@@ -36,9 +41,9 @@ class ModuleTest extends Test {
           const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + this.mod.getSearchModule().getQualifiedPathName();
 
           [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
-            const foundGetListEndpoint = this.getSchemaFields().some((f) => f.name === endpoint);
+            const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
             if (!foundGetListEndpoint) {
-              assert.fail("Did not find an endpoint for " + endpoint);
+              assert.fail("Did not find a query endpoint for " + endpoint);
             }
           });
         }
@@ -47,13 +52,24 @@ class ModuleTest extends Test {
 
     idefs.forEach((idef) => {
       this.it(
-        "Should have a GET graphql endpoint for " + idef.getPath(),
+        "Should have a GET/ADD/EDIT/DELETE graphql endpoint for " + idef.getPath(),
         () => {
           const endpoint = PREFIX_GET + idef.getQualifiedPathName();
-          const foundField = this.getSchemaFields().some((f) => f.name === endpoint);
+          const foundField = this.getSchemaFields().query.some((f) => f.name === endpoint);
           if (!foundField) {
-            assert.fail("Did not find an endpoint for " + endpoint);
+            assert.fail("Did not find a query endpoint for " + endpoint);
           }
+
+          const addEndpoint = PREFIX_ADD + idef.getQualifiedPathName();
+          const editEndpoint = PREFIX_EDIT + idef.getQualifiedPathName();
+          const deleteEndpoint = PREFIX_DELETE + idef.getQualifiedPathName();
+
+          [addEndpoint, editEndpoint, deleteEndpoint].forEach((endpoint) => {
+            const foundGetListEndpoint = this.getSchemaFields().mutation.some((f) => f.name === endpoint);
+            if (!foundGetListEndpoint) {
+              assert.fail("Did not find a mutation endpoint for " + endpoint);
+            }
+          });
         }
       );
 
@@ -66,9 +82,9 @@ class ModuleTest extends Test {
             const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + idef.getSearchModeCounterpart().getQualifiedPathName();
 
             [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
-              const foundGetListEndpoint = this.getSchemaFields().some((f) => f.name === endpoint);
+              const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
               if (!foundGetListEndpoint) {
-                assert.fail("Did not find an endpoint for " + endpoint);
+                assert.fail("Did not find a query endpoint for " + endpoint);
               }
             });
           }
@@ -96,7 +112,8 @@ export class GraphqlTest extends Test {
     this.info = info;
   }
   public describe() {
-    let shemaFields: ISchemaFields = null;
+    let schemaFields: ISchemaFields = null;
+    let schemaMutationFields: ISchemaFields = null;
 
     this.it(
       "Should have a graphql endpoint",
@@ -157,9 +174,9 @@ export class GraphqlTest extends Test {
     );
 
     this.it(
-      "Should return all supported schema query fields",
+      "Should return all supported schema query and mutation fields",
       async () => {
-        const schemaQuery = "query {__schema {queryType{fields {name}}}}";
+        const schemaQuery = "query {__schema {queryType{fields {name}}mutationType{fields {name}}}}";
         const response = await fetchNode(this.fullHost + "/graphql", {
           method: "POST",
           body: JSON.stringify({ query: schemaQuery, variables: null }),
@@ -172,16 +189,24 @@ export class GraphqlTest extends Test {
 
         const gqlAnswer = await response.json();
 
-        shemaFields = gqlAnswer.data.__schema.queryType.fields;
+        schemaFields = gqlAnswer.data.__schema.queryType.fields;
+        schemaMutationFields = gqlAnswer.data.__schema.mutationType.fields;
 
-        if (!Array.isArray(shemaFields)) {
-          assert.fail("Schema fields were not an array");
+        if (!Array.isArray(schemaFields)) {
+          assert.fail("Schema query fields were not an array");
+        }
+
+        if (!Array.isArray(schemaMutationFields)) {
+          assert.fail("Schema mutation fields were not an array");
         }
       }
     ).skipLayerOnFail();
 
-    const getSchemaFields = () => {
-      return shemaFields;
+    const getSchemaFields: ISchemaFieldsGetterFn = () => {
+      return {
+        query: schemaFields,
+        mutation: schemaMutationFields,
+      };
     }
 
     this.info.root.getAllModules().forEach((m) => {
