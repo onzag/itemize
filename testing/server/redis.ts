@@ -6,9 +6,12 @@ import redis, { RedisClient } from "redis";
 import { SERVER_DATA_IDENTIFIER } from "../../constants";
 import { promisify } from "util";
 import equals from "deep-equal";
+import { IUserInfoAndTokensForTesting } from ".";
+import fetchNode from "node-fetch";
 
 export class RedisTest extends Test {
   private testingInfo: ITestingInfoType;
+  private testingUserInfo: IUserInfoAndTokensForTesting;
   private fullHost: string;
 
   private knex: Knex;
@@ -19,12 +22,13 @@ export class RedisTest extends Test {
   private redisClient: RedisClient;
   private redisGlobalClient: RedisClient;
 
-  constructor(knex: Knex, testingInfo: ITestingInfoType, fullHost: string) {
+  constructor(knex: Knex, testingInfo: ITestingInfoType, testingUserInfo: IUserInfoAndTokensForTesting, fullHost: string) {
     super();
 
     this.knex = knex;
     this.testingInfo = testingInfo;
     this.fullHost = fullHost;
+    this.testingUserInfo = testingUserInfo;
   }
 
   public async before() {
@@ -38,7 +42,6 @@ export class RedisTest extends Test {
 
   public describe() {
     const getGlobalPromisified = promisify(this.redisGlobalClient.get).bind(this.redisGlobalClient);
-    const publishPromisified = promisify(this.redisPub.publish).bind(this.redisPub);
 
     if (equals(this.testingInfo.redisConfig.cache, this.testingInfo.redisConfig.global)) {
       this.warn("Your local and your global redis servers are the same, this is not recommended for multicluster builds");
@@ -103,6 +106,48 @@ export class RedisTest extends Test {
             reject();
           }, 300);
         });
+      }
+    );
+
+    this.it(
+      "Should be able to cache when graphql requested",
+      async () => {
+        const delPromisified = promisify(this.redisClient.del).bind(this.redisClient);
+        const getPromisified = promisify(this.redisClient.get).bind(this.redisClient);
+
+        const userIdef = this.testingInfo.root.getModuleFor(["users"]).getItemDefinitionFor(["user"]);
+        const idefQueryIdentifier = "IDEFQUERY:" +
+          userIdef.getQualifiedPathName() +
+          "." +
+          this.testingUserInfo.testUser.id.toString() +
+          "." +
+          (this.testingUserInfo.testUser.version || "");
+        // delete the user cache entry from the cluster registry
+        // bit hacky but okey
+        await delPromisified(idefQueryIdentifier);
+
+        // we will use the token request as that will cause a request via graphql
+        const response = await fetchNode(this.fullHost + "/graphql", {
+          method: "POST",
+          body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(this.testingUserInfo.testToken) + "){token,}}", variables: null }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
+
+        // fetch the new value from the redis cache, there should be a new one
+        const value = await getPromisified(idefQueryIdentifier);
+
+        // there should be a value
+        if (!value) {
+          assert.fail("Caching failed by the server");
+        }
+
+        // we expect the cache to equal what we have here, this was gotten
+        // directly from postgresql
+        assert.deepStrictEqual(JSON.parse(value), this.testingUserInfo.testUser);
       }
     );
   }

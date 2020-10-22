@@ -12,7 +12,7 @@ import { IServerSideTokenDataType } from "../resolvers/basic";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
-import { capitalize, renderTemplate } from "../../util";
+import { capitalize } from "../../util";
 import { promisify } from "util";
 
 interface RecoverPasswordTokenType {

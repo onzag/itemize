@@ -27,7 +27,7 @@ export function retrieveRootPool(rawData: IRootRawJSONDataType): Pool<Root> {
       );
     },
     min: 10,
-    max: 40,
+    max: 100,
     acquireTimeoutMillis: 1000,
     createTimeoutMillis: 1000,
     destroyTimeoutMillis: 300,

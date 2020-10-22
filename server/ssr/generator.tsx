@@ -307,6 +307,8 @@ export async function ssrGenerator(
         // when there's no app data in server mode it means
         // that the answer was handled as a redirect, so we must exit and avoid
         // further processing
+        root.cleanState();
+        appData.rootPool.release(root);
         return;
       }
 
@@ -351,6 +353,11 @@ export async function ssrGenerator(
           res.setHeader("Content-Language", appliedRule.language);
         }
         res.status(304).end();
+
+        // Release root
+        root.cleanState();
+        appData.rootPool.release(root);
+
         return;
       }
 

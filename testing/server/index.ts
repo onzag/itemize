@@ -7,8 +7,22 @@ import { RobotsTest } from "./robots";
 import { GraphqlTest } from "./graphql";
 import { DatabaseTest } from "./database";
 import { RedisTest } from "./redis";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
+import { jwtSign } from "../../server/token";
+import { TokenTest } from "./token";
+import { convertVersionsIntoNullsWhenNecessary } from "../../server/version-null-value";
 
 const NODE_ENV = process.env.NODE_ENV;
+
+export interface IUserInfoAndTokensForTesting {
+  testUser: any;
+  testToken: string;
+  malformedTestToken: string;
+  invalidSessionIdTestToken: string;
+  invalidSignatureTestToken: string;
+  invalidRoleTestToken: string;
+  garbageMadeUpToken: string;
+}
 
 export class ServerTest extends Test {
   private testingInfo: ITestingInfoType;
@@ -18,6 +32,8 @@ export class ServerTest extends Test {
 
   private knex: Knex;
   private fullHost: string;
+
+  private testingUserInfo: IUserInfoAndTokensForTesting;
 
   constructor(https: boolean, host: string, port: string | number, testingInfo: ITestingInfoType) {
     super();
@@ -44,6 +60,85 @@ export class ServerTest extends Test {
         connection: dbConnectionKnexConfig,
       });
     }
+
+    const userMod = this.testingInfo.root.getModuleFor(["users"]);
+    const userIdef = userMod.getItemDefinitionFor(["user"]);
+
+    // This will normally pick the admin user
+    // but who knows it can happen otherwise
+    const testUser = convertVersionsIntoNullsWhenNecessary(
+      await this.knex.first("*")
+        .from(userMod.getQualifiedPathName())
+        .join(userIdef.getQualifiedPathName(), (clause) => {
+          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+        }).orderBy("id")
+    );
+
+    const testToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: testUser.role,
+        sessionId: testUser.session_id || 0,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
+
+    const malformedTestToken = await jwtSign(
+      {
+        id: testUser.id.toString(),
+        role: testUser.role,
+        sessionId: (testUser.session_id || 0).toString(),
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
+
+    const invalidSessionIdTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: testUser.role,
+        sessionId: (testUser.session_id || 0) + 1,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
+
+    const allRoles = this.testingInfo.config.roles;
+    const rolesWithoutSelf = allRoles.filter((r) => r !== testUser.role);
+    const invalidRoleTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: rolesWithoutSelf[0] || "MADE_UP_ROLE",
+        sessionId: testUser.session_id || 0,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
+
+    const invalidSignatureTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: rolesWithoutSelf[0],
+        sessionId: testUser.session_id || 0,
+      },
+      "123456",
+    );
+
+    const garbageMadeUpToken = "THIS_IS_NOT_A_REAL_TOKEN";
+
+    this.info("Test user chosen: " + testUser.username);
+
+    this.testingUserInfo = {
+      testUser,
+      testToken,
+      malformedTestToken,
+      invalidSessionIdTestToken,
+      invalidRoleTestToken,
+      invalidSignatureTestToken,
+      garbageMadeUpToken,
+    }
+
+    if (testUser.role !== "ADMIN") {
+      this.warn("For some reason the test user is not an admin user but " + testUser.role);
+    }
   }
   public describe() {
     if (this.testingInfo.sensitiveConfig.localContainer) {
@@ -65,6 +160,17 @@ export class ServerTest extends Test {
         assert.strictEqual(response.status, 200, "Did not return 200 OK");
         const buildnumber = (await response.text()).trim();
         assert.strictEqual(buildnumber, this.testingInfo.buildnumber);
+      }
+    ).quitOnFail();
+
+    this.it(
+      "Should have at least one user",
+      async () => {
+        const userMod = this.testingInfo.root.getModuleFor(["users"]);
+        const oneUser = await this.knex.first("id").from(userMod.getQualifiedPathName());
+        if (!oneUser) {
+          assert.fail("Could not even get a single user");
+        }
       }
     ).quitOnFail();
 
@@ -152,7 +258,7 @@ export class ServerTest extends Test {
 
           const ssrHeader = response.headers.get("x-ssr");
           if (!ssrHeader) {
-            this.warn("The server informed that it did not use SSR for this render"); 
+            this.warn("The server informed that it did not use SSR for this render");
           }
         }
       );
@@ -161,6 +267,11 @@ export class ServerTest extends Test {
     this.define(
       "Graphql test",
       new GraphqlTest(this.fullHost, this.testingInfo),
+    );
+
+    this.define(
+      "Token test",
+      new TokenTest(this.fullHost, this.testingUserInfo),
     );
 
     // The following tests will not be good for a
@@ -181,7 +292,7 @@ export class ServerTest extends Test {
 
     this.define(
       "Redis test",
-      new RedisTest(this.knex, this.testingInfo, this.fullHost),
+      new RedisTest(this.knex, this.testingInfo, this.testingUserInfo, this.fullHost),
     );
   }
 
