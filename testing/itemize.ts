@@ -100,6 +100,6 @@ export class ItemizeTest extends Test {
   }
 
   public describe() {
-    this.define("Server Tests", new ServerTest(this.https, this.host, this.port, this.testingInfo, this.puppet));
+    this.define("Server Tests", new ServerTest(this.https, this.host, this.port, this.testingInfo));
   }
 }

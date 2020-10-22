@@ -14,16 +14,16 @@ interface IAllSchemaFields {
 type ISchemaFieldsGetterFn = () => IAllSchemaFields;
 
 class ModuleTest extends Test {
-  private info: ITestingInfoType;
+  private testingInfo: ITestingInfoType;
   private fullHost: string;
   private mod: Module;
   private getSchemaFields: ISchemaFieldsGetterFn;
 
-  constructor(fullHost: string, info: ITestingInfoType, mod: Module, getSchemaFields: ISchemaFieldsGetterFn) {
+  constructor(fullHost: string, testingInfo: ITestingInfoType, mod: Module, getSchemaFields: ISchemaFieldsGetterFn) {
     super();
 
     this.fullHost = fullHost;
-    this.info = info;
+    this.testingInfo = testingInfo;
     this.mod = mod;
     this.getSchemaFields = getSchemaFields;
   }
@@ -95,21 +95,21 @@ class ModuleTest extends Test {
     modchild.forEach((mod) => {
       this.define(
         "Module tests for " + mod.getPath(),
-        new ModuleTest(this.fullHost, this.info, mod, this.getSchemaFields),
+        new ModuleTest(this.fullHost, this.testingInfo, mod, this.getSchemaFields),
       );
     });
   }
 }
 
 export class GraphqlTest extends Test {
-  private info: ITestingInfoType;
+  private testingInfo: ITestingInfoType;
   private fullHost: string;
 
-  constructor(fullHost: string, info: ITestingInfoType) {
+  constructor(fullHost: string, testingInfo: ITestingInfoType) {
     super();
 
     this.fullHost = fullHost;
-    this.info = info;
+    this.testingInfo = testingInfo;
   }
   public describe() {
     let schemaFields: ISchemaFields = null;
@@ -219,10 +219,10 @@ export class GraphqlTest extends Test {
       };
     }
 
-    this.info.root.getAllModules().forEach((m) => {
+    this.testingInfo.root.getAllModules().forEach((m) => {
       this.define(
         "Module tests for " + m.getPath(),
-        new ModuleTest(this.fullHost, this.info, m, getSchemaFields),
+        new ModuleTest(this.fullHost, this.testingInfo, m, getSchemaFields),
       );
     });
   }

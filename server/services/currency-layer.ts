@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { logger } from "../";
 import { RedisClient } from "redis";
-import { CACHED_CURRENCY_LAYER_RESPONSE } from "../../constants";
+import { CACHED_CURRENCY_RESPONSE } from "../../constants";
 
 interface CurrencyLayerResponse {
   success: boolean;
@@ -31,7 +31,7 @@ export class CurrencyLayer {
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
       this.globalCache.get(
-        CACHED_CURRENCY_LAYER_RESPONSE,
+        CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
           if (!parsedCachedData || (new Date()).getTime() - (parsedCachedData.timestamp * 1000) >= 86400000) {
@@ -67,7 +67,7 @@ export class CurrencyLayer {
                     reject(new Error(parsedData.error));
                   } else {
                     this.globalCache.set(
-                      CACHED_CURRENCY_LAYER_RESPONSE,
+                      CACHED_CURRENCY_RESPONSE,
                       data,
                     );
                     resolve(parsedData);

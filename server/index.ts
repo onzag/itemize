@@ -6,7 +6,7 @@ import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import Knex from "knex";
 import { types } from "pg";
-import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_LAYER_RESPONSE } from "../constants";
+import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
@@ -365,14 +365,14 @@ export async function initializeServer(
       const setPromisified = promisify(redisClient.set).bind(redisClient);
 
       const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
-      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE) || null;
+      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_RESPONSE) || null;
       const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
       await flushAllPromisified();
       if (serverDataStr) {
         await setPromisified(SERVER_DATA_IDENTIFIER, serverDataStr);
       }
       if (currencyLayerCachedResponseRestore) {
-        await setPromisified(CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+        await setPromisified(CACHED_CURRENCY_RESPONSE, currencyLayerCachedResponseRestore);
       }
       const listener = new Listener(
         buildnumber,
@@ -656,12 +656,19 @@ export async function initializeServer(
       const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
       const getPromisified = promisify(appData.redis.get).bind(appData.redis);
       const setPromisified = promisify(appData.redis.set).bind(appData.redis);
-      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_LAYER_RESPONSE);
+      const currencyCachedResponseRestore = await getPromisified(CACHED_CURRENCY_RESPONSE);
+      const serverDataCachedRestore = await getPromisified(SERVER_DATA_IDENTIFIER);
       await flushAllPromisified();
-      // this cached data is intended for the global, but it might be the same, I need to restore it in order
+      // this cached data is intended for the global,
+      // but the global and the local might be set to the same redis
+      // database, which is not really optimal, but what can you do
+      // but it might be the same, I need to restore it in order
       // to avoid draining the currency layer api
-      if (currencyLayerCachedResponseRestore) {
-        await setPromisified(CACHED_CURRENCY_LAYER_RESPONSE, currencyLayerCachedResponseRestore);
+      if (currencyCachedResponseRestore) {
+        await setPromisified(CACHED_CURRENCY_RESPONSE, currencyCachedResponseRestore);
+      }
+      if (serverDataCachedRestore) {
+        await setPromisified(SERVER_DATA_IDENTIFIER, serverDataCachedRestore);
       }
     } else {
       logger.info(

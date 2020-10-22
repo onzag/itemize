@@ -6,20 +6,20 @@ import { JSDOM } from "jsdom";
 
 export class RobotsTest extends Test {
   private fullHost: string;
-  private info: ITestingInfoType;
+  private testingInfo: ITestingInfoType;
   private host: string;
   private port: string | number;
   private https: boolean;
   private parser: DOMParser;
 
-  constructor(https: boolean, host: string, port: string | number, fullHost: string, info: ITestingInfoType) {
+  constructor(https: boolean, host: string, port: string | number, fullHost: string, testingInfo: ITestingInfoType) {
     super();
 
     this.fullHost = fullHost;
     this.host = host;
     this.https = https;
     this.port = port;
-    this.info = info;
+    this.testingInfo = testingInfo;
 
     const dom = new JSDOM("");
     const DOMParser = dom.window.DOMParser;
@@ -75,8 +75,8 @@ export class RobotsTest extends Test {
 
       if (
         xmlComponent.tagName === "urlset" &&
-        sitemapURLParsed.hostname !== this.info.config.developmentHostname &&
-        sitemapURLParsed.hostname !== this.info.config.productionHostname
+        sitemapURLParsed.hostname !== this.testingInfo.config.developmentHostname &&
+        sitemapURLParsed.hostname !== this.testingInfo.config.productionHostname
       ) {
         assert.fail("Raw URL doesn't point to website " + loc.textContent);
       }
@@ -85,8 +85,8 @@ export class RobotsTest extends Test {
         (
           this.host === "localhost"
         ) && (
-          sitemapURLParsed.hostname === this.info.config.developmentHostname ||
-          sitemapURLParsed.hostname === this.info.config.productionHostname
+          sitemapURLParsed.hostname === this.testingInfo.config.developmentHostname ||
+          sitemapURLParsed.hostname === this.testingInfo.config.productionHostname
         )
       ) {
         if (this.https) {
@@ -134,8 +134,8 @@ export class RobotsTest extends Test {
           .find((l) => l.trim() === "disallow: /");
 
         if (disallowAllLine) {
+          this.warn("SEO is not active");
           this.skipAll();
-          return "SEO is not active";
         }
       },
     ).skipAllOnFail();
@@ -163,16 +163,15 @@ export class RobotsTest extends Test {
           assert.fail("The sitemap url is invalid: " + sitemapURLInRobots);
         }
 
-        let warningOfLocalhost: string = null;
         if (
           (
             this.host === "localhost"
           ) && (
-            sitemapURLParsed.hostname === this.info.config.developmentHostname ||
-            sitemapURLParsed.hostname === this.info.config.productionHostname
+            sitemapURLParsed.hostname === this.testingInfo.config.developmentHostname ||
+            sitemapURLParsed.hostname === this.testingInfo.config.productionHostname
           )
         ) {
-          warningOfLocalhost = "Used localhost instead of the proper host of " + sitemapURLParsed.hostname;
+          this.info("Used localhost instead of the proper host of " + sitemapURLParsed.hostname);
           if (this.https) {
             sitemapURLParsed.protocol = "https";
           } else {
@@ -188,8 +187,6 @@ export class RobotsTest extends Test {
           "Should serve and have a valid sitemap at " + sitemapURL,
           this.sitemapChecker.bind(this, sitemapURL)
         );
-
-        return warningOfLocalhost;
       }
     ).skipAllOnFail();
   }

@@ -1,70 +1,70 @@
 import fetchNode from "node-fetch";
 import { Test } from "..";
 import Knex from "knex";
-import redis, { RedisClient } from "redis";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
-import type { Browser } from "puppeteer";
 import { RobotsTest } from "./robots";
 import { GraphqlTest } from "./graphql";
+import { DatabaseTest } from "./database";
+import { RedisTest } from "./redis";
+
+const NODE_ENV = process.env.NODE_ENV;
 
 export class ServerTest extends Test {
-  private info: ITestingInfoType;
+  private testingInfo: ITestingInfoType;
   private host: string;
   private port: string | number;
   private https: boolean;
-  private puppet: Browser;
 
   private knex: Knex;
-  private redisPub: RedisClient;
-  private redisSub: RedisClient;
-  private redisLocalPub: RedisClient;
-  private redisLocalSub: RedisClient;
-  private redisClient: RedisClient;
-  private redisGlobalClient: RedisClient;
-
   private fullHost: string;
 
-  constructor(https: boolean, host: string, port: string | number, info: ITestingInfoType, puppet: Browser) {
+  constructor(https: boolean, host: string, port: string | number, testingInfo: ITestingInfoType) {
     super();
 
     this.host = host;
     this.https = https;
     this.port = port;
-    this.info = info;
-    this.puppet = puppet;
+    this.testingInfo = testingInfo;
   }
   public async before() {
-    const dbConnectionKnexConfig = {
-      host: this.info.dbConfig.host,
-      port: this.info.dbConfig.port,
-      user: this.info.dbConfig.user,
-      password: this.info.dbConfig.password,
-      database: this.info.dbConfig.database,
-    };
-    this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
+    if (NODE_ENV !== "production") {
+      const dbConnectionKnexConfig = {
+        host: this.testingInfo.dbConfig.host,
+        port: this.testingInfo.dbConfig.port,
+        user: this.testingInfo.dbConfig.user,
+        password: this.testingInfo.dbConfig.password,
+        database: this.testingInfo.dbConfig.database,
+      };
+      this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
 
-    this.knex = Knex({
-      client: "pg",
-      debug: process.env.NODE_ENV !== "production",
-      connection: dbConnectionKnexConfig,
-    });
-
-    this.redisPub = redis.createClient(this.info.redisConfig.pubSub);
-    this.redisSub = redis.createClient(this.info.redisConfig.pubSub);
-    this.redisLocalPub = redis.createClient(this.info.redisConfig.cache);
-    this.redisLocalSub = redis.createClient(this.info.redisConfig.cache);
-    this.redisClient = redis.createClient(this.info.redisConfig.cache);
-    this.redisGlobalClient = redis.createClient(this.info.redisConfig.global);
+      this.knex = Knex({
+        client: "pg",
+        debug: false,
+        connection: dbConnectionKnexConfig,
+      });
+    }
   }
   public describe() {
+    if (this.testingInfo.sensitiveConfig.localContainer) {
+      this.warn(
+        "You are using a local container named " +
+        this.testingInfo.sensitiveConfig.localContainer +
+        " local containers will not work on multicluster builds"
+      );
+    }
+
     this.it(
       "Should return the right buildnumber",
       async () => {
+        if (NODE_ENV === "production") {
+          this.warn("Cannot check the buildnumber against a production build because it's not guaranteed");
+          return;
+        }
         const response = await fetchNode(this.fullHost + "/rest/buildnumber");
         assert.strictEqual(response.status, 200, "Did not return 200 OK");
         const buildnumber = (await response.text()).trim();
-        assert.strictEqual(buildnumber, this.info.buildnumber);
+        assert.strictEqual(buildnumber, this.testingInfo.buildnumber);
       }
     ).quitOnFail();
 
@@ -98,9 +98,9 @@ export class ServerTest extends Test {
         const redirectTo = new URL(response.headers.get("location"));
         const lang = redirectTo.pathname.split("/")[1];
 
-        if (!this.info.config.supportedLanguages.includes(lang)) {
+        if (!this.testingInfo.config.supportedLanguages.includes(lang)) {
           assert.fail("Redirected to " + redirectTo + " but " + lang +
-            " is not a supported language: " + this.info.config.supportedLanguages.join(","))
+            " is not a supported language: " + this.testingInfo.config.supportedLanguages.join(","))
         }
       }
     );
@@ -108,7 +108,7 @@ export class ServerTest extends Test {
     this.it(
       "Should handle etags",
       async () => {
-        const language = this.info.config.fallbackLanguage;
+        const language = this.testingInfo.config.fallbackLanguage;
         const response = await fetchNode(this.fullHost + "/" + language, {
           method: "HEAD",
           redirect: "manual",
@@ -133,7 +133,7 @@ export class ServerTest extends Test {
       }
     );
 
-    this.info.config.supportedLanguages.forEach((lang) => {
+    this.testingInfo.config.supportedLanguages.forEach((lang) => {
       this.it(
         "Should provide results in language " + lang,
         async () => {
@@ -152,7 +152,7 @@ export class ServerTest extends Test {
 
           const ssrHeader = response.headers.get("x-ssr");
           if (!ssrHeader) {
-            return "The server informed that it did not use SSR for this render"
+            this.warn("The server informed that it did not use SSR for this render"); 
           }
         }
       );
@@ -160,22 +160,34 @@ export class ServerTest extends Test {
 
     this.define(
       "Graphql test",
-      new GraphqlTest(this.fullHost, this.info),
+      new GraphqlTest(this.fullHost, this.testingInfo),
     );
+
+    // The following tests will not be good for a
+    // production environment
+    if (NODE_ENV === "production") {
+      this.skipLayer();
+    }
 
     this.define(
       "Robots test",
-      new RobotsTest(this.https, this.host, this.port, this.fullHost, this.info),
+      new RobotsTest(this.https, this.host, this.port, this.fullHost, this.testingInfo),
+    );
+
+    this.define(
+      "Database test",
+      new DatabaseTest(this.knex, this.testingInfo),
+    );
+
+    this.define(
+      "Redis test",
+      new RedisTest(this.knex, this.testingInfo, this.fullHost),
     );
   }
 
   public after() {
-    this.knex.destroy();
-    this.redisPub.quit();
-    this.redisSub.quit();
-    this.redisLocalPub.quit();
-    this.redisLocalSub.quit();
-    this.redisClient.quit();
-    this.redisGlobalClient.quit();
+    if (NODE_ENV !== "production") {
+      this.knex.destroy();
+    }
   }
 }

@@ -1153,10 +1153,10 @@ export const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS"
 export const DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
 
 /**
- * An identifier for caching the currency layer api response
+ * An identifier for caching the currency api response
  * for currency conversion in redis
  */
-export const CACHED_CURRENCY_LAYER_RESPONSE = "CACHED_CURRENCY_LAYER_RESPONSE";
+export const CACHED_CURRENCY_RESPONSE = "CACHED_CURRENCY_RESPONSE";
 
 /**
  * The minimum update time for the server data to be changed
