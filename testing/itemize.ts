@@ -5,6 +5,7 @@ import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { Test } from ".";
 import type { Browser } from "puppeteer";
+import { ClientTest } from "./client";
 
 const fsAsync = fs.promises;
 
@@ -101,5 +102,11 @@ export class ItemizeTest extends Test {
 
   public describe() {
     this.define("Server Tests", new ServerTest(this.https, this.host, this.port, this.testingInfo));
+
+    if (NODE_ENV === "production") {
+      this.skipLayer();
+    }
+
+    this.define("Client Tests", new ClientTest(this.https, this.host, this.port, this.testingInfo, this.puppet));
   }
 }

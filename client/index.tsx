@@ -20,6 +20,7 @@ import Root, { ILangLocalesType } from "../base/Root";
 import CacheWorkerInstance from "./internal/workers/cache";
 import { ConfigProvider } from "./internal/providers/config-provider";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
+import { IGlobalTestingType, setupTesting } from "./internal/testing";
 
 /**
  * when cookies expire
@@ -34,15 +35,64 @@ export const COOKIE_EXPIRATION_DATE = (new Date(9999999999999)).toUTCString();
  * @returns the value of the cookie as a string or null
  */
 export function getCookie(name: string): string {
-  const splittedCookie = document.cookie.split(";").map((c)=>c.trim());
+  const splittedCookie = document.cookie.split(";").map((c) => c.trim());
   const nameEQ = name + "=";
   const foundCookie = splittedCookie.find((cookieValue) => {
     return cookieValue.indexOf(nameEQ) === 0;
   });
-  if (!foundCookie) {
+  if (!foundCookie) {
     return null;
   }
   return foundCookie.substr(nameEQ.length) || null;
+}
+
+declare global {
+  interface Window {
+    BUILD_NUMBER: string;
+    ROOT: Root;
+    CONFIG: IConfigRawJSONDataType;
+    SSR: ISSRContextType;
+    LANG: ILangLocalesType;
+    INITIAL_CURRENCY_FACTORS: {
+      [code: string]: number;
+    },
+    PHONE_OR_PAD: boolean;
+    TESTING: IGlobalTestingType;
+    SET_DEV_MODE: (mode: string, key: string) => void;
+    ENABLE_TESTING: () => void;
+    DISABLE_TESTING: () => void;
+  }
+}
+
+// set development mode
+if (typeof document !== "undefined") {
+  window.SET_DEV_MODE = function (mode, key) {
+    document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    document.cookie = "devkey=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    document.cookie = "devmode=" + mode + ";path=/";
+    document.cookie = "devkey=" + key + ";path=/";
+  }
+
+  // set testing mode
+  if (process.env.NODE_ENV === "development") {
+    window.ENABLE_TESTING = function () {
+      document.cookie = "testing=true;path=/";
+    }
+    window.DISABLE_TESTING = function () {
+      document.cookie = "testing=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+    }
+
+    // in the client side if we happen to get
+    // the special testing cookie we want to initialize
+    // the testing in window in order to signal
+    // the itemize app to initialize in testing mode
+    // testing mode provides more insights to what is going on
+    // in the app
+    const testingCookie = getCookie("testing");
+    if (testingCookie === "true") {
+      setupTesting();
+    }
+  }
 }
 
 // Create the browser history to feed the router
@@ -194,8 +244,8 @@ export async function initializeItemizeApp(
   const serverMode = options && options.serverMode;
 
   // CONFIG, as well as SSR are injected variables via index.html
-  const config: IConfigRawJSONDataType = serverMode ? serverMode.config : (window as any).CONFIG;
-  const ssrContext: ISSRContextType = serverMode ? serverMode.ssrContext : (window as any).SSR;
+  const config: IConfigRawJSONDataType = serverMode ? serverMode.config : window.CONFIG;
+  const ssrContext: ISSRContextType = serverMode ? serverMode.ssrContext : window.SSR;
 
   // basically the way this website works is that the
   // language is the first argument of the location url
@@ -322,7 +372,7 @@ export async function initializeItemizeApp(
 
     // Let's set the values
     guessedLang = storedLang || guessedUserData.language;
-    guessedCountry = storedCurrency || guessedUserData.country;
+    guessedCountry = storedCurrency || guessedUserData.country;
     guessedCurrency = storedCountry || guessedUserData.currency;
 
     // So this is a global variable, that must exist, sadly but necessary
@@ -370,10 +420,10 @@ export async function initializeItemizeApp(
 
     let isExpectedToRender = true;
     try {
-      const response = await fetch("/rest/buildnumber?current=" + (window as any).BUILD_NUMBER);
+      const response = await fetch("/rest/buildnumber?current=" + window.BUILD_NUMBER);
       if (response.status === 200) {
         const actualBuildNumber: string = await response.text();
-        if (actualBuildNumber !== (window as any).BUILD_NUMBER) {
+        if (actualBuildNumber !== window.BUILD_NUMBER) {
           // refer to the setupVersion function in the cache for realization how
           // the object store in indexed db updates, since indexed db databases
           // are versioned, we don't need to worry
@@ -387,7 +437,7 @@ export async function initializeItemizeApp(
         }
       }
     } catch (err) {
-      
+
     }
 
     if (!isExpectedToRender) {
@@ -420,9 +470,9 @@ export async function initializeItemizeApp(
         initialLang !== "en" ?
           importScript(`/rest/resource/${initialLang}.moment.js`) : null,
       ]);
-      (window as any).ROOT = new Root(initialRoot);
-      (window as any).LANG = lang;
-      (window as any).INITIAL_CURRENCY_FACTORS = currencyFactors;
+      window.ROOT = new Root(initialRoot);
+      window.LANG = lang;
+      window.INITIAL_CURRENCY_FACTORS = currencyFactors;
       if (CacheWorkerInstance.isSupported) {
         CacheWorkerInstance.instance.proxyRoot(initialRoot);
       }
@@ -432,19 +482,19 @@ export async function initializeItemizeApp(
     // have been imported, and should be available for moment
     Moment.locale(initialLang);
 
-    const root: Root = serverMode ? serverMode.root : (window as any).ROOT;
+    const root: Root = serverMode ? serverMode.root : window.ROOT;
 
     // now we get the app that we are expected to use
     const app = <App
       root={root}
-      langLocales={serverMode ? serverMode.langLocales : (window as any).LANG}
+      langLocales={serverMode ? serverMode.langLocales : window.LANG}
       config={config}
 
       initialCurrency={initialCurrency}
       initialCountry={initialCountry}
       initialCurrencyFactors={serverMode ?
         serverMode.ssrContext.currencyFactors :
-        (window as any).INITIAL_CURRENCY_FACTORS
+        window.INITIAL_CURRENCY_FACTORS
       }
 
       mainComponent={mainComponent}

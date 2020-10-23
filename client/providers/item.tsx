@@ -673,6 +673,9 @@ interface IActualItemProviderState extends IActualItemProviderSearchState {
  */
 export class ActualItemProvider extends
   React.Component<IActualItemProviderProps, IActualItemProviderState> {
+  // an internal uuid only used for testing purposes
+  private internalUUID: string;
+
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
   private isUnmounted: boolean = false;
@@ -857,7 +860,7 @@ export class ActualItemProvider extends
       // let's set it up
       // as you can see this function might run several times per instance
       // but that's okay, all next runs get ignored
-      CacheWorkerInstance.instance.setupVersion((window as any).BUILD_NUMBER);
+      CacheWorkerInstance.instance.setupVersion(parseInt(window.BUILD_NUMBER, 10));
     }
   }
   public blockCleanup(props: IActualItemProviderProps = this.props) {
@@ -1091,6 +1094,39 @@ export class ActualItemProvider extends
     if (!this.props.avoidLoading) {
       this.loadValue();
     }
+
+    if (window.TESTING && process.env.NODE_ENV === "development") {
+      this.internalUUID = uuid.v4();
+      this.mountOrUpdateIdefForTesting();
+    }
+  }
+
+  public mountOrUpdateIdefForTesting() {
+    if (process.env.NODE_ENV === "development") {
+      const current = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
+      const idefId = this.props.itemDefinitionInstance.getQualifiedPathName();
+      const modId = this.props.itemDefinitionInstance.getParentModule().getQualifiedPathName();
+      if (current) {
+        current.module = modId;
+        current.itemDefinition = idefId;
+        current.id = this.props.forId || null;
+        current.version = this.props.forVersion || null;
+        current.isSearchMode = this.props.itemDefinitionInstance.isInSearchMode();
+        current.isExtensions = this.props.itemDefinitionInstance.isExtensionsInstance();
+        current.time = (new Date()).toISOString();
+      } else {
+        window.TESTING.mountedItems.push({
+          instanceUUID: this.internalUUID,
+          module: modId,
+          itemDefinition: idefId,
+          id: this.props.forId || null,
+          version: this.props.forVersion || null,
+          isSearchMode: this.props.itemDefinitionInstance.isInSearchMode(),
+          isExtensions: this.props.itemDefinitionInstance.isExtensionsInstance(),
+          time: (new Date()).toISOString(),
+        });
+      }
+    }
   }
 
   // setup the listeners is simple
@@ -1254,6 +1290,16 @@ export class ActualItemProvider extends
       )
     ) {
       this.markForDestruction();
+    }
+
+    if (
+      window.TESTING &&
+      (
+        itemDefinitionWasUpdated ||
+        uniqueIDChanged
+      )
+    ) {
+      this.mountOrUpdateIdefForTesting();
     }
 
     if (didSomethingThatInvalidatedSetters) {
@@ -2014,7 +2060,7 @@ export class ActualItemProvider extends
         );
 
         if (props.itemDefinitionInstance.isInSearchMode()) {
-          props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+          props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
           props.itemDefinitionInstance.triggerListeners("search-change", props.forId || null, props.forVersion || null);
         }
       } else {
@@ -2027,6 +2073,11 @@ export class ActualItemProvider extends
     this.releaseCleanupBlock();
     this.unSetupListeners();
     this.runDismountOn();
+
+    if (window.TESTING && process.env.NODE_ENV === "development") {
+      window.TESTING.mountedItems =
+        window.TESTING.mountedItems.filter(m => m.instanceUUID !== this.internalUUID);
+    }
   }
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {
     // just sets the exclusion state
@@ -2906,7 +2957,7 @@ export class ActualItemProvider extends
       this.props.forVersion || null,
     );
 
-    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
+    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
 
     if (listenPolicy === "by-owner" && !options.createdBy || options.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Listen policy is by-owner yet there's no creator specified");
@@ -3332,7 +3383,7 @@ export class ActualItemProvider extends
       }
 
       return (
-        <ItemProvider {...newProps}/>
+        <ItemProvider {...newProps} />
       );
     }
 

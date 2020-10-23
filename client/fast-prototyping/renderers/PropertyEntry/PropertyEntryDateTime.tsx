@@ -150,7 +150,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
       },
     };
 
-    if (!(window as any).PHONE_OR_PAD) {
+    if (window.PHONE_OR_PAD) {
       component = (
         <KeyboardDatePicker
           KeyboardButtonProps={{
@@ -199,7 +199,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
       },
     };
 
-    if (!(window as any).PHONE_OR_PAD) {
+    if (!window.PHONE_OR_PAD) {
       component = (
         <KeyboardDateTimePicker
           KeyboardButtonProps={{
@@ -248,7 +248,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
       },
     };
 
-    if (!(window as any).PHONE_OR_PAD) {
+    if (!window.PHONE_OR_PAD) {
       component = (
         <KeyboardTimePicker
           KeyboardButtonProps={{

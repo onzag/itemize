@@ -56,12 +56,5 @@
         var CONFIG = "%{}";
         // the SSR data, note that this is runtime calculated, so it differs, just like $MODE
         var SSR = "$SSR";
-        // set development mode
-        function SET_DEV_MODE(mode, key) {
-            document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-            document.cookie = "devkey=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-            document.cookie = "devmode=" + mode + ";path=/";
-            document.cookie = "devkey=" + key + ";path=/";
-        }
     </script>
 </html>

@@ -44,6 +44,8 @@ export class ServerTest extends Test {
     this.testingInfo = testingInfo;
   }
   public async before() {
+    this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
+
     if (NODE_ENV !== "production") {
       const dbConnectionKnexConfig = {
         host: this.testingInfo.dbConfig.host,
@@ -52,7 +54,6 @@ export class ServerTest extends Test {
         password: this.testingInfo.dbConfig.password,
         database: this.testingInfo.dbConfig.database,
       };
-      this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
 
       this.knex = Knex({
         client: "pg",

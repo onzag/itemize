@@ -216,7 +216,7 @@ export class RemoteListener {
     this.parentedSearchListeners = {};
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
-    this.lastRecievedBuildNumber = (window as any).BUILD_NUMBER;
+    this.lastRecievedBuildNumber = window.BUILD_NUMBER;
     this.setupTime = (new Date()).getTime();
 
     // setup the io to the client
@@ -322,7 +322,7 @@ export class RemoteListener {
    * Checks whether the app is uppdated compared to what we are running right now
    */
   public isAppUpdated() {
-    return this.lastRecievedBuildNumber !== (window as any).BUILD_NUMBER;
+    return this.lastRecievedBuildNumber !== window.BUILD_NUMBER;
   }
 
   /**
@@ -385,7 +385,7 @@ export class RemoteListener {
       // this will trigger the service worker to realize the app has
       // updated if any service worker is active
       try {
-        fetch("/rest/buildnumber?current=" + (window as any).BUILD_NUMBER);
+        fetch("/rest/buildnumber?current=" + window.BUILD_NUMBER);
       } catch (err) {
         // if it fails the service worker should be able to
         // handle it stills by reloading twice

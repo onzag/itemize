@@ -8,7 +8,6 @@
  */
 
 import { IGQLSearchRecord } from "../gql-querier";
-import { ISQLTableRowValue } from "./Root/sql";
 
 // EVENTS
 

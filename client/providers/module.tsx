@@ -3,6 +3,7 @@ import Module from "../../base/Root/Module";
 import { DataContext } from "../internal/providers/appdata-provider";
 import Root from "../../base/Root";
 import { RemoteListener } from "../internal/app/remote-listener";
+import uuid from "uuid";
 
 export interface IModuleContextType {
   mod: Module;
@@ -24,11 +25,50 @@ interface IActualModuleProviderProps {
 }
 
 class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {}> {
+  private internalUUID: string;
+  public componentDidMount() {
+    if (
+      window.TESTING &&
+      process.env.NODE_ENV === "development"
+    ) {
+      this.internalUUID = uuid.v4();
+      this.mountOrUpdateModuleForTesting();
+    }
+  }
+  public mountOrUpdateModuleForTesting() {
+    if (process.env.NODE_ENV === "development") {
+      const current = window.TESTING.mountedModules.find(m => m.instanceUUID === this.internalUUID);
+      const id = this.props.root.getModuleFor(this.props.mod.split("/")).getQualifiedPathName();
+      if (current) {
+        current.module = id;
+        current.time = (new Date()).toISOString();
+      } else {
+        window.TESTING.mountedModules.push({
+          instanceUUID: this.internalUUID,
+          module: id,
+          time: (new Date()).toISOString(),
+        });
+      }
+    }
+  }
   public shouldComponentUpdate(nextProps: IActualModuleProviderProps) {
+    if (
+      process.env.NODE_ENV === "development" &&
+      window.TESTING &&
+      this.props.mod !== nextProps.mod
+    ) {
+      this.mountOrUpdateModuleForTesting();
+    }
     return this.props.mod !== nextProps.mod ||
       this.props.children !== nextProps.children ||
       this.props.root !== nextProps.root ||
       this.props.remoteListener !== nextProps.remoteListener;
+  }
+  public componentWillUnmount() {
+    if (window.TESTING && process.env.NODE_ENV === "development") {
+      window.TESTING.mountedModules =
+        window.TESTING.mountedModules.filter(m => m.instanceUUID !== this.internalUUID);
+    }
   }
   public render() {
     return (
