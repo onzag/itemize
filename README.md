@@ -41,7 +41,7 @@ Itemize is also able to track the user IP in order to be able to predict a first
 
 ### Currency and Currency Exchanges
 
-Itemize currency type, provides values for currencies and these currencies can be displayed in any other currency that itemize supports; the factors are automatically updated using a currency layer API key, this means that currency values are displayed and converted to the current market value of what the user wants to see
+Itemize currency type, provides values for currencies and these currencies can be displayed in any other currency that itemize supports; the factors are automatically updated, this means that currency values are displayed and converted to the current market value of what the user wants to see
 
 ### Secure
 
