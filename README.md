@@ -37,7 +37,7 @@ Testing and test cases are automatically generated based on the application desi
 
 Itemize was made so that it doesn't assume any primary language, internationalization is enforced, as it has a global approach.
 
-Itemize is also able to track the user IP using an IPstack api key in order to be able to predict a first's user language and region.
+Itemize is also able to track the user IP in order to be able to predict a first's user language and region.
 
 ### Currency and Currency Exchanges
 
