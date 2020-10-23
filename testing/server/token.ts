@@ -72,7 +72,7 @@ export class TokenTest extends Test {
     );
 
     this.it(
-      "Should allow an EDIT action when using the valid token",
+      "Should allow a graphql action when using the valid token",
       async () => {
         const response = await fetchNode(this.fullHost + "/graphql", {
           method: "POST",
@@ -158,6 +158,45 @@ export class TokenTest extends Test {
           }
   
           assert.strictEqual(gqlAnswer.data.token, null);
+        }
+      );
+
+      this.it(
+        t.label + " during a graphql action",
+        async () => {
+          const response = await fetchNode(this.fullHost + "/graphql", {
+            method: "POST",
+            body: JSON.stringify(
+              {
+                query:
+                  "mutation{EDIT_MOD_users__IDEF_user(token: " +
+                  JSON.stringify(t.token) +
+                  ",id:" +
+                  this.testingUserInfo.testUser.id +
+                  ",version:null,language:" +
+                  JSON.stringify(this.testingUserInfo.testUser.app_language) +
+                  ",listener_uuid:null){id,}}",
+                variables: null
+              }
+            ),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+  
+          assert.strictEqual(response.status, 200, "Did not return 200 OK");
+  
+          const gqlAnswer = await response.json();
+  
+          if (
+            !gqlAnswer.errors ||
+            !gqlAnswer.errors[0] ||
+            !gqlAnswer.errors[0].extensions ||
+            gqlAnswer.errors[0].extensions.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
+          ) {
+            console.log(gqlAnswer);
+            assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
+          }
         }
       );
     });

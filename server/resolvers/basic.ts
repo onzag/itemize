@@ -97,7 +97,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     if (throwErr) {
       throw new EndpointError({
         message: "Invalid token that didn't pass verification",
-        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
       });
     }
   }
