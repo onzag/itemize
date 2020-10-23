@@ -33,13 +33,22 @@ export interface IMountedItem {
   isSearchMode: boolean;
   id: number;
   version: string;
-  time: string;
+  wasContentLoadedFromMemory: boolean;
+  wasFound: boolean;
+  hadAFallback: boolean;
+  staticStatus: "TOTAL" | "NO_LISTENING";
+  avoidsLoading: boolean;
+  mountTime: string;
+  updateTime: string;
+  unmountTime: string;
 }
 
 export interface IMountedModule {
   instanceUUID: string;
   module: string;
-  time: string;
+  mountTime: string;
+  updateTime: string;
+  unmountTime: string;
 }
 
 export interface IErrorEventWithTime extends IErrorEvent {

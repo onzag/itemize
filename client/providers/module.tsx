@@ -41,12 +41,14 @@ class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {
       const id = this.props.root.getModuleFor(this.props.mod.split("/")).getQualifiedPathName();
       if (current) {
         current.module = id;
-        current.time = (new Date()).toISOString();
+        current.updateTime = (new Date()).toISOString();
       } else {
         window.TESTING.mountedModules.push({
           instanceUUID: this.internalUUID,
           module: id,
-          time: (new Date()).toISOString(),
+          mountTime: (new Date()).toISOString(),
+          updateTime: null,
+          unmountTime: null,
         });
       }
     }
@@ -66,8 +68,11 @@ class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {
   }
   public componentWillUnmount() {
     if (window.TESTING && process.env.NODE_ENV === "development") {
-      window.TESTING.mountedModules =
-        window.TESTING.mountedModules.filter(m => m.instanceUUID !== this.internalUUID);
+      const mountedModule =
+        window.TESTING.mountedModules.find(m => m.instanceUUID === this.internalUUID);
+      if (mountedModule) {
+        mountedModule.unmountTime = (new Date()).toISOString();
+      }
     }
   }
   public render() {

@@ -2,6 +2,7 @@ import { Test } from "..";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
 import type { Browser } from "puppeteer";
+import { ExplorerText } from "./explorer";
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -33,8 +34,19 @@ export class ClientTest extends Test {
   public async before() {
     this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
   }
+
   public describe() {
-    
+    // TODO explore the website as a range of users and with language specified
+    this.define(
+      "Exploring the website as a guest (no language specified)",
+      new ExplorerText(
+        this.host,
+        this.fullHost,
+        this.testingInfo,
+        this.puppet,
+        "/",
+      ),
+    );
   }
 
   public after() {

@@ -260,6 +260,27 @@ export class RemoteListener {
   }
 
   /**
+   * When testing is enable it pushes test information
+   * to the given slot in the socket data
+   * @param slot the slot to use
+   * @param data the data we are inserting
+   */
+  public pushTestingInfo(
+    slot: string,
+    data: any,
+  ) {
+    if (process.env.NODE_ENV === "development") {
+      if (window.TESTING) {
+        const dataWithTime = {
+          ...data,
+          time: (new Date()).toISOString(),
+        };
+        window.TESTING.socket[slot].push(dataWithTime);
+      }
+    }
+  }
+
+  /**
    * Called when the token changes an allows for
    * identification as well as re-identification
    * 
@@ -272,12 +293,17 @@ export class RemoteListener {
     this.hasSetToken = true;
     this.token = token;
     if (this.socket.connected) {
+      const request = {
+        uuid: this.uuid,
+        token: this.token,
+      };
+      this.pushTestingInfo(
+        "identifyRequests",
+        request,
+      );
       this.socket.emit(
         IDENTIFY_REQUEST,
-        {
-          uuid: this.uuid,
-          token: this.token,
-        },
+        request,
       );
       await this.onIdentificationDone();
       this.isReady = true;
@@ -360,6 +386,11 @@ export class RemoteListener {
    * @param event the error event
    */
   public onError(event: IErrorEvent) {
+    this.pushTestingInfo(
+      "errors",
+      event,
+    );
+
     console.error(
       event.message,
     );
@@ -448,6 +479,10 @@ export class RemoteListener {
       await this.onIdentificationDone();
       // check if still connected after a possible await
       if (this.socket.connected) {
+        this.pushTestingInfo(
+          "registerRequests",
+          request,
+        );
         this.socket.emit(
           REGISTER_REQUEST,
           request,
@@ -494,6 +529,10 @@ export class RemoteListener {
             version: forVersion,
             itemDefinition: itemDefinitionQualifiedPathName,
           };
+          this.pushTestingInfo(
+            "unregisterRequests",
+            request,
+          );
           this.socket.emit(
             UNREGISTER_REQUEST,
             request,
@@ -527,6 +566,10 @@ export class RemoteListener {
         // check if connected again
         if (this.socket.connected) {
           // and then emit it
+          this.pushTestingInfo(
+            "feedbackRequests",
+            request,
+          );
           this.socket.emit(
             FEEDBACK_REQUEST,
             request,
@@ -562,6 +605,10 @@ export class RemoteListener {
         // the reason we use delayed feedbacks is for efficiency, while we don't
         // use this for owned searches, but sometimes a same feedback would be requested twice
         this.delayedFeedbacks.forEach((df) => {
+          this.pushTestingInfo(
+            "feedbackRequests",
+            df,
+          );
           this.socket.emit(
             FEEDBACK_REQUEST,
             df,
@@ -625,6 +672,10 @@ export class RemoteListener {
       await this.onIdentificationDone();
       // check if still connected after a possible await
       if (this.socket.connected) {
+        this.pushTestingInfo(
+          "ownedSearchRegisterRequests",
+          request,
+        );
         this.socket.emit(
           OWNED_SEARCH_REGISTER_REQUEST,
           request,
@@ -667,6 +718,10 @@ export class RemoteListener {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
             createdBy,
           };
+          this.pushTestingInfo(
+            "ownedSearchUnregisterRequests",
+            request,
+          );
           this.socket.emit(
             OWNED_SEARCH_UNREGISTER_REQUEST,
             request,
@@ -691,6 +746,10 @@ export class RemoteListener {
 
       // check if still connected after a possible await
       if (this.socket.connected) {
+        this.pushTestingInfo(
+          "ownedSearchFeedbackRequests",
+          request,
+        );
         this.socket.emit(
           OWNED_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -760,6 +819,10 @@ export class RemoteListener {
 
       // check if still connected after a possible await
       if (this.socket.connected) {
+        this.pushTestingInfo(
+          "parentedSearchRegisterRequests",
+          request,
+        );
         this.socket.emit(
           PARENTED_SEARCH_REGISTER_REQUEST,
           request,
@@ -810,6 +873,10 @@ export class RemoteListener {
             parentType,
             parentVersion,
           };
+          this.pushTestingInfo(
+            "parentedSearchUnregisterRequests",
+            request,
+          );
           this.socket.emit(
             PARENTED_SEARCH_UNREGISTER_REQUEST,
             request,
@@ -834,6 +901,10 @@ export class RemoteListener {
 
       // check if still connected after a possible await
       if (this.socket.connected) {
+        this.pushTestingInfo(
+          "parentedSearchFeebackRequests",
+          request,
+        );
         this.socket.emit(
           PARENTED_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -849,6 +920,11 @@ export class RemoteListener {
   private onChangeListened(
     event: IChangedFeedbackEvent,
   ) {
+    this.pushTestingInfo(
+      "changedFeedbackEvents",
+      event,
+    );
+
     // first we need to see what item definition we matched
     const itemDefinition: ItemDefinition = this.root.registry[event.itemDefinition] as ItemDefinition;
     // and let's get the applied value for it we currently have
@@ -947,6 +1023,11 @@ export class RemoteListener {
   private async onRecordsAddedToOwnedSearch(
     event: IOwnedSearchRecordsAddedEvent,
   ) {
+    this.pushTestingInfo(
+      "ownedSearchRecordsAddedEvents",
+      event,
+    );
+
     // so first we want to get our owned listener for it
     const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
 
@@ -994,6 +1075,11 @@ export class RemoteListener {
   private async onRecordsAddedToParentedSearch(
     event: IParentedSearchRecordsAddedEvent,
   ) {
+    this.pushTestingInfo(
+      "parentedSearchRecordsAddedEvents",
+      event,
+    );
+
     // build the listener id
     const parentedListener = this.parentedSearchListeners[
       event.qualifiedPathName + "." + event.parentType + "." +
@@ -1047,6 +1133,10 @@ export class RemoteListener {
     }
     return new Promise((resolve) => {
       const doneListener = () => {
+        this.pushTestingInfo(
+          "identifiedEvents",
+          {},
+        );
         this.socket.off(IDENTIFIED_EVENT, doneListener);
         this.socket.off("disconnect", doneListenerDisconnect);
         resolve();
@@ -1082,12 +1172,17 @@ export class RemoteListener {
 
     // so we attempt to reidentify as soon as we are connected
     if (this.hasSetToken && !this.isReady) {
+      const request = {
+        uuid: this.uuid,
+        token: this.token,
+      };
+      this.pushTestingInfo(
+        "identifyRequests",
+        request,
+      )
       this.socket.emit(
         IDENTIFY_REQUEST,
-        {
-          uuid: this.uuid,
-          token: this.token,
-        },
+        request,
       );
 
       // now we await for identification to be sucesful

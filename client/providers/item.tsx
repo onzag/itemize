@@ -1101,7 +1101,7 @@ export class ActualItemProvider extends
     }
   }
 
-  public mountOrUpdateIdefForTesting() {
+  public mountOrUpdateIdefForTesting(wasContentLoadedFromMemory?: boolean) {
     if (process.env.NODE_ENV === "development") {
       const current = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
       const idefId = this.props.itemDefinitionInstance.getQualifiedPathName();
@@ -1113,7 +1113,14 @@ export class ActualItemProvider extends
         current.version = this.props.forVersion || null;
         current.isSearchMode = this.props.itemDefinitionInstance.isInSearchMode();
         current.isExtensions = this.props.itemDefinitionInstance.isExtensionsInstance();
-        current.time = (new Date()).toISOString();
+        current.wasFound = !this.state.notFound;
+        current.staticStatus = this.props.static;
+        if (typeof wasContentLoadedFromMemory !== "undefined") {
+          current.wasContentLoadedFromMemory = wasContentLoadedFromMemory;
+        }
+        current.hadAFallback = !!this.props.loadUnversionedFallback;
+        current.updateTime = (new Date()).toISOString();
+        current.avoidsLoading = !!this.props.avoidLoading;
       } else {
         window.TESTING.mountedItems.push({
           instanceUUID: this.internalUUID,
@@ -1123,7 +1130,14 @@ export class ActualItemProvider extends
           version: this.props.forVersion || null,
           isSearchMode: this.props.itemDefinitionInstance.isInSearchMode(),
           isExtensions: this.props.itemDefinitionInstance.isExtensionsInstance(),
-          time: (new Date()).toISOString(),
+          mountTime: (new Date()).toISOString(),
+          wasFound: !this.state.notFound,
+          hadAFallback: !!this.props.loadUnversionedFallback,
+          updateTime: null,
+          unmountTime: null,
+          staticStatus: this.props.static,
+          wasContentLoadedFromMemory: !!wasContentLoadedFromMemory,
+          avoidsLoading: !!this.props.avoidLoading,
         });
       }
     }
@@ -1292,13 +1306,7 @@ export class ActualItemProvider extends
       this.markForDestruction();
     }
 
-    if (
-      window.TESTING &&
-      (
-        itemDefinitionWasUpdated ||
-        uniqueIDChanged
-      )
-    ) {
+    if (process.env.NODE_ENV === "development") {
       this.mountOrUpdateIdefForTesting();
     }
 
@@ -1673,6 +1681,9 @@ export class ActualItemProvider extends
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         forId, forVersion,
       );
+      if (process.env.NODE_ENV === "development") {
+        this.mountOrUpdateIdefForTesting(true);
+      }
       if (
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
@@ -2075,8 +2086,10 @@ export class ActualItemProvider extends
     this.runDismountOn();
 
     if (window.TESTING && process.env.NODE_ENV === "development") {
-      window.TESTING.mountedItems =
-        window.TESTING.mountedItems.filter(m => m.instanceUUID !== this.internalUUID);
+      const mountItem = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
+      if (mountItem) {
+        mountItem.unmountTime = (new Date()).toISOString();
+      }
     }
   }
   public onIncludeSetExclusionState(include: Include, state: IncludeExclusionState) {

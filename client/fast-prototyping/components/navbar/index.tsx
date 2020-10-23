@@ -5,8 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon,
-  ImportantDevicesIcon, LibraryBooksIcon, HomeIcon } from "../../mui-core";
+import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";

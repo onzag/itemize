@@ -6,6 +6,7 @@ class ItHandle {
   public isSkippedAllOnFail: boolean = false;
   public isSkippedLayerOnFail: boolean = false;
   public isQuitted: boolean = false;
+  public isSkippedNextOnFail: boolean = false;
 
   constructor(label: string, fn: () => void | PromiseLike<void>) {
     this.label = label;
@@ -19,6 +20,11 @@ class ItHandle {
 
   public skipLayerOnFail() {
     this.isSkippedLayerOnFail = true;
+    return this;
+  }
+
+  public skipNextOnFail() {
+    this.isSkippedNextOnFail = true;
     return this;
   }
 
@@ -258,7 +264,9 @@ export class Test {
                 (itAttr.label ? tabsPlus : tabs) +
                 colorFn(warningToShow.isInfo ? "ⓘ" : "⚠") + " " + colorFn(warningToShow.content)
               );
-              warnings++;
+              if (!warningToShow.isInfo) {
+                warnings++;
+              }
             }
           }
           if (itAttr.label) {
@@ -271,6 +279,9 @@ export class Test {
           }
           if (itAttr.isSkippedLayerOnFail) {
             this.doSkipLayer = true;
+          }
+          if (itAttr.isSkippedNextOnFail) {
+            this.doSkipNext = true;
           }
           if (itAttr.isQuitted) {
             this.doStop = true;
@@ -359,7 +370,9 @@ export class Test {
             tabs +
             colorFn(warningToShow.isInfo ? "ⓘ" : "⚠") + " " + colorFn(warningToShow.content)
           );
-          warnings++;
+          if (!warningToShow.isInfo) {
+            warnings++;
+          }
         }
       }
     }
