@@ -97,7 +97,7 @@ Itemize supports geography and geographical search out of the box, using openstr
 
 Itemize supports rich text and rich text based search out of the box with file support
 
-## API Documentation
+## Documentation
 
 Documentation is available [here](./docs)
 
