@@ -37,6 +37,7 @@ import { IPStackService } from "./services/ipstack";
 import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
+import { FakeMailService } from "./services/fake-mail";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -597,7 +598,10 @@ export async function initializeServer(
         "initializeServer: initializing mail service",
       );
     }
-    const MailServiceClass = (custom && custom.mailServiceProvider) || MailgunService;
+    let MailServiceClass = (custom && custom.mailServiceProvider) || MailgunService;
+    if (process.env.FAKE_EMAILS === "true") {
+      MailServiceClass = FakeMailService;
+    }
     const mailService = sensitiveConfig.mail ?
       new MailServiceClass(
         sensitiveConfig.mail,
