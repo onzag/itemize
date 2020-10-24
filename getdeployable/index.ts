@@ -283,11 +283,11 @@ export default async function build(version: string, buildID: string, services: 
       "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
       "\ndocker-compose -f docker-compose-only-db.yml up -d" +
       "\nthen run the code for accessing the builder" +
-      "\ndir=${PWD##*/} docker run -it --network \"${dir,,}_default\" "
+      "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" " +
       "-v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
       " -e INSTANCE_MODE=BUILD_DATABASE app:latest" +
       "\nalso if you need to load dumps remember to run:" +
-      "\ndir=${PWD##*/} docker run -it --network \"${dir,,}_default\" "
+      "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" "
       "-v $PWD/config:/home/node/app/config -v $PWD/dump:/home/node/app/dump -e NODE_ENV=" + version +
       " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest" +
       "\nstop the database by doing" +
