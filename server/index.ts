@@ -600,6 +600,9 @@ export async function initializeServer(
     }
     let MailServiceClass = (custom && custom.mailServiceProvider) || MailgunService;
     if (process.env.FAKE_EMAILS === "true") {
+      logger.info(
+        "initializeServer: using fake email service",
+      );
       MailServiceClass = FakeMailService;
     }
     const mailService = sensitiveConfig.mail ?
