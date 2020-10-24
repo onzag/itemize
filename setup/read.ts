@@ -274,7 +274,9 @@ export async function configRequest<T>(
   extractData: Array<IConfigRequestExtractPoint>,
   variableNamePrefix: string = "",
 ): Promise<T> {
-  console.log(colors.bgGreen("\nENTER:") + " " + message);
+  if (message) {
+    console.log(colors.bgGreen("\nENTER:") + " " + message);
+  }
 
   // so we first use our source to build this new config
   const newConfig: T = {
@@ -286,14 +288,21 @@ export async function configRequest<T>(
   for (const extractPoint of extractData) {
     if (
       extractPoint.cantRerun &&
-      typeof newConfig[extractPoint.variableName] !== "undefined" &&
-      newConfig[extractPoint.variableName] !== null
+      (
+        typeof newConfig[extractPoint.variableName] !== "undefined" &&
+        newConfig[extractPoint.variableName] !== null
+      )
     ) {
+      console.log(colors.bgRed("\t>") + " " + variableNamePrefix + extractPoint.variableName);
       continue;
     }
 
+    console.log(colors.bgGreen("\t>") + " " + variableNamePrefix + extractPoint.variableName);
+
     // so if it's a config type
     if (extractPoint.type === "config") {
+      console.log("\t" + extractPoint.message);
+
       if (extractPoint.preferUnfilled && await yesno("Would you rather leave the field untouched?")) {
         newConfig[extractPoint.variableName] =
           typeof newConfig[extractPoint.variableName] !== "undefined" ?
@@ -304,8 +313,8 @@ export async function configRequest<T>(
         newConfig[extractPoint.variableName] = await configRequest(
           // the source value is the value inside this newConfig if there's one
           typeof newConfig[extractPoint.variableName] !== "undefined" ? newConfig[extractPoint.variableName] : null,
-          // the message
-          extractPoint.message,
+          // the message is null because we already showed it
+          null,
           // the data we are extracting for
           extractPoint.extractData,
           // and we prefix with the current prefix plus the variable name and a dot
@@ -314,6 +323,8 @@ export async function configRequest<T>(
       }
       // now for multiconfig or the keys of config or multiconfig
     } else if (extractPoint.type === "multiconfig") {
+      console.log("\t" + extractPoint.message);
+  
       if (extractPoint.preferUnfilled && await yesno("Would you rather leave the field untouched?")) {
         newConfig[extractPoint.variableName] =
         typeof newConfig[extractPoint.variableName] !== "undefined" ?
@@ -342,12 +353,14 @@ export async function configRequest<T>(
 
         // now for every key we have added in these key list
         for (const key of keys) {
+          console.log(colors.bgGreen("\t>") + " " + variableNamePrefix + extractPoint.variableName + "." + key);
+
           // we make a config request each
           newConfig[extractPoint.variableName][key] = await configRequest(
             // as you can see the source is what is inside of it right now
             typeof newConfig[extractPoint.variableName][key] !== "undefined" ? newConfig[extractPoint.variableName][key] : null,
-            // the message
-            extractPoint.message,
+            // the message is null because we already showed it
+            null,
             // the data we are supposed to extract for each one of these
             extractPoint.extractData,
             // and a nice prefix
@@ -377,9 +390,6 @@ export async function configRequest<T>(
       );
     }
   }
-
-  // we are done with it
-  console.log(colors.bgGreen("\nEXIT:") + " " + message);
 
   // return this config
   return newConfig;
