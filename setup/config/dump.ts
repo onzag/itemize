@@ -29,16 +29,16 @@ export function dumpConfigRequest(
     load: {
       primaryContainerId:
         // No openstack containers defined
-        !sensitiveConfig.openstackContainers ?
+        !sensitiveConfig.containers ?
           // then it's main
           (sensitiveConfig.localContainer || "MAIN") :
           (
             // main in the openstack container list
-            sensitiveConfig.openstackContainers["MAIN"] ?
+            sensitiveConfig.containers["MAIN"] ?
             // so it is main
             "MAIN" :
             // pick the first container you find, nothing found, then main
-            Object.keys(sensitiveConfig.openstackContainers)[0] || sensitiveConfig.localContainer || "MAIN"
+            Object.keys(sensitiveConfig.containers)[0] || sensitiveConfig.localContainer || "MAIN"
           ),
     },
   };

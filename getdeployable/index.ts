@@ -12,7 +12,6 @@ import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config
 import YAML from 'yaml';
 import { request } from "../setup/read";
 import { execSudo } from "../setup/exec";
-import util from "util";
 
 const fsAsync = fs.promises;
 

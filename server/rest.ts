@@ -181,7 +181,7 @@ export default function restServices(appData: IAppDataType) {
       ip === "127.0.0.1" ||
       ip === "::1" ||
       ip === "::ffff:127.0.0.1" ||
-      !appData.ipStack
+      !appData.userLocalizationService
     ) {
       res.end(JSON.stringify(standardAPIResponse));
       return;
@@ -189,15 +189,15 @@ export default function restServices(appData: IAppDataType) {
 
     logger.info("Requesting location for ip address of " + ip);
 
-    const ipStackResponse = await appData.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
-    res.end(JSON.stringify(ipStackResponse));
+    const serviceResponse = await appData.userLocalizationService.getLocalizationFor(ip, standardAPIResponse);
+    res.end(JSON.stringify(serviceResponse));
   });
 
   router.get("/util/location-geocode", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     if (
-      !appData.here
+      !appData.locationSearchService
     ) {
       res.status(400);
       res.end(JSON.stringify({
@@ -221,7 +221,7 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const finalResult = await appData.here.requestGeocodeFor(
+    const finalResult = await appData.locationSearchService.requestGeocodeFor(
       req.query.lat as string,
       req.query.lng as string,
       req.query.q as string,
@@ -237,7 +237,7 @@ export default function restServices(appData: IAppDataType) {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     if (
-      !appData.here
+      !appData.locationSearchService
     ) {
       res.status(400);
       res.end(JSON.stringify({
@@ -261,7 +261,7 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const finalResults = await appData.here.requestAutocompleteFor(
+    const finalResults = await appData.locationSearchService.requestAutocompleteFor(
       req.query.lat as string,
       req.query.lng as string,
       req.query.q as string,
@@ -277,7 +277,7 @@ export default function restServices(appData: IAppDataType) {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     if (
-      !appData.here
+      !appData.locationSearchService
     ) {
       res.status(400);
       res.end(JSON.stringify({
@@ -301,7 +301,7 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const finalResults = await appData.here.requestSearchFor(
+    const finalResults = await appData.locationSearchService.requestSearchFor(
       req.query.lat as string,
       req.query.lng as string,
       req.query.q as string,

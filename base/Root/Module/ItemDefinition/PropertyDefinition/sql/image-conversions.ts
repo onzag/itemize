@@ -11,7 +11,7 @@ import sharp from "sharp";
 import { ReadStream } from "fs";
 import path from "path";
 import { sqlUploadPipeFile } from "./file-management";
-import { CloudClient } from "../../../../../../server/cloud";
+import { StorageProvider } from "../../../../../../server/services";
 
 /**
  * this is what we get as a result from
@@ -116,7 +116,7 @@ export async function runImageConversions(
   filePath: string,
   fileName: string,
   fileMimeType: string,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   propDef: PropertyDefinition,
 ): Promise<void> {

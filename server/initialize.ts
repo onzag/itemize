@@ -226,7 +226,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
         }
       });
 
-      const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
+      const prefix = appData.storage[appData.sensitiveConfig.seoContainerID].getPrefix();
       let host = "";
       if (prefix.startsWith("/")) {
         host = "https://" +
@@ -245,7 +245,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   });
 
   if (!NO_SEO) {
-    const prefix = appData.cloudClients[appData.sensitiveConfig.seoContainerID].getPrefix();
+    const prefix = appData.storage[appData.sensitiveConfig.seoContainerID].getPrefix();
     app.get("/sitemap.xml", (req, res) => {
       res.redirect(prefix + (prefix.endsWith("/") ? "" : "/") + "sitemaps/" + hostname + "/index.xml")
     });

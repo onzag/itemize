@@ -2,6 +2,7 @@ import http from "http";
 import https from "https";
 import { countries } from "../../imported-resources";
 import { logger } from "../";
+import { IUserLocalizationType, UserLocalizationProvider } from ".";
 
 interface IPStackResponse {
   ip: string;
@@ -31,22 +32,15 @@ interface IPStackResponse {
   }
 }
 
-interface IPStackItemizeSpecificResponse {
-  country: string;
-  currency: string;
-  language: string;
+export interface IPStackConfig {
+  apiKey: string;
+  httpsEnabled: boolean;
 }
 
-export class IPStack {
-  private apiKey: string;
-  private httpsEnabled: boolean;
-  constructor(apiKey: string, httpsEnabled: boolean) {
-    this.apiKey = apiKey;
-    this.httpsEnabled = httpsEnabled;
-  }
+export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
   private requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
-      (this.httpsEnabled ? https : http).get(`http://api.ipstack.com/${ip}?access_key=${this.apiKey}`, (resp) => {
+      (this.config.httpsEnabled ? https : http).get(`http://api.ipstack.com/${ip}?access_key=${this.config.apiKey}`, (resp) => {
         // let's get the response from the stream
         let data = "";
         resp.on("data", (chunk) => {
@@ -54,7 +48,7 @@ export class IPStack {
         });
         resp.on("error", (err) => {
           logger.error(
-            "IPStack.requestInfoFor: request to the ip stack ip returned error",
+            "IPStackService.requestInfoFor: request to the ip stack ip returned error",
             {
               errMessage: err.message,
               errStack: err.stack,
@@ -69,7 +63,7 @@ export class IPStack {
             const parsedData = JSON.parse(data);
             if (parsedData.error) {
               logger.error(
-                "IPStack.requestInfoFor: ipstack provided a custom error",
+                "IPStackService.requestInfoFor: ipstack provided a custom error",
                 {
                   errMessage: parsedData.error,
                   ip,
@@ -82,7 +76,7 @@ export class IPStack {
             }
           } catch (err) {
             logger.error(
-              "IPStack.requestInfoFor: request to the ip stack ip returned invalid data",
+              "IPStackService.requestInfoFor: request to the ip stack ip returned invalid data",
               {
                 errMessage: err.message,
                 errStack: err.stack,
@@ -95,7 +89,7 @@ export class IPStack {
         });
       }).on("error", (err) => {
         logger.error(
-          "IPStack.requestInfoFor: https request to ipstack API failed",
+          "IPStackService.requestInfoFor: https request to ipstack API failed",
           {
             errMessage: err.message,
             errStack: err.stack,
@@ -106,10 +100,10 @@ export class IPStack {
       });
     });
   }
-  async requestUserInfoForIp(
+  public async getLocalizationFor(
     ip: string,
-    fallback: IPStackItemizeSpecificResponse,
-  ): Promise<IPStackItemizeSpecificResponse> {
+    fallback: IUserLocalizationType,
+  ): Promise<IUserLocalizationType> {
     try {
       const standardResponse = await this.requestInfoFor(ip);
       if (standardResponse.country_code === null) {
@@ -126,8 +120,4 @@ export class IPStack {
       return fallback;
     }
   }
-}
-
-export function setupIPStack(apiKey: string, httpsEnabled: boolean) {
-  return new IPStack(apiKey, httpsEnabled);
 }

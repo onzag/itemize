@@ -17,8 +17,8 @@ import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
-import { getCloudClients } from "../server";
-import { CloudClient, ICloudClients } from "../server/cloud";
+import { getStorageProviders } from "../server";
+import { StorageProvider, IStorageProvidersObject } from "../server/services";
 
 const fsAsync = fs.promises;
 
@@ -182,10 +182,10 @@ async function dumpAllFromModuleRecursive(knex: Knex, root: Root, mod: Module): 
  * concatenated and separated by a dot
  * @param client the cloud client
  */
-async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, client: CloudClient) {
-  await client.dumpEntireFolder(
+async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, client: StorageProvider<any>) {
+  await client.dumpFolder(
     domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
-    "dump",
+    path.join("dump", qualifiedPathName, idVersionHandle),
   );
 }
 
@@ -193,10 +193,10 @@ async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHa
  * Performs the copy of the data that is necessary for a given row
  * @param row the row in question
  * @param root the root
- * @param cloudClients all the cloud clients
+ * @param storageClients all the cloud clients
  * @param domain the domain in question
  */
-async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: ICloudClients, domain: string) {
+async function copyDataOf(row: ISQLTableRowValue, root: Root, storageClients: IStorageProvidersObject, domain: string) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
   // so we need the idef and the module
@@ -205,7 +205,7 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: IClo
 
   // and now we'll see our container and download the data from there
   let idUsed = row.container_id;
-  let client = cloudClients[idUsed];
+  let client = storageClients[idUsed];
   if (!client) {
     console.log(
       colors.red(
@@ -246,12 +246,13 @@ export default async function dump(version: string, knex: Knex, root: Root) {
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
-  // and our pkgcloud containers
-  const cloudClients = await getCloudClients(config, sensitiveConfig);
+  // and our containers
+  // TODO we need to pass the custom info and get it from somewhere
+  const storageClients = await getStorageProviders(config, sensitiveConfig, null);
 
   // we can specify we have loaded them
-  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
-    colors.yellow(Object.keys(cloudClients).join(", ")));
+  console.log(`Loaded ${Object.keys(storageClients).length} storage containers: ` +
+    colors.yellow(Object.keys(storageClients).join(", ")));
 
   // and now we can start dumping
   let final: ISQLTableRowValue[] = [];
@@ -347,7 +348,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
         await copyDataOf(
           row,
           root,
-          cloudClients,
+          storageClients,
           version === "development" ?
             config.developmentHostname :
             config.productionHostname

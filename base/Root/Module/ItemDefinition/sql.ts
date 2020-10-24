@@ -32,7 +32,7 @@ import {
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
 import Knex from "knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
-import { CloudClient } from "../../../../server/cloud";
+import { StorageProvider } from "../../../../server/services";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -281,7 +281,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,

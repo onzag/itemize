@@ -16,51 +16,10 @@ import { ISQLTableDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { yesno } from ".";
 import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
-import { CloudClient } from "../server/cloud";
-import { getCloudClients } from "../server";
+import { getStorageProviders } from "../server";
+import { StorageProvider } from "../server/services";
 
 const fsAsync = fs.promises;
-
-// /**
-//  * Removes a folder from the given openstack container
-//  * @param uploadsClient the uploadsClient
-//  * @param mainPath the path we are deleting for
-//  */
-// export async function removeFolderFor(
-//   uploadsContainer: pkgcloud.storage.Container,
-//   mainPath: string,
-// ): Promise<void> {
-//   console.log("Deleting existing files for: " + mainPath);
-
-//   // we return a promise for this
-//   return new Promise((resolve, reject) => {
-//     // need to get all the files
-//     (uploadsContainer as any).getFiles({
-//       prefix: mainPath,
-//     }, (err: pkgcloud.ClientError, files: pkgcloud.storage.File[]) => {
-//       // if we get an error
-//       if (err) {
-//         reject(err);
-//       } else if (files && files.length) {
-
-//         // now we can delete the files in bulk
-//         console.log("bulk deleting " + files.length + " files");
-
-//         // by calling this
-//         (uploadsContainer.client as any).bulkDelete(uploadsContainer, files, (err: pkgcloud.ClientError) => {
-//           if (err) {
-//             reject(err);
-//           } else {
-//             resolve();
-//           }
-//         });
-//       } else {
-//         console.log("No files found to delete");
-//         resolve();
-//       }
-//     });
-//   });
-// }
 
 /**
  * Copy the local files from the dump into the container by sending
@@ -70,7 +29,7 @@ const fsAsync = fs.promises;
  * @param remotePath the remote path we are expected to copy at
  */
 export async function copyFilesFor(
-  uploadClient: CloudClient,
+  uploadClient: StorageProvider<any>,
   localPath: string,
   remotePath: string,
 ) {
@@ -102,7 +61,7 @@ export async function copyFilesFor(
         // and a read stream for our local
         const readStream = fs.createReadStream(localFilePath);
         // and we pipe it!
-        await uploadClient.upload(remoteFilePath, readStream);
+        await uploadClient.upload(remoteFilePath, readStream, false);
       }
     }
   } catch {
@@ -141,7 +100,8 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
   );
 
   // and the upload containers
-  const cloudClients = await getCloudClients(config, sensitiveConfig);
+  // TODO same thing, we need to add the config for the providers somehow
+  const cloudClients = await getStorageProviders(config, sensitiveConfig, null);
 
   // inform the users
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +

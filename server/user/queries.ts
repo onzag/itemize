@@ -287,9 +287,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
       },
       async resolve(source: any, args: any, context: any, info: any) {
-        if (!appData.mailgun) {
+        if (!appData.mailService) {
           throw new EndpointError({
-            message: "Mailgun is not available",
+            message: "Mail service is not available",
             code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         } else if (!emailProperty || !eValidatedProperty) {
@@ -452,7 +452,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           throw err;
         }
 
-        const validateLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
+        const validateLink = (
+          process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
+        ) +
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
         const templateIdToUse = parseInt(i18nData.custom.validate_account_fragment_id, 10);
 
@@ -496,9 +498,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
       },
       async resolve(source: any, args: any, context: any, info: any) {
-        if (!appData.mailgun) {
+        if (!appData.mailService) {
           throw new EndpointError({
-            message: "Mailgun is not available",
+            message: "Mail service is not available",
             code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         } else if (!emailProperty || !eValidatedProperty) {
@@ -633,7 +635,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           throw err;
         }
 
-        const resetPasswordLink = (appData.sensitiveConfig.mailgunTargetDomain || appData.config.productionHostname) +
+        const resetPasswordLink = (
+          process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
+        ) +
           i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
 
         const templateIdToUse = parseInt(i18nData.custom.forgot_password_fragment_id, 10);

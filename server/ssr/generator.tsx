@@ -275,7 +275,7 @@ export async function ssrGenerator(
 
     try {
       // for that we try to initialize, which can indeed, fail
-      // mainly because calls to ipstack and whatnot which must
+      // mainly because calls to the localizations service and whatnot which must
       // be consistent
       serverAppData = await initializeItemizeApp(
         appData.ssrConfig.rendererContext,
@@ -297,7 +297,7 @@ export async function ssrGenerator(
             root: root,
             req: req,
             res: res,
-            ipStack: appData.ipStack,
+            userLocalizationService: appData.userLocalizationService,
           }
         }
       );

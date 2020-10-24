@@ -1,7 +1,6 @@
 import https from "https";
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
-import uuidv5 from "uuid/v5";
-import { logger } from "../";
+import { LocationSearchProvider } from ".";
 
 // the interface that roughly represents a result from the
 // here we go API, check the API at
@@ -22,31 +21,22 @@ interface IHereResult {
   distance: number;
 }
 
-// this id can be whatever just to ensure lat and long produce the same id no matter what
-// basically a combination for location, this way we are not tied to any API
-const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
-function makeIdOutOf(lat: number, lng: number) {
-  return "L" + uuidv5(lat.toString() + lng.toString(), NAMESPACE).replace(/-/g, "");
+export interface IHereMapsConfig {
+  apiKey: string;
 }
 
-// converts a suggestion to our lovely location type
-function processHereResult(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
-  return {
-    lat: suggestion.position[0],
-    lng: suggestion.position[1],
-    txt: overwriteTxt || suggestion.title,
-    id: makeIdOutOf(suggestion.position[0], suggestion.position[1]),
-    // NOTE adding tf=plain makes plain text results, but this works pretty well
-    atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, wordSeparator + " ") : null,
-  };
-}
-
-export class Here {
-  private apiKey: string;
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
+  private processHereResult(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
+    return {
+      lat: suggestion.position[0],
+      lng: suggestion.position[1],
+      txt: overwriteTxt || suggestion.title,
+      id: this.makeIdOutOf(suggestion.position[0], suggestion.position[1]),
+      // NOTE adding tf=plain makes plain text results, but this works pretty well
+      atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, wordSeparator + " ") : null,
+    };
   }
-  requestGeocodeFor(
+  public requestGeocodeFor(
     lat: string | number,
     lng: string | number,
     query: string,
@@ -55,7 +45,7 @@ export class Here {
   ): Promise<IPropertyDefinitionSupportedLocationType> {
     const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/discover/here";
-    const qs = `?at=${lat},${lng}&cat=none&apiKey=${this.apiKey}`;
+    const qs = `?at=${lat},${lng}&cat=none&apiKey=${this.config.apiKey}`;
     const pathwithqs = path + qs;
 
     const latp = typeof lat === "number" ? lat : parseFloat(lat);
@@ -65,7 +55,7 @@ export class Here {
       atxt: "???",
       lat: latp,
       lng: lngp,
-      id: makeIdOutOf(latp, lngp),
+      id: this.makeIdOutOf(latp, lngp),
     };
     
     return new Promise<IPropertyDefinitionSupportedLocationType>((resolve, reject) => {
@@ -84,8 +74,8 @@ export class Here {
             data += chunk;
           });
           resp.on("error", (err) => {
-            logger.error(
-              "Here.requestGeocodeFor [SERIOUS]: here response cancelled",
+            this.logError(
+              "HereMapsService.requestGeocodeFor [SERIOUS]: here response cancelled",
               {
                 errMessage: err.message,
                 errStack: err.stack,
@@ -111,8 +101,8 @@ export class Here {
                 txt: query ? query : addressText,
               });
             } catch (err) {
-              logger.error(
-                "Here.requestGeocodeFor [SERIOUS]: here replied with invalid data or with error message",
+              this.logError(
+                "HereMapsService.requestGeocodeFor [SERIOUS]: here replied with invalid data or with error message",
                 {
                   errMessage: err.message,
                   errStack: err.stack,
@@ -129,8 +119,8 @@ export class Here {
           });
         }
       ).on("error", (err) => {
-        logger.error(
-          "Here.requestGeocodeFor [SERIOUS]: https request to here API failed",
+        this.logError(
+          "HereMapsService.requestGeocodeFor [SERIOUS]: https request to here API failed",
           {
             errMessage: err.message,
             errStack: err.stack,
@@ -145,7 +135,7 @@ export class Here {
       });
     });
   }
-  requestSearchFor(
+  public requestSearchFor(
     lat: string | number,
     lng: string | number,
     query: string,
@@ -154,7 +144,7 @@ export class Here {
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
     const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/discover/search";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}`;
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}`;
     const pathwithqs = path + qs;
     
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -173,8 +163,8 @@ export class Here {
             data += chunk;
           });
           resp.on("error", (err) => {
-            logger.error(
-              "Here.requestSearchFor [SERIOUS]: here response cancelled",
+            this.logError(
+              "HereMapsService.requestSearchFor [SERIOUS]: here response cancelled",
               {
                 errMessage: err.message,
                 errStack: err.stack,
@@ -200,14 +190,14 @@ export class Here {
                   ) === index;
                 }
               );
-              resolve(parsedData.results.items.map((r: IHereResult) => processHereResult(
+              resolve(parsedData.results.items.map((r: IHereResult) => this.processHereResult(
                 sep,
                 r,
                 query,
               )));
             } catch (err) {
-              logger.error(
-                "Here.requestSearchFor [SERIOUS]: here replied with invalid data or with error message",
+              this.logError(
+                "HereMapsService.requestSearchFor [SERIOUS]: here replied with invalid data or with error message",
                 {
                   errMessage: err.message,
                   errStack: err.stack,
@@ -224,8 +214,8 @@ export class Here {
           });
         }
       ).on("error", (err) => {
-        logger.error(
-          "Here.requestSearchFor [SERIOUS]: https request to here API failed",
+        this.logError(
+          "HereMapsService.requestSearchFor [SERIOUS]: https request to here API failed",
           {
             errMessage: err.message,
             errStack: err.stack,
@@ -240,7 +230,7 @@ export class Here {
       });
     });
   }
-  requestAutocompleteFor(
+  public requestAutocompleteFor(
     lat: string | number,
     lng: string | number,
     query: string,
@@ -249,7 +239,7 @@ export class Here {
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
     const hostname = "places.ls.hereapi.com";
     const path = "/places/v1/autosuggest";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.apiKey}&size=6`;
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}&size=6`;
     const pathwithqs = path + qs;
     
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -268,8 +258,8 @@ export class Here {
             data += chunk;
           });
           resp.on("error", (err) => {
-            logger.error(
-              "Here.requestAutocompleteFor [SERIOUS]: here response cancelled",
+            this.logError(
+              "HereMapsService.requestAutocompleteFor [SERIOUS]: here response cancelled",
               {
                 errMessage: err.message,
                 errStack: err.stack,
@@ -288,13 +278,13 @@ export class Here {
             try {
               const parsedData = JSON.parse(data);
               parsedData.results = parsedData.results.filter((s: IHereResult) => s.position);
-              resolve(parsedData.results.map((r: IHereResult) => processHereResult(
+              resolve(parsedData.results.map((r: IHereResult) => this.processHereResult(
                 sep,
                 r,
               )));
             } catch (err) {
-              logger.error(
-                "Here.requestAutocompleteFor [SERIOUS]: here replied with invalid data or with error message",
+              this.logError(
+                "HereMapsService.requestAutocompleteFor [SERIOUS]: here replied with invalid data or with error message",
                 {
                   errMessage: err.message,
                   errStack: err.stack,
@@ -311,8 +301,8 @@ export class Here {
           });
         }
       ).on("error", (err) => {
-        logger.error(
-          "Here.requestSearchFor [SERIOUS]: https request to here API failed",
+        this.logError(
+          "HereMapsService.requestSearchFor [SERIOUS]: https request to here API failed",
           {
             errMessage: err.message,
             errStack: err.stack,
@@ -327,8 +317,4 @@ export class Here {
       });
     });
   }
-}
-
-export function setupHere(apiKey: string) {
-  return new Here(apiKey);
 }

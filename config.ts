@@ -136,19 +136,6 @@ export interface IConfigRawJSONDataType {
 }
 
 /**
- * The sensitive openstack container information
- */
-export interface ISensitiveConfigOpenstackContainerType {
-  username: string;
-  password: string;
-  region: string;
-  domainId: string;
-  domainName: string;
-  authUrl: string;
-  containerName: string;
-}
-
-/**
  * Specification to dump specific item definitions
  */
 export interface IDumpSpecificIdefInfoType {
@@ -219,35 +206,35 @@ export interface IDumpConfigRawJSONDataType {
  */
 export interface ISensitiveConfigRawJSONDataType {
   /**
-   * An ip stack access key
-   * can be null, fallback regionalization will always be used
+   * Used for localization services to localize users
    */
-  ipStackAccessKey: string;
-  /**
-   * whether ipstack is https enabled
-   * by default it's not, on the free plans
-   */
-  ipStackHttpsEnabled: boolean;
+  userLocalization: any;
   /**
    * the currency layer access key,
    * can be null, currency type won't work
    */
-  currencyLayerAccessKey: string;
-  /**
-   * whether currency layer is https enabled
-   * by default it's not, on the free plans
-   */
-  currencyLayerHttpsEnabled: boolean;
+  currencyFactors: any;
   /**
    * The here maps api key, can be null, address search won't work
    */
-  hereApiKey: string;
+  locationSearch: any;
   /**
-   * The openstack containers, they should match the previously given
+   * The mail service information, api key what not
+   */
+  mail: any;
+  /**
+   * The mail domain that is used when sending emails from
+   */
+  mailDomain: string;
+  /**
+   * The containers, they should match the previously given
    * containers id
    */
-  openstackContainers: {
-    [containerId: string]: ISensitiveConfigOpenstackContainerType,
+  containers: {
+    [containerId: string]: {
+      type: string;
+      config: any;
+    }
   };
   /**
    * A local container (if any)
@@ -261,25 +248,6 @@ export interface ISensitiveConfigRawJSONDataType {
    * The seo container id used when storing sitemaps
    */
   seoContainerID: string;
-  /**
-   * mailgun api key, can be null
-   */
-  mailgunAPIKey: string;
-  /**
-   * mailgun domain, can be null
-   * it is the domain you are using to send emails
-   */
-  mailgunDomain: string;
-  /**
-   * the mailgun api host, usually differs can be
-   * api.mailgun.net or api.eu.mailgun.net
-   */
-  mailgunAPIHost: string;
-  /**
-   * The target domain, basically the same as your development/production
-   * hostname, if null, will default to production
-   */
-  mailgunTargetDomain: string;
   /**
    * a json web token key to use, itemize uses JWT and as such it can be trusted
    * to call other external APIs
@@ -348,81 +316,24 @@ export interface IRedisConfigRawJSONDataType {
 export const rawSensitiveConfigSchema = {
   type: "object",
   properties: {
-    ipStackAccessKey: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
+    userLocalization: {
+      type: ["object", "null"],
+      additionalProperties: {},
     },
-    ipStackHttpsEnabled: {
-      type: "boolean",
+    currencyFactors: {
+      type: ["object", "null"],
+      additionalProperties: {},
     },
-    currencyLayerAccessKey: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
+    locationSearch: {
+      type: ["object", "null"],
+      additionalProperties: {},
     },
-    currencyLayerHttpsEnabled: {
-      type: "boolean",
+    mail: {
+      type: ["object", "null"],
+      additionalProperties: {},
     },
-    hereApiKey: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
-    },
-    mailgunAPIKey: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
-    },
-    mailgunDomain: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
-    },
-    mailgunAPIHost: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
-    },
-    mailgunTargetDomain: {
-      anyOf: [
-        {
-          "type": "string",
-        },
-        {
-          "type": "null"
-        }
-      ],
+    mailDomain: {
+      type: ["string", "null"]
     },
     jwtKey: {
       type: "string",
@@ -430,41 +341,22 @@ export const rawSensitiveConfigSchema = {
     devKey: {
       type: "string",
     },
-    openstackContainers: {
-      type: "object",
+    containers: {
+      type: ["object", "null"],
       additionalProperties: {
         type: "object",
         properties: {
-          username: {
+          type: {
             type: "string",
           },
-          password: {
-            type: "string",
-          },
-          region: {
-            type: "string",
-          },
-          domainId: {
-            type: "string",
-          },
-          domainName: {
-            type: "string",
-          },
-          containerName: {
-            type: "string",
-          },
-          authUrl: {
-            type: "string",
+          config: {
+            type: "object",
+            additionalProperties: {}
           },
         },
         required: [
-          "username",
-          "password",
-          "region",
-          "domainId",
-          "domainName",
-          "containerName",
-          "authUrl",
+          "type",
+          "config",
         ],
       },
     },
@@ -484,16 +376,13 @@ export const rawSensitiveConfigSchema = {
   },
   additionalProperties: false,
   required: [
-    "ipStackAccessKey",
-    "ipStackHttpsEnabled",
-    "currencyLayerAccessKey",
-    "currencyLayerHttpsEnabled",
+    "userLocalization",
+    "currencyFactors",
+    "locationSearch",
+    "mail",
+    "mailDomain",
     "defaultContainerID",
     "seoContainerID",
-    "hereApiKey",
-    "mailgunAPIKey",
-    "mailgunDomain",
-    "mailgunTargetDomain",
     "jwtKey",
     "devKey",
   ],

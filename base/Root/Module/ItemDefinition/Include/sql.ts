@@ -18,7 +18,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowV
 import Knex from "knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
-import { CloudClient } from "../../../../../server/cloud";
+import { StorageProvider } from "../../../../../server/services";
 
 /**
  * Provides the table bit that is necessary to store include data
@@ -147,7 +147,7 @@ export function convertGQLValueToSQLValueForInclude(
   include: Include,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   dictionary: string,
   partialFields?: any,

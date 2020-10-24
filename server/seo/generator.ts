@@ -9,7 +9,7 @@ import { escapeStringRegexp } from "../../util";
 import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
-import { CloudClient } from "../cloud";
+import { StorageProvider } from "../../server/services";
 
 const NO_SEO = process.env.NO_SEO === "true";
 
@@ -26,7 +26,7 @@ interface ISEOPreResult {
 export class SEOGenerator {
   private root: Root;
   private knex: Knex;
-  private cloudClient: CloudClient;
+  private storageClient: StorageProvider<any>;
   private rules: ISEORuleSet;
   private supportedLanguages: string[];
   private hostname: string;
@@ -40,7 +40,7 @@ export class SEOGenerator {
   /**
    * Buillds a new seo generator
    * @param rules the seo rules
-   * @param cloudClient the cloud client with the XML files
+   * @param storageClient the storageClient with the XML files
    * @param knex the knex instance
    * @param root the root for definitions
    * @param prefix the prefix for the openstack container
@@ -50,14 +50,14 @@ export class SEOGenerator {
    */
   constructor(
     rules: ISEORuleSet,
-    cloudClient: CloudClient,
+    storageClient: StorageProvider<any>,
     knex: Knex,
     root: Root,
     supportedLanguages: string[],
     hostname: string,
     pingGoogle: boolean,
   ) {
-    this.cloudClient = cloudClient;
+    this.storageClient = storageClient;
     this.knex = knex;
     this.root = root;
     this.rules = rules;
@@ -139,9 +139,9 @@ export class SEOGenerator {
       let changed = false;
 
       // now we get our current static file
-      const currentStatic = await this.cloudClient.getFileJSON(
+      const currentStatic = JSON.parse(await this.storageClient.read(
         "sitemaps/" + this.hostname + "/main/static.json",
-      );
+      ));
       // and the new one we are trying to set
       const newStatic: ISitemapJSONType = {
         lastQueried: null,
@@ -279,7 +279,7 @@ export class SEOGenerator {
   }
 
   private async checkExist(at: string): Promise<boolean> {
-    return this.cloudClient.checkExists(at);
+    return this.storageClient.exists(at);
   }
 
   /**
@@ -291,9 +291,10 @@ export class SEOGenerator {
     logger.info("SEOGenerator.writeFile: Attempting to write file at: " + target);
 
     const readStream = Readable.from(data);
-    await this.cloudClient.upload(
+    await this.storageClient.upload(
       target,
       readStream,
+      false,
     );
   }
 
@@ -313,7 +314,7 @@ export class SEOGenerator {
   ) {
     logger.info("SEOGenerator.writeSitemapFile: Attempting to write sitemap file at: " + target);
 
-    await this.writeFile(toXML(src, this.hostname, this.cloudClient.getPrefix(), prefix, suffix), target);
+    await this.writeFile(toXML(src, this.hostname, this.storageClient.getPrefix(), prefix, suffix), target);
   }
 
   private async checkIndexFile() {
@@ -326,7 +327,7 @@ export class SEOGenerator {
     await this.writeSitemapFile(this.primaryIndex, "sitemaps/" + this.hostname + "/index.xml");
 
     // we need to retrieve now the main index based on the json, if it exists
-    this.mainIndex = await this.cloudClient.getFileJSON("sitemaps/" + this.hostname + "/main/index.json");
+    this.mainIndex = JSON.parse(await this.storageClient.read("sitemaps/" + this.hostname + "/main/index.json"));
     let mainIndexWasNotFound = !this.mainIndex;
 
     // if we don't have a main index we build a new fresh one from scratch
@@ -378,7 +379,7 @@ export class SEOGenerator {
           // and fetch it from the target or use our cache
           const entry: ISitemapJSONType =
             cachedEntries[entryURL] ||
-            await this.cloudClient.getFileJSON("sitemaps/" + this.hostname + "/main/" + entryURL + ".json");
+            JSON.parse(await this.storageClient.read("sitemaps/" + this.hostname + "/main/" + entryURL + ".json"));
           // and store it in the cache
           cachedEntries[entryURL] = entry;
 

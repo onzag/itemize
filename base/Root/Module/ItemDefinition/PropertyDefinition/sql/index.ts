@@ -18,7 +18,7 @@ import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
-import { CloudClient } from "../../../../../../server/cloud";
+import { StorageProvider } from "../../../../../../server/services";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -311,7 +311,7 @@ export function convertGQLValueToSQLValueForProperty(
   propertyDefinition: PropertyDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   dictionary: string,
 ): ISQLStreamComposedTableRowValue {

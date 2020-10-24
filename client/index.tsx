@@ -205,8 +205,8 @@ export interface ICollectorType {
  * @param options.serverMode.res the server response, this is used to do the redirect, when no language is specified to the language
  * that was either guessed or was set by the user, or otherwise to change the url using a redirect to the actual language
  * that the user is supposed to speak, so that if the user picks a url on another language, switch it to his language
- * @param options.serverMode.ipStack when no lang, currency, country are set an we have no guessed data indeed, then we need to run a guess
- * in the client side this is used by fetching the util/country which does use ipstack under the hood, but this will perform
+ * @param options.serverMode.userLocalizationService when no lang, currency, country are set an we have no guessed data indeed, then we need to run a guess
+ * in the client side this is used by fetching the util/country under the hood, but this will perform
  * such check in place since we have no fetch chances
  */
 export async function initializeItemizeApp(
@@ -236,7 +236,7 @@ export async function initializeItemizeApp(
       root: Root,
       req: any,
       res: any,
-      ipStack: any,
+      userLocalizationService: any,
     }
   }
 ) {
@@ -350,11 +350,11 @@ export async function initializeItemizeApp(
           ip === "127.0.0.1" ||
           ip === "::1" ||
           ip === "::ffff:127.0.0.1" ||
-          !serverMode.ipStack
+          !serverMode.userLocalizationService
         ) {
           guessedUserData = standardAPIResponse;
         } else {
-          guessedUserData = await serverMode.ipStack.requestUserInfoForIp(ip, standardAPIResponse);
+          guessedUserData = await serverMode.userLocalizationService.getLocalizationFor(ip, standardAPIResponse);
         }
       }
     } catch (err) {

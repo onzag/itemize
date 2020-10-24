@@ -7,12 +7,12 @@ import { logger, IServerDataType } from ".";
 import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER, SERVER_MAPPING_TIME } from "../constants";
 import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
-import { CurrencyLayer, setupCurrencyLayer } from "./services/currency-layer";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
+import { CurrencyFactorsProvider, ICurrencyFactorsProviderClassType } from "./services";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -36,10 +36,11 @@ export class GlobalManager {
   private serverData: IServerDataType;
   private serverDataLastUpdated: number;
   private seoGenLastUpdated: number;
-  private currencyLayer: CurrencyLayer;
+  private currencyFactorsProvider: CurrencyFactorsProvider<any>;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
+
   constructor(
     root: Root,
     knex: Knex,
@@ -47,6 +48,7 @@ export class GlobalManager {
     redisPub: RedisClient,
     config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
+    currencyFactorsProvider: CurrencyFactorsProvider<any>,
   ) {
     this.root = root;
     this.knex = knex;
@@ -58,9 +60,7 @@ export class GlobalManager {
     this.config = config;
     this.sensitiveConfig = sensitiveConfig;
 
-    this.currencyLayer = sensitiveConfig.currencyLayerAccessKey ?
-      setupCurrencyLayer(sensitiveConfig.currencyLayerAccessKey, this.globalCache, sensitiveConfig.currencyLayerHttpsEnabled) :
-      null;
+    this.currencyFactorsProvider = currencyFactorsProvider;
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
@@ -409,7 +409,7 @@ export class GlobalManager {
 
     try {
       this.serverData = {
-        [CURRENCY_FACTORS_IDENTIFIER]: this.currencyLayer ? await this.currencyLayer.requestCurrencyFactors() : null,
+        [CURRENCY_FACTORS_IDENTIFIER]: this.currencyFactorsProvider ? await this.currencyFactorsProvider.getFactors() : null,
       };
       await this.informNewServerData(); 
     } catch (err) {

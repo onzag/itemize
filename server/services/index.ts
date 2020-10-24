@@ -1,0 +1,388 @@
+import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+import type { ReadStream } from "fs";
+import type { RedisClient } from "redis";
+import { logger } from "..";
+import uuidv5 from "uuid/v5";
+import { ISensitiveConfigRawJSONDataType } from "../../config";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import { ISQLTableRowValue } from "../../base/Root/sql";
+import { renderTemplate } from "../../util";
+import { Cache } from "../cache";
+import type { Readable } from "stream";
+
+const LOG_LEVEL = process.env.LOG_LEVEL;
+const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+
+export class ServiceProvider {
+  constructor() {
+  }
+  public logInfo(str: string, extra?: any) {
+    logger && logger.info(str, extra);
+  }
+  public logDebug(str: string, extra?: any) {
+    CAN_LOG_DEBUG && logger && logger.info(str, extra);
+  }
+  public logError(str: string, extra?: any) {
+    logger && logger.error(str, extra);
+  }
+
+  /**
+   * This function is executed during
+   * the initialization of the service
+   * @override
+   */
+  public initialize(): Promise<void> | void {
+    
+  }
+}
+
+export interface ISendEmailData {
+  from: string;
+  to: string | string[];
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export interface IMailProviderClassType<T> {
+  new (config: T, cache: Cache, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>
+}
+
+export class MailProvider<T> extends ServiceProvider {
+  public config: T;
+  private cache: Cache;
+  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+
+  constructor(config: T, cache: Cache, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
+    super();
+    this.config = config;
+    this.cache = cache;
+    this.sensitiveConfig = sensitiveConfig;
+  }
+
+  public async sendTemplateEmail(
+    arg: {
+      fromUsername: string,
+      fromEmailHandle: string,
+      to: string | string[];
+      subject: string;
+      itemDefinition: ItemDefinition;
+      property: PropertyDefinition;
+      id: number;
+      version?: string;
+      args: any;
+    }
+  ) {
+    let templateValue: ISQLTableRowValue = null;
+    let parsedTemplateValue: string = null;
+    let textValue: string = null;
+
+    if (arg.id) {
+      try {
+        templateValue = await this.cache.requestValue(arg.itemDefinition, arg.id, arg.version || null);
+
+        if (!templateValue && arg.version) {
+          templateValue = await this.cache.requestValue(arg.itemDefinition, arg.id, null);
+        }
+
+        if (templateValue && templateValue.content) {
+          parsedTemplateValue = renderTemplate(
+            templateValue.content,
+            arg.args,
+          );
+        }
+      } catch (err) {
+        this.logError(
+          "MailProvider.sendTemplateEmail [SERIOUS]: failed to retrieve item definition",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+            itemDefinition: arg.itemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
+        );
+        throw err;
+      }
+    }
+
+    if (!parsedTemplateValue) {
+      textValue = "You do not have a template fragment setup for " +
+        arg.itemDefinition.getQualifiedPathName() + "." + arg.id + "." + (arg.version || "");
+      textValue += "\n\n" + JSON.stringify(arg.args, null, 2) + "\n";
+    }
+
+    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.sensitiveConfig.mailDomain}>`;
+
+    const args: ISendEmailData = {
+      from,
+      to: arg.to,
+      subject: arg.subject,
+    }
+
+    if (textValue) {
+      args.text = textValue;
+    } else {
+      args.html = parsedTemplateValue;
+    }
+
+    if (args.to === null || (Array.isArray(args.to) && args.to.length === 0)) {
+      logger && logger.warn(
+        "MailProvider.sendTemplateEmail: Attempted to send an email without recepient",
+        {
+          args,
+        },
+      );
+      return;
+    }
+
+    try {
+      await this.sendEmail(args);
+    } catch (err) {
+      this.logError(
+        "MailProvider.sendTemplateEmail [SERIOUS]: API failed to deliver an email",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          args,
+        },
+      );
+      throw err;
+    }
+  }
+
+  /**
+   * This function is executed when the service
+   * needs to send an email
+   * @override
+   */
+  public async sendEmail(data: ISendEmailData): Promise<void> {
+    this.logError(
+      "MailProvider.sendEmail [SERIOUS]: Attempted to send an email with a raw provider, there's no API available to complete this action",
+      data,
+    );
+  }
+}
+
+export interface IStorageProvidersObject {
+  [id: string]: StorageProvider<any>,
+}
+
+export interface IStorageProviderClassType<T> {
+  new (config: T, id: string, prefix: string): StorageProvider<T>
+}
+
+export class StorageProvider<T> extends ServiceProvider {
+  public config: T;
+  public prefix: string;
+  public id: string;
+
+  constructor(config: T, id: string, prefix: string) {
+    super();
+
+    this.config = config;
+    this.prefix = prefix;
+    this.id = id;
+  }
+
+  public getPrefix() {
+    return this.prefix;
+  }
+
+  public getId() {
+    return this.id;
+  }
+
+  /**
+   * This function is executed when the service
+   * uploading a read stream
+   * @param at the remote file to use
+   * @param readStream the stream to read from
+   * @param mustBeVerified a boolean that specifies whether the resouce must
+   * be verified and return a 200 when requested
+   * @override
+   */
+  public async upload(at: string, readStream: ReadStream | Readable, mustBeVerified: boolean): Promise<void> {
+
+  }
+
+  /**
+   * This function is executed once a folder
+   * removal is requested
+   * @param at the remote folder to remove
+   * @override
+   */
+  public async removeFolder(at: string): Promise<void> {
+
+  }
+
+  /**
+   * This function is executed once an entire folder
+   * is requested to be downloaded locally in the given
+   * local path
+   * @param remotePath the remote path
+   * @param localPath the local path
+   * @override
+   */
+  public async dumpFolder(remotePath: string, localPath: string): Promise<void> {
+
+  }
+
+  /**
+   * It's executed to verify whether a given remote resource
+   * exists
+   * @param at the resource to check for
+   * @override
+   */
+  public async exists(at: string): Promise<boolean> {
+    return false;
+  }
+
+  /**
+   * It's executed to read files
+   * @param at the file to read
+   * @override
+   */
+  public async read(at: string): Promise<string> {
+    return "";
+  }
+}
+
+// this id can be whatever just to ensure lat and long produce the same id no matter what
+// basically a combination for location, this way we are not tied to any API
+const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
+
+export interface ILocationSearchProviderClassType<T> {
+  new (config: T): LocationSearchProvider<T>
+}
+
+export class LocationSearchProvider<T> extends ServiceProvider {
+  public config: T;
+  constructor(config: T) {
+    super();
+    this.config = config;
+  }
+
+  public makeIdOutOf(lat: number, lng: number) {
+    return "L" + uuidv5(lat.toString() + lng.toString(), NAMESPACE).replace(/-/g, "");
+  }
+
+  /**
+   * This function is executed once the user requests a geocode
+   * for a given location
+   * @param lat the latitude the geocode is requested for
+   * @param lng the longitude the geocode is requested for
+   * @param query a query text (what is written in the search box while this is clicked)
+   * @param lang the language of the user
+   * @param sep the word separarator, usually a comma is here
+   * @returns a promise for a location
+   * @override
+   */
+  public async requestGeocodeFor(
+    lat: string | number,
+    lng: string | number,
+    query: string,
+    lang: string,
+    sep: string,
+  ): Promise<IPropertyDefinitionSupportedLocationType> {
+    return null;
+  }
+
+  /**
+   * This function is executed once the user requests a search
+   * for a given location
+   * @param lat the latitude where results should be nearby for
+   * @param lng the longitude where results should be nearby for
+   * @param query a query of what we are searching for
+   * @param lang the language of the user
+   * @param sep the word separarator, usually a comma is here
+   * @returns a promise for a location array
+   * @override
+   */
+  public async requestSearchFor(
+    lat: string | number,
+    lng: string | number,
+    query: string,
+    lang: string,
+    sep: string,
+  ): Promise<IPropertyDefinitionSupportedLocationType[]> {
+    return null;
+  }
+
+  /**
+   * Similar to search, but should return fewer results, and maybe
+   * less accurate, these are used for autocompletition
+   * @param lat the latitude where results should be nearby for
+   * @param lng the longitude where results should be nearby for
+   * @param query a query of what we are searching for
+   * @param lang the language of the user
+   * @param sep the word separarator, usually a comma is here
+   * @returns a promise for a location array
+   * @override
+   */
+  public async requestAutocompleteFor(
+    lat: string | number,
+    lng: string | number,
+    query: string,
+    lang: string,
+    sep: string,
+  ): Promise<IPropertyDefinitionSupportedLocationType[]> {
+    return null;
+  }
+}
+
+export interface ICurrencyFactors {
+  [key: string]: number,
+}
+
+export interface ICurrencyFactorsProviderClassType<T> {
+  new (config: T, globalCache: RedisClient): CurrencyFactorsProvider<T>
+}
+
+export class CurrencyFactorsProvider<T> extends ServiceProvider {
+  public config: T;
+  public globalCache: RedisClient;
+
+  constructor(config: T, globalCache: RedisClient) {
+    super();
+    this.config = config;
+    this.globalCache = globalCache;
+  }
+
+  /**
+   * Should provide the currency factors
+   * @override
+   */
+  public async getFactors(): Promise<ICurrencyFactors> {
+    return null;
+  }
+}
+
+export interface IUserLocalizationType {
+  country: string;
+  currency: string;
+  language: string;
+}
+
+export interface IUserLocalizationProviderClassType<T> {
+  new (config: T): UserLocalizationProvider<T>
+}
+
+export class UserLocalizationProvider<T> extends ServiceProvider {
+  public config: T;
+
+  constructor(config: T) {
+    super();
+    this.config = config;
+  }
+
+  /**
+   * Should provide the localization for the user
+   * @param ip the ip address
+   * @override
+   */
+  public async getLocalizationFor(ip: string, fallback: IUserLocalizationType): Promise<IUserLocalizationType> {
+    return null;
+  }
+}

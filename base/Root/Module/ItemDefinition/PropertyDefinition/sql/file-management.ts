@@ -18,7 +18,7 @@ import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
 import { logger } from "../../../../../../server";
 import Module from "../../..";
-import { CloudClient } from "../../../../../../server/cloud";
+import { StorageProvider } from "../../../../../../server/services";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -40,7 +40,7 @@ const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LE
 export function processFileListFor(
   newValues: IGQLFile[],
   oldValues: IGQLFile[],
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -122,7 +122,7 @@ export function processFileListFor(
 export function processSingleFileFor(
   newValue: IGQLFile,
   oldValue: IGQLFile,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -188,7 +188,7 @@ export function processSingleFileFor(
 function processOneFileAndItsSameIDReplacement(
   newVersion: IGQLFile,
   oldVersion: IGQLFile,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
@@ -349,7 +349,7 @@ function processOneFileAndItsSameIDReplacement(
  */
 export function deleteEverythingInFilesContainerId(
   domain: string,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   itemDefinitionOrModule: ItemDefinition | Module,
   idVersionId: string,
 ): Promise<void> {
@@ -375,7 +375,7 @@ export function deleteEverythingInFilesContainerId(
 async function addFileFor(
   mainFilePath: string,
   curatedFileName: string,
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   domain: string,
   value: IGQLFile,
   propertyDefinition: PropertyDefinition,
@@ -421,7 +421,7 @@ async function addFileFor(
  * @returns a void promise
  */
 export async function sqlUploadPipeFile(
-  uploadsClient: CloudClient,
+  uploadsClient: StorageProvider<any>,
   readStream: ReadStream | sharp.Sharp,
   domain: string,
   remote: string,

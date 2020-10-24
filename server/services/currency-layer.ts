@@ -1,8 +1,8 @@
 import http from "http";
 import https from "https";
 import { logger } from "../";
-import { RedisClient } from "redis";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
+import { CurrencyFactorsProvider, ICurrencyFactors } from ".";
 
 interface CurrencyLayerResponse {
   success: boolean;
@@ -15,19 +15,12 @@ interface CurrencyLayerResponse {
   }
 }
 
-interface CurrencyLayerItemizeSpecificResponse {
-  [key: string]: number,
+export interface ICurrencyLayerConfig {
+  apiKey: string;
+  httpsEnabled: boolean;
 }
 
-export class CurrencyLayer {
-  private apiKey: string;
-  private httpsEnabled: boolean;
-  private globalCache: RedisClient;
-  constructor(apiKey: string, globalCache: RedisClient, httpsEnabled: boolean) {
-    this.apiKey = apiKey;
-    this.httpsEnabled = httpsEnabled;
-    this.globalCache = globalCache;
-  }
+export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
       this.globalCache.get(
@@ -36,7 +29,7 @@ export class CurrencyLayer {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
           if (!parsedCachedData || (new Date()).getTime() - (parsedCachedData.timestamp * 1000) >= 86400000) {
             logger.info("CurrencyLayer.requestInfo: requesting fresh info");
-            (this.httpsEnabled ? https : http).get(`http://api.currencylayer.com/live?access_key=${this.apiKey}`, (resp) => {
+            (this.config.httpsEnabled ? https : http).get(`http://api.currencylayer.com/live?access_key=${this.config.apiKey}`, (resp) => {
               // let's get the response from the stream
               let data = "";
               resp.on("data", (chunk) => {
@@ -102,7 +95,7 @@ export class CurrencyLayer {
       );
     });
   }
-  async requestCurrencyFactors(): Promise<CurrencyLayerItemizeSpecificResponse> {
+  async getFactors(): Promise<ICurrencyFactors> {
     const infoFromServer = await this.requestInfo();
     const converted = {};
     Object.keys(infoFromServer.quotes).forEach((quoteName) => {
@@ -110,8 +103,4 @@ export class CurrencyLayer {
     });
     return converted;
   }
-}
-
-export function setupCurrencyLayer(apiKey: string, globalCache: RedisClient, httpsEnabled: boolean) {
-  return new CurrencyLayer(apiKey, globalCache, httpsEnabled);
 }

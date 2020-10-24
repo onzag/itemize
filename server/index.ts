@@ -16,10 +16,6 @@ import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
-import { setupIPStack, IPStack } from "./services/ipstack";
-import { setupMailgun } from "./services/mailgun";
-import Mailgun from "mailgun-js";
-import { setupHere, Here } from "./services/here";
 import { promisify } from "util";
 
 import winston from "winston";
@@ -34,8 +30,13 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
-import { CloudClient, ICloudClients } from "./cloud";
-import { MailService } from "./mail";
+import { MailProvider, IStorageProvidersObject, IStorageProviderClassType, IMailProviderClassType, IUserLocalizationProviderClassType, ICurrencyFactorsProviderClassType, ILocationSearchProviderClassType, StorageProvider, UserLocalizationProvider, LocationSearchProvider } from "./services";
+import { LocalStorageService } from "./services/local";
+import { OpenstackService } from "./services/openstack";
+import { IPStackService } from "./services/ipstack";
+import { MailgunService } from "./services/mailgun";
+import { HereMapsService } from "./services/here";
+import { CurrencyLayerService } from "./services/currency-layer";
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -128,19 +129,22 @@ export interface IAppDataType {
   redisLocalSub: RedisClient;
   buildnumber: string;
   triggers: ITriggerRegistry;
-  ipStack: IPStack,
-  here: Here,
-  mailgun: Mailgun.Mailgun;
-  cloudClients: ICloudClients;
+  storage: IStorageProvidersObject;
   customUserTokenQuery: any;
   logger: winston.Logger;
-  mailService: MailService,
+  mailService: MailProvider<any>;
+  userLocalizationService: UserLocalizationProvider<any>;
+  locationSearchService: LocationSearchProvider<any>;
 }
 
 export interface IServerDataType {
   CURRENCY_FACTORS: {
     [usdto: string]: number;
   }
+}
+
+export interface IStorageProviders {
+  [type: string]: IStorageProviderClassType<any>;
 }
 
 export interface IServerCustomizationDataType {
@@ -150,10 +154,19 @@ export interface IServerCustomizationDataType {
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
+  storageServiceProviders?: IStorageProviders;
+  mailServiceProvider?: IMailProviderClassType<any>;
+  userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
+  currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
+  locationSearchProvider?: ILocationSearchProviderClassType<any>;
 }
 
-export async function getCloudClients(config: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
-  const cloudClients: ICloudClients = {};
+export async function getStorageProviders(
+  config: IConfigRawJSONDataType,
+  sensitiveConfig: ISensitiveConfigRawJSONDataType,
+  storageServiceProviders: IStorageProviders,
+) {
+  const cloudClients: IStorageProvidersObject = {};
   if (sensitiveConfig.localContainer) {
     let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
     if (!prefix) {
@@ -165,14 +178,14 @@ export async function getCloudClients(config: IConfigRawJSONDataType, sensitiveC
     if (prefix.indexOf("/") !== 0) {
       prefix = "https://" + prefix;
     }
-    const localClient = new CloudClient(sensitiveConfig.localContainer, prefix);
-    localClient.setAsLocal();
+    const localClient = new LocalStorageService(null, sensitiveConfig.localContainer, prefix);
+    await localClient.initialize();
     cloudClients[sensitiveConfig.localContainer] = localClient;
   }
 
-  if (sensitiveConfig.openstackContainers) {
-    await Promise.all(Object.keys(sensitiveConfig.openstackContainers).map(async (containerIdX) => {
-      const containerData = sensitiveConfig.openstackContainers[containerIdX];
+  if (sensitiveConfig.containers) {
+    await Promise.all(Object.keys(sensitiveConfig.containers).map(async (containerIdX) => {
+      const containerData = sensitiveConfig.containers[containerIdX];
       let prefix = config.containersHostnamePrefixes[containerIdX];
       if (!prefix) {
         logger && logger.error(
@@ -184,18 +197,11 @@ export async function getCloudClients(config: IConfigRawJSONDataType, sensitiveC
         prefix = "https://" + prefix;
       }
 
-      const client = new CloudClient(containerIdX, prefix);
-      await client.setAsOpenstack({
-        provider: "openstack",
-        username: containerData.username,
-        keystoneAuthVersion: 'v3',
-        region: containerData.region,
-        domainId: containerData.domainId, //default
-        domainName: containerData.domainName,
-        password: containerData.password,
-        authUrl: containerData.authUrl,
-      }, containerData.containerName);
+      const type = containerData.type;
+      const ServiceClass = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
 
+      const client = new ServiceClass(containerData.config, containerIdX, prefix);
+      await client.initialize();
       cloudClients[containerIdX] = client;
     }));
   }
@@ -426,17 +432,30 @@ export async function initializeServer(
       logger.info(
         "initializeServer: setting up global manager",
       );
-      const manager: GlobalManager = new GlobalManager(root, knex, redisGlobalClient, redisPub, config, sensitiveConfig);
+      const CurrencyFactorsClass = (custom && custom.currencyFactorsProvider) || CurrencyLayerService;
+      const currencyFactorsService = sensitiveConfig.currencyFactors ?
+        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, redisGlobalClient) :
+        null;
+      currencyFactorsService && await currencyFactorsService.initialize();
+      const manager: GlobalManager = new GlobalManager(
+        root,
+        knex,
+        redisGlobalClient,
+        redisPub,
+        config,
+        sensitiveConfig,
+        currencyFactorsService,
+      );
       if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
           "initializeServer: initializing SEO configuration",
         );
-        const openStackSEOContainerData = sensitiveConfig.openstackContainers &&
-          sensitiveConfig.openstackContainers[sensitiveConfig.seoContainerID];
+        const seoContainerData = sensitiveConfig.containers &&
+          sensitiveConfig.containers[sensitiveConfig.seoContainerID];
         const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
-        if (!openStackSEOContainerData && !isLocalInstead) {
+        if (!seoContainerData && !isLocalInstead) {
           logger.error(
-            "initializeServer [SERIOUS]: Invalid seo container id for the openstack container '" + sensitiveConfig.seoContainerID + "'",
+            "initializeServer [SERIOUS]: Invalid seo container id for the container '" + sensitiveConfig.seoContainerID + "'",
           );
         } else {
           let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
@@ -449,25 +468,21 @@ export async function initializeServer(
           if (prefix.indexOf("/") !== 0) {
             prefix = "https://" + prefix;
           }
-          const cloudClient = new CloudClient(sensitiveConfig.seoContainerID, prefix);
+
+          let storageClient: StorageProvider<any>;
           if (isLocalInstead) {
-            cloudClient.setAsLocal();
+            storageClient = new LocalStorageService(null, sensitiveConfig.seoContainerID, prefix);
           } else {
-            await cloudClient.setAsOpenstack({
-              provider: "openstack",
-              username: openStackSEOContainerData.username,
-              keystoneAuthVersion: 'v3',
-              region: openStackSEOContainerData.region,
-              domainId: openStackSEOContainerData.domainId, //default
-              domainName: openStackSEOContainerData.domainName,
-              password: openStackSEOContainerData.password,
-              authUrl: openStackSEOContainerData.authUrl,
-            }, openStackSEOContainerData.containerName);
+            const type = seoContainerData.type;
+            const ServiceClass = (custom && custom.storageServiceProviders[type]) || OpenstackService;
+            storageClient = new ServiceClass(seoContainerData.config, sensitiveConfig.seoContainerID, prefix);
           }
+
+          await storageClient.initialize();
 
           const seoGenerator = new SEOGenerator(
             seoConfig.seoRules,
-            cloudClient,
+            storageClient,
             knex,
             root,
             config.supportedLanguages,
@@ -489,25 +504,25 @@ export async function initializeServer(
       "initializeServer: initializing cloud clients",
     );
 
-    const cloudClients = await getCloudClients(config, sensitiveConfig);
+    const storageClients = await getStorageProviders(config, sensitiveConfig, custom && custom.storageServiceProviders);
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
         "initializeServer: cleaning storage",
       );
 
-      await Promise.all(Object.keys(cloudClients).map(async (containerId) => {
+      await Promise.all(Object.keys(storageClients).map(async (containerId) => {
         if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
           logger.info(
             "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
           );
-          const client = cloudClients[containerId];
+          const client = storageClients[containerId];
           await client.removeFolder("sitemaps/" + domain);
         } else {
           logger.info(
             "initializeServer: cleaning " + containerId + " data for " + domain,
           );
-          const client = cloudClients[containerId];
+          const client = storageClients[containerId];
           await client.removeFolder(domain);
         }
       }));
@@ -544,7 +559,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, cloudClients, domain, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -566,44 +581,40 @@ export async function initializeServer(
       sensitiveConfig,
     );
 
-    if (sensitiveConfig.ipStackAccessKey) {
+    if (sensitiveConfig.userLocalization) {
       logger.info(
-        "initializeServer: initializing ipstack connection",
+        "initializeServer: initializing user localization service",
       );
     }
-    const ipStack = sensitiveConfig.ipStackAccessKey ?
-      setupIPStack(sensitiveConfig.ipStackAccessKey, !!sensitiveConfig.ipStackHttpsEnabled) :
+    const UserLocalizationServiceClass = (custom && custom.userLocalizationProvider) || IPStackService;
+    const userLocalizationService = sensitiveConfig.userLocalization ?
+      new UserLocalizationServiceClass(sensitiveConfig.userLocalization) :
       null;
+    userLocalizationService && await userLocalizationService.initialize();
 
-    if (sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost) {
+    if (sensitiveConfig.mail) {
       logger.info(
-        "initializeServer: initializing mailgun connection",
+        "initializeServer: initializing mail service",
       );
     }
-    const mailgun = sensitiveConfig.mailgunAPIKey && sensitiveConfig.mailgunDomain && sensitiveConfig.mailgunAPIHost ?
-      setupMailgun({
-        apiKey: sensitiveConfig.mailgunAPIKey,
-        domain: sensitiveConfig.mailgunDomain,
-        host: sensitiveConfig.mailgunAPIHost,
-      }) : null;
+    const MailServiceClass = (custom && custom.mailServiceProvider) || MailgunService;
+    const mailService = sensitiveConfig.mail ?
+      new MailServiceClass(
+        sensitiveConfig.mail,
+        cache,
+        sensitiveConfig,
+      ) : null;
+    mailService && await mailService.initialize();
 
-    logger.info(
-      "initializeServer: configuring mail service",
-    );
-
-    const mailService = new MailService(mailgun, cache, sensitiveConfig);
-
-    if (sensitiveConfig.hereApiKey) {
+    if (sensitiveConfig.locationSearch) {
       logger.info(
-        "initializeServer: initializing here maps",
+        "initializeServer: initializing location search service",
       );
     }
-    const here = sensitiveConfig.hereApiKey ?
-      setupHere(sensitiveConfig.hereApiKey) : null;
-
-    logger.info(
-      "initializeServer: configuring app data build",
-    );
+    const LocationSearchClass = (custom && custom.locationSearchProvider) || HereMapsService;
+    const locationSearchService = sensitiveConfig.locationSearch ?
+      new LocationSearchClass(sensitiveConfig.locationSearch) : null;
+    locationSearchService && await locationSearchService.initialize();
 
     const appData: IAppDataType = {
       root,
@@ -629,14 +640,11 @@ export async function initializeServer(
         customUserTriggers,
         custom.customTriggers,
       ),
-      ipStack,
-      here,
-      mailgun,
+      userLocalizationService,
+      locationSearchService,
       mailService,
-      cloudClients,
-
+      storage: storageClients,
       logger,
-
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
