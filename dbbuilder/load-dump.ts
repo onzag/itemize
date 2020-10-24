@@ -16,8 +16,11 @@ import { ISQLTableDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { yesno } from ".";
 import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
-import { getStorageProviders } from "../server";
+import { getStorageProviders, IServiceCustomizationType } from "../server";
 import { StorageProvider } from "../server/services";
+
+const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
 
 const fsAsync = fs.promises;
 
@@ -100,8 +103,7 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
   );
 
   // and the upload containers
-  // TODO same thing, we need to add the config for the providers somehow
-  const cloudClients = await getStorageProviders(config, sensitiveConfig, null);
+  const cloudClients = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
 
   // inform the users
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +

@@ -17,8 +17,11 @@ import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
-import { getStorageProviders } from "../server";
+import { getStorageProviders, IServiceCustomizationType } from "../server";
 import { StorageProvider, IStorageProvidersObject } from "../server/services";
+
+const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
 
 const fsAsync = fs.promises;
 
@@ -247,8 +250,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
   );
 
   // and our containers
-  // TODO we need to pass the custom info and get it from somewhere
-  const storageClients = await getStorageProviders(config, sensitiveConfig, null);
+  const storageClients = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
 
   // we can specify we have loaded them
   console.log(`Loaded ${Object.keys(storageClients).length} storage containers: ` +

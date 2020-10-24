@@ -1306,7 +1306,7 @@ export class ActualItemProvider extends
       this.markForDestruction();
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (window.TESTING && process.env.NODE_ENV === "development") {
       this.mountOrUpdateIdefForTesting();
     }
 
@@ -1681,7 +1681,7 @@ export class ActualItemProvider extends
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         forId, forVersion,
       );
-      if (process.env.NODE_ENV === "development") {
+      if (window.TESTING && process.env.NODE_ENV === "development") {
         this.mountOrUpdateIdefForTesting(true);
       }
       if (

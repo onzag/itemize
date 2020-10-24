@@ -40,84 +40,173 @@ export async function sensitiveConfigSetup(
     "Sensitive configuration (" + version + ")",
     [
       {
-        variableName: "ipStackAccessKey",
-        message: "An ip stack access key, get one at https://ipstack.com/product." +
-          "It is required if you want to be able to guess the user location and language otherwise" +
-          "Fallbacks are used",
-        defaultValue: "",
-        hidden: true,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "ipStackHttpsEnabled",
-        message: "True when your subscription plan supports https, otherwise false",
-        defaultValue: false,
-        type: "boolean",
-      },
-      {
-        variableName: "currencyLayerAccessKey",
-        message: "A currency layer access key for currency usage get one at https://currencylayer.com/",
-        defaultValue: "",
-        hidden: true,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "currencyLayerHttpsEnabled",
-        message: "True when your subscription plan supports https, otherwise false",
-        defaultValue: false,
-        type: "boolean",
-      },
-      {
-        variableName: "hereApiKey",
-        message: "Used in order to be able to type addresses and get locations get key at https://developer.here.com/",
-        defaultValue: "",
-        hidden: true,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "openstackContainers",
-        type: "multiconfig",
-        message: "Openstack containers configuration, make sure to use the same container reference as in the standard config",
+        variableName: "userLocalization",
+        message: "The configuration used by the user localizer, if given, this enables to find the user location in order " +
+        "to accurately predict what language such user speaks, it uses the ip in order to do such prediction, itemize by default " +
+        "uses the IPStack provider, so you might refer to https://ipstack.com/product to get a free API key",
+        type: "config",
         defaultValue: null,
         extractData: [
           {
-            variableName: "username",
-            message: "An username provided by an openstack cloud provider",
-            defaultValue: "",
-          },
-          {
-            variableName: "password",
-            message: "The user password provided by an openstack cloud provider",
+            variableName: "apiKey",
+            message: "The api key given to the provider",
             defaultValue: "",
             hidden: true,
-          },
-          {
-            variableName: "region",
-            message: "The region to connect from the openstack cloud provider",
-            defaultValue: "",
             nullifyFalseValues: true,
           },
           {
-            variableName: "domainId",
-            message: "The domain id of the given openstack project",
-            defaultValue: "default",
+            variableName: "httpsEnabled",
+            message: "Whether it is https enabled",
+            defaultValue: false,
+            type: "boolean",
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
+        variableName: "currencyFactors",
+        message: "The configuration used by the currency manager in the global manager, if given, this enables to be abel to " +
+        "use the currency type, note that this is necessary in order to support currencies, by default itemize uses the currency " +
+        "provider from https://currencylayer.com/ you can get a free API key from there",
+        type: "config",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "apiKey",
+            message: "The api key given to the provider",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
           },
           {
-            variableName: "domainName",
-            message: "The domain name of the given openstack project",
+            variableName: "httpsEnabled",
+            message: "Whether it is https enabled",
+            defaultValue: false,
+            type: "boolean",
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
+        variableName: "locationSearch",
+        message: "The API used in order to fetch search results for used for location search autocompletition " +
+        "it is necessary in order to be able to use the location service as this enables the searchbox " +
+        "while you can still use location, it is preferable to have this service enabled, it can be accessed by " +
+        "rest endpoints and used by the renderers, by default itemize uses here maps autocomplete, get a key at https://developer.here.com/",
+        type: "config",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "apiKey",
+            message: "The api key given to the provider",
             defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
+        variableName: "mail",
+        message: "The configuration used by the email service provider by default itemize will use the " +
+        "mailgun provider you might get a key at https://www.mailgun.com/ however you can also start the system " +
+        "with FAKE_EMAILS=true in order to use an email delivery system that just logs the emails",
+        type: "config",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "apiKey",
+            message: "Used in order to send emails",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
           },
           {
-            variableName: "containerName",
-            message: "The name of the container that contains the uploaded files",
-            defaultValue: "",
+            variableName: "domain",
+            message: "Your own domain used in order to send emails",
+            defaultValue: "mail.mysite.com",
+            nullifyFalseValues: true,
           },
           {
-            variableName: "authUrl",
-            message: "The auth url of the service provider that you are utilizing",
-            defaultValue: "",
+            variableName: "host",
+            message: "The mailgun api host, usually api.eu.mailgun.net or api.mailgun.net",
+            defaultValue: "api.mailgun.net",
+            nullifyFalseValues: true,
           },
-        ]
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
+        variableName: "mailDomain",
+        message: "This is the domain that the template generator uses as domain, so when the users receive an email they see user@mail.mysite.com " +
+        "this has nothing to do with the configuration, it is simply what goes in the subject line when sending emails",
+        defaultValue: "mail.mysite.com",
+        nullifyFalseValues: true,
+      },
+      {
+        variableName: "containers",
+        type: "multiconfig",
+        message: "Containers to use, the default provider is openstack",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "type",
+            defaultValue: "openstack",
+            message: "The provider utilized",
+            nullifyFalseValues: true,
+          },
+          {
+            variableName: "config",
+            type: "config",
+            message: "the configuration utilized",
+            defaultValue: null,
+            extractData: [
+              {
+                variableName: "username",
+                message: "An username provided by an openstack cloud provider",
+                defaultValue: "",
+              },
+              {
+                variableName: "password",
+                message: "The user password provided by an openstack cloud provider",
+                defaultValue: "",
+                hidden: true,
+              },
+              {
+                variableName: "region",
+                message: "The region to connect from the openstack cloud provider",
+                defaultValue: "",
+                nullifyFalseValues: true,
+              },
+              {
+                variableName: "domainId",
+                message: "The domain id of the given openstack project",
+                defaultValue: "default",
+              },
+              {
+                variableName: "domainName",
+                message: "The domain name of the given openstack project",
+                defaultValue: "",
+              },
+              {
+                variableName: "containerName",
+                message: "The name of the container that contains the uploaded files",
+                defaultValue: "",
+              },
+              {
+                variableName: "authUrl",
+                message: "The auth url of the service provider that you are utilizing",
+                defaultValue: "",
+              },
+            ],
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
       },
       {
         variableName: "localContainer",
@@ -138,25 +227,6 @@ export async function sensitiveConfigSetup(
         message: "of all the previous containers id which one is used for storing SEO and sitemap information",
         defaultValue: "MAIN",
         hidden: false,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "mailgunAPIKey",
-        message: "Used in order to send emails, get your key at https://www.mailgun.com/",
-        defaultValue: "",
-        hidden: true,
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "mailgunDomain",
-        message: "Your own domain used in order to send emails, get your key at https://www.mailgun.com/",
-        defaultValue: "",
-        nullifyFalseValues: true,
-      },
-      {
-        variableName: "mailgunAPIHost",
-        message: "The mailgun api host, usually api.eu.mailgun.net or api.mailgun.net, get your key at https://www.mailgun.com/",
-        defaultValue: "api.mailgun.net",
         nullifyFalseValues: true,
       },
       {

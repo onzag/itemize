@@ -11,6 +11,15 @@ import colors from "colors";
 import Confirm from "prompt-confirm";
 
 /**
+ * Simple function to ask for a question
+ * @param question the question to ask
+ * @returns a boolean on the answer
+ */
+export function yesno(question: string) {
+  return (new Confirm(question)).run();
+}
+
+/**
  * requests a single value
  * @param options the read options
  */
@@ -93,7 +102,7 @@ export async function fieldRequest<T>(
         // the variable name and :
         prompt: variableName + ": ",
         // the default is what is based on, or otherwise the default, or otherwise nothing
-        default: (basedOnValue || defaultValue || "").toString(),
+        default: (basedOnValue || defaultValue || "").toString(),
         // we are editing, rather than writting a new value if we have a based on value
         edit: typeof basedOnValue !== "undefined" && basedOnValue !== null,
         // silent if it's hidden
@@ -174,7 +183,7 @@ export async function fieldRequest<T>(
       // and this is for simple strings
       const retrievedValue = await request({
         prompt: variableName + ": ",
-        default: (basedOnValue || defaultValue || "").toString(),
+        default: (basedOnValue || defaultValue || "").toString(),
         edit: !!basedOnValue,
         silent: hidden,
         replace: "*",
@@ -240,7 +249,16 @@ export interface IConfigRequestExtractPoint {
    * Whether to nullify false values, only used
    * for standard fields
    */
-  nullifyFalseValues?: boolean,
+  nullifyFalseValues?: boolean;
+  /**
+   * prefers to keep a configuration and multi
+   * configuration request into an unfilled state
+   */
+  preferUnfilled?: boolean;
+  /**
+   * Prevents modification of already existant values
+   */
+  cantRerun?: boolean;
 };
 
 /**
@@ -266,55 +284,76 @@ export async function configRequest<T>(
   // and now we loop in our extract points of each data
   // that each represent a variable inside this config
   for (const extractPoint of extractData) {
+    if (
+      extractPoint.cantRerun &&
+      typeof newConfig[extractPoint.variableName] !== "undefined" &&
+      newConfig[extractPoint.variableName] !== null
+    ) {
+      continue;
+    }
+
     // so if it's a config type
     if (extractPoint.type === "config") {
-      // we just set the variable to a new config request
-      newConfig[extractPoint.variableName] = await configRequest(
-        // the source value is the value inside this newConfig if there's one
-        typeof newConfig[extractPoint.variableName] !== "undefined" ? newConfig[extractPoint.variableName] : null,
-        // the message
-        extractPoint.message,
-        // the data we are extracting for
-        extractPoint.extractData,
-        // and we prefix with the current prefix plus the variable name and a dot
-        variableNamePrefix + extractPoint.variableName + ".",
-      );
-
-    // now for multiconfig or the keys of config or multiconfig
-    } else if (extractPoint.type === "multiconfig") {
-      // if we don't have a current value
-      if (!newConfig[extractPoint.variableName]) {
-        // then the default will be nothing
-        newConfig[extractPoint.variableName] = {};
-      }
-
-      // first we need to ask for a strarray for our multiconfig
-      // keys
-      const keys = await fieldRequest<string[]>(
-        "strarray",
-        // no message as we should have already shown one on top
-        null,
-        // the variable name as usual with the $key to say these are keys
-        variableNamePrefix + extractPoint.variableName + "." + "[$key]",
-        // our based on value is our current value
-        Object.keys(newConfig[extractPoint.variableName]),
-        // as well as our default
-        Object.keys(newConfig[extractPoint.variableName]),
-      );
-
-      // now for every key we have added in these key list
-      for (const key of keys) {
-        // we make a config request each
-        newConfig[extractPoint.variableName][key] = await configRequest(
-          // as you can see the source is what is inside of it right now
-          typeof newConfig[extractPoint.variableName][key] !== "undefined" ? newConfig[extractPoint.variableName][key] : null,
+      if (extractPoint.preferUnfilled && await yesno("Would you rather leave the field untouched?")) {
+        newConfig[extractPoint.variableName] =
+          typeof newConfig[extractPoint.variableName] !== "undefined" ?
+            newConfig[extractPoint.variableName] :
+            extractPoint.defaultValue;
+      } else {
+        // we just set the variable to a new config request
+        newConfig[extractPoint.variableName] = await configRequest(
+          // the source value is the value inside this newConfig if there's one
+          typeof newConfig[extractPoint.variableName] !== "undefined" ? newConfig[extractPoint.variableName] : null,
           // the message
           extractPoint.message,
-          // the data we are supposed to extract for each one of these
+          // the data we are extracting for
           extractPoint.extractData,
-          // and a nice prefix
-          variableNamePrefix + extractPoint.variableName + "." + key + ".",
+          // and we prefix with the current prefix plus the variable name and a dot
+          variableNamePrefix + extractPoint.variableName + ".",
         );
+      }
+      // now for multiconfig or the keys of config or multiconfig
+    } else if (extractPoint.type === "multiconfig") {
+      if (extractPoint.preferUnfilled && await yesno("Would you rather leave the field untouched?")) {
+        newConfig[extractPoint.variableName] =
+        typeof newConfig[extractPoint.variableName] !== "undefined" ?
+          newConfig[extractPoint.variableName] :
+          extractPoint.defaultValue;
+      } else {
+        // if we don't have a current value
+        if (!newConfig[extractPoint.variableName]) {
+          // then the default will be nothing
+          newConfig[extractPoint.variableName] = {};
+        }
+
+        // first we need to ask for a strarray for our multiconfig
+        // keys
+        const keys = await fieldRequest<string[]>(
+          "strarray",
+          // no message as we should have already shown one on top
+          null,
+          // the variable name as usual with the $key to say these are keys
+          variableNamePrefix + extractPoint.variableName + "." + "[$key]",
+          // our based on value is our current value
+          Object.keys(newConfig[extractPoint.variableName]),
+          // as well as our default
+          Object.keys(newConfig[extractPoint.variableName]),
+        );
+
+        // now for every key we have added in these key list
+        for (const key of keys) {
+          // we make a config request each
+          newConfig[extractPoint.variableName][key] = await configRequest(
+            // as you can see the source is what is inside of it right now
+            typeof newConfig[extractPoint.variableName][key] !== "undefined" ? newConfig[extractPoint.variableName][key] : null,
+            // the message
+            extractPoint.message,
+            // the data we are supposed to extract for each one of these
+            extractPoint.extractData,
+            // and a nice prefix
+            variableNamePrefix + extractPoint.variableName + "." + key + ".",
+          );
+        }
       }
     } else {
       // otherwise it's a normal standard field

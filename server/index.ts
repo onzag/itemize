@@ -39,6 +39,10 @@ import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
 
+// load the custom services configuration
+const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
 const LOG_LEVEL = process.env.LOG_LEVEL;
@@ -148,6 +152,14 @@ export interface IStorageProviders {
   [type: string]: IStorageProviderClassType<any>;
 }
 
+export interface IServiceCustomizationType {
+  storageServiceProviders?: IStorageProviders;
+  mailServiceProvider?: IMailProviderClassType<any>;
+  userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
+  currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
+  locationSearchProvider?: ILocationSearchProviderClassType<any>;
+}
+
 export interface IServerCustomizationDataType {
   customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customTokenGQLQueries?: ICustomTokensType;
@@ -155,11 +167,6 @@ export interface IServerCustomizationDataType {
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
-  storageServiceProviders?: IStorageProviders;
-  mailServiceProvider?: IMailProviderClassType<any>;
-  userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
-  currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
-  locationSearchProvider?: ILocationSearchProviderClassType<any>;
 }
 
 export async function getStorageProviders(
@@ -433,7 +440,7 @@ export async function initializeServer(
       logger.info(
         "initializeServer: setting up global manager",
       );
-      const CurrencyFactorsClass = (custom && custom.currencyFactorsProvider) || CurrencyLayerService;
+      const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
       const currencyFactorsService = sensitiveConfig.currencyFactors ?
         new CurrencyFactorsClass(sensitiveConfig.currencyFactors, redisGlobalClient) :
         null;
@@ -475,7 +482,7 @@ export async function initializeServer(
             storageClient = new LocalStorageService(null, sensitiveConfig.seoContainerID, prefix);
           } else {
             const type = seoContainerData.type;
-            const ServiceClass = (custom && custom.storageServiceProviders[type]) || OpenstackService;
+            const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
             storageClient = new ServiceClass(seoContainerData.config, sensitiveConfig.seoContainerID, prefix);
           }
 
@@ -505,7 +512,7 @@ export async function initializeServer(
       "initializeServer: initializing cloud clients",
     );
 
-    const storageClients = await getStorageProviders(config, sensitiveConfig, custom && custom.storageServiceProviders);
+    const storageClients = await getStorageProviders(config, sensitiveConfig, serviceCustom && serviceCustom.storageServiceProviders);
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
@@ -587,7 +594,7 @@ export async function initializeServer(
         "initializeServer: initializing user localization service",
       );
     }
-    const UserLocalizationServiceClass = (custom && custom.userLocalizationProvider) || IPStackService;
+    const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
     const userLocalizationService = sensitiveConfig.userLocalization ?
       new UserLocalizationServiceClass(sensitiveConfig.userLocalization) :
       null;
@@ -598,7 +605,7 @@ export async function initializeServer(
         "initializeServer: initializing mail service",
       );
     }
-    let MailServiceClass = (custom && custom.mailServiceProvider) || MailgunService;
+    let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
     if (process.env.FAKE_EMAILS === "true") {
       logger.info(
         "initializeServer: using fake email service",
@@ -618,7 +625,7 @@ export async function initializeServer(
         "initializeServer: initializing location search service",
       );
     }
-    const LocationSearchClass = (custom && custom.locationSearchProvider) || HereMapsService;
+    const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
     const locationSearchService = sensitiveConfig.locationSearch ?
       new LocationSearchClass(sensitiveConfig.locationSearch) : null;
     locationSearchService && await locationSearchService.initialize();

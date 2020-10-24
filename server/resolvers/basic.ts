@@ -82,7 +82,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
     let throwErr = false;
     try {
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
-      if (!result.custom || result.isRealUser) {
+      if (!result.custom || result.isRealUser) {
         throwErr = (
           typeof result.id !== "number" ||
           typeof result.role !== "string" ||
@@ -339,7 +339,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       const sinceMs = sinceArg.getTime();
       if (now - sinceMs > modLimiters.since) {
         sinceError = "Since is not respected as it requires a difference of less than " +
-        modLimiters.since + "ms but " + sinceMs + " provided"
+          modLimiters.since + "ms but " + sinceMs + " provided"
       } else {
         sinceSucceed = true;
       }
@@ -407,7 +407,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     throw new EndpointError({
       message: "None of the OR request limiting conditions from the module passed",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
-    }); 
+    });
   }
 
   if (idefLimiters && idefLimiters.condition === "OR") {
@@ -418,7 +418,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     throw new EndpointError({
       message: "None of the OR request limiting conditions from the item definition passed",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
-    }); 
+    });
   }
 }
 
@@ -520,7 +520,7 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
   } else if (canOwnerSearch && args.created_by && tokenData.id && args.created_by !== tokenData.id) {
     throw new EndpointError({
       message: "You have requested a search for items owned by user " + args.created_by +
-      " , but you identify yourself as " + tokenData.id,
+        " , but you identify yourself as " + tokenData.id,
       code: ENDPOINT_ERRORS.FORBIDDEN,
     });
   }
@@ -555,7 +555,12 @@ export function validateContainerIdIsReal(
   containerId: string,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
 ) {
-  if (!sensitiveConfig.containers[containerId] && sensitiveConfig.localContainer !== containerId) {
+  if (
+    (
+      !sensitiveConfig.containers || !sensitiveConfig.containers[containerId]
+    ) &&
+    sensitiveConfig.localContainer !== containerId
+  ) {
     throw new EndpointError({
       message: "Container id " + containerId + " does not exist",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -575,7 +580,7 @@ export async function validateTokenIsntBlocked(
 ) {
   if (tokenData.id && (!tokenData.custom || tokenData.isRealUser)) {
     let sqlResult: ISQLTableRowValue;
-    
+
     try {
       sqlResult = await cache.requestValue(
         "MOD_users__IDEF_user", tokenData.id, null,
@@ -700,7 +705,7 @@ export function filterAndPrepareGQLValue(
     DATA: valueOfTheItem,
   };
   const finalRequestFields = {
-    DATA: {...requestedFields},
+    DATA: { ...requestedFields },
   };
 
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
@@ -795,15 +800,15 @@ export async function serverSideCheckItemDefinitionAgainst(
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
         code: ENDPOINT_ERRORS.INVALID_PROPERTY,
         pcode: propertyValue.invalidReason,
-        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: referredInclude && referredInclude.getId(),
         includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
         propertyId: propertyValue.propertyId,
       });
 
-    // we also check that the values are matching, but only if they have been
-    // defined in the graphql value
+      // we also check that the values are matching, but only if they have been
+      // defined in the graphql value
     } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
       CAN_LOG_SILLY && logger.silly(
         "serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " being unequal",
@@ -819,8 +824,8 @@ export async function serverSideCheckItemDefinitionAgainst(
         // a null pcode is a red flag, well almost all these checks show tampering
         // this will make the client side give an error nevertheless
         pcode: null,
-        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: referredInclude && referredInclude.getId(),
         includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
         propertyId: propertyValue.propertyId,
@@ -852,12 +857,12 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
-        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: includeValue.includeId,
         includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
       });
-    // and we check if the there's a value set despite it being excluded
+      // and we check if the there's a value set despite it being excluded
     } else if (gqlExclusionState === IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
       CAN_LOG_SILLY && logger.silly(
         "serverSideCheckItemDefinitionAgainst: failed due to value set on include where it was excluded",
@@ -869,8 +874,8 @@ export async function serverSideCheckItemDefinitionAgainst(
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with an excluded item but data set for it`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
-        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
-        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
+        modulePath: (referredParentOfInclude || itemDefinition).getParentModule().getPath(),
+        itemDefPath: (referredParentOfInclude || itemDefinition).getPath(),
         includeId: includeValue.includeId,
         includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
       });
@@ -942,7 +947,7 @@ export function splitArgsInGraphqlQuery(
     moduleOrItemDefinition.getAllIncludes()).map((i) => i.getQualifiedIdentifier());
 
   Object.keys(args).forEach((key) => {
-    if (propertyIds.includes(key) || includeIds.includes(key) || reservedKeys.includes(key)) {
+    if (propertyIds.includes(key) || includeIds.includes(key) || reservedKeys.includes(key)) {
       resultingSelfValues[key] = args[key];
     } else {
       resultingExtraArgs[key] = args[key];
@@ -1005,7 +1010,7 @@ export async function runPolicyCheck(
   let parentSelectQueryValue: ISQLTableRowValue = null;
   if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
     try {
-      selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version); 
+      selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
     } catch (err) {
       logger.error(
         "runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail",
@@ -1103,7 +1108,7 @@ export async function runPolicyCheck(
 
         if (!someIncludeOrPropertyIsApplied) {
           const applyingIncludeIds =
-          arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
+            arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
 
           if (applyingIncludeIds) {
             someIncludeOrPropertyIsApplied =
