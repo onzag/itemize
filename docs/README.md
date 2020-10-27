@@ -21,7 +21,6 @@
 ## Customization
  - [Moving away from fast protoyping](./customization/customization.md)
  - [Customizing Rendering of Entry/View](./customization/custom-renderers.md)
- - [Adding CKEditor 5 as Rich Text Entry](./customization/ckeditor5.md)
 
 ## Natively supported 3rd party API's
  - [Navigation](./3rdparty/navigation.md)
