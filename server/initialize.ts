@@ -4,7 +4,7 @@ import graphqlHTTP from "express-graphql";
 import path from "path";
 import resolvers from "./resolvers";
 import { getGQLSchemaForRoot } from "../base/Root/gql";
-import { MAX_FILE_TOTAL_BATCH_COUNT, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
+import { MAX_ALL_COMBINED_FILES_SIZE, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import restServices from "./rest";
@@ -156,7 +156,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     "/graphql",
     graphqlUploadExpress({
       maxFileSize: MAX_FILE_SIZE,
-      maxFiles: MAX_FILE_TOTAL_BATCH_COUNT,
+      maxFiles: MAX_ALL_COMBINED_FILES_SIZE,
       maxFieldSize: MAX_FIELD_SIZE,
     }),
     graphqlHTTP({

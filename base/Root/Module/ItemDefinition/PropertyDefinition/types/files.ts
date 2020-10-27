@@ -7,7 +7,7 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
-import { MAX_FILE_BATCH_COUNT, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
+import { MAX_FILES_PER_PROPERTY, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { IGQLFile } from "../../../../../../gql-querier";
 import { standardLocalEqual } from "../local-sql";
 
@@ -84,7 +84,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
   allowsMinMaxLengthDefined: true,
   validate: (l: PropertyDefinitionSupportedFilesType) => {
-    if (l.length > MAX_FILE_BATCH_COUNT) {
+    if (l.length > MAX_FILES_PER_PROPERTY) {
       return PropertyInvalidReason.TOO_LARGE;
     }
 

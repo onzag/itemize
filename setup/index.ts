@@ -15,6 +15,7 @@ import gitSetup from "./git";
 import packageSetup from "./package";
 import babelSetup from "./babel";
 import webpackSetup from "./webpack";
+import itemizeConfigSetup from "./itemize";
 import srcSetup from "./src";
 import typescriptSetup from "./typescript";
 const fsAsync = fs.promises;
@@ -82,6 +83,10 @@ const stepsInOrder: IStepType[] = [
   {
     fn: webpackSetup,
     name: "webpack",
+  },
+  {
+    fn: itemizeConfigSetup,
+    name: "itemize",
   },
   {
     fn: srcSetup,

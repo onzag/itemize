@@ -8,7 +8,7 @@
 import { IModuleRawJSONDataType } from ".";
 import { buildSearchModeItemDefinition } from "./ItemDefinition/search-mode";
 import { buildSearchModePropertyDefinitions } from "./ItemDefinition/PropertyDefinition/search-mode";
-import { SEARCH_MODE_MODULE_PREFIX, MAX_SEARCH_FIELD_SIZE } from "../../../constants";
+import { SEARCH_MODE_MODULE_PREFIX, MAX_SEARCH_FIELD_LENGTH } from "../../../constants";
 
 /**
  * Builds the module based on its raw data
@@ -62,7 +62,7 @@ export function buildSearchModeModule(
       id: "search",
       type: "string",
       nullable: true,
-      maxLength: MAX_SEARCH_FIELD_SIZE,
+      maxLength: MAX_SEARCH_FIELD_LENGTH,
       i18nData: searchI18nData,
     });
   }

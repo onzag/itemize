@@ -10,7 +10,7 @@ import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredProperty
 import { IModuleRawJSONDataType } from "..";
 import { getConversionRulesetId, buildSearchModeConditionalRuleSet } from "./ConditionalRuleSet/search-mode";
 import { getConversionIds, buildSearchModePropertyDefinitions } from "./PropertyDefinition/search-mode";
-import { MAX_SEARCH_FIELD_SIZE } from "../../../../constants";
+import { MAX_SEARCH_FIELD_LENGTH } from "../../../../constants";
 
 /**
  * This builds item definitions
@@ -65,7 +65,7 @@ export function buildSearchModeItemDefinition(
       id: "search",
       type: "string",
       nullable: true,
-      maxLength: MAX_SEARCH_FIELD_SIZE,
+      maxLength: MAX_SEARCH_FIELD_LENGTH,
       i18nData: searchI18nData,
     });
 

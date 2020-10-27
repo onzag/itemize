@@ -16,6 +16,7 @@ COPY src src
 COPY schema schema
 COPY resources resources
 COPY webpack.config.js webpack.config.js
+COPY itemize.config.js itemize.config.js
 COPY babel.config.json babel.config.json
 COPY .npmrc-docker .npmrc
 
@@ -47,5 +48,6 @@ COPY --from=0 /home/node/app/node_modules node_modules
 COPY --from=0 /home/node/app/dist dist
 COPY package.json .
 COPY tsconfig.json .
+COPY itemize.config.js .
 
 CMD [ "node", "-r", "tsconfig-paths/register", "./dist/server/index.js" ]

@@ -7,6 +7,8 @@
 export default `const path = require('path');
 const webpack = require("webpack");
 const fs = require("fs");
+const itemizeConfig = require("./itemize.config");
+
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin");
@@ -30,6 +32,11 @@ const plugins = [
   // define the variable config for injecting the configuration
   new webpack.DefinePlugin({
     CONFIG: JSON.stringify(config),
+  }),
+  
+  // define itemize config to be injected
+  new webpack.DefinePlugin({
+    ITEMIZE_CONFIG: JSON.stringify(itemizeConfig),
   }),
 
   // worker generator plugin to share information between
