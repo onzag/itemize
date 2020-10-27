@@ -309,7 +309,7 @@ This allows to dinamically set the href property
 
 ### Style templating
 
-Two types of style templating are supported, and only available for templates "data-hover-style" and "data-active-style" both will replace the style attribute value when the actions are given
+Two types of style templating are supported, and only available for templates "data-style-hover" and "data-style-active" both will replace the style attribute value when the actions are given
 
 Similar security policies apply from the style tag.
 
