@@ -36,6 +36,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
     userIdef.getPropertyDefinitionFor("email", false);
   const eValidatedProperty = userIdef.hasPropertyDefinitionFor("e_validated", false) &&
     userIdef.getPropertyDefinitionFor("e_validated", false);
+  const eNotifcationsProperty = userIdef.hasPropertyDefinitionFor("e_notifications", false) &&
+    userIdef.getPropertyDefinitionFor("e_notifications", false);
   const passwordProperty = userIdef.getPropertyDefinitionFor("password", false);
 
   const userNamePropertyDescription = usernameProperty.getPropertyDefinitionDescription();
@@ -424,7 +426,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           validateToken = await jwtSign({
             validateUserId: decoded.id,
             validateUserEmail: resultUser.email,
-          }, appData.sensitiveConfig.jwtKey);
+          }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
             "customUserQueries.send_validate_email [SERIOUS]: could not sign the validation email token",
@@ -458,7 +460,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
         const templateIdToUse = parseInt(i18nData.custom.validate_account_fragment_id, 10);
 
-        const to = resultUser.email;
         const subject = capitalize(i18nData.custom.validate_account);
 
         const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
@@ -482,7 +483,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
-          to,
+          to: resultUser,
+          canUnsubscribe: !!eNotifcationsProperty,
+          ignoreUnsubscribe: true,
+          subscribeProperty: eNotifcationsProperty && eNotifcationsProperty.getId(),
+          emailProperty: "email",
         });
 
         return {
@@ -621,7 +626,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resetToken = await jwtSign({
             resetPasswordUserId: userId,
             resetPasswordTempTokenCode: randomId,
-          }, appData.sensitiveConfig.jwtKey);
+          }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
             "customUserQueries.send_reset_password [SERIOUS]: failed to sign reset token",
@@ -641,7 +646,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
 
         const templateIdToUse = parseInt(i18nData.custom.forgot_password_fragment_id, 10);
-        const to = resultUser.email;
         const subject = capitalize(i18nData.custom.forgot_password_title);
 
         const extractedProperties: any = {};
@@ -665,7 +669,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
-          to,
+          to: resultUser,
+          canUnsubscribe: !!eNotifcationsProperty,
+          ignoreUnsubscribe: true,
+          subscribeProperty: eNotifcationsProperty && eNotifcationsProperty.getId(),
+          emailProperty: "email",
         });
 
         return {
@@ -687,7 +695,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let decoded: RecoverPasswordTokenType = null;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.jwtKey);
+          decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           throw new EndpointError({
             message: "Reset token is invalid",

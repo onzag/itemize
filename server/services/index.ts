@@ -3,13 +3,17 @@ import type { ReadStream } from "fs";
 import type { RedisClient } from "redis";
 import { logger } from "..";
 import uuidv5 from "uuid/v5";
-import { ISensitiveConfigRawJSONDataType } from "../../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../config";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { renderTemplate } from "../../util";
 import { Cache } from "../cache";
 import type { Readable } from "stream";
+import { IGQLValue } from "../../gql-querier";
+import Root from "../../base/Root";
+import { jwtSign } from "../token";
+import { IUnsubscribeUserTokenDataType } from "../user/rest";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -33,8 +37,13 @@ export class ServiceProvider {
    * @override
    */
   public initialize(): Promise<void> | void {
-    
+
   }
+}
+
+export interface IUnsubscribeURL {
+  redirected: string;
+  noRedirected: string;
 }
 
 export interface ISendEmailData {
@@ -43,25 +52,34 @@ export interface ISendEmailData {
   subject: string;
   text?: string;
   html?: string;
+  unsubscribeURLs: {
+    [email: string]: IUnsubscribeURL;
+  };
 }
 
 export interface IMailProviderClassType<T> {
-  new (config: T, cache: Cache, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>
+  new(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>
 }
 
 export class MailProvider<T> extends ServiceProvider {
   public config: T;
-  private cache: Cache;
-  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  public internalConfig: IConfigRawJSONDataType;
+  public cache: Cache;
+  public root: Root;
+  private userIdef: ItemDefinition;
+  public sensitiveConfig: ISensitiveConfigRawJSONDataType;
 
-  constructor(config: T, cache: Cache, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
+  constructor(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
     super();
     this.config = config;
+    this.internalConfig = internalConfig;
+    this.root = root;
     this.cache = cache;
     this.sensitiveConfig = sensitiveConfig;
+    this.userIdef = this.root.getModuleFor(["users"]).getItemDefinitionFor(["user"]);
   }
 
-  public async sendTemplateEmail(
+  public async sendUnverifiedTemplateEmail(
     arg: {
       fromUsername: string,
       fromEmailHandle: string,
@@ -72,6 +90,9 @@ export class MailProvider<T> extends ServiceProvider {
       id: number;
       version?: string;
       args: any;
+      unsubscribeURLs?: {
+        [email: string]: IUnsubscribeURL;
+      },
     }
   ) {
     let templateValue: ISQLTableRowValue = null;
@@ -94,7 +115,7 @@ export class MailProvider<T> extends ServiceProvider {
         }
       } catch (err) {
         this.logError(
-          "MailProvider.sendTemplateEmail [SERIOUS]: failed to retrieve item definition",
+          "MailProvider.sendUnverifiedTemplateEmail [SERIOUS]: failed to retrieve item definition",
           {
             errMessage: err.message,
             errStack: err.stack,
@@ -119,6 +140,7 @@ export class MailProvider<T> extends ServiceProvider {
       from,
       to: arg.to,
       subject: arg.subject,
+      unsubscribeURLs: arg.unsubscribeURLs || {},
     }
 
     if (textValue) {
@@ -129,7 +151,7 @@ export class MailProvider<T> extends ServiceProvider {
 
     if (args.to === null || (Array.isArray(args.to) && args.to.length === 0)) {
       logger && logger.warn(
-        "MailProvider.sendTemplateEmail: Attempted to send an email without recepient",
+        "MailProvider.sendUnverifiedTemplateEmail: Attempted to send an email without recepient",
         {
           args,
         },
@@ -141,7 +163,7 @@ export class MailProvider<T> extends ServiceProvider {
       await this.sendEmail(args);
     } catch (err) {
       this.logError(
-        "MailProvider.sendTemplateEmail [SERIOUS]: API failed to deliver an email",
+        "MailProvider.sendUnverifiedTemplateEmail [SERIOUS]: API failed to deliver an email",
         {
           errMessage: err.message,
           errStack: err.stack,
@@ -150,6 +172,112 @@ export class MailProvider<T> extends ServiceProvider {
       );
       throw err;
     }
+  }
+
+  public async sendTemplateEmail(
+    arg: {
+      fromUsername: string,
+      fromEmailHandle: string,
+      to: number | IGQLValue | ISQLTableRowValue | Array<number | IGQLValue | ISQLTableRowValue>;
+      subject: string;
+      itemDefinition: ItemDefinition;
+      property: PropertyDefinition;
+      id: number;
+      version?: string;
+      args: any;
+      canUnsubscribe: boolean;
+      ignoreUnsubscribe: boolean;
+      subscribeProperty: string;
+      emailProperty?: string;
+    }
+  ) {
+    const emailPropertyUsed = arg.emailProperty || "email";
+    if (!this.userIdef.hasPropertyDefinitionFor(emailPropertyUsed, true)) {
+      this.logError(
+        "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + emailPropertyUsed + " property in the item definition for user",
+        {
+          subject: arg.subject,
+          itemDefinition: arg.itemDefinition.getQualifiedPathName(),
+          id: arg.id,
+          version: arg.version,
+        },
+      );
+      throw new Error("There is no " + emailPropertyUsed + " property in the item definition for user");
+    }
+
+    let actualUsersToSend: any[] = Array.isArray(arg.to) ? arg.to : [arg.to];
+    let actualUsersEmailsToSend: string[] = null;
+    let unsubscribeURLs: {
+      [email: string]: IUnsubscribeURL;
+    } = {};
+    actualUsersEmailsToSend = await Promise.all(actualUsersToSend.map(async (u) => {
+      let userData: ISQLTableRowValue | IGQLValue = u;
+      if (typeof userData === "number") {
+        userData = await this.cache.requestValue(
+          this.userIdef,
+          userData as number,
+          null,
+        );
+      }
+
+      if (!userData) {
+        return null;
+      }
+
+      const email = userData.DATA ? userData.DATA[emailPropertyUsed] : userData[emailPropertyUsed];
+      // we are subscribed to this if we have an email
+      // otherwise we cannot even send such email
+      let isSubscribed = !!email;
+      if (email && !arg.ignoreUnsubscribe && arg.subscribeProperty) {
+        if (userData.DATA) {
+          isSubscribed = !!userData.DATA[arg.subscribeProperty];
+        } else {
+          isSubscribed = !!userData[arg.subscribeProperty];
+        }
+      }
+
+      if (!isSubscribed) {
+        return null;
+      }
+
+      if (email && arg.canUnsubscribe && arg.subscribeProperty && isSubscribed) {
+        const tokenData: IUnsubscribeUserTokenDataType = {
+          unsubscribeUserId: userData.id,
+          unsubscribeProperty: arg.subscribeProperty,
+        }
+        const hostname = process.env.NODE_ENV === "development" ?
+          this.internalConfig.developmentHostname :
+          this.internalConfig.productionHostname;
+        const token = await jwtSign(tokenData, this.sensitiveConfig.secondaryJwtKey);
+        const url = "https://" + hostname + "/rest/user/unsubscribe?userid=" + userData.id + "&token=" + encodeURIComponent(token);
+        unsubscribeURLs[email] = {
+          redirected: url,
+          noRedirected: url + "&noredirect"
+        };
+      }
+
+      return email;
+    }));
+    actualUsersToSend = actualUsersToSend.filter((u) => {
+      return (u !== null);
+    });
+
+    if (!actualUsersToSend.length) {
+      return;
+    }
+
+    await this.sendUnverifiedTemplateEmail({
+      fromUsername: arg.fromUsername,
+      fromEmailHandle: arg.fromEmailHandle,
+      to: actualUsersToSend,
+      subject: arg.subject,
+      itemDefinition: arg.itemDefinition,
+      property: arg.property,
+      id: arg.id,
+      version: arg.version,
+      args: arg.args,
+      unsubscribeURLs,
+    });
   }
 
   /**
@@ -170,7 +298,7 @@ export interface IStorageProvidersObject {
 }
 
 export interface IStorageProviderClassType<T> {
-  new (config: T, id: string, prefix: string): StorageProvider<T>
+  new(config: T, id: string, prefix: string): StorageProvider<T>
 }
 
 export class StorageProvider<T> extends ServiceProvider {
@@ -254,7 +382,7 @@ export class StorageProvider<T> extends ServiceProvider {
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
 export interface ILocationSearchProviderClassType<T> {
-  new (config: T): LocationSearchProvider<T>
+  new(config: T): LocationSearchProvider<T>
 }
 
 export class LocationSearchProvider<T> extends ServiceProvider {
@@ -337,7 +465,7 @@ export interface ICurrencyFactors {
 }
 
 export interface ICurrencyFactorsProviderClassType<T> {
-  new (config: T, globalCache: RedisClient): CurrencyFactorsProvider<T>
+  new(config: T, globalCache: RedisClient): CurrencyFactorsProvider<T>
 }
 
 export class CurrencyFactorsProvider<T> extends ServiceProvider {
@@ -366,7 +494,7 @@ export interface IUserLocalizationType {
 }
 
 export interface IUserLocalizationProviderClassType<T> {
-  new (config: T): UserLocalizationProvider<T>
+  new(config: T): UserLocalizationProvider<T>
 }
 
 export class UserLocalizationProvider<T> extends ServiceProvider {

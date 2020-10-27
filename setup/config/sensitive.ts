@@ -236,6 +236,13 @@ export async function sensitiveConfigSetup(
         hidden: true,
       },
       {
+        variableName: "secondaryJwtKey",
+        message: "a Secondary JSON web token key used for key validation and token generation, mostly used for secondary tasks, eg. email services, " +
+        "leave blank to autogenerate one if not filled",
+        defaultValue: genToken(64),
+        hidden: true,
+      },
+      {
         variableName: "devKey",
         message: "a development key that is used to obtain development javascript files in production settings when set as a cookie",
         defaultValue: genToken(16),

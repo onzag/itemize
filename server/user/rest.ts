@@ -6,6 +6,16 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import bcyrpt from "bcrypt";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 
+export interface IValidateUserTokenDataType {
+  validateUserId: number;
+  validateUserEmail: string;
+}
+
+export interface IUnsubscribeUserTokenDataType {
+  unsubscribeUserId: number;
+  unsubscribeProperty: string;
+}
+
 export function userRestServices(appData: IAppDataType) {
   const userModule = appData.root.getModuleFor(["users"]);
   const userIdef = userModule.getItemDefinitionFor(["user"]);
@@ -25,13 +35,10 @@ export function userRestServices(appData: IAppDataType) {
       return;
     }
 
-    let decoded: {
-      validateUserId: number;
-      validateUserEmail: string;
-    };
+    let decoded: IValidateUserTokenDataType;
     try {
       // we attempt to decode it
-      decoded = await jwtVerify(req.query.token as string, appData.sensitiveConfig.jwtKey);
+      decoded = await jwtVerify(req.query.token as string, appData.sensitiveConfig.secondaryJwtKey);
     } catch (err) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
       return;
@@ -257,6 +264,108 @@ export function userRestServices(appData: IAppDataType) {
       res.redirect("/" + user.app_language + "/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
       return;
     }
+  });
+
+  router.get("/unsubscribe", async (req, res) => {
+    const userId = parseInt(req.query.userid as string);
+    const token = req.query.token as string;
+    const noRedirect = !!req.query.noredirect;
+
+    let user: ISQLTableRowValue;
+    // let's ensure the user exists that we are working with
+    try {
+      user = await appData.cache.requestValue(userIdef, userId, null);
+      if (!user) {
+        noRedirect ? res.status(404).end() : res.redirect("/en/?err=" + ENDPOINT_ERRORS.USER_REMOVED);
+        return;
+      } else if (user.blocked_at !== null) {
+        noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.USER_BLOCKED}`);
+        return;
+      }
+    } catch (err) {
+      logger.error(
+        "userRestServices/unsubscribe: failed to retrieve user from the id",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+      throw err;
+    }
+
+    // now let's confirm the token given is valid
+    let tokenData: IUnsubscribeUserTokenDataType;
+    if (token) {
+      // we try
+      try {
+        tokenData = await jwtVerify(token, appData.sensitiveConfig.secondaryJwtKey);
+        // check the shape of the token
+        if (
+          !tokenData.unsubscribeUserId ||
+          !tokenData.unsubscribeProperty
+        ) {
+          // invalid shape
+          noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
+          logger.error(
+            "userRestServices/unsubscribe: The token provided was invalid and did not respect the shape",
+            {
+              tokenData,
+            }
+          );
+          return;
+        } else if (tokenData.unsubscribeUserId !== userId) {
+          // the given user id does not match
+          noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+          return;
+        } else if (!userIdef.hasPropertyDefinitionFor(tokenData.unsubscribeProperty, true)) {
+          // there's no such property to toggle to false
+          noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+          return;
+        } else if (!user[tokenData.unsubscribeProperty]) {
+          // it's already toggled to false
+          noRedirect ? res.status(200).end() : res.redirect(`/${user.app_language}/?msg=unsubscribe_success&msgtitle=unsubscribe_success_title`);
+          return;
+        }
+      } catch {
+        // invalid credentials as the token did not decode
+        noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+        return;
+      }
+    } else {
+      // no token, forbidden
+      noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.INVALID_CREDENTIALS}`);
+      return;
+    }
+
+    // now we are going to toggle the property
+    try {
+      await appData.cache.requestUpdate(
+        userIdef,
+        tokenData.unsubscribeUserId,
+        null,
+        {
+          [tokenData.unsubscribeProperty]: false,
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+      );
+    } catch (err) {
+      logger.error(
+        "userRestServices/unsubscribe: failed to set " + tokenData.unsubscribeProperty + " status to false",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          user,
+        }
+      );
+      throw err;
+    }
+
+    // display the success status
+    noRedirect ? res.status(200).end() : res.redirect(`/${user.app_language}/?msg=unsubscribe_success&msgtitle=unsubscribe_success_title`);
   });
 
   return router;

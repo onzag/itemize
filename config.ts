@@ -254,6 +254,12 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   jwtKey: string;
   /**
+   * A secondary json web token key to use, for tasks where these tokens might be
+   * used on less secure third party tasks and are not used in more critical tasks
+   * eg. for email services
+   */
+  secondaryJwtKey: string;
+  /**
    * A development key, allows to use development files in its full form on the production
    * interface
    */
@@ -338,6 +344,9 @@ export const rawSensitiveConfigSchema = {
     jwtKey: {
       type: "string",
     },
+    secondaryJwtKey: {
+      type: "string",
+    },
     devKey: {
       type: "string",
     },
@@ -384,6 +393,7 @@ export const rawSensitiveConfigSchema = {
     "defaultContainerID",
     "seoContainerID",
     "jwtKey",
+    "secondaryJwtKey",
     "devKey",
   ],
 };

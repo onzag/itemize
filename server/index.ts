@@ -616,6 +616,8 @@ export async function initializeServer(
       new MailServiceClass(
         sensitiveConfig.mail,
         cache,
+        root,
+        config,
         sensitiveConfig,
       ) : null;
     mailService && await mailService.initialize();
