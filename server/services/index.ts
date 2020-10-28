@@ -16,34 +16,138 @@ import { jwtSign } from "../token";
 import { IUnsubscribeUserTokenDataType } from "../user/rest";
 import express from "express";
 import { ITriggerRegistry } from "../resolvers/triggers";
+import Knex from "knex";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
+const wait = (time: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+}
+
 export class ServiceProvider<T> {
+  private lastRan: number;
+
   public config: T;
+
+  public globalKnex: Knex;
+  public globalRedisPub: RedisClient;
+  public globalRedis: RedisClient;
+
   constructor(config: T) {
     this.config = config;
   }
+
   public logInfo(str: string, extra?: any) {
     logger && logger.info(str, extra);
   }
+
   public logDebug(str: string, extra?: any) {
     CAN_LOG_DEBUG && logger && logger.info(str, extra);
   }
+
   public logError(str: string, extra?: any) {
     logger && logger.error(str, extra);
   }
+
   public expressRouter(options?: express.RouterOptions) {
     return express.Router(options);
+  }
+
+  public setupGlobalResources(knex: Knex, globalClient: RedisClient, globalPub: RedisClient) {
+    this.globalKnex = knex;
+    this.globalRedis = globalClient;
+    this.globalRedisPub = globalPub;
+  }
+
+  /**
+   * Specifies whether the current service is a global service
+   * if true global services will only execute initialize and a router
+   * will not be extracted from them
+   * 
+   * it will instead have access to the global resources
+   * 
+   * @override
+   */
+  public static isGlobal() {
+    return false;
+  }
+
+  /**
+   * Performs the execution of the service, basically
+   * it will do the run function and then re-run as specified
+   */
+  public execute() {
+    (async () => {
+      while (true) {
+        this.lastRan = (new Date()).getTime();
+
+        try {
+          await this.run();
+        } catch (err) {
+          logger.error(
+            "ServiceManager.run [SERIOUS]: a service crashed during running " + this.constructor.name,
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+              config: this.config,
+            }
+          );
+        }
+
+        const cycleTime = this.getRunCycleTime();
+
+        if (!cycleTime) {
+          break;
+        }
+  
+        const nowTime = (new Date()).getTime();
+        const timeItPassedSinceSeoGenRan = nowTime - this.lastRan;
+        const timeUntilItNeedsToRun = cycleTime - timeItPassedSinceSeoGenRan;
+  
+        if (timeUntilItNeedsToRun <= 0) {
+          logger.error(
+            "ServiceManager.run [SERIOUS]: a service took so long to run " + this.constructor.name,
+            {
+              timeUntilItNeedsToRun,
+            }
+          );
+        } else {
+          await wait(timeUntilItNeedsToRun);
+        }
+      }
+    })();
   }
 
   /**
    * This function is executed during
    * the initialization of the service
+   * 
+   * If your service is a global service you will
+   * have access to the global resources while
+   * this function executes
    * @override
    */
   public initialize(): Promise<void> | void {
+
+  }
+
+  /**
+   * Determines whether the run function
+   * should run over again
+   * @override
+   */
+  public getRunCycleTime(): number {
+    return null;
+  }
+
+  /**
+   * Executes some code
+   * @override
+   */
+  public run(): Promise<void> | void {
 
   }
 
@@ -110,6 +214,7 @@ export interface IServiceProviderClassType<T> {
   new(config: T): ServiceProvider<T>;
   getRouter: (appData: IAppDataType) => express.Router | Promise<express.Router>;
   getTriggerRegistry: () => ITriggerRegistry | Promise<ITriggerRegistry>;
+  isGlobal: () => boolean;
 }
 
 export interface IUnsubscribeURL {

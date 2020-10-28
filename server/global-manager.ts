@@ -12,7 +12,7 @@ import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
-import { CurrencyFactorsProvider, ICurrencyFactorsProviderClassType } from "./services";
+import { CurrencyFactorsProvider, ServiceProvider } from "./services";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -40,6 +40,7 @@ export class GlobalManager {
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
+  private customServices: ServiceProvider<any>[];
 
   constructor(
     root: Root,
@@ -62,6 +63,8 @@ export class GlobalManager {
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 
+    this.customServices = [];
+
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
     this.run = this.run.bind(this);
@@ -74,6 +77,11 @@ export class GlobalManager {
   }
   public setSEOGenerator(seoGenerator: SEOGenerator) {
     this.seoGenerator = seoGenerator;
+  }
+  public async installGlobalService(service: ServiceProvider<any>) {
+    this.customServices.push(service);
+    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub);
+    await service.initialize();
   }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
@@ -205,13 +213,29 @@ export class GlobalManager {
     }
   }
   public run() {
+    // currency factors shoudn't really have its own execution but who knows
+    if (this.currencyFactorsProvider) {
+      this.currencyFactorsProvider.execute();
+    }
+
+    // hijack the seo generator and do our own executions
     if (this.seoGenerator) {
       (async () => {
         while (true) {
           this.seoGenLastUpdated = (new Date()).getTime();
 
           logger.info("GlobalManager.run: running SEO Generator");
-          await this.seoGenerator.run();
+          try {
+            await this.seoGenerator.run();
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: Seo generator failed to run",
+              {
+                errStack: err.stack,
+                errMessage: err.message,
+              }
+            );
+          }
     
           const nowTime = (new Date()).getTime();
           const timeItPassedSinceSeoGenRan = nowTime - this.seoGenLastUpdated;
@@ -232,12 +256,25 @@ export class GlobalManager {
         }
       })();
     }
+
+    // this is what it's used with currency factors in reality
     (async () => {
       while (true) {
         this.serverDataLastUpdated = (new Date()).getTime();
 
         await this.calculateServerData();
-        await this.runOnce();
+
+        try {
+          await this.runOnce();
+        } catch (err) {
+          logger.error(
+            "GlobalManager.run [SERIOUS]: run once function failed to run",
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+            }
+          );
+        }
   
         const nowTime = (new Date()).getTime();
         const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
@@ -258,6 +295,9 @@ export class GlobalManager {
         }
       }
     })();
+    
+    // execute every custom service
+    this.customServices.forEach((s) => s.execute());
   }
   private async runOnce() {
     for (const mod of this.modNeedsMantenience) {

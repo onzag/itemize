@@ -479,6 +479,26 @@ export async function initializeServer(
         sensitiveConfig,
         currencyFactorsService,
       );
+
+      if (serviceCustom && serviceCustom.customServices) {
+        await Promise.all(
+          Object.keys(serviceCustom.customServices).map(async (keyName) => {
+            const CustomServiceClass = serviceCustom.customServices[keyName];
+  
+            if (!CustomServiceClass.isGlobal()) {
+              return;
+            }
+  
+            const configData = {
+              ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+              ...(config.custom && config.custom[keyName]),
+            };
+            const customGlobalService = new CustomServiceClass(configData);
+            await manager.installGlobalService(customGlobalService);
+          })
+        );
+      }
+
       if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
           "initializeServer: initializing SEO configuration",
@@ -668,11 +688,16 @@ export async function initializeServer(
     if (serviceCustom && serviceCustom.customServices) {
       await Promise.all(
         Object.keys(serviceCustom.customServices).map(async (keyName) => {
+          const CustomServiceClass = serviceCustom.customServices[keyName];
+
+          if (CustomServiceClass.isGlobal()) {
+            return;
+          }
+
           const configData = {
             ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
             ...(config.custom && config.custom[keyName]),
           };
-          const CustomServiceClass = serviceCustom.customServices[keyName];
           customServices[keyName] = new CustomServiceClass(configData);
           await customServices[keyName].initialize();
 
@@ -684,6 +709,9 @@ export async function initializeServer(
       );
     }
 
+    logger.info(
+      "initializeServer: extracting triggers from all the providers",
+    );
     const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
     const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
     const mailServiceInstanceTrigger = mailService && await mailService.getTriggerRegistry();
@@ -778,9 +806,17 @@ export async function initializeServer(
     }
 
     logger.info(
-      "initializeServer: setting up endpoints",
+      "initializeServer: setting execution of all service providers",
     );
+    userLocalizationService && userLocalizationService.execute();
+    mailService && mailService.execute();
+    locationSearchService && locationSearchService.execute();
+    storageClients.instancesUsed.forEach((i) => i.execute());
+    customServicesInstances.forEach((i) => i.execute());
 
+    logger.info(
+      "initializeServer: extracting routers of all the providers",
+    );
     const userLocalizationInstanceRouter = userLocalizationService && await userLocalizationService.getRouter(appData);
     const userLocalizationClassRouter = userLocalizationService && await UserLocalizationServiceClass.getRouter(appData);
     const mailServiceInstanceRouter = mailService && await mailService.getRouter(appData);
@@ -804,6 +840,9 @@ export async function initializeServer(
       locationSearchServiceClassRouter,
     ].filter((r) => !!r);
 
+    logger.info(
+      "initializeServer: setting up endpoints",
+    );
     initializeApp(appData, custom, routers);
 
     logger.info(
