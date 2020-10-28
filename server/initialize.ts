@@ -99,7 +99,7 @@ async function customResolveWrapper(
  * @param appData the application data to use
  * @param custom the custom config that has been passed
  */
-export function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType) {
+export function initializeApp(appData: IAppDataType, custom: IServerCustomizationDataType, routers: express.Router[]) {
   // removing the powered by header
   app.use((req, res, next) => {
     res.removeHeader("X-Powered-By");
@@ -116,6 +116,9 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   // adding rest services
   app.use("/rest/user", userRestServices(appData));
   app.use("/rest", restServices(appData));
+  routers.forEach((r) => {
+    app.use("/rest/service", r);
+  });
 
   const customUserQueriesProcessed = customUserQueries(appData);
   appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;

@@ -36,8 +36,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
     userIdef.getPropertyDefinitionFor("email", false);
   const eValidatedProperty = userIdef.hasPropertyDefinitionFor("e_validated", false) &&
     userIdef.getPropertyDefinitionFor("e_validated", false);
-  const eNotifcationsProperty = userIdef.hasPropertyDefinitionFor("e_notifications", false) &&
-    userIdef.getPropertyDefinitionFor("e_notifications", false);
   const passwordProperty = userIdef.getPropertyDefinitionFor("password", false);
 
   const userNamePropertyDescription = usernameProperty.getPropertyDefinitionDescription();
@@ -484,9 +482,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
           to: resultUser,
-          canUnsubscribe: !!eNotifcationsProperty,
+          canUnsubscribe: false,
           ignoreUnsubscribe: true,
-          subscribeProperty: eNotifcationsProperty && eNotifcationsProperty.getId(),
+          subscribeProperty: null,
           emailProperty: "email",
         });
 
@@ -670,9 +668,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
           to: resultUser,
-          canUnsubscribe: !!eNotifcationsProperty,
+          canUnsubscribe: false,
           ignoreUnsubscribe: true,
-          subscribeProperty: eNotifcationsProperty && eNotifcationsProperty.getId(),
+          subscribeProperty: null,
           emailProperty: "email",
         });
 

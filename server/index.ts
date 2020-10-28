@@ -30,7 +30,7 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
-import { MailProvider, IStorageProvidersObject, IStorageProviderClassType, IMailProviderClassType, IUserLocalizationProviderClassType, ICurrencyFactorsProviderClassType, ILocationSearchProviderClassType, StorageProvider, UserLocalizationProvider, LocationSearchProvider } from "./services";
+import { MailProvider, IStorageProvidersObject, IStorageProviderClassType, IMailProviderClassType, IUserLocalizationProviderClassType, ICurrencyFactorsProviderClassType, ILocationSearchProviderClassType, StorageProvider, UserLocalizationProvider, LocationSearchProvider, IServiceProviderClassType, ServiceProvider } from "./services";
 import { LocalStorageService } from "./services/local";
 import { OpenstackService } from "./services/openstack";
 import { IPStackService } from "./services/ipstack";
@@ -140,6 +140,9 @@ export interface IAppDataType {
   mailService: MailProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
+  customServices: {
+    [name: string]: ServiceProvider<any>;
+  };
 }
 
 export interface IServerDataType {
@@ -158,6 +161,9 @@ export interface IServiceCustomizationType {
   userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
   currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
   locationSearchProvider?: ILocationSearchProviderClassType<any>;
+  customServices?: {
+    [name: string]: IServiceProviderClassType<any>,
+  };
 }
 
 export interface IServerCustomizationDataType {
@@ -173,8 +179,17 @@ export async function getStorageProviders(
   config: IConfigRawJSONDataType,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
   storageServiceProviders: IStorageProviders,
-) {
-  const cloudClients: IStorageProvidersObject = {};
+): Promise<{
+  cloudClients: IStorageProvidersObject;
+  instancesUsed: StorageProvider<any>[];
+  classesUsed: IStorageProviderClassType<any>[];
+}> {
+  const finalOutput = {
+    instancesUsed: [] as StorageProvider<any>[],
+    classesUsed: [] as IStorageProviderClassType<any>[],
+    cloudClients: {} as IStorageProvidersObject,
+  };
+
   if (sensitiveConfig.localContainer) {
     let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
     if (!prefix) {
@@ -188,7 +203,12 @@ export async function getStorageProviders(
     }
     const localClient = new LocalStorageService(null, sensitiveConfig.localContainer, prefix);
     await localClient.initialize();
-    cloudClients[sensitiveConfig.localContainer] = localClient;
+    finalOutput.instancesUsed.push(localClient);
+    // typescript for some reason misses the types
+    if (!finalOutput.classesUsed.includes(LocalStorageService as any)) {
+      finalOutput.classesUsed.push(LocalStorageService as any);
+    }
+    finalOutput.cloudClients[sensitiveConfig.localContainer] = localClient;
   }
 
   if (sensitiveConfig.containers) {
@@ -210,11 +230,16 @@ export async function getStorageProviders(
 
       const client = new ServiceClass(containerData.config, containerIdX, prefix);
       await client.initialize();
-      cloudClients[containerIdX] = client;
+      finalOutput.instancesUsed.push(client);
+      // typescript misses the types
+      if (!finalOutput.classesUsed.includes(ServiceClass as any)) {
+        finalOutput.classesUsed.push(ServiceClass as any);
+      }
+      finalOutput.cloudClients[containerIdX] = client;
     }));
   }
 
-  return cloudClients;
+  return finalOutput;
 }
 
 /**
@@ -519,18 +544,18 @@ export async function initializeServer(
         "initializeServer: cleaning storage",
       );
 
-      await Promise.all(Object.keys(storageClients).map(async (containerId) => {
+      await Promise.all(Object.keys(storageClients.cloudClients).map(async (containerId) => {
         if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
           logger.info(
             "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
           );
-          const client = storageClients[containerId];
+          const client = storageClients.cloudClients[containerId];
           await client.removeFolder("sitemaps/" + domain);
         } else {
           logger.info(
             "initializeServer: cleaning " + containerId + " data for " + domain,
           );
-          const client = storageClients[containerId];
+          const client = storageClients.cloudClients[containerId];
           await client.removeFolder(domain);
         }
       }));
@@ -567,7 +592,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients, domain, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -610,7 +635,8 @@ export async function initializeServer(
       logger.info(
         "initializeServer: using fake email service",
       );
-      MailServiceClass = FakeMailService;
+      // typescript messes the types again
+      MailServiceClass = FakeMailService as any;
     }
     const mailService = sensitiveConfig.mail ?
       new MailServiceClass(
@@ -631,6 +657,55 @@ export async function initializeServer(
     const locationSearchService = sensitiveConfig.locationSearch ?
       new LocationSearchClass(sensitiveConfig.locationSearch) : null;
     locationSearchService && await locationSearchService.initialize();
+
+    const customServices: {
+      [name: string]: ServiceProvider<any>,
+    } = {};
+
+    const customServicesInstances: ServiceProvider<any>[] = [];
+    const customServiceClassesUsed: IServiceProviderClassType<any>[] = [];
+
+    if (serviceCustom && serviceCustom.customServices) {
+      await Promise.all(
+        Object.keys(serviceCustom.customServices).map(async (keyName) => {
+          const configData = {
+            ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+            ...(config.custom && config.custom[keyName]),
+          };
+          const CustomServiceClass = serviceCustom.customServices[keyName];
+          customServices[keyName] = new CustomServiceClass(configData);
+          await customServices[keyName].initialize();
+
+          customServicesInstances.push(customServices[keyName]);
+          if (!customServiceClassesUsed.includes(CustomServiceClass)) {
+            customServiceClassesUsed.push(CustomServiceClass);
+          }
+        })
+      );
+    }
+
+    const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
+    const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
+    const mailServiceInstanceTrigger = mailService && await mailService.getTriggerRegistry();
+    const mailServiceClassTrigger = mailService && await MailServiceClass.getTriggerRegistry();
+    const locationSearchServiceInstanceTrigger = locationSearchService && await locationSearchService.getTriggerRegistry();
+    const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
+    const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
+    const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
+    const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
+    const classTriggersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getTriggerRegistry()));
+    const triggers = [
+      ...instanceTriggers,
+      ...classTriggers,
+      ...instaceTriggersCustom,
+      ...classTriggersCustom,
+      userLocalizationInstanceTrigger,
+      userLocalizationClassTrigger,
+      mailServiceInstanceTrigger,
+      mailServiceClassTrigger,
+      locationSearchServiceInstanceTrigger,
+      locationSearchServiceClassTrigger,
+    ].filter((r) => !!r);
 
     const appData: IAppDataType = {
       root,
@@ -655,12 +730,14 @@ export async function initializeServer(
       triggers: mergeTriggerRegistries(
         customUserTriggers,
         custom.customTriggers,
+        ...triggers,
       ),
       userLocalizationService,
       locationSearchService,
       mailService,
-      storage: storageClients,
+      storage: storageClients.cloudClients,
       logger,
+      customServices,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
@@ -703,7 +780,31 @@ export async function initializeServer(
     logger.info(
       "initializeServer: setting up endpoints",
     );
-    initializeApp(appData, custom);
+
+    const userLocalizationInstanceRouter = userLocalizationService && await userLocalizationService.getRouter(appData);
+    const userLocalizationClassRouter = userLocalizationService && await UserLocalizationServiceClass.getRouter(appData);
+    const mailServiceInstanceRouter = mailService && await mailService.getRouter(appData);
+    const mailServiceClassRouter = mailService && await MailServiceClass.getRouter(appData);
+    const locationSearchServiceInstanceRouter = locationSearchService && await locationSearchService.getRouter(appData);
+    const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
+    const instanceRouters = await Promise.all(storageClients.instancesUsed.map((i) => i.getRouter(appData)));
+    const classRouters = await Promise.all(storageClients.classesUsed.map((c) => c.getRouter(appData)));
+    const instaceRoutersCustom = await Promise.all(customServicesInstances.map((i) => i.getRouter(appData)));
+    const classRoutersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getRouter(appData)));
+    const routers = [
+      ...instanceRouters,
+      ...classRouters,
+      ...instaceRoutersCustom,
+      ...classRoutersCustom,
+      userLocalizationInstanceRouter,
+      userLocalizationClassRouter,
+      mailServiceInstanceRouter,
+      mailServiceClassRouter,
+      locationSearchServiceInstanceRouter,
+      locationSearchServiceClassRouter,
+    ].filter((r) => !!r);
+
+    initializeApp(appData, custom, routers);
 
     logger.info(
       "initializeServer: attempting to listen at " + PORT,

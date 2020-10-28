@@ -1,7 +1,7 @@
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import type { ReadStream } from "fs";
 import type { RedisClient } from "redis";
-import { logger } from "..";
+import { IAppDataType, logger } from "..";
 import uuidv5 from "uuid/v5";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../config";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
@@ -14,12 +14,16 @@ import { IGQLValue } from "../../gql-querier";
 import Root from "../../base/Root";
 import { jwtSign } from "../token";
 import { IUnsubscribeUserTokenDataType } from "../user/rest";
+import express from "express";
+import { ITriggerRegistry } from "../resolvers/triggers";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
-export class ServiceProvider {
-  constructor() {
+export class ServiceProvider<T> {
+  public config: T;
+  constructor(config: T) {
+    this.config = config;
   }
   public logInfo(str: string, extra?: any) {
     logger && logger.info(str, extra);
@@ -30,6 +34,9 @@ export class ServiceProvider {
   public logError(str: string, extra?: any) {
     logger && logger.error(str, extra);
   }
+  public expressRouter(options?: express.RouterOptions) {
+    return express.Router(options);
+  }
 
   /**
    * This function is executed during
@@ -39,6 +46,70 @@ export class ServiceProvider {
   public initialize(): Promise<void> | void {
 
   }
+
+  /**
+   * Provides a router endpoint, the router endpoint
+   * will exist directly under the rest services
+   * this enables to create webhooks and other subservices
+   * that are attached to this service
+   * 
+   * If the service provider if executed on a global environment
+   * the endpoint does not get created, this means that in the global
+   * manager this won't be executed, or anything that is meant
+   * for the global manager
+   * 
+   * The router gets attached to /rest/service
+   * 
+   * @override
+   */
+  public getRouter(appData: IAppDataType): express.Router | Promise<express.Router> {
+    return null;
+  }
+
+  /**
+   * Provides a router endpoint, but this method
+   * is static, which means it only gets added once
+   * 
+   * If the service provider if executed on a global environment
+   * the endpoint does not get created, this means that in the global
+   * manager this won't be executed, or anything that is meant
+   * for the global manager
+   * 
+   * the router gets attached to /rest/service
+   * 
+   * @override
+   */
+  public static getRouter(appData: IAppDataType): express.Router | Promise<express.Router> {
+    return null;
+  }
+
+  /**
+   * Allows to setup trigger registries via the service
+   * so that they trigger just as normal trigger will do
+   * 
+   * @override
+   */
+  public getTriggerRegistry(): ITriggerRegistry | Promise<ITriggerRegistry> {
+    return null;
+  }
+
+  /**
+   * Allows to setup trigger registries via the service
+   * so that they trigger just as normal trigger will do
+   * 
+   * This gets attached if a class is used rather than per instance
+   * 
+   * @override
+   */
+  public static getTriggerRegistry(): ITriggerRegistry | Promise<ITriggerRegistry> {
+    return null;
+  }
+}
+
+export interface IServiceProviderClassType<T> {
+  new(config: T): ServiceProvider<T>;
+  getRouter: (appData: IAppDataType) => express.Router | Promise<express.Router>;
+  getTriggerRegistry: () => ITriggerRegistry | Promise<ITriggerRegistry>;
 }
 
 export interface IUnsubscribeURL {
@@ -57,12 +128,11 @@ export interface ISendEmailData {
   };
 }
 
-export interface IMailProviderClassType<T> {
-  new(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>
+export interface IMailProviderClassType<T> extends IServiceProviderClassType<T> {
+  new(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>;
 }
 
-export class MailProvider<T> extends ServiceProvider {
-  public config: T;
+export class MailProvider<T> extends ServiceProvider<T> {
   public internalConfig: IConfigRawJSONDataType;
   public cache: Cache;
   public root: Root;
@@ -70,8 +140,8 @@ export class MailProvider<T> extends ServiceProvider {
   public sensitiveConfig: ISensitiveConfigRawJSONDataType;
 
   constructor(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
-    super();
-    this.config = config;
+    super(config);
+
     this.internalConfig = internalConfig;
     this.root = root;
     this.cache = cache;
@@ -297,19 +367,17 @@ export interface IStorageProvidersObject {
   [id: string]: StorageProvider<any>,
 }
 
-export interface IStorageProviderClassType<T> {
+export interface IStorageProviderClassType<T> extends IServiceProviderClassType<T> {
   new(config: T, id: string, prefix: string): StorageProvider<T>
 }
 
-export class StorageProvider<T> extends ServiceProvider {
-  public config: T;
+export class StorageProvider<T> extends ServiceProvider<T> {
   public prefix: string;
   public id: string;
 
   constructor(config: T, id: string, prefix: string) {
-    super();
+    super(config);
 
-    this.config = config;
     this.prefix = prefix;
     this.id = id;
   }
@@ -381,15 +449,13 @@ export class StorageProvider<T> extends ServiceProvider {
 // basically a combination for location, this way we are not tied to any API
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
-export interface ILocationSearchProviderClassType<T> {
+export interface ILocationSearchProviderClassType<T> extends IServiceProviderClassType<T> {
   new(config: T): LocationSearchProvider<T>
 }
 
-export class LocationSearchProvider<T> extends ServiceProvider {
-  public config: T;
+export class LocationSearchProvider<T> extends ServiceProvider<T> {
   constructor(config: T) {
-    super();
-    this.config = config;
+    super(config);
   }
 
   public makeIdOutOf(lat: number, lng: number) {
@@ -464,17 +530,15 @@ export interface ICurrencyFactors {
   [key: string]: number,
 }
 
-export interface ICurrencyFactorsProviderClassType<T> {
+export interface ICurrencyFactorsProviderClassType<T> extends IServiceProviderClassType<T> {
   new(config: T, globalCache: RedisClient): CurrencyFactorsProvider<T>
 }
 
-export class CurrencyFactorsProvider<T> extends ServiceProvider {
-  public config: T;
+export class CurrencyFactorsProvider<T> extends ServiceProvider<T> {
   public globalCache: RedisClient;
 
   constructor(config: T, globalCache: RedisClient) {
-    super();
-    this.config = config;
+    super(config);
     this.globalCache = globalCache;
   }
 
@@ -493,16 +557,13 @@ export interface IUserLocalizationType {
   language: string;
 }
 
-export interface IUserLocalizationProviderClassType<T> {
+export interface IUserLocalizationProviderClassType<T> extends IServiceProviderClassType<T> {
   new(config: T): UserLocalizationProvider<T>
 }
 
-export class UserLocalizationProvider<T> extends ServiceProvider {
-  public config: T;
-
+export class UserLocalizationProvider<T> extends ServiceProvider<T> {
   constructor(config: T) {
-    super();
-    this.config = config;
+    super(config);
   }
 
   /**

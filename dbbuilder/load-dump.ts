@@ -103,7 +103,7 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
   );
 
   // and the upload containers
-  const cloudClients = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
+  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
 
   // inform the users
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
