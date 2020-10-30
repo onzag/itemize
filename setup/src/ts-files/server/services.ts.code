@@ -10,7 +10,7 @@ import { IServiceCustomizationType } from "@onzag/itemize/server";
 // storage, and others, if left emtpy it will use the itemize defaults
 const services: IServiceCustomizationType = {
 
-}
+};
 
 // this export being the default is important
 export default services;

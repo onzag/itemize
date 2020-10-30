@@ -40,8 +40,12 @@ import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
 
 // load the custom services configuration
-const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+let serviceCustom: IServiceCustomizationType = {};
+try {
+  const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+  serviceCustom = serviceFileSrc.default;
+} catch {
+}
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;

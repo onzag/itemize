@@ -99,9 +99,15 @@ export interface IItemizeConfig {
 // in the client side it gets injected via webpack in the server side
 // it has to be required
 declare var ITEMIZE_CONFIG: IItemizeConfig;
-const R_ITEMIZE_CONFIG = typeof ITEMIZE_CONFIG !== "undefined" ?
-  ITEMIZE_CONFIG :
-  require(path.join(path.resolve("."), "itemize.config")) as IItemizeConfig;
+let R_ITEMIZE_CONFIG: IItemizeConfig = typeof ITEMIZE_CONFIG !== "undefined" ?
+  ITEMIZE_CONFIG : null;
+if (!R_ITEMIZE_CONFIG) {
+  try {
+    R_ITEMIZE_CONFIG = require(path.join(path.resolve("."), "itemize.config")) as IItemizeConfig;
+  } catch {
+    R_ITEMIZE_CONFIG = {};
+  }
+}
 
 // DATA ATTRIBUTES
 

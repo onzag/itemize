@@ -20,8 +20,12 @@ import { yesno } from ".";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import { StorageProvider, IStorageProvidersObject } from "../server/services";
 
-const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+let serviceCustom: IServiceCustomizationType = {};
+try {
+  const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+  serviceCustom = serviceFileSrc.default;
+} catch {
+}
 
 const fsAsync = fs.promises;
 

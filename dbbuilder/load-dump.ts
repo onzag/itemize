@@ -19,8 +19,12 @@ import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, 
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import { StorageProvider } from "../server/services";
 
-const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+let serviceCustom: IServiceCustomizationType = {};
+try {
+  const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
+  serviceCustom = serviceFileSrc.default;
+} catch {
+}
 
 const fsAsync = fs.promises;
 
