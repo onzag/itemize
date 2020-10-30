@@ -28,7 +28,7 @@ import { EndpointError } from "../base/errors";
 import { logger, IServerDataType } from ".";
 import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
-import { IStorageProvidersObject } from "./services";
+import { IStorageProvidersObject } from "./services/base/StorageProvider";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;

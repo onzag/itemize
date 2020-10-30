@@ -1,6 +1,6 @@
 import https from "https";
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
-import { LocationSearchProvider } from ".";
+import LocationSearchProvider from "./base/LocationSearchProvider";
 
 // the interface that roughly represents a result from the
 // here we go API, check the API at

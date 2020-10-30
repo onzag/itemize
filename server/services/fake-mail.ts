@@ -1,9 +1,9 @@
-import { ISendEmailData, MailProvider } from ".";
+import MailProvider, { ISendEmailData } from "./base/MailProvider";
 
 export class FakeMailService extends MailProvider<null> {
   public async sendEmail(data: ISendEmailData) {
     this.logInfo(
-      "FakeMailService.sendTemplateEmail: Fake email being sent",
+      "FakeMailService.sendEmail: Fake email being sent",
       data,
     );
   }

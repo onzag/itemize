@@ -30,7 +30,6 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
-import { MailProvider, IStorageProvidersObject, IStorageProviderClassType, IMailProviderClassType, IUserLocalizationProviderClassType, ICurrencyFactorsProviderClassType, ILocationSearchProviderClassType, StorageProvider, UserLocalizationProvider, LocationSearchProvider, IServiceProviderClassType, ServiceProvider } from "./services";
 import { LocalStorageService } from "./services/local";
 import { OpenstackService } from "./services/openstack";
 import { IPStackService } from "./services/ipstack";
@@ -38,6 +37,12 @@ import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
+import { ServiceProvider, IServiceProviderClassType } from "./services";
+import { ICurrencyFactorsProviderClassType } from "./services/base/CurrencyFactorsProvider";
+import LocationSearchProvider, { ILocationSearchProviderClassType } from "./services/base/LocationSearchProvider";
+import MailProvider, { IMailProviderClassType } from "./services/base/MailProvider";
+import StorageProvider, { IStorageProvidersObject, IStorageProviderClassType } from "./services/base/StorageProvider";
+import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./services/base/UserLocalizationProvider";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};

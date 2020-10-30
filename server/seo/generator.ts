@@ -9,7 +9,7 @@ import { escapeStringRegexp } from "../../util";
 import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
-import { StorageProvider } from "../../server/services";
+import StorageProvider from "../../server/services/base/StorageProvider";
 
 const NO_SEO = process.env.NO_SEO === "true";
 

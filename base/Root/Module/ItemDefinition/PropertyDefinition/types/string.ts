@@ -45,6 +45,8 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
  * remember that we try to keep it so that many languages are allowed, this is so usernames in
  * many languages are achievable, D'L things like that and so on, but we want to avoid characters
  * that can be used to build other stuff, and can make for confusing user identifiers
+ * 
+ * These identifiers are expected to be used as email handles so be careful
  */
 const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
 

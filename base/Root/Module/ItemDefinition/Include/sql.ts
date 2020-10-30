@@ -18,7 +18,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowV
 import Knex from "knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
-import { StorageProvider } from "../../../../../server/services";
+import StorageProvider from "../../../../../server/services/base/StorageProvider";
 
 /**
  * Provides the table bit that is necessary to store include data

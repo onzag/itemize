@@ -1,7 +1,7 @@
 import fs, { ReadStream } from "fs";
 const fsAsync = fs.promises;
 import path from "path";
-import { StorageProvider } from ".";
+import StorageProvider from "./base/StorageProvider";
 
 async function copyDir(src: string, dest: string) {
   try {

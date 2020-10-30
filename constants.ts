@@ -94,6 +94,16 @@ export interface IItemizeConfig {
    * these are used for realtime updates
    */
   MAX_REMOTE_LISTENERS_PER_SOCKET?: number;
+  /**
+   * Usernames that are not allowed to be taken
+   * by users, defaults to admin and unsubscribe
+   * it will prevent new users to creating accounts
+   * with those names via the standard signup method
+   * note that unsubscribe will remain being a protected
+   * username no matter what, even if you fail
+   * to specify it
+   */
+  PROTECTED_USERNAMES?: string[];
 }
 
 // in the client side it gets injected via webpack in the server side
@@ -201,6 +211,13 @@ export const SERVER_MAPPING_TIME = R_ITEMIZE_CONFIG.SERVER_MAPPING_TIME || 86400
  * The maximum amount of remote listeners a socket supports
  */
 export const MAX_REMOTE_LISTENERS_PER_SOCKET = R_ITEMIZE_CONFIG.MAX_REMOTE_LISTENERS_PER_SOCKET || 100;
+
+/**
+ * The protected usernames that cannot be taken by the users
+ */
+export const PROTECTED_USERNAMES = R_ITEMIZE_CONFIG.PROTECTED_USERNAMES ?
+  R_ITEMIZE_CONFIG.PROTECTED_USERNAMES.concat(["unsubscribe"]) :
+  ["admin", "unsubscribe"];
 
 
 /**

@@ -133,6 +133,13 @@ export default class Root {
     [qualifiedName: string]: Module | ItemDefinition,
   } = {};
   /**
+   * A registry for fast access of Modules an Item definitions by
+   * path
+   */
+  public pathRegistry: {
+    [path: string]: Module | ItemDefinition;
+  } = {};
+  /**
    * The child modules
    */
   private childModules: Module[];

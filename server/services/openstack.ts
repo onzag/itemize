@@ -3,7 +3,7 @@ import fs, { ReadStream } from "fs";
 const fsAsync = fs.promises;
 import path from "path";
 import https from "https";
-import { StorageProvider } from ".";
+import StorageProvider from "./base/StorageProvider";
 
 export interface IOpenstackInitializationAttributes {
   provider: "openstack";

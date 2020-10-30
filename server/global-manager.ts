@@ -12,7 +12,8 @@ import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
-import { CurrencyFactorsProvider, ServiceProvider } from "./services";
+import { ServiceProvider } from "./services";
+import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 
 interface IMantainProp {
   pdef: PropertyDefinition;

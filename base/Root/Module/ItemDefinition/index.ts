@@ -617,6 +617,7 @@ export default class ItemDefinition {
     this.listeners = {};
 
     this.parentModule.getParentRoot().registry[this.getQualifiedPathName()] = this;
+    this.parentModule.getParentRoot().registry[this.getPath().join("/")] = this;
   }
 
   public cleanState(init?: boolean) {

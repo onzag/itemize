@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { logger } from "../";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
-import { CurrencyFactorsProvider, ICurrencyFactors } from ".";
+import CurrencyFactorsProvider, { ICurrencyFactors } from "./base/CurrencyFactorsProvider";
 
 interface CurrencyLayerResponse {
   success: boolean;

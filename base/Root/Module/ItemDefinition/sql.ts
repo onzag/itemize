@@ -32,7 +32,7 @@ import {
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
 import Knex from "knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
-import { StorageProvider } from "../../../../server/services";
+import StorageProvider from "../../../../server/services/base/StorageProvider";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole

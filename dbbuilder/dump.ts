@@ -18,7 +18,7 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
-import { StorageProvider, IStorageProvidersObject } from "../server/services";
+import StorageProvider, { IStorageProvidersObject } from "../server/services/base/StorageProvider";
 
 let serviceCustom: IServiceCustomizationType = {};
 try {

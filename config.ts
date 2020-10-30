@@ -227,6 +227,12 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   mailDomain: string;
   /**
+   * The mail storage item definition path
+   * it must pass some criteria in order to be valid
+   * as emails get added there
+   */
+  mailStorage: string;
+  /**
    * The containers, they should match the previously given
    * containers id
    */
@@ -339,7 +345,10 @@ export const rawSensitiveConfigSchema = {
       additionalProperties: {},
     },
     mailDomain: {
-      type: ["string", "null"]
+      type: ["string", "null"],
+    },
+    mailStorage: {
+      type: ["string", "null"],
     },
     jwtKey: {
       type: "string",
@@ -390,6 +399,7 @@ export const rawSensitiveConfigSchema = {
     "locationSearch",
     "mail",
     "mailDomain",
+    "mailStorage",
     "defaultContainerID",
     "seoContainerID",
     "jwtKey",

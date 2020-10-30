@@ -1,5 +1,5 @@
 import Mailgun from "mailgun-js";
-import { ISendEmailData, MailProvider } from ".";
+import MailProvider, { ISendEmailData } from "./base/MailProvider";
 import type { Router } from "express";
 import { IAppDataType } from "..";
 import { ITriggerRegistry } from "../resolvers/triggers";

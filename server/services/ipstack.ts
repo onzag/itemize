@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { countries } from "../../imported-resources";
 import { logger } from "../";
-import { IUserLocalizationType, UserLocalizationProvider } from ".";
+import UserLocalizationProvider, { IUserLocalizationType } from "./base/UserLocalizationProvider";
 
 interface IPStackResponse {
   ip: string;
