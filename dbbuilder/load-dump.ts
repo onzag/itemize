@@ -18,6 +18,7 @@ import { getSQLTableDefinitionForModule } from "../base/Root/Module/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER } from "../constants";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import StorageProvider from "../server/services/base/StorageProvider";
+import { RegistryService } from "../server/services/registry";
 
 let serviceCustom: IServiceCustomizationType = {};
 try {
@@ -106,8 +107,13 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
+  const registry = new RegistryService({
+    knex,
+  }, null);
+  await registry.initialize();
+
   // and the upload containers
-  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
+  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders, registry);
 
   // inform the users
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +

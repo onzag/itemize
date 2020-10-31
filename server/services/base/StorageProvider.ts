@@ -1,21 +1,22 @@
 import type { ReadStream } from "fs";
 import type { Readable } from "stream";
 import { IServiceProviderClassType, ServiceProvider } from "..";
+import { RegistryService } from "../registry";
 
 export interface IStorageProvidersObject {
   [id: string]: StorageProvider<any>,
 }
 
 export interface IStorageProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, id: string, prefix: string): StorageProvider<T>
+  new(config: T, registry: RegistryService, id: string, prefix: string): StorageProvider<T>
 }
 
 export default class StorageProvider<T> extends ServiceProvider<T> {
   public prefix: string;
   public id: string;
 
-  constructor(config: T, id: string, prefix: string) {
-    super(config);
+  constructor(config: T, registry: RegistryService, id: string, prefix: string) {
+    super(config, registry);
 
     this.prefix = prefix;
     this.id = id;

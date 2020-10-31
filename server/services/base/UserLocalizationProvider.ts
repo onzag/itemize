@@ -1,4 +1,5 @@
 import { IServiceProviderClassType, ServiceProvider } from "..";
+import { RegistryService } from "../registry";
 
 export interface IUserLocalizationType {
   country: string;
@@ -7,12 +8,12 @@ export interface IUserLocalizationType {
 }
 
 export interface IUserLocalizationProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T): UserLocalizationProvider<T>
+  new(config: T, registry: RegistryService): UserLocalizationProvider<T>
 }
 
 export default class UserLocalizationProvider<T> extends ServiceProvider<T> {
-  constructor(config: T) {
-    super(config);
+  constructor(config: T, registry: RegistryService) {
+    super(config, registry);
   }
 
   /**

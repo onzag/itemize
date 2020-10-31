@@ -19,6 +19,7 @@ import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME }
 import { yesno } from ".";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
 import StorageProvider, { IStorageProvidersObject } from "../server/services/base/StorageProvider";
+import { RegistryService } from "../server/services/registry";
 
 let serviceCustom: IServiceCustomizationType = {};
 try {
@@ -253,8 +254,13 @@ export default async function dump(version: string, knex: Knex, root: Root) {
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
+  const registry = new RegistryService({
+    knex,
+  }, null);
+  await registry.initialize();
+
   // and our containers
-  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
+  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders, registry);
 
   // we can specify we have loaded them
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +

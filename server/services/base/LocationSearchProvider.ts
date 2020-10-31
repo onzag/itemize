@@ -1,18 +1,19 @@
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import uuidv5 from "uuid/v5";
 import { IServiceProviderClassType, ServiceProvider } from "..";
+import { RegistryService } from "../registry";
 
 // this id can be whatever just to ensure lat and long produce the same id no matter what
 // basically a combination for location, this way we are not tied to any API
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
 export interface ILocationSearchProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T): LocationSearchProvider<T>
+  new(config: T, registry: RegistryService): LocationSearchProvider<T>
 }
 
 export default class LocationSearchProvider<T> extends ServiceProvider<T> {
-  constructor(config: T) {
-    super(config);
+  constructor(config: T, registry: RegistryService) {
+    super(config, registry);
   }
 
   public makeIdOutOf(lat: number, lng: number) {

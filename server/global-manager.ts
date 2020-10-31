@@ -14,6 +14,7 @@ import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
 import { ServiceProvider } from "./services";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
+import { RegistryService } from "./services/registry";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -42,6 +43,7 @@ export class GlobalManager {
   private config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
   private customServices: ServiceProvider<any>[];
+  private registry: RegistryService;
 
   constructor(
     root: Root,
@@ -51,6 +53,7 @@ export class GlobalManager {
     config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
+    registry: RegistryService,
   ) {
     this.root = root;
     this.knex = knex;
@@ -61,6 +64,7 @@ export class GlobalManager {
     this.serverData = null;
     this.config = config;
     this.sensitiveConfig = sensitiveConfig;
+    this.registry = registry;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 

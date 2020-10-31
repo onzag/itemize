@@ -43,6 +43,7 @@ import LocationSearchProvider, { ILocationSearchProviderClassType } from "./serv
 import MailProvider, { IMailProviderClassType } from "./services/base/MailProvider";
 import StorageProvider, { IStorageProvidersObject, IStorageProviderClassType } from "./services/base/StorageProvider";
 import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./services/base/UserLocalizationProvider";
+import { RegistryService } from "./services/registry";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -152,6 +153,7 @@ export interface IAppDataType {
   customServices: {
     [name: string]: ServiceProvider<any>;
   };
+  registry: RegistryService,
 }
 
 export interface IServerDataType {
@@ -188,6 +190,7 @@ export async function getStorageProviders(
   config: IConfigRawJSONDataType,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
   storageServiceProviders: IStorageProviders,
+  registry: RegistryService,
 ): Promise<{
   cloudClients: IStorageProvidersObject;
   instancesUsed: StorageProvider<any>[];
@@ -210,7 +213,7 @@ export async function getStorageProviders(
     if (prefix.indexOf("/") !== 0) {
       prefix = "https://" + prefix;
     }
-    const localClient = new LocalStorageService(null, sensitiveConfig.localContainer, prefix);
+    const localClient = new LocalStorageService(null, registry, sensitiveConfig.localContainer, prefix);
     await localClient.initialize();
     finalOutput.instancesUsed.push(localClient);
     // typescript for some reason misses the types
@@ -237,7 +240,7 @@ export async function getStorageProviders(
       const type = containerData.type;
       const ServiceClass = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
 
-      const client = new ServiceClass(containerData.config, containerIdX, prefix);
+      const client = new ServiceClass(containerData.config, registry, containerIdX, prefix);
       await client.initialize();
       finalOutput.instancesUsed.push(client);
       // typescript misses the types
@@ -470,13 +473,21 @@ export async function initializeServer(
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
+    logger.info(
+      "initializeServer: initializing registry",
+    );
+    const registry = new RegistryService({
+      knex,
+    }, null);
+    await registry.initialize();
+
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
         "initializeServer: setting up global manager",
       );
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
       const currencyFactorsService = sensitiveConfig.currencyFactors ?
-        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, redisGlobalClient) :
+        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, redisGlobalClient) :
         null;
       currencyFactorsService && await currencyFactorsService.initialize();
       const manager: GlobalManager = new GlobalManager(
@@ -487,6 +498,7 @@ export async function initializeServer(
         config,
         sensitiveConfig,
         currencyFactorsService,
+        registry,
       );
 
       if (serviceCustom && serviceCustom.customServices) {
@@ -502,7 +514,7 @@ export async function initializeServer(
               ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
               ...(config.custom && config.custom[keyName]),
             };
-            const customGlobalService = new CustomServiceClass(configData);
+            const customGlobalService = new CustomServiceClass(configData, registry);
             await manager.installGlobalService(customGlobalService);
           })
         );
@@ -533,11 +545,11 @@ export async function initializeServer(
 
           let storageClient: StorageProvider<any>;
           if (isLocalInstead) {
-            storageClient = new LocalStorageService(null, sensitiveConfig.seoContainerID, prefix);
+            storageClient = new LocalStorageService(null, registry, sensitiveConfig.seoContainerID, prefix);
           } else {
             const type = seoContainerData.type;
             const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
-            storageClient = new ServiceClass(seoContainerData.config, sensitiveConfig.seoContainerID, prefix);
+            storageClient = new ServiceClass(seoContainerData.config, registry, sensitiveConfig.seoContainerID, prefix);
           }
 
           await storageClient.initialize();
@@ -566,7 +578,12 @@ export async function initializeServer(
       "initializeServer: initializing cloud clients",
     );
 
-    const storageClients = await getStorageProviders(config, sensitiveConfig, serviceCustom && serviceCustom.storageServiceProviders);
+    const storageClients = await getStorageProviders(
+      config,
+      sensitiveConfig,
+      serviceCustom && serviceCustom.storageServiceProviders,
+      registry,
+    );
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
@@ -650,7 +667,7 @@ export async function initializeServer(
     }
     const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
     const userLocalizationService = sensitiveConfig.userLocalization ?
-      new UserLocalizationServiceClass(sensitiveConfig.userLocalization) :
+      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry) :
       null;
     userLocalizationService && await userLocalizationService.initialize();
 
@@ -670,6 +687,7 @@ export async function initializeServer(
     const mailService = sensitiveConfig.mail ?
       new MailServiceClass(
         sensitiveConfig.mail,
+        registry,
         cache,
         root,
         config,
@@ -684,7 +702,7 @@ export async function initializeServer(
     }
     const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
     const locationSearchService = sensitiveConfig.locationSearch ?
-      new LocationSearchClass(sensitiveConfig.locationSearch) : null;
+      new LocationSearchClass(sensitiveConfig.locationSearch, registry) : null;
     locationSearchService && await locationSearchService.initialize();
 
     const customServices: {
@@ -707,7 +725,7 @@ export async function initializeServer(
             ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
             ...(config.custom && config.custom[keyName]),
           };
-          customServices[keyName] = new CustomServiceClass(configData);
+          customServices[keyName] = new CustomServiceClass(configData, registry);
           await customServices[keyName].initialize();
 
           customServicesInstances.push(customServices[keyName]);
@@ -775,6 +793,7 @@ export async function initializeServer(
       storage: storageClients.cloudClients,
       logger,
       customServices,
+      registry,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };

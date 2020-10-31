@@ -1282,6 +1282,11 @@ export const CURRENCY_FACTORS_IDENTIFIER = "CURRENCY_FACTORS"
 export const DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
 
 /**
+ * An identifier for the internal global registry
+ */
+export const REGISTRY_IDENTIFIER = "REGISTRY";
+
+/**
  * An identifier for caching the currency api response
  * for currency conversion in redis
  */

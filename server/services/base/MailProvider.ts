@@ -10,6 +10,7 @@ import Root from "../../../base/Root";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { IServiceProviderClassType, ServiceProvider } from "..";
+import { RegistryService } from "../registry";
 
 export interface IUnsubscribeURL {
   redirected: string;
@@ -29,7 +30,7 @@ export interface ISendEmailData {
 }
 
 export interface IMailProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>;
+  new(config: T, registry: RegistryService, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>;
 }
 
 export interface IReceiveEmailData {
@@ -47,8 +48,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
   private storageIdef: ItemDefinition;
   public sensitiveConfig: ISensitiveConfigRawJSONDataType;
 
-  constructor(config: T, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
-    super(config);
+  constructor(config: T, registry: RegistryService, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
+    super(config, registry);
 
     this.internalConfig = internalConfig;
     this.root = root;
