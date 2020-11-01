@@ -23,8 +23,8 @@ import { RegistryService } from "../server/services/registry";
 
 let serviceCustom: IServiceCustomizationType = {};
 try {
-  const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-  serviceCustom = serviceFileSrc.default;
+  const itemizeConfig = require(path.join(path.resolve("."), "itemize.config"));
+  serviceCustom = itemizeConfig.services;
 } catch {
 }
 

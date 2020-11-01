@@ -36,7 +36,7 @@ const plugins = [
   
   // define itemize config to be injected
   new webpack.DefinePlugin({
-    ITEMIZE_CONFIG: JSON.stringify(itemizeConfig),
+    ITEMIZE_CONSTANTS_CONFIG: JSON.stringify(itemizeConfig.constants),
   }),
 
   // worker generator plugin to share information between

@@ -19,7 +19,7 @@ import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { ISQLTableDefinitionType } from "./base/Root/sql";
 import path from "path";
 
-export interface IItemizeConfig {
+export interface IItemizeConstantsConfig {
   /**
    * The maximum supported year
    */
@@ -108,14 +108,15 @@ export interface IItemizeConfig {
 
 // in the client side it gets injected via webpack in the server side
 // it has to be required
-declare var ITEMIZE_CONFIG: IItemizeConfig;
-let R_ITEMIZE_CONFIG: IItemizeConfig = typeof ITEMIZE_CONFIG !== "undefined" ?
-  ITEMIZE_CONFIG : null;
-if (!R_ITEMIZE_CONFIG) {
+declare var ITEMIZE_CONSTANTS_CONFIG: IItemizeConstantsConfig;
+let R_ITEMIZE_CONSTANTS_CONFIG: IItemizeConstantsConfig = typeof ITEMIZE_CONSTANTS_CONFIG !== "undefined" ?
+  ITEMIZE_CONSTANTS_CONFIG : null;
+if (!R_ITEMIZE_CONSTANTS_CONFIG) {
   try {
-    R_ITEMIZE_CONFIG = require(path.join(path.resolve("."), "itemize.config")) as IItemizeConfig;
+    const itemizeConfig = require(path.join(path.resolve("."), "itemize.config"));
+    R_ITEMIZE_CONSTANTS_CONFIG = itemizeConfig.constants;
   } catch {
-    R_ITEMIZE_CONFIG = {};
+    R_ITEMIZE_CONSTANTS_CONFIG = {};
   }
 }
 
@@ -145,7 +146,7 @@ export const MIN_SUPPORTED_REAL = -999999999;
 /**
  * Years max
  */
-export const MAX_SUPPORTED_YEAR = R_ITEMIZE_CONFIG.MAX_SUPPORTED_YEAR || 3000;
+export const MAX_SUPPORTED_YEAR = R_ITEMIZE_CONSTANTS_CONFIG.MAX_SUPPORTED_YEAR || 3000;
 /**
  * Years min
  */
@@ -153,70 +154,70 @@ export const MIN_SUPPORTED_YEAR = 0;
 /**
  * Defines how many characters a string might have
  */
-export const MAX_STRING_LENGTH = R_ITEMIZE_CONFIG.MAX_STRING_LENGTH || 10000;
+export const MAX_STRING_LENGTH = R_ITEMIZE_CONSTANTS_CONFIG.MAX_STRING_LENGTH || 10000;
 /**
  * Defines how many characters (yes characters) a text might have max
  * please define maxLenght in the property itself for specific checking
  * this check is expensive so checking twice is not good
  */
-export const MAX_RAW_TEXT_LENGTH = R_ITEMIZE_CONFIG.MAX_RAW_TEXT_LENGTH || 100000;
+export const MAX_RAW_TEXT_LENGTH = R_ITEMIZE_CONSTANTS_CONFIG.MAX_RAW_TEXT_LENGTH || 100000;
 /**
  * The max file size (for either images and binary files)
  */
-export const MAX_FILE_SIZE = R_ITEMIZE_CONFIG.MAX_FILE_SIZE || 5000000; // equivalent to 5MB
+export const MAX_FILE_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILE_SIZE || 5000000; // equivalent to 5MB
 /**
  * how many files can be used in one item field at once
  */
-export const MAX_FILES_PER_PROPERTY = R_ITEMIZE_CONFIG.MAX_FILES_PER_PROPERTY || 25;
+export const MAX_FILES_PER_PROPERTY = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_PROPERTY || 25;
 /**
  * how many files can there be total
  * in a single request, this is more of a security concern
  */
 export const MAX_ALL_COMBINED_FILES_SIZE =
-  R_ITEMIZE_CONFIG.MAX_FILES_PER_REQUEST ?
-  R_ITEMIZE_CONFIG.MAX_FILES_PER_REQUEST * MAX_FILE_SIZE :
+  R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST ?
+  R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST * MAX_FILE_SIZE :
   MAX_FILES_PER_PROPERTY * 10;
 /**
  * Another just a security concern, this
  * is the size of the graphql query, 1MB should be way more than enough for a graphql query
  */
-export const MAX_FIELD_SIZE = R_ITEMIZE_CONFIG.MAX_FIELD_SIZE || 1000000; // equivalent to 1MB
+export const MAX_FIELD_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FIELD_SIZE || 1000000; // equivalent to 1MB
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export const MAX_SEARCH_RESULTS_DEFAULT = R_ITEMIZE_CONFIG.MAX_SEARCH_RECORDS_DEFAULT || 50;
+export const MAX_SEARCH_RESULTS_DEFAULT = R_ITEMIZE_CONSTANTS_CONFIG.MAX_SEARCH_RECORDS_DEFAULT || 50;
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results
  */
-export const MAX_SEARCH_RECORDS_DEFAULT = R_ITEMIZE_CONFIG.MAX_SEARCH_RECORDS_DEFAULT || 500;
+export const MAX_SEARCH_RECORDS_DEFAULT = R_ITEMIZE_CONSTANTS_CONFIG.MAX_SEARCH_RECORDS_DEFAULT || 500;
 /**
  * Size in characters of the search field
  */
-export const MAX_SEARCH_FIELD_LENGTH = R_ITEMIZE_CONFIG.MAX_SEARCH_FIELD_LENGTH || 1024;
+export const MAX_SEARCH_FIELD_LENGTH = R_ITEMIZE_CONSTANTS_CONFIG.MAX_SEARCH_FIELD_LENGTH || 1024;
 /**
  * The minimum update time for the server data to be changed
  * basically runs mantenience functions, mainly it's about
  * updating the currency information
  */
-export const SERVER_DATA_MIN_UPDATE_TIME = R_ITEMIZE_CONFIG.SERVER_DATA_MIN_UPDATE_TIME || 259200000; // 3 days
+export const SERVER_DATA_MIN_UPDATE_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_DATA_MIN_UPDATE_TIME || 259200000; // 3 days
 
 /**
  * The time it takes for sitemaps to be refreshed
  */
-export const SERVER_MAPPING_TIME = R_ITEMIZE_CONFIG.SERVER_MAPPING_TIME || 86400000; // 1 day, to sitemap the site
+export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIME || 86400000; // 1 day, to sitemap the site
 
 /**
  * The maximum amount of remote listeners a socket supports
  */
-export const MAX_REMOTE_LISTENERS_PER_SOCKET = R_ITEMIZE_CONFIG.MAX_REMOTE_LISTENERS_PER_SOCKET || 100;
+export const MAX_REMOTE_LISTENERS_PER_SOCKET = R_ITEMIZE_CONSTANTS_CONFIG.MAX_REMOTE_LISTENERS_PER_SOCKET || 100;
 
 /**
  * The protected usernames that cannot be taken by the users
  */
-export const PROTECTED_USERNAMES = R_ITEMIZE_CONFIG.PROTECTED_USERNAMES ?
-  R_ITEMIZE_CONFIG.PROTECTED_USERNAMES.concat(["unsubscribe"]) :
+export const PROTECTED_USERNAMES = R_ITEMIZE_CONSTANTS_CONFIG.PROTECTED_USERNAMES ?
+  R_ITEMIZE_CONSTANTS_CONFIG.PROTECTED_USERNAMES.concat(["unsubscribe"]) :
   ["admin", "unsubscribe", "postmaster"];
 
 
