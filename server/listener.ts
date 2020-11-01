@@ -1,6 +1,5 @@
 import { Socket } from "socket.io";
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { Server } from "http";
 import Root from "../base/Root";
@@ -62,6 +61,7 @@ import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IServerSideTokenDataType } from "./resolvers/basic";
+import { ItemizeRedisClient } from "./redis";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -129,22 +129,23 @@ export class Listener {
   private listeners: IListenerList = {};
   private listensSS: IServerListensList = {};
 
-  private redisGlobalSub: RedisClient;
-  private redisGlobalPub: RedisClient;
-  private redisLocalSub: RedisClient;
-  private redisLocalPub: RedisClient;
+  private redisGlobalSub: ItemizeRedisClient;
+  private redisGlobalPub: ItemizeRedisClient;
+  private redisLocalSub: ItemizeRedisClient;
+  private redisLocalPub: ItemizeRedisClient;
   private buildnumber: string;
   private root: Root;
   private knex: Knex;
   private cache: Cache;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  private server: Server;
 
   constructor(
     buildnumber: string,
-    redisGlobalSub: RedisClient,
-    redisGlobalPub: RedisClient,
-    redisLocalSub: RedisClient,
-    redisLocalPub: RedisClient,
+    redisGlobalSub: ItemizeRedisClient,
+    redisGlobalPub: ItemizeRedisClient,
+    redisLocalSub: ItemizeRedisClient,
+    redisLocalPub: ItemizeRedisClient,
     root: Root,
     cache: Cache,
     knex: Knex,
@@ -163,23 +164,55 @@ export class Listener {
 
     this.cache.setListener(this);
 
+    this.die = this.die.bind(this);
+    this.revive = this.revive.bind(this);
+
     this.globalRedisListener = this.globalRedisListener.bind(this);
     this.localRedisListener = this.localRedisListener.bind(this);
 
-    this.redisGlobalSub.on("message", this.globalRedisListener);
-    this.redisGlobalSub.subscribe(SERVER_DATA_IDENTIFIER);
-    this.redisLocalSub.on("message", this.localRedisListener);
+    this.redisGlobalSub.redisClient.on("message", this.globalRedisListener);
+    this.redisGlobalSub.redisClient.subscribe(SERVER_DATA_IDENTIFIER);
+    this.redisGlobalSub.redisClient.on("error", this.die);
+    this.redisGlobalSub.redisClient.on("connect", this.revive);
+
+    this.redisLocalSub.redisClient.on("message", this.localRedisListener);
+    this.redisLocalSub.redisClient.on("error", this.die);
+    this.redisLocalSub.redisClient.on("connect", this.revive);
+
     if (INSTANCE_MODE === "ABSOLUTE" || INSTANCE_MODE === "CLUSTER_MANAGER") {
-      this.redisLocalSub.subscribe(CLUSTER_MANAGER_REGISTER_SS);
+      this.redisLocalSub.redisClient.subscribe(CLUSTER_MANAGER_REGISTER_SS);
     } else {
-      this.redisLocalSub.subscribe(CLUSTER_MANAGER_RESET);
+      this.redisLocalSub.redisClient.subscribe(CLUSTER_MANAGER_RESET);
     }
 
-    if (server === null) {
+    this.server = server;
+    this.setupSocketIO();
+  }
+  public die() {
+    
+  }
+  public async revive() {
+    this.listeners = {};
+    this.listensSS = {};
+
+    // kick all the clients force them to reconnect
+    this.onClusterManagerResetInformed();
+
+    // we cannot ensure that the main cache
+    // hasn't gone stale because the events mechanism
+    // has broke off, this is a very drastic method
+    // but should work nonetheless
+    if (INSTANCE_MODE === "CLUSTER_MANAGER") {
+      await this.cache.wipe();
+      this.informClusterManagerReset();
+    }
+  }
+  public setupSocketIO() {
+    if (this.server === null) {
       return;
     }
 
-    this.io = ioMain(server);
+    this.io = ioMain(this.server);
     this.io.on("connection", (socket) => {
       this.addSocket(socket);
       socket.on(REGISTER_REQUEST, (request: IRegisterRequest) => {
@@ -253,7 +286,7 @@ export class Listener {
       },
       source: "global",
     };
-    this.redisGlobalPub.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify(redisEvent));
+    this.redisGlobalPub.redisClient.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify(redisEvent));
   }
   public onReceiveKickEvent(
     userId: number,
@@ -314,9 +347,21 @@ export class Listener {
       }
 
       if (!invalid) {
-        const sqlResult = await this.cache.requestValue(
-          "MOD_users__IDEF_user", result.id, null,
-        );
+        let sqlResult: ISQLTableRowValue;
+        try {
+          sqlResult = await this.cache.requestValue(
+            "MOD_users__IDEF_user", result.id, null,
+          );
+        } catch (err) {
+          logger.error(
+            "Listener.identify [SERIOUS]: socket " + socket.id + " failed to identify because of the cache failed",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+            }
+          );
+          return;
+        }
 
         if (!sqlResult) {
           invalid = true;
@@ -400,12 +445,12 @@ export class Listener {
         serverInstanceGroupId: INSTANCE_GROUP_ID,
         source: "local",
       }
-      this.redisLocalPub.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(redisEvent));
+      this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(redisEvent));
     } else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.registerSS: performing subscription as cluster manager",
       );
-      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listensSS[mergedIndexIdentifier] = true;
     } else {
       CAN_LOG_DEBUG && logger.debug(
@@ -455,7 +500,19 @@ export class Listener {
       this.emitError(socket, "could not find item definition", request);
       return;
     }
-    const value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    let value: ISQLTableRowValue;
+    try {
+      value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    } catch (err) {
+      logger.error(
+        "Listener.identify [SERIOUS]: socket " + socket.id + " could not register due to cache failure",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+      return;
+    }
     const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
     const hasAccess = itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
@@ -479,7 +536,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -550,7 +607,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       listenerData.listens[mergedIndexIdentifier] = true;
       listenerData.amount++;
     }
@@ -622,7 +679,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
       );
-      this.redisGlobalSub.subscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
       this.listeners[socket.id].amount++;
     }
@@ -866,7 +923,19 @@ export class Listener {
       return;
     }
 
-    const value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    let value: ISQLTableRowValue;
+    try {
+      value = await this.cache.requestValue(itemDefinition, request.id, request.version);
+    } catch (err) {
+      logger.error(
+        "Listener.identify [SERIOUS]: socket " + socket.id + " could not retrieve feedback due to cache failure",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+      return;
+    }
     const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
     const hasAccess = itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
@@ -894,16 +963,13 @@ export class Listener {
         this.emitError(socket, "could not find item definition", request);
         return;
       }
-      const queriedResult: ISQLTableRowValue = await this.cache.requestValue(
-        itemDefinition, request.id, request.version,
-      );
-      if (queriedResult) {
+      if (value) {
         const event: IChangedFeedbackEvent = {
           itemDefinition: request.itemDefinition,
           id: request.id,
           version: request.version,
           type: "last_modified",
-          lastModified: queriedResult.last_modified,
+          lastModified: value.last_modified,
         };
         CAN_LOG_DEBUG && logger.debug(
           "Listener.feedback: emitting " + CHANGED_FEEEDBACK_EVENT,
@@ -950,7 +1016,7 @@ export class Listener {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
       );
-      this.redisGlobalSub.unsubscribe(mergedIndexIdentifier);
+      this.redisGlobalSub.redisClient.unsubscribe(mergedIndexIdentifier);
     }
   }
   public removeListener(
@@ -1089,7 +1155,7 @@ export class Listener {
       },
     );
 
-    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerOwnedSearchListeners(
     event: IOwnedSearchRecordsAddedEvent,
@@ -1108,7 +1174,7 @@ export class Listener {
       "Listener.triggerOwnedSearchListeners: triggering redis event",
       redisEvent,
     );
-    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerParentedSearchListeners(
     event: IParentedSearchRecordsAddedEvent,
@@ -1128,7 +1194,7 @@ export class Listener {
       "Listener.triggerParentedSearchListeners: triggering redis event",
       redisEvent,
     );
-    this.redisGlobalPub.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public async globalRedisListener(
     channel: string,
@@ -1277,7 +1343,7 @@ export class Listener {
         CAN_LOG_DEBUG && logger.debug(
           "Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier,
         );
-        this.redisGlobalSub.unsubscribe(listensMergedIdentifier);
+        this.redisGlobalSub.redisClient.unsubscribe(listensMergedIdentifier);
       }
     });
     delete this.listeners[socket.id];
@@ -1315,6 +1381,6 @@ export class Listener {
       serverInstanceGroupId: INSTANCE_GROUP_ID,
       source: "local",
     }
-    this.redisLocalPub.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
+    this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
   }
 }

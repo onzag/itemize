@@ -21,9 +21,9 @@ export interface ICurrencyLayerConfig {
 }
 
 export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
-  private requestInfo() {
+  private async requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
-      this.globalCache.get(
+      this.globalCache.redisClient.get(
         CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);

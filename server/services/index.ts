@@ -1,9 +1,9 @@
-import type { RedisClient } from "redis";
 import { IAppDataType, logger } from "..";
 import express from "express";
 import { ITriggerRegistry } from "../resolvers/triggers";
 import Knex from "knex";
 import { RegistryService } from "./registry";
+import { ItemizeRedisClient } from "../redis";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -21,8 +21,8 @@ export class ServiceProvider<T> {
   public registry: RegistryService;
 
   public globalKnex: Knex;
-  public globalRedisPub: RedisClient;
-  public globalRedis: RedisClient;
+  public globalRedisPub: ItemizeRedisClient;
+  public globalRedis: ItemizeRedisClient;
 
   constructor(config: T, registry: RegistryService) {
     this.config = config;
@@ -61,7 +61,7 @@ export class ServiceProvider<T> {
     return express.Router(options);
   }
 
-  public setupGlobalResources(knex: Knex, globalClient: RedisClient, globalPub: RedisClient) {
+  public setupGlobalResources(knex: Knex, globalClient: ItemizeRedisClient, globalPub: ItemizeRedisClient) {
     this.globalKnex = knex;
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;

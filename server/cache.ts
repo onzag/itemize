@@ -7,11 +7,10 @@
  * @packageDocumentation
  */
 
-import { RedisClient } from "redis";
 import Knex from "knex";
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
@@ -29,6 +28,7 @@ import { logger, IServerDataType } from ".";
 import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
+import { ItemizeRedisClient } from "./redis";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -46,7 +46,7 @@ const CAN_LOG_SILLY = LOG_LEVEL === "silly";
  * all the servers
  */
 export class Cache {
-  private redisClient: RedisClient;
+  private redisClient: ItemizeRedisClient;
   private domain: string;
   private knex: Knex;
   private storageClients: IStorageProvidersObject;
@@ -71,7 +71,7 @@ export class Cache {
    * @param root the root of itemize
    */
   constructor(
-    redisClient: RedisClient,
+    redisClient: ItemizeRedisClient,
     knex: Knex,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     storageClients: IStorageProvidersObject,
@@ -103,89 +103,77 @@ export class Cache {
    * @param key the identifier
    * @returns a promise with the value
    */
-  public getRaw<T>(
+  public async getRaw<T>(
     key: string,
   ): Promise<{ value: T }> {
     CAN_LOG_DEBUG && logger.debug(
       "Cache.getRaw: requesting " + key,
     );
     // we build the promise
-    return new Promise((resolve) => {
-      // and call redis, note how we never reject
-      this.redisClient.get(key, (error, value) => {
-        // we just resolve to null if we have to
-        if (value === null) {
-          resolve(null);
-        }
-        // if we don't have any error
-        if (!error) {
-          // we try to resolve to the parsed json value
-          try {
-            resolve({
-              value: JSON.parse(value),
-            });
-            // and poke the cache to reset the clock for expiration
-            this.pokeCache(key);
-          } catch (err) {
-            logger.error(
-              "Cache.getRaw: could not JSON parse value from cache in " + key,
-              value,
-            );
-            // resolve it to null in case of problem
-            resolve(null);
-          }
-        } else {
-          logger.error(
-            "Cache.getRaw: could not retrieve value from redis cache client for " + key + " with error",
-            {
-              errStack: error.stack,
-              errMessage: error.message,
-            },
-          );
-          // also here
-          resolve(null);
-        }
-      });
-    });
+    // and call redis, note how we never reject
+    try {
+      const value = await this.redisClient.get(key);
+      if (value === null) {
+        return null;
+      }
+      try {
+        return ({
+          value: JSON.parse(value) as T,
+        });
+        // and poke the cache to reset the clock for expiration
+        this.pokeCache(key);
+      } catch (err) {
+        logger.error(
+          "Cache.getRaw: could not JSON parse value from cache in " + key,
+          value,
+        );
+      }
+    } catch (error) {
+      logger.error(
+        "Cache.getRaw: could not retrieve value from redis cache client for " + key + " with error",
+        {
+          errStack: error.stack,
+          errMessage: error.message,
+        },
+      );
+      return null;
+    }
   }
 
-  public setRaw(key: string, value: any) {
+  public async setRaw(key: string, value: any) {
     CAN_LOG_DEBUG && logger.debug(
       "Cache.setRaw: setting " + key,
     );
-    return new Promise((resolve) => {
-      this.redisClient.set(key, JSON.stringify(value), (error) => {
-        resolve(value);
-        if (!error) {
-          this.pokeCache(key);
-        } else {
-          logger.error(
-            "Cache.forceCacheInto: could not set value for " + key + " with error",
-            {
-              errStack: error.stack,
-              errMessage: error.message,
-            },
-          );
-        }
-      });
-    });
+    try {
+      await this.redisClient.set(key, JSON.stringify(value));
+      this.pokeCache(key);
+    } catch (error) {
+      logger.error(
+        "Cache.forceCacheInto: could not set value for " + key + " with error",
+        {
+          errStack: error.stack,
+          errMessage: error.message,
+        },
+      );
+    }
   }
+
   /**
    * Resets the expiration clock of a given identifier
    * @param keyIdentifier the identifier
    */
-  private pokeCache(keyIdentifier: string) {
+  private async pokeCache(keyIdentifier: string) {
     CAN_LOG_DEBUG && logger.debug(
       "Cache.pokeCache: poking " + keyIdentifier,
     );
-    this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400, (err) => {
-      if (err) {
-        logger.error(
-          "Cache.pokeCache: could not poke " + keyIdentifier + " with error",
-          err.stack ? err.stack : err.message,
-        );
-      }
-    });
+    try {
+      await this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400);
+    } catch (err) {
+      logger.error(
+        "Cache.pokeCache: could not poke " + keyIdentifier + " with error",
+        err.stack ? err.stack : err.message,
+      );
+    }
   }
 
   /**
@@ -699,9 +687,9 @@ export class Cache {
         edited_at: "[this.knex.fn.now()]",
         last_modified: "[this.knex.fn.now()]",
       } : {
-        ...sqlModData,
-        last_modified: "[this.knex.fn.now()]",
-      },
+          ...sqlModData,
+          last_modified: "[this.knex.fn.now()]",
+        },
     );
 
     CAN_LOG_DEBUG && logger.debug(
@@ -938,7 +926,7 @@ export class Cache {
               version: version || "",
               type: selfTable,
               created_by: row.created_by || null,
-              parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+              parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
               transaction_time: transactionKnex.fn.now(),
             });
           }));
@@ -968,7 +956,7 @@ export class Cache {
             version: version || "",
             type: selfTable,
             created_by: row.created_by || null,
-            parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+            parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
             transaction_time: transactionKnex.fn.now(),
           });
         });
@@ -1146,44 +1134,30 @@ export class Cache {
    * @param data the entire SQL result
    * @returns a void promise when done
    */
-  public onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue) {
+  public async onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
-    return new Promise((resolve) => {
-      // first we need to check that we hold such key, while we are listening to this, the values in redis are volatile
-      // and expire and as so we only want to update values that exist already there
-      this.redisClient.exists(idefQueryIdentifier, async (error, value) => {
-        // if we have an error log it
-        if (error) {
-          logger.error(
-            "Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier,
+    try {
+      const value = await this.redisClient.exists(idefQueryIdentifier);
+      if (value) {
+        if (typeof data === "undefined") {
+          await this.requestValue(
+            this.root.registry[itemDefinition] as ItemDefinition,
+            id,
+            version,
             {
-              errStack: error.stack,
-              errMessage: error.message,
+              refresh: true,
             },
           );
-          resolve();
-        } else if (value) {
-          if (typeof data === "undefined") {
-            await this.requestValue(
-              this.root.registry[itemDefinition] as ItemDefinition,
-              id,
-              version,
-              {
-                refresh: true,
-              },
-            );
-            resolve();
-          } else {
-            // if we have such a value we want to update it
-            await this.forceCacheInto(itemDefinition, id, version, data);
-            resolve();
-          }
-        } else if (!value) {
+        } else {
+          // if we have such a value we want to update it
+          await this.forceCacheInto(itemDefinition, id, version, data);
+        }
+      } else {
           // it's done, the value has just expired and it's not hold in
           // memory, we are done updating the redis database, we don't do anything
           // we don't need to worry about this value unless it's further requested
           // down the line
-          resolve();
+
           // we simply unregister the event, if a client requests it later
           // it will be re registered and value fetched and repopulated
           this.listener.unregisterSS({
@@ -1191,9 +1165,33 @@ export class Cache {
             id,
             version,
           });
-        }
-      });
-    });
+      }
+    } catch (error) {
+      logger.error(
+        "Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier,
+        {
+          errStack: error.stack,
+          errMessage: error.message,
+        },
+      );
+    }
+  }
+
+  /**
+   * wipes the cache, usually executed on edge cases during connectivity issues
+   * with clusters and nodes, once the connection is restablished with redis
+   * the cache is wiped by the cluster manager which handles the cache
+   */
+  public async wipe() {
+    const serverDataStr = await this.redisClient.get(SERVER_DATA_IDENTIFIER) || null;
+    const currencyFactorsCachedResponseRestore = await this.redisClient.get(CACHED_CURRENCY_RESPONSE) || null;
+    await this.redisClient.flushall();
+    if (serverDataStr) {
+      await this.redisClient.set(SERVER_DATA_IDENTIFIER, serverDataStr);
+    }
+    if (currencyFactorsCachedResponseRestore) {
+      await this.redisClient.set(CACHED_CURRENCY_RESPONSE, currencyFactorsCachedResponseRestore);
+    }
   }
 
   public async onChangeInformedNoData(itemDefinition: string, id: number, version: string) {

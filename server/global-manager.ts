@@ -1,5 +1,4 @@
 import Knex from "knex";
-import { RedisClient } from "redis";
 import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
@@ -15,6 +14,7 @@ import { IRedisEvent } from "../base/remote-protocol";
 import { ServiceProvider } from "./services";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { RegistryService } from "./services/registry";
+import { ItemizeRedisClient } from "./redis";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -31,8 +31,8 @@ const wait = (time: number) => {
 export class GlobalManager {
   private root: Root;
   private knex: Knex;
-  private globalCache: RedisClient;
-  private redisPub: RedisClient;
+  private globalCache: ItemizeRedisClient;
+  private redisPub: ItemizeRedisClient;
   private idefNeedsMantenience: ItemDefinition[];
   private modNeedsMantenience: Module[];
   private serverData: IServerDataType;
@@ -48,8 +48,8 @@ export class GlobalManager {
   constructor(
     root: Root,
     knex: Knex,
-    globalCache: RedisClient,
-    redisPub: RedisClient,
+    globalCache: ItemizeRedisClient,
+    redisPub: ItemizeRedisClient,
     config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
@@ -100,15 +100,37 @@ export class GlobalManager {
     const userIdef = userMod.getItemDefinitionFor(["user"]);
     const moduleTable = userMod.getQualifiedPathName();
     const selfTable = userIdef.getQualifiedPathName();
-    const primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
+    let primaryAdminUser: any;
+    try {
+      primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
+    } catch (err) {
+      logger.error(
+        "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+    }
 
     if (!primaryAdminUser) {
       logger.info(
         "GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one",
       );
 
-      const currentAdminUserWithSuchUsername =
-        await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
+      let currentAdminUserWithSuchUsername: any;
+      try {
+        currentAdminUserWithSuchUsername = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
+      } catch (err) {
+        logger.error(
+          "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+      }
+
       let username = "admin";
       if (currentAdminUserWithSuchUsername) {
         username = "admin" + (new Date()).getTime();
@@ -506,7 +528,7 @@ export class GlobalManager {
     const stringifiedServerData = JSON.stringify(this.serverData);
 
     // update the server data so that the instances can receive it
-    this.globalCache.set(
+    this.globalCache.redisClient.set(
       SERVER_DATA_IDENTIFIER,
       stringifiedServerData,
       (err: Error) => {
@@ -532,7 +554,7 @@ export class GlobalManager {
     }
 
     // publishing new server data
-    this.redisPub.publish(
+    this.redisPub.redisClient.publish(
       SERVER_DATA_IDENTIFIER,
       JSON.stringify(redisEvent),
       (err: Error) => {

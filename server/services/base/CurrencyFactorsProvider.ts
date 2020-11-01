@@ -1,4 +1,4 @@
-import type { RedisClient } from "redis";
+import { ItemizeRedisClient } from "../../redis";
 import { IServiceProviderClassType, ServiceProvider } from "..";
 import { RegistryService } from "../registry";
 
@@ -7,13 +7,13 @@ export interface ICurrencyFactors {
 }
 
 export interface ICurrencyFactorsProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService, globalCache: RedisClient): CurrencyFactorsProvider<T>
+  new(config: T, registry: RegistryService, globalCache: ItemizeRedisClient): CurrencyFactorsProvider<T>
 }
 
 export default class CurrencyFactorsProvider<T> extends ServiceProvider<T> {
-  public globalCache: RedisClient;
+  public globalCache: ItemizeRedisClient;
 
-  constructor(config: T, registry: RegistryService, globalCache: RedisClient) {
+  constructor(config: T, registry: RegistryService, globalCache: ItemizeRedisClient) {
     super(config, registry);
     this.globalCache = globalCache;
   }
