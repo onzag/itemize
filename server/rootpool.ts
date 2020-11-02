@@ -1,3 +1,10 @@
+/**
+ * Contains a pool of root, we need a pool of root because
+ * we are unable to render an itemize app being used at once
+ * as the root registires are modified during SSR rendering
+ * @packageDocumentation
+ */
+
 import { Pool } from "tarn";
 import Root, { IRootRawJSONDataType } from "../base/Root";
 import { logger } from ".";
@@ -7,6 +14,10 @@ import { logger } from ".";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
+/**
+ * Provides a pool of root
+ * @param rawData the root raw data
+ */
 export function retrieveRootPool(rawData: IRootRawJSONDataType): Pool<Root> {
   const pool: Pool<Root> = new Pool({
     create: (cb) => {

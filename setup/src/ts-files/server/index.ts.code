@@ -52,7 +52,10 @@ initializeServer(
       "profile/:id": {
         crawable: true,
         collect: [
-          ["users", "user"],
+          {
+            module: "users",
+            item: "user",
+          },
         ],
       },
     },

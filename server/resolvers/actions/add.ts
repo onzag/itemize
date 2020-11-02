@@ -1,3 +1,9 @@
+/**
+ * This file contains the action for adding for every item definition that
+ * is added
+ * @packageDocumentation
+ */
+
 import { IAppDataType, logger } from "../../";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";

@@ -1,3 +1,9 @@
+/**
+ * This is the root server file and does the initialization
+ * of the server side of things
+ * @packageDocumentation
+ */
+
 import express from "express";
 import http from "http";
 import path from "path";

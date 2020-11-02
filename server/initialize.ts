@@ -1,3 +1,10 @@
+/**
+ * This file contains the initialization function that initializes
+ * the itemize application, just basically setting up the rest endpoints
+ * and whatever the server requires to show something to the client
+ * @packageDocumentation
+ */
+
 import { IAppDataType, IServerCustomizationDataType, logger, app } from ".";
 import express from "express";
 import graphqlHTTP from "express-graphql";

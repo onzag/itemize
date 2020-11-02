@@ -1,4 +1,9 @@
-import Root from "../../base/Root";
+/**
+ * This file contains the collector that collects results based on what the react
+ * tree has asked to collect for
+ * @packageDocumentation
+ */
+
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLRequestFields } from "../../gql-querier";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
@@ -7,36 +12,100 @@ import { logger, IAppDataType } from "../../server";
 import { UNSPECIFIED_OWNER } from "../../constants";
 import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { ISSRRule } from ".";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { IOTriggerActions } from "../../server/resolvers/triggers";
 
+/**
+ * This is what a collection result looks like
+ */
 export interface ICollectionResult {
+  /**
+   * The date when the result was last modified
+   */
   lastModified: Date,
+  /**
+   * The signature for this specific collection result
+   */
   signature: string,
+  /**
+   * The query value, the same that is passed to the client side
+   * this contains the value and all the attributes
+   */
   query: ISSRCollectedQueryType,
 };
 
+/**
+ * This is the collector class that actually does
+ * the collection for the SSR, it is attached to the
+ * react rendering
+ * 
+ * The collector binds it collect function to the request manager of the root
+ * the item-provider (for example) calls this function during the beforeSSRRender
+ * that is used during SSR, which delays the execution of render until the collection
+ * is done
+ * 
+ * The collector is then able to retrieve all the collection requests given by the
+ * rendering of the app
+ */
 export class Collector {
+  /**
+   * Represents all the collected results
+   */
   private results: ICollectionResult[] = [];
+  /**
+   * All the collection statuses per result
+   */
   private collectionStatuses: {
     [mergedID: string]: boolean;
   } = {};
+  /**
+   * Collection requests callbacks of other
+   * collection requests that are awaiting because
+   * we might ask for collection and then ask again
+   * for collection for the same item
+   */
   private collectionRequestsCbs: {
     [mergedID: string]: Array<() => void>;
   } = {};
+  /**
+   * Same but gives a rejected promise instead
+   */
   private collectionRequestsRejectedCbs: {
     [mergedID: string]: Array<() => void>;
   } = {};
+
+  /**
+   * The app data that is being used while rendering
+   * this
+   */
   private appData: IAppDataType;
+  /**
+   * The SSR rule that is being used
+   */
   private appliedRule: ISSRRule;
+  /**
+   * A signature for forbidden elements that did not
+   * pass the security scrutiny, either by the default
+   * rule or because of read triggers
+   */
   private forbiddenSignature: string[] = [];
 
+  /**
+   * Builds a new collector
+   * @param appData the application data
+   * @param rule the SSR rule
+   */
   constructor(appData: IAppDataType, rule: ISSRRule) {
     this.appData = appData;
     this.appliedRule = rule;
 
     this.collect = this.collect.bind(this);
   }
+
+  /**
+   * Provides the last date of the last modified of the given
+   * results, the most recent one, or the date that the application
+   * was built at if nothing else is found
+   */
   public getLastModified() {
     let final = new Date(parseInt(this.appData.buildnumber));
     // filtering items without access rights
@@ -48,10 +117,20 @@ export class Collector {
     });
     return final;
   }
+
+  /**
+   * Provides all the resulting queries for use in the client side
+   */
   public getQueries() {
     // remove the non-accessible ones
     return this.results.filter((r) => r !== null).map((r) => r.query);
   }
+
+  /**
+   * Provides the signature of all the collected results, this signature
+   * can be used to create an etag, but remember to add the buildnumber and
+   * the mode it was rendered at for it
+   */
   public getSignature() {
     const standard = this.results.filter((r) => r !== null).map((r) => r.signature).sort((a, b) => {
       return a.localeCompare(b);
@@ -59,13 +138,32 @@ export class Collector {
     const forbiddenBit = this.getForbiddenSignature();
     return standard + (forbiddenBit ? "_FORBIDDEN_" : "") + forbiddenBit;
   }
+
+  /**
+   * Provides a forbidden signature for the bits that couldn't be accessed and
+   * were denied absolute access, note that the primary signature already
+   * constains this forbidden information
+   */
   public getForbiddenSignature() {
     return this.forbiddenSignature.join(";");
   }
+
+  /**
+   * Informs whether the collection caught up forbidden resources
+   */
   public hasForbiddenResources() {
     return this.results.some((r) => r === null);
   }
+
+  /**
+   * This is the actual collection function and it is what is called
+   * by the beforeSSRRender function in the custom build on the server side
+   * @param idef the item definition in question
+   * @param id the id we want
+   * @param version the version we want
+   */
   public async collect(idef: ItemDefinition, id: number, version: string): Promise<void> {
+    // now we build the merged id
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
     // request has been done and it's ready
@@ -235,6 +333,7 @@ export class Collector {
       );
     }
 
+    // ensure all the callbacks
     this.collectionStatuses[mergedID] = true;
     this.collectionRequestsCbs[mergedID].forEach((r) => r());
   }

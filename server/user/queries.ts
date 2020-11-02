@@ -13,7 +13,6 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize } from "../../util";
-import { promisify } from "util";
 
 interface RecoverPasswordTokenType {
   resetPasswordUserId: number;
@@ -83,6 +82,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             });
           }
 
+          // only real user tokens can be used here for these
+          // kind of requests so they must have this shape
+          // other sort of tokens cannot be used in this
           if (
             typeof decoded.id !== "number" ||
             typeof decoded.role !== "string" ||

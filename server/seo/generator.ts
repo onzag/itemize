@@ -15,7 +15,8 @@ import { escapeStringRegexp } from "../../util";
 import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
-import StorageProvider from "../../server/services/base/StorageProvider";
+import StorageProvider from "../services/base/StorageProvider";
+import { convertVersionsIntoNullsWhenNecessary } from "../version-null-value";
 
 /**
  * Whether seo is disabled
@@ -519,6 +520,9 @@ export class SEOGenerator {
           const collected: ISEOCollectedData[] =
             this.seoCache[cachedKey] ||
             await query as ISEOCollectedData[];
+
+          // fix the null values
+          collected.forEach((c) => convertVersionsIntoNullsWhenNecessary(c));
 
           // and that will be our value for our cache
           this.seoCache[cachedKey] = collected;
