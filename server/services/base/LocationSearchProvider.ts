@@ -1,27 +1,53 @@
+/**
+ * This file contains the location search provider base class that specifies
+ * how to complete locations for itemize location type
+ * @packageDocumentation
+ */
+
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import uuidv5 from "uuid/v5";
 import { IServiceProviderClassType, ServiceProvider } from "..";
 
-// this id can be whatever just to ensure lat and long produce the same id no matter what
-// basically a combination for location, this way we are not tied to any API
+/**
+ * this id can be whatever just to ensure lat and long produce the same id no matter what
+ * basically a combination for location, this way we are not tied to any API
+ * @ignore
+ */
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
+/**
+ * This represents a location search provider class
+ */
 export interface ILocationSearchProviderClassType<T> extends IServiceProviderClassType<T> {
   new(config: T): LocationSearchProvider<T>
 }
 
+/**
+ * The location search provider is a base interface type class
+ * that specifies how to create a service for location search
+ */
 export default class LocationSearchProvider<T> extends ServiceProvider<T> {
   constructor(config: T) {
     super(config);
   }
 
+  /**
+   * A helping utility that specifies how to make location search ids
+   * this is what itemize uses internally and it should be kept consistent
+   * we cannot rely on ids given by third party services so we have
+   * to create our own in order to be able to switch services
+   * 
+   * @param lat the latitude
+   * @param lng the longitude
+   */
   public makeIdOutOf(lat: number, lng: number) {
     return "L" + uuidv5(lat.toString() + lng.toString(), NAMESPACE).replace(/-/g, "");
   }
 
   /**
    * This function is executed once the user requests a geocode
-   * for a given location
+   * for a given location, you should override it
+   * 
    * @param lat the latitude the geocode is requested for
    * @param lng the longitude the geocode is requested for
    * @param query a query text (what is written in the search box while this is clicked)
@@ -42,7 +68,8 @@ export default class LocationSearchProvider<T> extends ServiceProvider<T> {
 
   /**
    * This function is executed once the user requests a search
-   * for a given location
+   * for a given location, you should override it
+   * 
    * @param lat the latitude where results should be nearby for
    * @param lng the longitude where results should be nearby for
    * @param query a query of what we are searching for
@@ -64,6 +91,8 @@ export default class LocationSearchProvider<T> extends ServiceProvider<T> {
   /**
    * Similar to search, but should return fewer results, and maybe
    * less accurate, these are used for autocompletition
+   * this function should be overriden
+   * 
    * @param lat the latitude where results should be nearby for
    * @param lng the longitude where results should be nearby for
    * @param query a query of what we are searching for

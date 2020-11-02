@@ -475,6 +475,9 @@ export async function initializeServer(
         "initializeServer: setting up global manager",
       );
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
+      if (!CurrencyFactorsClass.isGlobal()) {
+        throw new Error("Currency factors custom provider class is not a global type");
+      }
       const currencyFactorsService = sensitiveConfig.currencyFactors ?
         new CurrencyFactorsClass(sensitiveConfig.currencyFactors, redisGlobalClient) :
         null;
@@ -649,6 +652,9 @@ export async function initializeServer(
       );
     }
     const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
+    if (UserLocalizationServiceClass.isGlobal()) {
+      throw new Error("The user localization service class is a global type, and that's not allowed");
+    }
     const userLocalizationService = sensitiveConfig.userLocalization ?
       new UserLocalizationServiceClass(sensitiveConfig.userLocalization) :
       null;
@@ -660,6 +666,9 @@ export async function initializeServer(
       );
     }
     let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
+    if (MailServiceClass.isGlobal()) {
+      throw new Error("The mail service class is global type, and that's not allowed");
+    }
     if (process.env.FAKE_EMAILS === "true") {
       logger.info(
         "initializeServer: using fake email service",
@@ -683,6 +692,9 @@ export async function initializeServer(
       );
     }
     const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
+    if (LocationSearchClass.isGlobal()) {
+      throw new Error("The location search service class is global type, and that's not allowed");
+    }
     const locationSearchService = sensitiveConfig.locationSearch ?
       new LocationSearchClass(sensitiveConfig.locationSearch) : null;
     locationSearchService && await locationSearchService.initialize();

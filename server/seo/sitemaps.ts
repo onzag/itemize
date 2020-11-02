@@ -1,3 +1,9 @@
+/**
+ * This file builds the sitemaps and converts the JSON type
+ * structure to the XML type
+ * @packageDocumentation
+ */
+
 export interface ISitemapLastQueryType {
   [id: string]: string,
 };
@@ -9,11 +15,18 @@ export interface ISitemapLastQueryType {
  */
 export interface ISitemapJSONType {
   /**
-   * This is an object for all the elements inside the sitemap
-   * and when they were last queried
+   * A main index will contain this filed, it is normally null for eg. the main entry, the static
+   * index but the last queried is when some bit of data was last queried in the form of URL_RULE.MODULE_PATH.ITEM_PATH
+   * and it contains a date where it will ask for what it was created after that, this is used for collection
    */
   lastQueried: ISitemapLastQueryType;
+  /**
+   * Whether it is an index type, index types is what truly contains these fields on the itemize structure for sitemaps is
+   */
   isIndex: boolean;
+  /**
+   * Just a list of urls
+   */
   entries: string[];
 }
 

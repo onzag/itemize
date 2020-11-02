@@ -21,6 +21,11 @@ export interface ICurrencyLayerConfig {
 }
 
 export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
+
+  public static isGlobal() {
+    return true;
+  }
+
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
       this.globalCache.get(
