@@ -7,7 +7,7 @@
 
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
-import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX } from "../../constants";
+import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER } from "../../constants";
 import Knex from "knex";
 
 export interface ISQLTableIndexType {
@@ -178,6 +178,46 @@ export function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDef
       },
       transaction_time: {
         type: "datetime",
+      },
+    },
+    [REGISTRY_IDENTIFIER]: {
+      id: {
+        type: "serial",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 0,
+        },
+      },
+      pkey: {
+        type: "text",
+        notNull: true,
+        index: {
+          id: "UNIQUE_REGISTRY_COMBINATION",
+          type: "unique",
+          level: 0,
+        },
+      },
+      skey: {
+        type: "text",
+        notNull: true,
+        index: {
+          id: "UNIQUE_REGISTRY_COMBINATION",
+          type: "unique",
+          level: 1,
+        },
+      },
+      value: {
+        type: "text",
+      },
+      created_at: {
+        type: "datetime",
+        notNull: true,
+      },
+      last_modified: {
+        type: "datetime",
+        notNull: true,
       },
     },
   };

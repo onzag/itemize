@@ -7,8 +7,9 @@
  * @packageDocumentation
  */
 
-import type { RedisClient } from "redis";
+import { ItemizeRedisClient } from "../../redis";
 import { IServiceProviderClassType, ServiceProvider } from "..";
+import { RegistryService } from "../registry";
 
 /**
  * This is the expected currency factors shape
@@ -36,7 +37,7 @@ export interface ICurrencyFactors {
  * This  interfaces represents a currency factors class
  */
 export interface ICurrencyFactorsProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, globalCache: RedisClient): CurrencyFactorsProvider<T>
+  new(config: T, registry: RegistryService, globalCache: ItemizeRedisClient): CurrencyFactorsProvider<T>
 }
 
 /**
@@ -44,7 +45,7 @@ export interface ICurrencyFactorsProviderClassType<T> extends IServiceProviderCl
  * be extended in order ot provide the proper currency factors
  */
 export default class CurrencyFactorsProvider<T> extends ServiceProvider<T> {
-  public globalCache: RedisClient;
+  public globalCache: ItemizeRedisClient;
 
   /**
    * When built the currency factors provider will receive
@@ -55,10 +56,11 @@ export default class CurrencyFactorsProvider<T> extends ServiceProvider<T> {
    * automatically and it expects this form
    * 
    * @param config 
+   * @param registry the registry service
    * @param globalCache 
    */
-  constructor(config: T, globalCache: RedisClient) {
-    super(config);
+  constructor(config: T, registry: RegistryService, globalCache: ItemizeRedisClient) {
+    super(config, registry);
     this.globalCache = globalCache;
   }
 

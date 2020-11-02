@@ -148,6 +148,12 @@ export async function sensitiveConfigSetup(
         nullifyFalseValues: true,
       },
       {
+        variableName: "mailStorage",
+        message: "A path for an item definition in order to be used for storage of emails so that itemize acts as a mail client",
+        defaultValue: "",
+        nullifyFalseValues: true,
+      },
+      {
         variableName: "containers",
         type: "multiconfig",
         message: "Containers to use, the default provider is openstack",

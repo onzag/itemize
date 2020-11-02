@@ -21,14 +21,13 @@ export interface ICurrencyLayerConfig {
 }
 
 export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
-
   public static isGlobal() {
     return true;
   }
 
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
-      this.globalCache.get(
+      this.globalCache.redisClient.get(
         CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
