@@ -1719,13 +1719,12 @@ export class ActualItemProvider extends
               appliedGQLValue.requestFields,
             );
           } else {
-            CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+            CacheWorkerInstance.instance.setCachedValue(
+              PREFIX_GET + qualifiedName,
               forId,
               forVersion || null,
-              qualifiedName,
-              PREFIX_GET + qualifiedName,
-              PREFIX_SEARCH + this.props.itemDefinitionInstance.getParentModule().getSearchModule().getQualifiedPathName(),
-              PREFIX_SEARCH + this.props.itemDefinitionInstance.getSearchModeCounterpart().getQualifiedPathName(),
+              null,
+              null,
             );
           }
         }

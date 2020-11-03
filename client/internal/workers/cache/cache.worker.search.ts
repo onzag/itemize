@@ -59,6 +59,8 @@ export async function search(
           // This means data corruption, we cancel everything, data is corrupted
           throw new DataCorruptionError("Search function was executed with missing value for " + queryIdentifier);
         } else if (value.value === null) {
+          // value is in deleted state, it will return null and it will be filtered
+          // by the filter later on
           return null;
         } else {
           const checkedValue = await checkOne(rootProxy, result, value.value, searchArgs);

@@ -969,13 +969,12 @@ export class RemoteListener {
         // and if we got a cache worker
         if (CacheWorkerInstance.isSupported) {
           // we do the delete
-          CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+          CacheWorkerInstance.instance.setCachedValue(
+            PREFIX_GET + itemDefinition.getQualifiedPathName(),
             event.id,
             event.version,
-            itemDefinition.getQualifiedPathName(),
-            PREFIX_GET + itemDefinition.getQualifiedPathName(),
-            PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
-            PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+            null,
+            null,
           );
         }
 
@@ -999,13 +998,12 @@ export class RemoteListener {
       if (CacheWorkerInstance.isSupported) {
         // we are going to do this to upate such it gets deleted
         // if it exists there
-        CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
+        CacheWorkerInstance.instance.setCachedValue(
+          PREFIX_GET + itemDefinition.getQualifiedPathName(),
           event.id,
           event.version,
-          itemDefinition.getQualifiedPathName(),
-          PREFIX_GET + itemDefinition.getQualifiedPathName(),
-          PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          null,
+          null,
         );
       }
 

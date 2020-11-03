@@ -18,6 +18,7 @@ import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
+import { NanoSecondComposedDate } from "../../../../nanodate";
 
 /**
  * A cache match for a standard query, basically
@@ -300,79 +301,6 @@ export default class CacheWorker {
   }
 
   /**
-   * Sets the cached value as null and updates all the searches
-   * that contained that value to have it sliced from it
-   * @param id the id of the item definition
-   * @param version the version of the item definition
-   * @param type the type of the item definition
-   * @param queryName the GET query name
-   * @param searchQueryNameModule optional, a search query name module to
-   * be the only one to check against it should be SEARCH prefixed
-   * @param searchQueryNameItemDefinition optional, a search query name
-   * item definition to be the only one to check against it should be SEARCH prefixed
-   *
-   * These optional attributes make it way more efficient as it will allow
-   * the algorithm to ignore something if it knows it won't contain the
-   * item definition
-   */
-  public async setCachedValueAsNullAndUpdateSearches(
-    id: number,
-    version: string,
-    type: string,
-    queryName: string,
-    searchQueryNameModule?: string,
-    searchQueryNameItemDefinition?: string,
-  ) {
-    await this.waitForSetupPromise;
-
-    const succeed = await this.setCachedValue(
-      queryName,
-      id,
-      version,
-      null,
-      null,
-    );
-    if (!succeed) {
-      return false;
-    }
-
-    // so first we await for our database
-    if (!this.db) {
-      return succeed;
-    }
-
-    try {
-      const allKeys = await this.db.getAllKeys(SEARCHES_TABLE_NAME);
-      await Promise.all(allKeys.map(async (key) => {
-        try {
-          const splitted = key.split(".");
-          if (
-            !searchQueryNameModule ||
-            !searchQueryNameItemDefinition ||
-            splitted[0] === searchQueryNameModule ||
-            splitted[0] === searchQueryNameItemDefinition
-          ) {
-            const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, key);
-            const foundIndex = currentValue.value.findIndex((v) => v.id === id && v.type === type);
-            if (foundIndex !== -1) {
-              currentValue.value.splice(foundIndex, 1);
-              await this.db.put(SEARCHES_TABLE_NAME, currentValue, key);
-            }
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      }));
-    } catch (err) {
-      console.warn(err);
-    }
-
-    // we consider it sucesful even if they
-    // failed to update
-    return succeed;
-  }
-
-  /**
    * sets a cache value, all of it, using a query name, should
    * be a get query, the id of the item definition and the
    * value that was retrieved, this value can be a partial value
@@ -593,14 +521,16 @@ export default class CacheWorker {
    * @param newLastRecordDate the new last record date of the added records
    * @param cachePolicy the cache policy that we are working with
    */
-  public async addRecordsToCachedSearch(
+  public async updateRecordsOnCachedSearch(
     searchQueryName: string,
     createdByIfKnown: number,
     parentTypeIfKnown: string,
     parentIdIfKnown: number,
     parentVersionIfKnown: string,
     newRecords: IGQLSearchRecord[],
-    newLastRecordDate: string,
+    modifiedRecords: IGQLSearchRecord[],
+    lostRecords: IGQLSearchRecord[],
+    newLastModified: string,
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
     await this.waitForSetupPromise;
@@ -617,6 +547,20 @@ export default class CacheWorker {
       storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + JSON.stringify(parentVersionIfKnown);
     }
 
+    try {
+      await Promise.all(lostRecords.map((r) => {
+        return this.setCachedValue(
+          PREFIX_GET + r.type,
+          r.id,
+          r.version,
+          null,
+          null
+        );
+      }));
+    } catch {
+
+    }
+
     // So we say that not all results are preloaded so that when the next iteration of the
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
@@ -624,10 +568,23 @@ export default class CacheWorker {
       // there might not be a current value, eg. if for some reason cache policy was set to none and yet
       // there was a listen policy for it, or if otherwise the data got somehow corrupted
       if (currentValue) {
+        const newValue = currentValue.value.map((r) => {
+          const matchingLostRecord = lostRecords.find((lr) => lr.id === r.id && lr.version === r.version);
+          if (matchingLostRecord) {
+            return null;
+          }
+          const matchingUpdatedRecord = modifiedRecords.find((mr) => mr.id === r.id && mr.version === r.version);
+          if (matchingUpdatedRecord) {
+            return matchingUpdatedRecord;
+          }
+
+          return r;
+        }).filter((r) => r !== null).concat(newRecords);
+
         await this.db.put(SEARCHES_TABLE_NAME, {
           ...currentValue,
-          lastModified: newLastRecordDate,
-          value: currentValue.value.concat(newRecords),
+          lastModified: newLastModified,
+          value: newValue,
           allResultsPreloaded: false,
         }, storeKeyName);
       }
@@ -806,7 +763,6 @@ export default class CacheWorker {
       }
     } catch (err) {
       // yet some other errors might come here
-      console.error(err);
       // we return an unspecified error if we hit an error
       const gqlValue: IGQLEndpointValue = {
         data: null,
@@ -846,7 +802,7 @@ export default class CacheWorker {
     // results to process and actually has managed to make it to the database
     // this can happens when something fails in between, or it is loaded by another
     // part of the application
-    const uncachedResultsToProcess: IGQLSearchRecord[] = [];
+    const uncachedOrOutdatedResultsToProcess: IGQLSearchRecord[] = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
       // and get the cached results, considering the fields
@@ -860,7 +816,19 @@ export default class CacheWorker {
       // if there is no cached results
       if (!cachedResult) {
         // then we add it to the uncached list we need to process
-        uncachedResultsToProcess.push(resultToProcess);
+        uncachedOrOutdatedResultsToProcess.push(resultToProcess);
+      } else if (cachedResult && cachedResult.value) {
+        // this is the value that it has for the last modified as a query
+        const cachedResultNanoDate = new NanoSecondComposedDate(cachedResult.value.last_modified as string);
+        // this is the value that it has for the last modified as a record
+        const recordNanoDate = new NanoSecondComposedDate(resultToProcess.last_modified);
+        // if the cached result date is less than the record it means the record is newer and it
+        // was updated during the search and that's why all results preloaded might be false
+        // then those records must be added
+        if (cachedResultNanoDate.lessThan(recordNanoDate)) {
+          // it is outdated
+          uncachedOrOutdatedResultsToProcess.push(resultToProcess);
+        }
       }
     }));
 
@@ -869,7 +837,7 @@ export default class CacheWorker {
     const batches: IGQLSearchRecord[][] = [[]];
     let lastBatchIndex = 0;
     // for that we run a each event in all our uncached results
-    uncachedResultsToProcess.forEach((uncachedResultToProcess) => {
+    uncachedOrOutdatedResultsToProcess.forEach((uncachedOrOutdatedResultToProcess) => {
       // and when we hit the limit, we build a new batch
       if (batches[lastBatchIndex].length === maxGetListResultsAtOnce) {
         batches.push([]);
@@ -877,7 +845,7 @@ export default class CacheWorker {
       }
 
       // add this to the batch
-      batches[lastBatchIndex].push(uncachedResultToProcess);
+      batches[lastBatchIndex].push(uncachedOrOutdatedResultToProcess);
     });
 
     // now we need to load all those batches into graphql queries
@@ -944,17 +912,13 @@ export default class CacheWorker {
           if (value === null) {
             // if the item was deleted, somehow, like it's so unlikely but
             // still possible, say run a search search fails somehow, and then
-            // later when executed the item is gone, then we mark it as deleted
-            // note that this will have an effect on the query itself of our
-            // current search as deleting values (setting them to null) causes them
-            // to be dropped off searchs where they might have been, this will have
-            // the side effect of updating our search values, yes we use the
-            // inefficient search without the optionals, this is unlikely anyway
-            suceedStoring = await this.setCachedValueAsNullAndUpdateSearches(
-              originalBatchRequest.id,
-              originalBatchRequest.type,
-              originalBatchRequest.version,
+            // later when executed the item is gone
+            suceedStoring = await this.setCachedValue(
               PREFIX_GET + originalBatchRequest.type,
+              originalBatchRequest.id,
+              originalBatchRequest.version,
+              null,
+              null
             );
           } else {
             // otherwise we do push the value and merge the cache
@@ -986,19 +950,7 @@ export default class CacheWorker {
     // if something has not failed then we are good to go
     if (!somethingFailed) {
       // we mark everything as cached, it has succeed caching
-      // everything! null results that somehow appeared deleted
-      // were automatically deleted by the setCachedValue function
-      // using null, this is why we must reread our fields as some
-      // records might have been removed from the databse itself
-      // during our process of fetching, this can happen
-      // with incompleted searches where results were partial, and then
-      // some were deleted, eg we get, 1,2,3,4,5 but then only manage to fetch
-      // 1,2,3 because our connection dropped, then using another device the
-      // user deletes 5, then comes back to this device when it's loading
-      // this loader will notice 5 is gone and cache its value as null, which
-      // will in turn go to the 1,2,3,4,5 results and remove the 5 key from the list
-      // so using resultsToProcess variable could be wrong as that would contain
-      // 1,2,3,4,5
+      // everything!
       const actualCurrentSearchValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
       await this.db.put(SEARCHES_TABLE_NAME, {
         ...actualCurrentSearchValue,
@@ -1007,11 +959,14 @@ export default class CacheWorker {
 
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
-
+      const records = await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs);
       const gqlValue: IGQLEndpointValue = {
         data: {
           [searchQueryName]: {
-            records: await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs),
+            last_modified: lastModified,
+            records,
+            limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
+            offset: 0,
           },
         },
       };

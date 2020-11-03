@@ -387,15 +387,13 @@ function storeAndCombineStorageValuesFor(
     if (!value) {
       // we are here guaranteed that if we have retrieved something from
       // the server in an unique value way it is not a module and it's not
-      // a search mode, since we are here, so we can infer the module search
-      // and the item definition search in order to be efficient
-      CacheWorkerInstance.instance.setCachedValueAsNullAndUpdateSearches(
-        id,
-        version,
-        qualifiedName,
+      // a search mode
+      CacheWorkerInstance.instance.setCachedValue(
         PREFIX_GET + qualifiedName,
-        PREFIX_SEARCH + itemDefinition.getParentModule().getSearchModule().getQualifiedPathName(),
-        PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+        id,
+        version || null,
+        null,
+        null,
       );
     } else {
       CacheWorkerInstance.instance.mergeCachedValue(
