@@ -1075,7 +1075,7 @@ export async function runSearchQueryFor(
           id: {},
           version: {},
           type: {},
-          created_at: {},
+          last_modified: {},
         },
         count: {},
         limit: {},

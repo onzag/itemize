@@ -42,10 +42,10 @@ const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
 export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
-  if (records.length === 0) {
+  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
+  if (recordsRespectiveNanoSecondAccuracyArray.length === 0) {
     return null;
   }
-  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
   const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev,cur) => {
     return prev.greaterThan(cur) ? prev : cur;
   });
@@ -119,7 +119,7 @@ export async function searchModule(
     true,
   );
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
@@ -138,8 +138,8 @@ export async function searchModule(
       "searchModule: Extracted requested fields from module",
       fieldsToRequest,
     );
-    if (!fieldsToRequest.includes("created_at")) {
-      fieldsToRequest.push("created_at");
+    if (!fieldsToRequest.includes("last_modified")) {
+      fieldsToRequest.push("last_modified");
     }
     if (!fieldsToRequest.includes("blocked_at")) {
       fieldsToRequest.push("blocked_at");
@@ -438,7 +438,7 @@ export async function searchItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
@@ -459,9 +459,12 @@ export async function searchItemDefinition(
       "searchItemDefinition: Extracted requested fields from module",
       fieldsToRequest,
     );
-    if (!fieldsToRequest.includes("created_at")) {
-      fieldsToRequest.push("created_at");
+    if (!fieldsToRequest.includes("last_modified")) {
+      fieldsToRequest.push("last_modified");
     }
+    // we need these to get the DATA properly populated
+    // as the filterAndPrepareGQLValue will use of those
+    // to know if the value is blocked to return to user
     if (!fieldsToRequest.includes("blocked_at")) {
       fieldsToRequest.push("blocked_at");
     }

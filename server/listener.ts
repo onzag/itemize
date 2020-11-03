@@ -747,9 +747,9 @@ export class Listener {
 
       const query = this.knex.select(["id", "version", "type", "last_modified"]);
       if (request.lastModified) {
-        query.select("?? > ? AS WAS_CREATED", ["created_at", request.lastModified]);
+        query.select(this.knex.raw("?? > ? AS ??", ["created_at", request.lastModified, "WAS_CREATED"]));
       } else {
-        query.select("TRUE AS WAS_CREATED");
+        query.select(this.knex.raw("TRUE AS ??", "WAS_CREATED"));
       }
       query.from(mod.getQualifiedPathName());
       if (requiredType) {
@@ -888,11 +888,11 @@ export class Listener {
         return;
       }
 
-      const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
+      const query = this.knex.select(["id", "version", "type", "last_modified"]).from(mod.getQualifiedPathName());
       if (request.lastModified) {
-        query.select("?? > ? AS WAS_CREATED", ["created_at", request.lastModified]);
+        query.select(this.knex.raw("?? > ? AS ??", ["created_at", request.lastModified, "WAS_CREATED"]));
       } else {
-        query.select("TRUE AS WAS_CREATED");
+        query.select(this.knex.raw("TRUE AS ??", "WAS_CREATED"));
       }
       query.from(mod.getQualifiedPathName());
       if (requiredType) {
@@ -900,7 +900,7 @@ export class Listener {
       }
 
       query.andWhere("parent_id", request.parentId);
-      query.andWhere("parent_version", request.parentVersion || null);
+      query.andWhere("parent_version", request.parentVersion || "");
       query.andWhere("parent_type", request.parentType);
       // the know last record might be null in case of empty searches
       if (request.lastModified) {
@@ -949,7 +949,7 @@ export class Listener {
 
         const event: IParentedSearchRecordsEvent = {
           parentId: request.parentId,
-          parentVersion: request.parentVersion,
+          parentVersion: request.parentVersion || null,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
           newRecords,

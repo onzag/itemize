@@ -730,7 +730,7 @@ export default class CacheWorker {
               id: {},
               version: {},
               type: {},
-              created_at: {},
+              last_modified: {},
             },
             last_modified: {},
             limit: {},
