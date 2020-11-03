@@ -64,17 +64,13 @@ declare global {
   }
 }
 
-/**
- * How to end cookies
- * @ignore
- */
-let cookieEnd = ";domain=" + location.host;
-if (!location.host.startsWith("localhost")) {
-  cookieEnd = ";secure=true";
-}
-
 // set development mode
 if (typeof document !== "undefined") {
+  let cookieEnd = ";domain=" + location.hostname;
+  if (location.hostname !== "localhost") {
+    cookieEnd = ";secure=true";
+  }
+
   window.SET_DEV_MODE = function (mode, key) {
     document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
     document.cookie = "devkey=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;

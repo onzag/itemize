@@ -292,8 +292,8 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
 
-      let cookieEnd = ";domain=" + location.host;
-      if (!location.host.startsWith("localhost")) {
+      let cookieEnd = ";domain=" + location.hostname;
+      if (location.hostname !== "localhost") {
         cookieEnd = ";secure=true";
       }
 

@@ -32,15 +32,6 @@ if (isDevelopment) {
 }
 
 /**
- * How to end cookies
- * @ignore
- */
-let cookieEnd = ";domain=" + location.host;
-if (!location.host.startsWith("localhost")) {
-  cookieEnd = ";secure=true";
-}
-
-/**
  * The props for the application, this initial information
  * must be passed by the initializer and it't available via
  * the rest endpoint, for the given languages
@@ -340,6 +331,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // Now we patch moment
     Moment.locale(locale);
 
+    let cookieEnd = ";domain=" + location.hostname;
+    if (location.hostname !== "localhost") {
+      cookieEnd = ";secure=true";
+    }
+
     // And we set the language
     document.cookie = "lang=" + locale + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
 
@@ -460,6 +456,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
       console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
     }
 
+    let cookieEnd = ";domain=" + location.hostname;
+    if (location.hostname !== "localhost") {
+      cookieEnd = ";secure=true";
+    }
+
     // Now we set the country in local storage
     document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
@@ -523,6 +524,11 @@ export default class App extends React.Component<IAppProps, IAppState> {
       // because all currencies are in the currency list
       codeToSet = "EUR";
       console.warn("Attempted to set currency to unavailable " + code + ", defaulted to Euros");
+    }
+
+    let cookieEnd = ";domain=" + location.hostname;
+    if (location.hostname !== "localhost") {
+      cookieEnd = ";secure=true";
     }
 
     // We set the currency in local storage

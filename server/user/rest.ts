@@ -230,7 +230,7 @@ export function userRestServices(appData: IAppDataType) {
 
     if (isValidPassword || assignedToken) {
       const useSecure = !req.headers.host || !req.headers.host.startsWith("localhost");
-      const host = req.headers.host;
+      const host = req.headers.host && req.headers.host.split(":")[0];
       res.cookie("token", assignedToken, {
         httpOnly: false,
         expires: new Date(9999999999999),
