@@ -54,10 +54,9 @@ export interface ICachedSearchResult {
    */
   dataMightBeStale: boolean;
   /**
-   * Of all the records stored for that search, what was the last time
-   * we fetch a record for it, this is a nanodate type
+   * When was this last search modified
    */
-  lastRecordDate: string;
+  lastModified: string;
 }
 
 /**
@@ -83,7 +82,7 @@ export interface ISearchMatchType {
   /**
    * The last record date of that records list
    */
-  lastRecordDate: string;
+  lastModified: string;
   /**
    * The limit we limited ourselves to, the list can however
    * be larger than the limit as it might grow by events
@@ -627,7 +626,7 @@ export default class CacheWorker {
       if (currentValue) {
         await this.db.put(SEARCHES_TABLE_NAME, {
           ...currentValue,
-          lastRecordDate: newLastRecordDate,
+          lastModified: newLastRecordDate,
           value: currentValue.value.concat(newRecords),
           allResultsPreloaded: false,
         }, storeKeyName);
@@ -685,7 +684,7 @@ export default class CacheWorker {
     // cached searches with different fields, we need both to be merged
     // in order to know what we have retrieved, originally it's just what
     // we were asked for
-    let lastRecordDate: string;
+    let lastModified: string;
     let dataMightBeStale = false;
     let limitToSetInDb: number;
 
@@ -733,7 +732,7 @@ export default class CacheWorker {
               type: {},
               created_at: {},
             },
-            last_record_date: {},
+            last_modified: {},
             limit: {},
             offset: {},
           },
@@ -749,7 +748,7 @@ export default class CacheWorker {
           return {
             gqlValue: serverValue,
             dataMightBeStale: false,
-            lastRecordDate: null,
+            lastModified: null,
           };
         }
 
@@ -757,14 +756,14 @@ export default class CacheWorker {
         // from the search query, the IGQLSearchRecord that we
         // need to process
         resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
-        lastRecordDate = serverValue.data[searchQueryName].last_record_date as string;
+        lastModified = serverValue.data[searchQueryName].lastModified as string;
         limitToSetInDb = searchArgs.limit as number;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
         // it depends
         resultsToProcess = dbValue.value;
-        lastRecordDate = dbValue.lastRecordDate;
+        lastModified = dbValue.lastModified;
         dataMightBeStale = true;
         limitToSetInDb = dbValue.limit;
 
@@ -784,7 +783,7 @@ export default class CacheWorker {
               data: {
                 [searchQueryName]: {
                   records,
-                  last_record_date: lastRecordDate,
+                  last_modified: lastModified,
                   // we return the true limit, because records might grow over the limit
                   limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
                   offset: 0,
@@ -795,7 +794,7 @@ export default class CacheWorker {
             return {
               gqlValue,
               dataMightBeStale,
-              lastRecordDate,
+              lastModified,
             };
           } catch (err) {
             // It comes here if it finds data corruption during the search and it should
@@ -824,7 +823,7 @@ export default class CacheWorker {
       return {
         gqlValue,
         dataMightBeStale,
-        lastRecordDate,
+        lastModified,
       };
     }
 
@@ -839,7 +838,7 @@ export default class CacheWorker {
       value: resultsToProcess,
       fields: getListRequestedFields,
       allResultsPreloaded: false,
-      lastRecordDate,
+      lastModified,
       limit: limitToSetInDb,
     }, storeKeyName);
 
@@ -1020,7 +1019,7 @@ export default class CacheWorker {
       return {
         gqlValue,
         dataMightBeStale,
-        lastRecordDate,
+        lastModified,
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
@@ -1036,7 +1035,7 @@ export default class CacheWorker {
       return {
         gqlValue,
         dataMightBeStale,
-        lastRecordDate,
+        lastModified,
       };
     } else {
       // otherwise it must have been some sort
@@ -1057,7 +1056,7 @@ export default class CacheWorker {
       return {
         gqlValue,
         dataMightBeStale,
-        lastRecordDate,
+        lastModified,
       };
     }
   }

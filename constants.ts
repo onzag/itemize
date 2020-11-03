@@ -889,7 +889,7 @@ const SEARCH_RECORD_FIELDS = {
   version: {
     type: GraphQLString,
   },
-  created_at: {
+  last_modified: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
   },
 };
@@ -918,7 +918,7 @@ export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObje
     records: {
       type: GraphQLList && GraphQLList(GraphQLNonNull(SEARCH_RECORD_GQL)),
     },
-    last_record_date: {
+    last_modified: {
       type: GraphQLString,
     },
     count: {

@@ -227,7 +227,7 @@ export function getGQLQueryFieldsForModule(
         offset: {
           type: GraphQLNonNull(GraphQLInt),
         },
-        last_record_date: {
+        last_modified: {
           type: GraphQLString,
         },
       },

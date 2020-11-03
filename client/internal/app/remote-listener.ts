@@ -18,8 +18,8 @@ import {
   IFeedbackRequest,
   CHANGED_FEEEDBACK_EVENT,
   BUILDNUMBER_EVENT,
-  OWNED_SEARCH_RECORDS_ADDED_EVENT,
-  PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+  OWNED_SEARCH_RECORDS_EVENT,
+  PARENTED_SEARCH_RECORDS_EVENT,
   IBuildNumberEvent,
   REGISTER_REQUEST,
   OWNED_SEARCH_REGISTER_REQUEST,
@@ -37,8 +37,8 @@ import {
   IParentedSearchUnregisterRequest,
   IChangedFeedbackEvent,
   IDENTIFY_REQUEST,
-  IOwnedSearchRecordsAddedEvent,
-  IParentedSearchRecordsAddedEvent,
+  IOwnedSearchRecordsEvent,
+  IParentedSearchRecordsEvent,
   IDENTIFIED_EVENT,
   ERROR_EVENT,
   IErrorEvent,
@@ -101,10 +101,10 @@ export class RemoteListener {
        */
       request: IOwnedSearchRegisterRequest;
       /**
-       * The last known record date a record was created (this is the last
+       * The last known record date a record was updated (this is the last
        * created_at of the last record of an owned search)
        */
-      lastKnownRecordDate: string;
+      lastModified: string;
       /**
        * Similarly the callbacks that are called when the search updates
        * unlike the instances part, these are direct callbacks that act
@@ -131,7 +131,7 @@ export class RemoteListener {
       /**
        * last known record date for the given answer
        */
-      lastKnownRecordDate: string;
+      lastModified: string;
       /**
        * The callbacks as well
        */
@@ -203,8 +203,8 @@ export class RemoteListener {
     this.onChangeListened = this.onChangeListened.bind(this);
     this.onBuildnumberListened = this.onBuildnumberListened.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
-    this.onRecordsAddedToOwnedSearch = this.onRecordsAddedToOwnedSearch.bind(this);
-    this.onRecordsAddedToParentedSearch = this.onRecordsAddedToParentedSearch.bind(this);
+    this.onOwnedSearchRecordsEvent = this.onOwnedSearchRecordsEvent.bind(this);
+    this.onParentedSearchRecordsEvent = this.onParentedSearchRecordsEvent.bind(this);
     this.onKicked = this.onKicked.bind(this);
     this.setCurrencyFactorsHandler = this.setCurrencyFactorsHandler.bind(this);
     this.triggerCurrencyFactorsHandler = this.triggerCurrencyFactorsHandler.bind(this);
@@ -226,8 +226,8 @@ export class RemoteListener {
     this.socket.on(KICKED_EVENT, this.onKicked);
     this.socket.on(CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
     this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
-    this.socket.on(OWNED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToOwnedSearch);
-    this.socket.on(PARENTED_SEARCH_RECORDS_ADDED_EVENT, this.onRecordsAddedToParentedSearch);
+    this.socket.on(OWNED_SEARCH_RECORDS_EVENT, this.onOwnedSearchRecordsEvent);
+    this.socket.on(PARENTED_SEARCH_RECORDS_EVENT, this.onParentedSearchRecordsEvent);
     this.socket.on(ERROR_EVENT, this.onError);
     this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
   }
@@ -624,13 +624,13 @@ export class RemoteListener {
    * Adds a listener for an owned search
    * @param itemDefinitionOrModuleQualifiedPathName the item definition or module we are listening for search changes
    * @param createdBy the creator that triggers this
-   * @param lastKnownRecordDate the last known record added date
+   * @param lastModified the last known record added date
    * @param callback a callback to trigger when the listener matches
    */
   public addOwnedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: number,
-    lastKnownRecordDate: string,
+    lastModified: string,
     callback: () => any,
   ) {
     // so we build our qualified identifier as well
@@ -656,7 +656,7 @@ export class RemoteListener {
     this.ownedSearchListeners[qualifiedIdentifier] = {
       request,
       callbacks: [callback],
-      lastKnownRecordDate,
+      lastModified,
     };
 
     // and attach the owner listener if possible
@@ -764,7 +764,7 @@ export class RemoteListener {
    * @param parentType the parent type (aka it's item definition qualified name)
    * @param parentId the parent id
    * @param parentVersion the parent version (or null)
-   * @param lastKnownRecordDate the last known record date this listener knows of its stored values
+   * @param lastModified the last known record date this listener knows of its stored values
    * @param callback the callback to trigger for
    */
   public addParentedSearchListenerFor(
@@ -772,7 +772,7 @@ export class RemoteListener {
     parentType: string,
     parentId: number,
     parentVersion: string,
-    lastKnownRecordDate: string,
+    lastModified: string,
     callback: () => any,
   ) {
     // so we build the id for the parent type
@@ -801,7 +801,7 @@ export class RemoteListener {
     this.parentedSearchListeners[qualifiedIdentifier] = {
       request,
       callbacks: [callback],
-      lastKnownRecordDate,
+      lastModified,
     };
 
     // and attempt to attach it
@@ -1020,8 +1020,8 @@ export class RemoteListener {
    * result that is cached by owner
    * @param event the owned search event
    */
-  private async onRecordsAddedToOwnedSearch(
-    event: IOwnedSearchRecordsAddedEvent,
+  private async onOwnedSearchRecordsEvent(
+    event: IOwnedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
       "ownedSearchRecordsAddedEvents",
@@ -1034,7 +1034,7 @@ export class RemoteListener {
     // we still ensure that it exists, even when it should
     if (ownedListener) {
       // so we updated the lastKnownRecordDate
-      ownedListener.lastKnownRecordDate = event.newLastRecordDate;
+      ownedListener.lastModified = event.newLastModified;
 
       // and if our cache worker is supported
       if (CacheWorkerInstance.isSupported) {
@@ -1048,16 +1048,17 @@ export class RemoteListener {
 
         // we are going to request it to add the new records that our event
         // comes loaded with the new records that were added to it
-        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-          event.createdBy,
-          null,
-          null,
-          null,
-          event.newRecords,
-          event.newLastRecordDate,
-          "by-owner",
-        );
+        // TODO FIX THIS add, remove, edit, everything
+        // await CacheWorkerInstance.instance.addRecordsToCachedSearch(
+        //   PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+        //   event.createdBy,
+        //   null,
+        //   null,
+        //   null,
+        //   event.newRecords,
+        //   event.newLastModified,
+        //   "by-owner",
+        // );
       }
 
       // now we trigger the callbacks that should re-perform the cached
@@ -1072,8 +1073,8 @@ export class RemoteListener {
    * result that is cached by parent
    * @param event the parent search records added event
    */
-  private async onRecordsAddedToParentedSearch(
-    event: IParentedSearchRecordsAddedEvent,
+  private async onParentedSearchRecordsEvent(
+    event: IParentedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
       "parentedSearchRecordsAddedEvents",
@@ -1089,7 +1090,7 @@ export class RemoteListener {
     // and we still check it if exists
     if (parentedListener) {
       // do the same as in the owned version
-      parentedListener.lastKnownRecordDate = event.newLastRecordDate;
+      parentedListener.lastModified = event.newLastModified;
 
       // and equally we try to add these records
       if (CacheWorkerInstance.isSupported) {
@@ -1100,16 +1101,17 @@ export class RemoteListener {
         } else {
           itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
         }
-        await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-          null,
-          event.parentType,
-          event.parentId,
-          event.parentVersion,
-          event.newRecords,
-          event.newLastRecordDate,
-          "by-parent",
-        );
+        // TODO fix this
+        // await CacheWorkerInstance.instance.addRecordsToCachedSearch(
+        //   PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+        //   null,
+        //   event.parentType,
+        //   event.parentId,
+        //   event.parentVersion,
+        //   event.newRecords,
+        //   event.newLastModified,
+        //   "by-parent",
+        // );
       }
 
       // now we trigger the callbacks that should re-perform the cached
@@ -1236,10 +1238,10 @@ export class RemoteListener {
       this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
 
       if (requiresFeedback) {
-        const lastKnownRecordDate = this.ownedSearchListeners[listenerKey].lastKnownRecordDate;
+        const lastModified = this.ownedSearchListeners[listenerKey].lastModified;
         this.requestOwnedSearchFeedbackFor({
           ...this.ownedSearchListeners[listenerKey].request,
-          knownLastRecordDate: lastKnownRecordDate,
+          lastModified: lastModified,
         });
       }
     });
@@ -1249,10 +1251,10 @@ export class RemoteListener {
       this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
 
       if (requiresFeedback) {
-        const lastKnownRecordDate = this.parentedSearchListeners[listenerKey].lastKnownRecordDate;
+        const lastModified = this.parentedSearchListeners[listenerKey].lastModified;
         this.requestParentedSearchFeedbackFor({
           ...this.parentedSearchListeners[listenerKey].request,
-          knownLastRecordDate: lastKnownRecordDate,
+          lastModified: lastModified,
         });
       }
     });

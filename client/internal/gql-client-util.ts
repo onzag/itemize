@@ -913,7 +913,7 @@ interface IRunSearchQueryResult {
   count: number,
   limit: number,
   offset: number,
-  knownLastRecordDate: string,
+  lastModified: string,
 }
 
 /**
@@ -996,7 +996,9 @@ export async function runSearchQueryFor(
   searchArgs.limit = arg.limit;
   searchArgs.offset = arg.offset;
 
-  let knownLastRecordDate: string = null;
+  // when the search was last modified
+  // in practice the last modified of the last record
+  let lastModified: string = null;
 
   let gqlValue: IGQLEndpointValue;
   // if we are in a search with
@@ -1039,7 +1041,7 @@ export async function runSearchQueryFor(
 
     // last record date of the given record
     // might be null, if no records
-    knownLastRecordDate = cacheWorkerGivenSearchValue.lastRecordDate;
+    lastModified = cacheWorkerGivenSearchValue.lastModified;
 
     // note that this value doesn't contain the count, it contains
     // the limit and the offset but not the count that is because
@@ -1051,7 +1053,7 @@ export async function runSearchQueryFor(
           searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             createdBy: arg.createdBy,
-            knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
+            lastModified: cacheWorkerGivenSearchValue.lastModified,
           });
         } else {
           searchOptions.remoteListener.requestParentedSearchFeedbackFor({
@@ -1059,7 +1061,7 @@ export async function runSearchQueryFor(
             parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
             parentId: arg.parentedBy.id,
             parentVersion: arg.parentedBy.version || null,
-            knownLastRecordDate: cacheWorkerGivenSearchValue.lastRecordDate,
+            lastModified: cacheWorkerGivenSearchValue.lastModified,
           });
         }
       }
@@ -1078,7 +1080,7 @@ export async function runSearchQueryFor(
         count: {},
         limit: {},
         offset: {},
-        last_record_date: {},
+        last_modified: {},
       },
     });
 
@@ -1090,7 +1092,7 @@ export async function runSearchQueryFor(
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
     if (data) {
-      knownLastRecordDate = data.last_record_date as string;
+      lastModified = data.last_modified as string;
     }
   } else {
     const query = buildGqlQuery({
@@ -1101,7 +1103,7 @@ export async function runSearchQueryFor(
         count: {},
         limit: {},
         offset: {},
-        last_record_date: {},
+        last_modified: {},
       },
     });
 
@@ -1113,7 +1115,7 @@ export async function runSearchQueryFor(
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
     if (data) {
-      knownLastRecordDate = data.last_record_date as string;
+      lastModified = data.last_modified as string;
     }
   }
 
@@ -1137,7 +1139,7 @@ export async function runSearchQueryFor(
 
     // sometimes count is not there, this happens when using the cached search
     // as the cached search doesn't perform any counting so it doesn't return such data
-    // check out the cache worker to see that it returns records, last_record_date,
+    // check out the cache worker to see that it returns records, last_modified,
     // limit and offset, but no count, so we collapse the count to all the given results that
     // were provided
     if (data && count === null) {
@@ -1151,7 +1153,7 @@ export async function runSearchQueryFor(
       limit,
       offset,
       count,
-      knownLastRecordDate,
+      lastModified,
     };
   } else {
     const records: IGQLSearchRecord[] = (
@@ -1159,7 +1161,7 @@ export async function runSearchQueryFor(
         type: v.type,
         version: v.version || null,
         id: v.id || null,
-        created_at: (v.DATA && (v.DATA as any).created_at) || null
+        last_modified: (v.DATA && (v.DATA as any).last_modified) || null
       }))
     ) as IGQLSearchRecord[] || null;
   
@@ -1170,7 +1172,7 @@ export async function runSearchQueryFor(
       limit,
       offset,
       count,
-      knownLastRecordDate,
+      lastModified,
     };
   }
 }

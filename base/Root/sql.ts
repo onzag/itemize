@@ -156,6 +156,10 @@ export function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDef
         type: "text",
         notNull: true,
       },
+      module: {
+        type: "text",
+        notNull: true
+      },
       type: {
         type: "text",
         notNull: true

@@ -39,11 +39,12 @@ export class ItemizeRedisClient {
     this.callFn = this.callFn.bind(this);
 
     this.get = this.callFn(promisify(this.redisClient.get).bind(this.redisClient));
-    this.set = this.callFn(promisify(this.redisClient.set).bind(this.redisClient));
-    this.flushall = this.callFn(promisify(this.redisClient.flushall).bind(this.redisClient));
-    this.expire = this.callFn(promisify(this.redisClient.expire).bind(this.redisClient));
     this.exists = this.callFn(promisify(this.redisClient.exists).bind(this.redisClient));
-    this.del = this.callFn(promisify(this.redisClient.del).bind(this.redisClient));
+
+    this.set = promisify(this.redisClient.set).bind(this.redisClient);
+    this.flushall = promisify(this.redisClient.flushall).bind(this.redisClient);
+    this.expire = promisify(this.redisClient.expire).bind(this.redisClient);
+    this.del = promisify(this.redisClient.del).bind(this.redisClient);
   }
 
   /**

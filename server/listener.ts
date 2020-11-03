@@ -30,10 +30,10 @@ import {
   IOwnedSearchUnregisterRequest,
   IParentedSearchUnregisterRequest,
   BUILDNUMBER_EVENT,
-  OWNED_SEARCH_RECORDS_ADDED_EVENT,
-  IOwnedSearchRecordsAddedEvent,
-  IParentedSearchRecordsAddedEvent,
-  PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+  OWNED_SEARCH_RECORDS_EVENT,
+  IOwnedSearchRecordsEvent,
+  IParentedSearchRecordsEvent,
+  PARENTED_SEARCH_RECORDS_EVENT,
   CHANGED_FEEEDBACK_EVENT,
   IChangedFeedbackEvent,
   IDENTIFIED_EVENT,
@@ -56,12 +56,13 @@ import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
 import { SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER } from "../constants";
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import { ItemizeRedisClient } from "./redis";
+import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -744,34 +745,76 @@ export class Listener {
         return;
       }
 
-      const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
+      const query = this.knex.select(["id", "version", "type", "last_modified"]);
+      if (request.lastModified) {
+        query.select("?? > ? AS WAS_CREATED", ["created_at", request.lastModified]);
+      } else {
+        query.select("TRUE AS WAS_CREATED");
+      }
+      query.from(mod.getQualifiedPathName());
       if (requiredType) {
         query.where("type", requiredType);
       }
 
       query.andWhere("created_by", request.createdBy);
       // the know last record might be null in case of empty searches
-      if (request.knownLastRecordDate) {
-        query.andWhere("created_at", ">", request.knownLastRecordDate);
+      if (request.lastModified) {
+        query.andWhere("last_modified", ">", request.lastModified);
       }
-      query.orderBy("created_at", "desc");
 
-      const newRecords: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
+      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
 
-      if (newRecords.length) {
-        const event: IOwnedSearchRecordsAddedEvent = {
+      const deletedQuery = this.knex.select(["id", "version", "type", "transaction_time"])
+        .from(DELETED_REGISTRY_IDENTIFIER).where("module", mod.getQualifiedPathName()).andWhere("created_by", request.createdBy);
+      if (requiredType) {
+        deletedQuery.where("type", requiredType);
+      }
+      deletedQuery.andWhere("transaction_time", ">", request.lastModified);
+
+      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+        .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.transaction_time,
+          }
+        ));
+
+      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+
+      if (totalDiffRecordCount) {
+        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+
+        const event: IOwnedSearchRecordsEvent = {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: newRecords as IGQLSearchRecord[],
-          // this contains all the data and the new record has the right form
-          newLastRecordDate: (newRecords[0] as IGQLSearchRecord).created_at,
+          newRecords,
+          lostRecords,
+          modifiedRecords,
+          newLastModified: findLastRecordLastModifiedDate(newRecords, lostRecords, modifiedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.ownedSearchFeedback: triggering " + OWNED_SEARCH_RECORDS_ADDED_EVENT,
+          "Listener.ownedSearchFeedback: triggering " + OWNED_SEARCH_RECORDS_EVENT,
           event,
         );
         socket.emit(
-          OWNED_SEARCH_RECORDS_ADDED_EVENT,
+          OWNED_SEARCH_RECORDS_EVENT,
           event,
         );
       }
@@ -846,6 +889,12 @@ export class Listener {
       }
 
       const query = this.knex.select(["id", "version", "type", "created_at"]).from(mod.getQualifiedPathName());
+      if (request.lastModified) {
+        query.select("?? > ? AS WAS_CREATED", ["created_at", request.lastModified]);
+      } else {
+        query.select("TRUE AS WAS_CREATED");
+      }
+      query.from(mod.getQualifiedPathName());
       if (requiredType) {
         query.where("type", requiredType);
       }
@@ -854,28 +903,66 @@ export class Listener {
       query.andWhere("parent_version", request.parentVersion || null);
       query.andWhere("parent_type", request.parentType);
       // the know last record might be null in case of empty searches
-      if (request.knownLastRecordDate) {
-        query.andWhere("created_at", ">", request.knownLastRecordDate);
+      if (request.lastModified) {
+        query.andWhere("last_modified", ">", request.lastModified);
       }
-      query.orderBy("created_at", "desc");
 
-      const newRecords: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
+      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
 
-      if (newRecords.length) {
-        const event: IParentedSearchRecordsAddedEvent = {
+      const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+      const deletedQuery = this.knex.select(["id", "version", "type", "transaction_time"])
+        .from(DELETED_REGISTRY_IDENTIFIER).where("module", mod.getQualifiedPathName()).andWhere("parenting_id", parentingId);
+      if (requiredType) {
+        deletedQuery.where("type", requiredType);
+      }
+      deletedQuery.andWhere("transaction_time", ">", request.lastModified);
+
+      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+        .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.transaction_time,
+          }
+        ));
+
+      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+
+      if (totalDiffRecordCount) {
+        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+
+        const event: IParentedSearchRecordsEvent = {
           parentId: request.parentId,
           parentVersion: request.parentVersion,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: newRecords as IGQLSearchRecord[],
-          newLastRecordDate: (newRecords[0] as IGQLSearchRecord).created_at,
+          newRecords,
+          modifiedRecords,
+          lostRecords,
+          newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.parentedSearchFeedback: emmitting " + PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+          "Listener.parentedSearchFeedback: emmitting " + PARENTED_SEARCH_RECORDS_EVENT,
           event,
         );
         socket.emit(
-          PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+          PARENTED_SEARCH_RECORDS_EVENT,
           event,
         );
       }
@@ -1158,12 +1245,12 @@ export class Listener {
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerOwnedSearchListeners(
-    event: IOwnedSearchRecordsAddedEvent,
+    event: IOwnedSearchRecordsEvent,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "OWNED_SEARCH." + event.qualifiedPathName + "." + event.createdBy;
     const redisEvent: IRedisEvent = {
-      type: OWNED_SEARCH_RECORDS_ADDED_EVENT,
+      type: OWNED_SEARCH_RECORDS_EVENT,
       event,
       listenerUUID,
       mergedIndexIdentifier,
@@ -1177,7 +1264,7 @@ export class Listener {
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
   public triggerParentedSearchListeners(
-    event: IParentedSearchRecordsAddedEvent,
+    event: IParentedSearchRecordsEvent,
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
@@ -1186,7 +1273,7 @@ export class Listener {
       event,
       listenerUUID,
       mergedIndexIdentifier,
-      type: PARENTED_SEARCH_RECORDS_ADDED_EVENT,
+      type: PARENTED_SEARCH_RECORDS_EVENT,
       serverInstanceGroupId: INSTANCE_GROUP_ID,
       source: "global",
     }

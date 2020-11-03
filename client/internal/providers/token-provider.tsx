@@ -292,18 +292,23 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
 
+      let cookieEnd = ";domain=" + location.host;
+      if (!location.host.startsWith("localhost")) {
+        cookieEnd = ";secure=true";
+      }
+
       // so if we got the token, and assumingly an id and role; aka
       // we are not guests
       if (tokenDataToken !== null) {
         // we set them
-        document.cookie = "token=" + tokenDataToken + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
-        document.cookie = "role=" + tokenDataRole + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
-        document.cookie = "id=" + tokenDataId + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
+        document.cookie = "token=" + tokenDataToken + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
+        document.cookie = "role=" + tokenDataRole + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
+        document.cookie = "id=" + tokenDataId + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
       } else {
         // otherwise we want to remove these cookies
-        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-        document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-        document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
+        document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+        document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+        document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
       }
     } else {
       // otherwise if we are offline, we are going to trust our cookies

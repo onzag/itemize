@@ -32,6 +32,15 @@ if (isDevelopment) {
 }
 
 /**
+ * How to end cookies
+ * @ignore
+ */
+let cookieEnd = ";domain=" + location.host;
+if (!location.host.startsWith("localhost")) {
+  cookieEnd = ";secure=true";
+}
+
+/**
  * The props for the application, this initial information
  * must be passed by the initializer and it't available via
  * the rest endpoint, for the given languages
@@ -202,7 +211,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // so we try
     try {
       // get the new factors
-      const newFactors: {[code: string]: number} = await fetch(`/rest/currency-factors`).then((r) => r.json());
+      const newFactors: { [code: string]: number } = await fetch(`/rest/currency-factors`).then((r) => r.json());
       const currentFactors = this.state.specifiedCurrencyFactors;
       // and if they don't equal to the current we set the state
       if (!equals(currentFactors, newFactors)) {
@@ -265,7 +274,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
       // now we need the user definition
       const userItemDefinition = this.props.root
-          .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
+        .getModuleFor(["users"]).getItemDefinitionFor(["user"]);
 
       // so we can run an edit query, this will update
       // the cache too
@@ -332,7 +341,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     Moment.locale(locale);
 
     // And we set the language
-    document.cookie = "lang=" + locale + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/"
+    document.cookie = "lang=" + locale + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
 
     // now we set the html lang in locale
     document.body.parentElement.lang = locale;
@@ -452,7 +461,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // Now we set the country in local storage
-    document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
+    document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_country", codeToSet);
     }
@@ -517,7 +526,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
 
     // We set the currency in local storage
-    document.cookie = "currency=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/";
+    document.cookie = "currency=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
       this.updateUserProperty("app_currency", codeToSet);
     }
@@ -576,12 +585,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
           <div id="main" dir={rtl ? "rtl" : "ltr"}>
             {
               this.props.mainWrapper ?
-              this.props.mainWrapper(
-                this.props.mainComponent,
-                this.props.config,
-                localeContextValue,
-              ) :
-              this.props.mainComponent
+                this.props.mainWrapper(
+                  this.props.mainComponent,
+                  this.props.config,
+                  localeContextValue,
+                ) :
+                this.props.mainComponent
             }
           </div>
         </TokenProvider>

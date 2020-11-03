@@ -14,11 +14,11 @@ import {
   IFeedbackRequest,
   IIdentifyRequest,
   IOwnedSearchFeedbackRequest,
-  IOwnedSearchRecordsAddedEvent,
+  IOwnedSearchRecordsEvent,
   IOwnedSearchRegisterRequest,
   IOwnedSearchUnregisterRequest,
   IParentedSearchFeedbackRequest,
-  IParentedSearchRecordsAddedEvent,
+  IParentedSearchRecordsEvent,
   IParentedSearchRegisterRequest,
   IParentedSearchUnregisterRequest,
   IRegisterRequest,
@@ -103,11 +103,11 @@ export interface IChangedFeedbackEventWithTime extends IChangedFeedbackEvent {
   time: string;
 }
 
-export interface IOwnedSearchRecordsAddedEventWithTime extends IOwnedSearchRecordsAddedEvent {
+export interface IOwnedSearchRecordsAddedEventWithTime extends IOwnedSearchRecordsEvent {
   time: string;
 }
 
-export interface IParentedSearchRecordsAddedEventWithTime extends IParentedSearchRecordsAddedEvent {
+export interface IParentedSearchRecordsAddedEventWithTime extends IParentedSearchRecordsEvent {
   time: string;
 }
 

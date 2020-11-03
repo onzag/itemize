@@ -229,35 +229,49 @@ export function userRestServices(appData: IAppDataType) {
     }
 
     if (isValidPassword || assignedToken) {
+      const useSecure = !req.headers.host || !req.headers.host.startsWith("localhost");
+      const host = req.headers.host;
       res.cookie("token", assignedToken, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.cookie("lang", user.app_language, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.cookie("country", user.app_country, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.cookie("currency", user.app_currency, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.cookie("id", user.id, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.cookie("role", user.role, {
         httpOnly: false,
         expires: new Date(9999999999999),
         path: "/",
+        secure: useSecure,
+        domain: host,
       });
       res.redirect(`/${user.app_language}${redirect}`);
     } else {

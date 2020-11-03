@@ -21,7 +21,7 @@ import Root from "../base/Root";
 import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
-import { IOwnedSearchRecordsAddedEvent, IParentedSearchRecordsAddedEvent } from "../base/remote-protocol";
+import { IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
 import { logger, IServerDataType } from ".";
@@ -29,6 +29,7 @@ import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { ItemizeRedisClient } from "./redis";
+import Module from "../base/Root/Module";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -198,6 +199,87 @@ export class Cache {
       version: version || null,
     });
     return this.setRaw(idefQueryIdentifier, value);
+  }
+
+  public triggerSearchListenersFor(
+    itemDefinition: ItemDefinition,
+    createdBy: number,
+    parent: {
+      type: string,
+      id: number,
+      version: string,
+    },
+    record: IGQLSearchRecord,
+    location: "new" | "lost" | "modified",
+  ) {
+    const newRecordArr = [record];
+    const idefQualifiedPathName = itemDefinition.getQualifiedPathName();
+    const modQualifiedPathName = itemDefinition.getParentModule().getQualifiedPathName();
+    const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsEvent = {
+      qualifiedPathName: idefQualifiedPathName,
+      createdBy: itemDefinition.isOwnerObjectId() ? record.id : createdBy,
+      newRecords: location === "new" ? newRecordArr : [],
+      lostRecords: location === "lost" ? newRecordArr : [],
+      modifiedRecords: location === "modified" ? newRecordArr : [],
+      newLastModified: record.last_modified,
+    };
+
+    CAN_LOG_DEBUG && logger.debug(
+      "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
+      itemDefinitionBasedOwnedEvent,
+    );
+    this.listener.triggerOwnedSearchListeners(
+      itemDefinitionBasedOwnedEvent,
+      null, // TODO add the listener uuid, maybe?
+    );
+
+    const moduleBasedOwnedEvent: IOwnedSearchRecordsEvent = {
+      ...itemDefinitionBasedOwnedEvent,
+      qualifiedPathName: modQualifiedPathName,
+    };
+
+    CAN_LOG_DEBUG && logger.debug(
+      "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
+      moduleBasedOwnedEvent,
+    );
+    this.listener.triggerOwnedSearchListeners(
+      moduleBasedOwnedEvent,
+      null, // TODO add the listener uuid, maybe?
+    );
+
+    if (parent) {
+      const itemDefinitionBasedParentedEvent: IParentedSearchRecordsEvent = {
+        qualifiedPathName: idefQualifiedPathName,
+        parentId: parent.id,
+        parentVersion: parent.version || null,
+        parentType: parent.type,
+        newRecords: location === "new" ? newRecordArr : [],
+        lostRecords: location === "lost" ? newRecordArr : [],
+        modifiedRecords: location === "modified" ? newRecordArr : [],
+        newLastModified: record.last_modified,
+      };
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)",
+        itemDefinitionBasedParentedEvent,
+      );
+      this.listener.triggerParentedSearchListeners(
+        itemDefinitionBasedParentedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+
+      const moduleBasedParentedEvent: IParentedSearchRecordsEvent = {
+        ...itemDefinitionBasedParentedEvent,
+        qualifiedPathName: modQualifiedPathName,
+      };
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)",
+        moduleBasedParentedEvent,
+      );
+      this.listener.triggerParentedSearchListeners(
+        moduleBasedParentedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+    }
   }
 
   /**
@@ -459,74 +541,16 @@ export class Cache {
         id: sqlValue.id,
         version: sqlValue.version || null,
         type: selfTable,
-        created_at: sqlValue.created_at,
+        last_modified: sqlValue.last_modified,
       };
 
-      const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
-        qualifiedPathName: selfTable,
-        createdBy: itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlModData.created_by,
-        newRecords: [
-          searchResultForThisValue,
-        ],
-        newLastRecordDate: searchResultForThisValue.created_at,
-      };
-
-      CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
-        itemDefinitionBasedOwnedEvent,
+      this.triggerSearchListenersFor(
+        itemDefinition,
+        createdBy,
+        parent,
+        searchResultForThisValue,
+        "new",
       );
-      this.listener.triggerOwnedSearchListeners(
-        itemDefinitionBasedOwnedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
-
-      const moduleBasedOwnedEvent: IOwnedSearchRecordsAddedEvent = {
-        ...itemDefinitionBasedOwnedEvent,
-        qualifiedPathName: moduleTable,
-      };
-
-      CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
-        moduleBasedOwnedEvent,
-      );
-      this.listener.triggerOwnedSearchListeners(
-        moduleBasedOwnedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
-
-      if (parent) {
-        const itemDefinitionBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
-          qualifiedPathName: selfTable,
-          parentId: parent.id,
-          parentVersion: parent.version || null,
-          parentType: parent.type,
-          newRecords: [
-            searchResultForThisValue,
-          ],
-          newLastRecordDate: searchResultForThisValue.created_at,
-        };
-        CAN_LOG_DEBUG && logger.debug(
-          "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)",
-          itemDefinitionBasedParentedEvent,
-        );
-        this.listener.triggerParentedSearchListeners(
-          itemDefinitionBasedParentedEvent,
-          null, // TODO add the listener uuid, maybe?
-        );
-
-        const moduleBasedParentedEvent: IParentedSearchRecordsAddedEvent = {
-          ...itemDefinitionBasedParentedEvent,
-          qualifiedPathName: moduleTable,
-        };
-        CAN_LOG_DEBUG && logger.debug(
-          "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)",
-          moduleBasedParentedEvent,
-        );
-        this.listener.triggerParentedSearchListeners(
-          moduleBasedParentedEvent,
-          null, // TODO add the listener uuid, maybe?
-        );
-      }
     })();
 
     return sqlValue;
@@ -819,9 +843,159 @@ export class Cache {
         sqlValue,
         listenerUUID || null,
       );
+
+      const searchRecord: IGQLSearchRecord = {
+        id,
+        version: version || null,
+        type: selfTable,
+        last_modified: sqlValue.last_modified,
+      };
+
+      this.triggerSearchListenersFor(
+        itemDefinition,
+        sqlValue.created_by || null,
+        (
+          sqlValue.parent_id ? {
+            id: sqlValue.parent_id,
+            version: sqlValue.parent_version || null,
+            type: sqlValue.parent_type,
+          } : null
+        ),
+        searchRecord,
+        "modified",
+      );
     })();
 
     return sqlValue;
+  }
+
+  /**
+  * This function analyzes an item definition to check for a possible
+  * parent and returns true if there's any parent rule within itself, including
+  * its children that matches the possible parent
+  * @param possibleParent the possible parent
+  * @param idef the item definition in question
+  * @returns a simple boolean
+  */
+  private analyzeIdefForPossibleParent(possibleParent: ItemDefinition, idef: ItemDefinition): boolean {
+    const canBeParented = idef.checkCanBeParentedBy(possibleParent, false);
+    if (canBeParented) {
+      return true;
+    }
+
+    return idef.getChildDefinitions().some(this.analyzeIdefForPossibleParent.bind(this, possibleParent));
+  }
+
+  /**
+  * This function finds modules for a given module, including its children
+  * that do match a possible parent rule
+  * @param possibleParent the possible parent
+  * @param module the current module to analyze
+  * @returns a list of modules
+  */
+  private analyzeModuleForPossibleParent(possibleParent: ItemDefinition, module: Module): Module[] {
+    // first we set up the modules we have collected, nothing yet
+    let collectedModules: Module[] = [];
+    // now we check if at least one of the item definitions within this module
+    // can be set as child of the given possible parent
+    const canAtLeastOneIdefBeChildOf = module.getAllChildItemDefinitions().some(this.analyzeIdefForPossibleParent.bind(this, possibleParent));
+    // if that's the case we add this same module to the list
+    if (canAtLeastOneIdefBeChildOf) {
+      collectedModules.push(module);
+    }
+
+    // now we need to check the child modules, for that we run this function recursively
+    const childModules = module.getAllModules().map(this.analyzeModuleForPossibleParent.bind(this, possibleParent)) as Module[];
+    // and now we check if we got anything, if we did
+    if (childModules.length) {
+      // we concat the result
+      collectedModules = collectedModules.concat(childModules);
+    }
+
+    // and return that
+    return collectedModules;
+  }
+
+  /**
+ * Deletes all the possible children that might have been set as parent of the deleted
+ * item definition value
+ * @param itemDefinition 
+ * @param id 
+ * @param version 
+ */
+  private async deletePossibleChildrenOf(
+    itemDefinition: ItemDefinition,
+    id: number,
+    version: string,
+  ) {
+    // first we need to find if there is even such a rule and in which modules so we can
+    // query the database
+    const modulesThatMightBeSetAsChildOf: Module[] =
+      this.root.getAllModules().map(this.analyzeModuleForPossibleParent.bind(this, itemDefinition)).flat() as Module[];
+
+    // if such is the case
+    if (modulesThatMightBeSetAsChildOf.length) {
+      // we get this is our current deleted item qualified name, and it's our parent type
+      const idefQualified = itemDefinition.getQualifiedPathName();
+
+      // now we can loop in these modules
+      await Promise.all(modulesThatMightBeSetAsChildOf.map(async (mod) => {
+        // and ask for results from the module table, where parents do match this
+        let results: ISQLTableRowValue[];
+        try {
+          results = await this.knex.select(["id", "version", "type", "container_id"]).from(mod.getQualifiedPathName()).where({
+            parent_id: id,
+            parent_version: version || "",
+            parent_type: idefQualified,
+          });
+        } catch (err) {
+          logger.error(
+            "Cache.deletePossibleChildrenOf (MAYBE-ORPHANED): Failed to attempt to find orphans for deleting",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              parentItemDefinition: itemDefinition.getQualifiedPathName(),
+              parentId: id,
+              parentVersion: version,
+              moduleChildCheck: mod.getQualifiedPathName(),
+            },
+          );
+          return;
+        }
+
+        // if we got results
+        if (results.length) {
+          // then we need to delete each, one by one
+          await Promise.all(results.map(async (r) => {
+            // we use the registry to get the proper item definition that represented
+            // that module item
+            const deleteItemDefinition = this.root.registry[r.type] as ItemDefinition;
+            try {
+              // and request a delete on it
+              await this.requestDelete(
+                deleteItemDefinition,
+                r.id,
+                r.version || null,
+                false,
+                r.container_id,
+                null,
+              );
+            } catch (err) {
+              logger.error(
+                "Cache.deletePossibleChildrenOf (ORPHANED): Failed to delete an orphan",
+                {
+                  errMessage: err.message,
+                  errStack: err.stack,
+                  orphanItemDefinition: deleteItemDefinition.getQualifiedPathName(),
+                  orphanId: r.id,
+                  orphanVersion: r.version || null,
+                },
+              );
+            }
+          }));
+        }
+      }));
+    }
   }
 
   /**
@@ -845,6 +1019,7 @@ export class Cache {
     containerId: string,
     listenerUUID: string,
   ): Promise<void> {
+    // so first we need to get these two
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
@@ -853,21 +1028,46 @@ export class Cache {
       moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
     );
 
+    // whether we have a container for this
     const containerExists = containerId && this.storageClients[containerId];
 
-    let deleteFilesInContainer = async (specifiedVersion: string) => {
+    // this helper function will allow us to delete all the files
+    // for a given version, if we are dropping all version this is useful
+    // we want to delete files
+    const deleteFilesInContainer = async (specifiedVersion: string) => {
+      // first we need to find if we have any file type in either the property
+      // definitions of the prop extensions, any will do
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
       const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+
+      // for item definition found files
       if (someFilesInItemDef) {
+        // we need to ensure the container exists and is some value
         if (containerExists) {
-          await deleteEverythingInFilesContainerId(
-            this.domain,
-            this.storageClients[containerId],
-            itemDefinition,
-            id + "." + (specifiedVersion || null),
-          );
+          // and now we can try to delete everything in there
+          // for our given domain and with the handle mysite.com/MOD_x__IDEF_y/id.version
+          // that will delete literally everything for the given id.version combo
+          try {
+            await deleteEverythingInFilesContainerId(
+              this.domain,
+              this.storageClients[containerId],
+              itemDefinition,
+              id + "." + (specifiedVersion || null),
+            );
+          } catch (err) {
+            logger.error(
+              "Cache.requestDelete [SERIOUS]: Could not remove all the files for item definition storage",
+              {
+                domain: this.domain,
+                containerId,
+                itemDefinition: itemDefinition.getQualifiedPathName(),
+                id,
+                version: specifiedVersion || null,
+              }
+            );
+          }
         } else {
           logger.warn(
             "Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available",
@@ -877,14 +1077,29 @@ export class Cache {
           );
         }
       }
+
+      // this is doing exactly the same but for the module
       if (someFilesInModule) {
         if (containerExists) {
-          await deleteEverythingInFilesContainerId(
-            this.domain,
-            this.storageClients[containerId],
-            itemDefinition.getParentModule(),
-            id + "." + (specifiedVersion || null),
-          );
+          try {
+            await deleteEverythingInFilesContainerId(
+              this.domain,
+              this.storageClients[containerId],
+              itemDefinition.getParentModule(),
+              id + "." + (specifiedVersion || null),
+            );
+          } catch (err) {
+            logger.error(
+              "Cache.requestDelete [SERIOUS]: Could not remove all the files for module storage",
+              {
+                domain: this.domain,
+                containerId,
+                module: itemDefinition.getParentModule().getQualifiedPathName(),
+                id,
+                version: specifiedVersion || null,
+              }
+            );
+          }
         } else {
           logger.warn(
             "Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
@@ -896,74 +1111,157 @@ export class Cache {
       }
     }
 
-    let runDetachedEvents = async (specifiedVersion: string) => {
-      await this.forceCacheInto(selfTable, id, specifiedVersion || null, null);
-      const changeEvent: IChangedFeedbackEvent = {
-        itemDefinition: selfTable,
-        id,
-        version: specifiedVersion || null,
-        type: "not_found",
-        lastModified: null,
-      };
-      this.listener.triggerChangedListeners(
-        changeEvent,
-        null,
-        listenerUUID || null,
-      );
+    // performs the proper deletetition of whatever is in there
+    // it takes the record that represents what we are deleting, the parent (or null) and the creator
+    const performProperDeleteOf = async (record: IGQLSearchRecord, parent: { id: number; version: string; type: string }, createdBy: number) => {
+      // got to cascade and delete all the children, this method should be able to execute after
+      this.deletePossibleChildrenOf(itemDefinition, id, record.version);
+      // got to trigger the search listeners saying we have just lost an item
+      this.triggerSearchListenersFor(itemDefinition, createdBy, parent, record, "lost");
+
+      try {
+        // update the cache with the new value
+        await this.forceCacheInto(selfTable, id, record.version, null);
+        // trigger the change event informing of the update
+        const changeEvent: IChangedFeedbackEvent = {
+          itemDefinition: selfTable,
+          id,
+          version: record.version,
+          type: "not_found",
+          lastModified: null,
+        };
+        this.listener.triggerChangedListeners(
+          changeEvent,
+          null,
+          listenerUUID || null,
+        );
+        // we don't await for this delete to happen
+        deleteFilesInContainer(record.version);
+      } catch (err) {
+        logger.error(
+          "Cache.requestDelete: Could not force cache into new value",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+      }
     }
 
+    // now time to do this and actually do the dropping
     try {
+      // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
+        // for that we run a transaction
         const allVersionsDropped: ISQLTableRowValue[] = await this.knex.transaction(async (transactionKnex) => {
+          // and we delete based on id and type
           const allVersionsDroppedInternal: ISQLTableRowValue[] = await transactionKnex(moduleTable).delete().where({
             id,
             type: selfTable,
           }).returning(["version", "parent_id", "parent_type", "parent_version", "created_by"]);
+          // but yet we return the version to see what we dropped, and well parenting and creator
 
-          await Promise.all(allVersionsDroppedInternal.map(async (row) => {
-            await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
+          // and now we need to store the fact we have lost these records in the deleted registry
+          const trasactionTimes = await Promise.all(allVersionsDroppedInternal.map(async (row) => {
+            const insertQueryValue = await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
               id,
               version: version || "",
               type: selfTable,
+              module: moduleTable,
               created_by: row.created_by || null,
               parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
               transaction_time: transactionKnex.fn.now(),
-            });
+            }).returning("transaction_time");
+
+            // but we need the transaction time for each as the new record
+            // last_modified is that transaction time
+            return insertQueryValue[0].transaction_time as string;
           }));
 
-          return allVersionsDroppedInternal;
+          // now we return these rows we got with version, parent_id, parent_type, parent_version and created_by
+          // but we add last_modified based on the insert query
+          return allVersionsDroppedInternal.map((row, index) => ({
+            ...row,
+            last_modified: trasactionTimes[index],
+          }));
         });
 
+        // and now we can see all what we have dropped
         allVersionsDropped.forEach((row) => {
           // this version can be null (aka empty string)
-          const retrievedVersion = row.version || null;
-          deleteFilesInContainer(retrievedVersion);
-          runDetachedEvents(retrievedVersion);
+          // we need to construct the record
+          // the last modified is the transaction time of the deletition
+          const record: IGQLSearchRecord = {
+            id,
+            version: row.version || null,
+            last_modified: row.last_modified,
+            type: selfTable,
+          };
+          // build the parent
+          const parent = row.parent_id ? {
+            id: row.parent_id,
+            type: row.parent_type,
+            version: row.parent_version || null,
+          } : null;
+          const createdBy = row.created_by;
+
+          // and now we can perform the proper delete where
+          // we update the caches
+          // we do this without awaiting, as for all it concerns
+          // our action is done and only events will need to fire
+          performProperDeleteOf(record, parent, createdBy);
         });
       } else {
-        await this.knex.transaction(async (transactionKnex) => {
+        // otherwise if we are deleting a specific version
+        const row = await this.knex.transaction(async (transactionKnex) => {
           // we run this
           // because the index in the item definition cascades
-          const rows = await transactionKnex(moduleTable).delete().where({
+          const internalDroppedRows = await transactionKnex(moduleTable).delete().where({
             id,
             version: version || "",
             type: selfTable,
           }).returning(["parent_id", "parent_type", "parent_version", "created_by"]);
-          const row = rows[0];
 
-          await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
+          // now we got the row we have dropped, it's the first one
+          const interalDroppedRow = internalDroppedRows[0];
+
+          // and now we got to insert that row into the deleted registry
+          // and retrieve the transaction time
+          const insertQueryValue = await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
             id,
             version: version || "",
             type: selfTable,
-            created_by: row.created_by || null,
-            parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+            module: moduleTable,
+            created_by: interalDroppedRow.created_by || null,
+            parenting_id: interalDroppedRow.parent_id ?
+              (interalDroppedRow.parent_type + "." + interalDroppedRow.parent_id + "." + interalDroppedRow.parent_version || "") :
+              null,
             transaction_time: transactionKnex.fn.now(),
-          });
+          }).returning("transaction_time");
+
+          // and we set it as last modified
+          return {
+            ...interalDroppedRow,
+            last_modified: insertQueryValue[0].transaction_time,
+          };
         });
 
+        // now we can build our search record
+        const record: IGQLSearchRecord = {
+          id,
+          version: version || null,
+          last_modified: row.last_modified,
+          type: selfTable,
+        };
+        // the parent
+        const parent = row.parent_id ? {
+          id: row.parent_id,
+          type: row.parent_type,
+          version: row.parent_version || null,
+        } : null;
+        const createdBy = row.created_by;
         // we don't want to await any of this
-        deleteFilesInContainer(version);
-        runDetachedEvents(version);
+        performProperDeleteOf(record, parent, createdBy);
       }
     } catch (err) {
       logger.error(
@@ -982,6 +1280,14 @@ export class Cache {
     }
   }
 
+  /**
+   * Provides a valid token for a given
+   * user, you might not really want to use this method
+   * unless you are fairly sure as these are permanent tokens
+   * for users for their given session id, normally you would use
+   * these tokens for redirected logins
+   * @param id the user id
+   */
   public async requestToken(
     id: number,
   ) {
@@ -1114,10 +1420,17 @@ export class Cache {
     return resultValues;
   }
 
+  /**
+   * Provides the current server data
+   */
   public getServerData() {
     return this.serverData;
   }
 
+  /**
+   * This function is called once new server data was informed by a redis event
+   * @param newData the new server data that redis is giving
+   */
   public onServerDataChangeInformed(newData: IServerDataType) {
     CAN_LOG_DEBUG && logger.debug(
       "Cache.onServerDataChangeInformed: new server data has been informed",
@@ -1153,18 +1466,18 @@ export class Cache {
           await this.forceCacheInto(itemDefinition, id, version, data);
         }
       } else {
-          // it's done, the value has just expired and it's not hold in
-          // memory, we are done updating the redis database, we don't do anything
-          // we don't need to worry about this value unless it's further requested
-          // down the line
+        // it's done, the value has just expired and it's not hold in
+        // memory, we are done updating the redis database, we don't do anything
+        // we don't need to worry about this value unless it's further requested
+        // down the line
 
-          // we simply unregister the event, if a client requests it later
-          // it will be re registered and value fetched and repopulated
-          this.listener.unregisterSS({
-            itemDefinition,
-            id,
-            version,
-          });
+        // we simply unregister the event, if a client requests it later
+        // it will be re registered and value fetched and repopulated
+        this.listener.unregisterSS({
+          itemDefinition,
+          id,
+          version,
+        });
       }
     } catch (error) {
       logger.error(

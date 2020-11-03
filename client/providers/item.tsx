@@ -2985,7 +2985,7 @@ export class ActualItemProvider extends
       limit,
       offset,
       error,
-      knownLastRecordDate,
+      lastModified,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
@@ -3019,7 +3019,7 @@ export class ActualItemProvider extends
         this.props.remoteListener.addOwnedSearchListenerFor(
           standardCounterpartQualifiedName,
           options.createdBy,
-          knownLastRecordDate,
+          lastModified,
           this.onSearchReload,
         );
       } else if (listenPolicy === "by-parent") {
@@ -3028,7 +3028,7 @@ export class ActualItemProvider extends
           parentedBy.itemDefinition.getQualifiedPathName(),
           parentedBy.id,
           parentedBy.version || null,
-          knownLastRecordDate,
+          lastModified,
           this.onSearchReload,
         );
       }

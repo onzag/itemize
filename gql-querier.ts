@@ -34,7 +34,7 @@ export interface IGQLSearchRecord {
   /**
    * Whent he record was created
    */
-  created_at: string;
+  last_modified: string;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface IGQLSearchRecord {
  */
 export interface IGQLSearchRecordsContainer {
   records: IGQLSearchRecord[],
-  last_record_date: string,
+  last_modified: string,
   count: number,
   limit: number,
   offset: number,
@@ -58,7 +58,7 @@ export interface IGQLSearchResultsContainer {
   count: number,
   limit: number,
   offset: number,
-  last_record_date: string,
+  last_modified: string,
 }
 
 /**

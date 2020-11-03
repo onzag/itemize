@@ -41,31 +41,11 @@ import { IOTriggerActions } from "../triggers";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
-function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
-  let maximumRecords: IGQLSearchRecord[] = [];
-  let maximumRecordId: number = null;
-  records.forEach((record: IGQLSearchRecord) => {
-    if (!maximumRecordId || record.id > maximumRecordId) {
-      maximumRecordId = record.id;
-      maximumRecords = [record];
-    } else if (maximumRecordId === record.id) {
-      maximumRecords.push(record);
-    }
-  });
-
-  if (!maximumRecords.length) {
+export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
+  if (records.length === 0) {
     return null;
   }
-  if (maximumRecords.length === 1) {
-    return maximumRecords[0].created_at;
-  }
-
-  if (maximumRecords.length === 2) {
-    const versionedRecord = maximumRecords.find((r) => r.version !== null);
-    return versionedRecord.created_at;
-  }
-
-  const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new NanoSecondComposedDate(r.created_at));
+  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
   const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev,cur) => {
     return prev.greaterThan(cur) ? prev : cur;
   });
@@ -316,7 +296,7 @@ export async function searchModule(
           return valueToProvide.toReturnToUser;
         }),
       ),
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count,
@@ -330,7 +310,7 @@ export async function searchModule(
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
       records: baseResult as IGQLSearchRecord[],
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 
@@ -650,7 +630,7 @@ export async function searchItemDefinition(
           return valueToProvide.toReturnToUser;
         })
       ),
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 
@@ -666,7 +646,7 @@ export async function searchItemDefinition(
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
       records: baseResult as IGQLSearchRecord[],
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 
