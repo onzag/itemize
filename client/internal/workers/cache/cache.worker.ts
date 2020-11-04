@@ -542,9 +542,9 @@ export default class CacheWorker {
 
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
-      storeKeyName += createdByIfKnown;
+      storeKeyName += (createdByIfKnown || "");
     } else {
-      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + JSON.stringify(parentVersionIfKnown);
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown|| "");
     }
 
     try {
@@ -565,21 +565,50 @@ export default class CacheWorker {
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
       const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+
+      // the patch has already been applied it must be the same
+      // exact patch
+      if (currentValue.lastModified === newLastModified) {
+        return;
+      }
+
       // there might not be a current value, eg. if for some reason cache policy was set to none and yet
       // there was a listen policy for it, or if otherwise the data got somehow corrupted
       if (currentValue) {
-        const newValue = currentValue.value.map((r) => {
+        let newValue = currentValue.value.map((r) => {
           const matchingLostRecord = lostRecords.find((lr) => lr.id === r.id && lr.version === r.version);
           if (matchingLostRecord) {
             return null;
           }
           const matchingUpdatedRecord = modifiedRecords.find((mr) => mr.id === r.id && mr.version === r.version);
           if (matchingUpdatedRecord) {
+            // just in case and to avoid corruption we should ensure that the new record incoming
+            // for modification is newer than the current one
+            const matchingUpdatedRecordNano = new NanoSecondComposedDate(matchingUpdatedRecord.last_modified);
+            const currentRecordNano = new NanoSecondComposedDate(r.last_modified);
+
+            // if our current is older than the supposed patch update
+            if (currentRecordNano.greaterThan(matchingUpdatedRecordNano)) {
+              // we avoid and return our current since it's newer
+              return r;
+            }
+
+            // otherwise we return the newer patch
             return matchingUpdatedRecord;
           }
 
           return r;
-        }).filter((r) => r !== null).concat(newRecords);
+        }).filter((r) => r !== null);
+
+        // we need to filter the new records to stop duplicates from occurring
+        // this can happen when there are several listeners going on at the same time
+        const newRecordsFiltered: IGQLSearchRecord[] = newRecords.filter((nr) => {
+          const recordAlreadyAdded = newValue.find((r) => r.id === nr.id && r.version === nr.version);
+          return !recordAlreadyAdded;
+        });
+
+        // and now we can concat them
+        newValue = newValue.concat(newRecordsFiltered);
 
         await this.db.put(SEARCHES_TABLE_NAME, {
           ...currentValue,
@@ -713,7 +742,7 @@ export default class CacheWorker {
         // from the search query, the IGQLSearchRecord that we
         // need to process
         resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
-        lastModified = serverValue.data[searchQueryName].lastModified as string;
+        lastModified = serverValue.data[searchQueryName].last_modified as string;
         limitToSetInDb = searchArgs.limit as number;
       } else {
         // otherwise our results to process are the same ones we got

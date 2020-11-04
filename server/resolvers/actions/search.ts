@@ -224,7 +224,7 @@ export async function searchModule(
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
-  const count = (countResult[0] && countResult[0].count) || null;
+  const count = (countResult && countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
@@ -562,7 +562,7 @@ export async function searchItemDefinition(
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
-  const count = (countResult[0] && countResult[0].count) || null;
+  const count = (countResult && countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(

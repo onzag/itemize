@@ -209,6 +209,8 @@ export class RemoteListener {
     this.setCurrencyFactorsHandler = this.setCurrencyFactorsHandler.bind(this);
     this.triggerCurrencyFactorsHandler = this.triggerCurrencyFactorsHandler.bind(this);
     this.consumeDelayedFeedbacks = this.consumeDelayedFeedbacks.bind(this);
+    this.onError = this.onError.bind(this);
+    this.pushTestingInfo = this.pushTestingInfo.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -851,7 +853,7 @@ export class RemoteListener {
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName +
       "." + parentType + "." + parentId + "." + (parentVersion || "");
     // an the listener value
-    const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
+    const listenerValue = this.parentedSearchListeners[qualifiedIdentifier];
     // we ensure we have one already
     if (listenerValue) {
       // and then we remove the callback from it for a new value
@@ -863,7 +865,7 @@ export class RemoteListener {
       // if then we got no callbacks left
       if (newListenerValue.callbacks.length === 0) {
         // we can delete the listener
-        delete this.ownedSearchListeners[qualifiedIdentifier];
+        delete this.parentedSearchListeners[qualifiedIdentifier];
         // and if we are connected
         if (this.socket.connected) {
           // we can unregister the listener
@@ -886,7 +888,7 @@ export class RemoteListener {
         // otherwise if there are callbacks left
       } else {
         // we just update the value with the new callbacks
-        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
+        this.parentedSearchListeners[qualifiedIdentifier] = newListenerValue;
       }
     }
   }
@@ -1046,17 +1048,18 @@ export class RemoteListener {
 
         // we are going to request it to add the new records that our event
         // comes loaded with the new records that were added to it
-        // TODO FIX THIS add, remove, edit, everything
-        // await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-        //   PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-        //   event.createdBy,
-        //   null,
-        //   null,
-        //   null,
-        //   event.newRecords,
-        //   event.newLastModified,
-        //   "by-owner",
-        // );
+        await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          event.createdBy,
+          null,
+          null,
+          null,
+          event.newRecords,
+          event.modifiedRecords,
+          event.lostRecords,
+          event.newLastModified,
+          "by-owner",
+        );
       }
 
       // now we trigger the callbacks that should re-perform the cached
@@ -1099,17 +1102,19 @@ export class RemoteListener {
         } else {
           itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
         }
-        // TODO fix this
-        // await CacheWorkerInstance.instance.addRecordsToCachedSearch(
-        //   PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
-        //   null,
-        //   event.parentType,
-        //   event.parentId,
-        //   event.parentVersion,
-        //   event.newRecords,
-        //   event.newLastModified,
-        //   "by-parent",
-        // );
+
+        await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          null,
+          event.parentType,
+          event.parentId,
+          event.parentVersion,
+          event.newRecords,
+          event.modifiedRecords,
+          event.lostRecords,
+          event.newLastModified,
+          "by-parent",
+        );
       }
 
       // now we trigger the callbacks that should re-perform the cached

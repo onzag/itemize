@@ -257,7 +257,6 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
   listenPolicy?: "by-owner" | "by-parent" | "none";
-  listenRealtime?: boolean;
   traditional?: boolean;
   limit: number;
   offset: number;
@@ -1469,17 +1468,22 @@ export class ActualItemProvider extends
       // if the automatic search is not setup to just initial
       !this.props.automaticSearchIsOnlyInitial &&
       // if there was previously an automatic search
-      prevProps.automaticSearch &&
       (
-        !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
-        // these two would cause search results to be dismissed because
-        // the fact the token is a key part of the search itself so we would
-        // dismiss the search in such a case as the token is different
-        // that or the automatic search would be reexecuted
-        itemDefinitionWasUpdated ||
-        didSomethingThatInvalidatedSetters ||
-        didSomethingThatInvalidatedPrefills ||
-        prevProps.tokenData.token !== this.props.tokenData.token
+        (
+          prevProps.automaticSearch &&
+          (
+            !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
+            // these two would cause search results to be dismissed because
+            // the fact the token is a key part of the search itself so we would
+            // dismiss the search in such a case as the token is different
+            // that or the automatic search would be reexecuted
+            itemDefinitionWasUpdated ||
+            didSomethingThatInvalidatedSetters ||
+            didSomethingThatInvalidatedPrefills ||
+            prevProps.tokenData.token !== this.props.tokenData.token
+          )
+        ) ||
+        (!prevProps.automaticSearch && this.props.automaticSearch)
       )
     ) {
       // we might have a listener in an old item definition
@@ -1973,9 +1977,16 @@ export class ActualItemProvider extends
       );
     }
 
+    // if we are in search mode and have an automatic search we need
+    // to retrigger the search when properties change
     if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
       clearTimeout(this.automaticSearchTimeout);
       this.automaticSearchTimeout = setTimeout(() => {
+        // now this is used in cached searches and the reason we need to
+        // prevent search feedback for this is because we are just refiltering
+        // as the properties have changed, we do not need to request for feedback
+        // every single time a property changes because it is wasteful
+        this.preventSearchFeedbackOnPossibleStaleData = true;
         this.search(this.props.automaticSearch);
       }, 300);
     }

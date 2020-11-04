@@ -3,13 +3,39 @@
  * @packageDocumentation
  */
 
-import { IGQLSearchRecord } from "../../../../gql-querier";
+import { IGQLArgs, IGQLSearchRecord } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
 import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import { NanoSecondComposedDate } from "../../../../nanodate";
+
+/**
+ * Will take a gql arg and clear it up so GQLEnum and GQLValues
+ * are treated as simple strings
+ * @param data the data to clearup
+ */
+function gqlArgClearup(data: any): any {
+  if (
+    !data ||
+    typeof data === "string" &&
+    typeof data === "boolean" &&
+    typeof data === "number"
+  ) {
+    return data;
+  } else if (Array.isArray(data)) {
+    return data.map(gqlArgClearup);
+  } else if (data.__type__) {
+    return data.value;
+  }
+
+  const newData: any = {};
+  Object.keys(data).forEach((key) => {
+    newData[key] = gqlArgClearup(data[key]);
+  });
+  return newData;
+}
 
 
 /**
@@ -41,7 +67,7 @@ export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
   searchRecords: IGQLSearchRecord[],
-  searchArgs: any,
+  searchArgs: IGQLArgs,
 ): Promise<IGQLSearchRecord[]> {
 
   // so now we get the new records with a promise where we read a bunch of stuff
@@ -81,7 +107,7 @@ export async function search(
   )).filter((r) => !!r);
 
   // so now we got to order by
-  const orderBy: IOrderByRuleType = searchArgs.orderBy;
+  const orderBy: IOrderByRuleType = gqlArgClearup(searchArgs.order_by as IOrderByRuleType) || {};
   const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
     return {
       property: orderByProperty,
