@@ -8,7 +8,7 @@ import { Stream } from "stream";
 import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
-import { ENDPOINT_ERRORS } from "./constants";
+import { ENDPOINT_ERRORS, MAX_ALL_COMBINED_FILES_SIZE } from "./constants";
 import equals from "deep-equal";
 import { requestFieldsAreContained } from "./gql-util";
 
@@ -34,7 +34,7 @@ export interface IGQLSearchRecord {
   /**
    * Whent he record was created
    */
-  created_at: string;
+  last_modified: string;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface IGQLSearchRecord {
  */
 export interface IGQLSearchRecordsContainer {
   records: IGQLSearchRecord[],
-  last_record_date: string,
+  last_modified: string,
   count: number,
   limit: number,
   offset: number,
@@ -58,7 +58,7 @@ export interface IGQLSearchResultsContainer {
   count: number,
   limit: number,
   offset: number,
-  last_record_date: string,
+  last_modified: string,
 }
 
 /**
@@ -214,11 +214,23 @@ export class GQLQuery {
     }
 
     // check for file collision
+    let totalFilesSize = 0;
     const collapsingFiles = this.foundUnprocessedArgFiles.some((uf) => {
+      // we have cheated and calculated half of the files size here
+      totalFilesSize += uf.size;
       return !!query.foundUnprocessedArgFiles.find((suf) => suf.id === uf.id);
     });
 
     if (collapsingFiles) {
+      return false;
+    }
+
+    // query is too big check, now we add the other query
+    // files size
+    query.foundUnprocessedArgFiles.forEach((f) => {
+      totalFilesSize += f.size;
+    });
+    if (totalFilesSize > MAX_ALL_COMBINED_FILES_SIZE) {
       return false;
     }
 

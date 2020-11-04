@@ -41,31 +41,11 @@ import { IOTriggerActions } from "../triggers";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 
-function findLastRecordDateCheatMethod(records: IGQLSearchRecord[]): string {
-  let maximumRecords: IGQLSearchRecord[] = [];
-  let maximumRecordId: number = null;
-  records.forEach((record: IGQLSearchRecord) => {
-    if (!maximumRecordId || record.id > maximumRecordId) {
-      maximumRecordId = record.id;
-      maximumRecords = [record];
-    } else if (maximumRecordId === record.id) {
-      maximumRecords.push(record);
-    }
-  });
-
-  if (!maximumRecords.length) {
+export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
+  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
+  if (recordsRespectiveNanoSecondAccuracyArray.length === 0) {
     return null;
   }
-  if (maximumRecords.length === 1) {
-    return maximumRecords[0].created_at;
-  }
-
-  if (maximumRecords.length === 2) {
-    const versionedRecord = maximumRecords.find((r) => r.version !== null);
-    return versionedRecord.created_at;
-  }
-
-  const recordsRespectiveNanoSecondAccuracyArray = maximumRecords.map((r) => new NanoSecondComposedDate(r.created_at));
   const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev,cur) => {
     return prev.greaterThan(cur) ? prev : cur;
   });
@@ -139,7 +119,7 @@ export async function searchModule(
     true,
   );
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
@@ -158,8 +138,8 @@ export async function searchModule(
       "searchModule: Extracted requested fields from module",
       fieldsToRequest,
     );
-    if (!fieldsToRequest.includes("created_at")) {
-      fieldsToRequest.push("created_at");
+    if (!fieldsToRequest.includes("last_modified")) {
+      fieldsToRequest.push("last_modified");
     }
     if (!fieldsToRequest.includes("blocked_at")) {
       fieldsToRequest.push("blocked_at");
@@ -244,7 +224,7 @@ export async function searchModule(
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
-  const count = (countResult[0] && countResult[0].count) || null;
+  const count = (countResult && countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
@@ -316,7 +296,7 @@ export async function searchModule(
           return valueToProvide.toReturnToUser;
         }),
       ),
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count,
@@ -330,7 +310,7 @@ export async function searchModule(
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
       records: baseResult as IGQLSearchRecord[],
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 
@@ -458,7 +438,7 @@ export async function searchItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "created_at"];
+  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
@@ -479,9 +459,12 @@ export async function searchItemDefinition(
       "searchItemDefinition: Extracted requested fields from module",
       fieldsToRequest,
     );
-    if (!fieldsToRequest.includes("created_at")) {
-      fieldsToRequest.push("created_at");
+    if (!fieldsToRequest.includes("last_modified")) {
+      fieldsToRequest.push("last_modified");
     }
+    // we need these to get the DATA properly populated
+    // as the filterAndPrepareGQLValue will use of those
+    // to know if the value is blocked to return to user
     if (!fieldsToRequest.includes("blocked_at")) {
       fieldsToRequest.push("blocked_at");
     }
@@ -579,7 +562,7 @@ export async function searchItemDefinition(
     (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
   const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
-  const count = (countResult[0] && countResult[0].count) || null;
+  const count = (countResult && countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
@@ -650,7 +633,7 @@ export async function searchItemDefinition(
           return valueToProvide.toReturnToUser;
         })
       ),
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 
@@ -666,7 +649,7 @@ export async function searchItemDefinition(
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
       records: baseResult as IGQLSearchRecord[],
-      last_record_date: findLastRecordDateCheatMethod(baseResult as IGQLSearchRecord[]),
+      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
       count, 

@@ -18,7 +18,7 @@ import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
-import { StorageProvider } from "../../../../../../server/services";
+import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 
 /**
  * Provides the sql function that defines the schema that is used to build

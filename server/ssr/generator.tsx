@@ -1,3 +1,9 @@
+/**
+ * This file contains the all mighty SSR generator
+ * that does a lot of the heavy lifting
+ * @packageDocumentation
+ */
+
 import { IAppDataType, logger } from "..";
 import React from "react";
 import express from "express";
@@ -11,6 +17,8 @@ import Root from "../../base/Root";
 import Moment from "moment";
 import { Collector } from "./collect";
 import { capitalize } from "../../util";
+import { jwtDecode } from "../token";
+import { IServerSideTokenDataType } from "../resolvers/basic";
 
 // This is a custom react dom build
 const ReactDOMServer = require('@onzag/react-dom/server');
@@ -92,7 +100,7 @@ export async function ssrGenerator(
     // they'll never hit SSR they'll recieve only this fast memoized option meant for the same buildnumber
     // and they'll get it mainly from the service worker, they won't even bother with the server
     appliedRule = {
-      noData: true,
+      noSSR: true,
       language: null,
       rtl: false,
       languages: config.supportedLanguages,
@@ -154,7 +162,12 @@ export async function ssrGenerator(
         userAfterValidate.id = tokenData.id;
         userAfterValidate.token = tokenData.token;
         userAfterValidate.role = tokenData.role;
-        userAfterValidate.customData = tokenData.customData || null;
+
+        // need to extract the custom data out of the token itself
+        // since the TOKEN_OBJECT does not return it but our triggers
+        // do expect custom data
+        const tokenDataWhole = jwtDecode<IServerSideTokenDataType>(tokenData.token);
+        userAfterValidate.customData = tokenDataWhole.customData;
       } catch (err) {
 
       }
@@ -166,7 +179,7 @@ export async function ssrGenerator(
     // from scratch, however robots will end up triggering this (as well as bad browsers)
     // and incognito mode possibly; and first users, even when they'll most likely be guests
     appliedRule = {
-      noData: false,
+      noSSR: false,
       language,
       rtl: config.rtlLanguages.includes(language),
       languages: config.supportedLanguages,
@@ -219,7 +232,7 @@ export async function ssrGenerator(
 
   // if there's no data let's not give SSR at all
   // since we cannot really keep it consistent
-  if (appliedRule.noData) {
+  if (appliedRule.noSSR) {
     // and we go here
     const usedTitle = i18nAppName || config.appName || "";
     const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
@@ -460,7 +473,7 @@ export async function ssrGenerator(
       res.setHeader("Cache-Control", "public, max-age=0");
     }
 
-    if (!appliedRule.noData) {
+    if (!appliedRule.noSSR) {
       res.setHeader("x-ssr", "true");
     }
 

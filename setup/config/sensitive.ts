@@ -148,6 +148,12 @@ export async function sensitiveConfigSetup(
         nullifyFalseValues: true,
       },
       {
+        variableName: "mailStorage",
+        message: "A path for an item definition in order to be used for storage of emails so that itemize acts as a mail client",
+        defaultValue: "",
+        nullifyFalseValues: true,
+      },
+      {
         variableName: "containers",
         type: "multiconfig",
         message: "Containers to use, the default provider is openstack",
@@ -232,6 +238,13 @@ export async function sensitiveConfigSetup(
       {
         variableName: "jwtKey",
         message: "a JSON web token key used for key validation and token generation, leave blank to autogenerate one if not filled",
+        defaultValue: genToken(64),
+        hidden: true,
+      },
+      {
+        variableName: "secondaryJwtKey",
+        message: "a Secondary JSON web token key used for key validation and token generation, mostly used for secondary tasks, eg. email services, " +
+        "leave blank to autogenerate one if not filled",
         defaultValue: genToken(64),
         hidden: true,
       },

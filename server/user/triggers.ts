@@ -1,5 +1,5 @@
 import { ITriggerRegistry, IOTriggerActions } from "../resolvers/triggers";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, ENDPOINT_ERRORS } from "../../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, ENDPOINT_ERRORS, PROTECTED_USERNAMES } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { logger } from "../";
@@ -8,6 +8,11 @@ export const customUserTriggers: ITriggerRegistry = {
   itemDefinition: {
     io: {
       "users/user": async (arg) => {
+        // these might not be there on custom builds so we check
+        // if these properties are even real
+        const hasEmail = arg.itemDefinition.hasPropertyDefinitionFor("email", false);
+        const hasEvalidated = arg.itemDefinition.hasPropertyDefinitionFor("e_validated", false);
+        
         // check for sessionId changes in order to trigger a whole kick
         // event
         if (
@@ -21,12 +26,25 @@ export const customUserTriggers: ITriggerRegistry = {
           if (newSessionId && newSessionId !== oldSessionId) {
             arg.appData.listener.sendKickEvent(arg.value.id as number);
           }
-        }
 
-        // these might not be there on custom builds so we check
-        // if these properties are even real
-        const hasEmail = arg.itemDefinition.hasPropertyDefinitionFor("email", false);
-        const hasEvalidated = arg.itemDefinition.hasPropertyDefinitionFor("e_validated", false);
+          const newUsername = arg.update.username;
+          if (newUsername) {
+            if (PROTECTED_USERNAMES.includes(newUsername as string)) {
+              arg.forbid("This is a protected username");
+              return;
+            }
+          }
+
+          if (hasEmail && arg.update.email) {
+            const host = (arg.update.email as string).split("@")[1];
+            const isEmailPartOfThisHost =
+              host === arg.appData.config.developmentHostname ||
+              host === arg.appData.config.productionHostname;
+            if (isEmailPartOfThisHost) {
+              arg.forbid("Emails from the same domain are not allowed");
+            }
+          }
+        }
 
         // we add a trigger for when the user updated the email
         // either because of creation or from a normal update

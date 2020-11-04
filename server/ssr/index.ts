@@ -1,55 +1,39 @@
-import Root from "../../base/Root";
-import express from "express";
+/**
+ * This file contains all the interfaces that are used to define SSR rules
+ * it used to be big, but now it has become simple
+ * @packageDocumentation
+ */
 
-// import { IOrderByRuleType, SearchVariants } from "../../constants";
-// import { PropertyDefinitionValueType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-
-// export interface ISSRSearchPropertySetter {
-//   [property: string]: {
-//     variant: SearchVariants;
-//     value: PropertyDefinitionValueType;
-//   }
-// }
-
-// export interface ISSRSearchIncludeSetter {
-//   [include: string]: {
-//     exclusionState: boolean;
-//     properties: ISSRSearchPropertySetter;
-//   };
-// };
-
-// export interface ISSRSearchRule {
-//   slot: [string, string, number, string];
-//   searchId: string;
-//   options: {
-//     setProperties?: ISSRSearchPropertySetter;
-//     setIncludes?: ISSRSearchIncludeSetter;
-//     requestedProperties: string[];
-//     requestedIncludes?: string[];
-//     orderBy?: IOrderByRuleType;
-//     createdBy?: number;
-//     parentedBy?: {
-//       module: string,
-//       itemDefinition: string,
-//       id: number,
-//       version?: string,
-//     };
-//     limit: number;
-//     offset: number;
-//   };
-// }
-
-// this infor can be retrieved via the config and other attributes
-// doesn't need to be specified
+/**
+ * This is what a SSR rule is and specifies
+ * how a page is to be rendered
+ */
 export interface ISSRRule {
+  /**
+   * The language that the rule is rendering at
+   */
   language: string;
+  /**
+   * All the other available languages, this is used to build
+   * the href langs
+   */
   languages: string[];
+  /**
+   * whether it is a right to left language so it
+   * can be accounted for in the HTML
+   */
   rtl: boolean;
+  /**
+   * The user we are rendering for
+   */
   forUser: {
     token: string;
     id: number;
     role: string;
     customData: any;
   };
-  noData: boolean;
+  /**
+   * Whether we will simply not use SSR at all
+   */
+  noSSR: boolean;
 }

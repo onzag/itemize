@@ -66,6 +66,9 @@ custom.validate_account_user = $APPNAME
 custom.validate_account_success = your account has been successfully activated
 custom.validate_account_success_title = success!
 
+custom.unsubscribe_success = you have been unsubscribed
+custom.unsubscribe_success_title = success
+
 custom.forgot_password = forgot password
 custom.forgot_password_template_name =
 custom.forgot_password_email_user = recovery
@@ -198,6 +201,9 @@ custom.validate_account_email_user = activar
 custom.validate_account_user = $APPNAME
 custom.validate_account_success = su cuenta ha sido activada satisfactoriamente
 custom.validate_account_success_title = ¡validación exitosa!
+
+custom.unsubscribe_success = usted ya no está suscrito
+custom.unsubscribe_success_title = ¡acción exitosa!
 
 custom.forgot_password = He olvidado mi contraseña
 custom.forgot_password_template_name =

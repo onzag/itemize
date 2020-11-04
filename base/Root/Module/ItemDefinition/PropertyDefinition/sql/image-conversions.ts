@@ -11,7 +11,7 @@ import sharp from "sharp";
 import { ReadStream } from "fs";
 import path from "path";
 import { sqlUploadPipeFile } from "./file-management";
-import { StorageProvider } from "../../../../../../server/services";
+import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 
 /**
  * this is what we get as a result from

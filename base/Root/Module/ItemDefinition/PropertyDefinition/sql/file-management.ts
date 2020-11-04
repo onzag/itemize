@@ -18,7 +18,7 @@ import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
 import { logger } from "../../../../../../server";
 import Module from "../../..";
-import { StorageProvider } from "../../../../../../server/services";
+import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display

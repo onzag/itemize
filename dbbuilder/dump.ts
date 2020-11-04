@@ -18,10 +18,15 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { yesno } from ".";
 import { getStorageProviders, IServiceCustomizationType } from "../server";
-import { StorageProvider, IStorageProvidersObject } from "../server/services";
+import StorageProvider, { IStorageProvidersObject } from "../server/services/base/StorageProvider";
+import { RegistryService } from "../server/services/registry";
 
-const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+let serviceCustom: IServiceCustomizationType = {};
+try {
+  const itemizeConfig = require(path.join(path.resolve("."), "itemize.config"));
+  serviceCustom = itemizeConfig.services;
+} catch {
+}
 
 const fsAsync = fs.promises;
 
@@ -196,10 +201,10 @@ async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHa
  * Performs the copy of the data that is necessary for a given row
  * @param row the row in question
  * @param root the root
- * @param storageClients all the cloud clients
+ * @param cloudClients all the cloud clients
  * @param domain the domain in question
  */
-async function copyDataOf(row: ISQLTableRowValue, root: Root, storageClients: IStorageProvidersObject, domain: string) {
+async function copyDataOf(row: ISQLTableRowValue, root: Root, cloudClients: IStorageProvidersObject, domain: string) {
   console.log("dumping files of: " + colors.green(row.type + " " + row.id + " " + row.version));
 
   // so we need the idef and the module
@@ -208,7 +213,7 @@ async function copyDataOf(row: ISQLTableRowValue, root: Root, storageClients: IS
 
   // and now we'll see our container and download the data from there
   let idUsed = row.container_id;
-  let client = storageClients[idUsed];
+  let client = cloudClients[idUsed];
   if (!client) {
     console.log(
       colors.red(
@@ -249,12 +254,17 @@ export default async function dump(version: string, knex: Knex, root: Root) {
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
+  const registry = new RegistryService({
+    knex,
+  }, null);
+  await registry.initialize();
+
   // and our containers
-  const storageClients = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders);
+  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders, registry);
 
   // we can specify we have loaded them
-  console.log(`Loaded ${Object.keys(storageClients).length} storage containers: ` +
-    colors.yellow(Object.keys(storageClients).join(", ")));
+  console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
+    colors.yellow(Object.keys(cloudClients).join(", ")));
 
   // and now we can start dumping
   let final: ISQLTableRowValue[] = [];
@@ -350,7 +360,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
         await copyDataOf(
           row,
           root,
-          storageClients,
+          cloudClients,
           version === "development" ?
             config.developmentHostname :
             config.productionHostname

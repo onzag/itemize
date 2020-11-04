@@ -227,6 +227,12 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   mailDomain: string;
   /**
+   * The mail storage item definition path
+   * it must pass some criteria in order to be valid
+   * as emails get added there
+   */
+  mailStorage: string;
+  /**
    * The containers, they should match the previously given
    * containers id
    */
@@ -253,6 +259,12 @@ export interface ISensitiveConfigRawJSONDataType {
    * to call other external APIs
    */
   jwtKey: string;
+  /**
+   * A secondary json web token key to use, for tasks where these tokens might be
+   * used on less secure third party tasks and are not used in more critical tasks
+   * eg. for email services
+   */
+  secondaryJwtKey: string;
   /**
    * A development key, allows to use development files in its full form on the production
    * interface
@@ -333,9 +345,15 @@ export const rawSensitiveConfigSchema = {
       additionalProperties: {},
     },
     mailDomain: {
-      type: ["string", "null"]
+      type: ["string", "null"],
+    },
+    mailStorage: {
+      type: ["string", "null"],
     },
     jwtKey: {
+      type: "string",
+    },
+    secondaryJwtKey: {
       type: "string",
     },
     devKey: {
@@ -381,9 +399,11 @@ export const rawSensitiveConfigSchema = {
     "locationSearch",
     "mail",
     "mailDomain",
+    "mailStorage",
     "defaultContainerID",
     "seoContainerID",
     "jwtKey",
+    "secondaryJwtKey",
     "devKey",
   ],
 };

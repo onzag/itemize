@@ -99,7 +99,7 @@ export interface IChangedFeedbackEvent {
 /**
  * Base form of when a search that adds records to
  */
-interface IBaseSearchRecordsAddedEvent {
+interface IBaseSearchRecordsEvent {
   /**
    * the qualified path name or type of the either module or item definition
    */
@@ -109,21 +109,29 @@ interface IBaseSearchRecordsAddedEvent {
    */
   newRecords: IGQLSearchRecord[];
   /**
+   * the records that have been deleted
+   */
+  lostRecords: IGQLSearchRecord[];
+  /**
+   * the records that have been modified
+   */
+  modifiedRecords: IGQLSearchRecord[];
+  /**
    * the new last record search result
    */
-  newLastRecordDate: string;
+  newLastModified: string;
 }
 
 /**
  * When they are owned items, as a search has been cached using a creator
  * as a base
  */
-export const OWNED_SEARCH_RECORDS_ADDED_EVENT = "owned-search-records-added";
+export const OWNED_SEARCH_RECORDS_EVENT = "owned-search-records";
 /**
  * The interface adds the creator in its event
  * check [[IOwnedSearchRegisterRequest]]
  */
-export interface IOwnedSearchRecordsAddedEvent extends IBaseSearchRecordsAddedEvent {
+export interface IOwnedSearchRecordsEvent extends IBaseSearchRecordsEvent {
   createdBy: number;
 }
 
@@ -131,12 +139,12 @@ export interface IOwnedSearchRecordsAddedEvent extends IBaseSearchRecordsAddedEv
  * When they are parented items the parent type and id, that has been cached
  * using those
  */
-export const PARENTED_SEARCH_RECORDS_ADDED_EVENT = "parented-search-records-added";
+export const PARENTED_SEARCH_RECORDS_EVENT = "parented-search-records";
 /**
  * The interface adds the parent type (qualified path name) and parent id (slot id)
  * check [[IParentedSearchRegisterRequest]]
  */
-export interface IParentedSearchRecordsAddedEvent extends IBaseSearchRecordsAddedEvent {
+export interface IParentedSearchRecordsEvent extends IBaseSearchRecordsEvent {
   parentType: string;
   parentId: number;
   parentVersion: string;
@@ -444,7 +452,7 @@ interface IBaseSearchFeedbackRequest {
    * since they come in order it's easy to know if
    * something has been added
    */
-  knownLastRecordDate: string;
+  lastModified: string;
 }
 
 /**
@@ -464,7 +472,7 @@ export const OwnedSearchFeedbackRequestSchema = {
     qualifiedPathName: {
       type: "string",
     },
-    knownLastRecordDate: {
+    lastModified: {
       type: ["string", "null"],
     },
     createdBy: {
@@ -473,7 +481,7 @@ export const OwnedSearchFeedbackRequestSchema = {
   },
   required: [
     "qualifiedPathName",
-    "knownLastRecordDate",
+    "lastModified",
     "createdBy",
   ],
 }
@@ -496,7 +504,7 @@ export const ParentedSearchFeedbackRequestSchema = {
     qualifiedPathName: {
       type: "string",
     },
-    knownLastRecordDate: {
+    lastModified: {
       type: ["string", "null"],
     },
     parentType: {
@@ -511,7 +519,7 @@ export const ParentedSearchFeedbackRequestSchema = {
   },
   required: [
     "qualifiedPathName",
-    "knownLastRecordDate",
+    "lastModified",
     "parentType",
     "parentId",
     "parentVersion",

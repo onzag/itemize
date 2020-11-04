@@ -13,7 +13,6 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize } from "../../util";
-import { promisify } from "util";
 
 interface RecoverPasswordTokenType {
   resetPasswordUserId: number;
@@ -42,11 +41,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const passwordPropertyDescription = passwordProperty.getPropertyDefinitionDescription();
   const emailPropertyDescription = emailProperty && emailProperty.getPropertyDefinitionDescription();
   const eValidatedPropertyDescription = eValidatedProperty && eValidatedProperty.getPropertyDefinitionDescription();
-
-  const setPromisified = promisify(appData.redisGlobal.set).bind(appData.redisGlobal);
-  const expirePromisified = promisify(appData.redisGlobal.expire).bind(appData.redisGlobal);
-  const getPromisified = promisify(appData.redisGlobal.get).bind(appData.redisGlobal);
-  const delPromisified = promisify(appData.redisGlobal.del).bind(appData.redisGlobal);
 
   return {
     token: {
@@ -88,6 +82,9 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             });
           }
 
+          // only real user tokens can be used here for these
+          // kind of requests so they must have this shape
+          // other sort of tokens cannot be used in this
           if (
             typeof decoded.id !== "number" ||
             typeof decoded.role !== "string" ||
@@ -391,7 +388,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         try {
           const avoidSendingEmailEmailTarget =
-            !!(await getPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
+            !!(await appData.redisGlobal.get("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString()));
           if (avoidSendingEmailEmailTarget === resultUser.email) {
             return {
               status: "OK",
@@ -424,7 +421,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           validateToken = await jwtSign({
             validateUserId: decoded.id,
             validateUserEmail: resultUser.email,
-          }, appData.sensitiveConfig.jwtKey);
+          }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
             "customUserQueries.send_validate_email [SERIOUS]: could not sign the validation email token",
@@ -438,8 +435,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         try {
-          await setPromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
-          await expirePromisified("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
+          await appData.redisGlobal.set("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), resultUser.email.toString());
+          await appData.redisGlobal.expire("USER_VERIFY_ACCOUNT_EMAIL_TEMP_AVOID_SENDING." + resultUser.id.toString(), VERIFY_ACCOUNT_EMAIL_RESEND_SECONDS_TIME);
         } catch (err) {
           logger.error(
             "customUserQueries.send_validate_email [SERIOUS]: could not set the global values for the temporary avoid sending email flags",
@@ -458,7 +455,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
         const templateIdToUse = parseInt(i18nData.custom.validate_account_fragment_id, 10);
 
-        const to = resultUser.email;
         const subject = capitalize(i18nData.custom.validate_account);
 
         const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
@@ -482,7 +478,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
-          to,
+          to: resultUser,
+          canUnsubscribe: false,
+          ignoreUnsubscribe: true,
+          subscribeProperty: null,
+          emailProperty: "email",
         });
 
         return {
@@ -576,7 +576,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const userId = resultUser[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
 
         try {
-          const avoidSendingEmail = !!(await getPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
+          const avoidSendingEmail = !!(await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
           if (avoidSendingEmail) {
             return {
               status: "OK",
@@ -598,10 +598,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const randomId = Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER));
 
         try {
-          await setPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), userId.toString());
-          await expirePromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
-          await setPromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), userId.toString());
-          await expirePromisified("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
+          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), userId.toString());
+          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
+          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), userId.toString());
+          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
         } catch (err) {
           logger.error(
             "customUserQueries.send_reset_password [SERIOUS]: failed to set flags into global redis instance to avoid sending " +
@@ -621,7 +621,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resetToken = await jwtSign({
             resetPasswordUserId: userId,
             resetPasswordTempTokenCode: randomId,
-          }, appData.sensitiveConfig.jwtKey);
+          }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
             "customUserQueries.send_reset_password [SERIOUS]: failed to sign reset token",
@@ -641,7 +641,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
 
         const templateIdToUse = parseInt(i18nData.custom.forgot_password_fragment_id, 10);
-        const to = resultUser.email;
         const subject = capitalize(i18nData.custom.forgot_password_title);
 
         const extractedProperties: any = {};
@@ -665,7 +664,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
-          to,
+          to: resultUser,
+          canUnsubscribe: false,
+          ignoreUnsubscribe: true,
+          subscribeProperty: null,
+          emailProperty: "email",
         });
 
         return {
@@ -687,7 +690,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let decoded: RecoverPasswordTokenType = null;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.jwtKey);
+          decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           throw new EndpointError({
             message: "Reset token is invalid",
@@ -707,7 +710,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         let codeWasSent: any;
         try {
-          codeWasSent = await getPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+          codeWasSent = await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
         } catch (err) {
           logger.error(
             "customUserQueries.reset_password [SERIOUS]: failed to check the token code that was sent",
@@ -795,7 +798,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         (async () => {
           try {
-            await delPromisified("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+            await appData.redisGlobal.del("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
           } catch (err) {
             logger.error(
               "customUserQueries.reset_password (detached): failed to remove temporary token code for password reset",

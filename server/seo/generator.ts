@@ -1,3 +1,9 @@
+/**
+ * This file contains the seo generator and helper interfaces
+ * for using for SEO purposes
+ * @packageDocumentation
+ */
+
 import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOParametrizer } from ".";
 import https from "https";
 import { logger } from "../index";
@@ -9,20 +15,53 @@ import { escapeStringRegexp } from "../../util";
 import moment from "moment";
 import { Readable } from "stream";
 import equals from "deep-equal";
-import { StorageProvider } from "../../server/services";
+import StorageProvider from "../services/base/StorageProvider";
+import { convertVersionsIntoNullsWhenNecessary } from "../version-null-value";
 
+/**
+ * Whether seo is disabled
+ * @ignore
+ */
 const NO_SEO = process.env.NO_SEO === "true";
 
-interface ISEOCollectedDataWithCreatedAt extends ISEOCollectedData {
-  created_at: string;
-}
-
+/**
+ * Represents the list of results
+ */
 interface ISEOPreResult {
   lastQueried: ISitemapLastQueryType,
   urls: string[],
   static: boolean,
 };
 
+/**
+ * This is the seo generator class that runs
+ * on the global service in order to build sitemaps
+ * and setup the SEO in the server
+ * 
+ * Itemize builds sitemaps using these forms
+ * 1. The primary JSON index, the primary index is not saved as it always takes the same
+ * shape, it just contains a list of urls for all the given languages, it does not contain lastQueried
+ * information.
+ * 2. The main JSON index, this is the index that contains all the sitemaps that exist within it that were collected
+ * during each run of the seo generator; the main index is stored as JSON form and it can be translated
+ * to each language url, eg the url /hello/world becomes https://mysite.com/en/hello/world https://mysite.com/es/hello/world
+ * and so on when converted into XML; the mainIndex is what contains the last queried information; every main index
+ * has a reference to the static entry and as many dynamic entries as necessary.
+ * 3. The static JSON entry, contains all the static urls, static urls are considered like those that do not collect and do
+ * not parametrize as such they are basically just static content; it does not contain last queried information.
+ * 4. Dynamic JSON entries, are collected and generated at a given time, they are based on the collection of the last entries
+ * and if they have some data they will be appended and reference to the main JSON index.
+ * 
+ * Once these indexes have been calculated and properly generated they are converted into XML per language.
+ * The primary index becomes the index at sitemaps/mysite.com/index.xml
+ * because it is an index it references other sitemaps so it is prefixed for the container
+ * The main JSON index becomes the index at sitemaps/mysite.com/en/index.xml in as many languages as necessary
+ * because it is an index it references other sitemaps so it is prefixed for the container
+ * The static JSON entry becomes the entry at sitemaps/mysite.com/en/static.xml in as many languages as necessary
+ * because it is an entry type all their urls will be prefixed for the webpage with https://mysite.com/{language}/
+ * All the dynamic JSON entries become entries at the given date in as many languages as necessary
+ * because it is an entry type all their urls will be prefixed for the webpage with https://mysite.com/{language}/
+ */
 export class SEOGenerator {
   private root: Root;
   private knex: Knex;
@@ -31,11 +70,10 @@ export class SEOGenerator {
   private supportedLanguages: string[];
   private hostname: string;
   private pingGoogle: boolean;
-  private cache: Cache;
 
   private primaryIndex: ISitemapJSONType = null;
   private mainIndex: ISitemapJSONType = null;
-  private seoCache: { [key: string]: ISEOCollectedDataWithCreatedAt[] } = {};
+  private seoCache: { [key: string]: ISEOCollectedData[] } = {};
 
   /**
    * Buillds a new seo generator
@@ -416,7 +454,8 @@ export class SEOGenerator {
     }
 
     // otherwise let's see if it's a dynamic collect type
-    if (rule.collect) {
+    // either because collect is set or parametrize is set
+    if (rule.collect || rule.parametrize) {
       // so here we will store our results
       const collectedResults: ISEOCollectedResult[] = [];
       // and this will be our last queried information
@@ -424,74 +463,80 @@ export class SEOGenerator {
 
       // we start at index -1 in order to start at 0
       let index = -1;
-      for (const collectionPoint of rule.collect) {
-        index++;
+      if (rule.collect) {
+        for (const collectionPoint of rule.collect) {
+          index++;
 
-        // this might be null, we are seeing when we last queried this item
-        const lastQueriedKey = key + "." + collectionPoint[0] + "." + (collectionPoint[1] || "");
-        // and according to that we require since
-        const querySince = this.mainIndex.lastQueried && this.mainIndex.lastQueried[
-          lastQueriedKey
-        ];
-        // this is our cache key for all the results we get to store in our cache, we also use the timestamp
-        const cachedKey = collectionPoint[0] + "." + (collectionPoint[1] || "") + "." + (querySince || "");
+          // this might be null, we are seeing when we last queried this item
+          const lastQueriedKey = key + "." + collectionPoint.module + "." + (collectionPoint.item || "");
+          // and according to that we require since
+          const querySince = this.mainIndex.lastQueried && this.mainIndex.lastQueried[
+            lastQueriedKey
+          ];
+          // this is our cache key for all the results we get to store in our cache, we also use the timestamp
+          const cachedKey = collectionPoint.module + "." + (collectionPoint.item || "") + "." + (querySince || "");
 
-        // so this will be our query
-        let query: Knex.QueryBuilder;
+          // so this will be our query
+          let query: Knex.QueryBuilder;
 
-        // and we will make the query if there's no cached result for it
-        if (!this.seoCache[cachedKey]) {
-          const splittedModule = collectionPoint[0].split("/");
-          const splittedIdef = collectionPoint[1] && collectionPoint[1].split("/");
-          if (splittedModule[0] === "") {
-            splittedModule.shift();
+          // and we will make the query if there's no cached result for it
+          if (!this.seoCache[cachedKey]) {
+            const splittedModule = collectionPoint.item[0].split("/");
+            const splittedIdef = collectionPoint.item && collectionPoint.item.split("/");
+            if (splittedModule[0] === "") {
+              splittedModule.shift();
+            }
+            if (splittedIdef && splittedIdef[0] === "") {
+              splittedIdef.shift();
+            }
+
+            // get the module and the item definition, if exists
+            const mod = this.root.getModuleFor(splittedModule);
+            const idef = splittedIdef && mod.getItemDefinitionFor(splittedIdef);
+
+            const whatToSelect = ["id", "version", "created_at"].concat(collectionPoint.extraProperties || []);
+            query = this.knex.select(whatToSelect);
+            if (idef) {
+              query.from(idef.getQualifiedPathName()).join(mod.getQualifiedPathName(), (clause) => {
+                clause.on("id", "=", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+                clause.on("version", "=", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+              })
+            } else {
+              query.from(mod.getQualifiedPathName());
+            }
+
+            if (querySince) {
+              query.where("created_at", ">", querySince);
+            }
+
+            if (!collectionPoint.collectAllVersions) {
+              query.where("version", "");
+            }
+
+            query.where("blocked_at", null).orderBy("created_at", "desc");
           }
-          if (splittedIdef && splittedIdef[0] === "") {
-            splittedIdef.shift();
+
+          // otherwise we set by our cache or well, execute the query
+          const collected: ISEOCollectedData[] =
+            this.seoCache[cachedKey] ||
+            await query as ISEOCollectedData[];
+
+          // fix the null values
+          collected.forEach((c) => convertVersionsIntoNullsWhenNecessary(c));
+
+          // and that will be our value for our cache
+          this.seoCache[cachedKey] = collected;
+
+          // if we got something then we can set our last queried attribute to it
+          if (collected[0]) {
+            lastQueried[lastQueriedKey] = collected[0].created_at;
           }
 
-          // get the module and the item definition, if exists
-          const mod = this.root.getModuleFor(splittedModule);
-          const idef = splittedIdef && mod.getItemDefinitionFor(splittedIdef);
-
-          query = this.knex.select(["id", "version", "created_at"]);
-          if (idef) {
-            query.from(idef.getQualifiedPathName()).join(mod.getQualifiedPathName(), (clause) => {
-              clause.on("id", "=", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
-              clause.on("version", "=", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
-            })
-          } else {
-            query.from(mod.getQualifiedPathName());
-          }
-
-          if (querySince) {
-            query.where("created_at", ">", querySince);
-          }
-
-          if (!rule.collectAllVersions) {
-            query.where("version", "");
-          }
-
-          query.where("blocked_at", null).orderBy("created_at", "desc");
+          // and add to our collected results
+          collectedResults[index] = {
+            collected,
+          };
         }
-
-        // otherwise we set by our cache or well, execute the query
-        const collected: ISEOCollectedDataWithCreatedAt[] =
-          this.seoCache[cachedKey] ||
-          await query as ISEOCollectedDataWithCreatedAt[];
-
-        // and that will be our value for our cache
-        this.seoCache[cachedKey] = collected;
-
-        // if we got something then we can set our last queried attribute to it
-        if (collected[0]) {
-          lastQueried[lastQueriedKey] = collected[0].created_at;
-        }
-
-        // and add to our collected results
-        collectedResults[index] = {
-          collected,
-        };
       }
 
       // now we need the parametrize function, or we use the default
@@ -540,6 +585,11 @@ export class SEOGenerator {
     };
   }
 
+  /**
+   * defines how the parameters are collected from the given
+   * SEO results
+   * @param arg the collected results argument
+   */
   private defaultParametrizer(arg: {
     collectedResults: ISEOCollectedResult[]
   }): ISEOParametrizer[] {

@@ -1,5 +1,4 @@
 > :warning: **WARNING**: Project in Alpha
-> :warning: **WARNING**: Project is Experimental
 
 # ItemizeJS
 
@@ -9,17 +8,11 @@ The aim of itemize is to be a library that can produce and deliver results fast,
 
 # **WARNING** Alpha
 
-This library is in alpha, it's incomplete, documentation isn't done and might be misleading, and while everything that is described in this document is currently functional as described there might be bugs and issues, undocumented, untested features, the library will be considered mature once it hits version 1.0 which might take until 2021
-
-# **WARNING** Experimental
-
-Itemize is an experimental library that defies some of the most common development patterns, meta analysis and self optimization is common, it aims to take the burden away from the developer and put the focus on what the final user will see; however this means currently things are fast changing, and features might be removed.
+This library is in alpha, it is an experimental library that defies some of the most common development pattern and currently it's incomplete, documentation isn't done and might be misleading, and while everything that is described in this document is currently functional as described there might be bugs and issues, undocumented, untested features, the library will be considered mature once it hits version 1.0 which might take until 2021
 
 ## When to use Itemize
 
 Itemize was made to create web software in a large range of needs, for the most part almost any new web software can be created using itemize, as such it is an excellent tool for startups that need a fully featured complex app.
-
-However Itemize is a fully featured end to end library, which includes its own server, protocol (on top of graphql) and client mechanism, and while it can indeed communicate with other clients and add services on top of it, attempting to merge two server technologies can be cumbersome.
 
 ## Features
 
@@ -35,9 +28,9 @@ Testing and test cases are automatically generated based on the application desi
 
 ### Internationalized
 
-Itemize was made so that it doesn't assume any primary language, internationalization is enforced, as it has a global approach.
+Itemize app are made so that it doesn't assume any primary language, as it has a global approach; it can easily be translated into any language.
 
-Itemize is also able to track the user IP in order to be able to predict a first's user language and region.
+It is also able to track the user IP in order to be able to predict a first's user language and region.
 
 ### Currency and Currency Exchanges
 
@@ -83,7 +76,7 @@ Every item in itemize is realtime, and as such changes populate over all the net
 
 ### Mail Integration
 
-Using a Mailgun API key, itemize will be able to validate and send emails to users.
+With little configuration itemize automatically handles email sending and management, as well as subscriptions.
 
 ### Fast Prototyping
 
@@ -93,9 +86,13 @@ Itemize comes with a fast prototyping out of the box, which uses Material UI; th
 
 Itemize supports geography and geographical search out of the box, using openstreetmap for display on its fast prototyping mode, and an Here Maps API key allows for address autocompletition.
 
-### Rich Text
+### Rich Text and Content Management
 
 Itemize supports rich text and rich text based search out of the box with file support
+
+The rich text specification is powerful enough it can be used to build templates and make content for your application, even fully functional event driven DOM bits can be made via rich text without programming knowledge via the CMS and integrate with react. This means separation of design and programming logic can be achieved via these fragments.
+
+The fragments can also exist in many languages.
 
 ## Documentation
 

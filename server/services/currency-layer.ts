@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { logger } from "../";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
-import { CurrencyFactorsProvider, ICurrencyFactors } from ".";
+import CurrencyFactorsProvider, { ICurrencyFactors } from "./base/CurrencyFactorsProvider";
 
 interface CurrencyLayerResponse {
   success: boolean;
@@ -21,9 +21,13 @@ export interface ICurrencyLayerConfig {
 }
 
 export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
+  public static isGlobal() {
+    return true;
+  }
+
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
-      this.globalCache.get(
+      this.globalCache.redisClient.get(
         CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);

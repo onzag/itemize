@@ -1,3 +1,9 @@
+/**
+ * This is the root server file and does the initialization
+ * of the server side of things
+ * @packageDocumentation
+ */
+
 import express from "express";
 import http from "http";
 import path from "path";
@@ -10,13 +16,11 @@ import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
-import redis, { RedisClient } from "redis";
 import { Cache } from "./cache";
 import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
-import { promisify } from "util";
 
 import winston from "winston";
 import "winston-daily-rotate-file";
@@ -30,7 +34,6 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
-import { MailProvider, IStorageProvidersObject, IStorageProviderClassType, IMailProviderClassType, IUserLocalizationProviderClassType, ICurrencyFactorsProviderClassType, ILocationSearchProviderClassType, StorageProvider, UserLocalizationProvider, LocationSearchProvider } from "./services";
 import { LocalStorageService } from "./services/local";
 import { OpenstackService } from "./services/openstack";
 import { IPStackService } from "./services/ipstack";
@@ -38,10 +41,22 @@ import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
+import { ServiceProvider, IServiceProviderClassType } from "./services";
+import { ICurrencyFactorsProviderClassType } from "./services/base/CurrencyFactorsProvider";
+import LocationSearchProvider, { ILocationSearchProviderClassType } from "./services/base/LocationSearchProvider";
+import MailProvider, { IMailProviderClassType } from "./services/base/MailProvider";
+import StorageProvider, { IStorageProvidersObject, IStorageProviderClassType } from "./services/base/StorageProvider";
+import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./services/base/UserLocalizationProvider";
+import { RegistryService } from "./services/registry";
+import { ItemizeRedisClient, setupRedisClient } from "./redis";
 
 // load the custom services configuration
-const serviceFileSrc = require(path.join(path.resolve("."), "dist", "server", "services"));
-const serviceCustom: IServiceCustomizationType = serviceFileSrc.default;
+let serviceCustom: IServiceCustomizationType = {};
+try {
+  const itemizeConfig = require(path.join(path.resolve("."), "itemize.config"));
+  serviceCustom = itemizeConfig.services;
+} catch {
+}
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
@@ -126,12 +141,12 @@ export interface IAppDataType {
   knex: Knex;
   listener: Listener;
   cache: Cache;
-  redis: RedisClient;
-  redisGlobal: RedisClient;
-  redisPub: RedisClient;
-  redisSub: RedisClient;
-  redisLocalPub: RedisClient;
-  redisLocalSub: RedisClient;
+  redis: ItemizeRedisClient;
+  redisGlobal: ItemizeRedisClient;
+  redisPub: ItemizeRedisClient;
+  redisSub: ItemizeRedisClient;
+  redisLocalPub: ItemizeRedisClient;
+  redisLocalSub: ItemizeRedisClient;
   buildnumber: string;
   triggers: ITriggerRegistry;
   storage: IStorageProvidersObject;
@@ -140,6 +155,10 @@ export interface IAppDataType {
   mailService: MailProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
+  customServices: {
+    [name: string]: ServiceProvider<any>;
+  };
+  registry: RegistryService,
 }
 
 export interface IServerDataType {
@@ -158,6 +177,9 @@ export interface IServiceCustomizationType {
   userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
   currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
   locationSearchProvider?: ILocationSearchProviderClassType<any>;
+  customServices?: {
+    [name: string]: IServiceProviderClassType<any>,
+  };
 }
 
 export interface IServerCustomizationDataType {
@@ -173,8 +195,18 @@ export async function getStorageProviders(
   config: IConfigRawJSONDataType,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
   storageServiceProviders: IStorageProviders,
-) {
-  const cloudClients: IStorageProvidersObject = {};
+  registry: RegistryService,
+): Promise<{
+  cloudClients: IStorageProvidersObject;
+  instancesUsed: StorageProvider<any>[];
+  classesUsed: IStorageProviderClassType<any>[];
+}> {
+  const finalOutput = {
+    instancesUsed: [] as StorageProvider<any>[],
+    classesUsed: [] as IStorageProviderClassType<any>[],
+    cloudClients: {} as IStorageProvidersObject,
+  };
+
   if (sensitiveConfig.localContainer) {
     let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
     if (!prefix) {
@@ -186,9 +218,14 @@ export async function getStorageProviders(
     if (prefix.indexOf("/") !== 0) {
       prefix = "https://" + prefix;
     }
-    const localClient = new LocalStorageService(null, sensitiveConfig.localContainer, prefix);
+    const localClient = new LocalStorageService(null, registry, sensitiveConfig.localContainer, prefix);
     await localClient.initialize();
-    cloudClients[sensitiveConfig.localContainer] = localClient;
+    finalOutput.instancesUsed.push(localClient);
+    // typescript for some reason misses the types
+    if (!finalOutput.classesUsed.includes(LocalStorageService as any)) {
+      finalOutput.classesUsed.push(LocalStorageService as any);
+    }
+    finalOutput.cloudClients[sensitiveConfig.localContainer] = localClient;
   }
 
   if (sensitiveConfig.containers) {
@@ -208,13 +245,18 @@ export async function getStorageProviders(
       const type = containerData.type;
       const ServiceClass = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
 
-      const client = new ServiceClass(containerData.config, containerIdX, prefix);
+      const client = new ServiceClass(containerData.config, registry, containerIdX, prefix);
       await client.initialize();
-      cloudClients[containerIdX] = client;
+      finalOutput.instancesUsed.push(client);
+      // typescript misses the types
+      if (!finalOutput.classesUsed.includes(ServiceClass as any)) {
+        finalOutput.classesUsed.push(ServiceClass as any);
+      }
+      finalOutput.cloudClients[containerIdX] = client;
     }));
   }
 
-  return cloudClients;
+  return finalOutput;
 }
 
 /**
@@ -340,8 +382,8 @@ export async function initializeServer(
         "initializeServer: initializing redis global pub client" :
         "initializeServer: initializing redis global pub/sub client",
     );
-    const redisPub: RedisClient = redis.createClient(redisConfig.pubSub);
-    const redisSub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.pubSub);
+    const redisPub: ItemizeRedisClient = await setupRedisClient("pub", redisConfig.pubSub);
+    const redisSub: ItemizeRedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : await setupRedisClient("sub", redisConfig.pubSub);
 
     // so every other instance mode will end up setting up a local pub/sub for the local cache, however not the global manager
     // because it only talks to the global redis by publishing server data, and it shouldn't have anything to do with
@@ -351,8 +393,8 @@ export async function initializeServer(
         "initializeServer: initializing local redis pub/sub client",
       );
     }
-    const redisLocalPub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
-    const redisLocalSub: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
+    const redisLocalPub: ItemizeRedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : await setupRedisClient("local pub", redisConfig.cache);
+    const redisLocalSub: ItemizeRedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : await setupRedisClient("local sub", redisConfig.cache);
 
     // same for this, for the cache, as the cache is the same that is used for local pub/sub
     if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
@@ -360,7 +402,40 @@ export async function initializeServer(
         "initializeServer: initializing redis cache client",
       );
     }
-    const redisClient: RedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : redis.createClient(redisConfig.cache);
+    const redisClient: ItemizeRedisClient =
+      INSTANCE_MODE === "GLOBAL_MANAGER" ?
+        null :
+        await setupRedisClient("local", redisConfig.cache, async (client: ItemizeRedisClient, isReconnect: boolean) => {
+          // when we reconnect or connect for the first time and we are a cluster manager
+          // we need to wipe the cache as we don't know if we have gone out of sync
+          // and our cache is stale
+          // https://github.com/onzag/itemize/issues/23
+          if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
+            if (!isReconnect) {
+              logger.info(
+                "initializeServer: server initialized in cluster manager/absolute mode flushing redis",
+              );
+            } else {
+              logger.info(
+                "initializeServer: server re-initialized in cluster manager/absolute mode flushing redis",
+              );
+            }
+
+            // however in many situations the global and the local are literally the
+            // same redis server, not optimal but this is allowed so we restore
+            // these attributes from the redis server, server data, and the cached response
+            // from the currency factors, and so we flush all
+            const serverDataStr = await client.get(SERVER_DATA_IDENTIFIER) || null;
+            const currencyFactorsCachedResponseRestore = await client.get(CACHED_CURRENCY_RESPONSE) || null;
+            await client.flushall();
+            if (serverDataStr) {
+              await client.set(SERVER_DATA_IDENTIFIER, serverDataStr);
+            }
+            if (currencyFactorsCachedResponseRestore) {
+              await client.set(CACHED_CURRENCY_RESPONSE, currencyFactorsCachedResponseRestore);
+            }
+          }
+        });
 
     // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
     // go futher, the job of the cluster manager is to mantain the cluster redis database
@@ -370,24 +445,6 @@ export async function initializeServer(
     if (INSTANCE_MODE === "CLUSTER_MANAGER") {
       // as such 
       const cache = new Cache(redisClient, null, null, null, null, null, null);
-      logger.info(
-        "initializeServer: server initialized in cluster manager exclusive mode flushing redis",
-      );
-
-      // in case both the global and local cluster are the same
-      const getPromisified = promisify(redisClient.get).bind(redisClient);
-      const setPromisified = promisify(redisClient.set).bind(redisClient);
-
-      const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
-      const currencyLayerCachedResponseRestore = await getPromisified(CACHED_CURRENCY_RESPONSE) || null;
-      const flushAllPromisified = promisify(redisClient.flushall).bind(redisClient);
-      await flushAllPromisified();
-      if (serverDataStr) {
-        await setPromisified(SERVER_DATA_IDENTIFIER, serverDataStr);
-      }
-      if (currencyLayerCachedResponseRestore) {
-        await setPromisified(CACHED_CURRENCY_RESPONSE, currencyLayerCachedResponseRestore);
-      }
       const listener = new Listener(
         buildnumber,
         redisSub,
@@ -400,6 +457,23 @@ export async function initializeServer(
         null,
         sensitiveConfig,
       );
+      // we need to inform that the cluster manager has been reset
+      // the extended nodes come after the cluster manager
+      // but if the cluster manager dies for some reason, a reset ought
+      // to be informed
+
+      // cluster manager shouldn't ever ever die but if it does there is a
+      // chance that the client caches have now gone stale as they
+      // were using non-updates cache references, now that the cache is clear
+      // as the cache is cleared whenever the cluster manager starts then
+      // we need to ensure clients that are connected to the extended nodes
+      // are updated as well, so what the cluster manager reset does under the hood
+      // is kick all the clients so they are forced to reconnect and ask for feedback
+      // a non-optimal situation, and a non-optimal solution, but this is an edge
+      // case scenario, because the cluster manager, shouldn't ever die
+
+      // the whole action on its own should repopulate the cache but again
+      // the cluster manager shouldn't die
       listener.informClusterManagerReset();
       return;
     }
@@ -407,7 +481,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing redis global cache client",
     );
-    const redisGlobalClient: RedisClient = redis.createClient(redisConfig.global);
+    const redisGlobalClient: ItemizeRedisClient = await setupRedisClient("global", redisConfig.global);
 
     logger.info(
       "initializeServer: initializing itemize server root",
@@ -436,13 +510,24 @@ export async function initializeServer(
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
+    logger.info(
+      "initializeServer: initializing registry",
+    );
+    const registry = new RegistryService({
+      knex,
+    }, null);
+    await registry.initialize();
+
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
         "initializeServer: setting up global manager",
       );
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
+      if (!CurrencyFactorsClass.isGlobal()) {
+        throw new Error("Currency factors custom provider class is not a global type");
+      }
       const currencyFactorsService = sensitiveConfig.currencyFactors ?
-        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, redisGlobalClient) :
+        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, redisGlobalClient) :
         null;
       currencyFactorsService && await currencyFactorsService.initialize();
       const manager: GlobalManager = new GlobalManager(
@@ -453,7 +538,28 @@ export async function initializeServer(
         config,
         sensitiveConfig,
         currencyFactorsService,
+        registry,
       );
+
+      if (serviceCustom && serviceCustom.customServices) {
+        await Promise.all(
+          Object.keys(serviceCustom.customServices).map(async (keyName) => {
+            const CustomServiceClass = serviceCustom.customServices[keyName];
+
+            if (!CustomServiceClass.isGlobal()) {
+              return;
+            }
+
+            const configData = {
+              ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+              ...(config.custom && config.custom[keyName]),
+            };
+            const customGlobalService = new CustomServiceClass(configData, registry);
+            await manager.installGlobalService(customGlobalService);
+          })
+        );
+      }
+
       if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
           "initializeServer: initializing SEO configuration",
@@ -479,11 +585,11 @@ export async function initializeServer(
 
           let storageClient: StorageProvider<any>;
           if (isLocalInstead) {
-            storageClient = new LocalStorageService(null, sensitiveConfig.seoContainerID, prefix);
+            storageClient = new LocalStorageService(null, registry, sensitiveConfig.seoContainerID, prefix);
           } else {
             const type = seoContainerData.type;
             const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
-            storageClient = new ServiceClass(seoContainerData.config, sensitiveConfig.seoContainerID, prefix);
+            storageClient = new ServiceClass(seoContainerData.config, registry, sensitiveConfig.seoContainerID, prefix);
           }
 
           await storageClient.initialize();
@@ -512,25 +618,30 @@ export async function initializeServer(
       "initializeServer: initializing cloud clients",
     );
 
-    const storageClients = await getStorageProviders(config, sensitiveConfig, serviceCustom && serviceCustom.storageServiceProviders);
+    const storageClients = await getStorageProviders(
+      config,
+      sensitiveConfig,
+      serviceCustom && serviceCustom.storageServiceProviders,
+      registry,
+    );
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
         "initializeServer: cleaning storage",
       );
 
-      await Promise.all(Object.keys(storageClients).map(async (containerId) => {
+      await Promise.all(Object.keys(storageClients.cloudClients).map(async (containerId) => {
         if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
           logger.info(
             "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
           );
-          const client = storageClients[containerId];
+          const client = storageClients.cloudClients[containerId];
           await client.removeFolder("sitemaps/" + domain);
         } else {
           logger.info(
             "initializeServer: cleaning " + containerId + " data for " + domain,
           );
-          const client = storageClients[containerId];
+          const client = storageClients.cloudClients[containerId];
           await client.removeFolder(domain);
         }
       }));
@@ -542,7 +653,6 @@ export async function initializeServer(
     logger.info(
       "initializeServer: attempting to retrieve server data",
     );
-    const getPromisified = promisify(redisGlobalClient.get).bind(redisGlobalClient);
     const wait = (time: number) => {
       return new Promise((resolve) => {
         setTimeout(resolve, time);
@@ -554,7 +664,7 @@ export async function initializeServer(
         "initializeServer: waiting one second",
       );
       await wait(1000);
-      const serverDataStr = await getPromisified(SERVER_DATA_IDENTIFIER) || null;
+      const serverDataStr = await redisGlobalClient.get(SERVER_DATA_IDENTIFIER) || null;
       if (!serverDataStr) {
         logger.info(
           "initializeServer: server data not available, is global cache and global manager running?",
@@ -567,7 +677,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients, domain, root, serverData);
+    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -595,8 +705,11 @@ export async function initializeServer(
       );
     }
     const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
+    if (UserLocalizationServiceClass.isGlobal()) {
+      throw new Error("The user localization service class is a global type, and that's not allowed");
+    }
     const userLocalizationService = sensitiveConfig.userLocalization ?
-      new UserLocalizationServiceClass(sensitiveConfig.userLocalization) :
+      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry) :
       null;
     userLocalizationService && await userLocalizationService.initialize();
 
@@ -606,16 +719,23 @@ export async function initializeServer(
       );
     }
     let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
+    if (MailServiceClass.isGlobal()) {
+      throw new Error("The mail service class is global type, and that's not allowed");
+    }
     if (process.env.FAKE_EMAILS === "true") {
       logger.info(
         "initializeServer: using fake email service",
       );
-      MailServiceClass = FakeMailService;
+      // typescript messes the types again
+      MailServiceClass = FakeMailService as any;
     }
     const mailService = sensitiveConfig.mail ?
       new MailServiceClass(
         sensitiveConfig.mail,
+        registry,
         cache,
+        root,
+        config,
         sensitiveConfig,
       ) : null;
     mailService && await mailService.initialize();
@@ -626,9 +746,69 @@ export async function initializeServer(
       );
     }
     const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
+    if (LocationSearchClass.isGlobal()) {
+      throw new Error("The location search service class is global type, and that's not allowed");
+    }
     const locationSearchService = sensitiveConfig.locationSearch ?
-      new LocationSearchClass(sensitiveConfig.locationSearch) : null;
+      new LocationSearchClass(sensitiveConfig.locationSearch, registry) : null;
     locationSearchService && await locationSearchService.initialize();
+
+    const customServices: {
+      [name: string]: ServiceProvider<any>,
+    } = {};
+
+    const customServicesInstances: ServiceProvider<any>[] = [];
+    const customServiceClassesUsed: IServiceProviderClassType<any>[] = [];
+
+    if (serviceCustom && serviceCustom.customServices) {
+      await Promise.all(
+        Object.keys(serviceCustom.customServices).map(async (keyName) => {
+          const CustomServiceClass = serviceCustom.customServices[keyName];
+
+          if (CustomServiceClass.isGlobal()) {
+            return;
+          }
+
+          const configData = {
+            ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+            ...(config.custom && config.custom[keyName]),
+          };
+          customServices[keyName] = new CustomServiceClass(configData, registry);
+          await customServices[keyName].initialize();
+
+          customServicesInstances.push(customServices[keyName]);
+          if (!customServiceClassesUsed.includes(CustomServiceClass)) {
+            customServiceClassesUsed.push(CustomServiceClass);
+          }
+        })
+      );
+    }
+
+    logger.info(
+      "initializeServer: extracting triggers from all the providers",
+    );
+    const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
+    const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
+    const mailServiceInstanceTrigger = mailService && await mailService.getTriggerRegistry();
+    const mailServiceClassTrigger = mailService && await MailServiceClass.getTriggerRegistry();
+    const locationSearchServiceInstanceTrigger = locationSearchService && await locationSearchService.getTriggerRegistry();
+    const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
+    const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
+    const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
+    const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
+    const classTriggersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getTriggerRegistry()));
+    const triggers = [
+      ...instanceTriggers,
+      ...classTriggers,
+      ...instaceTriggersCustom,
+      ...classTriggersCustom,
+      userLocalizationInstanceTrigger,
+      userLocalizationClassTrigger,
+      mailServiceInstanceTrigger,
+      mailServiceClassTrigger,
+      locationSearchServiceInstanceTrigger,
+      locationSearchServiceClassTrigger,
+    ].filter((r) => !!r);
 
     const appData: IAppDataType = {
       root,
@@ -653,12 +833,15 @@ export async function initializeServer(
       triggers: mergeTriggerRegistries(
         customUserTriggers,
         custom.customTriggers,
+        ...triggers,
       ),
       userLocalizationService,
       locationSearchService,
       mailService,
-      storage: storageClients,
+      storage: storageClients.cloudClients,
       logger,
+      customServices,
+      registry,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
@@ -670,38 +853,45 @@ export async function initializeServer(
       "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,
     );
 
-    if (INSTANCE_MODE === "ABSOLUTE") {
-      logger.info(
-        "initializeServer: server initialized in absolute mode flushing redis",
-      );
+    logger.info(
+      "initializeServer: setting execution of all service providers",
+    );
+    userLocalizationService && userLocalizationService.execute();
+    mailService && mailService.execute();
+    locationSearchService && locationSearchService.execute();
+    storageClients.instancesUsed.forEach((i) => i.execute());
+    customServicesInstances.forEach((i) => i.execute());
 
-      const flushAllPromisified = promisify(appData.redis.flushall).bind(appData.redis);
-      const getPromisified = promisify(appData.redis.get).bind(appData.redis);
-      const setPromisified = promisify(appData.redis.set).bind(appData.redis);
-      const currencyCachedResponseRestore = await getPromisified(CACHED_CURRENCY_RESPONSE);
-      const serverDataCachedRestore = await getPromisified(SERVER_DATA_IDENTIFIER);
-      await flushAllPromisified();
-      // this cached data is intended for the global,
-      // but the global and the local might be set to the same redis
-      // database, which is not really optimal, but what can you do
-      // but it might be the same, I need to restore it in order
-      // to avoid draining the currency layer api
-      if (currencyCachedResponseRestore) {
-        await setPromisified(CACHED_CURRENCY_RESPONSE, currencyCachedResponseRestore);
-      }
-      if (serverDataCachedRestore) {
-        await setPromisified(SERVER_DATA_IDENTIFIER, serverDataCachedRestore);
-      }
-    } else {
-      logger.info(
-        "initializeServer: server initialized in standard mode, not flushing redis",
-      );
-    }
+    logger.info(
+      "initializeServer: extracting routers of all the providers",
+    );
+    const userLocalizationInstanceRouter = userLocalizationService && await userLocalizationService.getRouter(appData);
+    const userLocalizationClassRouter = userLocalizationService && await UserLocalizationServiceClass.getRouter(appData);
+    const mailServiceInstanceRouter = mailService && await mailService.getRouter(appData);
+    const mailServiceClassRouter = mailService && await MailServiceClass.getRouter(appData);
+    const locationSearchServiceInstanceRouter = locationSearchService && await locationSearchService.getRouter(appData);
+    const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
+    const instanceRouters = await Promise.all(storageClients.instancesUsed.map((i) => i.getRouter(appData)));
+    const classRouters = await Promise.all(storageClients.classesUsed.map((c) => c.getRouter(appData)));
+    const instaceRoutersCustom = await Promise.all(customServicesInstances.map((i) => i.getRouter(appData)));
+    const classRoutersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getRouter(appData)));
+    const routers = [
+      ...instanceRouters,
+      ...classRouters,
+      ...instaceRoutersCustom,
+      ...classRoutersCustom,
+      userLocalizationInstanceRouter,
+      userLocalizationClassRouter,
+      mailServiceInstanceRouter,
+      mailServiceClassRouter,
+      locationSearchServiceInstanceRouter,
+      locationSearchServiceClassRouter,
+    ].filter((r) => !!r);
 
     logger.info(
       "initializeServer: setting up endpoints",
     );
-    initializeApp(appData, custom);
+    initializeApp(appData, custom, routers);
 
     logger.info(
       "initializeServer: attempting to listen at " + PORT,

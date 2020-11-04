@@ -461,6 +461,7 @@ export default class Module {
     this.childPropExtensionItemDefinition.setAsExtensionsInstance();
 
     this.parentRoot.registry[this.getQualifiedPathName()] = this;
+    this.parentRoot.pathRegistry[this.getPath().join("/")] = this;
   }
 
   public cleanState() {

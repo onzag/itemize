@@ -21,7 +21,7 @@ import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
 import Knex from "knex";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
-import { StorageProvider } from "../../../server/services";
+import StorageProvider from "../../../server/services/base/StorageProvider";
 
 /**
  * Provides the table that is necesary to include this module and all

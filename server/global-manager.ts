@@ -1,5 +1,4 @@
 import Knex from "knex";
-import { RedisClient } from "redis";
 import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
@@ -12,7 +11,10 @@ import uuid from "uuid";
 import Include from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
-import { CurrencyFactorsProvider, ICurrencyFactorsProviderClassType } from "./services";
+import { ServiceProvider } from "./services";
+import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
+import { RegistryService } from "./services/registry";
+import { ItemizeRedisClient } from "./redis";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -29,8 +31,8 @@ const wait = (time: number) => {
 export class GlobalManager {
   private root: Root;
   private knex: Knex;
-  private globalCache: RedisClient;
-  private redisPub: RedisClient;
+  private globalCache: ItemizeRedisClient;
+  private redisPub: ItemizeRedisClient;
   private idefNeedsMantenience: ItemDefinition[];
   private modNeedsMantenience: Module[];
   private serverData: IServerDataType;
@@ -40,15 +42,18 @@ export class GlobalManager {
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
+  private customServices: ServiceProvider<any>[];
+  private registry: RegistryService;
 
   constructor(
     root: Root,
     knex: Knex,
-    globalCache: RedisClient,
-    redisPub: RedisClient,
+    globalCache: ItemizeRedisClient,
+    redisPub: ItemizeRedisClient,
     config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
+    registry: RegistryService,
   ) {
     this.root = root;
     this.knex = knex;
@@ -59,8 +64,11 @@ export class GlobalManager {
     this.serverData = null;
     this.config = config;
     this.sensitiveConfig = sensitiveConfig;
+    this.registry = registry;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
+
+    this.customServices = [];
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
@@ -75,6 +83,11 @@ export class GlobalManager {
   public setSEOGenerator(seoGenerator: SEOGenerator) {
     this.seoGenerator = seoGenerator;
   }
+  public async installGlobalService(service: ServiceProvider<any>) {
+    this.customServices.push(service);
+    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub);
+    await service.initialize();
+  }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
       logger.info(
@@ -87,15 +100,37 @@ export class GlobalManager {
     const userIdef = userMod.getItemDefinitionFor(["user"]);
     const moduleTable = userMod.getQualifiedPathName();
     const selfTable = userIdef.getQualifiedPathName();
-    const primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
+    let primaryAdminUser: any;
+    try {
+      primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
+    } catch (err) {
+      logger.error(
+        "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+    }
 
     if (!primaryAdminUser) {
       logger.info(
         "GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one",
       );
 
-      const currentAdminUserWithSuchUsername =
-        await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
+      let currentAdminUserWithSuchUsername: any;
+      try {
+        currentAdminUserWithSuchUsername = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
+      } catch (err) {
+        logger.error(
+          "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+      }
+
       let username = "admin";
       if (currentAdminUserWithSuchUsername) {
         username = "admin" + (new Date()).getTime();
@@ -205,13 +240,29 @@ export class GlobalManager {
     }
   }
   public run() {
+    // currency factors shoudn't really have its own execution but who knows
+    if (this.currencyFactorsProvider) {
+      this.currencyFactorsProvider.execute();
+    }
+
+    // hijack the seo generator and do our own executions
     if (this.seoGenerator) {
       (async () => {
         while (true) {
           this.seoGenLastUpdated = (new Date()).getTime();
 
           logger.info("GlobalManager.run: running SEO Generator");
-          await this.seoGenerator.run();
+          try {
+            await this.seoGenerator.run();
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: Seo generator failed to run",
+              {
+                errStack: err.stack,
+                errMessage: err.message,
+              }
+            );
+          }
     
           const nowTime = (new Date()).getTime();
           const timeItPassedSinceSeoGenRan = nowTime - this.seoGenLastUpdated;
@@ -232,12 +283,25 @@ export class GlobalManager {
         }
       })();
     }
+
+    // this is what it's used with currency factors in reality
     (async () => {
       while (true) {
         this.serverDataLastUpdated = (new Date()).getTime();
 
         await this.calculateServerData();
-        await this.runOnce();
+
+        try {
+          await this.runOnce();
+        } catch (err) {
+          logger.error(
+            "GlobalManager.run [SERIOUS]: run once function failed to run",
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+            }
+          );
+        }
   
         const nowTime = (new Date()).getTime();
         const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
@@ -258,6 +322,9 @@ export class GlobalManager {
         }
       }
     })();
+    
+    // execute every custom service
+    this.customServices.forEach((s) => s.execute());
   }
   private async runOnce() {
     for (const mod of this.modNeedsMantenience) {
@@ -461,7 +528,7 @@ export class GlobalManager {
     const stringifiedServerData = JSON.stringify(this.serverData);
 
     // update the server data so that the instances can receive it
-    this.globalCache.set(
+    this.globalCache.redisClient.set(
       SERVER_DATA_IDENTIFIER,
       stringifiedServerData,
       (err: Error) => {
@@ -487,7 +554,7 @@ export class GlobalManager {
     }
 
     // publishing new server data
-    this.redisPub.publish(
+    this.redisPub.redisClient.publish(
       SERVER_DATA_IDENTIFIER,
       JSON.stringify(redisEvent),
       (err: Error) => {

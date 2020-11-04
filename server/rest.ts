@@ -1,3 +1,8 @@
+/**
+ * This provides the rest endpoints for the itemize app
+ * @packageDocumentation
+ */
+
 import { IAppDataType, logger } from ".";
 import express from "express";
 import path from "path";

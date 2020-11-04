@@ -66,11 +66,16 @@ declare global {
 
 // set development mode
 if (typeof document !== "undefined") {
+  let cookieEnd = ";domain=" + location.hostname;
+  if (location.hostname !== "localhost") {
+    cookieEnd = ";secure=true";
+  }
+
   window.SET_DEV_MODE = function (mode, key) {
-    document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-    document.cookie = "devkey=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
-    document.cookie = "devmode=" + mode + ";path=/";
-    document.cookie = "devkey=" + key + ";path=/";
+    document.cookie = "devmode=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+    document.cookie = "devkey=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/" + cookieEnd;
+    document.cookie = "devmode=" + mode + ";path=/" + cookieEnd;
+    document.cookie = "devkey=" + key + ";path=/" + cookieEnd;
   }
 
   // set testing mode
