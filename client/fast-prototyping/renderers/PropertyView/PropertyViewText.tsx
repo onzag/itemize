@@ -7,12 +7,10 @@
  */
 
 import {
-  ICustomUITemplateHandler,
   IPropertyViewTextRendererProps,
-  SUPPORTED_TEMPLATE_EVENTS,
 } from "../../../internal/components/PropertyView/PropertyViewText";
 import React from "react";
-import { DOMWindow, processTemplateInitialization } from "../../../../util";
+import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
 
 /**
@@ -146,7 +144,7 @@ interface IPropertyViewRichTextViewerProps {
   disableLinks: boolean;
   children?: string;
   isTemplate?: boolean;
-  disableHTMLTemplating?: boolean;
+  disableInnerHTMLTemplating?: boolean;
   templateArgs?: any;
 }
 
@@ -186,7 +184,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     this.cheapdiv = DOMWindow.document.createElement("div");
 
     this.state = {
-      html: this.getHTML(props.children, props.disableLinks, props.isTemplate, props.disableHTMLTemplating, props.templateArgs),
+      html: this.getHTML(props.children, props.disableLinks, props.isTemplate, props.disableInnerHTMLTemplating, props.templateArgs),
     }
   }
 
@@ -195,7 +193,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
    * that is going to be rendered instead for the inner html
    * @param html 
    */
-  public getHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableHTMLTemplating: boolean, templateArgs: any) {
+  public getHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableInnerHTMLTemplating: boolean, templateArgs: any) {
     // with no html it's null
     if (!html) {
       return null;
@@ -247,13 +245,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     });
 
     if (isTemplate) {
-      processTemplateInitialization(
-        this.cheapdiv,
-        disableHTMLTemplating,
-        this.props.templateArgs,
-        this.props.templateArgs,
-        [],
-      );
+      // TODO
     }
 
     // and return the fresh inner html
@@ -283,9 +275,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
    * updates the html
    * @param html the html to update for
    */
-  public updateHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableHTMLTemplating: boolean, templateArgs: any) {
+  public updateHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableInnerHTMLTemplating: boolean, templateArgs: any) {
     this.setState({
-      html: this.getHTML(html, disableLinks, isTemplate, disableHTMLTemplating, templateArgs),
+      html: this.getHTML(html, disableLinks, isTemplate, disableInnerHTMLTemplating, templateArgs),
     });
   }
 
@@ -326,135 +318,28 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     triggerOldSchoolListeners();
   }
 
-  public attachTemplateListeners() {
-    SUPPORTED_TEMPLATE_EVENTS.forEach((eventKey) => {
-      this.divref.current.querySelectorAll("[data-on-" + eventKey + "]").forEach((node: HTMLElement) => {
-        const functionToCall = node.getAttribute("data-on-" + eventKey);
-        let processedFunctionToCall = functionToCall.trim();
-
-        const fn = this.props.templateArgs[processedFunctionToCall];
-        if (typeof fn === "undefined") {
-          console.warn("Listener does not match a function to call in template at data-on-" + eventKey + "=" + JSON.stringify(functionToCall));
-        } else if (typeof fn !== "function" && fn !== null) {
-          console.warn(
-            "Listener is not an actual function but rather " +
-            (typeof fn) +
-            " at data-on-" + eventKey + "=" + JSON.stringify(functionToCall)
-          );
-        } else if (fn !== null) {
-          this.divref.current.addEventListener(eventKey, fn);
-        }
-      });
-    });
-
-    this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node: HTMLElement) => {
-      const handlerToUseKey = node.dataset.uiHandler;
-      const handler: ICustomUITemplateHandler = this.props.templateArgs[handlerToUseKey];
-
-      if (typeof handler === "undefined") {
-        console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
-      } else if (handler && handler.load) {
-        const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
-        let contextArgsToUse = this.props.templateArgs;
-        handlerContextPath.forEach((key: string | number) => {
-          contextArgsToUse = contextArgsToUse[key];
-        });
-        handler.load(node, DOMWindow, contextArgsToUse, this.props.templateArgs);
-      }
-    });
-
-    this.divref.current.querySelectorAll("[data-hover-style]").forEach((node: HTMLElement) => {
-      const styleToUse = node.getAttribute("data-hover-style");
-      const originalStyle = node.getAttribute("style");
-
-      node.addEventListener("moouseover", () => {
-        node.setAttribute("style", styleToUse);
-      });
-
-      node.addEventListener("mouseleave", () => {
-        if (originalStyle) {
-          node.setAttribute("style", originalStyle);
-        } else {
-          node.removeAttribute("style");
-        }
-      });
-    });
-
-    this.divref.current.querySelectorAll("[data-active-style]").forEach((node: HTMLElement) => {
-      const styleToUse = node.getAttribute("data-active-style");
-      const originalStyle = node.getAttribute("style");
-
-      const setStyle = () => {
-        node.setAttribute("style", styleToUse);
-      };
-      const rmStyle = () => {
-        if (originalStyle) {
-          node.setAttribute("style", originalStyle);
-        } else {
-          node.removeAttribute("style");
-        }
-      }
-      node.addEventListener("touchstart", setStyle);
-      node.addEventListener("touchend", rmStyle);
-      node.addEventListener("mousedown", setStyle);
-      node.addEventListener("mouseup", rmStyle);
-    });
-  }
-
-  public dropOldHandlers() {
-    this.divref.current.querySelectorAll("[data-ui-handler]").forEach((node: HTMLElement) => {
-      const handlerToUseKey = node.dataset.uiHandler;
-      const handler: ICustomUITemplateHandler = this.props.templateArgs[handlerToUseKey];
-
-      if (typeof handler === "undefined") {
-        console.warn("Handler is not specified at data-ui-handler=" + JSON.stringify(handlerToUseKey));
-      } else if (handler && handler.unload) {
-        const handlerContextPath = JSON.parse(node.dataset.uiHandlerContext);
-        let contextArgsToUse = this.props.templateArgs;
-        handlerContextPath.forEach((key: string | number) => {
-          contextArgsToUse = contextArgsToUse[key];
-        });
-        handler.unload(node, DOMWindow, contextArgsToUse, this.props.templateArgs);
-      }
-    });
-  }
-
   public componentDidMount() {
     // we prepare all the lazy loader stuff which might make our things
     // go with loading=lazy
     this.prepareLazyLoader();
     // and attach the events for the stuff
     this.attachEvents();
-
-    if (this.props.isTemplate) {
-      this.attachTemplateListeners();
-    }
   }
   public componentDidUpdate() {
     // on any update we do the same as we only really update when the html changes
     // any other updates are denied
     this.prepareLazyLoader();
     this.attachEvents();
-
-    if (this.props.isTemplate) {
-      this.attachTemplateListeners();
-    }
-  }
-  public componentWillUnmount() {
-    if (this.props.isTemplate) {
-      this.dropOldHandlers();
-    }
   }
   public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
     if (
       nextProps.children !== this.props.children ||
       nextProps.disableLinks !== this.props.disableLinks ||
       nextProps.isTemplate !== this.props.isTemplate ||
-      nextProps.disableHTMLTemplating !== this.props.disableHTMLTemplating ||
+      nextProps.disableInnerHTMLTemplating !== this.props.disableInnerHTMLTemplating ||
       !equals(nextProps.templateArgs, this.props.templateArgs)
     ) {
-      this.dropOldHandlers();
-      this.updateHTML(nextProps.children, nextProps.disableLinks, nextProps.isTemplate, nextProps.disableHTMLTemplating, nextProps.templateArgs);
+      this.updateHTML(nextProps.children, nextProps.disableLinks, nextProps.isTemplate, nextProps.disableInnerHTMLTemplating, nextProps.templateArgs);
     }
     // see only when the html changes
     return this.state.html !== nextState.html;
@@ -489,7 +374,7 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
         disableLinks={!!props.args.disableLinks}
         isTemplate={!!props.args.makeTemplate}
         templateArgs={props.args.templateArgs}
-        disableHTMLTemplating={!!props.args.disableHTMLTemplating}
+        disableInnerHTMLTemplating={!!props.args.disableInnerHTMLTemplating}
       >
         {props.currentValue}
       </PropertyViewRichTextViewer>

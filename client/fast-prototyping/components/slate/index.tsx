@@ -1,6 +1,7 @@
 import React from "react";
 import uuid from "uuid";
-import { IRootLevelDocument } from "./serializer";
+
+import { IRootLevelDocument } from "../../../internal/text/serializer";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";

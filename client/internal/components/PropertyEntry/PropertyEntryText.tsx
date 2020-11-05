@@ -9,10 +9,10 @@ import equals from "deep-equal";
 import uuid from "uuid";
 import { DOMPurify, checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { propertyViewPostProcessingHook, PROPERTY_VIEW_SANITIZE_CONFIG } from "../PropertyView/PropertyViewText";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
+import { sanitize } from "../../../internal/text";
 
 /**
  * Information about the file that has just been inserted
@@ -554,9 +554,23 @@ export default class PropertyEntryText
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
         this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
-      currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
-      DOMPurify.removeAllHooks();
+      currentValue = sanitize(
+        {
+          cacheFiles: this.props.cacheFiles,
+          config: this.props.config,
+          containerId: this.props.containerId,
+          currentFiles,
+          forId: this.props.forId,
+          forVersion: this.props.forVersion,
+          include: this.props.include,
+          itemDefinition: this.props.itemDefinition,
+          mediaProperty: this.cachedMediaProperty,
+          supportsFiles,
+          supportsImages,
+          supportsVideos,
+        },
+        currentValue,
+      );
     }
 
     let invalidReason = this.props.state.invalidReason;

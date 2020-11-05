@@ -1,5 +1,15 @@
-const SERIALIZE_REGISTRY: any = {};
-const DESERIALIZE_REGISTRY: any = {
+const SERIALIZE_REGISTRY: {
+  [type: string]: (element: SlateElement) => Node
+} = {};
+
+interface IDeserializeRegistryType {
+  [attr: string]: (n: Node) => SlateElement | IText;
+}
+const DESERIALIZE_REGISTRY: {
+  byClassNamePrefix: IDeserializeRegistryType;
+  byClassName: IDeserializeRegistryType;
+  byTag: IDeserializeRegistryType;
+} = {
   // in priority
   byClassNamePrefix: {
 
@@ -33,12 +43,35 @@ function serializeText(text: IText): Node {
   return final;
 }
 
-function deserializeText(node: Node) {
+function deserializeText(node: Node): IText {
+  if (!node) {
+    return {
+      text: "",
+      bold: false,
+      italic: false,
+    }
+  }
 
+  const nodeAsHTMLElement = node as HTMLElement;
+  if (nodeAsHTMLElement.tagName === "STRONG") {
+    const textValue = deserializeText(node.childNodes[0]);
+    textValue.bold = true;
+    return textValue;
+  } else if (nodeAsHTMLElement.tagName === "I") {
+    const textValue = deserializeText(node.childNodes[0]);
+    textValue.italic = true;
+    return textValue;
+  }
+
+  return {
+    text: node.textContent,
+    bold: false,
+    italic: false,
+  };
 }
 
-DESERIALIZE_REGISTRY.byTag.strong = deserializeText;
-DESERIALIZE_REGISTRY.byTag.i = deserializeText;
+DESERIALIZE_REGISTRY.byTag.STRONG = deserializeText;
+DESERIALIZE_REGISTRY.byTag.I = deserializeText;
 
 /**
  * Represents the basic text type for the slate editor support
@@ -120,13 +153,39 @@ function serializeElementBase(base: IElementBase, tag: string, baseClass: string
         elementComponent.appendChild(textNode);
       } else if (SERIALIZE_REGISTRY[(c as SlateElement).type]) {
         const fn = SERIALIZE_REGISTRY[(c as SlateElement).type];
-        const childElement = fn(c);
+        const childElement = fn(c as SlateElement);
         elementComponent.appendChild(childElement);
       }
     });
   }
 
   return elementComponent;
+}
+
+function deserializeElementBase(node: HTMLElement): IElementBase {
+  if (!node) {
+    return {};
+  }
+
+  const result: IElementBase = {};
+  if (node.classList) {
+    node.classList.forEach((c) => {
+      if (c.startsWith("rich-text--")) {
+        result.richClassList = result.richClassList || [];
+        result.richClassList.push(c.substr(11));
+      }
+    });
+  }
+
+  Object.keys(translations).forEach((tKey) => {
+    const attr = translations[tKey] as string;
+    const value = node.getAttribute(attr);
+    if (value) {
+      result[tKey] = value;
+    }
+  });
+
+  return result;
 }
 
 /**
@@ -286,13 +345,20 @@ function serializeParagraph(p: IParagraph) {
 }
 SERIALIZE_REGISTRY["paragraph"] = serializeParagraph;
 
-function deserializeParagraph(node: HTMLElement) {
-
+function deserializeParagraph(node: HTMLElement): IParagraph {
+  const base = deserializeElementBase(node);
+  const paragraph: IParagraph = {
+    ...base,
+    type: "paragraph",
+    subtype: node.tagName.toLowerCase() as any,
+    children: [deserializeText(node.childNodes[0])],
+  }
+  return paragraph;
 }
 
-DESERIALIZE_REGISTRY.byTag.p = deserializeParagraph;
-DESERIALIZE_REGISTRY.byTag.div = deserializeParagraph;
-DESERIALIZE_REGISTRY.byTag.span = deserializeParagraph;
+DESERIALIZE_REGISTRY.byTag.P = deserializeParagraph;
+DESERIALIZE_REGISTRY.byTag.DIV = deserializeParagraph;
+DESERIALIZE_REGISTRY.byTag.SPAN = deserializeParagraph;
 
 /**
  * Represents the paragraph, p type for the
@@ -317,16 +383,23 @@ function serializeTitle(title: ITitle) {
 }
 SERIALIZE_REGISTRY["title"] = serializeTitle;
 
-function deserializeTitle(node: HTMLElement) {
-
+function deserializeTitle(node: HTMLElement): ITitle {
+  const base = deserializeElementBase(node);
+  const title: ITitle = {
+    ...base,
+    type: "title",
+    subtype: node.tagName.toLowerCase() as any,
+    children: [deserializeText(node.childNodes[0])],
+  }
+  return title;
 }
 
-DESERIALIZE_REGISTRY.byTag.h1 = deserializeTitle;
-DESERIALIZE_REGISTRY.byTag.h2 = deserializeTitle;
-DESERIALIZE_REGISTRY.byTag.h3 = deserializeTitle;
-DESERIALIZE_REGISTRY.byTag.h4 = deserializeTitle;
-DESERIALIZE_REGISTRY.byTag.h5 = deserializeTitle;
-DESERIALIZE_REGISTRY.byTag.h6 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H1 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H2 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H3 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H4 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H5 = deserializeTitle;
+DESERIALIZE_REGISTRY.byTag.H6 = deserializeTitle;
 
 /**
  * Represents the title, h1, h2, h3, etc...
@@ -356,8 +429,21 @@ function serializeContainer(container: IContainer) {
 }
 SERIALIZE_REGISTRY["container"] = serializeContainer;
 
-function deserializeContainer(node: HTMLDivElement) {
-
+function deserializeContainer(node: HTMLDivElement): IContainer {
+  const base = deserializeElementBase(node);
+  let containerType: string = null;
+  node.classList.forEach((c) => {
+    if (c.startsWith("container-")) {
+      containerType = c.substr(10);
+    }
+  });
+  const container: IContainer = {
+    ...base,
+    type: "container",
+    containerType,
+    children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as SlateElement[],
+  }
+  return container;
 }
 
 DESERIALIZE_REGISTRY.byClassName.container = deserializeContainer;
@@ -399,11 +485,28 @@ function serializeLink(link: ILink) {
 }
 SERIALIZE_REGISTRY["link"] = serializeLink;
 
-function deserializeLink(node: HTMLAnchorElement) {
+function deserializeLink(node: HTMLAnchorElement): ILink {
+  const base = deserializeElementBase(node);
+  let href: string = null;
+  let thref: string = null;
 
+  if (node.dataset.href) {
+    thref = node.dataset.href;
+  } else {
+    href = node.href || null;
+  }
+
+  const link: ILink = {
+    ...base,
+    type: "link",
+    href,
+    thref,
+    children: [deserializeText(node.childNodes[0])],
+  }
+  return link;
 }
 
-DESERIALIZE_REGISTRY.byTag.a = deserializeLink;
+DESERIALIZE_REGISTRY.byTag.A = deserializeLink;
 
 /**
  * The link represents an a type
@@ -437,11 +540,17 @@ function serializeQuote(quote: IQuote) {
 }
 SERIALIZE_REGISTRY["quote"] = serializeQuote;
 
-function deserializeQuote(node: HTMLQuoteElement) {
-
+function deserializeQuote(node: HTMLQuoteElement): IQuote {
+  const base = deserializeElementBase(node);
+  const quote: IQuote = {
+    ...base,
+    type: "quote",
+    children: [deserializeText(node.childNodes[0])],
+  }
+  return quote;
 }
 
-DESERIALIZE_REGISTRY.byTag.quote = deserializeQuote;
+DESERIALIZE_REGISTRY.byTag.QUOTE = deserializeQuote;
 
 /**
  * Represents a quote tag
@@ -531,12 +640,40 @@ function serializeImage(img: IImage) {
 }
 SERIALIZE_REGISTRY["image"] = serializeImage;
 
-function deserializeImage(node: HTMLDivElement | HTMLImageElement) {
+function deserializeImage(node: HTMLDivElement | HTMLImageElement): IImage {
+  // first we need to check everything is fine
+  const img = node.tagName === "IMG" ? node : node.querySelector("img") as HTMLImageElement;
+  if (!img) {
+    return null;
+  }
 
+  const base = deserializeElementBase(node);
+
+  // and extract the info according to the specs
+  // the spec says srcset sizes and src will be stripped but can be available
+  return {
+    ...base,
+    type: "image",
+    alt: img.getAttribute("alt") || null,
+    src: img.getAttribute("src"),
+    srcId: img.dataset.srcId,
+    srcSet: img.getAttribute("srcset") || null,
+    sizes: img.getAttribute("sizes") || null,
+    width: parseInt(img.dataset.srcWidth) || null,
+    height: parseInt(img.dataset.srcHeight) || null,
+    standalone: node.tagName === "IMG",
+    children: [
+      {
+        text: "",
+        bold: false,
+        italic: false,
+      }
+    ]
+  };
 }
 
 DESERIALIZE_REGISTRY.byClassName.image = deserializeImage;
-DESERIALIZE_REGISTRY.byTag.img = deserializeImage;
+DESERIALIZE_REGISTRY.byTag.IMG = deserializeImage;
 
 /**
  * Represents the basic image element
@@ -627,8 +764,30 @@ function serializeFile(file: IFile) {
 }
 SERIALIZE_REGISTRY["file"] = serializeFile;
 
-function deserializeFile(node: HTMLDivElement) {
-
+function deserializeFile(node: HTMLDivElement): IFile {
+  const fileNameNode = node.querySelector(".file-name");
+  const fileExtensionNode = node.querySelector(".file-extension");
+  const fileSizeNode = node.querySelector(".file-size");
+  if (!fileNameNode || !fileExtensionNode || !fileSizeNode) {
+    return null;
+  }
+  const base = deserializeElementBase(node);
+  return {
+    ...base,
+    type: "file",
+    srcId: node.dataset.srcId,
+    name: fileNameNode.textContent,
+    extension: fileExtensionNode.textContent,
+    size: fileSizeNode.textContent,
+    src: node.dataset.src,
+    children: [
+      {
+        text: "",
+        bold: false,
+        italic: false,
+      },
+    ],
+  };
 }
 
 DESERIALIZE_REGISTRY.byClassName.file = deserializeFile;
@@ -703,8 +862,26 @@ function serializeVideo(video: IVideo) {
 }
 SERIALIZE_REGISTRY["video"] = serializeVideo;
 
-function deserializeVideo(node: HTMLDivElement) {
+function deserializeVideo(node: HTMLDivElement): IVideo {
+  const iframe = node.querySelector("iframe") as HTMLIFrameElement;
+  if (!iframe) {
+    return null;
+  }
+  const base = deserializeElementBase(node);
 
+  return {
+    ...base,
+    type: "video",
+    src: iframe.dataset.videoSrc,
+    origin: iframe.dataset.videoOrigin as any,
+    children: [
+      {
+        text: "",
+        bold: false,
+        italic: false,
+      }
+    ]
+  };
 }
 
 DESERIALIZE_REGISTRY.byClassName.video = deserializeVideo;
@@ -761,8 +938,21 @@ export interface ICustom extends IElementBase {
   children: SlateElement[];
 }
 
-function deserializeCustom(node: HTMLDivElement) {
-
+function deserializeCustom(node: HTMLDivElement): ICustom {
+  const base = deserializeElementBase(node);
+  let customType: string = null;
+  node.classList.forEach((c) => {
+    if (c.startsWith("custom-")) {
+      customType = c.substr(7);
+    }
+  });
+  const custom: ICustom = {
+    ...base,
+    type: "custom",
+    customType,
+    children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as SlateElement[],
+  }
+  return custom;
 }
 
 DESERIALIZE_REGISTRY.byClassNamePrefix.custom = deserializeCustom;
@@ -785,7 +975,7 @@ export interface IRootLevelDocument {
  * @param document 
  */
 export function serialize(document: IRootLevelDocument): HTMLElement[] {
-  return document.children.map(serializeElement).filter((n) => n !== null);
+  return document.children.map(serializeElement).filter((n) => n !== null) as HTMLElement[];
 }
 
 function serializeElement(element: SlateElement) {
@@ -797,10 +987,10 @@ function serializeElement(element: SlateElement) {
   return null;
 }
 
-function deserializeElement(node: Node): SlateElement {
+function deserializeElement(node: Node): SlateElement | IText {
   const tagName = (node as HTMLElement).tagName;
   if (!tagName) {
-    return null;
+    return deserializeText(node);
   }
   const classList = (node as HTMLElement).classList;
 
@@ -836,7 +1026,7 @@ export function deserialize(html: string) {
   const newDocument: IRootLevelDocument = {
     type: "document",
     id: null,
-    children: Array.from(cheapdiv.childNodes).map(deserializeElement).filter((n) => n !== null),
+    children: Array.from(cheapdiv.childNodes).map(deserializeElement).filter((n) => n !== null) as SlateElement[],
   };
 
   return newDocument;
