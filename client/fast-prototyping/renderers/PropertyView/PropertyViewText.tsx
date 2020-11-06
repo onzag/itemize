@@ -12,6 +12,7 @@ import {
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
+import { deserialize } from "../../../internal/text";
 
 /**
  * The current intersection observer
@@ -345,8 +346,14 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     return this.state.html !== nextState.html;
   }
   public render() {
+    // TODO URGENT remove this it's being used for developing
     return (
-      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
+      <>
+        <code style={{whiteSpace: "pre"}}>
+          {JSON.stringify(deserialize(this.state.html), null, 2)}
+        </code>
+        <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
+      </>
     )
   }
 }

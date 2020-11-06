@@ -8,33 +8,43 @@ The purpose of the text specs being this meaningful is to provide a design platf
 
 The text is represented as a string, however null is also a valid value, this is for when there's no text (as in an empty string); for such the value should be null and is considered equivalent to null
 
+## Links
+
+Links should use the data-href property because the href property is a forbidden attribute
+
+These links are validated and can be relative
+
+```html
+<a data-href="some/url">my link</a>
+```
+
 ## Images
 
 Any images that are added to the text should be compounded like this
 
 ```html
-<div class="image">
+<a class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
       <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
     </div>
   </div>
-</div>
+</a>
 ```
 
 However the attributes `src`, `srcset` and `sizes` might be added as well and it's considered valid and it can be submitted to the server side with these attributes in place, but they will be removed by such server side
 
 ```html
-<div class="image">
+<a class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
       <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000" sizes="70vw" src="blob:xxxxxx" srcset="etc...">
     </div>
   </div>
-</div>
+</a>
 ```
 
-The breakdown can be given like this the `div.image` represents the begining of an image, and the `div.image-container` is next as it's what actually contains the image, the `div.image-pad` class contains the valid style with a given padding this padding represents the relative height to ratio for the given image, 
+The breakdown can be given like this the `div.image` represents the begining of an image, and the `a.image-container` is next as it's what actually contains the image, it is an a type because it is able to hold a href when wished to do so, the `div.image-pad` class contains the valid style with a given padding this padding represents the relative height to ratio for the given image, 
 
 This is the "standard" form itemize recommends to format images as the rich text editor will be able to handle these, and it will able to load them lazily without affecting the layout, as the fast prototyping viewer does, however the viewer also supports standalone images.
 
@@ -71,6 +81,7 @@ These attributes can be used but they are removed by the server side for securit
  - sizes
  - data-src
  - loading
+ - href
 
 Feel free to use them they won't pollute the environment; in fact src, srcset, and sizes should be added by the handler
 
@@ -194,7 +205,7 @@ A recommended css is, in order to have a good aspect ratio
 Files can be inserted into the document and work similarly to images, however containing more information, this is the default form a file takes according to the text specification
 
 ```html
-<span class="file" contenteditable="false" data-src-id="FILE2132131231231" spellcheck="false">
+<a class="file" data-src-id="FILE2132131231231" spellcheck="false">
   <span class="file-container">
     <span class="file-icon">
       <span class="file-extension">txt</span>
@@ -202,13 +213,13 @@ Files can be inserted into the document and work similarly to images, however co
     <span class="file-name">myfile</span>
     <span class="file-size">10kb</span>
   </span>
-</span>
+</a>
 ```
 
-As these are meant to be synced to the file data itself, open the file by using event listeners, a data-src property is also allowed and will be cleared
+As these are meant to be synced to the file data itself, open the file by using event listeners, a href property is also allowed and will be cleared
 
 ```html
-<span class="file" contenteditable="false" data-src="blob:xxxxxx" data-src-id="FILE2132131231231" spellcheck="false">
+<a class="file" href="blob:xxxxxx" data-src-id="FILE2132131231231" spellcheck="false">
   <span class="file-container">
     <span class="file-icon">
       <span class="file-extension">txt</span>
@@ -216,7 +227,7 @@ As these are meant to be synced to the file data itself, open the file by using 
     <span class="file-name">myfile</span>
     <span class="file-size">10kb</span>
   </span>
-</span>
+</a>
 ```
 
 ### Forbidden Attributes
@@ -304,7 +315,7 @@ This means that the content of the span should be replaced, via textContent meth
 This allows to dinamically set the href property
 
 ```html
-<a data-href="userLink">click here</a>
+<a data-thref="userLink">click here</a>
 ```
 
 ### Style templating

@@ -1,12 +1,11 @@
-import { PropertyDefinitionSupportedFilesType, IPropertyDefinitionSupportedSingleFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { IPropertyDefinitionSupportedSingleFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { DOMPurify, fileURLAbsoluter } from "../../../util";
-import equals from "deep-equal";
 import { imageSrcSetRetriever } from "../../components/util";
-import { DOMWindow } from "jsdom";
 import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
+import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize } from "./serializer";
 
 /**
  * Sanitazation standard configuraton
@@ -302,6 +301,12 @@ export function postprocess(
         }
       }
     });
+
+    // set the href
+    const href = node.dataset.href;
+    if (href) {
+      node.setAttribute("href", href);
+    }
   }
 
   const classList = node.classList;
@@ -325,23 +330,37 @@ export function postprocess(
 }
 
 /**
- * Serializes the content into an internally used itemize form
- * that can be used to construct rich text editors
- * 
- * Please ensure to have sanitized the content and
- * postprocessing it before serializing it if you
- * don't trust it but also to setup urls for
- * the given content
+ * Serializes an internal itemize structure back into
+ * HTML
  */
-export function serialize() {
-
+export function serialize(document: IRootLevelDocument) {
+  return oserialize(document);
 }
 
 /**
- * Deserializes a previously serialized content back to its original
- * form, as long as it followed the text specs
+ * Deserializes an HTML string or DOM element that should have been previously
+ * sanitized into an internally used document itemize structure that can be used
+ * for analysis or constructing rich text editors
+ * 
+ * Please ensure to have sanitized the content and
+ * postprocessing it before deserializing it if you
+ * don't trust it but also to setup urls for
+ * the given content
  */
-export function deserialize() {
+export function deserialize(html: string | Node[]) {
+  return odeserialize(html);
+}
+
+/**
+ * This is like a deserialization process where a deserialized and
+ * santized data input is converted into react
+ * 
+ * this is mainly used to convert the raw text as it is into react
+ * and not for usage for templating
+ * 
+ * The property should be a template for this to be usable
+ */
+export function reactify() {
 
 }
 
@@ -352,6 +371,6 @@ export function deserialize() {
  * 
  * The property should be a template for this to be usable
  */
-export function reactify() {
+export function reactifyTemplate() {
 
 }

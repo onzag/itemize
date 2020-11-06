@@ -16,14 +16,14 @@ function processTemplateNodeInitialization(
     }
   }
 
-  // set the href key
-  const hrefKey = node.dataset.href;
-  if (hrefKey) {
-    const href: string = templateArgsContext[hrefKey];
-    if (typeof href !== "string") {
+  // set the thref key
+  const threfKey = node.dataset.thref;
+  if (threfKey) {
+    const thref: string = templateArgsContext[threfKey];
+    if (typeof thref !== "string") {
       // we do not log because this will hit the server side
     } else {
-      node.setAttribute("href", href);
+      node.setAttribute("href", thref);
     }
   }
 
