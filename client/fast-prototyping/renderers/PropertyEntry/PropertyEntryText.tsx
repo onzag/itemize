@@ -9,18 +9,18 @@
  * @packageDocumentation
  */
 import React from "react";
-import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
+import {
+  InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
   TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
   Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, CodeIcon } from "../../mui-core";
+  FormatBoldIcon, CodeIcon
+} from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { SlateEditor } from "../../components/slate";
 
-import { capitalize, mimeTypeToExtension } from "../../../../util";
-import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
+import { capitalize } from "../../../../util";
 import { Dialog } from "../../components/dialog";
-import prettyBytes from "pretty-bytes";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { SlowLoadingElement } from "../../components/util";
@@ -177,23 +177,23 @@ function RichTextEditorToolbar(props: {
         <IconButton
           tabIndex={-1}
           title={props.i18n.formatBoldLabel}
-          classes={{root: "ql-bold"}}
+          classes={{ root: "ql-bold" }}
         >
-          <FormatBoldIcon/>
+          <FormatBoldIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
           title={props.i18n.formatItalicLabel}
           classes={{ root: "ql-italic" }}
         >
-          <FormatItalicIcon/>
+          <FormatItalicIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
           title={props.i18n.formatUnderlineLabel}
           classes={{ root: "ql-underline" }}
         >
-          <FormatUnderlinedIcon/>
+          <FormatUnderlinedIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
@@ -201,7 +201,7 @@ function RichTextEditorToolbar(props: {
           classes={{ root: "ql-header" }}
           value="1"
         >
-          <TitleIcon/>
+          <TitleIcon />
         </IconButton>
         <span className="ql-divider" />
         <IconButton
@@ -209,7 +209,7 @@ function RichTextEditorToolbar(props: {
           title={props.i18n.formatQuoteLabel}
           classes={{ root: "ql-blockquote" }}
         >
-          <FormatQuoteIcon/>
+          <FormatQuoteIcon />
         </IconButton>
         <span className="ql-divider" />
         <IconButton
@@ -218,7 +218,7 @@ function RichTextEditorToolbar(props: {
           classes={{ root: "ql-list" }}
           value="ordered"
         >
-          <FormatListNumberedIcon/>
+          <FormatListNumberedIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
@@ -226,61 +226,61 @@ function RichTextEditorToolbar(props: {
           classes={{ root: "ql-list" }}
           value="bullet"
         >
-          <FormatListBulletedIcon/>
+          <FormatListBulletedIcon />
         </IconButton>
         {
           props.supportsImages || props.supportsFiles ?
-          (
-            <span className="ql-divider" />
-          ) : null
+            (
+              <span className="ql-divider" />
+            ) : null
         }
         {
           props.supportsImages ?
-          (
-            <IconButton
-              tabIndex={-1}
-              title={props.i18n.formatAddImageLabel}
-              classes={{ root: "ql-image" }}
-            >
-              <InsertPhotoIcon/>
-            </IconButton>
-          ) : null
+            (
+              <IconButton
+                tabIndex={-1}
+                title={props.i18n.formatAddImageLabel}
+                classes={{ root: "ql-image" }}
+              >
+                <InsertPhotoIcon />
+              </IconButton>
+            ) : null
         }
         {
           props.supportsVideos ?
-          (
-            <IconButton
-              tabIndex={-1}
-              title={props.i18n.formatAddVideoLabel}
-              classes={{ root: "ql-video" }}
-            >
-              <VideoLibraryIcon/>
-            </IconButton>
-          ) : null
+            (
+              <IconButton
+                tabIndex={-1}
+                title={props.i18n.formatAddVideoLabel}
+                classes={{ root: "ql-video" }}
+              >
+                <VideoLibraryIcon />
+              </IconButton>
+            ) : null
         }
         {
           props.supportsFiles ?
-          (
-            <IconButton
-              tabIndex={-1}
-              title={props.i18n.formatAddFileLabel}
-              classes={{ root: "ql-file" }}
-            >
-              <AttachFileIcon/>
-            </IconButton>
-          ) : null
+            (
+              <IconButton
+                tabIndex={-1}
+                title={props.i18n.formatAddFileLabel}
+                classes={{ root: "ql-file" }}
+              >
+                <AttachFileIcon />
+              </IconButton>
+            ) : null
         }
       </> : null}
       {
         props.supportsRawMode ?
-        (
-          <IconButton
-            tabIndex={-1}
-            onClick={props.onToggleRawMode}
-          >
-            <CodeIcon/>
-          </IconButton>
-        ) : null
+          (
+            <IconButton
+              tabIndex={-1}
+              onClick={props.onToggleRawMode}
+            >
+              <CodeIcon />
+            </IconButton>
+          ) : null
       }
     </Toolbar>
   );
@@ -346,7 +346,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     this.fileInputRef = React.createRef();
 
     // basic functions
-    this.onChange = this.onChange.bind(this);
     this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
     this.focusIfNecessary = this.focusIfNecessary.bind(this);
     this.onFocus = this.onFocus.bind(this);
@@ -370,29 +369,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   public onChangeByTextarea(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const value = e.target.value || null;
     this.props.onChange(value, null);
-  }
-  public onChange(value: string, delta: any, sources: string, editor: any) {
-    // on change, these values are basically empty
-    // so we set to null, however in some circumstances
-    // they are unavoidable, use a value larger than 1 for min
-    // if the field is not nullable
-    // if (
-    //   value === "<p><br></p>" ||
-    //   value === "<p><span class=\"ql-cursor\">\ufeff</span></p>"
-    // ) {
-    //   // prevent this change where it changes to the same value on focus
-    //   if (this.props.currentValue !== null) {
-    //     if (window) {
-    //       (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = 0;
-    //     }
-    //     this.props.onChange(null, null);
-    //   }
-    //   return;
-    // } else if (window) {
-    //   const actualLenght = editor.getText().replace(/\n/g, "").length;
-    //   (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = actualLenght;
-    // }
-    // this.props.onChange(value, null);
   }
   /**
    * This image handler is not binded due to quill existing in the this namespace
@@ -494,7 +470,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     // const prettySize = prettyBytes(fileData.result.size);
     // const expectedExtension = mimeTypeToExtension(fileData.result.type);
-  
+
     // const quill = this.quillRef.current.getEditor();
     // const range = quill.getSelection(true);
 
@@ -527,7 +503,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     //   const ratio = height / width;
     //   const percentage = ratio * 100;
     //   const padStyle = "padding-bottom:" + percentage + "%";
-    
+
     //   const quill = this.quillRef.current.getEditor();
     //   const range = quill.getSelection(true);
     //   quill.insertEmbed(range.index, "itemizeimage", {
@@ -560,7 +536,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       focused: true,
     });
   }
-  public onBlur() {
+  public onBlur() {
     this.setState({
       focused: false,
     });
@@ -592,31 +568,31 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
 
-    const imageInput = this.props.supportsImages ? (
+    const imageInput = this.props.isRichText && this.props.features.supportsImages ? (
       <input
         ref={this.inputImageRef}
         type="file"
         accept={this.props.mediaPropertyAcceptsImages}
         tabIndex={-1}
-        style={{display: "none"}}
+        style={{ display: "none" }}
         autoComplete="off"
         onChange={this.onImageLoad}
       />
     ) : null;
 
-    const fileInput = this.props.supportsFiles ? (
+    const fileInput = this.props.isRichText && this.props.features.supportsFiles ? (
       <input
         ref={this.fileInputRef}
         type="file"
         accept={this.props.mediaPropertyAcceptsFiles}
         tabIndex={-1}
-        style={{display: "none"}}
+        style={{ display: "none" }}
         autoComplete="off"
         onChange={this.onFileLoad}
       />
     ) : null;
 
-    const uploadVideoDialog = this.props.supportsVideos ? (
+    const uploadVideoDialog = this.props.isRichText && this.props.features.supportsVideos ? (
       <Dialog
         fullScreen={false}
         open={this.state.requestingVideoLink}
@@ -641,7 +617,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       </Dialog>
     ) : null;
 
-    const fileLoadErrorDialog = (this.props.supportsImages || this.props.supportsFiles) ? (
+    const fileLoadErrorDialog = this.props.isRichText && (this.props.features.supportsImages || this.props.features.supportsFiles) ? (
       <Dialog
         fullScreen={false}
         open={!!this.props.lastLoadedFileError}
@@ -659,39 +635,76 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       </Dialog>
     ) : null;
 
-    const slate = <>
-      <RichTextEditorToolbar
-        i18n={this.props.i18nFormat}
-        supportsImages={this.props.supportsImages}
-        supportsFiles={this.props.supportsFiles}
-        supportsVideos={this.props.supportsVideos}
-        supportsBasicMode={true}
-        className={this.props.classes.toolbar}
-        supportsRawMode={this.props.args.supportsRawMode}
-        onToggleRawMode={this.toggleRawMode}
-      />
-      <SlateEditor
-        value={this.props.currentValue}
-        internalValue={this.props.currentInternalValue}
-      />
-    </>;
+    const toolbar =
+      this.props.isRichText ?
+        (
+          this.state.rawMode ?
+            (
+              <RichTextEditorToolbar
+                i18n={this.props.i18nFormat}
+                supportsImages={false}
+                supportsFiles={false}
+                supportsVideos={false}
+                supportsBasicMode={false}
+                className={this.props.classes.toolbar}
+                supportsRawMode={this.props.args.supportsRawMode}
+                onToggleRawMode={this.toggleRawMode}
+              />
+            ) :
+            (
+              <RichTextEditorToolbar
+                i18n={this.props.i18nFormat}
+                supportsImages={this.props.features.supportsImages}
+                supportsFiles={this.props.features.supportsFiles}
+                supportsVideos={this.props.features.supportsVideos}
+                supportsBasicMode={true}
+                className={this.props.classes.toolbar}
+                supportsRawMode={this.props.args.supportsRawMode}
+                onToggleRawMode={this.toggleRawMode}
+              />
+            )
+        ) : null
+
+    const editor =
+      this.state.rawMode || !this.props.isRichText ?
+        (
+          <SlowLoadingElement id="textarea" onMount={this.focusIfNecessary}>
+            <TextareaAutosize
+              ref={this.textAreaRef as any}
+              className={this.props.classes.rawTextArea}
+              onChange={this.onChangeByTextarea}
+              placeholder={capitalize(this.props.placeholder)}
+              value={editorValue}
+              onFocus={this.onFocus}
+              onBlur={this.onBlur}
+              disabled={this.props.disabled}
+            />
+          </SlowLoadingElement>
+        ) : (
+          <SlateEditor
+            features={this.props.features}
+            value={this.props.currentValue}
+            internalValue={this.props.currentInternalValue}
+            onChange={this.props.onChange}
+          />
+        );
 
     // we return the component, note how we set the thing to focused
     return (
       <div className={this.props.classes.container}>
         {
           this.props.description && descriptionAsAlert ?
-          <Alert severity="info" className={this.props.classes.description}>
-            {this.props.description}
-          </Alert> :
-          null
+            <Alert severity="info" className={this.props.classes.description}>
+              {this.props.description}
+            </Alert> :
+            null
         }
         {
           this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={this.props.classes.description}>
-            {this.props.description}
-          </Typography> :
-          null
+            <Typography variant="caption" className={this.props.classes.description}>
+              {this.props.description}
+            </Typography> :
+            null
         }
         <div>
           <InputLabel
@@ -707,31 +720,11 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           {
             (
               <>
-                {this.props.isRichText && this.props.args.supportsRawMode ? <RichTextEditorToolbar
-                  i18n={this.props.i18nFormat}
-                  supportsImages={false}
-                  supportsFiles={false}
-                  supportsVideos={false}
-                  supportsBasicMode={false}
-                  className={this.props.classes.toolbar}
-                  supportsRawMode={this.props.args.supportsRawMode}
-                  onToggleRawMode={this.toggleRawMode}
-                /> : null}
+                {toolbar}
                 <div
                   className={this.props.classes.editor + (this.state.focused ? " focused" : "")}
                 >
-                  <SlowLoadingElement id="textarea" onMount={this.focusIfNecessary}>
-                    <TextareaAutosize
-                      ref={this.textAreaRef as any}
-                      className={this.props.classes.rawTextArea}
-                      onChange={this.onChangeByTextarea}
-                      placeholder={capitalize(this.props.placeholder)}
-                      value={editorValue}
-                      onFocus={this.onFocus}
-                      onBlur={this.onBlur}
-                      disabled={this.props.disabled}
-                    />
-                  </SlowLoadingElement>
+                  {editor}
                 </div>
               </>
             )

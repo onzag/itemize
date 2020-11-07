@@ -931,7 +931,7 @@ export function checkPropertyDefinition(
           `type '${rawData.type}' requires specialProperties field for '${property.name}'`,
           traceback,
         );
-      } else if (isRequired && !rawData.specialProperties[property.name]) {
+      } else if (isRequired && typeof rawData.specialProperties[property.name] === "undefined") {
         throw new CheckUpError(
           `type '${rawData.type}' requires special property '${property.name}'`,
           traceback.newTraceToBit("specialProperties"),

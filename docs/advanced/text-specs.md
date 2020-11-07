@@ -315,7 +315,7 @@ This means that the content of the span should be replaced, via textContent meth
 This allows to dinamically set the href property
 
 ```html
-<a data-thref="userLink">click here</a>
+<a data-href="userLink">click here</a>
 ```
 
 ### Style templating
@@ -432,6 +432,8 @@ Because this also represents a context update of the template, the children of t
 ### Complete UI Handler
 
 Text in templating mode can provide a whole custom ui handler for the given component, a whole complete UI handler allows for full modification and control over a given node and it's given by `data-ui-handler` where the value is one of the values given by the templating object
+
+You can pass args to the ui handler by using `data-[name]` in order to pass those arguments as props, technically all the data attributes get passed as props to the handler
 
 ```html
 <div data-ui-handler="myRepeatHandler" data-amount="10"><span>repeat</span></div>

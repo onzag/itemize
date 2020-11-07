@@ -43,14 +43,67 @@ const typeValue: IPropertyDefinitionSupportedType = {
     {
       name: "supportsVideos",
       type: "boolean",
+      required: ["html"],
     },
     {
       name: "supportsImages",
       type: "boolean",
+      required: ["html"],
     },
     {
       name: "supportsFiles",
       type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsLists",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsContainers",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsCustom",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsExternalLinks",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsLinks",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsQuote",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsRichClasses",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsTitle",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsCustomStyles",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportsTemplating",
+      type: "boolean",
+      required: ["html"],
     },
   ],
   sql: textSQL,

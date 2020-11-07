@@ -328,7 +328,7 @@ export const LOCALE_I18N = [
   // N$ or $N depending if currency symbol goes before or after
   "currency_format",
 
-  // For quilljs editor
+  // For the given text editor
   "format_bold",
   "format_italic",
   "format_underline",
@@ -339,6 +339,20 @@ export const LOCALE_I18N = [
   "format_add_image",
   "format_add_file",
   "format_add_video",
+  "format_add_container",
+  "format_add_custom",
+  "format_set_style",
+  "format_set_hover_style",
+  "format_set_active_style",
+  "format_set_class",
+  "format_set_event_handlers",
+  "format_set_context",
+  "format_make_loop",
+  "format_set_ui_handler",
+  "format_set_ui_handler_arg",
+  "format_set_ui_handler_arg_name",
+  "format_set_ui_handler_arg_value",
+
 
   // for filling the booleans and other things
   "yes",

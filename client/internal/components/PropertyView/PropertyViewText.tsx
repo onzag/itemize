@@ -62,6 +62,16 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
     const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+    const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
+    const supportsLists = this.props.property.getSpecialProperty("supportsLists");
+    const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
+    const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
+    const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
+    const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
+    const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
+    const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
+    const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
+    const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
 
     if (isRichText && currentValue !== null) {
       const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
@@ -84,13 +94,16 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
           supportsFiles,
           supportsImages,
           supportsVideos,
-          supportsContainers: true,
-          supportsCustom: true,
-          supportsExternalLinks: true,
-          supportsLinks: true,
-          supportsQuote: true,
-          supportsRichClasses: true,
-          supportsTitle: true,
+          supportsLists,
+          supportsContainers,
+          supportsCustom,
+          supportsExternalLinks,
+          supportsLinks,
+          supportsQuote,
+          supportsRichClasses,
+          supportsTitle,
+          supportsCustomStyles,
+          supportsTemplating,
         },
         currentValue,
       );

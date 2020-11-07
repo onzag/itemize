@@ -5,8 +5,9 @@ import { imageSrcSetRetriever } from "../../components/util";
 import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
-import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize } from "./serializer";
+import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement } from "./serializer";
 import equals from "deep-equal";
+import { IText } from "./serializer/text";
 
 
 /**
@@ -107,17 +108,20 @@ interface IPostProcessingContext {
   cacheFiles: boolean;
 }
 
-interface ISanitizeOptions {
+export interface IFeatureSupportOptions {
   supportsImages: boolean;
   supportsVideos: boolean;
   supportsFiles: boolean;
   supportsLinks: boolean;
   supportsExternalLinks: boolean;
   supportsContainers: boolean;
+  supportsLists: boolean;
   supportsCustom: boolean;
   supportsQuote: boolean;
   supportsTitle: boolean;
   supportsRichClasses: boolean;
+  supportsCustomStyles: boolean;
+  supportsTemplating: boolean;
 }
 
 /**
@@ -130,7 +134,7 @@ interface ISanitizeOptions {
  */
 export function sanitize(
   context: IPostProcessingContext,
-  options: ISanitizeOptions,
+  options: IFeatureSupportOptions,
   value: string,
 ) {
   DOMPurify.addHook("afterSanitizeElements", postprocess.bind(this, context, options));
@@ -165,7 +169,7 @@ function cleanAllAttribs(node: HTMLElement) {
  */
 export function postprocess(
   context: IPostProcessingContext,
-  options: ISanitizeOptions,
+  options: IFeatureSupportOptions,
   node: HTMLElement,
 ) {
   if (node.tagName === "IFRAME") {
@@ -248,7 +252,7 @@ export function postprocess(
       const src = node.dataset.src;
       cleanAllAttribs(node);
       const currentFile = context.currentFiles && context.currentFiles.find((f) => f.id === srcId);
-      
+
       if (currentFile) {
         // spellcheck
         node.spellcheck = false;
@@ -289,32 +293,78 @@ export function postprocess(
     }
   }
 
-  const style = node.getAttribute && node.getAttribute("style");
-  if (style) {
-    const removeStyle =
-      style.indexOf("javascript") !== -1 ||
-      style.indexOf("http") !== -1 ||
-      style.indexOf("://") !== -1 ||
-      node.style.position === "fixed";
-    if (removeStyle) {
-      node.removeAttribute("style");
+  if (node.tagName === "A" && (node.hasAttribute("href") || node.hasAttribute("data-href"))) {
+    if (!options.supportsLinks) {
+      node.removeAttribute("href");
+      node.removeAttribute("data-href");
+    } else if (!options.supportsExternalLinks) {
+      const href = node.getAttribute("href");
+      if (href.indexOf("http") !== -1 || href.indexOf("://") !== -1) {
+        node.removeAttribute("href");
+      }
     }
   }
 
-  if (node.dataset) {
+  if (node.classList && !options.supportsContainers) {
+    const classList = Array.from(node.classList);
+    classList.forEach((e) => e.startsWith("container") && node.classList.remove(e));
+  }
+
+  if (node.classList && !options.supportsCustom) {
+    const classList = Array.from(node.classList);
+    classList.forEach((e) => e.startsWith("custom-") && node.classList.remove(e));
+  }
+
+  if (node.tagName === "QUOTE" && !options.supportsQuote) {
+    node.parentElement && node.parentElement.removeChild(node);
+  }
+
+  if (["UL", "OL", "LI"].includes(node.tagName) && !options.supportsLists) {
+    node.parentElement && node.parentElement.removeChild(node);
+  }
+
+  if (["H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName) && !options.supportsTitle) {
+    node.parentElement && node.parentElement.removeChild(node);
+  }
+
+  if (node.classList && !options.supportsRichClasses) {
+    const classList = Array.from(node.classList);
+    classList.forEach((e) => e.startsWith("rich-text--") && node.classList.remove(e));
+  }
+
+  if (node.style && !options.supportsCustomStyles) {
+    node.removeAttribute("style");
     SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
-      const templateEventStyle = node.dataset[attr + "Style"];
-      if (templateEventStyle) {
-        const removeStyle =
-          templateEventStyle.indexOf("javascript") !== -1 ||
-          templateEventStyle.indexOf("http") !== -1 ||
-          templateEventStyle.indexOf("://") !== -1 ||
-          templateEventStyle.indexOf("fixed") !== -1;
-        if (removeStyle) {
-          delete node.dataset[attr + "Style"];
-        }
-      }
+      delete node.dataset[attr + "Style"];
     });
+  } else {
+    const style = node.getAttribute && node.getAttribute("style");
+    if (style) {
+      const removeStyle =
+        style.indexOf("javascript") !== -1 ||
+        style.indexOf("http") !== -1 ||
+        style.indexOf("://") !== -1 ||
+        node.style.position === "fixed";
+      if (removeStyle) {
+        node.removeAttribute("style");
+      }
+    }
+
+    if (node.dataset) {
+      SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
+        const templateEventStyle = node.dataset[attr + "Style"];
+        if (templateEventStyle) {
+          const removeStyle =
+            templateEventStyle.indexOf("javascript") !== -1 ||
+            templateEventStyle.indexOf("http") !== -1 ||
+            templateEventStyle.indexOf("://") !== -1 ||
+            templateEventStyle.indexOf("fixed") !== -1;
+          if (removeStyle) {
+            delete node.dataset[attr + "Style"];
+          }
+        }
+      });
+    }
   }
 
   const classList = node.classList;
@@ -341,8 +391,36 @@ export function postprocess(
  * Serializes an internal itemize structure back into
  * HTML
  */
-export function serialize(document: IRootLevelDocument) {
-  return oserialize(document);
+export function serialize(root: IRootLevelDocument) {
+  return oserialize(root);
+}
+
+/**
+ * Serializes but returns the string representation
+ * rather than a bunch of nodes
+ * @param root 
+ */
+export function serializeHTMLString(root: IRootLevelDocument) {
+  const serialized = oserialize(root);
+  return serialized.map((s) => s.outerHTML).join("");
+}
+
+/**
+ * Counts the size of the document
+ * @param root 
+ */
+export function countSize(root: IRootLevelDocument | RichElement | IText): number {
+  if (typeof (root as IText).text === "string") {
+    return (root as IText).text.length;
+  }
+  const counts = (root as IRootLevelDocument).children.map(countSize);
+  if (counts.length === 0) {
+    return 0;
+  } else if (counts.length === 1) {
+    return counts[0];
+  }
+
+  return counts.reduce((a, b) => a + b);
 }
 
 /**
@@ -355,7 +433,7 @@ export function serialize(document: IRootLevelDocument) {
  * don't trust it but also to setup urls for
  * the given content
  */
-export function deserialize(html: string | Node[]) {
+export function deserialize(html: string | Node[]) {
   return odeserialize(html);
 }
 
@@ -364,41 +442,6 @@ export function deserialize(html: string | Node[]) {
  * @ignore
  */
 const NULL_DOCUMENT = deserialize(null);
-
-/**
- * Compares a given html and the document that is used in order to determine
- * whether they are actually the same value
- * 
- * This is a method that tries to be as cheap as possible and it uses id
- * only in order to perform equality, this means that this method is not
- * 100% certain
- * 
- * The method is guaranteed to return true if they are equal, but it might
- * return false in cases where they are still equal
- * 
- * @param html 
- * @param document 
- */
-export function compareLoselyEquals(html: string | Node[], document: IRootLevelDocument) {
-  if (html === null) {
-    return equals(NULL_DOCUMENT.children, document.children);
-  }
-
-  let id: string = null;
-  if (typeof html === "string") {
-    const cheapdiv = DOMWindow.document.createElement("div");
-    cheapdiv.innerHTML = html;
-    id = cheapdiv.childNodes[0] && (cheapdiv.childNodes[0] as HTMLElement).id;
-  } else {
-    id = html[0] && (html[0] as HTMLElement).id;
-  }
-
-  if (id === document.id) {
-    return true;
-  }
-
-  return false;
-}
 
 /**
  * This is like a deserialization process where a deserialized and

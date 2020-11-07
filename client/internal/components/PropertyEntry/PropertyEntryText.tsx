@@ -12,7 +12,7 @@ import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupporte
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
-import { sanitize } from "../../../internal/text";
+import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
 
 /**
  * Information about the file that has just been inserted
@@ -56,6 +56,19 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
     formatAddImageLabel: string;
     formatAddVideoLabel: string;
     formatAddFileLabel: string;
+    formatAddContainerLabel: string;
+    formatAddCustomLabel: string;
+    formatSetStyleLabel: string;
+    formatSetHoverStyleLabel: string;
+    formatSetActiveStyleLabel: string;
+    formatSetClassLabel: string;
+    formatSetEventHandlers: string;
+    formatSetContext: string;
+    formatMakeLoop: string;
+    formatSetUIHandlerLabel: string;
+    formatSetUIHandlerArgLabel: string;
+    formatSetUIHandlerArgName: string;
+    formatSetUIHandlerArgValue: string;
   };
 
   /**
@@ -72,22 +85,14 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   };
 
   /**
+   * Rich text features
+   */
+  features: IFeatureSupportOptions;
+
+  /**
    * Whether it is rich text
    */
   isRichText: boolean;
-
-  /**
-   * Whether it supports image loading
-   */
-  supportsImages: boolean;
-  /**
-   * Whether it supports file loading
-   */
-  supportsFiles: boolean;
-  /**
-   * Whether it supports videos
-   */
-  supportsVideos: boolean;
   /**
    * The accept for the input accept="property" of the linked media
    * property so you can filter by that, all files are included
@@ -402,7 +407,7 @@ export default class PropertyEntryText
       });
       return null;
 
-    // otherwise in the generic files
+      // otherwise in the generic files
     } else if (!isExpectingImage && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsFiles)) {
       this.setState({
         lastLoadedFileError: "file_uploader_invalid_type",
@@ -441,7 +446,7 @@ export default class PropertyEntryText
       height: null,
       isImage: false,
     };
-    
+
     // however if we are expecting images or the file to add is an image,
     // we need the image metadata
     if (isExpectingImage || addedFile.type.startsWith("image")) {
@@ -452,7 +457,7 @@ export default class PropertyEntryText
         // on load
         img.onload = () => {
           // we build the metadata
-          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
           const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
           addedFile.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
@@ -542,15 +547,45 @@ export default class PropertyEntryText
 
     const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
     const supportsMedia = !!mediaPropertyId && isRichText;
-    const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
-    const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
-    const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
     const i18nInLanguage = this.props.i18n[this.props.language];
+
+    let features: IFeatureSupportOptions = null;
+    if (isRichText) {
+      const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
+      const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
+      const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+      const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
+      const supportsLists = this.props.property.getSpecialProperty("supportsLists");
+      const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
+      const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
+      const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
+      const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
+      const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
+      const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
+      const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
+      const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
+
+      features = {
+        supportsFiles,
+        supportsImages,
+        supportsVideos,
+        supportsLists,
+        supportsContainers,
+        supportsCustom,
+        supportsExternalLinks,
+        supportsLinks,
+        supportsQuote,
+        supportsRichClasses,
+        supportsTitle,
+        supportsCustomStyles,
+        supportsTemplating,
+      }
+    }
 
     let currentValue = this.props.state.value as string;
     // we only want to purify values that haven't been manually set by the user, other
     // than that we can trust the value, it'd be a waste
-    if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) { 
+    if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
         this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
@@ -566,18 +601,7 @@ export default class PropertyEntryText
           itemDefinition: this.props.itemDefinition,
           mediaProperty: this.cachedMediaProperty,
         },
-        {
-          supportsFiles,
-          supportsImages,
-          supportsVideos,
-          supportsContainers: true,
-          supportsCustom: true,
-          supportsExternalLinks: true,
-          supportsLinks: true,
-          supportsQuote: true,
-          supportsRichClasses: true,
-          supportsTitle: true,
-        },
+        features,
         currentValue,
       );
     }
@@ -651,6 +675,19 @@ export default class PropertyEntryText
         formatAddImageLabel: i18nInLanguage.format_add_image,
         formatAddVideoLabel: i18nInLanguage.format_add_video,
         formatAddFileLabel: i18nInLanguage.format_add_file,
+        formatAddContainerLabel: i18nInLanguage.format_add_container,
+        formatAddCustomLabel: i18nInLanguage.format_add_custom,
+        formatMakeLoop: i18nInLanguage.format_make_loop,
+        formatSetActiveStyleLabel: i18nInLanguage.format_set_active_style,
+        formatSetClassLabel: i18nInLanguage.format_set_class,
+        formatSetEventHandlers: i18nInLanguage.format_set_event_handlers,
+        formatSetContext: i18nInLanguage.format_set_context,
+        formatSetHoverStyleLabel: i18nInLanguage.format_set_hover_style,
+        formatSetStyleLabel: i18nInLanguage.format_set_style,
+        formatSetUIHandlerArgLabel: i18nInLanguage.format_set_ui_handler_arg,
+        formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
+        formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
+        formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
       },
 
       i18nLoadVideo: {
@@ -664,9 +701,7 @@ export default class PropertyEntryText
       i18nGenericError: i18nInLanguage["generic_error"],
       i18nOk: i18nInLanguage["ok"],
 
-      supportsImages,
-      supportsFiles,
-      supportsVideos,
+      features,
       mediaPropertyAcceptsFiles: this.cachedMediaPropertyAcceptsFiles,
       mediaPropertyAcceptsImages: this.cachedMediaPropertyAcceptsImages,
 

@@ -101,6 +101,12 @@ export function serializeElementBase(
     }
   });
 
+  if (base.uiHandlerArgs) {
+    Object.keys(base.uiHandlerArgs).forEach((arg) => {
+      elementComponent.dataset[arg] = base.uiHandlerArgs[arg];
+    });
+  }
+
   if (children) {
     children.forEach((c) => {
       if ((c as IText).text) {
@@ -297,6 +303,12 @@ export function deserializeElementBase(node: HTMLElement): IElementBase {
     }
   });
 
+  if (result.uiHandler && node.dataset) {
+    Object.keys(node.dataset).forEach((datasetKey) => {
+      result.uiHandlerArgs[datasetKey] = node.dataset[datasetKey];
+    });
+  }
+
   return result;
 }
 
@@ -370,6 +382,12 @@ export interface IElementBase {
    * data-ui-handler
    */
   uiHandler?: string;
+  /**
+   * Arguments for the ui handler
+   */
+  uiHandlerArgs?: {
+    [key: string]: string,
+  };
   /**
    * for templating
    * Represents a chosen context and it applies to the property
