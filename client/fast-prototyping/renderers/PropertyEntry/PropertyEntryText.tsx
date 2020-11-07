@@ -15,6 +15,7 @@ import { InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, CodeIcon } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
+import { SlateEditor } from "../../components/slate";
 
 import { capitalize, mimeTypeToExtension } from "../../../../util";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
@@ -148,142 +149,142 @@ export const style = createStyles({
   }
 });
 
-// function RichTextEditorToolbar(props: {
-//   id: string,
-//   i18n: {
-//     formatBoldLabel: string,
-//     formatItalicLabel: string;
-//     formatUnderlineLabel: string;
-//     formatTitleLabel: string;
-//     formatQuoteLabel: string;
-//     formatListNumberedLabel: string;
-//     formatListBulletedLabel: string;
-//     formatAddImageLabel: string;
-//     formatAddVideoLabel: string;
-//     formatAddFileLabel: string;
-//   },
-//   supportsImages: boolean;
-//   supportsFiles: boolean;
-//   supportsVideos: boolean;
-//   supportsRawMode: boolean;
-//   supportsBasicMode: boolean;
-//   className: string;
-//   onToggleRawMode: () => void;
-// }) {
-//   return (
-//     <Toolbar id={props.id} className={props.className}>
-//       {props.supportsBasicMode ? <>
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatBoldLabel}
-//           classes={{root: "ql-bold"}}
-//         >
-//           <FormatBoldIcon/>
-//         </IconButton>
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatItalicLabel}
-//           classes={{ root: "ql-italic" }}
-//         >
-//           <FormatItalicIcon/>
-//         </IconButton>
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatUnderlineLabel}
-//           classes={{ root: "ql-underline" }}
-//         >
-//           <FormatUnderlinedIcon/>
-//         </IconButton>
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatTitleLabel}
-//           classes={{ root: "ql-header" }}
-//           value="1"
-//         >
-//           <TitleIcon/>
-//         </IconButton>
-//         <span className="ql-divider" />
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatQuoteLabel}
-//           classes={{ root: "ql-blockquote" }}
-//         >
-//           <FormatQuoteIcon/>
-//         </IconButton>
-//         <span className="ql-divider" />
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatListNumberedLabel}
-//           classes={{ root: "ql-list" }}
-//           value="ordered"
-//         >
-//           <FormatListNumberedIcon/>
-//         </IconButton>
-//         <IconButton
-//           tabIndex={-1}
-//           title={props.i18n.formatListBulletedLabel}
-//           classes={{ root: "ql-list" }}
-//           value="bullet"
-//         >
-//           <FormatListBulletedIcon/>
-//         </IconButton>
-//         {
-//           props.supportsImages || props.supportsFiles ?
-//           (
-//             <span className="ql-divider" />
-//           ) : null
-//         }
-//         {
-//           props.supportsImages ?
-//           (
-//             <IconButton
-//               tabIndex={-1}
-//               title={props.i18n.formatAddImageLabel}
-//               classes={{ root: "ql-image" }}
-//             >
-//               <InsertPhotoIcon/>
-//             </IconButton>
-//           ) : null
-//         }
-//         {
-//           props.supportsVideos ?
-//           (
-//             <IconButton
-//               tabIndex={-1}
-//               title={props.i18n.formatAddVideoLabel}
-//               classes={{ root: "ql-video" }}
-//             >
-//               <VideoLibraryIcon/>
-//             </IconButton>
-//           ) : null
-//         }
-//         {
-//           props.supportsFiles ?
-//           (
-//             <IconButton
-//               tabIndex={-1}
-//               title={props.i18n.formatAddFileLabel}
-//               classes={{ root: "ql-file" }}
-//             >
-//               <AttachFileIcon/>
-//             </IconButton>
-//           ) : null
-//         }
-//       </> : null}
-//       {
-//         props.supportsRawMode ?
-//         (
-//           <IconButton
-//             tabIndex={-1}
-//             onClick={props.onToggleRawMode}
-//           >
-//             <CodeIcon/>
-//           </IconButton>
-//         ) : null
-//       }
-//     </Toolbar>
-//   );
-// }
+function RichTextEditorToolbar(props: {
+  i18n: {
+    formatBoldLabel: string,
+    formatItalicLabel: string;
+    formatUnderlineLabel: string;
+    formatTitleLabel: string;
+    formatQuoteLabel: string;
+    formatListNumberedLabel: string;
+    formatListBulletedLabel: string;
+    formatAddImageLabel: string;
+    formatAddVideoLabel: string;
+    formatAddFileLabel: string;
+  },
+  supportsImages: boolean;
+  supportsFiles: boolean;
+  supportsVideos: boolean;
+  supportsRawMode: boolean;
+  supportsBasicMode: boolean;
+  className: string;
+
+  onToggleRawMode: () => void;
+}) {
+  return (
+    <Toolbar className={props.className}>
+      {props.supportsBasicMode ? <>
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatBoldLabel}
+          classes={{root: "ql-bold"}}
+        >
+          <FormatBoldIcon/>
+        </IconButton>
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatItalicLabel}
+          classes={{ root: "ql-italic" }}
+        >
+          <FormatItalicIcon/>
+        </IconButton>
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatUnderlineLabel}
+          classes={{ root: "ql-underline" }}
+        >
+          <FormatUnderlinedIcon/>
+        </IconButton>
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatTitleLabel}
+          classes={{ root: "ql-header" }}
+          value="1"
+        >
+          <TitleIcon/>
+        </IconButton>
+        <span className="ql-divider" />
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatQuoteLabel}
+          classes={{ root: "ql-blockquote" }}
+        >
+          <FormatQuoteIcon/>
+        </IconButton>
+        <span className="ql-divider" />
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatListNumberedLabel}
+          classes={{ root: "ql-list" }}
+          value="ordered"
+        >
+          <FormatListNumberedIcon/>
+        </IconButton>
+        <IconButton
+          tabIndex={-1}
+          title={props.i18n.formatListBulletedLabel}
+          classes={{ root: "ql-list" }}
+          value="bullet"
+        >
+          <FormatListBulletedIcon/>
+        </IconButton>
+        {
+          props.supportsImages || props.supportsFiles ?
+          (
+            <span className="ql-divider" />
+          ) : null
+        }
+        {
+          props.supportsImages ?
+          (
+            <IconButton
+              tabIndex={-1}
+              title={props.i18n.formatAddImageLabel}
+              classes={{ root: "ql-image" }}
+            >
+              <InsertPhotoIcon/>
+            </IconButton>
+          ) : null
+        }
+        {
+          props.supportsVideos ?
+          (
+            <IconButton
+              tabIndex={-1}
+              title={props.i18n.formatAddVideoLabel}
+              classes={{ root: "ql-video" }}
+            >
+              <VideoLibraryIcon/>
+            </IconButton>
+          ) : null
+        }
+        {
+          props.supportsFiles ?
+          (
+            <IconButton
+              tabIndex={-1}
+              title={props.i18n.formatAddFileLabel}
+              classes={{ root: "ql-file" }}
+            >
+              <AttachFileIcon/>
+            </IconButton>
+          ) : null
+        }
+      </> : null}
+      {
+        props.supportsRawMode ?
+        (
+          <IconButton
+            tabIndex={-1}
+            onClick={props.onToggleRawMode}
+          >
+            <CodeIcon/>
+          </IconButton>
+        ) : null
+      }
+    </Toolbar>
+  );
+}
 
 /**
  * The text renderer styles
@@ -658,34 +659,22 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
       </Dialog>
     ) : null;
 
-    // const quill = <>
-    //   <RichTextEditorToolbar
-    //     id={this.props.propertyId}
-    //     i18n={this.props.i18nFormat}
-    //     supportsImages={this.props.supportsImages}
-    //     supportsFiles={this.props.supportsFiles}
-    //     supportsVideos={this.props.supportsVideos}
-    //     supportsBasicMode={true}
-    //     className={this.props.classes.toolbar}
-    //     supportsRawMode={this.props.args.supportsRawMode}
-    //     onToggleRawMode={this.toggleRawMode}
-    //   />
-    //   {this.state.isReadyToType ? <ReactQuill
-    //     ref={this.quillRef}
-    //     className={this.props.classes.quill + (this.state.focused ? " focused" : "")}
-    //     modules={this.cachedModuleOptionsRich}
-    //     formats={CACHED_FORMATS_RICH}
-    //     theme={null}
-    //     placeholder={capitalize(this.props.placeholder)}
-    //     value={editorValue}
-    //     onChange={this.onChange}
-    //     beforeChange={this.beforeChange}
-    //     onFocus={this.onFocus}
-    //     onBlur={this.onBlur}
-    //     disableClipboardMatchersOnUpdate={CACHED_CLIPBOARD_MATCHERS}
-    //     readOnly={this.props.disabled}
-    //   /> : null}
-    // </>;
+    const slate = <>
+      <RichTextEditorToolbar
+        i18n={this.props.i18nFormat}
+        supportsImages={this.props.supportsImages}
+        supportsFiles={this.props.supportsFiles}
+        supportsVideos={this.props.supportsVideos}
+        supportsBasicMode={true}
+        className={this.props.classes.toolbar}
+        supportsRawMode={this.props.args.supportsRawMode}
+        onToggleRawMode={this.toggleRawMode}
+      />
+      <SlateEditor
+        value={this.props.currentValue}
+        internalValue={this.props.currentInternalValue}
+      />
+    </>;
 
     // we return the component, note how we set the thing to focused
     return (
@@ -718,8 +707,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           {
             (
               <>
-                {/* {this.props.isRichText && this.props.args.supportsRawMode ? <RichTextEditorToolbar
-                  id={this.props.propertyId + "-raw-mode-only"}
+                {this.props.isRichText && this.props.args.supportsRawMode ? <RichTextEditorToolbar
                   i18n={this.props.i18nFormat}
                   supportsImages={false}
                   supportsFiles={false}
@@ -728,7 +716,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                   className={this.props.classes.toolbar}
                   supportsRawMode={this.props.args.supportsRawMode}
                   onToggleRawMode={this.toggleRawMode}
-                /> : null} */}
+                /> : null}
                 <div
                   className={this.props.classes.editor + (this.state.focused ? " focused" : "")}
                 >

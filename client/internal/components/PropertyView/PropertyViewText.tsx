@@ -79,9 +79,18 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
           include: this.props.include,
           itemDefinition: this.props.itemDefinition,
           mediaProperty,
+        },
+        {
           supportsFiles,
           supportsImages,
           supportsVideos,
+          supportsContainers: true,
+          supportsCustom: true,
+          supportsExternalLinks: true,
+          supportsLinks: true,
+          supportsQuote: true,
+          supportsRichClasses: true,
+          supportsTitle: true,
         },
         currentValue,
       );

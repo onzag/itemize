@@ -11,6 +11,7 @@ import { IQuote, registerQuote } from "./quote";
 import { IText, registerText } from "./text";
 import { ITitle, registerTitle } from "./title";
 import { IVideo, registerVideo } from "./video";
+import uuid from "uuid";
 
 type DeserializationFn = (n: Node) => RichElement | IText;
 
@@ -33,7 +34,7 @@ export interface ISerializationRegistryType {
   };
 }
 
-const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
+export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   SERIALIZE: {},
   DESERIALIZE: {
     byClassName: {},
@@ -98,6 +99,9 @@ export function serialize(root: IRootLevelDocument): HTMLElement[] {
     return null;
   }
 
+  // hack the id in
+  results[0].id = root.id;
+
   return results;
 }
 
@@ -132,7 +136,7 @@ export function deserialize(html: string | Node[]) {
 
   const newDocument: IRootLevelDocument = {
     type: "document",
-    id: null,
+    id: uuid.v4(),
     children: childNodes.length === 0 ?
       [
         {

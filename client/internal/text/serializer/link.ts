@@ -9,7 +9,7 @@ export function registerLink(registry: ISerializationRegistryType) {
     if (link.thref) {
       attrs["data-thref"] = link.thref;
     } else if (link.href) {
-      attrs["data-href"] = link.href;
+      attrs.href = link.href;
     }
   
     return serializeElementBase(
@@ -30,7 +30,7 @@ export function registerLink(registry: ISerializationRegistryType) {
     if (node.dataset.thref) {
       thref = node.dataset.thref;
     } else {
-      href = node.dataset.href || null;
+      href = node.href || null;
     }
   
     const link: ILink = {

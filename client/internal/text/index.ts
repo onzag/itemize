@@ -1,11 +1,13 @@
 import { IPropertyDefinitionSupportedSingleFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { DOMPurify, fileURLAbsoluter } from "../../../util";
+import { DOMPurify, fileURLAbsoluter, DOMWindow } from "../../../util";
 import { imageSrcSetRetriever } from "../../components/util";
 import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize } from "./serializer";
+import equals from "deep-equal";
+
 
 /**
  * Sanitazation standard configuraton
@@ -96,9 +98,6 @@ export const SUPPORTED_HANDLERS = [
 interface IPostProcessingContext {
   mediaProperty: PropertyDefinition;
   currentFiles: IPropertyDefinitionSupportedSingleFilesType[];
-  supportsImages: boolean;
-  supportsVideos: boolean;
-  supportsFiles: boolean;
   config: IConfigRawJSONDataType;
   itemDefinition: ItemDefinition;
   include: Include;
@@ -106,6 +105,19 @@ interface IPostProcessingContext {
   forVersion: string;
   containerId: string;
   cacheFiles: boolean;
+}
+
+interface ISanitizeOptions {
+  supportsImages: boolean;
+  supportsVideos: boolean;
+  supportsFiles: boolean;
+  supportsLinks: boolean;
+  supportsExternalLinks: boolean;
+  supportsContainers: boolean;
+  supportsCustom: boolean;
+  supportsQuote: boolean;
+  supportsTitle: boolean;
+  supportsRichClasses: boolean;
 }
 
 /**
@@ -118,9 +130,10 @@ interface IPostProcessingContext {
  */
 export function sanitize(
   context: IPostProcessingContext,
+  options: ISanitizeOptions,
   value: string,
 ) {
-  DOMPurify.addHook("afterSanitizeElements", postprocess.bind(this, context));
+  DOMPurify.addHook("afterSanitizeElements", postprocess.bind(this, context, options));
   const newValue = DOMPurify.sanitize(value, PROPERTY_VIEW_SANITIZE_CONFIG);
   DOMPurify.removeAllHooks();
   return newValue;
@@ -152,10 +165,11 @@ function cleanAllAttribs(node: HTMLElement) {
  */
 export function postprocess(
   context: IPostProcessingContext,
+  options: ISanitizeOptions,
   node: HTMLElement,
 ) {
   if (node.tagName === "IFRAME") {
-    if (context.supportsVideos) {
+    if (options.supportsVideos) {
       const videoSrc = node.dataset.videoSrc || "";
       const origin = node.dataset.videoOrigin || "";
       cleanAllAttribs(node);
@@ -184,7 +198,7 @@ export function postprocess(
       node.parentElement && node.parentElement.removeChild(node);
     }
   } else if (node.tagName === "IMG") {
-    if (context.supportsImages) {
+    if (options.supportsImages) {
       const srcId = node.dataset.srcId;
       const currentFile = context.currentFiles && context.currentFiles.find((f) => f.id === srcId);
       const alt = (node as HTMLImageElement).alt || "";
@@ -229,7 +243,7 @@ export function postprocess(
       node.parentElement && node.parentElement.removeChild(node);
     }
   } else if (node.className === "file") {
-    if (context.supportsFiles) {
+    if (options.supportsFiles) {
       const srcId = node.dataset.srcId;
       const src = node.dataset.src;
       cleanAllAttribs(node);
@@ -301,12 +315,6 @@ export function postprocess(
         }
       }
     });
-
-    // set the href
-    const href = node.dataset.href;
-    if (href) {
-      node.setAttribute("href", href);
-    }
   }
 
   const classList = node.classList;
@@ -349,6 +357,47 @@ export function serialize(document: IRootLevelDocument) {
  */
 export function deserialize(html: string | Node[]) {
   return odeserialize(html);
+}
+
+
+/**
+ * @ignore
+ */
+const NULL_DOCUMENT = deserialize(null);
+
+/**
+ * Compares a given html and the document that is used in order to determine
+ * whether they are actually the same value
+ * 
+ * This is a method that tries to be as cheap as possible and it uses id
+ * only in order to perform equality, this means that this method is not
+ * 100% certain
+ * 
+ * The method is guaranteed to return true if they are equal, but it might
+ * return false in cases where they are still equal
+ * 
+ * @param html 
+ * @param document 
+ */
+export function compareLoselyEquals(html: string | Node[], document: IRootLevelDocument) {
+  if (html === null) {
+    return equals(NULL_DOCUMENT.children, document.children);
+  }
+
+  let id: string = null;
+  if (typeof html === "string") {
+    const cheapdiv = DOMWindow.document.createElement("div");
+    cheapdiv.innerHTML = html;
+    id = cheapdiv.childNodes[0] && (cheapdiv.childNodes[0] as HTMLElement).id;
+  } else {
+    id = html[0] && (html[0] as HTMLElement).id;
+  }
+
+  if (id === document.id) {
+    return true;
+  }
+
+  return false;
 }
 
 /**

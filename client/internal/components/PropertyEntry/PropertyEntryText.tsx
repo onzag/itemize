@@ -565,9 +565,18 @@ export default class PropertyEntryText
           include: this.props.include,
           itemDefinition: this.props.itemDefinition,
           mediaProperty: this.cachedMediaProperty,
+        },
+        {
           supportsFiles,
           supportsImages,
           supportsVideos,
+          supportsContainers: true,
+          supportsCustom: true,
+          supportsExternalLinks: true,
+          supportsLinks: true,
+          supportsQuote: true,
+          supportsRichClasses: true,
+          supportsTitle: true,
         },
         currentValue,
       );

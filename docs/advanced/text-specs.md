@@ -10,12 +10,12 @@ The text is represented as a string, however null is also a valid value, this is
 
 ## Links
 
-Links should use the data-href property because the href property is a forbidden attribute
+Links should use the href property because the href property is a forbidden attribute
 
 These links are validated and can be relative
 
 ```html
-<a data-href="some/url">my link</a>
+<a href="some/url">my link</a>
 ```
 
 ## Images
@@ -81,7 +81,7 @@ These attributes can be used but they are removed by the server side for securit
  - sizes
  - data-src
  - loading
- - href
+ - id
 
 Feel free to use them they won't pollute the environment; in fact src, srcset, and sizes should be added by the handler
 

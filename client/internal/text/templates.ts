@@ -17,7 +17,7 @@ function processTemplateNodeInitialization(
   }
 
   // set the thref key
-  const threfKey = node.dataset.thref;
+  const threfKey = node.dataset.href;
   if (threfKey) {
     const thref: string = templateArgsContext[threfKey];
     if (typeof thref !== "string") {
