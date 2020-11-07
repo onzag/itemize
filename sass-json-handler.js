@@ -13,9 +13,14 @@ function walkDirectory(directory, targetDirectory) {
     list.forEach((filename) => {
       const filepath = path.resolve(directory, filename);
       const outFilePath = path.resolve(targetDirectory, filename);
-      if (filename.endsWith(".scss") || filename.endsWith(".sass") || filename.endsWith(".css")) {
+      if (filename.endsWith(".scss") || filename.endsWith(".sass") || filename.endsWith(".css") || filename.endsWith(".json")) {
         console.log("outputting", outFilePath);
-        fs.writeFile(outFilePath, "", () => {});
+        if (filename.endsWith(".json")) {
+          const content = fs.readFileSync(filepath, "utf-8");
+          fs.writeFile(outFilePath, content, () => {});
+        } else {
+          fs.writeFile(outFilePath, "", () => {});
+        }
       } else {
         fs.stat(filepath, (err, stat) => {
           if (stat && stat.isDirectory()) {
@@ -40,4 +45,6 @@ function walkDirectory(directory, targetDirectory) {
   });
 }
 
+// corruption that occurs during the npm install process with forgets these files
+walkDirectory("imported-resources", path.join("nodejs", "imported-resources"));
 walkDirectory("client", path.join("nodejs", "client"));

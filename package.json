@@ -1,14 +1,14 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.106.slate",
+  "version": "0.0.113.slate",
   "description": "Itemize",
   "bin": {
-    "itemize": "./nodejs/main.js"
+    "itemize": "index.js"
   },
   "main": "index",
   "types": "nodejs/index",
   "scripts": {
-    "install": "tsc && node ./sass-handler.js"
+    "install": "tsc && node ./sass-json-handler.js"
   },
   "author": "Onza Systems - Edward Gonzalez",
   "license": "AGPL3",
