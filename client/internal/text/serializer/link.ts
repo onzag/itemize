@@ -1,7 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
 import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerLink(registry: ISerializationRegistryType) {
   function serializeLink(link: ILink) {
@@ -32,13 +32,15 @@ export function registerLink(registry: ISerializationRegistryType) {
     } else {
       href = node.href || null;
     }
+
+    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
   
     const link: ILink = {
       ...base,
       type: "link",
       href,
       thref,
-      children: [registry.DESERIALIZE.text(node.childNodes[0])],
+      children: children.length ? children : [STANDARD_TEXT_NODE],
     }
     return link;
   }
@@ -72,9 +74,7 @@ export interface ILink extends IElementBase {
   /**
    * The children for the link is a text that specifies the link
    */
-  children: [
-    IText,
-  ];
+  children: IText[];
   /**
    * Represents the data-href templating attribute
    */

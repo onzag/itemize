@@ -111,6 +111,7 @@ export function registerImage(registry: ISerializationRegistryType) {
           text: "",
           bold: false,
           italic: false,
+          templateText: null,
         }
       ]
     };

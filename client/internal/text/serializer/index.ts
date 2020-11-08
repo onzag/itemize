@@ -91,13 +91,13 @@ export function serialize(root: IRootLevelDocument): HTMLElement[] | string {
       if (result) {
         result += "\n";
       }
-      result += paragraph.children[0].text;
+      result += (paragraph.children[0] as IText).text || "";
     });
     return result;
   }
 
   const lastElement = root.children[root.children.length - 1];
-  const lastNeedsDropping = lastElement.type === "paragraph" && lastElement.children[0].text === "";
+  const lastNeedsDropping = lastElement.type === "paragraph" && (lastElement.children[0] as IText).text === "";
   const childrenToProcess = lastNeedsDropping ? [...root.children] : root.children;
   if (lastNeedsDropping) {
     childrenToProcess.pop();
@@ -112,9 +112,6 @@ export function serialize(root: IRootLevelDocument): HTMLElement[] | string {
   if (results.length === 0) {
     return null;
   }
-
-  // hack the id in
-  results[0].id = root.id;
 
   return results;
 }
@@ -148,25 +145,27 @@ export function deserialize(html: string | Node[]) {
     childNodes = html || [];
   }
 
+  const finalChildren = childNodes.map(boundDeserializeElement).filter((n) => n !== null) as RichElement[];
+
   const newDocument: IRootLevelDocument = {
     type: "document",
     id: uuid.v4(),
     rich: true,
-    children: childNodes.length === 0 ?
+    children: finalChildren.length === 0 ?
       [
         {
           type: "paragraph",
-          subtype: "p",
           children: [
             {
               bold: false,
               italic: false,
               text: "",
+              templateText: null,
             }
           ]
         }
       ] :
-      childNodes.map(boundDeserializeElement).filter((n) => n !== null) as RichElement[],
+      finalChildren,
   };
 
   return newDocument;
@@ -187,7 +186,8 @@ export function deserializePlain(data: string) {
           {
             bold: false,
             italic: false,
-            text: c
+            text: c,
+            templateText: null,
           },
         ],
       }

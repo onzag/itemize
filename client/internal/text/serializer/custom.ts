@@ -1,5 +1,6 @@
 import React from "react";
 import { RichElement, ISerializationRegistryType } from ".";
+import { CUSTOM_CLASS_PREFIX } from "..";
 import { serializeElementBase, deserializeElementBase, deserializeElement, IElementBase, reactifyElementBase } from "./base";
 
 export function registerCustom(registry: ISerializationRegistryType) {
@@ -10,7 +11,7 @@ export function registerCustom(registry: ISerializationRegistryType) {
       registry,
       custom,
       "div",
-      "custom-" + custom.customType,
+      CUSTOM_CLASS_PREFIX + custom.customType,
       null,
       custom.children,
     );
@@ -20,8 +21,8 @@ export function registerCustom(registry: ISerializationRegistryType) {
     const base = deserializeElementBase(node);
     let customType: string = null;
     node.classList.forEach((c) => {
-      if (c.startsWith("custom-")) {
-        customType = c.substr(7);
+      if (c.startsWith(CUSTOM_CLASS_PREFIX)) {
+        customType = c.substr(CUSTOM_CLASS_PREFIX.length);
       }
     });
     const custom: ICustom = {
@@ -38,7 +39,7 @@ export function registerCustom(registry: ISerializationRegistryType) {
       registry,
       custom,
       "div",
-      "custom-" + custom.customType,
+      CUSTOM_CLASS_PREFIX + custom.customType,
       null,
       customProps,
       custom.children,

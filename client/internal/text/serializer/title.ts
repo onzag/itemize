@@ -1,7 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerTitle(registry: ISerializationRegistryType) {
   function serializeTitle(title: ITitle) {
@@ -10,11 +10,12 @@ export function registerTitle(registry: ISerializationRegistryType) {
   
   function deserializeTitle(node: HTMLElement): ITitle {
     const base = deserializeElementBase(node);
+    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
     const title: ITitle = {
       ...base,
       type: "title",
       subtype: node.tagName.toLowerCase() as any,
-      children: [registry.DESERIALIZE.text(node.childNodes[0])],
+      children: children.length ? children : [STANDARD_TEXT_NODE],
     }
     return title;
   }
@@ -53,7 +54,5 @@ export interface ITitle extends IElementBase {
    * The title only has one children and it's text
    * as it only contains text within it
    */
-  children: [
-    IText,
-  ];
+  children: IText[]
 }

@@ -1,22 +1,22 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
-import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
-import { IText } from "./text";
+import { deserializeElement, deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
+import { ILink } from "./link";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerParagraph(registry: ISerializationRegistryType) {
   function serializeParagraph(p: IParagraph) {
-    return serializeElementBase(registry, p, p.subtype, null, null, p.children);
+    return serializeElementBase(registry, p, "p", null, null, p.children);
   }
   
   function deserializeParagraph(node: HTMLElement): IParagraph {
+    const boundDeserializeElement = deserializeElement.bind(null, registry);
     const base = deserializeElementBase(node);
+    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
     const paragraph: IParagraph = {
       ...base,
       type: "paragraph",
-      subtype: node.tagName.toLowerCase() as any,
-      children: [
-        registry.DESERIALIZE.text(node.childNodes[0])
-      ],
+      children: children.length ? children : [STANDARD_TEXT_NODE],
     }
     return paragraph;
   }
@@ -25,7 +25,7 @@ export function registerParagraph(registry: ISerializationRegistryType) {
     return reactifyElementBase(
       registry,
       paragraph,
-      paragraph.subtype,
+      "p",
       null,
       null,
       customProps,
@@ -36,8 +36,6 @@ export function registerParagraph(registry: ISerializationRegistryType) {
   registry.REACTIFY.paragraph = reactifyParagraph;
   registry.SERIALIZE.paragraph = serializeParagraph;
   registry.DESERIALIZE.byTag.P = deserializeParagraph;
-  registry.DESERIALIZE.byTag.DIV = deserializeParagraph;
-  registry.DESERIALIZE.byTag.SPAN = deserializeParagraph;
 }
 
 /**
@@ -47,13 +45,9 @@ export function registerParagraph(registry: ISerializationRegistryType) {
  */
 export interface IParagraph extends IElementBase {
   type: "paragraph",
-  subtype: "p" | "div" | "span",
 
   /**
-   * The paragraph only has one children and it's text
-   * as it only contains text within it
+   * The paragraph children can be either text or link
    */
-  children: [
-    IText,
-  ];
+  children: Array<IText | ILink>;
 }

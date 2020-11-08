@@ -1,5 +1,6 @@
 import React from "react";
 import { ISerializationRegistryType, RichElement } from ".";
+import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, deserializeElement, reactifyElementBase } from "./base";
 
 export function registerContainer(registry: ISerializationRegistryType) {
@@ -10,7 +11,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       registry,
       container,
       "div",
-      container.containerType ? "container-" + container.containerType : "container",
+      container.containerType ? CONTAINER_CLASS_PREFIX + container.containerType : CONTAINER_CLASS,
       null,
       container.children,
     );
@@ -20,8 +21,8 @@ export function registerContainer(registry: ISerializationRegistryType) {
     const base = deserializeElementBase(node);
     let containerType: string = null;
     node.classList.forEach((c) => {
-      if (c.startsWith("container-")) {
-        containerType = c.substr(10);
+      if (c.startsWith(CONTAINER_CLASS_PREFIX)) {
+        containerType = c.substr(CONTAINER_CLASS_PREFIX.length);
       }
     });
     const container: IContainer = {
@@ -38,7 +39,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       registry,
       container,
       "div",
-      container.containerType ? "container-" + container.containerType : "container",
+      container.containerType ? CONTAINER_CLASS_PREFIX + container.containerType : CONTAINER_CLASS,
       null,
       customProps,
       container.children,
@@ -48,6 +49,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
   registry.REACTIFY.container = reactifyContainer;
   registry.SERIALIZE.container = serializeContainer;
   registry.DESERIALIZE.byClassName.container = deserializeContainer;
+  registry.DESERIALIZE.byTag.DIV = deserializeContainer;
   registry.DESERIALIZE.byClassNamePrefix.container = deserializeContainer;
 }
 

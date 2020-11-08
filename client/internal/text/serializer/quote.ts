@@ -1,7 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType} from ".";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerQuote(registry: ISerializationRegistryType) {
   function serializeQuote(quote: IQuote) {
@@ -17,10 +17,13 @@ export function registerQuote(registry: ISerializationRegistryType) {
   
   function deserializeQuote(node: HTMLQuoteElement): IQuote {
     const base = deserializeElementBase(node);
+    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
     const quote: IQuote = {
       ...base,
       type: "quote",
-      children: [registry.DESERIALIZE.text(node.childNodes[0])],
+      children: children.length ? children : [
+        STANDARD_TEXT_NODE,
+      ],
     }
     return quote;
   }
@@ -53,7 +56,5 @@ export interface IQuote extends IElementBase {
   /**
    * Represents the children
    */
-  children: [
-    IText,
-  ];
+  children: IText[];
 }

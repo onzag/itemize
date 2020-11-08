@@ -52,6 +52,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
           text: "",
           bold: false,
           italic: false,
+          templateText: null,
         }
       ]
     };
