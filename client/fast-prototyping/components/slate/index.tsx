@@ -3,25 +3,243 @@ import equals from "deep-equal";
 import { createEditor, Transforms, Range, Editor, Element, Node } from 'slate';
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
-import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY } from "../../../internal/text/serializer";
-import { countSize, IFeatureSupportOptions, serializeHTMLString } from "../../../internal/text";
+import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
+import { countSize, IFeatureSupportOptions, serializeString } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
+import { IText } from "../../../internal/text/serializer/text";
+import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
-  description: string;
+  label: string;
 }
 
 /**
  * Represents the vailable args in the context
  */
-interface ITemplateArgsContext {
+export interface ITemplateArgsContext {
   type: "context";
   loopable?: boolean;
   properties: {
     [name: string]: ITemplateArg | ITemplateArgsContext;
   };
+}
+
+/**
+ * Represents a custom set of classes that are avaliable
+ * for the creation of the custom element
+ */
+export interface ITemplateArgsClasses {
+  rich?: IAvailableElement[];
+  custom?: IAvailableElement[];
+  container?: IAvailableElement[];
+  baseContainer?: IAvailableElement;
+}
+
+interface IAvailableElement {
+  value: string;
+  label: string;
+}
+
+export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions {
+  /**
+   * Whether it is curently focused
+   */
+  isFocused: boolean;
+  /**
+   * Whether an image can be inserted at the given location
+   */
+  canInsertImage: boolean;
+  /**
+   * Whether a video can be inserted at the given location
+   */
+  canInsertVideo: boolean;
+  /**
+   * Whether a file can be inserted at the given location
+   */
+  canInsertFile: boolean;
+  /**
+   * Whether a link can be inserted at the given location
+   */
+  canInsertLink: boolean;
+  /**
+   * Whether a container can be inserted at the given location
+   */
+  canInsertContainer: boolean;
+  /**
+   * Whether a list can be inserted at the given location
+   */
+  canInsertList: boolean;
+  /**
+   * Whether a custom element can be inserted at the given
+   * location
+   */
+  canInsertCustom: boolean;
+  /**
+   * Whether a quote can be inserted at the given location
+   */
+  canInsertQuote: boolean;
+  /**
+   * Whether a title element can be inserted at the given location
+   */
+  canInsertTitle: boolean;
+  /**
+   * Whether a rich class element can be inserted at the given location
+   */
+  canInsertRichClass: boolean;
+
+  /**
+   * Whether the style of the current element can be set
+   */
+  canSetStyle: boolean;
+  // Templating specific
+  /**
+   * Whether we can set the hover style
+   * normally true if templating is true
+   */
+  canSetHoverStyle: boolean;
+  /**
+   * Whether the active style can be set
+   * normally true if templating is true
+   */
+  canSetActiveStyle: boolean;
+  /**
+   * Whether the dynamic href can be set for links
+   * normally true if templating is true
+   */
+  canSetDynamicHref: boolean;
+  /**
+   * Whether an UI handler can be set on the given element
+   * normally true if templating is true
+   */
+  canSetUIHandler: boolean;
+  /**
+   * Whether an action function can be set on the given element
+   * normally true if templating is true
+   */
+  canSetActionFunction: boolean;
+  /**
+   * Whether a loop can be established
+   * normally true if templating is true
+   */
+  canSetLoop: boolean;
+
+  /**
+   * The current element being worked with
+   */
+  currentElement: RichElement;
+  /**
+   * The current text being worked with
+   */
+  currentText: IText;
+  // Templating specific
+  /**
+   * The current templating context
+   */
+  currentContext: ITemplateArgsContext;
+
+  /**
+   * The classes that are available by the rich text
+   * non prefixed
+   */
+  availableRichClasses: IAvailableElement[];
+  /**
+   * The customs that are available
+   */
+  availableCustoms: IAvailableElement[];
+  /**
+   * The classes that are available for the containers
+   */
+  availableContainers: IAvailableElement[];
+}
+
+export interface IHelperFunctions {
+  editor: any;
+
+  /**
+   * Will insert an image based on a given file that has
+   * been taken as an input
+   * @param file the file
+   * @param standalone whether to make it a standalone image
+   */
+  insertImage: (file: File, standalone: boolean) => void;
+  /**
+   * Will insert a video given the information
+   * @param origin the origin of the video
+   * @param id the id of the video
+   */
+  insertVideo: (origin: "youtube" | "vimeo", id: string) => void;
+  /**
+   * Will insert a file based on the information given
+   * @param file the file to insert
+   */
+  insertFile: (file: File) => void;
+  /**
+   * Will insert a container at the given location
+   * @param type optional, the container type, otherwise will
+   * insert a standard container
+   */
+  insertContainer: (type?: string) => void;
+  /**
+   * Inserts a custom element
+   */
+  insertCustom: (type: string) => void;
+
+  /**
+   * Makes a quote out of the current element
+   */
+  makeQuote: () => void;
+  /**
+   * Makes a title out of the current element
+   */
+  makeTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => void;
+  /**
+   * Makes a list out of the current element
+   */
+  makeList: () => void;
+  /**
+   * Makes a link out of the current element
+   */
+  makeLink: (url: string) => void;
+  /**
+   * Makes a template link out of the current element
+   */
+  makeTemplateLink: (value: string) => void;
+
+  /**
+   * Sets the current style for the element
+   */
+  setStyle: (style: string) => void;
+  /**
+   * Sets the template hover style for the element
+   */
+  setHoverStyle: (style: string) => void;
+  /**
+   * Sets the active style for the element
+   */
+  setActiveStyle: (style: string) => void;
+  /**
+   * Sets the context key
+   */
+  setContext: (key: string) => void;
+  /**
+   * Sets the for-each loop key
+   */
+  setForEach: (key: string) => void;
+
+  /**
+   * Formats the current text as bold
+   */
+  formatToggleBold: () => void;
+  /**
+   * formats the current text as italic
+   */
+  formatToggleItalic: () => void;
+  /**
+   * toggles a given active rich class
+   */
+  formatToggleRichClass: (richClass: string) => void;
 }
 
 interface ISlateEditorProps {
@@ -38,16 +256,27 @@ interface ISlateEditorProps {
    * itemize fast prototyping editor and its wrapper can do wonders it might not cover
    * all your use cases and you might want to create your own cusom renderers
    */
-  Wrapper?: any;
+  Wrapper?: React.ComponentType<{
+    featureSupport: IFeatureSupportOptions,
+    helpers: IHelperFunctions,
+  }>;
+  /**
+   * Extra wrapper arguments to pass to the wrapper
+   */
+  wrapperArgs?: any;
   /**
    * The list of standard features that are supported
    * according to the definition
    */
   features: IFeatureSupportOptions,
   /**
-   * The value as html
+   * The value as html or plain text
    */
   value: string;
+  /**
+   * Whether the value represents rich text
+   */
+  isRichText: boolean;
   /**
    * An internal value provided
    * that represents a slate document
@@ -59,6 +288,19 @@ interface ISlateEditorProps {
    * Triggers on change
    */
   onChange: (value: string, internalValue: IRootLevelDocument) => void;
+  /**
+   * Triggers on focus
+   */
+  onFocus: () => void;
+  /**
+   * Triggers on blur
+   */
+  onBlur: () => void;
+  /**
+   * Function that usually comes from the handler and is provided via the renderer
+   * directly to this in order to handle file insertions into the media property
+   */
+  onInsertFile: (file: File, isExpectingImage?: boolean) => Promise<IInsertedFileInformationType>;
 }
 
 interface ISlateEditorState {
@@ -79,14 +321,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState) {
     if (state.synced) {
       if (props.internalValue) {
-        if (!state.internalValue || props.internalValue.id !== state.internalValue.id) {
+        if (!state.internalValue || props.internalValue.id !== state.internalValue.id) {
           return {
             internalValue: props.internalValue,
           };
         }
       } else {
         return {
-          internalValue: deserialize(props.value),
+          internalValue: props.isRichText ? deserialize(props.value) : deserializePlain(props.value),
         };
       }
     }
@@ -97,7 +339,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     super(props);
 
     this.state = {
-      internalValue: props.internalValue || deserialize(props.value),
+      internalValue: props.internalValue || (props.isRichText ? deserialize(props.value) : deserializePlain(props.value)),
       synced: true,
     }
 
@@ -112,6 +354,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public shouldComponentUpdate(nextProps: ISlateEditorProps, nextState: ISlateEditorState) {
     const standardUpdate = (
       nextProps.Wrapper !== this.props.Wrapper ||
+      !equals(nextProps.isRichText, this.props.isRichText) ||
+      !equals(nextProps.wrapperArgs, this.props.wrapperArgs) ||
       !equals(nextProps.features, this.props.features)
     )
     if (standardUpdate) {
@@ -128,6 +372,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const newRootDocument: IRootLevelDocument = {
       id: uuid.v4(),
       type: "document",
+      rich: this.state.internalValue.rich,
       children: v,
     };
     this.setState({
@@ -144,12 +389,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we can set it
     this.updateTimeout = setTimeout(() => {
-      // what we do is that we count the characters
-      const count = countSize(this.state.internalValue);
-      // and set it in the last rich text change cheat variable
-      (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = count;
+      if (this.state.internalValue.rich) {
+        // what we do is that we count the characters
+        const count = countSize(this.state.internalValue);
+        // and set it in the last rich text change cheat variable
+        (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = count;
+      }
       // and now we can trigger the on change event
-      this.props.onChange(serializeHTMLString(this.state.internalValue), this.state.internalValue);
+      this.props.onChange(serializeString(this.state.internalValue), this.state.internalValue);
       // and now we are going to wait a little bit more
       this.updateTimeout = setTimeout(() => {
         // to tell it that it should sync
@@ -161,22 +408,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public renderElement(props: RenderElementProps) {
     const { attributes, children, element } = props;
-    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, {...attributes, children}) as any;
+    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, { ...attributes, children }) as any;
   }
   public renderText(props: RenderLeafProps) {
     const { attributes, children, leaf } = props;
-    return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, {...attributes, children}) as any;
+    return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, { ...attributes, children }) as any;
   }
   public onChange(newValue: Node[]) {
     this.setValue(newValue);
   }
   public render() {
+    let children: React.ReactNode = (
+      <Editable
+        renderElement={this.renderElement}
+        renderLeaf={this.renderText}
+      />
+    );
+    const Wrapper = this.props.Wrapper;
+    if (Wrapper) {
+      children = (
+        <Wrapper {...this.props.wrapperArgs}>
+          {children}
+        </Wrapper>
+      );
+    }
     return (
       <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
-        <Editable
-          renderElement={this.renderElement}
-          renderLeaf={this.renderText}
-        />
+        {children}
       </Slate>
     )
   }

@@ -65,21 +65,35 @@ export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | I
  */
 export interface IRootLevelDocument {
   type: "document",
+  rich: boolean;
   id: string;
   children: RichElement[];
 }
 
 /**
  * Serializes a document
+ * will return html elements for rich documents
+ * or a string for plain documents
  * @param document 
  */
-export function serialize(root: IRootLevelDocument): HTMLElement[] {
+export function serialize(root: IRootLevelDocument): HTMLElement[] | string {
   if (!root) {
     return null;
   }
 
   if (root.children.length === 0) {
     return null;
+  }
+
+  if (!root.rich) {
+    let result: string = "";
+    root.children.forEach((paragraph: IParagraph) => {
+      if (result) {
+        result += "\n";
+      }
+      result += paragraph.children[0].text;
+    });
+    return result;
   }
 
   const lastElement = root.children[root.children.length - 1];
@@ -137,6 +151,7 @@ export function deserialize(html: string | Node[]) {
   const newDocument: IRootLevelDocument = {
     type: "document",
     id: uuid.v4(),
+    rich: true,
     children: childNodes.length === 0 ?
       [
         {
@@ -152,6 +167,31 @@ export function deserialize(html: string | Node[]) {
         }
       ] :
       childNodes.map(boundDeserializeElement).filter((n) => n !== null) as RichElement[],
+  };
+
+  return newDocument;
+}
+
+export function deserializePlain(data: string) {
+  const content = (data || "").split("\n");
+
+  const newDocument: IRootLevelDocument = {
+    type: "document",
+    id: uuid.v4(),
+    rich: false,
+    children: content.map((c) => {
+      return {
+        type: "paragraph",
+        subtype: "p",
+        children: [
+          {
+            bold: false,
+            italic: false,
+            text: c
+          },
+        ],
+      }
+    }),
   };
 
   return newDocument;

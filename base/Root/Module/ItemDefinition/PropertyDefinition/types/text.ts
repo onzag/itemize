@@ -66,9 +66,17 @@ const typeValue: IPropertyDefinitionSupportedType = {
       required: ["html"],
     },
     {
+      name: "supportedContainers",
+      type: "array-string",
+    },
+    {
       name: "supportsCustom",
       type: "boolean",
       required: ["html"],
+    },
+    {
+      name: "supportedCustoms",
+      type: "array-string",
     },
     {
       name: "supportsExternalLinks",
@@ -89,6 +97,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
       name: "supportsRichClasses",
       type: "boolean",
       required: ["html"],
+    },
+    ,
+    {
+      name: "supportedRichClasses",
+      type: "array-string",
     },
     {
       name: "supportsTitle",

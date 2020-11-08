@@ -33,7 +33,8 @@ export const ALLOWED_CLASSES = [
 ]
 
 export const RICH_TEXT_CLASS_PREFIX = "rich-text--";
-export const CONTAINER_CLASS_PREFIX = "container-";
+export const CONTAINER_CLASS = "container";
+export const CONTAINER_CLASS_PREFIX = CONTAINER_CLASS + "-";
 export const CUSTOM_CLASS_PREFIX = "custom-";
 
 /**
@@ -114,14 +115,39 @@ export interface IFeatureSupportOptions {
   supportsFiles: boolean;
   supportsLinks: boolean;
   supportsExternalLinks: boolean;
-  supportsContainers: boolean;
   supportsLists: boolean;
-  supportsCustom: boolean;
   supportsQuote: boolean;
   supportsTitle: boolean;
-  supportsRichClasses: boolean;
   supportsCustomStyles: boolean;
   supportsTemplating: boolean;
+
+  /**
+   * Whether we support customs
+   */
+  supportsCustom: boolean;
+  /**
+   * the supported custom elements
+   */
+  supportedCustoms: string[];
+  /**
+   * whether we support containers
+   */
+  supportsContainers: boolean;
+  /**
+   * The supported containers, might be null
+   * if all supported, note that this will
+   * not affect the base container
+   */
+  supportedContainers: string[];
+  /**
+   * whether rich classes are supported
+   */
+  supportsRichClasses: boolean;
+  /**
+   * The supported rich classes, might be null
+   * if all supported
+   */
+  supportedRichClasses: string[];
 }
 
 /**
@@ -305,14 +331,38 @@ export function postprocess(
     }
   }
 
-  if (node.classList && !options.supportsContainers) {
+  if (node.classList) {
     const classList = Array.from(node.classList);
-    classList.forEach((e) => e.startsWith("container") && node.classList.remove(e));
-  }
 
-  if (node.classList && !options.supportsCustom) {
-    const classList = Array.from(node.classList);
-    classList.forEach((e) => e.startsWith("custom-") && node.classList.remove(e));
+    classList.forEach((className) => {
+      if (!ALLOWED_CLASSES.includes(className)) {
+        const isPrefixedByAValidPrefix = ALLOWED_CLASSES_PREFIXES.some((prefix) => className.indexOf(prefix) === 0);
+        if (!isPrefixedByAValidPrefix) {
+          node.classList.remove(className);
+          return;
+        }
+      }
+
+      if (className.startsWith(CONTAINER_CLASS)) {
+        if (!options.supportsContainers) {
+          node.classList.remove(className);
+        } else if (options.supportedContainers) {
+          !options.supportedContainers.includes(className.substr(CONTAINER_CLASS_PREFIX.length)) && node.classList.remove(className);
+        }
+      } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
+        if (!options.supportsCustom) {
+          node.classList.remove(className);
+        } else if (options.supportedCustoms) {
+          !options.supportedCustoms.includes(className.substr(CUSTOM_CLASS_PREFIX.length)) && node.classList.remove(className);
+        }
+      } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
+        if (!options.supportsRichClasses) {
+          node.classList.remove(className);
+        } else if (options.supportedRichClasses) {
+          !options.supportedRichClasses.includes(className.substr(RICH_TEXT_CLASS_PREFIX.length)) && node.classList.remove(className);
+        }
+      }
+    });
   }
 
   if (node.tagName === "QUOTE" && !options.supportsQuote) {
@@ -329,7 +379,7 @@ export function postprocess(
 
   if (node.classList && !options.supportsRichClasses) {
     const classList = Array.from(node.classList);
-    classList.forEach((e) => e.startsWith("rich-text--") && node.classList.remove(e));
+    
   }
 
   if (node.style && !options.supportsCustomStyles) {
@@ -367,18 +417,6 @@ export function postprocess(
     }
   }
 
-  const classList = node.classList;
-  if (classList) {
-    classList.forEach((className) => {
-      if (!ALLOWED_CLASSES.includes(className)) {
-        const isPrefixedByAValidPrefix = ALLOWED_CLASSES_PREFIXES.some((prefix) => className.indexOf(prefix) === 0);
-        if (!isPrefixedByAValidPrefix) {
-          node.classList.remove(className);
-        }
-      }
-    });
-  }
-
   const id = node.id;
   if (id) {
     node.removeAttribute("id");
@@ -400,8 +438,11 @@ export function serialize(root: IRootLevelDocument) {
  * rather than a bunch of nodes
  * @param root 
  */
-export function serializeHTMLString(root: IRootLevelDocument) {
+export function serializeString(root: IRootLevelDocument) {
   const serialized = oserialize(root);
+  if (typeof serialized === "string") {
+    return serialized;
+  }
   return serialized.map((s) => s.outerHTML).join("");
 }
 

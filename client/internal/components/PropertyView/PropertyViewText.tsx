@@ -63,12 +63,15 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
     const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
+    const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
     const supportsLists = this.props.property.getSpecialProperty("supportsLists");
     const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
+    const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
     const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
     const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
     const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
     const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
+    const supportedRichClasses = this.props.property.getSpecialProperty("supportedRichClasses");
     const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
     const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
     const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
@@ -104,6 +107,9 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
           supportsTitle,
           supportsCustomStyles,
           supportsTemplating,
+          supportedContainers,
+          supportedCustoms,
+          supportedRichClasses,
         },
         currentValue,
       );

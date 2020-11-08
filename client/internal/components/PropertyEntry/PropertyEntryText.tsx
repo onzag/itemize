@@ -36,6 +36,40 @@ export interface IInsertedFileInformationType {
   isImage: boolean;
 }
 
+export interface IPropertyEntryI18nRichTextInfo {
+  formatBoldLabel: string;
+  formatItalicLabel: string;
+  formatUnderlineLabel: string;
+  formatTitleLabel: string;
+  formatQuoteLabel: string;
+  formatListNumberedLabel: string;
+  formatListBulletedLabel: string;
+  formatAddImageLabel: string;
+  formatAddVideoLabel: string;
+  formatAddFileLabel: string;
+  formatAddContainerLabel: string;
+  formatAddCustomLabel: string;
+  formatSetStyleLabel: string;
+  formatSetHoverStyleLabel: string;
+  formatSetActiveStyleLabel: string;
+  formatSetClassLabel: string;
+  formatSetEventHandlers: string;
+  formatSetContext: string;
+  formatMakeLoop: string;
+  formatSetUIHandlerLabel: string;
+  formatSetUIHandlerArgLabel: string;
+  formatSetUIHandlerArgName: string;
+  formatSetUIHandlerArgValue: string;
+
+  loadVideo: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    title: string;
+    submit: string;
+  };
+}
+
 /**
  * The entry text renderer props that every renderer is going to get
  * in order to render text
@@ -45,45 +79,8 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * For rich text contains the information about
    * building the standard toolbar that is expected
    */
-  i18nFormat: {
-    formatBoldLabel: string;
-    formatItalicLabel: string;
-    formatUnderlineLabel: string;
-    formatTitleLabel: string;
-    formatQuoteLabel: string;
-    formatListNumberedLabel: string;
-    formatListBulletedLabel: string;
-    formatAddImageLabel: string;
-    formatAddVideoLabel: string;
-    formatAddFileLabel: string;
-    formatAddContainerLabel: string;
-    formatAddCustomLabel: string;
-    formatSetStyleLabel: string;
-    formatSetHoverStyleLabel: string;
-    formatSetActiveStyleLabel: string;
-    formatSetClassLabel: string;
-    formatSetEventHandlers: string;
-    formatSetContext: string;
-    formatMakeLoop: string;
-    formatSetUIHandlerLabel: string;
-    formatSetUIHandlerArgLabel: string;
-    formatSetUIHandlerArgName: string;
-    formatSetUIHandlerArgValue: string;
-  };
-
-  /**
-   * For rich text contains locale information that
-   * are used in order to specify the load video dialog
-   * that takes an url
-   */
-  i18nLoadVideo: {
-    invalid: string;
-    label: string;
-    placeholder: string;
-    title: string;
-    submit: string;
-  };
-
+  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+  
   /**
    * Rich text features
    */
@@ -555,12 +552,15 @@ export default class PropertyEntryText
       const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
       const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
       const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
+      const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
       const supportsLists = this.props.property.getSpecialProperty("supportsLists");
       const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
+      const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
       const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
       const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
       const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
       const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
+      const supportedRichClasses = this.props.property.getSpecialProperty("supportedRichClasses");
       const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
       const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
       const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
@@ -579,6 +579,9 @@ export default class PropertyEntryText
         supportsTitle,
         supportsCustomStyles,
         supportsTemplating,
+        supportedRichClasses,
+        supportedCustoms,
+        supportedContainers,
       }
     }
 
@@ -664,7 +667,7 @@ export default class PropertyEntryText
 
       autoFocus: this.props.autoFocus || false,
 
-      i18nFormat: {
+      i18nRichInfo: isRichText ? {
         formatBoldLabel: i18nInLanguage.format_bold,
         formatItalicLabel: i18nInLanguage.format_italic,
         formatUnderlineLabel: i18nInLanguage.format_underline,
@@ -688,15 +691,15 @@ export default class PropertyEntryText
         formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
         formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
         formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
-      },
 
-      i18nLoadVideo: {
-        title: i18nInLanguage.video_loader_title,
-        label: i18nInLanguage.video_loader_label,
-        placeholder: i18nInLanguage.video_loader_placeholder,
-        invalid: i18nInLanguage.video_loader_invalid,
-        submit: i18nInLanguage.video_loader_submit,
-      },
+        loadVideo: {
+          title: i18nInLanguage.video_loader_title,
+          label: i18nInLanguage.video_loader_label,
+          placeholder: i18nInLanguage.video_loader_placeholder,
+          invalid: i18nInLanguage.video_loader_invalid,
+          submit: i18nInLanguage.video_loader_submit,
+        },
+      } : null,
 
       i18nGenericError: i18nInLanguage["generic_error"],
       i18nOk: i18nInLanguage["ok"],

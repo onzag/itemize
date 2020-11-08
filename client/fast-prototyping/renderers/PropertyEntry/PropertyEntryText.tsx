@@ -11,19 +11,13 @@
 import React from "react";
 import {
   InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
-  TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
-  Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
-  FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, CodeIcon
+  Button, WithStyles, withStyles, createStyles,
+  Alert,
 } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { SlateEditor } from "../../components/slate";
 
 import { capitalize } from "../../../../util";
-import { Dialog } from "../../components/dialog";
-import TextareaAutosize from "react-textarea-autosize";
-
-import { SlowLoadingElement } from "../../components/util";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -149,142 +143,10 @@ export const style = createStyles({
   }
 });
 
-function RichTextEditorToolbar(props: {
-  i18n: {
-    formatBoldLabel: string,
-    formatItalicLabel: string;
-    formatUnderlineLabel: string;
-    formatTitleLabel: string;
-    formatQuoteLabel: string;
-    formatListNumberedLabel: string;
-    formatListBulletedLabel: string;
-    formatAddImageLabel: string;
-    formatAddVideoLabel: string;
-    formatAddFileLabel: string;
-  },
-  supportsImages: boolean;
-  supportsFiles: boolean;
-  supportsVideos: boolean;
-  supportsRawMode: boolean;
-  supportsBasicMode: boolean;
-  className: string;
-
-  onToggleRawMode: () => void;
-}) {
-  return (
-    <Toolbar className={props.className}>
-      {props.supportsBasicMode ? <>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatBoldLabel}
-          classes={{ root: "ql-bold" }}
-        >
-          <FormatBoldIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatItalicLabel}
-          classes={{ root: "ql-italic" }}
-        >
-          <FormatItalicIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatUnderlineLabel}
-          classes={{ root: "ql-underline" }}
-        >
-          <FormatUnderlinedIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatTitleLabel}
-          classes={{ root: "ql-header" }}
-          value="1"
-        >
-          <TitleIcon />
-        </IconButton>
-        <span className="ql-divider" />
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatQuoteLabel}
-          classes={{ root: "ql-blockquote" }}
-        >
-          <FormatQuoteIcon />
-        </IconButton>
-        <span className="ql-divider" />
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatListNumberedLabel}
-          classes={{ root: "ql-list" }}
-          value="ordered"
-        >
-          <FormatListNumberedIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatListBulletedLabel}
-          classes={{ root: "ql-list" }}
-          value="bullet"
-        >
-          <FormatListBulletedIcon />
-        </IconButton>
-        {
-          props.supportsImages || props.supportsFiles ?
-            (
-              <span className="ql-divider" />
-            ) : null
-        }
-        {
-          props.supportsImages ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddImageLabel}
-                classes={{ root: "ql-image" }}
-              >
-                <InsertPhotoIcon />
-              </IconButton>
-            ) : null
-        }
-        {
-          props.supportsVideos ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddVideoLabel}
-                classes={{ root: "ql-video" }}
-              >
-                <VideoLibraryIcon />
-              </IconButton>
-            ) : null
-        }
-        {
-          props.supportsFiles ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddFileLabel}
-                classes={{ root: "ql-file" }}
-              >
-                <AttachFileIcon />
-              </IconButton>
-            ) : null
-        }
-      </> : null}
-      {
-        props.supportsRawMode ?
-          (
-            <IconButton
-              tabIndex={-1}
-              onClick={props.onToggleRawMode}
-            >
-              <CodeIcon />
-            </IconButton>
-          ) : null
-      }
-    </Toolbar>
-  );
+interface IPropertyEntryTextRendererState {
+  focused: boolean;
 }
+
 
 /**
  * The text renderer styles
@@ -293,118 +155,38 @@ interface IPropertyEntryTextRendererWithStylesProps extends IPropertyEntryTextRe
 }
 
 /**
- * The text renderer state
- */
-interface IPropertyEntryTextRendererState {
-  /**
-   * True when it's focused
-   */
-  focused: boolean;
-  /**
-   * True for when the user tries to put a link
-   * so we show a dialog for the youtube/vimeo link
-   */
-  requestingVideoLink: boolean;
-  /**
-   * True when such link is invalid
-   */
-  invalidVideoLink: boolean;
-  /**
-   * The video link being input
-   */
-  currentVideoLink: string;
-  /**
-   * Whether it is in raw mode
-   */
-  rawMode: boolean;
-}
-
-/**
  * The class that does the magic
  */
 class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererWithStylesProps, IPropertyEntryTextRendererState> {
-  // this one also gets an uuid
-  private inputImageRef: React.RefObject<HTMLInputElement>;
-  private fileInputRef: React.RefObject<HTMLInputElement>;
-
-  private textAreaRef: React.RefObject<HTMLTextAreaElement>;
-
   constructor(props: IPropertyEntryTextRendererWithStylesProps) {
     super(props);
 
-    // whether it is focused or not
     this.state = {
       focused: false,
-      requestingVideoLink: false,
-      invalidVideoLink: false,
-      currentVideoLink: "",
-      rawMode: false,
-    };
-
-    this.inputImageRef = React.createRef();
-    this.textAreaRef = React.createRef();
-    this.fileInputRef = React.createRef();
+    }
 
     // basic functions
-    this.onChangeByTextarea = this.onChangeByTextarea.bind(this);
     this.focusIfNecessary = this.focusIfNecessary.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
-    this.customImageHandler = this.customImageHandler.bind(this);
-    this.customVideoHandler = this.customVideoHandler.bind(this);
-    this.customFileHandler = this.customFileHandler.bind(this);
-    this.closeVideoRequesting = this.closeVideoRequesting.bind(this);
-    this.onImageLoad = this.onImageLoad.bind(this);
-    this.onFileLoad = this.onFileLoad.bind(this);
-    this.submitVideoLink = this.submitVideoLink.bind(this);
-    this.updateCurrentVideoLink = this.updateCurrentVideoLink.bind(this);
-    this.onFileLoad = this.onFileLoad.bind(this);
-    this.toggleRawMode = this.toggleRawMode.bind(this);
   }
-  public toggleRawMode() {
-    this.setState({
-      rawMode: !this.state.rawMode,
-    });
+  public componentDidMount() {
+    this.focusIfNecessary();
   }
-  public onChangeByTextarea(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    const value = e.target.value || null;
-    this.props.onChange(value, null);
-  }
-  /**
-   * This image handler is not binded due to quill existing in the this namespace
-   */
-  public customImageHandler() {
-    this.inputImageRef.current.click();
-  }
-  public customFileHandler() {
-    this.fileInputRef.current.click();
-  }
-  public customVideoHandler() {
-    this.setState({
-      currentVideoLink: "",
-      invalidVideoLink: false,
-      requestingVideoLink: true,
-    });
-  }
-  public closeVideoRequesting() {
-    this.setState({
-      requestingVideoLink: false,
-    });
-  }
-  public updateCurrentVideoLink(e: React.ChangeEvent<HTMLInputElement>) {
-    let isValid = false;
-    try {
-      const url = new URL(e.target.value);
-      isValid = url.hostname === "youtube.com" || url.hostname === "www.youtube.com" ||
-        url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
-    } catch {
-    }
-    this.setState({
-      currentVideoLink: e.target.value,
-      invalidVideoLink: !isValid,
-    });
-  }
-  public submitVideoLink() {
+  // public updateCurrentVideoLink(e: React.ChangeEvent<HTMLInputElement>) {
+  //   let isValid = false;
+  //   try {
+  //     const url = new URL(e.target.value);
+  //     isValid = url.hostname === "youtube.com" || url.hostname === "www.youtube.com" ||
+  //       url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
+  //   } catch {
+  //   }
+  //   this.setState({
+  //     currentVideoLink: e.target.value,
+  //     invalidVideoLink: !isValid,
+  //   });
+  // }
+  // public submitVideoLink() {
     // const quill = this.quillRef.current.getEditor();
     // const range = quill.getSelection(true);
 
@@ -459,10 +241,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     //   origin,
     // }, (ReactQuill.Quill as any).sources.USER);
     // quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
-
-    this.closeVideoRequesting();
-  }
-  public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+  // }
+  // public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
     // const file = e.target.files[0];
     // e.target.value = "";
 
@@ -484,8 +264,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     //   }, (ReactQuill.Quill as any).sources.USER);
     //   quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     // } catch (err) {}
-  }
-  public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+  // }
+  // public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     // const file = e.target.files[0];
     // e.target.value = "";
 
@@ -519,18 +299,17 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     //   quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     // } catch (err) {
     // }
-  }
+  // }
   public focusIfNecessary() {
     if (this.props.autoFocus) {
       // if (this.quillRef.current) {
       //   this.quillRef.current.focus();
       // } else
-      if (this.textAreaRef.current) {
-        this.textAreaRef.current.focus();
-      }
+      // if (this.textAreaRef.current) {
+      //   this.textAreaRef.current.focus();
+      // }
     }
   }
-  // basically get the state onto its parent of the focus and blur
   public onFocus() {
     this.setState({
       focused: true,
@@ -568,126 +347,84 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
 
-    const imageInput = this.props.isRichText && this.props.features.supportsImages ? (
-      <input
-        ref={this.inputImageRef}
-        type="file"
-        accept={this.props.mediaPropertyAcceptsImages}
-        tabIndex={-1}
-        style={{ display: "none" }}
-        autoComplete="off"
-        onChange={this.onImageLoad}
-      />
-    ) : null;
+    // const imageInput = this.props.isRichText && this.props.features.supportsImages ? (
+    //   <input
+    //     ref={this.inputImageRef}
+    //     type="file"
+    //     accept={this.props.mediaPropertyAcceptsImages}
+    //     tabIndex={-1}
+    //     style={{ display: "none" }}
+    //     autoComplete="off"
+    //     onChange={this.onImageLoad}
+    //   />
+    // ) : null;
 
-    const fileInput = this.props.isRichText && this.props.features.supportsFiles ? (
-      <input
-        ref={this.fileInputRef}
-        type="file"
-        accept={this.props.mediaPropertyAcceptsFiles}
-        tabIndex={-1}
-        style={{ display: "none" }}
-        autoComplete="off"
-        onChange={this.onFileLoad}
-      />
-    ) : null;
+    // const fileInput = this.props.isRichText && this.props.features.supportsFiles ? (
+    //   <input
+    //     ref={this.fileInputRef}
+    //     type="file"
+    //     accept={this.props.mediaPropertyAcceptsFiles}
+    //     tabIndex={-1}
+    //     style={{ display: "none" }}
+    //     autoComplete="off"
+    //     onChange={this.onFileLoad}
+    //   />
+    // ) : null;
 
-    const uploadVideoDialog = this.props.isRichText && this.props.features.supportsVideos ? (
-      <Dialog
-        fullScreen={false}
-        open={this.state.requestingVideoLink}
-        onClose={this.closeVideoRequesting}
-        title={this.props.i18nLoadVideo.title}
-        buttons={
-          <Button onClick={this.submitVideoLink}>
-            {this.props.i18nLoadVideo.submit}
-          </Button>
-        }
-      >
-        <div>
-          <TextField
-            fullWidth={true}
-            value={this.state.currentVideoLink}
-            onChange={this.updateCurrentVideoLink}
-            label={this.props.i18nLoadVideo.label}
-            placeholder={this.props.i18nLoadVideo.placeholder}
-          />
-          <div>{this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null}</div>
-        </div>
-      </Dialog>
-    ) : null;
+    // const uploadVideoDialog = this.props.isRichText && this.props.features.supportsVideos ? (
+    //   <Dialog
+    //     fullScreen={false}
+    //     open={this.state.requestingVideoLink}
+    //     onClose={this.closeVideoRequesting}
+    //     title={this.props.i18nLoadVideo.title}
+    //     buttons={
+    //       <Button onClick={this.submitVideoLink}>
+    //         {this.props.i18nLoadVideo.submit}
+    //       </Button>
+    //     }
+    //   >
+    //     <div>
+    //       <TextField
+    //         fullWidth={true}
+    //         value={this.state.currentVideoLink}
+    //         onChange={this.updateCurrentVideoLink}
+    //         label={this.props.i18nLoadVideo.label}
+    //         placeholder={this.props.i18nLoadVideo.placeholder}
+    //       />
+    //       <div>{this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null}</div>
+    //     </div>
+    //   </Dialog>
+    // ) : null;
 
-    const fileLoadErrorDialog = this.props.isRichText && (this.props.features.supportsImages || this.props.features.supportsFiles) ? (
-      <Dialog
-        fullScreen={false}
-        open={!!this.props.lastLoadedFileError}
-        onClose={this.props.dismissLastLoadedFileError}
-        title={capitalize(this.props.i18nGenericError)}
-        buttons={
-          <Button onClick={this.props.dismissLastLoadedFileError}>
-            {capitalize(this.props.i18nOk)}
-          </Button>
-        }
-      >
-        <Typography>
-          {this.props.lastLoadedFileError}
-        </Typography>
-      </Dialog>
-    ) : null;
-
-    const toolbar =
-      this.props.isRichText ?
-        (
-          this.state.rawMode ?
-            (
-              <RichTextEditorToolbar
-                i18n={this.props.i18nFormat}
-                supportsImages={false}
-                supportsFiles={false}
-                supportsVideos={false}
-                supportsBasicMode={false}
-                className={this.props.classes.toolbar}
-                supportsRawMode={this.props.args.supportsRawMode}
-                onToggleRawMode={this.toggleRawMode}
-              />
-            ) :
-            (
-              <RichTextEditorToolbar
-                i18n={this.props.i18nFormat}
-                supportsImages={this.props.features.supportsImages}
-                supportsFiles={this.props.features.supportsFiles}
-                supportsVideos={this.props.features.supportsVideos}
-                supportsBasicMode={true}
-                className={this.props.classes.toolbar}
-                supportsRawMode={this.props.args.supportsRawMode}
-                onToggleRawMode={this.toggleRawMode}
-              />
-            )
-        ) : null
+    // const fileLoadErrorDialog = this.props.isRichText && (this.props.features.supportsImages || this.props.features.supportsFiles) ? (
+    //   <Dialog
+    //     fullScreen={false}
+    //     open={!!this.props.lastLoadedFileError}
+    //     onClose={this.props.dismissLastLoadedFileError}
+    //     title={capitalize(this.props.i18nGenericError)}
+    //     buttons={
+    //       <Button onClick={this.props.dismissLastLoadedFileError}>
+    //         {capitalize(this.props.i18nOk)}
+    //       </Button>
+    //     }
+    //   >
+    //     <Typography>
+    //       {this.props.lastLoadedFileError}
+    //     </Typography>
+    //   </Dialog>
+    // ) : null;
 
     const editor =
-      this.state.rawMode || !this.props.isRichText ?
-        (
-          <SlowLoadingElement id="textarea" onMount={this.focusIfNecessary}>
-            <TextareaAutosize
-              ref={this.textAreaRef as any}
-              className={this.props.classes.rawTextArea}
-              onChange={this.onChangeByTextarea}
-              placeholder={capitalize(this.props.placeholder)}
-              value={editorValue}
-              onFocus={this.onFocus}
-              onBlur={this.onBlur}
-              disabled={this.props.disabled}
-            />
-          </SlowLoadingElement>
-        ) : (
-          <SlateEditor
-            features={this.props.features}
-            value={this.props.currentValue}
-            internalValue={this.props.currentInternalValue}
-            onChange={this.props.onChange}
-          />
-        );
+      <SlateEditor
+        features={this.props.features}
+        value={this.props.currentValue}
+        internalValue={this.props.currentInternalValue}
+        onChange={this.props.onChange}
+        onInsertFile={this.props.onInsertFile}
+        isRichText={this.props.isRichText}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}
+      />
 
     // we return the component, note how we set the thing to focused
     return (
@@ -717,10 +454,10 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           >
             {capitalize(this.props.label)}{iconComponent}
           </InputLabel>
-          {
+          {editor}
+          {/* {
             (
               <>
-                {toolbar}
                 <div
                   className={this.props.classes.editor + (this.state.focused ? " focused" : "")}
                 >
@@ -728,15 +465,11 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
                 </div>
               </>
             )
-          }
+          } */}
         </div>
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}
         </div>
-        {imageInput}
-        {fileInput}
-        {uploadVideoDialog}
-        {fileLoadErrorDialog}
       </div>
     );
   }

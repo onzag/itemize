@@ -941,11 +941,32 @@ export function checkPropertyDefinition(
         rawData.specialProperties[property.name] &&
         property.type !== "any"
       ) {
-        if (property.type !== "property-set" && typeof rawData.specialProperties[property.name] !== property.type) {
+        if (
+          property.type !== "property-set" &&
+          !property.type.startsWith("array-") &&
+          typeof rawData.specialProperties[property.name] !== property.type
+        ) {
           throw new CheckUpError(
             `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
             traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
           );
+        } else if (property.type.startsWith("array-")) {
+          const expectedType = property.type.substr(6);
+          if (!Array.isArray(rawData.specialProperties[property.name])) {
+            throw new CheckUpError(
+              `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
+              traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+            );
+          }
+
+          rawData.specialProperties[property.name].forEach((v: any, index: number) => {
+            if (typeof v !== expectedType) {
+              throw new CheckUpError(
+                `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}' but one found not to match`,
+                traceback.newTraceToBit("specialProperties").newTraceToBit(property.name).newTraceToBit(index),
+              );
+            }
+          });
         } else if (property.type === "property-set") {
           ajvCheck(
             checkSpecialPropertyValueSetSchemaValidate,
