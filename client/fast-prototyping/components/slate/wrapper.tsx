@@ -1,58 +1,88 @@
+import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React from "react";
+import { ISlateEditorWrapperBaseProps } from ".";
 import {
   InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
-  TextField, Button, Toolbar, WithStyles, withStyles, createStyles,
+  TextField, Button, AppBar, Toolbar, WithStyles, withStyles, createStyles,
   Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, CodeIcon
 } from "../../mui-core";
 
-function RichTextEditorToolbar(props: {
-  i18n: {
-    formatBoldLabel: string,
-    formatItalicLabel: string;
-    formatUnderlineLabel: string;
-    formatTitleLabel: string;
-    formatQuoteLabel: string;
-    formatListNumberedLabel: string;
-    formatListBulletedLabel: string;
-    formatAddImageLabel: string;
-    formatAddVideoLabel: string;
-    formatAddFileLabel: string;
+const style = createStyles({
+  editor: (props: ISlateEditorWrapperBaseProps) => {
+    const shouldShowInvalidEditor = !props.info.currentValid;
+    return {
+      "position": "relative",
+      "padding": props.info.isRichText ? "1rem" : "0 1rem 1rem 1rem",
+      // this is the colur when the field is out of focus
+      "&::before": {
+        left: 0,
+        right: 0,
+        bottom: 0,
+        content: "'\\00a0'",
+        position: "absolute",
+        transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        borderBottom: "1px solid " +
+          (shouldShowInvalidEditor ? "#e57373" : "rgba(0,0,0,0.42)"),
+        pointerEvents: "none",
+      },
+      // the color that pops up when the field is in focus
+      "&::after": {
+        left: 0,
+        bottom: 0,
+        right: 0,
+        content: "''",
+        position: "absolute",
+        transform: "scaleX(0)",
+        transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
+        borderBottom: "2px solid " +
+          (shouldShowInvalidEditor ? "#f44336" : "#3f51b5"),
+        pointerEvents: "none",
+      },
+      // during the hover event
+      "&.focused::after": {
+        transform: "none",
+      },
+    };
   },
-  supportsImages: boolean;
-  supportsFiles: boolean;
-  supportsVideos: boolean;
-  supportsRawMode: boolean;
-  supportsBasicMode: boolean;
-  className: string;
+  toolbar: {
+    overflow: "auto",
+  },
+});
 
-  onToggleRawMode: () => void;
-}) {
+function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
+  if (!props.info.isRichText) {
+    return null;
+  }
   return (
-    <Toolbar className={props.className}>
-      {props.supportsBasicMode ? <>
+    <AppBar position="relative" variant="outlined" color="default">
+      <Toolbar className={props.classes.toolbar}>
         <IconButton
           tabIndex={-1}
-          title={props.i18n.formatBoldLabel}
-          classes={{ root: "ql-bold" }}
+          title={props.i18nRichInfo.formatBoldLabel}
+          disabled={!props.info.currentText}
         >
           <FormatBoldIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
-          title={props.i18n.formatItalicLabel}
-          classes={{ root: "ql-italic" }}
+          title={props.i18nRichInfo.formatItalicLabel}
+          disabled={!props.info.currentText}
         >
           <FormatItalicIcon />
         </IconButton>
         <IconButton
           tabIndex={-1}
-          title={props.i18n.formatUnderlineLabel}
-          classes={{ root: "ql-underline" }}
+          title={props.i18nRichInfo.formatUnderlineLabel}
+          disabled={!props.info.currentText}
         >
           <FormatUnderlinedIcon />
         </IconButton>
+        {/* {props.supportsBasicMode ? <>
+
+
+
         <IconButton
           tabIndex={-1}
           title={props.i18n.formatTitleLabel}
@@ -139,7 +169,27 @@ function RichTextEditorToolbar(props: {
               <CodeIcon />
             </IconButton>
           ) : null
-      }
-    </Toolbar>
+      } */}
+      </Toolbar>
+    </AppBar>
   );
 }
+
+interface MaterialUISlateWrapperStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
+  i18nGenericError: string;
+  i18nOk: string;
+  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+};
+
+export const MaterialUISlateWrapper = withStyles(style)((props: MaterialUISlateWrapperStyles) => {
+  return (
+    <>
+      <RichTextEditorToolbar {...props} />
+      <div className="rich-text">
+        <div className={props.classes.editor + (props.info.isFocused ? " focused" : "")}>
+          {props.children}
+        </div>
+      </div>
+    </>
+  );
+});

@@ -4,6 +4,7 @@ import { ISerializationRegistryType } from ".";
 export const STANDARD_TEXT_NODE = {
   bold: false,
   italic: false,
+  underline: false,
   templateText: null as string,
   text: "",
 };
@@ -27,9 +28,15 @@ export function registerText(registry: ISerializationRegistryType) {
       i.appendChild(final);
       final = i;
     }
+    if (text.underline) {
+      const u = document.createElement("u");
+      u.appendChild(final);
+      final = u;
+    }
     if (text.templateText) {
       const span = document.createElement("span");
       span.dataset.text = text.templateText;
+      span.appendChild(final);
       final = span;
     }
     return final;
@@ -41,6 +48,7 @@ export function registerText(registry: ISerializationRegistryType) {
         text: "",
         bold: false,
         italic: false,
+        underline: false,
         templateText: null,
       }
     }
@@ -54,6 +62,11 @@ export function registerText(registry: ISerializationRegistryType) {
     } else if (nodeAsHTMLElement.tagName === "I") {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
       textValue.italic = true;
+      textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
+      return textValue;
+    } else if (nodeAsHTMLElement.tagName === "U") {
+      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
+      textValue.underline = true;
       textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
       return textValue;
     } else if (nodeAsHTMLElement.tagName === "SPAN") {
@@ -120,6 +133,7 @@ export function registerText(registry: ISerializationRegistryType) {
       text: actualTextContent,
       bold: false,
       italic: false,
+      underline: false,
       templateText: null,
     };
   }
@@ -138,6 +152,12 @@ export function registerText(registry: ISerializationRegistryType) {
       newCustomProps.style = {
         ...newCustomProps.style,
         fontStyle: "italic",
+      }
+    }
+    if (text.underline) {
+      newCustomProps.style = {
+        ...newCustomProps.style,
+        textDecoration: "underline",
       }
     }
     return (
@@ -170,6 +190,10 @@ export interface IText {
    * Whether the text is in italic
    */
   italic: boolean;
+  /**
+   * Whether the text is underline
+   */
+  underline: boolean;
   /**
    * templated content
    */

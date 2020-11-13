@@ -1,6 +1,6 @@
 import React from "react";
 import equals from "deep-equal";
-import { createEditor, Transforms, Range, Editor, Element, Node } from 'slate';
+import { createEditor, Transforms, Range, Editor, Element, Node, Path } from 'slate';
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
@@ -43,10 +43,6 @@ interface IAvailableElement {
 }
 
 export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions {
-  /**
-   * Whether it is curently focused
-   */
-  isFocused: boolean;
   /**
    * Whether an image can be inserted at the given location
    */
@@ -124,20 +120,6 @@ export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions
    * normally true if templating is true
    */
   canSetLoop: boolean;
-
-  /**
-   * The current element being worked with
-   */
-  currentElement: RichElement;
-  /**
-   * The current text being worked with
-   */
-  currentText: IText;
-  // Templating specific
-  /**
-   * The current templating context
-   */
-  currentContext: ITemplateArgsContext;
 
   /**
    * The classes that are available by the rich text
@@ -242,6 +224,41 @@ export interface IHelperFunctions {
   formatToggleRichClass: (richClass: string) => void;
 }
 
+export interface ISlateEditorInfoType {
+  /**
+   * Whether it is curently focused
+   */
+  isFocused: boolean;
+  /**
+   * Whether it is rich text
+   */
+  isRichText: boolean;
+  /**
+   * Whether the current value is valid
+   */
+  currentValid: boolean;
+  /**
+   * The current element being worked with
+   */
+  currentElement: RichElement;
+  /**
+   * The current text being worked with
+   */
+  currentText: IText;
+  // Templating specific
+  /**
+   * The current templating context
+   */
+  currentContext: ITemplateArgsContext;
+}
+
+export interface ISlateEditorWrapperBaseProps {
+  info: ISlateEditorInfoType;
+  featureSupport: IAccessibleFeatureSupportOptions;
+  helpers: IHelperFunctions;
+  children: React.ReactNode;
+}
+
 interface ISlateEditorProps {
   /**
    * A react component that is to wrap the editor
@@ -256,10 +273,7 @@ interface ISlateEditorProps {
    * itemize fast prototyping editor and its wrapper can do wonders it might not cover
    * all your use cases and you might want to create your own cusom renderers
    */
-  Wrapper?: React.ComponentType<{
-    featureSupport: IFeatureSupportOptions,
-    helpers: IHelperFunctions,
-  }>;
+  Wrapper?: React.ComponentType<ISlateEditorWrapperBaseProps>;
   /**
    * Extra wrapper arguments to pass to the wrapper
    */
@@ -273,6 +287,14 @@ interface ISlateEditorProps {
    * The value as html or plain text
    */
   value: string;
+  /**
+   * whether the current value is valid
+   */
+  currentValid: boolean;
+  /**
+   * The root context, can be null if no context
+   */
+  rootContext: ITemplateArgsContext;
   /**
    * Whether the value represents rich text
    */
@@ -313,6 +335,28 @@ interface ISlateEditorState {
    * Whether the internal value is synced or should be synced
    */
   synced: boolean;
+  /**
+   * Whether it is currently focused
+   */
+  focused: boolean;
+  /**
+   * The current anchor, null if not focused
+   */
+  anchor: Path;
+  /**
+   * Related to the anchor, specifies the current context
+   * that is being worked with, can be null, if context is null
+   * or found context doesn't exist
+   */
+  currentContext: ITemplateArgsContext;
+  /**
+   * current text node that is selected
+   */
+  currentText: IText;
+  /**
+   * current rich text node that is selected
+   */
+  currentElement: RichElement;
 }
 
 export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditorState> {
@@ -341,6 +385,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.state = {
       internalValue: props.internalValue || (props.isRichText ? deserialize(props.value) : deserializePlain(props.value)),
       synced: true,
+      focused: false,
+      anchor: null,
+      currentContext: this.props.rootContext || null,
+      currentElement: null,
+      currentText: null,
     }
 
     const rawEditor = createEditor();
@@ -350,11 +399,71 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.renderElement = this.renderElement.bind(this);
     this.onChange = this.onChange.bind(this);
     this.renderText = this.renderText.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+  public onFocus(anchor: Path, value: Node[]) {
+    let currentContext = this.props.rootContext || null;
+    let currentElement: RichElement = {
+      children: value,
+    } as any;
+    let currentText: IText = null;
+
+    if (anchor) {
+      const last = anchor.length - 1;
+      anchor.forEach((n: number, index: number) => {
+        if (index === last) {
+          currentText = currentElement.children[n] as IText;
+        } else {
+          currentElement = currentElement.children[n] as RichElement;
+          if (currentContext && currentElement.context) {
+            currentContext = currentContext.properties[currentElement.context] as ITemplateArgsContext || null;
+            if (currentContext.type !== "context" || currentContext.loopable) {
+              currentContext = null;
+            }
+          }
+          if (currentContext && currentElement.forEach) {
+            currentContext = currentContext.properties[currentElement.forEach] as ITemplateArgsContext || null;
+            if (currentContext.type !== "context" || !currentContext.loopable) {
+              currentContext = null;
+            }
+          }
+        }
+      });
+    }
+
+    this.setState({
+      anchor,
+      currentContext,
+      currentElement,
+      currentText,
+    });
+    if (!this.state.focused) {
+      this.props.onFocus && this.props.onFocus();
+      this.setState({
+        focused: true,
+      });
+    }
+  }
+  public onBlur() {
+    if (this.state.focused) {
+      this.props.onBlur && this.props.onBlur();
+      this.setState({
+        focused: false,
+        anchor: null,
+        currentContext: this.props.rootContext || null,
+        currentElement: null,
+        currentText: null,
+      });
+    }
   }
   public shouldComponentUpdate(nextProps: ISlateEditorProps, nextState: ISlateEditorState) {
     const standardUpdate = (
+      nextProps.currentValid !== this.props.currentValid ||
+      nextState.focused !== this.state.focused ||
       nextProps.Wrapper !== this.props.Wrapper ||
-      !equals(nextProps.isRichText, this.props.isRichText) ||
+      nextProps.isRichText !== this.props.isRichText ||
+      nextProps.rootContext !== this.props.rootContext ||
       !equals(nextProps.wrapperArgs, this.props.wrapperArgs) ||
       !equals(nextProps.features, this.props.features)
     )
@@ -415,6 +524,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, { ...attributes, children }) as any;
   }
   public onChange(newValue: Node[]) {
+    if (this.editor.selection) {
+      this.onFocus(this.editor.selection.anchor.path, newValue);
+    } else {
+      this.onBlur();
+    }
+
     this.setValue(newValue);
   }
   public render() {
@@ -426,8 +541,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     );
     const Wrapper = this.props.Wrapper;
     if (Wrapper) {
+      const info: ISlateEditorInfoType = {
+        currentValid: this.props.currentValid,
+        isFocused: this.state.focused,
+        currentContext: this.state.currentContext,
+        currentElement: this.state.currentElement,
+        currentText: this.state.currentText,
+        isRichText: this.props.isRichText,
+      }
       children = (
-        <Wrapper {...this.props.wrapperArgs}>
+        <Wrapper {...this.props.wrapperArgs} info={info}>
           {children}
         </Wrapper>
       );

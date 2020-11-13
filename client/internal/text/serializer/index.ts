@@ -159,6 +159,7 @@ export function deserialize(html: string | Node[]) {
             {
               bold: false,
               italic: false,
+              underline: false,
               text: "",
               templateText: null,
             }
@@ -186,6 +187,7 @@ export function deserializePlain(data: string) {
           {
             bold: false,
             italic: false,
+            underline: false,
             text: c,
             templateText: null,
           },

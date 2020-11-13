@@ -57,6 +57,7 @@ export function registerFile(registry: ISerializationRegistryType) {
           text: "",
           bold: false,
           italic: false,
+          underline: false,
           templateText: null,
         },
       ],

@@ -16,6 +16,7 @@ import {
 } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { SlateEditor } from "../../components/slate";
+import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
 
 import { capitalize } from "../../../../util";
 
@@ -424,6 +425,14 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         isRichText={this.props.isRichText}
         onFocus={this.onFocus}
         onBlur={this.onBlur}
+        rootContext={this.props.args.context || null}
+        currentValid={this.props.currentValid}
+        Wrapper={MaterialUISlateWrapper}
+        wrapperArgs={{
+          i18nGenericError: this.props.i18nGenericError,
+          i18nOk: this.props.i18nOk,
+          i18nRichInfo: this.props.i18nRichInfo,
+        }}
       />
 
     // we return the component, note how we set the thing to focused
