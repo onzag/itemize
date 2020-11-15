@@ -61,9 +61,6 @@ export const style = createStyles({
       backgroundColor: "#1976d2",
     },
   },
-  toolbar: {
-    overflow: "auto",
-  },
   textButton: {
     border: "solid 1px rgba(0,0,0,0.1)",
     display: "flex",
@@ -428,6 +425,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         rootContext={this.props.args.context || null}
         currentValid={this.props.currentValid}
         Wrapper={MaterialUISlateWrapper}
+        rootI18n={this.props.i18nRoot}
         wrapperArgs={{
           i18nGenericError: this.props.i18nGenericError,
           i18nOk: this.props.i18nOk,

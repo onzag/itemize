@@ -12,6 +12,7 @@ import { IText, registerText } from "./text";
 import { ITitle, registerTitle } from "./title";
 import { IVideo, registerVideo } from "./video";
 import uuid from "uuid";
+import uuidv5 from "uuid/v5";
 
 type DeserializationFn = (n: Node) => RichElement | IText;
 
@@ -69,6 +70,9 @@ export interface IRootLevelDocument {
   id: string;
   children: RichElement[];
 }
+
+const TEXT_NAMESPACE = "ee6ce529-24f8-455b-8dd0-8b5bd377820d";
+const NULL_UUID = "83dd556b-889f-4a9b-aff0-f749a35a9c0f";
 
 /**
  * Serializes a document
@@ -133,7 +137,9 @@ function serializeElement(element: RichElement) {
  * Deserializes a document from the HTML form
  * @param html 
  */
-export function deserialize(html: string | Node[]) {
+export function deserialize(html: string | Node[], comparer?: IRootLevelDocument) {
+  let data: string;
+
   const boundDeserializeElement = deserializeElement.bind(null, SERIALIZATION_REGISTRY);
 
   let childNodes: Node[] = null;
@@ -141,15 +147,30 @@ export function deserialize(html: string | Node[]) {
     const cheapdiv = DOMWindow.document.createElement("div");
     cheapdiv.innerHTML = html;
     childNodes = Array.from(cheapdiv.childNodes);
+    data = html;
   } else {
-    childNodes = html || [];
+    childNodes = html || [];
+    if (html !== null) {
+      const cheapdiv = DOMWindow.document.createElement("div");
+      Array.from(html).forEach((n) => {
+        cheapdiv.appendChild(n);
+      });
+      data = cheapdiv.innerHTML;
+    } else {
+      data = null;
+    }
+  }
+
+  const expectedId = data === null ? NULL_UUID : uuidv5(data, TEXT_NAMESPACE);
+  if (comparer && comparer.id === expectedId) {
+    return comparer;
   }
 
   const finalChildren = childNodes.map(boundDeserializeElement).filter((n) => n !== null) as RichElement[];
 
   const newDocument: IRootLevelDocument = {
     type: "document",
-    id: uuid.v4(),
+    id: expectedId,
     rich: true,
     children: finalChildren.length === 0 ?
       [
@@ -172,12 +193,18 @@ export function deserialize(html: string | Node[]) {
   return newDocument;
 }
 
-export function deserializePlain(data: string) {
+export function deserializePlain(data: string, comparer?: IRootLevelDocument) {
+  const expectedId = data === null ? NULL_UUID : uuidv5(data, TEXT_NAMESPACE);
+
+  if (comparer && comparer.id === expectedId) {
+    return comparer;
+  }
+
   const content = (data || "").split("\n");
 
   const newDocument: IRootLevelDocument = {
     type: "document",
-    id: uuid.v4(),
+    id: expectedId,
     rich: false,
     children: content.map((c) => {
       return {

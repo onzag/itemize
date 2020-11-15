@@ -80,6 +80,10 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * building the standard toolbar that is expected
    */
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+  /**
+   * The i18n root
+   */
+  i18nRoot: any;
   
   /**
    * Rich text features
@@ -667,6 +671,7 @@ export default class PropertyEntryText
 
       autoFocus: this.props.autoFocus || false,
 
+      i18nRoot: this.props.i18n[this.props.language],
       i18nRichInfo: isRichText ? {
         formatBoldLabel: i18nInLanguage.format_bold,
         formatItalicLabel: i18nInLanguage.format_italic,

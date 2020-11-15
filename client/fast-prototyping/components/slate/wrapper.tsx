@@ -53,6 +53,7 @@ const style = createStyles({
 
 function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
   if (!props.info.isRichText) {
+
     return null;
   }
   return (
@@ -62,6 +63,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           tabIndex={-1}
           title={props.i18nRichInfo.formatBoldLabel}
           disabled={!props.info.currentText}
+          color={props.info.currentText && props.info.currentText.bold ? "primary" : "default"}
+          onClick={props.helpers.formatToggleBold.bind(null, true)}
         >
           <FormatBoldIcon />
         </IconButton>
@@ -69,6 +72,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           tabIndex={-1}
           title={props.i18nRichInfo.formatItalicLabel}
           disabled={!props.info.currentText}
+          color={props.info.currentText && props.info.currentText.italic ? "primary" : "default"}
+          onClick={props.helpers.formatToggleItalic.bind(null, true)}
         >
           <FormatItalicIcon />
         </IconButton>
@@ -76,9 +81,24 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           tabIndex={-1}
           title={props.i18nRichInfo.formatUnderlineLabel}
           disabled={!props.info.currentText}
+          color={props.info.currentText && props.info.currentText.underline ? "primary" : "default"}
+          onClick={props.helpers.formatToggleUnderline.bind(null, true)}
         >
           <FormatUnderlinedIcon />
         </IconButton>
+        {
+          props.featureSupport.supportsTitle ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatTitleLabel}
+              color={props.info.currentElement && props.info.currentElement.type === "title" ? "primary" : "default"}
+              disabled={!props.featureSupport.canInsertTitle}
+              onClick={props.helpers.toggleTitle.bind(null, "h1")}
+            >
+              <TitleIcon />
+            </IconButton> :
+            null
+        }
         {/* {props.supportsBasicMode ? <>
 
 

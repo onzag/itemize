@@ -1,10 +1,10 @@
 import React from "react";
 import equals from "deep-equal";
-import { createEditor, Transforms, Range, Editor, Element, Node, Path } from 'slate';
+import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text } from 'slate';
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
-import { countSize, IFeatureSupportOptions, serializeString } from "../../../internal/text";
+import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX, IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IText } from "../../../internal/text/serializer/text";
@@ -41,6 +41,83 @@ interface IAvailableElement {
   value: string;
   label: string;
 }
+
+let ALL_CONTAINERS: string[] = [];
+let ALL_CUSTOM: string[] = [];
+let ALL_RICH_CLASSES: string[] = [];
+let ALL_IS_LOADED: boolean = false;
+
+function calculateStylesheet(stylesheet: CSSStyleSheet) {
+  Array.from(stylesheet.cssRules).forEach((r) => {
+    const selectorSplitted = ((r as any).selectorText as string || r.cssText.split("{")[0].trim()).split(" ");
+    selectorSplitted.forEach((s) => {
+      if (s[0] !== ".") {
+        return;
+      }
+
+      const className = s.substr(1);
+      if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
+        ALL_CONTAINERS.push(className.substr(CONTAINER_CLASS_PREFIX.length))
+      } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
+        ALL_CUSTOM.push(className.substr(CUSTOM_CLASS_PREFIX.length))
+      } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
+        ALL_RICH_CLASSES.push(className.substr(RICH_TEXT_CLASS_PREFIX.length))
+      }
+    });
+  });
+}
+
+// we are going to build a promise
+// for retrieving the available classes for the rich
+// text editor
+const ALL_PROMISE = new Promise(async (resolve) => {
+  // if we are already loaded then we are done
+  if (ALL_IS_LOADED) {
+    resolve();
+    return;
+  }
+  if (typeof document !== "undefined") {
+    // now we got to see if by the time this promise is running
+    // it is already done loading
+    const foundPreloadedStylesheet =
+      document.styleSheets && Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith("/rest/resource/build"));
+
+    // if we find it and use it to calculate it
+    if (foundPreloadedStylesheet) {
+      ALL_IS_LOADED = true;
+      calculateStylesheet(foundPreloadedStylesheet);
+      resolve();
+
+    // otherwise we need to wait for the link to load
+    } else {
+      const allLinks = document.head.querySelectorAll("link");
+      const foundStylesheetNode = Array.from(allLinks).find((s) => s.href.startsWith("/rest/resource/build"));
+
+      // if we don't find a base css build, then we mark it as done
+      if (!foundStylesheetNode) {
+        ALL_IS_LOADED = true;
+        resolve();
+      } else {
+        // otherwise we set up a onload callback
+        foundStylesheetNode.addEventListener("load", () => {
+          // and once we are loaded we want to grab the css stylesheet
+          const foundLoadedStyleSheet =
+            document.styleSheets &&
+            Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith("/rest/resource/build"));
+          // mark it as loaded
+          ALL_IS_LOADED = true;
+
+          // process it
+          if (foundLoadedStyleSheet) {
+            calculateStylesheet(foundLoadedStyleSheet);
+          }
+          // and resolve
+          resolve();
+        });
+      }
+    }
+  }
+});
 
 export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions {
   /**
@@ -137,7 +214,10 @@ export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions
 }
 
 export interface IHelperFunctions {
-  editor: any;
+  editor: ReactEditor;
+  ReactEditor: typeof ReactEditor;
+  Transforms: typeof Transforms;
+  Range: typeof Range;
 
   /**
    * Will insert an image based on a given file that has
@@ -171,11 +251,11 @@ export interface IHelperFunctions {
   /**
    * Makes a quote out of the current element
    */
-  makeQuote: () => void;
+  toggleQuote: () => void;
   /**
    * Makes a title out of the current element
    */
-  makeTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => void;
+  toggleTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => void;
   /**
    * Makes a list out of the current element
    */
@@ -183,7 +263,7 @@ export interface IHelperFunctions {
   /**
    * Makes a link out of the current element
    */
-  makeLink: (url: string) => void;
+  toggleLink: (url: string) => void;
   /**
    * Makes a template link out of the current element
    */
@@ -218,6 +298,10 @@ export interface IHelperFunctions {
    * formats the current text as italic
    */
   formatToggleItalic: () => void;
+  /**
+   * formats to underline
+   */
+  formatToggleUnderline: () => void;
   /**
    * toggles a given active rich class
    */
@@ -296,6 +380,10 @@ interface ISlateEditorProps {
    */
   rootContext: ITemplateArgsContext;
   /**
+   * The root i18n
+   */
+  rootI18n: any;
+  /**
    * Whether the value represents rich text
    */
   isRichText: boolean;
@@ -357,6 +445,18 @@ interface ISlateEditorState {
    * current rich text node that is selected
    */
   currentElement: RichElement;
+  /**
+   * available containers
+   */
+  allContainers: string[];
+  /**
+   * available containers
+   */
+  allCustom: string[];
+  /**
+   * available rich class
+   */
+  allRichClasses: string[];
 }
 
 export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditorState> {
@@ -372,7 +472,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         }
       } else {
         return {
-          internalValue: props.isRichText ? deserialize(props.value) : deserializePlain(props.value),
+          internalValue: props.isRichText ? deserialize(props.value, state.internalValue) : deserializePlain(props.value, state.internalValue),
         };
       }
     }
@@ -390,6 +490,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentContext: this.props.rootContext || null,
       currentElement: null,
       currentText: null,
+
+      // ensure SSR compatibility
+      allContainers: [],
+      allCustom: [],
+      allRichClasses: [],
     }
 
     const rawEditor = createEditor();
@@ -401,6 +506,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.renderText = this.renderText.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
+
+    this.insertImage = this.insertImage.bind(this);
+    this.insertVideo = this.insertVideo.bind(this);
+    this.insertFile = this.insertFile.bind(this);
+    this.insertContainer = this.insertContainer.bind(this);
+    this.insertCustom = this.insertCustom.bind(this);
+    this.toggleQuote = this.toggleQuote.bind(this);
+    this.toggleTitle = this.toggleTitle.bind(this);
+    this.makeList = this.makeList.bind(this);
+    this.toggleLink = this.toggleLink.bind(this);
+    this.makeTemplateLink = this.makeTemplateLink.bind(this);
+    this.setStyle = this.setStyle.bind(this);
+    this.setHoverStyle = this.setHoverStyle.bind(this);
+    this.setActiveStyle = this.setActiveStyle.bind(this);
+    this.setContext = this.setContext.bind(this);
+    this.setForEach = this.setForEach.bind(this);
+    this.formatToggleBold = this.formatToggleBold.bind(this);
+    this.formatToggleItalic = this.formatToggleItalic.bind(this);
+    this.formatToggleUnderline = this.formatToggleUnderline.bind(this);
+    this.formatToggleRichClass = this.formatToggleRichClass.bind(this);
+
+    this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
   }
   public onFocus(anchor: Path, value: Node[]) {
     let currentContext = this.props.rootContext || null;
@@ -464,6 +591,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.Wrapper !== this.props.Wrapper ||
       nextProps.isRichText !== this.props.isRichText ||
       nextProps.rootContext !== this.props.rootContext ||
+      nextProps.rootI18n !== this.props.rootI18n ||
+      !equals(this.state.allContainers, nextState.allContainers) ||
+      !equals(this.state.allCustom, nextState.allCustom) ||
+      !equals(this.state.allRichClasses, nextState.allRichClasses) ||
       !equals(nextProps.wrapperArgs, this.props.wrapperArgs) ||
       !equals(nextProps.features, this.props.features)
     )
@@ -530,8 +661,200 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.onBlur();
     }
 
-    this.setValue(newValue);
+    if (newValue !== this.state.internalValue.children as any) {
+      this.setValue(newValue);
+    }
   }
+  /**
+   * Will insert an image based on a given file that has
+   * been taken as an input
+   * @param file the file
+   * @param standalone whether to make it a standalone image
+   */
+  public insertImage(file: File, standalone: boolean) {
+
+  };
+  /**
+   * Will insert a video given the information
+   * @param origin the origin of the video
+   * @param id the id of the video
+   */
+  public insertVideo(origin: "youtube" | "vimeo", id: string) {
+
+  };
+  /**
+   * Will insert a file based on the information given
+   * @param file the file to insert
+   */
+  public insertFile(file: File) {
+
+  };
+  /**
+   * Will insert a container at the given location
+   * @param type optional, the container type, otherwise will
+   * insert a standard container
+   */
+  public insertContainer(type?: string) {
+
+  };
+  /**
+   * Inserts a custom element
+   */
+  public insertCustom(type: string) {
+
+  };
+
+  /**
+   * Makes a quote out of the current element
+   */
+  public toggleQuote() {
+
+  };
+  /**
+   * Makes a title out of the current element
+   */
+  public toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
+    let needsWrapping: boolean = true;
+    if (this.state.currentElement.type === "title") {
+      needsWrapping = this.state.currentElement.subtype !== type;
+      Transforms.unwrapNodes(
+        this.editor,
+        { split: true }
+      );
+    }
+    if (needsWrapping) {
+      Transforms.wrapNodes(
+        this.editor,
+        {
+          type: "title",
+          subtype: type,
+          children: [],
+        },
+        { match: n => Element.isElement(n), split: true }
+      );
+    }
+    ReactEditor.focus(this.editor);
+  };
+  /**
+   * Makes a list out of the current element
+   */
+  public makeList() {
+
+  };
+  /**
+   * Makes a link out of the current element
+   */
+  public toggleLink(url: string) {
+
+  };
+  /**
+   * Makes a template link out of the current element
+   */
+  public makeTemplateLink(value: string) {
+
+  };;
+
+  /**
+   * Sets the current style for the element
+   */
+  public setStyle(style: string) {
+
+  };
+  /**
+   * Sets the template hover style for the element
+   */
+  public setHoverStyle(style: string) {
+
+  };
+  /**
+   * Sets the active style for the element
+   */
+  public setActiveStyle(style: string) {
+
+  };
+  /**
+   * Sets the context key
+   */
+  public setContext(key: string) {
+
+  };
+  /**
+  * Sets the for-each loop key
+  */
+  public setForEach(key: string) {
+
+  };
+
+  /**
+   * Formats the current text as bold
+   */
+  public formatToggleBold() {
+    Transforms.setNodes(
+      this.editor,
+      { bold: !this.state.currentText.bold },
+      { match: n => Text.isText(n), split: true }
+    );
+    ReactEditor.focus(this.editor);
+  }
+  /**
+   * formats the current text as italic
+   */
+  public formatToggleItalic() {
+    Transforms.setNodes(
+      this.editor,
+      { italic: !this.state.currentText.italic },
+      { match: n => Text.isText(n), split: true }
+    );
+    ReactEditor.focus(this.editor);
+  };
+  /**
+   * formats the current text as italic
+   */
+  public formatToggleUnderline() {
+    Transforms.setNodes(
+      this.editor,
+      { underline: !this.state.currentText.underline },
+      { match: n => Text.isText(n), split: true }
+    );
+    ReactEditor.focus(this.editor);
+  };
+  /**
+   * toggles a given active rich class
+   */
+  public formatToggleRichClass(richClass: string) {
+
+  };
+
+  private availableFilteringFunction(feature: string, featureAll: string, featureList: string, i18nLocation: string): IAvailableElement[] {
+    return (
+      this.props.features[feature] ?
+      (this.state[featureAll] as string[]).filter((c) =>
+        this.props.features[featureList] ? this.props.features[featureList].includes(c) : true
+      ) :
+      []
+    ).map((c) => {
+      return {
+        value: c,
+        label: (
+          this.props.rootI18n &&
+          this.props.rootI18n.custom &&
+          this.props.rootI18n.custom[i18nLocation] &&
+          this.props.rootI18n.custom[i18nLocation][c]
+        ) || c
+      }
+    });
+  }
+
+  public async componentDidMount() {
+    // ensure SSR compatibility
+    await ALL_PROMISE;
+    this.setState({
+      allContainers: ALL_CONTAINERS,
+      allCustom: ALL_CUSTOM,
+      allRichClasses: ALL_RICH_CLASSES,
+    });
+  }
+
   public render() {
     let children: React.ReactNode = (
       <Editable
@@ -549,16 +872,77 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentText: this.state.currentText,
         isRichText: this.props.isRichText,
       }
+
+      const helpers: IHelperFunctions = {
+        editor: this.editor,
+        Transforms,
+        Range,
+        ReactEditor,
+
+        formatToggleBold: this.formatToggleBold,
+        formatToggleItalic: this.formatToggleItalic,
+        formatToggleUnderline: this.formatToggleUnderline,
+        formatToggleRichClass: this.formatToggleRichClass,
+        insertContainer: this.insertContainer,
+        insertCustom: this.insertCustom,
+        insertFile: this.insertFile,
+        insertImage: this.insertImage,
+        insertVideo: this.insertVideo,
+        toggleLink: this.toggleLink,
+        makeList: this.makeList,
+        toggleQuote: this.toggleQuote,
+        makeTemplateLink: this.makeTemplateLink,
+        toggleTitle: this.toggleTitle,
+        setActiveStyle: this.setActiveStyle,
+        setContext: this.setContext,
+        setForEach: this.setForEach,
+        setHoverStyle: this.setHoverStyle,
+        setStyle: this.setStyle,
+      }
+
+      const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
+      const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
+
+      const newFeatureSupport: IAccessibleFeatureSupportOptions = {
+        ...this.props.features,
+
+        availableContainers: this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers"),
+        availableCustoms: availableCustoms,
+        availableRichClasses,
+
+        canInsertContainer: this.state.currentElement && this.props.features.supportsContainers,
+        canInsertCustom: this.state.currentElement && this.props.features.supportsCustom && !!availableCustoms.length,
+        canInsertFile: this.state.currentElement && this.props.features.supportsFiles,
+        canInsertImage: this.state.currentElement && this.props.features.supportsImages,
+        canInsertLink: this.state.currentElement && this.props.features.supportsLinks,
+        canInsertList: this.state.currentElement && this.props.features.supportsLists,
+        canInsertQuote: this.state.currentElement && this.props.features.supportsQuote,
+        canInsertRichClass: this.state.currentElement && this.props.features.supportsRichClasses && !!availableRichClasses.length,
+        canInsertTitle: this.state.currentText && this.props.features.supportsTitle,
+        canInsertVideo: this.state.currentElement && this.props.features.supportsVideos,
+        canSetActionFunction: this.state.currentElement && this.props.features.supportsTemplating,
+        canSetActiveStyle: this.state.currentElement && this.props.features.supportsTemplating,
+        canSetDynamicHref: this.state.currentElement && this.props.features.supportsTemplating,
+        canSetHoverStyle: this.state.currentElement && this.props.features.supportsTemplating,
+        canSetLoop: this.state.currentElement && this.props.features.supportsTemplating,
+        canSetStyle: this.state.currentElement && this.props.features.supportsCustomStyles,
+        canSetUIHandler: this.state.currentElement && this.props.features.supportsTemplating,
+      };
       children = (
-        <Wrapper {...this.props.wrapperArgs} info={info}>
+        <Wrapper {...this.props.wrapperArgs} info={info} helpers={helpers} featureSupport={newFeatureSupport}>
           {children}
         </Wrapper>
       );
     }
     return (
-      <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
-        {children}
-      </Slate>
+      <>
+        <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
+          {children}
+        </Slate>
+        <code>
+          {JSON.stringify(this.state.internalValue, null, 2)}
+        </code>
+      </>
     )
   }
 }

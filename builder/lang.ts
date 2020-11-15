@@ -192,7 +192,7 @@ export function clearLang(
   const nRawData: ILangLocalesType = {};
   Object.keys(rawData).forEach((locale) => {
     nRawData[locale] = {
-      name: rawData[locale].name,
+      name: rawData[locale].name as string,
       rtl: rawDataConfig.standard.rtlLanguages.includes(locale),
     };
   });
