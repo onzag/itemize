@@ -1,6 +1,6 @@
 import React from "react";
 import equals from "deep-equal";
-import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text } from 'slate';
+import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text, NodeEntry } from 'slate';
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
@@ -9,6 +9,9 @@ import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IText } from "../../../internal/text/serializer/text";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
+import { IParagraph } from "../../../internal/text/serializer/paragraph";
+import { ITitle } from "../../../internal/text/serializer/title";
+import { copyElementBase } from "../../../internal/text/serializer/base";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
@@ -88,7 +91,7 @@ const ALL_PROMISE = new Promise(async (resolve) => {
       calculateStylesheet(foundPreloadedStylesheet);
       resolve();
 
-    // otherwise we need to wait for the link to load
+      // otherwise we need to wait for the link to load
     } else {
       const allLinks = document.head.querySelectorAll("link");
       const foundStylesheetNode = Array.from(allLinks).find((s) => s.href.startsWith("/rest/resource/build"));
@@ -459,9 +462,32 @@ interface ISlateEditorState {
   allRichClasses: string[];
 }
 
+const ONLY_INLINE_CHILDREN_TYPES = [
+  "title",
+  "paragraph",
+  "quote",
+];
+
+const ONLY_TEXT_CHILDREN_TYPES = [
+  "link",
+];
+
+const VOID_TYPES = [
+  "video",
+  "image",
+  "file",
+];
+
+const ONLY_ELEMENT_CHILDREN_TYPES = [
+  "container",
+  "custom",
+];
+
 export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditorState> {
   private editor: ReactEditor;
   private updateTimeout: NodeJS.Timeout;
+  private originalNormalize: any;
+
   static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState) {
     if (state.synced) {
       if (props.internalValue) {
@@ -500,6 +526,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const rawEditor = createEditor();
     this.editor = withReact(rawEditor);
 
+    this.normalizeNode = this.normalizeNode.bind(this);
+
+    this.editor.isInline = this.isInline as any;
+    this.editor.isVoid = this.isVoid as any;
+    this.originalNormalize = this.editor.normalizeNode;
+    this.editor.normalizeNode = this.normalizeNode;
+
     this.setValue = this.setValue.bind(this);
     this.renderElement = this.renderElement.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -528,6 +561,80 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleRichClass = this.formatToggleRichClass.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
+  }
+  public checkShouldMerge(n1: Node, n2: Node) {
+    return Object.keys(n1).concat(Object.keys(n2)).every((key) => {
+      if (key === "children" || key === "text") {
+        return true;
+      }
+
+      return equals(n1[key], n2[key]);
+    });
+  }
+  public normalizeNode(entry: NodeEntry<Node>) {
+    const [node, path] = entry;
+    if (Element.isElement(node)) {
+      let n = 0;
+      for (let i = 0; i < node.children.length; i++) {
+        const prev = node.children[i - 1];
+        const current = node.children[i];
+
+        if (Text.isText(current)) {
+          const prevPath = path.concat(n - 1);
+          const curPath = path.concat(n);
+          const currentTextPath = this.editor.selection.anchor.path;
+          if (prev && Text.isText(prev) && !equals(prevPath, currentTextPath) && this.checkShouldMerge(current, prev)) {
+            Transforms.mergeNodes(this.editor, { at: path.concat(n) });
+            n--;
+          } else if (current.text === "" && !equals(curPath, currentTextPath)) {
+            Transforms.delete(this.editor, { at: path.concat(n) })
+            n--;
+          }
+        }
+
+        n++;
+      }
+
+      if (ONLY_INLINE_CHILDREN_TYPES.includes(node.type as string)) {
+        const newNode = Node.get(this.editor, path);
+        let offset = 0;
+        for (let i = 0; i < (newNode.children as any).length; i++) {
+          const child = newNode.children[i];
+          if (Element.isElement(child) && !this.editor.isInline(child)) {
+            Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
+            offset += child.children.length - 1;
+          }
+        }
+      } else if (ONLY_TEXT_CHILDREN_TYPES.includes(node.type as string)) {
+        const newNode = Node.get(this.editor, path);
+        let offset = 0;
+        for (let i = 0; i < (newNode.children as any).length; i++) {
+          const child = newNode.children[i];
+          if (Element.isElement(child)) {
+            Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
+            offset += child.children.length - 1;
+          }
+        }
+      } else if (ONLY_ELEMENT_CHILDREN_TYPES.includes(node.type as string)) {
+        const newNode = Node.get(this.editor, path);
+        for (let i = 0; i < (newNode.children as any).length; i++) {
+          const child = newNode.children[i];
+          if (Text.isText(child)) {
+            Transforms.wrapNodes(this.editor, {type: "paragraph", children: []}, { at: path.concat(i) });
+          }
+        }
+      }
+    }
+  }
+  public isInline(element: RichElement) {
+    if (element.type === "link") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  public isVoid(element: RichElement) {
+    return (element.type === "image" || element.type === "file" || element.type === "video");
   }
   public onFocus(anchor: Path, value: Node[]) {
     let currentContext = this.props.rootContext || null;
@@ -592,6 +699,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.isRichText !== this.props.isRichText ||
       nextProps.rootContext !== this.props.rootContext ||
       nextProps.rootI18n !== this.props.rootI18n ||
+      nextState.anchor !== this.state.anchor ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses) ||
@@ -714,23 +822,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Makes a title out of the current element
    */
   public toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
-    let needsWrapping: boolean = true;
-    if (this.state.currentElement.type === "title") {
-      needsWrapping = this.state.currentElement.subtype !== type;
-      Transforms.unwrapNodes(
-        this.editor,
-        { split: true }
-      );
-    }
-    if (needsWrapping) {
+    if (this.state.currentElement.type === "title" && this.state.currentElement.subtype === type) {
       Transforms.wrapNodes(
         this.editor,
         {
+          ...copyElementBase(this.state.currentElement),
+          type: "paragraph",
+          children: [],
+        },
+        { split: true }
+      );
+    } else {
+      Transforms.wrapNodes(
+        this.editor,
+        {
+          ...copyElementBase(this.state.currentElement),
           type: "title",
           subtype: type,
           children: [],
         },
-        { match: n => Element.isElement(n), split: true }
+        { split: true }
       );
     }
     ReactEditor.focus(this.editor);
@@ -789,33 +900,66 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Formats the current text as bold
    */
   public formatToggleBold() {
-    Transforms.setNodes(
-      this.editor,
-      { bold: !this.state.currentText.bold },
-      { match: n => Text.isText(n), split: true }
-    );
+    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      Transforms.insertNodes(
+        this.editor,
+        {
+          ...this.state.currentText,
+          text: "",
+          bold: !this.state.currentText.bold,
+        },
+      );
+    } else {
+      Transforms.setNodes(
+        this.editor,
+        { bold: !this.state.currentText.bold },
+        { match: n => Text.isText(n), split: true }
+      );
+    }
     ReactEditor.focus(this.editor);
   }
   /**
    * formats the current text as italic
    */
   public formatToggleItalic() {
-    Transforms.setNodes(
-      this.editor,
-      { italic: !this.state.currentText.italic },
-      { match: n => Text.isText(n), split: true }
-    );
+    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      Transforms.insertNodes(
+        this.editor,
+        {
+          ...this.state.currentText,
+          text: "",
+          italic: !this.state.currentText.italic,
+        },
+      );
+    } else {
+      Transforms.setNodes(
+        this.editor,
+        { italic: !this.state.currentText.italic },
+        { match: n => Text.isText(n), split: true }
+      );
+    }
     ReactEditor.focus(this.editor);
   };
   /**
    * formats the current text as italic
    */
   public formatToggleUnderline() {
-    Transforms.setNodes(
-      this.editor,
-      { underline: !this.state.currentText.underline },
-      { match: n => Text.isText(n), split: true }
-    );
+    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      Transforms.insertNodes(
+        this.editor,
+        {
+          ...this.state.currentText,
+          text: "",
+          underline: !this.state.currentText.underline,
+        },
+      );
+    } else {
+      Transforms.setNodes(
+        this.editor,
+        { underline: !this.state.currentText.underline },
+        { match: n => Text.isText(n), split: true }
+      );
+    }
     ReactEditor.focus(this.editor);
   };
   /**
@@ -828,10 +972,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   private availableFilteringFunction(feature: string, featureAll: string, featureList: string, i18nLocation: string): IAvailableElement[] {
     return (
       this.props.features[feature] ?
-      (this.state[featureAll] as string[]).filter((c) =>
-        this.props.features[featureList] ? this.props.features[featureList].includes(c) : true
-      ) :
-      []
+        (this.state[featureAll] as string[]).filter((c) =>
+          this.props.features[featureList] ? this.props.features[featureList].includes(c) : true
+        ) :
+        []
     ).map((c) => {
       return {
         value: c,
@@ -840,7 +984,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           this.props.rootI18n.custom &&
           this.props.rootI18n.custom[i18nLocation] &&
           this.props.rootI18n.custom[i18nLocation][c]
-        ) || c
+        ) || c
       }
     });
   }

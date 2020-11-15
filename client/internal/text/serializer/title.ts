@@ -1,6 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
+import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerTitle(registry: ISerializationRegistryType) {
@@ -47,12 +48,12 @@ export function registerTitle(registry: ISerializationRegistryType) {
  * for the rich text specification
  */
 export interface ITitle extends IElementBase {
-  type: "title",
-  subtype: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
+  type: "title";
+  subtype: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
   /**
    * The title only has one children and it's text
    * as it only contains text within it
    */
-  children: IText[]
+  children: Array<IText | ILink>;
 }

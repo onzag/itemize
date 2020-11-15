@@ -49,6 +49,9 @@ const style = createStyles({
   toolbar: {
     overflow: "auto",
   },
+  appbar: {
+    zIndex: 1,
+  },
 });
 
 function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
@@ -57,7 +60,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
     return null;
   }
   return (
-    <AppBar position="relative" variant="outlined" color="default">
+    <AppBar position="relative" variant="outlined" color="default" className={props.classes.appbar}>
       <Toolbar className={props.classes.toolbar}>
         <IconButton
           tabIndex={-1}

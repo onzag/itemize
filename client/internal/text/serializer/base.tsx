@@ -501,3 +501,19 @@ export interface IElementBase {
    */
   wheel?: string;
 }
+
+const ELEMENT_BASE_KEYS = [
+  ...Object.keys(translations),
+  "richClassList",
+  "uiHandlerArgs",
+];
+
+export function copyElementBase(src: IElementBase): IElementBase {
+  const newObj: IElementBase = {};
+  Object.keys(src).forEach((key) => {
+    if (ELEMENT_BASE_KEYS.includes(key)) {
+      newObj[key] = src[key];
+    }
+  });
+  return newObj;
+}

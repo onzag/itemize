@@ -1,6 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType} from ".";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerQuote(registry: ISerializationRegistryType) {
@@ -56,5 +57,5 @@ export interface IQuote extends IElementBase {
   /**
    * Represents the children
    */
-  children: IText[];
+  children: Array<IText | ILink>;
 }
