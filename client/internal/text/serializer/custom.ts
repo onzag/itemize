@@ -28,6 +28,7 @@ export function registerCustom(registry: ISerializationRegistryType) {
     const custom: ICustom = {
       ...base,
       type: "custom",
+      containment: "superblock",
       customType,
       children: Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as RichElement[],
     }
@@ -59,6 +60,10 @@ export interface ICustom extends IElementBase {
    * The type as custom
    */
   type: "custom";
+  /**
+   * refers to be able to contain blocks or other super blocks, etc...
+   */
+  containment: "superblock",
   /**
    * Specifies which custom type it is
    */

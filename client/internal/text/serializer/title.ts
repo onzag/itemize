@@ -15,6 +15,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
     const title: ITitle = {
       ...base,
       type: "title",
+      containment: "block",
       subtype: node.tagName.toLowerCase() as any,
       children: children.length ? children : [STANDARD_TEXT_NODE],
     }
@@ -50,6 +51,10 @@ export function registerTitle(registry: ISerializationRegistryType) {
 export interface ITitle extends IElementBase {
   type: "title";
   subtype: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  /**
+   * refers that it can only contain inline elements
+   */
+  containment: "block",
 
   /**
    * The title only has one children and it's text

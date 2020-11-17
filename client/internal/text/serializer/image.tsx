@@ -98,6 +98,7 @@ export function registerImage(registry: ISerializationRegistryType) {
     return {
       ...base,
       type: "image",
+      containment: "void-block",
       alt: img.getAttribute("alt") || null,
       src: img.getAttribute("src"),
       srcId: img.dataset.srcId,
@@ -181,6 +182,10 @@ export interface IImage extends IElementBase {
    * Image type
    */
   type: "image";
+  /**
+   * refers that it can't contain anything
+   */
+  containment: "void-block",
   /**
    * Width of the image in pixels
    * data-src-width

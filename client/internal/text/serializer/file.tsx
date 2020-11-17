@@ -46,6 +46,7 @@ export function registerFile(registry: ISerializationRegistryType) {
     const base = deserializeElementBase(node);
     return {
       ...base,
+      containment: "void-inline",
       type: "file",
       srcId: node.dataset.srcId,
       name: fileNameNode.textContent,
@@ -105,6 +106,10 @@ export interface IFile extends IElementBase {
    * The type
    */
   type: "file";
+  /**
+   * cannot contain anything
+   */
+  containment: "void-inline",
   /**
    * file name
    */

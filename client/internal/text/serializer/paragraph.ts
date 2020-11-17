@@ -15,6 +15,7 @@ export function registerParagraph(registry: ISerializationRegistryType) {
     const paragraph: IParagraph = {
       ...base,
       type: "paragraph",
+      containment: "block",
       children: children.length ? children : [STANDARD_TEXT_NODE],
     }
     return paragraph;
@@ -44,6 +45,10 @@ export function registerParagraph(registry: ISerializationRegistryType) {
  */
 export interface IParagraph extends IElementBase {
   type: "paragraph",
+  /**
+   * refers that it can't contain anything
+   */
+  containment: "block",
 
   /**
    * The paragraph children can be either text or link

@@ -262,7 +262,7 @@ export interface IHelperFunctions {
   /**
    * Makes a list out of the current element
    */
-  makeList: () => void;
+  toggleList: (type: "bulleted" | "numbered") => void;
   /**
    * Makes a link out of the current element
    */
@@ -309,6 +309,14 @@ export interface IHelperFunctions {
    * toggles a given active rich class
    */
   formatToggleRichClass: (richClass: string) => void;
+  /**
+   * cancels the field from blurring
+   */
+  blockBlur: () => void;
+  /**
+   * releases the blur
+   */
+  releaseBlur: () => void;
 }
 
 export interface ISlateEditorInfoType {
@@ -332,6 +340,10 @@ export interface ISlateEditorInfoType {
    * The current element (block type)
    */
   currentBlock: RichElement;
+  /**
+   * The current super block (superblock type)
+   */
+  currentSuperBlock: RichElement;
   /**
    * The current text being worked with
    */
@@ -447,6 +459,10 @@ interface ISlateEditorState {
    */
   blockAnchor: Path;
   /**
+   * The current super block anchor
+   */
+  superBlockAnchor: Path;
+  /**
    * Related to the anchor, specifies the current context
    * that is being worked with, can be null, if context is null
    * or found context doesn't exist
@@ -465,6 +481,10 @@ interface ISlateEditorState {
    */
   currentBlock: RichElement;
   /**
+   * current super block element
+   */
+  currentSuperBlock: RichElement;
+  /**
    * available containers
    */
   allContainers: string[];
@@ -478,31 +498,11 @@ interface ISlateEditorState {
   allRichClasses: string[];
 }
 
-const ONLY_INLINE_CHILDREN_TYPES = [
-  "title",
-  "paragraph",
-  "quote",
-];
-
-const ONLY_TEXT_CHILDREN_TYPES = [
-  "link",
-];
-
-const VOID_TYPES = [
-  "video",
-  "image",
-  "file",
-];
-
-const ONLY_ELEMENT_CHILDREN_TYPES = [
-  "container",
-  "custom",
-];
-
 export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditorState> {
   private editor: ReactEditor;
   private updateTimeout: NodeJS.Timeout;
-  private originalNormalize: any;
+  private blurTimeout: NodeJS.Timeout;
+  private blurBlocked: boolean = false;
 
   static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState) {
     if (state.synced) {
@@ -531,9 +531,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       anchor: null,
       elementAnchor: null,
       blockAnchor: null,
+      superBlockAnchor: null,
       currentContext: this.props.rootContext || null,
       currentElement: null,
       currentBlock: null,
+      currentSuperBlock: null,
       currentText: null,
 
       // ensure SSR compatibility
@@ -549,7 +551,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     this.editor.isInline = this.isInline as any;
     this.editor.isVoid = this.isVoid as any;
-    this.originalNormalize = this.editor.normalizeNode;
     this.editor.normalizeNode = this.normalizeNode;
 
     this.setValue = this.setValue.bind(this);
@@ -558,6 +559,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.renderText = this.renderText.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.onNativeBlur = this.onNativeBlur.bind(this);
 
     this.insertImage = this.insertImage.bind(this);
     this.insertVideo = this.insertVideo.bind(this);
@@ -566,7 +568,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertCustom = this.insertCustom.bind(this);
     this.toggleQuote = this.toggleQuote.bind(this);
     this.toggleTitle = this.toggleTitle.bind(this);
-    this.makeList = this.makeList.bind(this);
+    this.toggleList = this.toggleList.bind(this);
     this.toggleLink = this.toggleLink.bind(this);
     this.makeTemplateLink = this.makeTemplateLink.bind(this);
     this.setStyle = this.setStyle.bind(this);
@@ -580,6 +582,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleRichClass = this.formatToggleRichClass.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
+
+    this.blockBlur = this.blockBlur.bind(this);
+    this.releaseBlur = this.releaseBlur.bind(this);
   }
   public checkShouldMerge(n1: Node, n2: Node) {
     return Object.keys(n1).concat(Object.keys(n2)).every((key) => {
@@ -616,7 +621,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // otherwise if we have an empty node and either it is not selected which means
           // all non selected empty text nodes will dissapear regardless, or if it's able
           // to merge which means that it's a pointless empty node
-          } else if (current.text === "" && (!equals(curPath, currentTextAnchorPath) || this.checkShouldMerge(current, prev))) {
+          } else if (current.text === "" && !equals(curPath, currentTextAnchorPath)) {
             // we merge it with the previous
             Transforms.delete(this.editor, { at: path.concat(n) });
             n--;
@@ -627,8 +632,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         n++;
       }
 
-      // now if we have a children that can only have inline types
-      if (ONLY_INLINE_CHILDREN_TYPES.includes(node.type as string)) {
+      const nodeAsRichElement = (node as any as RichElement);
+
+      // now if we have a children that can only have inline as children types
+      if (nodeAsRichElement.containment === "block") {
         const newNode = Node.get(this.editor, path);
         let offset = 0;
         for (let i = 0; i < (newNode.children as any).length; i++) {
@@ -638,7 +645,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             offset += child.children.length - 1;
           }
         }
-      } else if (ONLY_TEXT_CHILDREN_TYPES.includes(node.type as string)) {
+      } else if (nodeAsRichElement.containment === "inline") {
         const newNode = Node.get(this.editor, path);
         let offset = 0;
         for (let i = 0; i < (newNode.children as any).length; i++) {
@@ -648,26 +655,30 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             offset += child.children.length - 1;
           }
         }
-      } else if (ONLY_ELEMENT_CHILDREN_TYPES.includes(node.type as string)) {
+      } else if (nodeAsRichElement.containment === "superblock") {
         const newNode = Node.get(this.editor, path);
         for (let i = 0; i < (newNode.children as any).length; i++) {
           const child = newNode.children[i];
           if (Text.isText(child)) {
-            Transforms.wrapNodes(this.editor, {type: "paragraph", children: []}, { at: path.concat(i) });
+            Transforms.wrapNodes(this.editor, {type: "paragraph", containment: "block", children: []}, { at: path.concat(i) });
+          }
+        }
+      } else if (nodeAsRichElement.containment === "list-item") {
+        const newNode = Node.get(this.editor, path);
+        for (let i = 0; i < (newNode.children as any).length; i++) {
+          const child = newNode.children[i] as any as RichElement;
+          if (Text.isText(child) || child.type !== "list-item") {
+            Transforms.wrapNodes(this.editor, {type: "list-item", containment: "block", children: []}, { at: path.concat(i) });
           }
         }
       }
     }
   }
   public isInline(element: RichElement) {
-    if (element.type === "link") {
-      return true;
-    } else {
-      return false;
-    }
+    return element.containment === "inline";
   }
   public isVoid(element: RichElement) {
-    return (element.type === "image" || element.type === "file" || element.type === "video");
+    return element.containment === "void-block" || element.containment === "void-inline";
   }
   public onFocus(anchor: Path, value: Node[]) {
     let currentContext = this.props.rootContext || null;
@@ -682,6 +693,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     let blockAnchor: Path = [];
 
+    let currentSuperBlock: RichElement = null;
+
+    let superBlockAnchor: Path = [];
+
     let currentText: IText = null;
 
     if (anchor) {
@@ -692,9 +707,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         } else {
           currentElement = currentElement.children[n] as RichElement;
 
-          if (!this.editor.isInline(currentElement as any)) {
+          if (currentElement.containment !== "inline") {
             currentBlock = currentElement;
             blockAnchor.push(n);
+          }
+
+          if (currentElement.containment === "superblock" || currentElement.containment === "list-item") {
+            currentSuperBlock = currentElement;
+            superBlockAnchor.push(n);
           }
 
           if (currentContext && currentElement.context) {
@@ -720,6 +740,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentContext,
       currentElement,
       currentBlock,
+      currentSuperBlock,
+      superBlockAnchor,
       currentText,
     });
     if (!this.state.focused) {
@@ -740,9 +762,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentContext: this.props.rootContext || null,
         currentElement: null,
         currentBlock: null,
+        currentSuperBlock: null,
+        superBlockAnchor: null,
         currentText: null,
       });
     }
+  }
+  public onNativeBlur() {
+    if (this.state.focused && !this.blurBlocked) {
+      this.blurTimeout = setTimeout(this.onBlur, 70);
+    }
+    return false;
   }
   public shouldComponentUpdate(nextProps: ISlateEditorProps, nextState: ISlateEditorState) {
     const standardUpdate = (
@@ -816,6 +846,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, { ...attributes, children }) as any;
   }
   public onChange(newValue: Node[]) {
+    clearTimeout(this.blurTimeout);
     if (this.editor.selection) {
       this.onFocus(this.editor.selection.anchor.path, newValue);
     } else {
@@ -825,6 +856,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (newValue !== this.state.internalValue.children as any) {
       this.setValue(newValue);
     }
+  }
+  public blockBlur() {
+    clearTimeout(this.blurTimeout);
+    this.blurBlocked = true;
+  }
+  public releaseBlur() {
+    this.blurBlocked = false;
   }
   /**
    * Will insert an image based on a given file that has
@@ -876,6 +914,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         {
           ...copyElementBase(this.state.currentBlock),
           type: "paragraph",
+          containment: "block",
           children: [],
         },
         { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
@@ -886,6 +925,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         {
           ...copyElementBase(this.state.currentBlock),
           type: "quote",
+          containment: "block",
           children: [],
         },
         { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
@@ -904,6 +944,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         {
           ...copyElementBase(this.state.currentBlock),
           type: "paragraph",
+          containment: "block",
           children: [],
         },
         { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
@@ -914,6 +955,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         {
           ...copyElementBase(this.state.currentBlock),
           type: "title",
+          containment: "block",
           subtype: type,
           children: [],
         },
@@ -925,8 +967,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Makes a list out of the current element
    */
-  public makeList() {
-
+  public toggleList(type: "bulleted" | "numbered") {
+    const isCollapsed = Range.isCollapsed(this.editor.selection);
+    if (this.state.currentSuperBlock && this.state.currentSuperBlock.type === "list") {
+      // TODO
+    } else {
+      Transforms.wrapNodes(
+        this.editor,
+        {
+          ...copyElementBase(this.state.currentBlock),
+          type: "list",
+          listType: type,
+          containment: "list-item",
+          children: [],
+        },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+      );
+    }
+    ReactEditor.focus(this.editor);
   };
   /**
    * Makes a link out of the current element
@@ -1078,6 +1136,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public render() {
     let children: React.ReactNode = (
       <Editable
+        onBlur={this.onNativeBlur}
         renderElement={this.renderElement}
         renderLeaf={this.renderText}
       />
@@ -1089,6 +1148,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         isFocused: this.state.focused,
         currentContext: this.state.currentContext,
         currentBlock: this.state.currentBlock,
+        currentSuperBlock: this.state.currentSuperBlock,
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
         isRichText: this.props.isRichText,
@@ -1110,7 +1170,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         insertImage: this.insertImage,
         insertVideo: this.insertVideo,
         toggleLink: this.toggleLink,
-        makeList: this.makeList,
+        toggleList: this.toggleList,
         toggleQuote: this.toggleQuote,
         makeTemplateLink: this.makeTemplateLink,
         toggleTitle: this.toggleTitle,
@@ -1119,6 +1179,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         setForEach: this.setForEach,
         setHoverStyle: this.setHoverStyle,
         setStyle: this.setStyle,
+
+        blockBlur: this.blockBlur,
+        releaseBlur: this.releaseBlur,
       }
 
       const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");

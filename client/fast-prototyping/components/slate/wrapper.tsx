@@ -72,6 +72,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatBoldLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.bold ? "primary" : "default"}
+          onMouseDown={props.helpers.blockBlur}
+          onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleBold}
         >
           <FormatBoldIcon />
@@ -81,6 +83,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatItalicLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.italic ? "primary" : "default"}
+          onMouseDown={props.helpers.blockBlur}
+          onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleItalic}
         >
           <FormatItalicIcon />
@@ -90,6 +94,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatUnderlineLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.underline ? "primary" : "default"}
+          onMouseDown={props.helpers.blockBlur}
+          onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleUnderline}
         >
           <FormatUnderlinedIcon />
@@ -103,6 +109,8 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
               color={props.info.currentBlock && props.info.currentBlock.type === "title" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertTitle}
               onClick={props.helpers.toggleTitle.bind(null, "h1")}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
             >
               <TitleIcon />
             </IconButton> :
@@ -116,8 +124,46 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
               color={props.info.currentBlock && props.info.currentBlock.type === "quote" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertQuote}
               onClick={props.helpers.toggleQuote}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
             >
               <FormatQuoteIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsLists ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatListNumberedLabel}
+              color={
+                props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
+                props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
+              }
+              disabled={!props.featureSupport.canInsertList}
+              onClick={props.helpers.toggleList.bind(null, "numbered")}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <FormatListNumberedIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsLists ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatListNumberedLabel}
+              color={
+                props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
+                props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
+              }
+              disabled={!props.featureSupport.canInsertList}
+              onClick={props.helpers.toggleList.bind(null, "bulleted")}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <FormatListBulletedIcon />
             </IconButton> :
             null
         }
@@ -125,31 +171,9 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
 
 
 
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatTitleLabel}
-          classes={{ root: "ql-header" }}
-          value="1"
-        >
-          <TitleIcon />
-        </IconButton>
+
         <span className="ql-divider" />
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatQuoteLabel}
-          classes={{ root: "ql-blockquote" }}
-        >
-          <FormatQuoteIcon />
-        </IconButton>
-        <span className="ql-divider" />
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatListNumberedLabel}
-          classes={{ root: "ql-list" }}
-          value="ordered"
-        >
-          <FormatListNumberedIcon />
-        </IconButton>
+        
         <IconButton
           tabIndex={-1}
           title={props.i18n.formatListBulletedLabel}

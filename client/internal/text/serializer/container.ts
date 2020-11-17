@@ -28,6 +28,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
     const container: IContainer = {
       ...base,
       type: "container",
+      containment: "superblock",
       containerType,
       children: Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as RichElement[],
     }
@@ -59,6 +60,10 @@ export function registerContainer(registry: ISerializationRegistryType) {
  */
 export interface IContainer extends IElementBase {
   type: "container";
+  /**
+   * refers to be able to contain blocks or other super blocks, etc...
+   */
+  containment: "superblock",
   /**
    * A container type, might be null
    */

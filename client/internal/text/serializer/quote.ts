@@ -22,6 +22,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
     const quote: IQuote = {
       ...base,
       type: "quote",
+      containment: "block",
       children: children.length ? children : [
         STANDARD_TEXT_NODE,
       ],
@@ -54,6 +55,10 @@ export interface IQuote extends IElementBase {
    * Represents the type
    */
   type: "quote";
+  /**
+   * refers that it can't contain anything
+   */
+  containment: "block",
   /**
    * Represents the children
    */

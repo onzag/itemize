@@ -38,6 +38,7 @@ export function registerLink(registry: ISerializationRegistryType) {
     const link: ILink = {
       ...base,
       type: "link",
+      containment: "inline",
       href,
       thref,
       children: children.length ? children : [STANDARD_TEXT_NODE],
@@ -67,6 +68,10 @@ export function registerLink(registry: ISerializationRegistryType) {
  */
 export interface ILink extends IElementBase {
   type: "link";
+  /**
+   * can only contain text
+   */
+  containment: "inline",
   /**
    * Represents the standard href attribute
    */

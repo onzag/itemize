@@ -11,8 +11,9 @@ import { IQuote, registerQuote } from "./quote";
 import { IText, registerText } from "./text";
 import { ITitle, registerTitle } from "./title";
 import { IVideo, registerVideo } from "./video";
-import uuid from "uuid";
 import uuidv5 from "uuid/v5";
+import { IList, registerList } from "./list";
+import { IListItem, registerListItem } from "./list-item";
 
 type DeserializationFn = (n: Node) => RichElement | IText;
 
@@ -56,8 +57,10 @@ registerQuote(SERIALIZATION_REGISTRY);
 registerText(SERIALIZATION_REGISTRY);
 registerTitle(SERIALIZATION_REGISTRY);
 registerVideo(SERIALIZATION_REGISTRY);
+registerList(SERIALIZATION_REGISTRY);
+registerListItem(SERIALIZATION_REGISTRY);
 
-export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage | IFile | IVideo;
+export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage | IFile | IVideo | IList | IListItem;
 
 /**
  * Represents the root level document and a id
@@ -176,6 +179,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
       [
         {
           type: "paragraph",
+          containment: "block",
           children: [
             {
               bold: false,
@@ -209,6 +213,7 @@ export function deserializePlain(data: string, comparer?: IRootLevelDocument) {
     children: content.map((c) => {
       return {
         type: "paragraph",
+        containment: "block",
         subtype: "p",
         children: [
           {
