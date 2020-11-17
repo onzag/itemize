@@ -6,7 +6,7 @@ import {
   TextField, Button, AppBar, Toolbar, WithStyles, withStyles, createStyles,
   Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, CodeIcon
+  FormatBoldIcon, CodeIcon, Divider
 } from "../../mui-core";
 
 const style = createStyles({
@@ -49,6 +49,11 @@ const style = createStyles({
   toolbar: {
     overflow: "auto",
   },
+  divider: {
+    border: "solid 1px #ccc",
+    height: "2rem",
+    margin: "0 0.5rem",
+  },
   appbar: {
     zIndex: 1,
   },
@@ -89,6 +94,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
         >
           <FormatUnderlinedIcon />
         </IconButton>
+        <Divider orientation="vertical" className={props.classes.divider}/>
         {
           props.featureSupport.supportsTitle ?
             <IconButton

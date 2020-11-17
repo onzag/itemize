@@ -329,6 +329,10 @@ export interface ISlateEditorInfoType {
    */
   currentElement: RichElement;
   /**
+   * The current element (block type)
+   */
+  currentBlock: RichElement;
+  /**
    * The current text being worked with
    */
   currentText: IText;
@@ -435,6 +439,14 @@ interface ISlateEditorState {
    */
   anchor: Path;
   /**
+   * The current element anchor
+   */
+  elementAnchor: Path;
+  /**
+   * The current block anchor
+   */
+  blockAnchor: Path;
+  /**
    * Related to the anchor, specifies the current context
    * that is being worked with, can be null, if context is null
    * or found context doesn't exist
@@ -448,6 +460,10 @@ interface ISlateEditorState {
    * current rich text node that is selected
    */
   currentElement: RichElement;
+  /**
+   * current block element
+   */
+  currentBlock: RichElement;
   /**
    * available containers
    */
@@ -513,8 +529,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       synced: true,
       focused: false,
       anchor: null,
+      elementAnchor: null,
+      blockAnchor: null,
       currentContext: this.props.rootContext || null,
       currentElement: null,
+      currentBlock: null,
       currentText: null,
 
       // ensure SSR compatibility
@@ -573,28 +592,42 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public normalizeNode(entry: NodeEntry<Node>) {
     const [node, path] = entry;
+
+    // if it's an element
     if (Element.isElement(node)) {
+      // we got to check first if we should merge the nodes
       let n = 0;
+      // for that we loop
       for (let i = 0; i < node.children.length; i++) {
         const prev = node.children[i - 1];
         const current = node.children[i];
 
+        // if we have a text type inside
         if (Text.isText(current)) {
-          const prevPath = path.concat(n - 1);
+          // we get the previous and current path
           const curPath = path.concat(n);
-          const currentTextPath = this.editor.selection.anchor.path;
-          if (prev && Text.isText(prev) && !equals(prevPath, currentTextPath) && this.checkShouldMerge(current, prev)) {
+          // and this is where we are now
+          const currentTextAnchorPath = this.editor.selection.anchor.path;
+          // if we have a previous that is also a text that is not our anchor and is mergable
+          if (prev && Text.isText(prev) && this.checkShouldMerge(current, prev)) {
+            // we merge it
             Transforms.mergeNodes(this.editor, { at: path.concat(n) });
             n--;
-          } else if (current.text === "" && !equals(curPath, currentTextPath)) {
-            Transforms.delete(this.editor, { at: path.concat(n) })
+          // otherwise if we have an empty node and either it is not selected which means
+          // all non selected empty text nodes will dissapear regardless, or if it's able
+          // to merge which means that it's a pointless empty node
+          } else if (current.text === "" && (!equals(curPath, currentTextAnchorPath) || this.checkShouldMerge(current, prev))) {
+            // we merge it with the previous
+            Transforms.delete(this.editor, { at: path.concat(n) });
             n--;
           }
         }
 
+        // one more
         n++;
       }
 
+      // now if we have a children that can only have inline types
       if (ONLY_INLINE_CHILDREN_TYPES.includes(node.type as string)) {
         const newNode = Node.get(this.editor, path);
         let offset = 0;
@@ -641,6 +674,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentElement: RichElement = {
       children: value,
     } as any;
+
+    let elementAnchor: Path = [...anchor];
+    elementAnchor.pop();
+
+    let currentBlock: RichElement = null;
+
+    let blockAnchor: Path = [];
+
     let currentText: IText = null;
 
     if (anchor) {
@@ -650,6 +691,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           currentText = currentElement.children[n] as IText;
         } else {
           currentElement = currentElement.children[n] as RichElement;
+
+          if (!this.editor.isInline(currentElement as any)) {
+            currentBlock = currentElement;
+            blockAnchor.push(n);
+          }
+
           if (currentContext && currentElement.context) {
             currentContext = currentContext.properties[currentElement.context] as ITemplateArgsContext || null;
             if (currentContext.type !== "context" || currentContext.loopable) {
@@ -668,8 +715,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     this.setState({
       anchor,
+      elementAnchor,
+      blockAnchor,
       currentContext,
       currentElement,
+      currentBlock,
       currentText,
     });
     if (!this.state.focused) {
@@ -685,8 +735,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.setState({
         focused: false,
         anchor: null,
+        elementAnchor: null,
+        blockAnchor: null,
         currentContext: this.props.rootContext || null,
         currentElement: null,
+        currentBlock: null,
         currentText: null,
       });
     }
@@ -822,26 +875,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Makes a title out of the current element
    */
   public toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
-    if (this.state.currentElement.type === "title" && this.state.currentElement.subtype === type) {
+    const isCollapsed = Range.isCollapsed(this.editor.selection);
+    if (this.state.currentBlock.type === "title" && this.state.currentBlock.subtype === type) {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentElement),
+          ...copyElementBase(this.state.currentBlock),
           type: "paragraph",
           children: [],
         },
-        { split: true }
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
       );
     } else {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentElement),
+          ...copyElementBase(this.state.currentBlock),
           type: "title",
           subtype: type,
           children: [],
         },
-        { split: true }
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1012,6 +1066,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentValid: this.props.currentValid,
         isFocused: this.state.focused,
         currentContext: this.state.currentContext,
+        currentBlock: this.state.currentBlock,
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
         isRichText: this.props.isRichText,
@@ -1054,23 +1109,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         availableCustoms: availableCustoms,
         availableRichClasses,
 
-        canInsertContainer: this.state.currentElement && this.props.features.supportsContainers,
-        canInsertCustom: this.state.currentElement && this.props.features.supportsCustom && !!availableCustoms.length,
-        canInsertFile: this.state.currentElement && this.props.features.supportsFiles,
-        canInsertImage: this.state.currentElement && this.props.features.supportsImages,
-        canInsertLink: this.state.currentElement && this.props.features.supportsLinks,
-        canInsertList: this.state.currentElement && this.props.features.supportsLists,
-        canInsertQuote: this.state.currentElement && this.props.features.supportsQuote,
-        canInsertRichClass: this.state.currentElement && this.props.features.supportsRichClasses && !!availableRichClasses.length,
+        canInsertContainer: this.state.currentBlock && this.props.features.supportsContainers,
+        canInsertCustom: this.state.currentBlock && this.props.features.supportsCustom && !!availableCustoms.length,
+        canInsertFile: this.state.currentBlock && this.props.features.supportsFiles,
+        canInsertImage: this.state.currentBlock && this.props.features.supportsImages,
+        canInsertLink: this.state.currentBlock && this.props.features.supportsLinks,
+        canInsertList: this.state.currentBlock && this.props.features.supportsLists,
+        canInsertQuote: this.state.currentBlock && this.props.features.supportsQuote,
+        canInsertRichClass: this.state.currentBlock && this.props.features.supportsRichClasses && !!availableRichClasses.length,
         canInsertTitle: this.state.currentText && this.props.features.supportsTitle,
-        canInsertVideo: this.state.currentElement && this.props.features.supportsVideos,
-        canSetActionFunction: this.state.currentElement && this.props.features.supportsTemplating,
-        canSetActiveStyle: this.state.currentElement && this.props.features.supportsTemplating,
-        canSetDynamicHref: this.state.currentElement && this.props.features.supportsTemplating,
-        canSetHoverStyle: this.state.currentElement && this.props.features.supportsTemplating,
-        canSetLoop: this.state.currentElement && this.props.features.supportsTemplating,
-        canSetStyle: this.state.currentElement && this.props.features.supportsCustomStyles,
-        canSetUIHandler: this.state.currentElement && this.props.features.supportsTemplating,
+        canInsertVideo: this.state.currentBlock && this.props.features.supportsVideos,
+        canSetActionFunction: this.state.currentBlock && this.props.features.supportsTemplating,
+        canSetActiveStyle: this.state.currentBlock && this.props.features.supportsTemplating,
+        canSetDynamicHref: this.state.currentBlock && this.props.features.supportsTemplating,
+        canSetHoverStyle: this.state.currentBlock && this.props.features.supportsTemplating,
+        canSetLoop: this.state.currentBlock && this.props.features.supportsTemplating,
+        canSetStyle: this.state.currentBlock && this.props.features.supportsCustomStyles,
+        canSetUIHandler: this.state.currentBlock && this.props.features.supportsTemplating,
       };
       children = (
         <Wrapper {...this.props.wrapperArgs} info={info} helpers={helpers} featureSupport={newFeatureSupport}>
