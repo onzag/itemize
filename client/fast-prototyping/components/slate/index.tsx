@@ -869,7 +869,29 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Makes a quote out of the current element
    */
   public toggleQuote() {
-
+    const isCollapsed = Range.isCollapsed(this.editor.selection);
+    if (this.state.currentBlock.type === "quote") {
+      Transforms.wrapNodes(
+        this.editor,
+        {
+          ...copyElementBase(this.state.currentBlock),
+          type: "paragraph",
+          children: [],
+        },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+      );
+    } else {
+      Transforms.wrapNodes(
+        this.editor,
+        {
+          ...copyElementBase(this.state.currentBlock),
+          type: "quote",
+          children: [],
+        },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+      );
+    }
+    ReactEditor.focus(this.editor);
   };
   /**
    * Makes a title out of the current element

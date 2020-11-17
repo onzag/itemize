@@ -1,46 +1,9 @@
-@import "~@onzag/react-quill/dist/quill.core.css";
-
-$toolbar-color: rgba(0, 0, 0, 0.09);
+$list-item-color: rgb(63, 81, 181);
 $quote-background-color: rgba(0, 0, 0, 0.09);
 $quote-highlight-color: #26a69a;
 $quote-text-color: #455a64;
-$icons-color: #000;
-$list-item-color: rgb(63, 81, 181);;
 
-.ql-toolbar {
-  background-color: $toolbar-color;
-  color: $icons-color;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  .material-icons {
-    color: $icons-color;
-  }
-
-  .ql-divider {
-    width: 1rem;
-    display: inline-block;
-  }
-
-  .ql-active {
-    background-color: rgba(0, 0, 0, 0.54);
-
-    .material-icons {
-      color: #fff;
-    }
-  }
-}
-
-.plain-text {
-  font-size: 1rem;
-  white-space: pre-line;
-  width: 100%;
-  position: relative;
-  overflow-wrap: break-word;
-  text-align: justify;
-}
-
-.quill .ql-container, .rich-text {
+.rich-text {
   font-size: 1rem;
   position: relative;
   overflow: hidden;

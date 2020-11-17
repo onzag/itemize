@@ -10,7 +10,6 @@ export function registerParagraph(registry: ISerializationRegistryType) {
   }
   
   function deserializeParagraph(node: HTMLElement): IParagraph {
-    const boundDeserializeElement = deserializeElement.bind(null, registry);
     const base = deserializeElementBase(node);
     const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
     const paragraph: IParagraph = {

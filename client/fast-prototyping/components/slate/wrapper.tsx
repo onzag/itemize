@@ -72,7 +72,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatBoldLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.bold ? "primary" : "default"}
-          onClick={props.helpers.formatToggleBold.bind(null, true)}
+          onClick={props.helpers.formatToggleBold}
         >
           <FormatBoldIcon />
         </IconButton>
@@ -81,7 +81,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatItalicLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.italic ? "primary" : "default"}
-          onClick={props.helpers.formatToggleItalic.bind(null, true)}
+          onClick={props.helpers.formatToggleItalic}
         >
           <FormatItalicIcon />
         </IconButton>
@@ -90,21 +90,34 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
           title={props.i18nRichInfo.formatUnderlineLabel}
           disabled={!props.info.currentText}
           color={props.info.currentText && props.info.currentText.underline ? "primary" : "default"}
-          onClick={props.helpers.formatToggleUnderline.bind(null, true)}
+          onClick={props.helpers.formatToggleUnderline}
         >
           <FormatUnderlinedIcon />
         </IconButton>
-        <Divider orientation="vertical" className={props.classes.divider}/>
+        <Divider orientation="vertical" className={props.classes.divider} />
         {
           props.featureSupport.supportsTitle ?
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatTitleLabel}
-              color={props.info.currentElement && props.info.currentElement.type === "title" ? "primary" : "default"}
+              color={props.info.currentBlock && props.info.currentBlock.type === "title" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertTitle}
               onClick={props.helpers.toggleTitle.bind(null, "h1")}
             >
               <TitleIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsQuote ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatQuoteLabel}
+              color={props.info.currentBlock && props.info.currentBlock.type === "quote" ? "primary" : "default"}
+              disabled={!props.featureSupport.canInsertQuote}
+              onClick={props.helpers.toggleQuote}
+            >
+              <FormatQuoteIcon />
             </IconButton> :
             null
         }

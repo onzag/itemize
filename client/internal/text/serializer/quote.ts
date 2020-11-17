@@ -9,7 +9,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
     return serializeElementBase(
       registry,
       quote,
-      "quote",
+      "blockquote",
       null,
       null,
       quote.children,
@@ -33,7 +33,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
     return reactifyElementBase(
       registry,
       quote,
-      "quote",
+      "blockquote",
       null,
       null,
       customProps,
