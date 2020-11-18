@@ -100,7 +100,11 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
         >
           <FormatUnderlinedIcon />
         </IconButton>
-        <Divider orientation="vertical" className={props.classes.divider} />
+        {
+          props.featureSupport.supportsTitle || props.featureSupport.supportsQuote || props.featureSupport.supportsLists ?
+            <Divider orientation="vertical" className={props.classes.divider} /> :
+            null
+        }
         {
           props.featureSupport.supportsTitle ?
             <IconButton
@@ -138,7 +142,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
                 props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
-                props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
+                  props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "numbered")}
@@ -156,7 +160,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
                 props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
-                props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
+                  props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "bulleted")}
@@ -167,75 +171,50 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
             </IconButton> :
             null
         }
-        {/* {props.supportsBasicMode ? <>
-
-
-
-
-        <span className="ql-divider" />
-        
-        <IconButton
-          tabIndex={-1}
-          title={props.i18n.formatListBulletedLabel}
-          classes={{ root: "ql-list" }}
-          value="bullet"
-        >
-          <FormatListBulletedIcon />
-        </IconButton>
         {
-          props.supportsImages || props.supportsFiles ?
-            (
-              <span className="ql-divider" />
-            ) : null
+          props.featureSupport.supportsImages || props.featureSupport.supportsFiles || props.featureSupport.supportsVideos ?
+            <Divider orientation="vertical" className={props.classes.divider} /> :
+            null
         }
         {
-          props.supportsImages ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddImageLabel}
-                classes={{ root: "ql-image" }}
-              >
-                <InsertPhotoIcon />
-              </IconButton>
-            ) : null
-        }
-        {
-          props.supportsVideos ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddVideoLabel}
-                classes={{ root: "ql-video" }}
-              >
-                <VideoLibraryIcon />
-              </IconButton>
-            ) : null
-        }
-        {
-          props.supportsFiles ?
-            (
-              <IconButton
-                tabIndex={-1}
-                title={props.i18n.formatAddFileLabel}
-                classes={{ root: "ql-file" }}
-              >
-                <AttachFileIcon />
-              </IconButton>
-            ) : null
-        }
-      </> : null}
-      {
-        props.supportsRawMode ?
-          (
+          props.featureSupport.supportsImages ?
             <IconButton
               tabIndex={-1}
-              onClick={props.onToggleRawMode}
+              title={props.i18nRichInfo.formatAddImageLabel}
+              disabled={!props.featureSupport.canInsertImage}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
             >
-              <CodeIcon />
-            </IconButton>
-          ) : null
-      } */}
+              <InsertPhotoIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsFiles ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatAddVideoLabel}
+              disabled={!props.featureSupport.canInsertVideo}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <VideoLibraryIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsFiles ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatAddFileLabel}
+              disabled={!props.featureSupport.canInsertFile}
+              onMouseDown={props.helpers.blockBlur}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <AttachFileIcon />
+            </IconButton> :
+            null
+        }
       </Toolbar>
     </AppBar>
   );

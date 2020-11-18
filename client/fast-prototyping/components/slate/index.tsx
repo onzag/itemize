@@ -9,8 +9,6 @@ import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IText } from "../../../internal/text/serializer/text";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import { IParagraph } from "../../../internal/text/serializer/paragraph";
-import { ITitle } from "../../../internal/text/serializer/title";
 import { copyElementBase } from "../../../internal/text/serializer/base";
 
 interface ITemplateArg {
@@ -548,10 +546,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor = withReact(rawEditor);
 
     this.normalizeNode = this.normalizeNode.bind(this);
+    this.insertBreak = this.insertBreak.bind(this);
+    this.deleteBackward = this.deleteBackward.bind(this);
 
     this.editor.isInline = this.isInline as any;
     this.editor.isVoid = this.isVoid as any;
     this.editor.normalizeNode = this.normalizeNode;
+    this.editor.insertBreak = this.insertBreak;
+    this.editor.deleteBackward = this.deleteBackward;
 
     this.setValue = this.setValue.bind(this);
     this.renderElement = this.renderElement.bind(this);
@@ -600,6 +602,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // if it's an element
     if (Element.isElement(node)) {
+      // the total current nodes
+      let totalNodes = node.children.length;
       // we got to check first if we should merge the nodes
       let n = 0;
       // for that we loop
@@ -618,13 +622,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             // we merge it
             Transforms.mergeNodes(this.editor, { at: path.concat(n) });
             n--;
-          // otherwise if we have an empty node and either it is not selected which means
-          // all non selected empty text nodes will dissapear regardless, or if it's able
-          // to merge which means that it's a pointless empty node
-          } else if (current.text === "" && !equals(curPath, currentTextAnchorPath)) {
+            totalNodes--;
+            // otherwise if we have an empty node and either it is not selected which means
+            // all non selected empty text nodes will dissapear regardless, or if it's able
+            // to merge which means that it's a pointless empty node
+            // note that we prevent to delete the node if that will leave us with no text nodes
+          } else if (current.text === "" && !equals(curPath, currentTextAnchorPath) && totalNodes !== 1) {
             // we merge it with the previous
             Transforms.delete(this.editor, { at: path.concat(n) });
             n--;
+            totalNodes--;
           }
         }
 
@@ -660,15 +667,19 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         for (let i = 0; i < (newNode.children as any).length; i++) {
           const child = newNode.children[i];
           if (Text.isText(child)) {
-            Transforms.wrapNodes(this.editor, {type: "paragraph", containment: "block", children: []}, { at: path.concat(i) });
+            Transforms.wrapNodes(this.editor, { type: "paragraph", containment: "block", children: [] }, { at: path.concat(i) });
           }
         }
       } else if (nodeAsRichElement.containment === "list-item") {
         const newNode = Node.get(this.editor, path);
+        let offset = 0;
         for (let i = 0; i < (newNode.children as any).length; i++) {
           const child = newNode.children[i] as any as RichElement;
-          if (Text.isText(child) || child.type !== "list-item") {
-            Transforms.wrapNodes(this.editor, {type: "list-item", containment: "block", children: []}, { at: path.concat(i) });
+          if (Element.isElement(child) && child.containment === "list-item") {
+            Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
+            offset += child.children.length - 1;
+          } else if (Text.isText(child) || child.type !== "list-item") {
+            Transforms.wrapNodes(this.editor, { type: "list-item", containment: "block", children: [] }, { at: path.concat(i + offset) });
           }
         }
       }
@@ -679,6 +690,107 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public isVoid(element: RichElement) {
     return element.containment === "void-block" || element.containment === "void-inline";
+  }
+  public breakList() {
+    const lastIndex = this.state.blockAnchor.length - 1;
+    const lastNumber = this.state.blockAnchor[lastIndex];
+    const hasChildrenNext = lastNumber < this.state.currentSuperBlock.children.length - 1;
+
+    const lastChildren = [...this.state.blockAnchor];
+    lastChildren[lastChildren.length - 1] = this.state.currentSuperBlock.children.length - 1;
+
+    const nextSuperAnchor = [...this.state.superBlockAnchor];
+    const lastSuperAnchorIndex = nextSuperAnchor.length - 1;
+    nextSuperAnchor[lastSuperAnchorIndex] = nextSuperAnchor[lastSuperAnchorIndex] + 1;
+
+    if (lastNumber === 0) {
+      Transforms.removeNodes(this.editor, {at: this.state.superBlockAnchor});
+      nextSuperAnchor[lastSuperAnchorIndex]--;
+    } else {
+      Transforms.removeNodes(this.editor, {
+        at: {
+          anchor: Editor.start(this.editor, this.state.blockAnchor),
+          focus: Editor.end(this.editor, lastChildren)
+        }
+      });
+    }
+
+    if (hasChildrenNext) {
+      Transforms.insertNodes(
+        this.editor,
+        {
+          ...copyElementBase(this.state.currentSuperBlock),
+          type: "list",
+          containment: "list-item",
+          listType: (this.state.currentSuperBlock as any).listType,
+          children: (this.state.currentSuperBlock.children.slice(lastNumber + 1) as any as Node[]),
+        },
+        {
+          at: nextSuperAnchor,
+        },
+      );
+    }
+
+    Transforms.insertNodes(
+      this.editor,
+      {
+        ...copyElementBase(this.state.currentSuperBlock),
+        type: "paragraph",
+        containment: "block",
+        children: this.state.currentBlock.children as any,
+      },
+      {
+        at: nextSuperAnchor,
+      },
+    );
+
+    Transforms.setSelection(
+      this.editor,
+      {
+        anchor: Editor.start(this.editor, nextSuperAnchor),
+        focus: Editor.start(this.editor, nextSuperAnchor),
+      }
+    );
+  }
+  public insertBreak() {
+    if (
+      Range.isCollapsed(this.editor.selection) &&
+      this.state.currentSuperBlock.type === "list" &&
+      this.state.currentBlock.type === "list-item" &&
+      this.state.currentBlock.children.length === 1 &&
+      Text.isText(this.state.currentBlock.children[0]) &&
+      this.state.currentBlock.children[0].text === ""
+    ) {
+      this.breakList();
+      return;
+    }
+
+    Transforms.splitNodes(this.editor, { always: true });
+  }
+  public deleteBackward(unit: "character" | "word" | "line" | "block") {
+    const { selection } = this.editor
+
+    if (
+      selection &&
+      Range.isCollapsed(this.editor.selection) &&
+      this.state.currentSuperBlock.type === "list" &&
+      this.state.currentBlock.type === "list-item" &&
+      (
+        (
+          (unit === "character" || unit === "word") &&
+          this.state.currentBlock.children.length === 1 &&
+          Text.isText(this.state.currentBlock.children[0]) &&
+          this.state.currentBlock.children[0].text === ""
+        ) ||
+        (
+          unit === "line" || unit == "block"
+        )
+      )
+    ) {
+      this.breakList();
+    } else if (selection && Range.isCollapsed(selection)) {
+      Transforms.delete(this.editor, { unit, reverse: true })
+    }
   }
   public onFocus(anchor: Path, value: Node[]) {
     let currentContext = this.props.rootContext || null;
@@ -970,7 +1082,21 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public toggleList(type: "bulleted" | "numbered") {
     const isCollapsed = Range.isCollapsed(this.editor.selection);
     if (this.state.currentSuperBlock && this.state.currentSuperBlock.type === "list") {
-      // TODO
+      if (this.state.currentSuperBlock.listType !== type) {
+        Transforms.wrapNodes(
+          this.editor,
+          {
+            ...copyElementBase(this.state.currentSuperBlock),
+            type: "list",
+            listType: type,
+            containment: "list-item",
+            children: [],
+          },
+          { split: false, at: this.state.superBlockAnchor },
+        );
+      } else {
+        this.breakList();
+      }
     } else {
       Transforms.wrapNodes(
         this.editor,

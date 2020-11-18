@@ -30,6 +30,8 @@ $quote-text-color: #455a64;
       color: $list-item-color;
       display: inline-block;
       width: 1rem;
+      margin-left: 1rem;
+      margin-right: 0.5rem;
     }
   }
 
@@ -49,7 +51,7 @@ $quote-text-color: #455a64;
       content: "." counter(item-count);
       color: $list-item-color;
       display: inline-block;
-      width: 1em;
+      width: 2em;
       margin-right: 0.5rem;
       text-align: right;
       direction: rtl;
