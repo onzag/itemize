@@ -111,8 +111,20 @@ interface IPostProcessingContext {
 
 export interface IFeatureSupportOptions {
   supportsImages: boolean;
+  /**
+   * The accept type that the input should accept
+   * for filling the image type, it can be null, if
+   * it doesn't support images, or when viewing
+   */
+  supportsImagesAccept: string;
   supportsVideos: boolean;
   supportsFiles: boolean;
+  /**
+   * The accept type that the input should accept
+   * for filling the file type, it can be null, if
+   * it doesn't support files, or when viewing
+   */
+  supportsFilesAccept: string;
   supportsLinks: boolean;
   supportsExternalLinks: boolean;
   supportsLists: boolean;

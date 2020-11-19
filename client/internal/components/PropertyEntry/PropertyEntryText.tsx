@@ -94,18 +94,6 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * Whether it is rich text
    */
   isRichText: boolean;
-  /**
-   * The accept for the input accept="property" of the linked media
-   * property so you can filter by that, all files are included
-   */
-  mediaPropertyAcceptsFiles: string;
-  /**
-   * The accept for the input accept="property" of the linked media
-   * property so you can filter by that, it's basically a narrowed
-   * down version of mediaPropertyAcceptsFiles that only includes
-   * image mime types
-   */
-  mediaPropertyAcceptsImages: string;
 
   /**
    * A generic error that is included for building the interface
@@ -572,6 +560,8 @@ export default class PropertyEntryText
       features = {
         supportsFiles,
         supportsImages,
+        supportsFilesAccept: this.cachedMediaPropertyAcceptsFiles,
+        supportsImagesAccept: this.cachedMediaPropertyAcceptsImages,
         supportsVideos,
         supportsLists,
         supportsContainers,
@@ -710,9 +700,6 @@ export default class PropertyEntryText
       i18nOk: i18nInLanguage["ok"],
 
       features,
-      mediaPropertyAcceptsFiles: this.cachedMediaPropertyAcceptsFiles,
-      mediaPropertyAcceptsImages: this.cachedMediaPropertyAcceptsImages,
-
       isRichText,
 
       lastLoadedFileError,

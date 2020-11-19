@@ -96,6 +96,8 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
         {
           supportsFiles,
           supportsImages,
+          supportsImagesAccept: null,
+          supportsFilesAccept: null,
           supportsVideos,
           supportsLists,
           supportsContainers,

@@ -10,6 +10,7 @@ import uuid from "uuid";
 import { IText } from "../../../internal/text/serializer/text";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { copyElementBase } from "../../../internal/text/serializer/base";
+import { IImage } from "../../../internal/text/serializer/image";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
@@ -358,6 +359,14 @@ export interface ISlateEditorWrapperBaseProps {
   featureSupport: IAccessibleFeatureSupportOptions;
   helpers: IHelperFunctions;
   children: React.ReactNode;
+  /**
+   * A current error, translated
+   */
+  currentLoadError: string;
+  /**
+   * Dismiss the current load error
+   */
+  dismissCurrentLoadError: () => void;
 }
 
 interface ISlateEditorProps {
@@ -392,6 +401,14 @@ interface ISlateEditorProps {
    * whether the current value is valid
    */
   currentValid: boolean;
+  /**
+   * A current error, translated
+   */
+  currentLoadError: string;
+  /**
+   * Dismiss the current load error
+   */
+  dismissCurrentLoadError: () => void;
   /**
    * The root context, can be null if no context
    */
@@ -895,6 +912,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.rootContext !== this.props.rootContext ||
       nextProps.rootI18n !== this.props.rootI18n ||
       nextState.anchor !== this.state.anchor ||
+      nextProps.currentLoadError !== this.props.currentLoadError ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses) ||
@@ -982,9 +1000,41 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param file the file
    * @param standalone whether to make it a standalone image
    */
-  public insertImage(file: File, standalone: boolean) {
+  public async insertImage(file: File, standalone: boolean): Promise<void> {
+    try {
+      const data = await this.props.onInsertFile(file, true);
 
-  };
+      if (!data) {
+        // soething went wrong there should be an error in the state
+        return;
+      }
+
+      const imageNode: IImage = {
+        type: "image",
+        containment: "void-block",
+        alt: null,
+        children: [
+          {
+            bold: false,
+            italic: false,
+            templateText: null,
+            text: "",
+            underline: false,
+          }
+        ],
+        height: data.height,
+        width: data.width,
+        sizes: null,
+        src: data.result.url,
+        srcId: data.result.id,
+        srcSet: null,
+        standalone,
+      };
+
+      this.editor.insertNode(imageNode as any);
+    } catch (err) {
+    }
+  }
   /**
    * Will insert a video given the information
    * @param origin the origin of the video
@@ -1029,7 +1079,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
       );
     } else {
       Transforms.wrapNodes(
@@ -1040,7 +1090,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1059,7 +1109,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
       );
     } else {
       Transforms.wrapNodes(
@@ -1071,7 +1121,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           subtype: type,
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1107,7 +1157,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           containment: "list-item",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : this.editor.selection },
+        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1339,7 +1389,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         canSetUIHandler: this.state.currentBlock && this.props.features.supportsTemplating,
       };
       children = (
-        <Wrapper {...this.props.wrapperArgs} info={info} helpers={helpers} featureSupport={newFeatureSupport}>
+        <Wrapper
+          {...this.props.wrapperArgs}
+          info={info}
+          helpers={helpers}
+          featureSupport={newFeatureSupport}
+          currentLoadError={this.props.currentLoadError}
+          dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+        >
           {children}
         </Wrapper>
       );

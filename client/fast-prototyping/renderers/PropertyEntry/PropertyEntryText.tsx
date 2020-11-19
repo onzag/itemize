@@ -263,41 +263,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     //   quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
     // } catch (err) {}
   // }
-  // public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
-    // const file = e.target.files[0];
-    // e.target.value = "";
-
-    // let alt: string = null;
-    // if (this.props.args["requestAltOnImages"]) {
-    //   alt = prompt("Please write an alt for your image:", "") || null;
-    // }
-    // try {
-    //   const data = await this.props.onInsertFile(file, true);
-
-    //   // first we get this information from it in order
-    //   // to build a ratio
-    //   const width = data.width;
-    //   const height = data.height;
-    //   const ratio = height / width;
-    //   const percentage = ratio * 100;
-    //   const padStyle = "padding-bottom:" + percentage + "%";
-
-    //   const quill = this.quillRef.current.getEditor();
-    //   const range = quill.getSelection(true);
-    //   quill.insertEmbed(range.index, "itemizeimage", {
-    //     alt,
-    //     src: data.result.url,
-    //     srcId: data.result.id,
-    //     srcSet: null,
-    //     sizes: null,
-    //     srcWidth: data.width,
-    //     srcHeight: data.height,
-    //     padStyle,
-    //   }, (ReactQuill.Quill as any).sources.USER);
-    //   quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
-    // } catch (err) {
-    // }
-  // }
   public focusIfNecessary() {
     if (this.props.autoFocus) {
       // if (this.quillRef.current) {
@@ -424,6 +389,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         onBlur={this.onBlur}
         rootContext={this.props.args.context || null}
         currentValid={this.props.currentValid}
+        currentLoadError={this.props.lastLoadedFileError}
+        dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={MaterialUISlateWrapper}
         rootI18n={this.props.i18nRoot}
         wrapperArgs={{

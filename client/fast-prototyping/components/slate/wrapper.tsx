@@ -8,6 +8,8 @@ import {
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, CodeIcon, Divider
 } from "../../mui-core";
+import { Dialog } from "../dialog";
+import { capitalize } from "../../../../util";
 
 const style = createStyles({
   editor: (props: ISlateEditorWrapperBaseProps) => {
@@ -59,9 +61,12 @@ const style = createStyles({
   },
 });
 
-function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
-  if (!props.info.isRichText) {
+interface RichTextEditorToolbarProps extends MaterialUISlateWrapperStyles {
+  requestImage: () => void;
+}
 
+function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
+  if (!props.info.isRichText) {
     return null;
   }
   return (
@@ -182,6 +187,7 @@ function RichTextEditorToolbar(props: MaterialUISlateWrapperStyles) {
               tabIndex={-1}
               title={props.i18nRichInfo.formatAddImageLabel}
               disabled={!props.featureSupport.canInsertImage}
+              onClick={props.requestImage}
               onMouseDown={props.helpers.blockBlur}
               onMouseUp={props.helpers.releaseBlur}
             >
@@ -226,15 +232,68 @@ interface MaterialUISlateWrapperStyles extends ISlateEditorWrapperBaseProps, Wit
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
 };
 
-export const MaterialUISlateWrapper = withStyles(style)((props: MaterialUISlateWrapperStyles) => {
-  return (
-    <>
-      <RichTextEditorToolbar {...props} />
-      <div className="rich-text">
-        <div className={props.classes.editor + (props.info.isFocused ? " focused" : "")}>
-          {props.children}
+class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperStyles> {
+  private inputImageRef: React.RefObject<HTMLInputElement>;
+  constructor(props: MaterialUISlateWrapperStyles) {
+    super(props);
+
+    this.inputImageRef = React.createRef();
+
+    this.onImageLoad = this.onImageLoad.bind(this);
+    this.requestImage = this.requestImage.bind(this);
+  }
+  public requestImage() {
+    this.inputImageRef.current.click();
+  }
+  public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    this.props.helpers.insertImage(file, false);
+  }
+  public render() {
+    const imageInput = this.props.featureSupport.supportsImages ? (
+      <input
+        ref={this.inputImageRef}
+        type="file"
+        accept={this.props.featureSupport.supportsImagesAccept}
+        tabIndex={-1}
+        style={{ display: "none" }}
+        autoComplete="off"
+        onChange={this.onImageLoad}
+      />
+    ) : null;
+
+    const fileLoadErrorDialog = this.props.info.isRichText && (this.props.featureSupport.supportsImages || this.props.featureSupport.supportsFiles) ? (
+      <Dialog
+        fullScreen={false}
+        open={!!this.props.currentLoadError}
+        onClose={this.props.dismissCurrentLoadError}
+        title={capitalize(this.props.i18nGenericError)}
+        buttons={
+          <Button onClick={this.props.dismissCurrentLoadError}>
+            {capitalize(this.props.i18nOk)}
+          </Button>
+        }
+      >
+        <Typography>
+          {this.props.currentLoadError}
+        </Typography>
+      </Dialog>
+    ) : null;
+
+    return (
+      <>
+        <RichTextEditorToolbar {...this.props} requestImage={this.requestImage}/>
+        <div className="rich-text">
+          <div className={this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
+            {this.props.children}
+          </div>
         </div>
-      </div>
-    </>
-  );
-});
+        {fileLoadErrorDialog}
+        {imageInput}
+      </>
+    );
+  }
+}
+
+export const MaterialUISlateWrapper = withStyles(style)(MaterialUISlateWrapperClass);
