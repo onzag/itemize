@@ -11,6 +11,10 @@ import { IText } from "../../../internal/text/serializer/text";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { copyElementBase } from "../../../internal/text/serializer/base";
 import { IImage } from "../../../internal/text/serializer/image";
+import { IFile } from "../../../internal/text/serializer/file";
+import { IVideo } from "../../../internal/text/serializer/video";
+import { mimeTypeToExtension } from "../../../../util";
+import prettyBytes from "pretty-bytes";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
@@ -227,28 +231,28 @@ export interface IHelperFunctions {
    * @param file the file
    * @param standalone whether to make it a standalone image
    */
-  insertImage: (file: File, standalone: boolean) => void;
+  insertImage: (file: File, standalone: boolean, at?: Partial<Range>) => void;
   /**
    * Will insert a video given the information
-   * @param origin the origin of the video
-   * @param id the id of the video
+   * @param url the url of the video, only youtube and vimeo supported as origin
+   * @returns a boolean true if the video was properly inserted, false if the video url was invalid
    */
-  insertVideo: (origin: "youtube" | "vimeo", id: string) => void;
+  insertVideo: (url: string, at?: Partial<Range>) => boolean;
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
    */
-  insertFile: (file: File) => void;
+  insertFile: (file: File, at?: Partial<Range>) => void;
   /**
    * Will insert a container at the given location
    * @param type optional, the container type, otherwise will
    * insert a standard container
    */
-  insertContainer: (type?: string) => void;
+  insertContainer: (type?: string, at?: Partial<Range>) => void;
   /**
    * Inserts a custom element
    */
-  insertCustom: (type: string) => void;
+  insertCustom: (type: string, at?: Partial<Range>) => void;
 
   /**
    * Makes a quote out of the current element
@@ -703,7 +707,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
   }
   public isInline(element: RichElement) {
-    return element.containment === "inline";
+    return element.containment === "inline" || element.containment === "void-inline";
   }
   public isVoid(element: RichElement) {
     return element.containment === "void-block" || element.containment === "void-inline";
@@ -999,8 +1003,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * been taken as an input
    * @param file the file
    * @param standalone whether to make it a standalone image
+   * @param at a range to insert it at
    */
-  public async insertImage(file: File, standalone: boolean): Promise<void> {
+  public async insertImage(file: File, standalone: boolean, at?: Partial<Range>): Promise<void> {
     try {
       const data = await this.props.onInsertFile(file, true);
 
@@ -1031,37 +1036,171 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         standalone,
       };
 
-      this.editor.insertNode(imageNode as any);
+      if (at) {
+        setTimeout(() => {
+          ReactEditor.focus(this.editor);
+          setTimeout(() => {
+            Transforms.setSelection(this.editor, at);
+            setTimeout(() => {
+              this.editor.insertNode(imageNode as any);
+            });
+          }, 0);
+        }, 0);
+      } else {
+        this.editor.insertNode(imageNode as any);
+      }
     } catch (err) {
     }
   }
   /**
    * Will insert a video given the information
-   * @param origin the origin of the video
-   * @param id the id of the video
+   * @param url the url of the video
+   * @param at a partial range to insert at
    */
-  public insertVideo(origin: "youtube" | "vimeo", id: string) {
+  public insertVideo(url: string, at?: Partial<Range>) {
+    const parsedURL = new URL(url);
+    let src: string;
+    let origin: string;
+    let status: boolean = false;
 
+    if (
+      parsedURL.hostname === "youtube.com" ||
+      parsedURL.hostname === "www.youtube.com" ||
+      parsedURL.hostname === "youtu.be"
+    ) {
+      origin = "youtube";
+      const isClassicYTUrl = (
+        parsedURL.hostname === "youtube.com" ||
+        parsedURL.hostname === "www.youtube.com"
+      );
+      if (
+        isClassicYTUrl &&
+        parsedURL.pathname.startsWith("/embed/")
+      ) {
+        src = parsedURL.pathname.split("/")[2];
+      } else if (
+        isClassicYTUrl &&
+        parsedURL.pathname.startsWith("/watch")
+      ) {
+        let search = parsedURL.search;
+        if (search[0] === "?") {
+          search = search.substr(1);
+        }
+        search.split("&").forEach((v) => {
+          if (v.startsWith("v=")) {
+            src = v.substr(2);
+          }
+        });
+      } else if (
+        parsedURL.hostname === "youtu.be"
+      ) {
+        src = parsedURL.pathname.split("/")[1];
+      }
+
+      status = true;
+    } else if (
+      parsedURL.host === "player.vimeo.com"
+    ) {
+      origin = "vimeo";
+      src = parsedURL.pathname.split("/")[2];
+      status = true
+    }
+
+    if (status) {
+      const videoNode: IVideo = {
+        type: "video",
+        containment: "void-block",
+        children: [
+          {
+            bold: false,
+            italic: false,
+            templateText: null,
+            text: "",
+            underline: false,
+          }
+        ],
+        origin: origin as any,
+        src,
+      }
+
+      if (at) {
+        setTimeout(() => {
+          ReactEditor.focus(this.editor);
+          setTimeout(() => {
+            Transforms.setSelection(this.editor, at);
+            setTimeout(() => {
+              this.editor.insertNode(videoNode as any);
+            });
+          }, 0);
+        }, 0);
+      } else {
+        this.editor.insertNode(videoNode as any);
+      }
+    }
+
+    return status;
   };
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
+   * @param at a partial range to insert at
    */
-  public insertFile(file: File) {
+  public async insertFile(file: File, at?: Partial<Range>) {
+    try {
+      const data = await this.props.onInsertFile(file, false);
 
+      if (!data) {
+        // soething went wrong there should be an error in the state
+        return;
+      }
+
+      const fileNode: IFile = {
+        type: "file",
+        containment: "void-inline",
+        children: [
+          {
+            bold: false,
+            italic: false,
+            templateText: null,
+            text: "",
+            underline: false,
+          }
+        ],
+        extension: mimeTypeToExtension(file.type),
+        name: data.result.name,
+        size: prettyBytes(data.result.size),
+        src: data.result.url,
+        srcId: data.result.id,
+      };
+
+      if (at) {
+        setTimeout(() => {
+          ReactEditor.focus(this.editor);
+          setTimeout(() => {
+            Transforms.setSelection(this.editor, at);
+            setTimeout(() => {
+              this.editor.insertNode(fileNode as any);
+            });
+          }, 0);
+        }, 0);
+      } else {
+        this.editor.insertNode(fileNode as any);
+      }
+    } catch (err) {
+    }
   };
   /**
    * Will insert a container at the given location
    * @param type optional, the container type, otherwise will
    * insert a standard container
    */
-  public insertContainer(type?: string) {
+  public insertContainer(type?: string, at?: Partial<Range>) {
 
   };
   /**
    * Inserts a custom element
    */
-  public insertCustom(type: string) {
+  public insertCustom(type: string, at?: Partial<Range>) {
 
   };
 

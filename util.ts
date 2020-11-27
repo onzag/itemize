@@ -169,7 +169,11 @@ export function checkFileInAccepts(fileType: string, accept: string) {
  * @returns an extension or txt if it doesn't know
  */
 export function mimeTypeToExtension(str: string) {
-  return mimeExtensions[str] || str.split("/")[1] || "txt";
+  const expectedExt = mimeExtensions[str];
+  if (expectedExt) {
+    return expectedExt;
+  }
+  return (str.split("/")[1] || "txt").substr(0, 3);
 }
 
 /**

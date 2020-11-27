@@ -45,7 +45,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
     return {
       ...base,
       type: "video",
-      containment: "block",
+      containment: "void-block",
       src: iframe.dataset.videoSrc,
       origin: iframe.dataset.videoOrigin as any,
       children: [
@@ -99,7 +99,7 @@ export interface IVideo extends IElementBase {
   /**
    * refers that it can only contain inline elements
    */
-  containment: "block",
+  containment: "void-block",
   /**
    * as for the text specs only vimeo and youtube are supported
    */

@@ -106,6 +106,7 @@ code {
   align-items: center;
   justify-content: center;
   user-select: none;
+  font-size: 85px;
 
   span[contenteditable] {
     width: 100%;
@@ -165,6 +166,7 @@ code {
       padding-top: 5px;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-size: 1rem;
     }
 
     .file-size {

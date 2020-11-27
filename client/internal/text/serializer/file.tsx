@@ -80,10 +80,10 @@ export function registerFile(registry: ISerializationRegistryType) {
         return (
           <span className="file-container">
             <span className="file-icon">
-              <span className="file-extension">{file.extension}</span>
+              <span className="file-extension" spellCheck={false}>{file.extension}</span>
             </span>
-            <span className="file-name">{file.name}</span>
-            <span className="file-size">{file.size}</span>
+            <span className="file-name" spellCheck={false}>{file.name}</span>
+            <span className="file-size" spellCheck={false}>{file.size}</span>
             {children}
           </span>
         );

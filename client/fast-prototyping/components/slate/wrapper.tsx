@@ -10,6 +10,7 @@ import {
 } from "../../mui-core";
 import { Dialog } from "../dialog";
 import { capitalize } from "../../../../util";
+import { Range } from "slate";
 
 const style = createStyles({
   editor: (props: ISlateEditorWrapperBaseProps) => {
@@ -63,6 +64,8 @@ const style = createStyles({
 
 interface RichTextEditorToolbarProps extends MaterialUISlateWrapperStyles {
   requestImage: () => void;
+  requestFile: () => void;
+  requestVideo: () => void;
 }
 
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
@@ -202,6 +205,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatAddVideoLabel}
               disabled={!props.featureSupport.canInsertVideo}
               onMouseDown={props.helpers.blockBlur}
+              onClick={props.requestVideo}
               onMouseUp={props.helpers.releaseBlur}
             >
               <VideoLibraryIcon />
@@ -215,6 +219,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatAddFileLabel}
               disabled={!props.featureSupport.canInsertFile}
               onMouseDown={props.helpers.blockBlur}
+              onClick={props.requestFile}
               onMouseUp={props.helpers.releaseBlur}
             >
               <AttachFileIcon />
@@ -232,23 +237,86 @@ interface MaterialUISlateWrapperStyles extends ISlateEditorWrapperBaseProps, Wit
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
 };
 
-class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperStyles> {
+interface MaterialUISlateWrapperState {
+  videoDialogOpen: boolean;
+  videoURL: string;
+  videoInvalid: boolean;
+}
+
+class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperStyles, MaterialUISlateWrapperState> {
   private inputImageRef: React.RefObject<HTMLInputElement>;
+  private inputFileRef: React.RefObject<HTMLInputElement>;
+  private originalSelectionArea: Range;
+  private textFieldVideoRef: React.RefObject<HTMLDivElement>;
   constructor(props: MaterialUISlateWrapperStyles) {
     super(props);
 
+    this.state = {
+      videoDialogOpen: false,
+      videoURL: "",
+      videoInvalid: false,
+    }
+
     this.inputImageRef = React.createRef();
+    this.inputFileRef = React.createRef();
+    this.textFieldVideoRef = React.createRef();
 
     this.onImageLoad = this.onImageLoad.bind(this);
+    this.onFileLoad = this.onFileLoad.bind(this);
     this.requestImage = this.requestImage.bind(this);
+    this.requestFile = this.requestFile.bind(this);
+    this.requestVideo = this.requestVideo.bind(this);
+    this.closeDialogVideo = this.closeDialogVideo.bind(this);
+    this.acceptVideo = this.acceptVideo.bind(this);
+    this.updateVideoURL = this.updateVideoURL.bind(this);
+    this.focusVideoTextField = this.focusVideoTextField.bind(this);
   }
   public requestImage() {
     this.inputImageRef.current.click();
+  }
+  public requestFile() {
+    this.inputFileRef.current.click();
+  }
+  public requestVideo() {
+    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.setState({
+      videoDialogOpen: true,
+    });
+  }
+  public closeDialogVideo() {
+    this.setState({
+      videoDialogOpen: false,
+      videoURL: "",
+      videoInvalid: false,
+    });
+  }
+  public acceptVideo() {
+    const status = this.props.helpers.insertVideo(this.state.videoURL, this.originalSelectionArea);
+    if (!status) {
+      this.setState({
+        videoInvalid: true,
+      });
+    } else {
+      this.closeDialogVideo();
+    }
+  }
+  public updateVideoURL(e: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({
+      videoURL: e.target.value,
+    });
+  }
+  public focusVideoTextField() {
+    this.textFieldVideoRef.current && this.textFieldVideoRef.current.focus();
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
     e.target.value = "";
     this.props.helpers.insertImage(file, false);
+  }
+  public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    this.props.helpers.insertFile(file);
   }
   public render() {
     const imageInput = this.props.featureSupport.supportsImages ? (
@@ -260,6 +328,18 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         style={{ display: "none" }}
         autoComplete="off"
         onChange={this.onImageLoad}
+      />
+    ) : null;
+
+    const fileInput = this.props.featureSupport.supportsFiles ? (
+      <input
+        ref={this.inputFileRef}
+        type="file"
+        accept={this.props.featureSupport.supportsFilesAccept}
+        tabIndex={-1}
+        style={{ display: "none" }}
+        autoComplete="off"
+        onChange={this.onFileLoad}
       />
     ) : null;
 
@@ -281,16 +361,50 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       </Dialog>
     ) : null;
 
+    const videoDialog = this.props.info.isRichText && this.props.featureSupport.supportsVideos ? (
+      <Dialog
+        fullScreen={false}
+        open={this.state.videoDialogOpen}
+        onClose={this.closeDialogVideo}
+        onOpen={this.focusVideoTextField}
+        title={this.props.i18nRichInfo.loadVideo.title}
+        buttons={
+          <Button onClick={this.acceptVideo}>
+            {this.props.i18nRichInfo.loadVideo.submit}
+          </Button>
+        }
+      >
+        <div>
+          <TextField
+            fullWidth={true}
+            value={this.state.videoURL}
+            onChange={this.updateVideoURL}
+            label={this.props.i18nRichInfo.loadVideo.label}
+            placeholder={this.props.i18nRichInfo.loadVideo.placeholder}
+            inputRef={this.textFieldVideoRef}
+          />
+          <div>{this.state.videoInvalid ? this.props.i18nRichInfo.loadVideo.invalid : null}</div>
+        </div>
+      </Dialog>
+    ) : null;
+
     return (
       <>
-        <RichTextEditorToolbar {...this.props} requestImage={this.requestImage}/>
+        <RichTextEditorToolbar
+          {...this.props}
+          requestImage={this.requestImage}
+          requestFile={this.requestFile}
+          requestVideo={this.requestVideo}
+        />
         <div className="rich-text">
           <div className={this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
         </div>
         {fileLoadErrorDialog}
+        {videoDialog}
         {imageInput}
+        {fileInput}
       </>
     );
   }
