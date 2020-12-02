@@ -248,6 +248,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   private inputFileRef: React.RefObject<HTMLInputElement>;
   private originalSelectionArea: Range;
   private textFieldVideoRef: React.RefObject<HTMLDivElement>;
+  private refocusTimeout: NodeJS.Timeout;
   constructor(props: MaterialUISlateWrapperStyles) {
     super(props);
 
@@ -270,11 +271,28 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.acceptVideo = this.acceptVideo.bind(this);
     this.updateVideoURL = this.updateVideoURL.bind(this);
     this.focusVideoTextField = this.focusVideoTextField.bind(this);
+    this.onFileEventedReFocus = this.onFileEventedReFocus.bind(this);
+    this.refocus = this.refocus.bind(this);
   }
   public requestImage() {
+    document.body.addEventListener("focus", this.onFileEventedReFocus, {capture: true});
+    this.originalSelectionArea = this.props.helpers.editor.selection;
     this.inputImageRef.current.click();
   }
+  public refocus() {
+    this.props.helpers.focusAt(this.originalSelectionArea);
+  }
+  public onFileEventedReFocus() {
+    document.body.removeEventListener("focus", this.onFileEventedReFocus, {capture: true});
+
+    // we do it this way because this is a hacky way and we are not sure
+    // on whether the focus event will trigger before the input event, it should
+    // trigger first, but we make no assumptions
+    this.refocusTimeout = setTimeout(this.refocus, 30);
+  }
   public requestFile() {
+    document.body.addEventListener("focus", this.onFileEventedReFocus, {capture: true});
+    this.originalSelectionArea = this.props.helpers.editor.selection;
     this.inputFileRef.current.click();
   }
   public requestVideo() {
@@ -284,6 +302,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     });
   }
   public closeDialogVideo() {
+    this.refocus();
     this.setState({
       videoDialogOpen: false,
       videoURL: "",
@@ -297,7 +316,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         videoInvalid: true,
       });
     } else {
-      this.closeDialogVideo();
+      this.setState({
+        videoDialogOpen: false,
+        videoURL: "",
+        videoInvalid: false,
+      });
     }
   }
   public updateVideoURL(e: React.ChangeEvent<HTMLInputElement>) {
@@ -309,14 +332,18 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.textFieldVideoRef.current && this.textFieldVideoRef.current.focus();
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    document.body.removeEventListener("focus", this.onFileEventedReFocus, {capture: true});
+    clearTimeout(this.refocusTimeout);
     const file = e.target.files[0];
     e.target.value = "";
-    this.props.helpers.insertImage(file, false);
+    this.props.helpers.insertImage(file, false, this.originalSelectionArea);
   }
   public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    document.body.removeEventListener("focus", this.onFileEventedReFocus, {capture: true});
+    clearTimeout(this.refocusTimeout);
     const file = e.target.files[0];
     e.target.value = "";
-    this.props.helpers.insertFile(file);
+    this.props.helpers.insertFile(file, this.originalSelectionArea);
   }
   public render() {
     const imageInput = this.props.featureSupport.supportsImages ? (

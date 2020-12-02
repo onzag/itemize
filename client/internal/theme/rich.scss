@@ -2,6 +2,9 @@ $list-item-color: rgb(63, 81, 181);
 $quote-background-color: rgba(0, 0, 0, 0.09);
 $quote-highlight-color: #26a69a;
 $quote-text-color: #455a64;
+$template-item-color: #1a237e;
+$general-highlight-color: #0d47a1;
+$superblock-highlight-color: #33691e;
 
 .rich-text {
   font-size: 1rem;
@@ -9,6 +12,11 @@ $quote-text-color: #455a64;
   overflow: hidden;
   overflow-wrap: break-word;
   width: 100%;
+
+  .template {
+    border: solid 1px $template-item-color;
+    border-style: dashed;
+  }
 
   .ql-editor {
     overflow: hidden;
@@ -88,5 +96,184 @@ $quote-text-color: #455a64;
     font-size: 1.6rem;
     font-weight: 300;
     text-align: left;
+  }
+
+  .image {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    .image-container {
+      position: relative;
+      width: 100%;
+      max-width: 700px;
+  
+      .image-pad {
+        position: relative;
+        width: 100%;
+  
+        img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+        }
+      }
+    }
+
+    &.selected {
+      img {
+        box-shadow: 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color;
+      }
+    }
+  }
+  
+  .video {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    .video-container {
+      width: 100%;
+      max-width: 700px;
+      padding-bottom: 56.25%;
+      height: 0;
+      position: relative;
+  
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    &.selected {
+      .video-container {
+        box-shadow: 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color;
+      }
+    }
+  }
+  
+  .file {
+    width: 100px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    font-size: 85px;
+  
+    span[contenteditable] {
+      width: 100%;
+      position: relative;
+      height: 100%;
+    }
+  
+    .file-container {
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+  
+      .thumbnail {
+        width: 100%;
+        height: 75px;
+        display: block;
+        object-fit: contain;
+        border-radius: 3px;
+        filter: drop-shadow(0px 0px 1px rgba(0,0,0,.3))
+                drop-shadow(0px 0px 10px rgba(0,0,0,.3));
+      }
+  
+      .file-icon {
+        width: 50px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' focusable='false' viewBox='0 0 24 24' aria-hidden='true'%3E%3Cpath fill='rgba(0,0,0,0.8)' d='M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z'%3E%3C/path%3E%3C/svg%3E");
+        height: 75px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        position: relative;
+        display: block;
+  
+        .file-extension {
+          display: block;
+          width: 100%;
+          font-size: 1rem;
+          text-align: right;
+          position: absolute;
+          bottom: 0;
+          font-weight: 900;
+          background-color: white;
+          border: solid 1px #ccc;
+          padding: 0 2px;
+          white-space: nowrap;
+          border-radius: 0 0 2px 2px;
+        }
+      }
+  
+      .file-name {
+        display: block;
+        width: 100%;
+        text-align: center;
+        overflow: hidden;
+        padding-top: 5px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1rem;
+      }
+  
+      .file-size {
+        display: block;
+        width: 100%;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.7rem;
+      }
+    }
+  
+    &.rejected {
+      .file-container {
+        .thumbnail {
+          filter: drop-shadow(0px 0px 1px #e57373)
+                  drop-shadow(0px 0px 10px #e57373);
+        }
+        .file-size, .file-name, .file-icon .file-extension {
+          color: #e57373;
+        }
+      }
+      &:hover {
+        .file-container {
+          .thumbnail {
+            filter: drop-shadow(0px 0px 1px #f44336)
+                    drop-shadow(0px 0px 10px #f44336);
+          }
+          .file-size, .file-name, .file-icon .file-extension {
+            color: #f44336;
+          }
+        }
+      }
+    }
+
+    &.selected {
+      .file-container {
+        .thumbnail, .file-icon {
+          filter: drop-shadow(0px 0px 1px $general-highlight-color)
+                  drop-shadow(0px 0px 10px $general-highlight-color);
+        }
+      }
+    }
+  }
+
+  .container.selected {
+    box-shadow: inset 0 0 5px $superblock-highlight-color;
   }
 }

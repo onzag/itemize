@@ -226,6 +226,11 @@ export interface IHelperFunctions {
   Range: typeof Range;
 
   /**
+   * Focuses at the desired location
+   */
+  focusAt: (at: Partial<Range>) => void;
+
+  /**
    * Will insert an image based on a given file that has
    * been taken as an input
    * @param file the file
@@ -637,7 +642,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // we get the previous and current path
           const curPath = path.concat(n);
           // and this is where we are now
-          const currentTextAnchorPath = this.editor.selection.anchor.path;
+          const currentTextAnchorPath = this.editor.selection && this.editor.selection.anchor.path;
           // if we have a previous that is also a text that is not our anchor and is mergable
           if (prev && Text.isText(prev) && this.checkShouldMerge(current, prev)) {
             // we merge it
@@ -973,7 +978,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public renderElement(props: RenderElementProps) {
     const { attributes, children, element } = props;
-    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, { ...attributes, children }) as any;
+    let className: string = null;
+    if (
+      (element as any) === this.state.currentBlock ||
+      (element as any) === this.state.currentElement ||
+      (element as any) === this.state.currentSuperBlock
+    ) {
+      className = "selected";
+    }
+    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, { ...attributes, children, className }) as any;
   }
   public renderText(props: RenderLeafProps) {
     const { attributes, children, leaf } = props;
@@ -998,6 +1011,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public releaseBlur() {
     this.blurBlocked = false;
   }
+
+  public focusAt(at: Partial<Range>) {
+    setTimeout(() => {
+      ReactEditor.focus(this.editor);
+      setTimeout(() => {
+        Transforms.setSelection(this.editor, at);
+      }, 0);
+    }, 0);
+  }
+
   /**
    * Will insert an image based on a given file that has
    * been taken as an input
@@ -1124,6 +1147,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
 
       if (at) {
+        (this.editor.insertNode as any)(videoNode as any, {at});
         setTimeout(() => {
           ReactEditor.focus(this.editor);
           setTimeout(() => {
@@ -1474,6 +1498,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         Transforms,
         Range,
         ReactEditor,
+
+        focusAt: this.focusAt,
 
         formatToggleBold: this.formatToggleBold,
         formatToggleItalic: this.formatToggleItalic,

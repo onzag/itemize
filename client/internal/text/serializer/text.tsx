@@ -160,6 +160,10 @@ export function registerText(registry: ISerializationRegistryType) {
         textDecoration: "underline",
       }
     }
+    if (text.templateText) {
+      newCustomProps.className = (newCustomProps.className || "") + " template";
+      newCustomProps.title = text.templateText;
+    }
     return (
       <span {...newCustomProps}/>
     );
