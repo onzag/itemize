@@ -35,9 +35,10 @@ export function registerContainer(registry: ISerializationRegistryType) {
     return container;
   }
 
-  function reactifyContainer(container: IContainer, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyContainer(container: IContainer, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       container,
       "div",
       container.containerType ? CONTAINER_CLASS_PREFIX + container.containerType : CONTAINER_CLASS,

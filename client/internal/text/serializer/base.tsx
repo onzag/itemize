@@ -217,6 +217,7 @@ class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifie
 
 export function reactifyElementBase(
   registry: ISerializationRegistryType,
+  active: boolean,
   base: IElementBase,
   Tag: string,
   baseClass: string,
@@ -246,9 +247,9 @@ export function reactifyElementBase(
   if (!props.children && children) {
     finalProps.children = children.map((c) => {
       if ((c as IText).text) {
-        return registry.REACTIFY.text(c);
+        return registry.REACTIFY.text(c, active);
       } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        return registry.REACTIFY[(c as RichElement).type](c);
+        return registry.REACTIFY[(c as RichElement).type](c, active);
       }
     });
   }

@@ -65,14 +65,17 @@ export function registerFile(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyFile(file: IFile, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyFile(file: IFile, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
     const newCustomProps = {
       ...customProps,
     };
-    (newCustomProps as any).href = file.src;
+    if (active) {
+      (newCustomProps as any).href = file.src;
+    }
 
     return reactifyElementBase(
       registry,
+      active,
       file,
       "a",
       "file",

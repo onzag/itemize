@@ -60,7 +60,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyVideo(video: IVideo, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyVideo(video: IVideo, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
     let iframeSrc: string;
     if (video.origin === "youtube") {
       iframeSrc = `https://youtube.com/embed/${video.src}?rel=0`;
@@ -70,6 +70,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
 
     return reactifyElementBase(
       registry,
+      active,
       video,
       "div",
       "video",

@@ -119,7 +119,7 @@ export function registerImage(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyImage(image: IImage, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyImage(image: IImage, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
     const newCustomProps = {
       ...customProps,
     };
@@ -131,6 +131,7 @@ export function registerImage(registry: ISerializationRegistryType) {
 
       return reactifyElementBase(
         registry,
+        active,
         image,
         "img",
         null,
@@ -140,7 +141,9 @@ export function registerImage(registry: ISerializationRegistryType) {
       );
     }
 
-    (newCustomProps as any).href = image.src;
+    if (active) {
+      (newCustomProps as any).href = image.src;
+    }
 
     const width = image.width;
     const height = image.height;
@@ -150,6 +153,7 @@ export function registerImage(registry: ISerializationRegistryType) {
 
     return reactifyElementBase(
       registry,
+      active,
       image,
       "a",
       "image",

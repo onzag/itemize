@@ -27,8 +27,8 @@ export function registerLink(registry: ISerializationRegistryType) {
     let href: string = null;
     let thref: string = null;
   
-    if (node.dataset.thref) {
-      thref = node.dataset.thref;
+    if (node.dataset.href) {
+      thref = node.dataset.href;
     } else {
       href = node.href || null;
     }
@@ -46,14 +46,25 @@ export function registerLink(registry: ISerializationRegistryType) {
     return link;
   }
 
-  function reactifyLink(link: ILink, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyLink(link: ILink, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+    const newCustomProps = {
+      ...customProps,
+    };
+    if (link.href && active) {
+      (newCustomProps as any).href = link.href;
+    }
+    if (link.thref) {
+      newCustomProps.className = (newCustomProps.className || "") + " template";
+      newCustomProps.title = link.thref;
+    }
     return reactifyElementBase(
       registry,
+      active,
       link,
       "a",
       null,
       null,
-      customProps,
+      newCustomProps,
       link.children,
     );
   }

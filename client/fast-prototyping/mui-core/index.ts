@@ -13,6 +13,7 @@ import Paper from "@material-ui/core/Paper";
 import Avatar from "@material-ui/core/Avatar";
 import Snackbar from "@material-ui/core/Snackbar";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -34,6 +35,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import LinkIcon from '@material-ui/icons/Link';
 import {
   createStyles,
   withStyles,
@@ -251,4 +254,7 @@ export {
   CardMedia,
   CardActionArea,
   CropSquareIcon,
+  MoreHorizIcon,
+  ExpandLessIcon,
+  LinkIcon,
 }

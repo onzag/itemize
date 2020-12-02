@@ -40,6 +40,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatBoldLabel: string;
   formatItalicLabel: string;
   formatUnderlineLabel: string;
+  formatLinkLabel: string;
   formatTitleLabel: string;
   formatQuoteLabel: string;
   formatListNumberedLabel: string;
@@ -60,6 +61,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatSetUIHandlerArgLabel: string;
   formatSetUIHandlerArgName: string;
   formatSetUIHandlerArgValue: string;
+  formatMore: string;
 
   loadVideo: {
     invalid: string;
@@ -68,6 +70,19 @@ export interface IPropertyEntryI18nRichTextInfo {
     title: string;
     submit: string;
   };
+
+  setLink: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    placeholderLocalOnly: string;
+    templated: string;
+    templatedLabel: string;
+    templatedPlaceholder: string;
+    templatedUnspecified: string;
+    title: string;
+    submit: string;
+  },
 }
 
 /**
@@ -667,6 +682,7 @@ export default class PropertyEntryText
         formatItalicLabel: i18nInLanguage.format_italic,
         formatUnderlineLabel: i18nInLanguage.format_underline,
         formatTitleLabel: i18nInLanguage.format_title,
+        formatLinkLabel: i18nInLanguage.format_link,
         formatQuoteLabel: i18nInLanguage.format_quote,
         formatListNumberedLabel: i18nInLanguage.format_list_numbered,
         formatListBulletedLabel: i18nInLanguage.format_list_bulleted,
@@ -686,6 +702,7 @@ export default class PropertyEntryText
         formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
         formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
         formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
+        formatMore: i18nInLanguage.format_more,
 
         loadVideo: {
           title: i18nInLanguage.video_loader_title,
@@ -694,10 +711,23 @@ export default class PropertyEntryText
           invalid: i18nInLanguage.video_loader_invalid,
           submit: i18nInLanguage.video_loader_submit,
         },
+
+        setLink: {
+          title: i18nInLanguage.link_setter_title,
+          label: i18nInLanguage.link_setter_label,
+          placeholder: i18nInLanguage.link_setter_placeholder,
+          placeholderLocalOnly: i18nInLanguage.link_setter_placeholder_local_only,
+          templated: i18nInLanguage.link_setter_templated,
+          templatedLabel: i18nInLanguage.link_setter_templated_label,
+          templatedPlaceholder: i18nInLanguage.link_setter_templated_placeholder,
+          templatedUnspecified: i18nInLanguage.link_setter_templated_unspecified,
+          invalid: i18nInLanguage.link_setter_invalid,
+          submit: i18nInLanguage.link_setter_submit,
+        },
       } : null,
 
-      i18nGenericError: i18nInLanguage["generic_error"],
-      i18nOk: i18nInLanguage["ok"],
+      i18nGenericError: i18nInLanguage.generic_error,
+      i18nOk: i18nInLanguage.ok,
 
       features,
       isRichText,

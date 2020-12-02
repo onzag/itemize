@@ -138,7 +138,7 @@ export function registerText(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyText(text: IText, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyText(text: IText, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     const newCustomProps = {
       ...customProps
     };

@@ -274,11 +274,7 @@ export interface IHelperFunctions {
   /**
    * Makes a link out of the current element
    */
-  toggleLink: (url: string) => void;
-  /**
-   * Makes a template link out of the current element
-   */
-  makeTemplateLink: (value: string) => void;
+  toggleLink: (url: string, templateValue: string) => boolean;
 
   /**
    * Sets the current style for the element
@@ -598,7 +594,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.toggleTitle = this.toggleTitle.bind(this);
     this.toggleList = this.toggleList.bind(this);
     this.toggleLink = this.toggleLink.bind(this);
-    this.makeTemplateLink = this.makeTemplateLink.bind(this);
     this.setStyle = this.setStyle.bind(this);
     this.setHoverStyle = this.setHoverStyle.bind(this);
     this.setActiveStyle = this.setActiveStyle.bind(this);
@@ -986,11 +981,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     ) {
       className = "selected";
     }
-    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, { ...attributes, children, className }) as any;
+    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, false, { ...attributes, children, className }) as any;
   }
   public renderText(props: RenderLeafProps) {
     const { attributes, children, leaf } = props;
-    return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, { ...attributes, children }) as any;
+    return SERIALIZATION_REGISTRY.REACTIFY.text(leaf as any, false, { ...attributes, children }) as any;
   }
   public onChange(newValue: Node[]) {
     clearTimeout(this.blurTimeout);
@@ -1329,14 +1324,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Makes a link out of the current element
    */
   public toggleLink(url: string) {
-
+    return true;
   };
-  /**
-   * Makes a template link out of the current element
-   */
-  public makeTemplateLink(value: string) {
-
-  };;
 
   /**
    * Sets the current style for the element
@@ -1513,7 +1502,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         toggleLink: this.toggleLink,
         toggleList: this.toggleList,
         toggleQuote: this.toggleQuote,
-        makeTemplateLink: this.makeTemplateLink,
         toggleTitle: this.toggleTitle,
         setActiveStyle: this.setActiveStyle,
         setContext: this.setContext,

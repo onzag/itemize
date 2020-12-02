@@ -1,10 +1,12 @@
 import React from "react";
 import { ISerializationRegistryType} from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, deserializeElement } from "./base";
+import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerQuote(registry: ISerializationRegistryType) {
+  const boundDeserializeElement = deserializeElement.bind(null, registry);
   function serializeQuote(quote: IQuote) {
     return serializeElementBase(
       registry,
@@ -18,7 +20,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
   
   function deserializeQuote(node: HTMLQuoteElement): IQuote {
     const base = deserializeElementBase(node);
-    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
+    const children = Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as any[];
     const quote: IQuote = {
       ...base,
       type: "quote",
@@ -30,9 +32,10 @@ export function registerQuote(registry: ISerializationRegistryType) {
     return quote;
   }
 
-  function reactifyQuote(quote: IQuote, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyQuote(quote: IQuote, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       quote,
       "blockquote",
       null,
@@ -62,5 +65,5 @@ export interface IQuote extends IElementBase {
   /**
    * Represents the children
    */
-  children: Array<IText | ILink>;
+  children: Array<IText | ILink | IFile>;
 }

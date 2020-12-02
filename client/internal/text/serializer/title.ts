@@ -1,17 +1,19 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
-import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
+import { deserializeElement, deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
+import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerTitle(registry: ISerializationRegistryType) {
+  const boundDeserializeElement = deserializeElement.bind(null, registry);
   function serializeTitle(title: ITitle) {
     return serializeElementBase(registry, title, title.subtype, null, null, title.children);
   }
   
   function deserializeTitle(node: HTMLElement): ITitle {
     const base = deserializeElementBase(node);
-    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
+    const children = Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as any[];
     const title: ITitle = {
       ...base,
       type: "title",
@@ -22,9 +24,10 @@ export function registerTitle(registry: ISerializationRegistryType) {
     return title;
   }
   
-  function reactifyTitle(title: ITitle, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyTitle(title: ITitle, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       title,
       title.subtype,
       null,
@@ -60,5 +63,5 @@ export interface ITitle extends IElementBase {
    * The title only has one children and it's text
    * as it only contains text within it
    */
-  children: Array<IText | ILink>;
+  children: Array<IText | ILink | IFile>;
 }

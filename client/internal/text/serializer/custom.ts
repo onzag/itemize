@@ -35,9 +35,10 @@ export function registerCustom(registry: ISerializationRegistryType) {
     return custom;
   }
 
-  function reactifyCustom(custom: ICustom, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyCustom(custom: ICustom, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       custom,
       "div",
       CUSTOM_CLASS_PREFIX + custom.customType,

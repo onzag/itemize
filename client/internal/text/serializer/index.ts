@@ -32,7 +32,7 @@ export interface ISerializationRegistryType {
     text: (n: Node) => IText;
   };
   REACTIFY: {
-    [type: string]: (element: RichElement | IText, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => React.ReactNode;
+    [type: string]: (element: RichElement | IText, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => React.ReactNode;
   };
 }
 

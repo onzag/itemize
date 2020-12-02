@@ -334,6 +334,7 @@ export const LOCALE_I18N = [
   "format_underline",
   "format_title",
   "format_quote",
+  "format_link",
   "format_list_numbered",
   "format_list_bulleted",
   "format_add_image",
@@ -352,6 +353,7 @@ export const LOCALE_I18N = [
   "format_set_ui_handler_arg",
   "format_set_ui_handler_arg_name",
   "format_set_ui_handler_arg_value",
+  "format_more",
 
 
   // for filling the booleans and other things
@@ -393,6 +395,18 @@ export const LOCALE_I18N = [
   "video_loader_placeholder",
   "video_loader_invalid",
   "video_loader_submit",
+
+  // for links
+  "link_setter_title",
+  "link_setter_label",
+  "link_setter_placeholder",
+  "link_setter_placeholder_local_only",
+  "link_setter_templated",
+  "link_setter_templated_label",
+  "link_setter_templated_placeholder",
+  "link_setter_templated_unspecified",
+  "link_setter_invalid",
+  "link_setter_submit",
 
   // for search utilites
   "no_results",

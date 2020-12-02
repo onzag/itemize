@@ -29,9 +29,10 @@ export function registerList(registry: ISerializationRegistryType) {
     return list;
   }
 
-  function reactifyList(list: IList, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyList(list: IList, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       list,
       list.listType === "numbered" ? "ol" : "ul",
       null,

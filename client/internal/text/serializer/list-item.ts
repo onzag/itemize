@@ -5,13 +5,15 @@ import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerListItem(registry: ISerializationRegistryType) {
+  const boundDeserializeElement = deserializeElement.bind(null, registry);
+
   function serializeListItem(li: IListItem) {
     return serializeElementBase(registry, li, "li", null, null, li.children);
   }
 
   function deserializeListItem(node: HTMLElement): IListItem {
     const base = deserializeElementBase(node);
-    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
+    const children = Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as any[];
     const li: IListItem = {
       ...base,
       type: "list-item",
@@ -21,9 +23,10 @@ export function registerListItem(registry: ISerializationRegistryType) {
     return li;
   }
 
-  function reactifyListItem(li: IListItem, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyListItem(li: IListItem, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
     return reactifyElementBase(
       registry,
+      active,
       li,
       "li",
       null,
