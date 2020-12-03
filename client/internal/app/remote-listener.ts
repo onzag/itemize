@@ -1192,15 +1192,16 @@ export class RemoteListener {
 
       // now we await for identification to be sucesful
       await this.onIdentificationDone();
+
+      // if we happened to die during the event then we return
+      if (this.offline) {
+        return;
+      }
+
+      // if we survived that then we are ready
+      this.isReady = true;
     }
 
-    // if we happened to die during the event then we return
-    if (this.offline) {
-      return;
-    }
-
-    // if we survived that then we are ready
-    this.isReady = true;
     this.connectionListeners.forEach((l) => l());
   }
 
