@@ -2,16 +2,14 @@ import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/Pro
 import React from "react";
 import { ISlateEditorWrapperBaseProps } from ".";
 import {
-  InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
-  TextField, Button, AppBar, Toolbar, WithStyles, withStyles, createStyles,
-  Alert, AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
+  IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
+  AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, Select, FormControl, MenuItem, FilledInput, LinkIcon,
+  FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon,
 } from "../../mui-core";
-import { Dialog } from "../dialog";
-import { capitalize } from "../../../../util";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
+import { FileLoadErrorDialog, LinkDialog, VideoDialog } from "./dialogs";
 
 const style = createStyles({
   editorContainer: {
@@ -296,41 +294,28 @@ interface MaterialUISlateWrapperStyles extends ISlateEditorWrapperBaseProps, Wit
 
 interface MaterialUISlateWrapperState {
   videoDialogOpen: boolean;
-  videoURL: string;
-  videoInvalid: boolean;
   linkDialogOpen: boolean;
-  linkURL: string;
-  linkTValue: string;
-  linkInvalid: boolean;
   drawerOpen: boolean;
+  originalSelectedElement: RichElement;
 }
 
 class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperStyles, MaterialUISlateWrapperState> {
   private inputImageRef: React.RefObject<HTMLInputElement>;
   private inputFileRef: React.RefObject<HTMLInputElement>;
   private originalSelectionArea: Range;
-  private textFieldVideoRef: React.RefObject<HTMLDivElement>;
-  private textFieldLinkRef: React.RefObject<HTMLDivElement>;
   private refocusTimeout: NodeJS.Timeout;
-  private originalSelectedElement: RichElement;
   constructor(props: MaterialUISlateWrapperStyles) {
     super(props);
 
     this.state = {
       videoDialogOpen: false,
-      videoURL: "",
-      videoInvalid: false,
       linkDialogOpen: false,
-      linkURL: "",
-      linkTValue: "",
-      linkInvalid: false,
       drawerOpen: !this.shouldHaveDrawer() ? false : localStorage.getItem("RICH_TEXT_DRAWER_OPEN") === "true",
+      originalSelectedElement: null,
     }
 
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
-    this.textFieldVideoRef = React.createRef();
-    this.textFieldLinkRef = React.createRef();
 
     this.onImageLoad = this.onImageLoad.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
@@ -341,16 +326,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.closeDialogVideo = this.closeDialogVideo.bind(this);
     this.closeDialogLink = this.closeDialogLink.bind(this);
     this.acceptVideo = this.acceptVideo.bind(this);
-    this.updateVideoURL = this.updateVideoURL.bind(this);
-    this.focusVideoTextField = this.focusVideoTextField.bind(this);
     this.onFileEventedReFocus = this.onFileEventedReFocus.bind(this);
     this.refocus = this.refocus.bind(this);
     this.shouldHaveDrawer = this.shouldHaveDrawer.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
-    this.focusLinkTextField = this.focusLinkTextField.bind(this);
     this.acceptLink = this.acceptLink.bind(this);
-    this.updateLinkURL = this.updateLinkURL.bind(this);
-    this.updateLinkTValue = this.updateLinkTValue.bind(this);
   }
   public shouldHaveDrawer() {
     return !!(
@@ -397,76 +377,28 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   }
   public requestLink() {
     this.originalSelectionArea = this.props.helpers.editor.selection;
-    this.originalSelectedElement = this.props.info.currentElement;
     this.setState({
       linkDialogOpen: true,
+      originalSelectedElement: this.props.info.currentElement,
     });
   }
   public closeDialogVideo() {
     this.refocus();
     this.setState({
       videoDialogOpen: false,
-      videoURL: "",
-      videoInvalid: false,
     });
   }
   public closeDialogLink() {
     this.refocus();
     this.setState({
       linkDialogOpen: false,
-      linkURL: "",
-      linkInvalid: false,
     });
   }
-  public acceptVideo() {
-    const status = this.props.helpers.insertVideo(this.state.videoURL, this.originalSelectionArea);
-    if (!status) {
-      this.setState({
-        videoInvalid: true,
-      });
-    } else {
-      this.setState({
-        videoDialogOpen: false,
-        videoURL: "",
-        videoInvalid: false,
-      });
-    }
+  public acceptVideo(videoURL: string) {
+    return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea);
   }
-  public acceptLink() {
-    const status = this.props.helpers.toggleLink(this.state.linkURL, this.state.linkTValue);
-    if (!status) {
-      this.setState({
-        linkInvalid: true,
-      });
-    } else {
-      this.setState({
-        linkDialogOpen: false,
-        linkURL: "",
-        linkTValue: "",
-        linkInvalid: false,
-      });
-    }
-  }
-  public updateVideoURL(e: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      videoURL: e.target.value,
-    });
-  }
-  public updateLinkURL(e: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      linkURL: e.target.value,
-    });
-  }
-  public updateLinkTValue(e: React.ChangeEvent<HTMLSelectElement>) {
-    this.setState({
-      linkTValue: e.target.value,
-    });
-  }
-  public focusVideoTextField() {
-    this.textFieldVideoRef.current && this.textFieldVideoRef.current.focus();
-  }
-  public focusLinkTextField() {
-    this.textFieldLinkRef.current && this.textFieldLinkRef.current.focus();
+  public acceptLink(linkURL: string, linkTValue: string) {
+    return this.props.helpers.toggleLink(linkURL, linkTValue);
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
@@ -507,156 +439,55 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
-    const fileLoadErrorDialog = this.props.info.isRichText && (this.props.featureSupport.supportsImages || this.props.featureSupport.supportsFiles) ? (
-      <Dialog
-        fullScreen={false}
-        open={!!this.props.currentLoadError}
-        onClose={this.props.dismissCurrentLoadError}
-        title={capitalize(this.props.i18nGenericError)}
-        buttons={
-          <Button onClick={this.props.dismissCurrentLoadError}>
-            {capitalize(this.props.i18nOk)}
-          </Button>
-        }
-      >
-        <Typography>
-          {this.props.currentLoadError}
-        </Typography>
-      </Dialog>
-    ) : null;
+    const fileLoadErrorDialog =
+      this.props.info.isRichText &&
+        (
+          this.props.featureSupport.supportsImages ||
+          this.props.featureSupport.supportsFiles
+        ) ?
+        (
+          <FileLoadErrorDialog
+            currentLoadError={this.props.currentLoadError}
+            dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+            i18nGenericError={this.props.i18nGenericError}
+            i18nOk={this.props.i18nOk}
+          />
+        ) : null;
 
     const videoDialog = this.props.info.isRichText && this.props.featureSupport.supportsVideos ? (
-      <Dialog
-        fullScreen={false}
-        open={this.state.videoDialogOpen}
-        onClose={this.closeDialogVideo}
-        onOpen={this.focusVideoTextField}
-        title={this.props.i18nRichInfo.loadVideo.title}
-        buttons={
-          <Button onClick={this.acceptVideo}>
-            {this.props.i18nRichInfo.loadVideo.submit}
-          </Button>
-        }
-      >
-        <div>
-          <TextField
-            fullWidth={true}
-            value={this.state.videoURL}
-            onChange={this.updateVideoURL}
-            label={this.props.i18nRichInfo.loadVideo.label}
-            placeholder={this.props.i18nRichInfo.loadVideo.placeholder}
-            inputRef={this.textFieldVideoRef}
-          />
-          <div>{this.state.videoInvalid ? this.props.i18nRichInfo.loadVideo.invalid : null}</div>
-        </div>
-      </Dialog>
+      <VideoDialog
+        acceptVideo={this.acceptVideo}
+        closeDialogVideo={this.closeDialogVideo}
+        videoDialogOpen={this.state.videoDialogOpen}
+        i18nLoadVideoInvalid={this.props.i18nRichInfo.loadVideo.invalid}
+        i18nLoadVideoLabel={this.props.i18nRichInfo.loadVideo.label}
+        i18nLoadVideoPlaceholder={this.props.i18nRichInfo.loadVideo.placeholder}
+        i18nLoadVideoSubmit={this.props.i18nRichInfo.loadVideo.submit}
+        i18nLoadVideoTitle={this.props.i18nRichInfo.loadVideo.title}
+      />
     ) : null;
 
-    const linkPropertiesToUse: Array<{
-      value: string;
-      label: string;
-    }> = [];
-    let selectedContextValue: string = "";
-
-    if (this.props.info.isRichText && this.props.featureSupport.supportsLinks && this.state.linkDialogOpen) {
-      this.props.info.currentContext && Object.keys(this.props.info.currentContext.properties).forEach((key) => {
-        const property = this.props.info.currentContext.properties[key];
-        if (property.type !== "link") {
-          return;
-        }
-        linkPropertiesToUse.push({
-          value: key,
-          label: property.label || key,
-        });
-      });
-
-      if (
-        this.originalSelectedElement &&
-        this.originalSelectedElement.type === "link" &&
-        this.originalSelectedElement.thref
-      ) {
-        if (!linkPropertiesToUse.some((p) => p.value === (this.originalSelectedElement as any).thref)) {
-          linkPropertiesToUse.push({
-            value: this.originalSelectedElement.thref,
-            label: this.originalSelectedElement.thref,
-          });
-        }
-
-        selectedContextValue = this.originalSelectedElement.thref;
-      }
-    }
+    
 
     const linkDialog = this.props.info.isRichText && this.props.featureSupport.supportsLinks ? (
-      <Dialog
-        fullScreen={false}
-        open={this.state.linkDialogOpen}
-        onClose={this.closeDialogLink}
-        onOpen={this.focusLinkTextField}
-        title={this.props.i18nRichInfo.setLink.title}
-        buttons={
-          <Button onClick={this.acceptLink}>
-            {this.props.i18nRichInfo.setLink.submit}
-          </Button>
-        }
-      >
-        <div>
-          <TextField
-            fullWidth={true}
-            value={this.state.linkURL}
-            onChange={this.updateVideoURL}
-            label={this.props.i18nRichInfo.setLink.label}
-            placeholder={
-              this.props.featureSupport.supportsExternalLinks ?
-              this.props.i18nRichInfo.setLink.placeholder :
-              this.props.i18nRichInfo.setLink.placeholderLocalOnly
-            }
-            inputRef={this.textFieldLinkRef}
-          />
-          <div>{this.state.linkInvalid ? this.props.i18nRichInfo.setLink.invalid : null}</div>
-          {
-            linkPropertiesToUse.length ?
-              <div>
-                {this.props.i18nRichInfo.setLink.templated}
-                <FormControl
-                  variant="filled"
-                >
-                  <InputLabel
-                    htmlFor="slate-wrapper-template-entry-id"
-                    shrink={true}
-                  >
-                    {this.props.i18nRichInfo.setLink.templatedLabel}
-                  </InputLabel>
-                  <Select
-                    value={selectedContextValue}
-                    onChange={this.updateLinkTValue}
-                    displayEmpty={true}
-                    variant="filled"
-                    input={
-                      <FilledInput
-                        id="slate-wrapper-template-entry-id"
-                        placeholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
-                      />
-                    }
-                  >
-                    <MenuItem value="">
-                      <em>{this.props.i18nRichInfo.setLink.templatedUnspecified}</em>
-                    </MenuItem>
-                    {
-                      // render the valid values that we display and choose
-                      linkPropertiesToUse.map((vv) => {
-                        // the i18n value from the i18n data
-                        return <MenuItem key={vv.value} value={vv.value}>{
-                          vv.label
-                        }</MenuItem>;
-                      })
-                    }
-                  </Select>
-                </FormControl>
-              </div> :
-              null
-          }
-        </div>
-      </Dialog>
+      <LinkDialog
+        acceptLink={this.acceptLink}
+        closeDialogLink={this.closeDialogLink}
+        i18nSetLinkInvalid={this.props.i18nRichInfo.setLink.invalid}
+        i18nSetLinkLabel={this.props.i18nRichInfo.setLink.label}
+        i18nSetLinkPlaceholder={this.props.i18nRichInfo.setLink.placeholder}
+        i18nSetLinkPlaceholderLocalOnly={this.props.i18nRichInfo.setLink.placeholderLocalOnly}
+        i18nSetLinkSubmit={this.props.i18nRichInfo.setLink.submit}
+        i18nSetLinkTemplated={this.props.i18nRichInfo.setLink.templated}
+        i18nSetLinkTemplatedLabel={this.props.i18nRichInfo.setLink.templatedLabel}
+        i18nSetLinkTemplatedPlaceholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
+        i18nSetLinkTemplatedUnspecified={this.props.i18nRichInfo.setLink.templatedUnspecified}
+        i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
+        info={this.props.info}
+        linkDialogOpen={this.state.linkDialogOpen}
+        originalSelectedElement={this.state.originalSelectedElement}
+        supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
+      />
     ) : null;
 
     return (

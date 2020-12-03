@@ -68,6 +68,10 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
    */
   onOpen?: () => void;
   /**
+   * A function that runs when the dialog is opening
+   */
+  onOpening?: () => void;
+  /**
    * The content of the dialog
    */
   children?: React.ReactNode;
@@ -98,6 +102,7 @@ const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
       onClose={props.onClose}
       fullScreen={props.fullScreen}
       onEntered={props.onOpen}
+      onEntering={props.onOpening}
       scroll="paper"
     >
       <AppBar className={props.classes.appbar}>
