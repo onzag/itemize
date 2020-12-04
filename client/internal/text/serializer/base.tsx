@@ -102,7 +102,7 @@ export function serializeElementBase(
   });
 
   if (base.uiHandlerArgs) {
-    Object.keys(base.uiHandlerArgs).forEach((arg) => {
+    Object.keys(base.uiHandlerArgs).forEach((arg) => {
       elementComponent.dataset[arg] = base.uiHandlerArgs[arg];
     });
   }
@@ -123,7 +123,7 @@ export function serializeElementBase(
   return elementComponent;
 }
 
-interface IReactifiedElementWithHoverAndActiveProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
+interface IReactifiedElementWithHoverAndActiveProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
   Tag: string;
   styleHover: React.CSSProperties;
   styleActive: React.CSSProperties;
@@ -211,7 +211,7 @@ class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifie
       standardProps.onMouseUp = this.onActiveEnd.bind(this.props.onMouseUp);
     }
 
-    return <Tag {...standardProps}/>;
+    return <Tag {...standardProps} />;
   }
 }
 
@@ -228,12 +228,18 @@ export function reactifyElementBase(
   const finalProps = {
     ...props,
   };
+  if (!active) {
+    finalProps.className = (finalProps.className || "") + " inactive";
+  } else {
+    finalProps.className = (finalProps.className || "") + " active";
+  }
+
   if (baseClass) {
-    finalProps.className = (finalProps.className || "") + " " + baseClass;
+    finalProps.className = (finalProps.className || "") + " " + baseClass;
   }
   if (base.richClassList) {
     base.richClassList.forEach((c) => {
-      finalProps.className = (finalProps.className || "") + " rich-text--" + c;
+      finalProps.className = (finalProps.className || "") + " rich-text--" + c;
     });
   }
 
@@ -272,12 +278,12 @@ export function reactifyElementBase(
     };
 
     return (
-      <ReactifiedElementWithHoverAndActive {...propsForThis}/>
+      <ReactifiedElementWithHoverAndActive {...propsForThis} />
     )
   }
 
   return (
-    <Tag {...finalProps}/>
+    <Tag {...finalProps} />
   );
 }
 
@@ -320,13 +326,14 @@ export function deserializeElement(registry: ISerializationRegistryType, node: N
   }
   const classList = (node as HTMLElement).classList;
 
+  let result: RichElement | IText = null;
   if (classList) {
     const foundPrefix = Object.keys(registry.DESERIALIZE.byClassNamePrefix).find((prefix) => {
       return classList.forEach((v) => v.startsWith(prefix));
     });
 
     if (foundPrefix) {
-      return registry.DESERIALIZE.byClassNamePrefix[foundPrefix](node);
+      result = registry.DESERIALIZE.byClassNamePrefix[foundPrefix](node) as any;
     }
 
     const foundExactClass = Object.keys(registry.DESERIALIZE.byClassName).find((className) => {
@@ -334,15 +341,31 @@ export function deserializeElement(registry: ISerializationRegistryType, node: N
     });
 
     if (foundExactClass) {
-      return registry.DESERIALIZE.byClassName[foundExactClass](node);
+      result = registry.DESERIALIZE.byClassName[foundExactClass](node) as any;
     }
   }
 
   if (registry.DESERIALIZE.byTag[tagName]) {
-    return registry.DESERIALIZE.byTag[tagName](node);
+    result = registry.DESERIALIZE.byTag[tagName](node) as any;
   }
 
-  return null;
+  if ((result as RichElement).children) {
+    const lastChild: any = (result as RichElement).children[(result as RichElement).children.length - 1];
+    if (lastChild.containment === "inline") {
+      const lastTextNode = lastChild.children[lastChild.children.length - 1];
+      const lastNode = {
+        bold: false,
+        italic: false,
+        underline: false,
+        ...copyElementBase(lastTextNode),
+        templateText: null,
+        text: "",
+      } as IText;
+      (result as RichElement).children.push(lastNode as any);
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -510,6 +533,9 @@ const ELEMENT_BASE_KEYS = [
 ];
 
 export function copyElementBase(src: IElementBase): IElementBase {
+  if (!src) {
+    return {};
+  }
   const newObj: IElementBase = {};
   Object.keys(src).forEach((key) => {
     if (ELEMENT_BASE_KEYS.includes(key)) {

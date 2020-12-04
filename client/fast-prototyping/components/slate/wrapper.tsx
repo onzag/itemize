@@ -162,7 +162,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatTitleLabel}
               color={props.info.currentBlock && props.info.currentBlock.type === "title" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertTitle}
-              onClick={props.helpers.toggleTitle.bind(null, "h1")}
+              onClick={props.helpers.toggleTitle.bind(null, "h1", null)}
               onMouseDown={props.helpers.blockBlur}
               onMouseUp={props.helpers.releaseBlur}
             >
@@ -177,7 +177,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatQuoteLabel}
               color={props.info.currentBlock && props.info.currentBlock.type === "quote" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertQuote}
-              onClick={props.helpers.toggleQuote}
+              onClick={props.helpers.toggleQuote.bind(null, null)}
               onMouseDown={props.helpers.blockBlur}
               onMouseUp={props.helpers.releaseBlur}
             >
@@ -195,7 +195,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
                   props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
-              onClick={props.helpers.toggleList.bind(null, "numbered")}
+              onClick={props.helpers.toggleList.bind(null, "numbered", null)}
               onMouseDown={props.helpers.blockBlur}
               onMouseUp={props.helpers.releaseBlur}
             >
@@ -213,7 +213,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
                   props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
-              onClick={props.helpers.toggleList.bind(null, "bulleted")}
+              onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
               onMouseDown={props.helpers.blockBlur}
               onMouseUp={props.helpers.releaseBlur}
             >
@@ -398,7 +398,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea);
   }
   public acceptLink(linkURL: string, linkTValue: string) {
-    return this.props.helpers.toggleLink(linkURL, linkTValue);
+    return this.props.helpers.toggleLink(linkURL, linkTValue, this.originalSelectionArea);
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });

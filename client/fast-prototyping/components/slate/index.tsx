@@ -1,6 +1,6 @@
 import React from "react";
 import equals from "deep-equal";
-import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text, NodeEntry } from 'slate';
+import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text, NodeEntry, Point } from 'slate';
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
@@ -228,7 +228,7 @@ export interface IHelperFunctions {
   /**
    * Focuses at the desired location
    */
-  focusAt: (at: Partial<Range>) => void;
+  focusAt: (at: Range) => void;
 
   /**
    * Will insert an image based on a given file that has
@@ -236,45 +236,45 @@ export interface IHelperFunctions {
    * @param file the file
    * @param standalone whether to make it a standalone image
    */
-  insertImage: (file: File, standalone: boolean, at?: Partial<Range>) => void;
+  insertImage: (file: File, standalone: boolean, at?: Range) => void;
   /**
    * Will insert a video given the information
    * @param url the url of the video, only youtube and vimeo supported as origin
    * @returns a boolean true if the video was properly inserted, false if the video url was invalid
    */
-  insertVideo: (url: string, at?: Partial<Range>) => boolean;
+  insertVideo: (url: string, at?: Range) => boolean;
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
    */
-  insertFile: (file: File, at?: Partial<Range>) => void;
+  insertFile: (file: File, at?: Range) => void;
   /**
    * Will insert a container at the given location
    * @param type optional, the container type, otherwise will
    * insert a standard container
    */
-  insertContainer: (type?: string, at?: Partial<Range>) => void;
+  insertContainer: (type?: string, at?: Range) => void;
   /**
    * Inserts a custom element
    */
-  insertCustom: (type: string, at?: Partial<Range>) => void;
+  insertCustom: (type: string, at?: Range) => void;
 
   /**
    * Makes a quote out of the current element
    */
-  toggleQuote: () => void;
+  toggleQuote: (at?: Range) => void;
   /**
    * Makes a title out of the current element
    */
-  toggleTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => void;
+  toggleTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", at?: Range) => void;
   /**
    * Makes a list out of the current element
    */
-  toggleList: (type: "bulleted" | "numbered") => void;
+  toggleList: (type: "bulleted" | "numbered", at?: Range) => void;
   /**
    * Makes a link out of the current element
    */
-  toggleLink: (url: string, templateValue: string) => boolean;
+  toggleLink: (url: string, templateValue: string, at?: Range) => boolean;
 
   /**
    * Sets the current style for the element
@@ -605,6 +605,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleRichClass = this.formatToggleRichClass.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
+    this.calculateAnchorsAndContext = this.calculateAnchorsAndContext.bind(this);
 
     this.blockBlur = this.blockBlur.bind(this);
     this.releaseBlur = this.releaseBlur.bind(this);
@@ -631,6 +632,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       for (let i = 0; i < node.children.length; i++) {
         const prev = node.children[i - 1];
         const current = node.children[i];
+        const next = node.children[i + 1];
 
         // if we have a text type inside
         if (Text.isText(current)) {
@@ -639,7 +641,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // and this is where we are now
           const currentTextAnchorPath = this.editor.selection && this.editor.selection.anchor.path;
           // if we have a previous that is also a text that is not our anchor and is mergable
-          if (prev && Text.isText(prev) && this.checkShouldMerge(current, prev)) {
+          if (
+            prev &&
+            Text.isText(prev) &&
+            this.checkShouldMerge(current, prev)
+          ) {
             // we merge it
             Transforms.mergeNodes(this.editor, { at: path.concat(n) });
             n--;
@@ -648,11 +654,44 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             // all non selected empty text nodes will dissapear regardless, or if it's able
             // to merge which means that it's a pointless empty node
             // note that we prevent to delete the node if that will leave us with no text nodes
-          } else if (current.text === "" && !equals(curPath, currentTextAnchorPath) && totalNodes !== 1) {
+          } else if (
+            current.text === "" &&
+            !equals(curPath, currentTextAnchorPath) &&
+            totalNodes !== 1 &&
+            !(Element.isElement(prev) && this.editor.isInline(prev) && !next)
+          ) {
             // we merge it with the previous
             Transforms.delete(this.editor, { at: path.concat(n) });
             n--;
             totalNodes--;
+          }
+        } else if (Element.isElement(current) && this.editor.isInline(current)) {
+          if (
+            prev &&
+            Element.isElement(prev) &&
+            this.editor.isInline(prev) &&
+            this.checkShouldMerge(current, prev)
+          ) {
+            // we merge it
+            Transforms.mergeNodes(this.editor, { at: path.concat(n) });
+            n--;
+            totalNodes--;
+          }
+
+          if (!next) {
+            const lastText = (current as any).children[(current as any).children.length - 1];
+            Transforms.insertNodes(
+              this.editor,
+              {
+                bold: false,
+                italic: false,
+                underline: false,
+                ...copyElementBase(lastText),
+                templateText: null,
+                text: "",
+              },
+              { at: path.concat(n + 1) }
+            );
           }
         }
 
@@ -786,7 +825,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return;
     }
 
-    Transforms.splitNodes(this.editor, { always: true });
+    const end = Range.end(this.editor.selection);
+    const finalBlockPath: Path = [...this.state.blockAnchor];
+    let lastChild: Node;
+    do {
+      const lastPoint = this.state.currentBlock.children.length - 1;
+      lastChild = this.state.currentBlock.children[lastPoint] as any as Node;
+      finalBlockPath.push(lastPoint);
+    } while (Element.isElement(lastChild));
+    const finalBlockOffset = lastChild.text.length;
+
+    if (
+      end.offset === finalBlockOffset &&
+      Path.equals(finalBlockPath, end.path)
+    ) {
+      Transforms.insertNodes(this.editor, {
+        ...this.state.currentBlock,
+        children: [
+          {
+            ...this.state.currentText,
+            text: "",
+            templateText: null,
+          }
+        ]
+      });
+    } else {
+      Transforms.splitNodes(this.editor, {always: true})
+    }
   }
   public deleteBackward(unit: "character" | "word" | "line" | "block") {
     const { selection } = this.editor
@@ -813,11 +878,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.delete(this.editor, { unit, reverse: true })
     }
   }
-  public onFocus(anchor: Path, value: Node[]) {
+  public calculateAnchorsAndContext(anchor: Path, value?: Node[]) {
     let currentContext = this.props.rootContext || null;
-    let currentElement: RichElement = {
+    let currentElement: RichElement = value ? {
       children: value,
-    } as any;
+    } as any : this.state.internalValue;
 
     let elementAnchor: Path = [...anchor];
     elementAnchor.pop();
@@ -866,7 +931,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       });
     }
 
-    this.setState({
+    return {
       anchor,
       elementAnchor,
       blockAnchor,
@@ -876,7 +941,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSuperBlock,
       superBlockAnchor,
       currentText,
-    });
+    }
+  }
+  public onFocus(anchor: Path, value: Node[]) {
+    this.setState(this.calculateAnchorsAndContext(anchor, value));
     if (!this.state.focused) {
       this.props.onFocus && this.props.onFocus();
       this.setState({
@@ -1007,13 +1075,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.blurBlocked = false;
   }
 
-  public focusAt(at: Partial<Range>) {
-    setTimeout(() => {
-      ReactEditor.focus(this.editor);
+  public async focusAt(at: Range) {
+    return new Promise((r) => {
       setTimeout(() => {
-        Transforms.setSelection(this.editor, at);
+        ReactEditor.focus(this.editor);
+        setTimeout(() => {
+          Transforms.setSelection(this.editor, at);
+          setTimeout(r, 0);
+        }, 0);
       }, 0);
-    }, 0);
+    });
   }
 
   /**
@@ -1023,9 +1094,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param standalone whether to make it a standalone image
    * @param at a range to insert it at
    */
-  public async insertImage(file: File, standalone: boolean, at?: Partial<Range>): Promise<void> {
+  public async insertImage(file: File, standalone: boolean, at?: Range): Promise<void> {
     try {
       const data = await this.props.onInsertFile(file, true);
+
+      if (at) {
+        await this.focusAt(at);
+      }
 
       if (!data) {
         // soething went wrong there should be an error in the state
@@ -1054,19 +1129,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         standalone,
       };
 
-      if (at) {
-        setTimeout(() => {
-          ReactEditor.focus(this.editor);
-          setTimeout(() => {
-            Transforms.setSelection(this.editor, at);
-            setTimeout(() => {
-              this.editor.insertNode(imageNode as any);
-            });
-          }, 0);
-        }, 0);
-      } else {
-        this.editor.insertNode(imageNode as any);
-      }
+      this.editor.insertNode(imageNode as any);
     } catch (err) {
     }
   }
@@ -1075,7 +1138,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param url the url of the video
    * @param at a partial range to insert at
    */
-  public insertVideo(url: string, at?: Partial<Range>) {
+  public insertVideo(url: string, at?: Range): boolean {
     const parsedURL = new URL(url);
     let src: string;
     let origin: string;
@@ -1124,38 +1187,30 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       status = true
     }
 
-    if (status) {
-      const videoNode: IVideo = {
-        type: "video",
-        containment: "void-block",
-        children: [
-          {
-            bold: false,
-            italic: false,
-            templateText: null,
-            text: "",
-            underline: false,
-          }
-        ],
-        origin: origin as any,
-        src,
-      }
-
+    (async () => {
       if (at) {
-        (this.editor.insertNode as any)(videoNode as any, {at});
-        setTimeout(() => {
-          ReactEditor.focus(this.editor);
-          setTimeout(() => {
-            Transforms.setSelection(this.editor, at);
-            setTimeout(() => {
-              this.editor.insertNode(videoNode as any);
-            });
-          }, 0);
-        }, 0);
-      } else {
+        await this.focusAt(at);
+      }
+      if (status) {
+        const videoNode: IVideo = {
+          type: "video",
+          containment: "void-block",
+          children: [
+            {
+              bold: false,
+              italic: false,
+              templateText: null,
+              text: "",
+              underline: false,
+            }
+          ],
+          origin: origin as any,
+          src,
+        }
+  
         this.editor.insertNode(videoNode as any);
       }
-    }
+    })();
 
     return status;
   };
@@ -1164,9 +1219,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param file the file to insert
    * @param at a partial range to insert at
    */
-  public async insertFile(file: File, at?: Partial<Range>) {
+  public async insertFile(file: File, at?: Range) {
     try {
       const data = await this.props.onInsertFile(file, false);
+
+      if (at) {
+        await this.focusAt(at);
+      }
 
       if (!data) {
         // soething went wrong there should be an error in the state
@@ -1192,19 +1251,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         srcId: data.result.id,
       };
 
-      if (at) {
-        setTimeout(() => {
-          ReactEditor.focus(this.editor);
-          setTimeout(() => {
-            Transforms.setSelection(this.editor, at);
-            setTimeout(() => {
-              this.editor.insertNode(fileNode as any);
-            });
-          }, 0);
-        }, 0);
-      } else {
-        this.editor.insertNode(fileNode as any);
-      }
+      this.editor.insertNode(fileNode as any);
     } catch (err) {
     }
   };
@@ -1213,42 +1260,47 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type optional, the container type, otherwise will
    * insert a standard container
    */
-  public insertContainer(type?: string, at?: Partial<Range>) {
+  public insertContainer(type?: string, at?: Range) {
 
   };
   /**
    * Inserts a custom element
    */
-  public insertCustom(type: string, at?: Partial<Range>) {
+  public insertCustom(type: string, at?: Range) {
 
   };
 
   /**
    * Makes a quote out of the current element
    */
-  public toggleQuote() {
-    const isCollapsed = Range.isCollapsed(this.editor.selection);
-    if (this.state.currentBlock.type === "quote") {
+  public async toggleQuote(at?: Range) {
+    if (at) {
+      await this.focusAt(at);
+    }
+
+    const isCollapsed = Range.isCollapsed(at || this.editor.selection);
+    const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
+    if (anchorData.currentBlock.type === "quote") {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentBlock),
+          ...copyElementBase(anchorData.currentBlock),
           type: "paragraph",
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
+        { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },
       );
     } else {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentBlock),
+          ...copyElementBase(anchorData.currentBlock),
           type: "quote",
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
+        { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1256,30 +1308,36 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Makes a title out of the current element
    */
-  public toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
-    const isCollapsed = Range.isCollapsed(this.editor.selection);
-    if (this.state.currentBlock.type === "title" && this.state.currentBlock.subtype === type) {
+  public async toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", at?: Range) {
+    if (at) {
+      await this.focusAt(at);
+    }
+
+    const isCollapsed = Range.isCollapsed(at || this.editor.selection);
+    const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
+
+    if (anchorData.currentBlock.type === "title" && anchorData.currentBlock.subtype === type) {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentBlock),
+          ...copyElementBase(anchorData.currentBlock),
           type: "paragraph",
           containment: "block",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
+        { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },
       );
     } else {
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentBlock),
+          ...copyElementBase(anchorData.currentBlock),
           type: "title",
           containment: "block",
           subtype: type,
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
+        { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1287,20 +1345,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Makes a list out of the current element
    */
-  public toggleList(type: "bulleted" | "numbered") {
-    const isCollapsed = Range.isCollapsed(this.editor.selection);
-    if (this.state.currentSuperBlock && this.state.currentSuperBlock.type === "list") {
-      if (this.state.currentSuperBlock.listType !== type) {
+  public async toggleList(type: "bulleted" | "numbered", at?: Range) {
+    if (at) {
+      await this.focusAt(at);
+    }
+
+    const isCollapsed = Range.isCollapsed(at || this.editor.selection);
+    const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
+
+    if (anchorData.currentSuperBlock && anchorData.currentSuperBlock.type === "list") {
+      if (anchorData.currentSuperBlock.listType !== type) {
         Transforms.wrapNodes(
           this.editor,
           {
-            ...copyElementBase(this.state.currentSuperBlock),
+            ...copyElementBase(anchorData.currentSuperBlock),
             type: "list",
             listType: type,
             containment: "list-item",
             children: [],
           },
-          { split: false, at: this.state.superBlockAnchor },
+          { split: false, at: anchorData.superBlockAnchor },
         );
       } else {
         this.breakList();
@@ -1309,13 +1373,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.wrapNodes(
         this.editor,
         {
-          ...copyElementBase(this.state.currentBlock),
+          ...copyElementBase(anchorData.currentBlock),
           type: "list",
           listType: type,
           containment: "list-item",
           children: [],
         },
-        { split: !isCollapsed, at: isCollapsed ? this.state.blockAnchor : undefined },
+        { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },
       );
     }
     ReactEditor.focus(this.editor);
@@ -1323,7 +1387,106 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Makes a link out of the current element
    */
-  public toggleLink(url: string) {
+  public toggleLink(url: string, tvalue: string, at?: Range): boolean {
+    if (!this.props.features.supportsLinks) {
+      return false;
+    }
+
+    let urlToUse: string = url;
+    if (!tvalue && url) {
+      try {
+        const urlParsed = new URL(url);
+        const isLocal = urlParsed.hostname === location.hostname;
+        const onlyLocal = !this.props.features.supportsExternalLinks;
+        if (onlyLocal && !isLocal) {
+          return false;
+        } else if (isLocal) {
+          urlToUse = urlParsed.pathname + urlParsed.search + urlParsed.hash;
+        }
+      } catch {
+        return false;
+      }
+    }
+
+    const noLink = !tvalue && !url;
+
+    const isCollapsed = Range.isCollapsed(at || this.editor.selection);
+    const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
+    
+    (async () => {
+      if (at) {
+        await this.focusAt(at);
+      }
+      if (isCollapsed) {
+        if (
+          anchorData.currentElement &&
+          anchorData.currentElement.type === "link"
+        ) {
+          if (urlToUse || tvalue) {
+            Transforms.setNodes(
+              this.editor,
+              {
+                href: !tvalue ? urlToUse : null,
+                thref: tvalue ? tvalue : null,
+              },
+              { at: anchorData.elementAnchor }
+            );
+          } else {
+            Transforms.unwrapNodes(
+              this.editor,
+              { at: anchorData.elementAnchor }
+            );
+          }
+        } else if (!noLink) {
+          Transforms.wrapNodes(
+            this.editor,
+            {
+              type: "link",
+              containment: "inline",
+              href: !tvalue ? urlToUse : null,
+              thref: tvalue ? tvalue : null,
+              children: [],
+            },
+            { split: false, at: anchorData.blockAnchor, match: (n: any) => n.containment === "inline" || Text.isText(n) },
+          );
+        }
+      } else {
+        if (
+          anchorData.currentElement &&
+          anchorData.currentElement.type === "link"
+        ) {
+          if (urlToUse || tvalue) {
+            Transforms.setNodes(
+              this.editor,
+              {
+                href: !tvalue ? urlToUse : null,
+                thref: tvalue ? tvalue : null,
+              },
+              { split: true, match: (n: any) => n.type === "link" }
+            );
+          } else {
+            Transforms.unwrapNodes(
+              this.editor,
+              { split: true, match: (n: any) => n.type === "link" },
+            );
+          }
+        } else {
+          Transforms.wrapNodes(
+            this.editor,
+            {
+              type: "link",
+              containment: "inline",
+              href: !tvalue ? urlToUse : null,
+              thref: tvalue ? tvalue : null,
+              children: [],
+            },
+            { split: true, match: (n: any) => n.containment === "inline" || Text.isText(n) },
+          );
+        }
+      }
+      ReactEditor.focus(this.editor);
+    })();
+
     return true;
   };
 

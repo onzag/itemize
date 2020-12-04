@@ -18,6 +18,14 @@ $superblock-highlight-color: #33691e;
     cursor: pointer;
   }
 
+  a.inactive {
+    cursor: auto;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   .template {
     border: solid 1px $template-item-color;
     border-style: dashed;

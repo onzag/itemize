@@ -211,6 +211,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
     }
 
     this.setState({
+      linkURL: (this.props.originalSelectedElement as any).href || "",
       linkTValue: selectedContextValue,
       linkTemplateOptions: linkPropertiesToUse,
     });
