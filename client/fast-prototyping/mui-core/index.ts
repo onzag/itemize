@@ -37,6 +37,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import LinkIcon from '@material-ui/icons/Link';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import {
   createStyles,
   withStyles,
@@ -257,4 +258,5 @@ export {
   MoreHorizIcon,
   ExpandLessIcon,
   LinkIcon,
+  Breadcrumbs,
 }

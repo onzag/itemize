@@ -83,10 +83,11 @@ const ALL_PROMISE = new Promise(async (resolve) => {
     return;
   }
   if (typeof document !== "undefined") {
+    const stylesheetHrefPrefix = location.protocol + "//" + location.host + "/rest/resource/build";
     // now we got to see if by the time this promise is running
     // it is already done loading
     const foundPreloadedStylesheet =
-      document.styleSheets && Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith("/rest/resource/build"));
+      document.styleSheets && Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith(stylesheetHrefPrefix));
 
     // if we find it and use it to calculate it
     if (foundPreloadedStylesheet) {
@@ -97,7 +98,7 @@ const ALL_PROMISE = new Promise(async (resolve) => {
       // otherwise we need to wait for the link to load
     } else {
       const allLinks = document.head.querySelectorAll("link");
-      const foundStylesheetNode = Array.from(allLinks).find((s) => s.href.startsWith("/rest/resource/build"));
+      const foundStylesheetNode = Array.from(allLinks).find((s) => s.href.startsWith(stylesheetHrefPrefix));
 
       // if we don't find a base css build, then we mark it as done
       if (!foundStylesheetNode) {
@@ -109,7 +110,7 @@ const ALL_PROMISE = new Promise(async (resolve) => {
           // and once we are loaded we want to grab the css stylesheet
           const foundLoadedStyleSheet =
             document.styleSheets &&
-            Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith("/rest/resource/build"));
+            Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith(stylesheetHrefPrefix));
           // mark it as loaded
           ALL_IS_LOADED = true;
 
@@ -225,6 +226,15 @@ export interface IHelperFunctions {
   Transforms: typeof Transforms;
   Range: typeof Range;
 
+  /**
+   * performs a pseudo selection at a given path
+   */
+  selectPath: (path: Path) => void;
+
+  /**
+   * focuses the element
+   */
+  focus: () => void;
   /**
    * Focuses at the desired location
    */
@@ -352,11 +362,42 @@ export interface ISlateEditorInfoType {
    * The current text being worked with
    */
   currentText: IText;
+  /**
+   * The current pseudo element being worked with
+   * normally equal to the current text unless selected
+   * against
+   */
+  currentSelectedNode: RichElement | IText;
+
   // Templating specific
   /**
    * The current templating context
    */
   currentContext: ITemplateArgsContext;
+  /**
+   * The current value
+   */
+  currentValue: Node[];
+  /**
+   * The current path followed, text path for the current text
+   */
+  textAnchor: Path;
+  /**
+   * The current path followed, for element
+   */
+  elementAnchor: Path;
+  /**
+   * The current path followed for block
+   */
+  blockAnchor: Path;
+  /**
+   * The current path followed for super block
+   */
+  superBlockAnchor: Path;
+  /**
+   * Selected anchor
+   */
+  selectedAnchor: Path;
 }
 
 export interface ISlateEditorWrapperBaseProps {
@@ -483,6 +524,10 @@ interface ISlateEditorState {
    */
   superBlockAnchor: Path;
   /**
+   * The selected anchor path
+   */
+  selectedAnchor: Path;
+  /**
    * Related to the anchor, specifies the current context
    * that is being worked with, can be null, if context is null
    * or found context doesn't exist
@@ -504,6 +549,10 @@ interface ISlateEditorState {
    * current super block element
    */
   currentSuperBlock: RichElement;
+  /**
+   * The selected node
+   */
+  currentSelectedNode: RichElement | IText;
   /**
    * available containers
    */
@@ -552,11 +601,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       elementAnchor: null,
       blockAnchor: null,
       superBlockAnchor: null,
+      selectedAnchor: null,
       currentContext: this.props.rootContext || null,
       currentElement: null,
       currentBlock: null,
       currentSuperBlock: null,
       currentText: null,
+      currentSelectedNode: null,
 
       // ensure SSR compatibility
       allContainers: [],
@@ -585,6 +636,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.onBlur = this.onBlur.bind(this);
     this.onNativeBlur = this.onNativeBlur.bind(this);
 
+    this.selectPath = this.selectPath.bind(this);
+    this.focus = this.focus.bind(this);
     this.insertImage = this.insertImage.bind(this);
     this.insertVideo = this.insertVideo.bind(this);
     this.insertFile = this.insertFile.bind(this);
@@ -931,16 +984,25 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       });
     }
 
+    let selectedAnchor = elementAnchor;
+    let currentSelectedNode: RichElement | IText = currentElement;
+    if (currentText.templateText) {
+      selectedAnchor = anchor;
+      currentSelectedNode = currentText;
+    }
+
     return {
       anchor,
       elementAnchor,
       blockAnchor,
+      selectedAnchor,
       currentContext,
       currentElement,
       currentBlock,
       currentSuperBlock,
       superBlockAnchor,
       currentText,
+      currentSelectedNode,
     }
   }
   public onFocus(anchor: Path, value: Node[]) {
@@ -966,6 +1028,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSuperBlock: null,
         superBlockAnchor: null,
         currentText: null,
+        currentSelectedNode: null,
+        selectedAnchor: null,
       });
     }
   }
@@ -1073,6 +1137,22 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public releaseBlur() {
     this.blurBlocked = false;
+  }
+
+  public selectPath(selectPath: Path) {
+    let finalNode: any = this.state.internalValue;
+    selectPath.forEach((v) => {
+      finalNode = finalNode.children[v];
+    });
+    this.setState({
+      selectedAnchor: selectPath,
+      currentSelectedNode: finalNode,
+    });
+    ReactEditor.focus(this.editor);
+  }
+
+  public focus() {
+    ReactEditor.focus(this.editor);
   }
 
   public async focusAt(at: Range) {
@@ -1642,7 +1722,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSuperBlock: this.state.currentSuperBlock,
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
+        currentSelectedNode: this.state.currentSelectedNode,
         isRichText: this.props.isRichText,
+        currentValue: this.state.internalValue.children as any,
+        textAnchor: this.state.anchor,
+        blockAnchor: this.state.blockAnchor,
+        elementAnchor: this.state.elementAnchor,
+        superBlockAnchor: this.state.superBlockAnchor,
+        selectedAnchor: this.state.selectedAnchor,
       }
 
       const helpers: IHelperFunctions = {
@@ -1651,6 +1738,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         Range,
         ReactEditor,
 
+        selectPath: this.selectPath,
+        focus: this.focus,
         focusAt: this.focusAt,
 
         formatToggleBold: this.formatToggleBold,

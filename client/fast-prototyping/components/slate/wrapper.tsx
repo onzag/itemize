@@ -10,12 +10,26 @@ import {
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
 import { FileLoadErrorDialog, LinkDialog, VideoDialog } from "./dialogs";
+import { WrapperDrawer } from "./drawer";
 
 const style = createStyles({
   editorContainer: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
+  },
+  wrapperButton: {
+    fontSize: "0.5rem",
+    padding: "0.1rem 0.5rem 0.2rem 0.5rem",
+  },
+  separator: {
+    margin: "1rem 0",
+  },
+  elementTitle: {
+    textTransform: "capitalize",
+    fontWeight: 700,
+    color: "#444",
+    fontSize: "1rem",
   },
   editorDrawer: {
     width: 0,
@@ -25,6 +39,21 @@ const style = createStyles({
       width: "300px",
       height: "500px",
     },
+    overflow: "hidden",
+    position: "relative",
+    flex: "none",
+  },
+  editorDrawerBody: {
+    width: "300px",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    borderLeft: "1px solid rgba(0, 0, 0, 0.12)",
+    borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+    backgroundColor: "#f5f5f5",
+    padding: "1rem",
   },
   editor: (props: ISlateEditorWrapperBaseProps) => {
     const shouldShowInvalidEditor = !props.info.currentValid;
@@ -80,7 +109,7 @@ const style = createStyles({
   },
 });
 
-interface RichTextEditorToolbarProps extends MaterialUISlateWrapperStyles {
+interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   requestImage: () => void;
   requestFile: () => void;
   requestVideo: () => void;
@@ -286,25 +315,25 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
   );
 }
 
-interface MaterialUISlateWrapperStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
+export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
   i18nGenericError: string;
   i18nOk: string;
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
 };
 
-interface MaterialUISlateWrapperState {
+export interface MaterialUISlateWrapperState {
   videoDialogOpen: boolean;
   linkDialogOpen: boolean;
   drawerOpen: boolean;
   originalSelectedElement: RichElement;
 }
 
-class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperStyles, MaterialUISlateWrapperState> {
+class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState> {
   private inputImageRef: React.RefObject<HTMLInputElement>;
   private inputFileRef: React.RefObject<HTMLInputElement>;
   private originalSelectionArea: Range;
   private refocusTimeout: NodeJS.Timeout;
-  constructor(props: MaterialUISlateWrapperStyles) {
+  constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
     this.state = {
@@ -467,7 +496,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
-    
+
 
     const linkDialog = this.props.info.isRichText && this.props.featureSupport.supportsLinks ? (
       <LinkDialog
@@ -502,11 +531,15 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           toggleDrawer={this.toggleDrawer}
           requestLink={this.requestLink}
         />
-        <div className={"rich-text " + this.props.classes.editorContainer}>
-          <div className={this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
+        <div className={this.props.classes.editorContainer}>
+          <div className={"rich-text " + this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
-          <div className={this.props.classes.editorDrawer + (this.state.drawerOpen ? " open" : "")} />
+          <div className={this.props.classes.editorDrawer + (this.state.drawerOpen ? " open" : "")}>
+            <div className={this.props.classes.editorDrawerBody}>
+              {this.state.drawerOpen ? <WrapperDrawer {...this.props}/> : null}
+            </div>
+          </div>
         </div>
         {fileLoadErrorDialog}
         {videoDialog}
