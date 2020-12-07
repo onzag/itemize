@@ -5,7 +5,7 @@ import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon,
+  FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
 } from "../../mui-core";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -13,6 +13,22 @@ import { FileLoadErrorDialog, LinkDialog, VideoDialog } from "./dialogs";
 import { WrapperDrawer } from "./drawer";
 
 const style = createStyles({
+  selectionInput: {
+    width: "100%",
+  },
+  box: {
+    padding: "0.5rem",
+  },
+  chips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: 2,
+  },
+  input: {
+    width: "100%",
+  },
   editorContainer: {
     width: "100%",
     display: "flex",
@@ -24,6 +40,9 @@ const style = createStyles({
   },
   separator: {
     margin: "1rem 0",
+  },
+  tab: {
+    minWidth: "auto",
   },
   elementTitle: {
     textTransform: "capitalize",
@@ -117,6 +136,7 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   shouldHaveDrawer: () => boolean;
   drawerOpen: boolean;
   toggleDrawer: () => void;
+  insertContainer: () => void;
 }
 
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
@@ -220,7 +240,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               tabIndex={-1}
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
-                props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
+                props.info.currentSuperBlock && props.info.currentSuperBlock.type === "list" &&
                   props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
@@ -238,7 +258,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               tabIndex={-1}
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
-                props.info.currentBlock && props.info.currentSuperBlock.type === "list" &&
+                props.info.currentSuperBlock && props.info.currentSuperBlock.type === "list" &&
                   props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
@@ -294,6 +314,25 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               onMouseUp={props.helpers.releaseBlur}
             >
               <AttachFileIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsContainers ?
+            <Divider orientation="vertical" className={props.classes.divider} /> :
+            null
+        }
+        {
+          props.featureSupport.supportsContainers ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatAddVideoLabel}
+              disabled={!props.featureSupport.canInsertContainer}
+              onMouseDown={props.helpers.blockBlur}
+              onClick={props.insertContainer}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <CheckBoxOutlineBlankIcon />
             </IconButton> :
             null
         }
@@ -360,6 +399,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.shouldHaveDrawer = this.shouldHaveDrawer.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.acceptLink = this.acceptLink.bind(this);
+    this.insertContainer = this.insertContainer.bind(this);
   }
   public shouldHaveDrawer() {
     return !!(
@@ -422,6 +462,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.setState({
       linkDialogOpen: false,
     });
+  }
+  public insertContainer() {
+    this.props.helpers.insertContainer();
   }
   public acceptVideo(videoURL: string) {
     return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea);
@@ -530,6 +573,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           drawerOpen={this.state.drawerOpen}
           toggleDrawer={this.toggleDrawer}
           requestLink={this.requestLink}
+          insertContainer={this.insertContainer}
         />
         <div className={this.props.classes.editorContainer}>
           <div className={"rich-text " + this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>

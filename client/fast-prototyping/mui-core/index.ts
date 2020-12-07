@@ -38,6 +38,14 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import LinkIcon from '@material-ui/icons/Link';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import BorderStyleIcon from '@material-ui/icons/BorderStyle';
+import TouchAppIcon from '@material-ui/icons/TouchApp';
+import PictureInPictureIcon from '@material-ui/icons/PictureInPicture';
+import WebIcon from '@material-ui/icons/Web';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import DeleteIcon from '@material-ui/icons/Delete';
+import SettingsIcon from '@material-ui/icons/Settings';
 import {
   createStyles,
   withStyles,
@@ -75,6 +83,7 @@ import Select from "@material-ui/core/Select";
 import FilledInput from "@material-ui/core/FilledInput";
 import Tooltip from "@material-ui/core/Tooltip";
 import Grid from "@material-ui/core/Grid";
+import NativeSelect from '@material-ui/core/NativeSelect';
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -259,4 +268,13 @@ export {
   ExpandLessIcon,
   LinkIcon,
   Breadcrumbs,
+  BorderStyleIcon,
+  TouchAppIcon,
+  PictureInPictureIcon,
+  WebIcon,
+  AddCircleIcon,
+  CheckBoxOutlineBlankIcon,
+  NativeSelect,
+  DeleteIcon,
+  SettingsIcon,
 }

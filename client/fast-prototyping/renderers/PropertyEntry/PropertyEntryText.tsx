@@ -171,106 +171,9 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
   public componentDidMount() {
     this.focusIfNecessary();
   }
-  // public updateCurrentVideoLink(e: React.ChangeEvent<HTMLInputElement>) {
-  //   let isValid = false;
-  //   try {
-  //     const url = new URL(e.target.value);
-  //     isValid = url.hostname === "youtube.com" || url.hostname === "www.youtube.com" ||
-  //       url.hostname === "player.vimeo.com" || url.hostname === "youtu.be";
-  //   } catch {
-  //   }
-  //   this.setState({
-  //     currentVideoLink: e.target.value,
-  //     invalidVideoLink: !isValid,
-  //   });
-  // }
-  // public submitVideoLink() {
-    // const quill = this.quillRef.current.getEditor();
-    // const range = quill.getSelection(true);
-
-    // const url = new URL(this.state.currentVideoLink);
-    // let src: string;
-    // let origin: string;
-
-    // if (
-    //   url.hostname === "youtube.com" ||
-    //   url.hostname === "www.youtube.com" ||
-    //   url.hostname === "youtu.be"
-    // ) {
-    //   origin = "youtube";
-    //   const isClassicYTUrl = (
-    //     url.hostname === "youtube.com" ||
-    //     url.hostname === "www.youtube.com"
-    //   );
-    //   if (
-    //     isClassicYTUrl &&
-    //     url.pathname.startsWith("/embed/")
-    //   ) {
-    //     src = url.pathname.split("/")[2];
-    //   } else if (
-    //     isClassicYTUrl &&
-    //     url.pathname.startsWith("/watch")
-    //   ) {
-    //     let search = url.search;
-    //     if (search[0] === "?") {
-    //       search = search.substr(1);
-    //     }
-    //     search.split("&").forEach((v) => {
-    //       if (v.startsWith("v=")) {
-    //         src = v.substr(2);
-    //       }
-    //     });
-    //   } else if (
-    //     url.hostname === "youtu.be"
-    //   ) {
-    //     src = url.pathname.split("/")[1];
-    //   }
-    // } else if (
-    //   url.host === "player.vimeo.com"
-    // ) {
-    //   origin = "vimeo";
-    //   src = url.pathname.split("/")[2];
-    // } else {
-    //   return;
-    // }
-
-    // quill.insertEmbed(range.index, "itemizevideo", {
-    //   src,
-    //   origin,
-    // }, (ReactQuill.Quill as any).sources.USER);
-    // quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
-  // }
-  // public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
-    // const file = e.target.files[0];
-    // e.target.value = "";
-
-    // const fileData = await this.props.onInsertFile(file);
-
-    // const prettySize = prettyBytes(fileData.result.size);
-    // const expectedExtension = mimeTypeToExtension(fileData.result.type);
-
-    // const quill = this.quillRef.current.getEditor();
-    // const range = quill.getSelection(true);
-
-    // try {
-    //   quill.insertEmbed(range.index, "itemizefile", {
-    //     srcId: fileData.result.id,
-    //     src: fileData.result.url,
-    //     name: fileData.result.name,
-    //     extension: expectedExtension,
-    //     size: prettySize,
-    //   }, (ReactQuill.Quill as any).sources.USER);
-    //   quill.setSelection(range.index + 2, 0, (ReactQuill.Quill as any).sources.SILENT);
-    // } catch (err) {}
-  // }
   public focusIfNecessary() {
     if (this.props.autoFocus) {
-      // if (this.quillRef.current) {
-      //   this.quillRef.current.focus();
-      // } else
-      // if (this.textAreaRef.current) {
-      //   this.textAreaRef.current.focus();
-      // }
+      // TODO
     }
   }
   public onFocus() {
@@ -309,73 +212,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
-
-    // const imageInput = this.props.isRichText && this.props.features.supportsImages ? (
-    //   <input
-    //     ref={this.inputImageRef}
-    //     type="file"
-    //     accept={this.props.mediaPropertyAcceptsImages}
-    //     tabIndex={-1}
-    //     style={{ display: "none" }}
-    //     autoComplete="off"
-    //     onChange={this.onImageLoad}
-    //   />
-    // ) : null;
-
-    // const fileInput = this.props.isRichText && this.props.features.supportsFiles ? (
-    //   <input
-    //     ref={this.fileInputRef}
-    //     type="file"
-    //     accept={this.props.mediaPropertyAcceptsFiles}
-    //     tabIndex={-1}
-    //     style={{ display: "none" }}
-    //     autoComplete="off"
-    //     onChange={this.onFileLoad}
-    //   />
-    // ) : null;
-
-    // const uploadVideoDialog = this.props.isRichText && this.props.features.supportsVideos ? (
-    //   <Dialog
-    //     fullScreen={false}
-    //     open={this.state.requestingVideoLink}
-    //     onClose={this.closeVideoRequesting}
-    //     title={this.props.i18nLoadVideo.title}
-    //     buttons={
-    //       <Button onClick={this.submitVideoLink}>
-    //         {this.props.i18nLoadVideo.submit}
-    //       </Button>
-    //     }
-    //   >
-    //     <div>
-    //       <TextField
-    //         fullWidth={true}
-    //         value={this.state.currentVideoLink}
-    //         onChange={this.updateCurrentVideoLink}
-    //         label={this.props.i18nLoadVideo.label}
-    //         placeholder={this.props.i18nLoadVideo.placeholder}
-    //       />
-    //       <div>{this.state.invalidVideoLink ? this.props.i18nLoadVideo.invalid : null}</div>
-    //     </div>
-    //   </Dialog>
-    // ) : null;
-
-    // const fileLoadErrorDialog = this.props.isRichText && (this.props.features.supportsImages || this.props.features.supportsFiles) ? (
-    //   <Dialog
-    //     fullScreen={false}
-    //     open={!!this.props.lastLoadedFileError}
-    //     onClose={this.props.dismissLastLoadedFileError}
-    //     title={capitalize(this.props.i18nGenericError)}
-    //     buttons={
-    //       <Button onClick={this.props.dismissLastLoadedFileError}>
-    //         {capitalize(this.props.i18nOk)}
-    //       </Button>
-    //     }
-    //   >
-    //     <Typography>
-    //       {this.props.lastLoadedFileError}
-    //     </Typography>
-    //   </Dialog>
-    // ) : null;
 
     const editor =
       <SlateEditor
@@ -429,17 +265,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             {capitalize(this.props.label)}{iconComponent}
           </InputLabel>
           {editor}
-          {/* {
-            (
-              <>
-                <div
-                  className={this.props.classes.editor + (this.state.focused ? " focused" : "")}
-                >
-                  {editor}
-                </div>
-              </>
-            )
-          } */}
         </div>
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}

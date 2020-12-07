@@ -28,13 +28,24 @@ export function convertStyleStringToReactObject(str: string) {
       return;
     }
     const [property, value] = el.split(":");
-    if (!property) {
+    if (!property || !value) {
       return;
     }
 
     const formattedProperty = convertStylePropertyToCamelCase(property.trim());
-    style[formattedProperty] = value.trim();
+    const formattedValue = value.trim();
+
+    if (formattedProperty === "position" && formattedValue === "fixed") {
+      // the sanitizer prevents the usage of position fixed
+      // as such this will be prevented
+      return;
+    }
+    style[formattedProperty] = formattedValue;
   });
+
+  if (Object.keys(style).length === 0) {
+    return null;
+  }
 
   return style;
 };
