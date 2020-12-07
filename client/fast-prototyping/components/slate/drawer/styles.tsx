@@ -23,7 +23,7 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps> {
     this.onStyleChange = this.onStyleChange.bind(this);
   }
   onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    this.props.onChange(e.target.value.trim() || null, this.props.anchor);
+    this.props.onChange(e.target.value.trim() || null, this.props.anchor);
   }
   render() {
     return (
@@ -31,7 +31,7 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps> {
         <p className={this.props.boxClassName}>{this.props.name}</p>
         <input
           type="text"
-          value={this.props.styleValue || ""}
+          value={this.props.styleValue || ""}
           className={this.props.inputClassName}
           onChange={this.onStyleChange}
         />
@@ -45,7 +45,7 @@ function ClassesOptionSelector(props: MaterialUISlateWrapperWithStyles) {
   return (
     <div className={props.classes.box}>
       <FormControl className={props.classes.selectionInput}>
-  <InputLabel id="slate-styles-option-selector-rich-classes-label">{props.i18nRichInfo.classes}</InputLabel>
+        <InputLabel id="slate-styles-option-selector-rich-classes-label">{props.i18nRichInfo.classes}</InputLabel>
         <Select
           labelId="slate-styles-option-selector-rich-classes-label"
           id="slate-styles-option-selector-rich-classes"

@@ -1185,7 +1185,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.props.onBlur && this.props.onBlur();
     }
 
-    console.log("updating anchor data");
     const anchorData = this.calculateAnchorsAndContext(null, value, this.state.selectedAnchor ? [
       this.state.selectedAnchor,
       this.state.selectedOriginAnchor,

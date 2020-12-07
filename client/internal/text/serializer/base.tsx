@@ -211,15 +211,15 @@ class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifie
     standardProps.style = styleUsed;
 
     if (this.props.styleHover) {
-      standardProps.onMouseEnter = this.onHoverStart.bind(this.props.onMouseEnter);
-      standardProps.onMouseLeave = this.onHoverEnd.bind(this.props.onMouseLeave);
+      standardProps.onMouseEnter = this.onHoverStart.bind(null, this.props.onMouseEnter);
+      standardProps.onMouseLeave = this.onHoverEnd.bind(null, this.props.onMouseLeave);
     }
 
     if (this.props.styleActive) {
-      standardProps.onTouchStart = this.onActiveStart.bind(this.props.onTouchStart);
-      standardProps.onTouchEnd = this.onActiveEnd.bind(this.props.onTouchEnd);
-      standardProps.onMouseDown = this.onActiveStart.bind(this.props.onMouseDown);
-      standardProps.onMouseUp = this.onActiveEnd.bind(this.props.onMouseUp);
+      standardProps.onTouchStart = this.onActiveStart.bind(null, this.props.onTouchStart);
+      standardProps.onTouchEnd = this.onActiveEnd.bind(null, this.props.onTouchEnd);
+      standardProps.onMouseDown = this.onActiveStart.bind(null, this.props.onMouseDown);
+      standardProps.onMouseUp = this.onActiveEnd.bind(null, this.props.onMouseUp);
     }
 
     return <Tag {...standardProps} />;
