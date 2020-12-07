@@ -353,8 +353,29 @@ export const LOCALE_I18N = [
   "format_set_ui_handler_arg",
   "format_set_ui_handler_arg_name",
   "format_set_ui_handler_arg_value",
+  "format_add_template_text",
+  "format_delete_element",
   "format_more",
 
+  // extra rich element information
+  "rich_container",
+  "rich_text",
+  "rich_custom",
+  "rich_file",
+  "rich_image",
+  "rich_link",
+  "rich_list",
+  "rich_list_item",
+  "rich_paragraph",
+  "rich_quote",
+  "rich_title",
+  "rich_video",
+  "rich_styled_component",
+  "rich_template_component",
+  "rich_style",
+  "rich_style_active",
+  "rich_style_hover",
+  "rich_classes",
 
   // for filling the booleans and other things
   "yes",
@@ -407,6 +428,12 @@ export const LOCALE_I18N = [
   "link_setter_templated_unspecified",
   "link_setter_invalid",
   "link_setter_submit",
+
+  // for template text
+  "add_template_text_title",
+  "add_template_text_label",
+  "add_template_text_placeholder",
+  "add_template_text_submit",
 
   // for search utilites
   "no_results",

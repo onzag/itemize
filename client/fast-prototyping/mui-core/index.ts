@@ -46,6 +46,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SettingsIcon from '@material-ui/icons/Settings';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
 import {
   createStyles,
   withStyles,
@@ -277,4 +278,5 @@ export {
   NativeSelect,
   DeleteIcon,
   SettingsIcon,
+  TextFieldsIcon,
 }

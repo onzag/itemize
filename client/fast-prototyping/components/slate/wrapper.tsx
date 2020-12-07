@@ -6,6 +6,7 @@ import {
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
+  TextFieldsIcon,
 } from "../../mui-core";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -326,13 +327,27 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
           props.featureSupport.supportsContainers ?
             <IconButton
               tabIndex={-1}
-              title={props.i18nRichInfo.formatAddVideoLabel}
+              title={props.i18nRichInfo.formatAddContainerLabel}
               disabled={!props.featureSupport.canInsertContainer}
               onMouseDown={props.helpers.blockBlur}
               onClick={props.insertContainer}
               onMouseUp={props.helpers.releaseBlur}
             >
               <CheckBoxOutlineBlankIcon />
+            </IconButton> :
+            null
+        }
+        {
+          props.featureSupport.supportsTemplating ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatAddTemplateText}
+              disabled={!props.info.currentBlock}
+              onMouseDown={props.helpers.blockBlur}
+              onClick={null}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <TextFieldsIcon />
             </IconButton> :
             null
         }

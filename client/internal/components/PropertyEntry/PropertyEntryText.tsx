@@ -61,7 +61,29 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatSetUIHandlerArgLabel: string;
   formatSetUIHandlerArgName: string;
   formatSetUIHandlerArgValue: string;
+  formatAddTemplateText: string;
+  formatDeleteElement: string;
   formatMore: string;
+
+  container: string;
+  text: string;
+  custom: string;
+  file: string;
+  image: string;
+  link: string;
+  list: string;
+  listItem: string;
+  paragraph: string;
+  quote: string;
+  title: string;
+  video: string;
+  styled: string;
+  template: string;
+  interactive: string;
+  style: string;
+  styleActive: string;
+  styleHover: string;
+  classes: string;
 
   loadVideo: {
     invalid: string;
@@ -82,7 +104,14 @@ export interface IPropertyEntryI18nRichTextInfo {
     templatedUnspecified: string;
     title: string;
     submit: string;
-  },
+  };
+
+  addTemplateText: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
 }
 
 /**
@@ -99,7 +128,7 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * The i18n root
    */
   i18nRoot: any;
-  
+
   /**
    * Rich text features
    */
@@ -702,7 +731,29 @@ export default class PropertyEntryText
         formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
         formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
         formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
+        formatAddTemplateText: i18nInLanguage.format_add_template_text,
+        formatDeleteElement: i18nInLanguage.format_delete_element,
         formatMore: i18nInLanguage.format_more,
+
+        container: i18nInLanguage.rich_container,
+        text: i18nInLanguage.rich_text,
+        custom: i18nInLanguage.rich_custom,
+        file: i18nInLanguage.rich_file,
+        image: i18nInLanguage.rich_image,
+        link: i18nInLanguage.rich_link,
+        list: i18nInLanguage.rich_list,
+        listItem: i18nInLanguage.rich_list_item,
+        paragraph: i18nInLanguage.rich_paragraph,
+        quote: i18nInLanguage.rich_quote,
+        title: i18nInLanguage.rich_title,
+        video: i18nInLanguage.rich_video,
+        styled: i18nInLanguage.rich_styled_component,
+        template: i18nInLanguage.rich_template_component,
+        interactive: i18nInLanguage.rich_interactive_component,
+        style: i18nInLanguage.rich_style,
+        styleActive: i18nInLanguage.rich_style_active,
+        styleHover: i18nInLanguage.rich_style_hover,
+        classes: i18nInLanguage.rich_classes,
 
         loadVideo: {
           title: i18nInLanguage.video_loader_title,
@@ -723,6 +774,13 @@ export default class PropertyEntryText
           templatedUnspecified: i18nInLanguage.link_setter_templated_unspecified,
           invalid: i18nInLanguage.link_setter_invalid,
           submit: i18nInLanguage.link_setter_submit,
+        },
+
+        addTemplateText: {
+          title: i18nInLanguage.add_template_text_title,
+          label: i18nInLanguage.add_template_text_label,
+          placeholder: i18nInLanguage.add_template_text_placeholder,
+          submit: i18nInLanguage.add_template_text_submit,
         },
       } : null,
 

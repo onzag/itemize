@@ -6,6 +6,8 @@ import { MaterialUISlateWrapperWithStyles } from "../wrapper";
 import { Path } from "slate";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
+import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/PropertyEntry/PropertyEntryText";
+import { localeReplacer } from "../../../../../util";
 
 const templatedInteractiveActions = [
   "click",
@@ -49,23 +51,27 @@ interface INodeInfo {
   isText: boolean;
 }
 
-function getInfoOf(node: any): INodeInfo {
+function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): INodeInfo {
   const isInteractive = templatedInteractiveActions.some((attr) => !!node[attr]);
   const isTemplateStyled = templatedStyledAttributes.some((attr) => !!node[attr]);
   const isBasicStyled = !!node.style || (node.richClassList && node.richClassList.length);
   const isBasicTemplated = templatedAttributes.some((attr) => !!node[attr]);
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
-  const specialType = node.containerType || node.customType;
+
+  let nameLabel: string = node.type ? (i18nData[node.type] || node.type) : i18nData.text;
+  if (isBasicStyled || isTemplateStyled) {
+    nameLabel = localeReplacer(i18nData.styled, nameLabel);
+  }
+  if (isInteractive) {
+    nameLabel = localeReplacer(i18nData.interactive, nameLabel);
+  }
+  if (isTemplate) {
+    nameLabel = localeReplacer(i18nData.template, nameLabel);
+  }
 
   return {
     isTemplate,
-    name: (
-      (isBasicStyled || isTemplateStyled ? "styled " : "") +
-      (isInteractive ? "interactive " : "") +
-      (isTemplate ? "template " : "") +
-      (node.type || "text") +
-      (specialType ? " (" + specialType + ")" : "")
-    ),
+    name: nameLabel,
     isText: typeof node.text === "string",
   }
 }
@@ -94,7 +100,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
       }
 
       const isSelected = Path.equals(props.info.selectedAnchor, pathSoFar);
-      const info = getInfoOf(currentRichElement);
+      const info = getInfoOf(currentRichElement, props.i18nRichInfo);
 
       return (
         <Button
@@ -113,7 +119,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
 
   let settingsForNode: React.ReactNode = null;
   if (props.info.currentSelectedNode) {
-    const selectedNodeInfo = getInfoOf(props.info.currentSelectedNode);
+    const selectedNodeInfo = getInfoOf(props.info.currentSelectedNode, props.i18nRichInfo);
 
     let actualLocation = location;
     if (actualLocation !== "MAIN" && selectedNodeInfo.isText) {

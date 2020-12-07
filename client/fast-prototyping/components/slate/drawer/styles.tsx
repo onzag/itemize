@@ -45,7 +45,7 @@ function ClassesOptionSelector(props: MaterialUISlateWrapperWithStyles) {
   return (
     <div className={props.classes.box}>
       <FormControl className={props.classes.selectionInput}>
-        <InputLabel id="slate-styles-option-selector-rich-classes-label">Classes</InputLabel>
+  <InputLabel id="slate-styles-option-selector-rich-classes-label">{props.i18nRichInfo.classes}</InputLabel>
         <Select
           labelId="slate-styles-option-selector-rich-classes-label"
           id="slate-styles-option-selector-rich-classes"
@@ -88,7 +88,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
           <SingleStyle
             anchor={props.info.selectedAnchor}
             onChange={props.helpers.setStyle}
-            name="Style"
+            name={props.i18nRichInfo.style}
             styleValue={currentNode.style}
             inputClassName={props.classes.input}
           /> : null
@@ -98,7 +98,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
           <SingleStyle
             anchor={props.info.selectedAnchor}
             onChange={props.helpers.setHoverStyle}
-            name="Hover Style"
+            name={props.i18nRichInfo.styleHover}
             styleValue={currentNode.styleHover}
             inputClassName={props.classes.input}
           /> : null
@@ -108,7 +108,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
           <SingleStyle
             anchor={props.info.selectedAnchor}
             onChange={props.helpers.setActiveStyle}
-            name="Active Style"
+            name={props.i18nRichInfo.styleActive}
             styleValue={currentNode.styleActive}
             inputClassName={props.classes.input}
           /> : null
