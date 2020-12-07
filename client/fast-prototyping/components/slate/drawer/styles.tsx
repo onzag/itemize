@@ -4,6 +4,7 @@ import React from "react";
 import { MaterialUISlateWrapperWithStyles } from "../wrapper";
 import { FormControl, InputLabel, Select, Input, Chip, MenuItem } from "@material-ui/core";
 import { Path } from "slate";
+import equals from "deep-equal";
 
 interface ISingleStyleProps {
   name: string;
@@ -16,22 +17,47 @@ interface ISingleStyleProps {
   inputClassName?: string;
 }
 
-class SingleStyle extends React.PureComponent<ISingleStyleProps> {
+interface ISingleStyleState {
+  value: string;
+  valueForAnchor: Path;
+}
+
+class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleState> {
+  static getDerivedStateFromProps(props: ISingleStyleProps, state: ISingleStyleState) {
+    if ((props.styleValue || "") !== state.value && !Path.equals(props.anchor, state.valueForAnchor)) {
+      return {
+        value: props.styleValue || "",
+        valueForAnchor: props.anchor,
+      }
+    }
+
+    return null;
+  }
   constructor(props: ISingleStyleProps) {
     super(props);
 
     this.onStyleChange = this.onStyleChange.bind(this);
+
+    this.state = {
+      value: props.styleValue || "",
+      valueForAnchor: props.anchor,
+    }
   }
-  onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    this.props.onChange(e.target.value.trim() || null, this.props.anchor);
+  public onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.value.trim() || null;
+    this.setState({
+      value: newValue || "",
+      valueForAnchor: this.props.anchor,
+    });
+    this.props.onChange(newValue, this.props.anchor);
   }
-  render() {
+  public render() {
     return (
       <div className={this.props.boxClassName}>
         <p className={this.props.boxClassName}>{this.props.name}</p>
         <input
           type="text"
-          value={this.props.styleValue || ""}
+          value={this.state.value}
           className={this.props.inputClassName}
           onChange={this.onStyleChange}
         />
@@ -40,39 +66,81 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps> {
   }
 }
 
-function ClassesOptionSelector(props: MaterialUISlateWrapperWithStyles) {
-  const selectedNode: RichElement = props.info.currentSelectedNode as any;
-  return (
-    <div className={props.classes.box}>
-      <FormControl className={props.classes.selectionInput}>
-        <InputLabel id="slate-styles-option-selector-rich-classes-label">{props.i18nRichInfo.classes}</InputLabel>
-        <Select
-          labelId="slate-styles-option-selector-rich-classes-label"
-          id="slate-styles-option-selector-rich-classes"
-          className={props.classes.selectionInput}
-          multiple={true}
-          value={selectedNode.richClassList || []}
-          onChange={null}
-          input={<Input id="slate-styles-option-selector-rich-classes-chip" />}
-          renderValue={(selected: any[]) => (
-            <div className={props.classes.chips}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} className={props.classes.chip} />
-              ))}
-            </div>
-          )}
-        >
-          {
-            props.featureSupport.availableRichClasses.map((element) => (
-              <MenuItem key={element.value} value={element.value}>
-                {element.label}
-              </MenuItem>
-            ))
-          }
-        </Select>
-      </FormControl>
-    </div>
-  );
+interface IClassesOptionSelectorState {
+  value: string[],
+  valueForAnchor: Path;
+}
+
+class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWithStyles, IClassesOptionSelectorState> {
+  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IClassesOptionSelectorState) {
+    const selectedNode: RichElement = props.info.currentSelectedNode as any;
+    if (
+      !equals(selectedNode.richClassList || [], state.value) &&
+      !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
+    ) {
+      return {
+        value: selectedNode.richClassList || [],
+        valueForAnchor: props.info.selectedAnchor,
+      }
+    }
+
+    return null;
+  }
+  constructor(props: MaterialUISlateWrapperWithStyles) {
+    super(props);
+
+    const selectedNode: RichElement = props.info.currentSelectedNode as any;
+    this.state = {
+      value: selectedNode.richClassList || [],
+      valueForAnchor: props.info.selectedAnchor,
+    };
+
+    this.onRichClassListChange = this.onRichClassListChange.bind(this);
+  }
+  public onRichClassListChange(e: React.ChangeEvent<{name: string, value: string[]}>) {
+    let newValue: string[] = e.target.value;
+    this.setState({
+      value: newValue,
+      valueForAnchor: this.props.info.selectedAnchor,
+    });
+    if (newValue.length === 0) {
+      newValue = null;
+    }
+    this.props.helpers.setRichClasses(newValue, this.props.info.selectedAnchor);
+  }
+  public render() {
+    return (
+      <div className={this.props.classes.box}>
+        <FormControl className={this.props.classes.selectionInput}>
+          <InputLabel id="slate-styles-option-selector-rich-classes-label">{this.props.i18nRichInfo.classes}</InputLabel>
+          <Select
+            labelId="slate-styles-option-selector-rich-classes-label"
+            id="slate-styles-option-selector-rich-classes"
+            className={this.props.classes.selectionInput}
+            multiple={true}
+            value={this.state.value}
+            onChange={this.onRichClassListChange}
+            input={<Input id="slate-styles-option-selector-rich-classes-chip" />}
+            renderValue={(selected: any[]) => (
+              <div className={this.props.classes.chips}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} className={this.props.classes.chip} />
+                ))}
+              </div>
+            )}
+          >
+            {
+              this.props.featureSupport.availableRichClasses.map((element) => (
+                <MenuItem key={element.value} value={element.value}>
+                  {element.label}
+                </MenuItem>
+              ))
+            }
+          </Select>
+        </FormControl>
+      </div>
+    );
+  }
 }
 
 export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
