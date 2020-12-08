@@ -450,10 +450,10 @@ export function serialize(root: IRootLevelDocument) {
  * rather than a bunch of nodes
  * @param root 
  */
-export function serializeString(root: IRootLevelDocument) {
+export function serializeString(root: IRootLevelDocument): string {
   const serialized = oserialize(root);
-  if (typeof serialized === "string") {
-    return serialized;
+  if (typeof serialized === "string" || serialized === null) {
+    return serialized as string;
   }
   return serialized.map((s) => s.outerHTML).join("");
 }

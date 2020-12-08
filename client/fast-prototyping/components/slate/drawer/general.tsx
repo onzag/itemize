@@ -75,7 +75,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   return (
     <>
       {specificNodeOptions}
-      <IconButton>
+      <IconButton onClick={props.helpers.deleteSelectedNode}>
         <DeleteIcon />
       </IconButton>
     </>

@@ -393,7 +393,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.state = {
       videoDialogOpen: false,
       linkDialogOpen: false,
-      drawerOpen: !this.shouldHaveDrawer() ? false : localStorage.getItem("RICH_TEXT_DRAWER_OPEN") === "true",
+
+      // keep SSR compatibility
+      drawerOpen: false,
       originalSelectedElement: null,
     }
 
@@ -416,6 +418,13 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.acceptLink = this.acceptLink.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
   }
+  public componentDidMount() {
+    if (this.shouldHaveDrawer()) {
+      this.setState({
+        drawerOpen: localStorage.getItem("SLATE_DRAWER_OPEN") === "true",
+      });
+    }
+  }
   public shouldHaveDrawer() {
     return !!(
       this.props.featureSupport.supportsTemplating ||
@@ -435,7 +444,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.setState({
       drawerOpen: newState,
     });
-    localStorage.setItem("RICH_TEXT_DRAWER_OPEN", JSON.stringify(newState));
+    localStorage.setItem("SLATE_DRAWER_OPEN", JSON.stringify(newState));
   }
   public refocus() {
     this.props.helpers.focusAt(this.originalSelectionArea);

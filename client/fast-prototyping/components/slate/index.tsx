@@ -7,7 +7,7 @@ import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, d
 import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX, IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
-import { IText } from "../../../internal/text/serializer/text";
+import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/text";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { copyElementBase } from "../../../internal/text/serializer/base";
 import { IImage } from "../../../internal/text/serializer/image";
@@ -233,6 +233,11 @@ export interface IHelperFunctions {
   selectPath: (path: Path) => void;
 
   /**
+   * Deletes the given node at the given path
+   */
+  deleteSelectedNode: () => void;
+
+  /**
    * focuses the element
    */
   focus: () => void;
@@ -311,6 +316,10 @@ export interface IHelperFunctions {
    * Sets all the rich classes
    */
   setRichClasses: (list: string[], anchor: Path) => void;
+  /**
+   * Sets an action key
+   */
+  setAction: (key: string, value: string, anchor: Path) => void;
 
   /**
    * Formats the current text as bold
@@ -324,6 +333,7 @@ export interface IHelperFunctions {
    * formats to underline
    */
   formatToggleUnderline: () => void;
+
   /**
    * cancels the field from blurring
    */
@@ -595,6 +605,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   private blurTimeout: NodeJS.Timeout;
   private blurBlocked: boolean = false;
   private ignoreCurrentLocationToRemoveEmpty: boolean = false;
+  private lastChangeWasSelectedDelete: boolean = false;
 
   static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState) {
     if (state.synced) {
@@ -648,6 +659,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertBreak = this.insertBreak.bind(this);
     this.insertSuperblockBreak = this.insertSuperblockBreak.bind(this);
     this.deleteBackward = this.deleteBackward.bind(this);
+    this.deleteForward = this.deleteForward.bind(this);
 
     this.editor.isInline = this.isInline as any;
     this.editor.isVoid = this.isVoid as any;
@@ -655,6 +667,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor.insertBreak = this.insertBreak;
     this.editor.deleteBackward = this.deleteBackward;
 
+    this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
     this.setValue = this.setValue.bind(this);
     this.renderElement = this.renderElement.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -684,6 +697,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleBold = this.formatToggleBold.bind(this);
     this.formatToggleItalic = this.formatToggleItalic.bind(this);
     this.formatToggleUnderline = this.formatToggleUnderline.bind(this);
+    this.setAction = this.setAction.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchorsAndContext = this.calculateAnchorsAndContext.bind(this);
@@ -703,8 +717,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public normalizeNode(entry: NodeEntry<Node>) {
     const [node, path] = entry;
 
+    // if it's the editor itself
+    if (Editor.isEditor(node)) {
+      if (node.children.length === 0) {
+        Transforms.insertNodes(this.editor,
+          { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE] },
+          { at: path.concat(0) }
+        );
+      }
     // if it's an element
-    if (Element.isElement(node)) {
+    } else if (Element.isElement(node)) {
       const managedChildrenExistance = node.children.map((v) => true);
       // the total current nodes
       let totalNodes = node.children.length;
@@ -804,6 +826,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             offset += child.children.length - 1;
           }
         }
+        if ((newNode.children as any).length === 0) {
+          Transforms.insertNodes(this.editor,
+            STANDARD_TEXT_NODE,
+            { at: path.concat(0) }
+          );
+        }
       } else if (nodeAsRichElement.containment === "inline") {
         const newNode = Node.get(this.editor, path);
         let offset = 0;
@@ -814,6 +842,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             offset += child.children.length - 1;
           }
         }
+        if ((newNode.children as any).length === 0) {
+          Transforms.insertNodes(this.editor,
+            STANDARD_TEXT_NODE,
+            { at: path.concat(0) }
+          );
+        }
       } else if (nodeAsRichElement.containment === "superblock") {
         const newNode = Node.get(this.editor, path);
         for (let i = 0; i < (newNode.children as any).length; i++) {
@@ -821,6 +855,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           if (Text.isText(child)) {
             Transforms.wrapNodes(this.editor, { type: "paragraph", containment: "block", children: [] }, { at: path.concat(i) });
           }
+        }
+
+        if ((newNode.children as any).length === 0) {
+          Transforms.insertNodes(this.editor,
+            { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE] },
+            { at: path.concat(0) }
+          );
         }
       } else if (nodeAsRichElement.containment === "list-item") {
         const newNode = Node.get(this.editor, path);
@@ -833,6 +874,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           } else if (Text.isText(child) || child.type !== "list-item") {
             Transforms.wrapNodes(this.editor, { type: "list-item", containment: "block", children: [] }, { at: path.concat(i + offset) });
           }
+        }
+        if ((newNode.children as any).length === 0) {
+          Transforms.insertNodes(this.editor,
+            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE] },
+            { at: path.concat(0) }
+          );
         }
       }
     }
@@ -984,6 +1031,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (
       selection &&
       Range.isCollapsed(this.editor.selection) &&
+      this.state.currentSuperBlock &&
       this.state.currentSuperBlock.type === "list" &&
       this.state.currentBlock.type === "list-item" &&
       (
@@ -1004,6 +1052,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.delete(this.editor, { unit, reverse: true });
       this.ignoreCurrentLocationToRemoveEmpty = false;
     }
+  }
+  public deleteForward(unit: "character" | "word" | "line" | "block") {
+
   }
   public calculateAnchorsAndContext(anchor: Path, value?: Node[], selectedAnchorAndOrigin?: [Path, Path]) {
     // first we set up all the basics to their null value
@@ -1098,7 +1149,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedNodeContext = currentContext;
       // if we have a text element that is templatizeable, then
       // that will be our new selected node and anchor
-      if (currentText.templateText) {
+      if (currentText && currentText.templateText) {
         selectedAnchor = anchor;
         currentSelectedNode = currentText;
       }
@@ -1185,7 +1236,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.props.onBlur && this.props.onBlur();
     }
 
-    const anchorData = this.calculateAnchorsAndContext(null, value, this.state.selectedAnchor ? [
+    const anchorData = this.calculateAnchorsAndContext(null, value, this.state.selectedAnchor && !this.lastChangeWasSelectedDelete ? [
       this.state.selectedAnchor,
       this.state.selectedOriginAnchor,
     ] : null)
@@ -1289,6 +1340,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.onBlur(newValue);
     }
 
+    this.lastChangeWasSelectedDelete = false;
+
     if (newValue !== this.state.internalValue.children as any) {
       this.setValue(newValue);
     }
@@ -1311,6 +1364,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedNode: finalNode,
     });
   }
+
+  public deleteSelectedNode() {
+    this.lastChangeWasSelectedDelete = true;
+
+    Transforms.delete(this.editor, {
+      at: this.state.selectedAnchor,
+    });
+
+    ReactEditor.focus(this.editor);
+  };
 
   public focus() {
     ReactEditor.focus(this.editor);
@@ -1789,6 +1852,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       richClassList: classes,
     }, { at: anchor });
   };
+
+  public setAction(key: string, value: string, anchor: Path) {
+    Transforms.setNodes(this.editor, {
+      [key]: value,
+    }, { at: anchor });
+  }
+
   /**
    * Sets the context key
    */
@@ -1883,7 +1953,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           this.props.rootI18n &&
           this.props.rootI18n.custom &&
           this.props.rootI18n.custom[i18nLocation] &&
-          this.props.rootI18n.custom[i18nLocation][c]
+          (
+            this.props.rootI18n.custom[i18nLocation][c] ||
+            this.props.rootI18n.custom[i18nLocation][c.replace(/-/g, "_")]
+          )
         ) || c
       }
     });
@@ -1943,6 +2016,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         ReactEditor,
 
         selectPath: this.selectPath,
+
+        deleteSelectedNode: this.deleteSelectedNode,
+
         focus: this.focus,
         focusAt: this.focusAt,
 
@@ -1964,6 +2040,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         setHoverStyle: this.setHoverStyle,
         setStyle: this.setStyle,
         setRichClasses: this.setRichClasses,
+        setAction: this.setAction,
 
         blockBlur: this.blockBlur,
         releaseBlur: this.releaseBlur,

@@ -77,9 +77,10 @@ function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): INodeIn
 }
 
 export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
-  const [location, setLocation] = useState("MAIN");
+  const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
 
   const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {
+    localStorage.setItem("SLATE_DRAWER_LAST_LOCATION", value);
     setLocation(value);
   }, []);
 
