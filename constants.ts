@@ -354,6 +354,7 @@ export const LOCALE_I18N = [
   "format_set_ui_handler_arg_name",
   "format_set_ui_handler_arg_value",
   "format_add_template_text",
+  "format_add_template_html",
   "format_delete_element",
   "format_more",
 
@@ -441,6 +442,12 @@ export const LOCALE_I18N = [
   "add_template_text_label",
   "add_template_text_placeholder",
   "add_template_text_submit",
+
+  // for template html
+  "add_template_html_title",
+  "add_template_html_label",
+  "add_template_html_placeholder",
+  "add_template_html_submit",
 
   // for search utilites
   "no_results",

@@ -9,6 +9,7 @@ import { StylesOptions } from "./styles";
 import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/PropertyEntry/PropertyEntryText";
 import { localeReplacer } from "../../../../../util";
 import { ActionsOptions } from "./actions";
+import { TemplatingOptions } from "./templating";
 
 const templatedInteractiveActions = [
   "click",
@@ -138,6 +139,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
         break;
       case "ACTIONS":
         infoPanel = ActionsOptions(props);
+        break;
+      case "TEMPLATING":
+        infoPanel = TemplatingOptions(props);
         break;
     }
 

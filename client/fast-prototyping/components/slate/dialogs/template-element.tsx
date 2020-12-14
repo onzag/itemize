@@ -5,30 +5,31 @@ import {
 } from "../../../mui-core";
 import { Dialog } from "../../dialog";
 
-interface ITemplateTextDialogProps {
-  insertTemplateText: (label: string, value: string) => void;
-  closeTemplateTextDialog: () => void;
+interface ITemplateElementDialogProps {
+  insertTemplateElement: (label: string, value: string) => void;
+  closeTemplateElementDialog: () => void;
   currentContext: ITemplateArgsContext;
-  templateTextDialogOpen: boolean;
-  i18nInsertTemplateTextTitle: string;
-  i18nInsertTemplateTextSubmit: string;
-  i18nInsertTemplateTextLabel: string;
-  i18nInsertTemplateTextPlaceholder: string;
+  templateElementDialogOpen: boolean;
+  i18nInsertTemplateElementTitle: string;
+  i18nInsertTemplateElementSubmit: string;
+  i18nInsertTemplateElementLabel: string;
+  i18nInsertTemplateElementPlaceholder: string;
+  elementType: "text" | "html";
 }
 
-interface ITemplateTextOption {
+interface ITemplateElementOption {
   value: string;
   label: string;
 };
 
-interface ITemplateTextState {
+interface ITemplateElementState {
   value: string;
   label: string;
-  options: ITemplateTextOption[],
+  options: ITemplateElementOption[],
 }
 
-export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogProps, ITemplateTextState> {
-  constructor(props: ITemplateTextDialogProps) {
+export class TemplateElementDialog extends React.PureComponent<ITemplateElementDialogProps, ITemplateElementState> {
+  constructor(props: ITemplateElementDialogProps) {
     super(props);
 
     this.state = {
@@ -43,14 +44,14 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
     this.closeDialog = this.closeDialog.bind(this);
   }
   public onOpeningDialog() {
-    const templateTextPropertiesToUse: ITemplateTextOption[] = [];
+    const templateHTMLPropertiesToUse: ITemplateElementOption[] = [];
 
     this.props.currentContext && Object.keys(this.props.currentContext.properties).forEach((key) => {
       const property = this.props.currentContext.properties[key];
-      if (property.type !== "text") {
+      if (property.type !== this.props.elementType) {
         return;
       }
-      templateTextPropertiesToUse.push({
+      templateHTMLPropertiesToUse.push({
         value: key,
         label: property.label || key,
       });
@@ -59,12 +60,12 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
     this.setState({
       value: null,
       label: null,
-      options: templateTextPropertiesToUse,
+      options: templateHTMLPropertiesToUse,
     });
   }
   public acceptText() {
     if (this.state.value) {
-      this.props.insertTemplateText(this.state.label || this.state.value, this.state.value);
+      this.props.insertTemplateElement(this.state.label || this.state.value, this.state.value);
     }
   }
   public updateTextValue(e: React.ChangeEvent<HTMLInputElement>) {
@@ -74,7 +75,7 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
     });
   }
   public closeDialog() {
-    this.props.closeTemplateTextDialog();
+    this.props.closeTemplateElementDialog();
 
     this.setState({
       value: null,
@@ -86,13 +87,13 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
     return (
       <Dialog
         fullScreen={false}
-        open={this.props.templateTextDialogOpen}
+        open={this.props.templateElementDialogOpen}
         onClose={this.closeDialog}
         onOpening={this.onOpeningDialog}
-        title={this.props.i18nInsertTemplateTextTitle}
+        title={this.props.i18nInsertTemplateElementTitle}
         buttons={
           <Button onClick={this.acceptText}>
-            {this.props.i18nInsertTemplateTextSubmit}
+            {this.props.i18nInsertTemplateElementSubmit}
           </Button>
         }
       >
@@ -102,9 +103,9 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
             fullWidth={true}
           >
             <InputLabel
-              htmlFor="slate-wrapper-template-text-entry-id"
+              htmlFor="slate-wrapper-template-element-entry-id"
             >
-              {this.props.i18nInsertTemplateTextLabel}
+              {this.props.i18nInsertTemplateElementLabel}
             </InputLabel>
             <Select
               value={this.state.value || ""}
@@ -112,8 +113,8 @@ export class TemplateTextDialog extends React.PureComponent<ITemplateTextDialogP
               variant="filled"
               input={
                 <FilledInput
-                  id="slate-wrapper-template-text-entry-id"
-                  placeholder={this.props.i18nInsertTemplateTextPlaceholder}
+                  id="slate-wrapper-template-element-entry-id"
+                  placeholder={this.props.i18nInsertTemplateElementPlaceholder}
                 />
               }
             >

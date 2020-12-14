@@ -2,7 +2,7 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { MaterialUISlateWrapperWithStyles } from "../wrapper";
-import { FormControl, InputLabel, Select, Input, Chip, MenuItem } from "@material-ui/core";
+import { FormControl, InputLabel, Select, Input, Chip, MenuItem, TextField, FilledInput } from "@material-ui/core";
 import { Path } from "slate";
 import equals from "deep-equal";
 
@@ -24,9 +24,9 @@ interface ISingleStyleState {
 
 class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleState> {
   static getDerivedStateFromProps(props: ISingleStyleProps, state: ISingleStyleState) {
-    if ((props.styleValue || "") !== state.value && !Path.equals(props.anchor, state.valueForAnchor)) {
+    if ((props.styleValue || "") !== state.value && !Path.equals(props.anchor, state.valueForAnchor)) {
       return {
-        value: props.styleValue || "",
+        value: props.styleValue || "",
         valueForAnchor: props.anchor,
       }
     }
@@ -39,14 +39,14 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
     this.onStyleChange = this.onStyleChange.bind(this);
 
     this.state = {
-      value: props.styleValue || "",
+      value: props.styleValue || "",
       valueForAnchor: props.anchor,
     }
   }
   public onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const newValue = e.target.value.trim() || null;
+    const newValue = e.target.value.trim() || null;
     this.setState({
-      value: newValue || "",
+      value: newValue || "",
       valueForAnchor: this.props.anchor,
     });
     this.props.onChange(newValue, this.props.anchor);
@@ -54,12 +54,15 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
   public render() {
     return (
       <div className={this.props.boxClassName}>
-        <p className={this.props.boxClassName}>{this.props.name}</p>
-        <input
+        <TextField
+          fullWidth={true}
           type="text"
           value={this.state.value}
           className={this.props.inputClassName}
           onChange={this.onStyleChange}
+          placeholder={this.props.name}
+          label={this.props.name}
+          variant="filled"
         />
       </div>
     );
@@ -75,11 +78,11 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IClassesOptionSelectorState) {
     const selectedNode: RichElement = props.info.currentSelectedNode as any;
     if (
-      !equals(selectedNode.richClassList || [], state.value) &&
+      !equals(selectedNode.richClassList || [], state.value) &&
       !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
     ) {
       return {
-        value: selectedNode.richClassList || [],
+        value: selectedNode.richClassList || [],
         valueForAnchor: props.info.selectedAnchor,
       }
     }
@@ -91,13 +94,13 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
 
     const selectedNode: RichElement = props.info.currentSelectedNode as any;
     this.state = {
-      value: selectedNode.richClassList || [],
+      value: selectedNode.richClassList || [],
       valueForAnchor: props.info.selectedAnchor,
     };
 
     this.onRichClassListChange = this.onRichClassListChange.bind(this);
   }
-  public onRichClassListChange(e: React.ChangeEvent<{name: string, value: string[]}>) {
+  public onRichClassListChange(e: React.ChangeEvent<{ name: string, value: string[] }>) {
     let newValue: string[] = e.target.value;
     this.setState({
       value: newValue,
@@ -110,35 +113,34 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
   }
   public render() {
     return (
-      <div className={this.props.classes.box}>
-        <FormControl className={this.props.classes.selectionInput}>
-          <InputLabel id="slate-styles-option-selector-rich-classes-label">{this.props.i18nRichInfo.classes}</InputLabel>
-          <Select
-            labelId="slate-styles-option-selector-rich-classes-label"
-            id="slate-styles-option-selector-rich-classes"
-            className={this.props.classes.selectionInput}
-            multiple={true}
-            value={this.state.value}
-            onChange={this.onRichClassListChange}
-            input={<Input id="slate-styles-option-selector-rich-classes-chip" />}
-            renderValue={(selected: any[]) => (
-              <div className={this.props.classes.chips}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} className={this.props.classes.chip} />
-                ))}
-              </div>
-            )}
-          >
-            {
-              this.props.featureSupport.availableRichClasses.map((element) => (
-                <MenuItem key={element.value} value={element.value}>
-                  {element.label}
-                </MenuItem>
-              ))
-            }
-          </Select>
-        </FormControl>
-      </div>
+      <FormControl className={this.props.classes.selectionInput} variant="filled">
+        <InputLabel id="slate-styles-option-selector-rich-classes-label">{this.props.i18nRichInfo.classes}</InputLabel>
+        <Select
+          labelId="slate-styles-option-selector-rich-classes-label"
+          id="slate-styles-option-selector-rich-classes"
+          className={this.props.classes.selectionInput}
+          multiple={true}
+          value={this.state.value}
+          onChange={this.onRichClassListChange}
+          input={<FilledInput id="slate-styles-option-selector-rich-classes-chip" />}
+          renderValue={(selected: any[]) => (
+            <div className={this.props.classes.chips}>
+              {selected.map((value) => (
+                <Chip key={value} label={value} className={this.props.classes.chip} color="primary" />
+              ))}
+            </div>
+          )}
+          variant="filled"
+        >
+          {
+            this.props.featureSupport.availableRichClasses.map((element) => (
+              <MenuItem key={element.value} value={element.value}>
+                {element.label}
+              </MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
     );
   }
 }

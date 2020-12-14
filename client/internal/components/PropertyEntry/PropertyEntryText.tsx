@@ -62,6 +62,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatSetUIHandlerArgName: string;
   formatSetUIHandlerArgValue: string;
   formatAddTemplateText: string;
+  formatAddTemplateHTML: string;
   formatDeleteElement: string;
   formatMore: string;
 
@@ -114,6 +115,13 @@ export interface IPropertyEntryI18nRichTextInfo {
   };
 
   addTemplateText: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
+
+  addTemplateHTML: {
     title: string;
     label: string;
     placeholder: string;
@@ -738,6 +746,7 @@ export default class PropertyEntryText
         formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
         formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
         formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
+        formatAddTemplateHTML: i18nInLanguage.format_add_template_html,
         formatAddTemplateText: i18nInLanguage.format_add_template_text,
         formatDeleteElement: i18nInLanguage.format_delete_element,
         formatMore: i18nInLanguage.format_more,
@@ -795,6 +804,13 @@ export default class PropertyEntryText
           label: i18nInLanguage.add_template_text_label,
           placeholder: i18nInLanguage.add_template_text_placeholder,
           submit: i18nInLanguage.add_template_text_submit,
+        },
+
+        addTemplateHTML: {
+          title: i18nInLanguage.add_template_html_title,
+          label: i18nInLanguage.add_template_html_label,
+          placeholder: i18nInLanguage.add_template_html_placeholder,
+          submit: i18nInLanguage.add_template_html_submit,
         },
       } : null,
 

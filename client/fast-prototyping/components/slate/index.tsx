@@ -16,6 +16,7 @@ import { IVideo } from "../../../internal/text/serializer/video";
 import { mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import { IContainer } from "../../../internal/text/serializer/container";
+import { IParagraph } from "../../../internal/text/serializer/paragraph";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
@@ -48,6 +49,7 @@ interface ITemplateArg {
  */
 export interface ITemplateArgsContext {
   type: "context";
+  label: string;
   loopable?: boolean;
   properties: {
     [name: string]: ITemplateArg | ITemplateArgsContext;
@@ -299,6 +301,10 @@ export interface IHelperFunctions {
    * Inserts a template text
    */
   insertTemplateText: (label: string, value: string, at?: Range) => void;
+  /**
+   * Inserts a template html fragment
+   */
+  insertTemplateHTML: (label: string, value: string, at?: Range) => void;
 
   /**
    * Makes a quote out of the current element
@@ -333,6 +339,10 @@ export interface IHelperFunctions {
    * Sets the context key
    */
   setContext: (key: string, anchor: Path) => void;
+  /**
+   * Sets an UI handler in the given anchor with the given args
+   */
+  setUIHandler: (key: string, args: {[key: string]: string}, anchor: Path) => void;
   /**
    * Sets the for-each loop key
    */
@@ -632,18 +642,50 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   private ignoreCurrentLocationToRemoveEmpty: boolean = false;
   private lastChangeWasSelectedDelete: boolean = false;
 
-  static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState) {
+  static getDerivedStateFromProps(props: ISlateEditorProps, state: ISlateEditorState): Partial<ISlateEditorState> {
     if (state.synced) {
       if (props.internalValue) {
         if (!state.internalValue || props.internalValue.id !== state.internalValue.id) {
           return {
             internalValue: props.internalValue,
+            anchor: null,
+            elementAnchor: null,
+            blockAnchor: null,
+            selectedAnchor: null,
+            currentContext: props.rootContext || null,
+            currentElement: null,
+            currentBlock: null,
+            currentSuperBlock: null,
+            superBlockAnchor: null,
+            currentText: null,
+            currentSelectedNode: null,
+            currentSelectedNodeContext: null,
+            currentSelectedNodeOrigin: null,
+            selectedOriginAnchor: null,
           };
         }
       } else {
-        return {
-          internalValue: props.isRichText ? deserialize(props.value, state.internalValue) : deserializePlain(props.value, state.internalValue),
-        };
+        const newInternalValue = props.isRichText ?
+          deserialize(props.value, state.internalValue) : deserializePlain(props.value, state.internalValue);
+        if (newInternalValue.id !== state.internalValue.id) {
+          return {
+            internalValue: newInternalValue,
+            anchor: null,
+            elementAnchor: null,
+            blockAnchor: null,
+            selectedAnchor: null,
+            currentContext: props.rootContext || null,
+            currentElement: null,
+            currentBlock: null,
+            currentSuperBlock: null,
+            superBlockAnchor: null,
+            currentText: null,
+            currentSelectedNode: null,
+            currentSelectedNodeContext: null,
+            currentSelectedNodeOrigin: null,
+            selectedOriginAnchor: null,
+          };
+        }
       }
     }
 
@@ -708,6 +750,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertVideo = this.insertVideo.bind(this);
     this.insertFile = this.insertFile.bind(this);
     this.insertTemplateText = this.insertTemplateText.bind(this);
+    this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
     this.insertCustom = this.insertCustom.bind(this);
     this.toggleQuote = this.toggleQuote.bind(this);
@@ -1521,6 +1564,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     this.editor.insertNode(textNode as any);
   }
+  public async insertTemplateHTML(label: string, value: string, at?: Range) {
+    if (at) {
+      await this.focusAt(at);
+    }
+    const textNode: IText = {
+      ...this.state.currentText,
+      text: label,
+      templateText: null,
+    }
+
+    const blockNode: IParagraph = {
+      children: [textNode],
+      containment: "block",
+      type: "paragraph",
+    };
+
+    const superBlock: IContainer = {
+      children: [blockNode],
+      containment: "superblock",
+      containerType: null,
+      type: "container",
+      html: value,
+    }
+
+    this.editor.insertNode(superBlock as any);
+  }
   /**
    * Will insert a video given the information
    * @param url the url of the video
@@ -1943,17 +2012,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
   }
 
+  public setUIHandler(value: string, args: {[key: string]: string}, anchor: Path) {
+    Transforms.setNodes(this.editor, {
+      uiHandler: value,
+      uiHandlerArgs: args,
+    }, { at: anchor });
+  }
+
   /**
    * Sets the context key
    */
-  public setContext(key: string) {
-
+  public setContext(value: string, anchor: Path) {
+    Transforms.setNodes(this.editor, {
+      context: value,
+    }, { at: anchor });
   };
   /**
   * Sets the for-each loop key
   */
-  public setForEach(key: string) {
-
+  public setForEach(value: string, anchor: Path) {
+    Transforms.setNodes(this.editor, {
+      forEach: value,
+    }, { at: anchor });
   };
 
   /**
@@ -2085,6 +2165,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       insertImage: this.insertImage,
       insertVideo: this.insertVideo,
       insertTemplateText: this.insertTemplateText,
+      insertTemplateHTML: this.insertTemplateHTML,
       toggleLink: this.toggleLink,
       toggleList: this.toggleList,
       toggleQuote: this.toggleQuote,
@@ -2096,6 +2177,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setStyle: this.setStyle,
       setRichClasses: this.setRichClasses,
       setAction: this.setAction,
+      setUIHandler: this.setUIHandler,
 
       blockBlur: this.blockBlur,
       releaseBlur: this.releaseBlur,

@@ -39,6 +39,7 @@ format_set_ui_handler_arg = set ui handler arguments
 format_set_ui_handler_arg_name = name
 format_set_ui_handler_arg_value = value
 format_add_template_text = add template text
+format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
@@ -104,6 +105,11 @@ add_template_text_title = insert template text
 add_template_text_label = select value
 add_template_text_placeholder = select template text value
 add_template_text_submit = submit
+
+add_template_html_title = insert template HTML
+add_template_html_label = select value
+add_template_html_placeholder = select template HTML value
+add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -193,6 +199,7 @@ format_set_ui_handler_arg = set ui handler arguments
 format_set_ui_handler_arg_name = name
 format_set_ui_handler_arg_value = value
 format_add_template_text = add template text
+format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = lisää
 
@@ -258,6 +265,11 @@ add_template_text_title = insert template text
 add_template_text_label = select value
 add_template_text_placeholder = select template text value
 add_template_text_submit = submit
+
+add_template_html_title = insert template HTML
+add_template_html_label = select value
+add_template_html_placeholder = select template HTML value
+add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -347,6 +359,7 @@ format_set_ui_handler_arg = set ui handler arguments
 format_set_ui_handler_arg_name = name
 format_set_ui_handler_arg_value = value
 format_add_template_text = add template text
+format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
@@ -412,6 +425,11 @@ add_template_text_title = insert template text
 add_template_text_label = select value
 add_template_text_placeholder = select template text value
 add_template_text_submit = submit
+
+add_template_html_title = insert template HTML
+add_template_html_label = select value
+add_template_html_placeholder = select template HTML value
+add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -501,6 +519,7 @@ format_set_ui_handler_arg = set ui handler arguments
 format_set_ui_handler_arg_name = name
 format_set_ui_handler_arg_value = value
 format_add_template_text = add template text
+format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
@@ -566,6 +585,11 @@ add_template_text_title = insert template text
 add_template_text_label = select value
 add_template_text_placeholder = select template text value
 add_template_text_submit = submit
+
+add_template_html_title = insert template HTML
+add_template_html_label = select value
+add_template_html_placeholder = select template HTML value
+add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
@@ -655,6 +679,7 @@ format_set_ui_handler_arg = colocar argumentos
 format_set_ui_handler_arg_name = nombre
 format_set_ui_handler_arg_value = valor
 format_add_template_text = insertar texto de plantilla
+format_add_template_html = insertar HTML de plantilla
 format_delete_element = eliminar elemento
 format_more = más opciones
 
@@ -720,6 +745,11 @@ add_template_text_title = insertar texto de plantilla
 add_template_text_label = seleccionar valor
 add_template_text_placeholder = seleccione el valor del texto
 add_template_text_submit = insertar
+
+add_template_html_title = insertar HTML de plantilla
+add_template_html_label = seleccionar valor
+add_template_html_placeholder = seleccione el valor HTML
+add_template_html_submit = insertar
 
 no_results = no se encontraron resultados
 result_out_of = resultado {0} de {1}
@@ -809,6 +839,7 @@ format_set_ui_handler_arg = set ui handler arguments
 format_set_ui_handler_arg_name = name
 format_set_ui_handler_arg_value = value
 format_add_template_text = add template text
+format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
@@ -874,6 +905,11 @@ add_template_text_title = insert template text
 add_template_text_label = select value
 add_template_text_placeholder = select template text value
 add_template_text_submit = submit
+
+add_template_html_title = insert template HTML
+add_template_html_label = select value
+add_template_html_placeholder = select template HTML value
+add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}

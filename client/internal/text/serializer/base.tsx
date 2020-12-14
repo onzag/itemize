@@ -55,6 +55,7 @@ export interface IAttrs {
 }
 
 const translations = {
+  html: "data-html",
   style: "style",
   styleHover: "data-style-hover",
   styleActive: "data-style-active",
@@ -254,6 +255,10 @@ export function reactifyElementBase(
     });
   }
 
+  if (base.html && !active) {
+    finalProps.className = (finalProps.className || "") + " template";
+  }
+
   if (base.style) {
     finalProps.style = {
       ...convertStyleStringToReactObject(base.style),
@@ -410,7 +415,12 @@ export interface IElementBase {
   richClassList?: string[];
 
   // TEMPLATING PROPERTIES
-
+  /**
+   * For templating
+   * Represents replacement html content for the inner HTML
+   * of the given element
+   */
+  html?: string;
   /**
    * For templating
    * Represents a chosen ui handler and it applies to the property

@@ -6,7 +6,7 @@ import {
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
-  TextFieldsIcon,
+  TextFieldsIcon, CodeIcon,
 } from "../../mui-core";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -14,7 +14,7 @@ import { WrapperDrawer } from "./drawer";
 import { FileLoadErrorDialog } from "./dialogs/file";
 import { LinkDialog } from "./dialogs/link";
 import { VideoDialog } from "./dialogs/video";
-import { TemplateTextDialog } from "./dialogs/template-text";
+import { TemplateElementDialog } from "./dialogs/template-element";
 
 const style = createStyles({
   selectionInput: {
@@ -157,6 +157,7 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   toggleDrawer: () => void;
   insertContainer: () => void;
   requestTemplateText: () => void;
+  requestTemplateHTML: () => void;
 }
 
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
@@ -276,7 +277,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
           props.featureSupport.supportsLists ?
             <IconButton
               tabIndex={-1}
-              title={props.i18nRichInfo.formatListNumberedLabel}
+              title={props.i18nRichInfo.formatListBulletedLabel}
               color={
                 props.info.currentSuperBlock && props.info.currentSuperBlock.type === "list" &&
                   props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
@@ -370,6 +371,20 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             </IconButton> :
             null
         }
+        {
+          props.featureSupport.supportsTemplating ?
+            <IconButton
+              tabIndex={-1}
+              title={props.i18nRichInfo.formatAddTemplateHTML}
+              disabled={!props.info.currentBlock}
+              onMouseDown={props.helpers.blockBlur}
+              onClick={props.requestTemplateHTML}
+              onMouseUp={props.helpers.releaseBlur}
+            >
+              <CodeIcon />
+            </IconButton> :
+            null
+        }
         <div className={props.classes.moreOptionsSpacer} />
         {
           props.shouldHaveDrawer() ?
@@ -398,6 +413,7 @@ export interface MaterialUISlateWrapperState {
   videoDialogOpen: boolean;
   linkDialogOpen: boolean;
   templateTextDialogOpen: boolean;
+  templateHTMLDialogOpen: boolean;
   drawerOpen: boolean;
   originalSelectedElement: RichElement;
 }
@@ -415,6 +431,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       videoDialogOpen: false,
       linkDialogOpen: false,
       templateTextDialogOpen: false,
+      templateHTMLDialogOpen: false,
 
       // keep SSR compatibility
       drawerOpen: false,
@@ -442,6 +459,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.acceptLink = this.acceptLink.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
     this.insertTemplateText = this.insertTemplateText.bind(this);
+    this.requestTemplateHTML = this.requestTemplateHTML.bind(this);
+    this.closeDialogTemplateHTML = this.closeDialogTemplateHTML.bind(this);
+    this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
   }
   public componentDidMount() {
     if (this.shouldHaveDrawer()) {
@@ -502,6 +522,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       templateTextDialogOpen: true,
     });
   }
+  public requestTemplateHTML() {
+    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.setState({
+      templateHTMLDialogOpen: true,
+    });
+  }
   public requestLink() {
     this.originalSelectionArea = this.props.helpers.editor.selection;
     this.setState({
@@ -527,6 +553,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       templateTextDialogOpen: false,
     });
   }
+  public closeDialogTemplateHTML() {
+    this.refocus();
+    this.setState({
+      templateHTMLDialogOpen: false,
+    });
+  }
   public insertContainer() {
     this.props.helpers.insertContainer();
   }
@@ -538,6 +570,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   }
   public insertTemplateText(label: string, value: string) {
     this.props.helpers.insertTemplateText(label, value, this.originalSelectionArea);
+  }
+  public insertTemplateHTML(label: string, value: string) {
+    this.props.helpers.insertTemplateHTML(label, value, this.originalSelectionArea);
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
@@ -632,15 +667,30 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     ) : null;
 
     const templateTextDialog = this.props.info.isRichText && this.props.featureSupport.supportsTemplating ? (
-      <TemplateTextDialog
-        insertTemplateText={this.insertTemplateText}
-        closeTemplateTextDialog={this.closeDialogTemplateText}
-        templateTextDialogOpen={this.state.templateTextDialogOpen}
+      <TemplateElementDialog
+        insertTemplateElement={this.insertTemplateText}
+        closeTemplateElementDialog={this.closeDialogTemplateText}
+        templateElementDialogOpen={this.state.templateTextDialogOpen}
         currentContext={this.props.info.currentContext}
-        i18nInsertTemplateTextLabel={this.props.i18nRichInfo.addTemplateText.label}
-        i18nInsertTemplateTextPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
-        i18nInsertTemplateTextSubmit={this.props.i18nRichInfo.addTemplateText.submit}
-        i18nInsertTemplateTextTitle={this.props.i18nRichInfo.addTemplateText.title}
+        i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateText.label}
+        i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
+        i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateText.submit}
+        i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateText.title}
+        elementType="text"
+      />
+    ) : null;
+
+    const templateHTMLDialog = this.props.info.isRichText && this.props.featureSupport.supportsTemplating ? (
+      <TemplateElementDialog
+        insertTemplateElement={this.insertTemplateHTML}
+        closeTemplateElementDialog={this.closeDialogTemplateHTML}
+        templateElementDialogOpen={this.state.templateHTMLDialogOpen}
+        currentContext={this.props.info.currentContext}
+        i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateHTML.label}
+        i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateHTML.placeholder}
+        i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateHTML.submit}
+        i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateHTML.title}
+        elementType="html"
       />
     ) : null;
 
@@ -657,6 +707,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           requestLink={this.requestLink}
           insertContainer={this.insertContainer}
           requestTemplateText={this.requestTemplateText}
+          requestTemplateHTML={this.requestTemplateHTML}
         />
         <div className={this.props.classes.editorContainer}>
           <div className={"rich-text " + this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
@@ -678,6 +729,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         {videoDialog}
         {linkDialog}
         {templateTextDialog}
+        {templateHTMLDialog}
         {imageInput}
         {fileInput}
       </>
