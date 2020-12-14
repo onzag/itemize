@@ -1,135 +1,16 @@
 import React from "react";
 import {
-  Typography, Button, TextField, FilledInput, FormControl, InputLabel, MenuItem, Select,
-} from "../../mui-core";
-import { Dialog } from "../dialog";
-import { capitalize } from "../../../../util";
-import { ISlateEditorInfoType } from ".";
-import { RichElement } from "../../../internal/text/serializer";
-
-interface IFileLoadErrorDialogProps {
-  currentLoadError: string;
-  dismissCurrentLoadError: () => void;
-  i18nGenericError: string;
-  i18nOk: string;
-}
-
-export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialogProps> {
-  public render() {
-    return (
-      <Dialog
-        fullScreen={false}
-        open={!!this.props.currentLoadError}
-        onClose={this.props.dismissCurrentLoadError}
-        title={capitalize(this.props.i18nGenericError)}
-        buttons={
-          <Button onClick={this.props.dismissCurrentLoadError}>
-            {capitalize(this.props.i18nOk)}
-          </Button>
-        }
-      >
-        <Typography>
-          {this.props.currentLoadError}
-        </Typography>
-      </Dialog>
-    );
-  }
-}
-
-interface IVideoDialogProps {
-  videoDialogOpen: boolean;
-  i18nLoadVideoTitle: string;
-  i18nLoadVideoSubmit: string;
-  i18nLoadVideoLabel: string;
-  i18nLoadVideoPlaceholder: string;
-  i18nLoadVideoInvalid: string;
-  closeDialogVideo: () => void;
-  acceptVideo: (url: string) => boolean;
-}
-
-interface IVideoDialogState {
-  videoURL: string;
-  videoInvalid: boolean;
-}
-
-export class VideoDialog extends React.PureComponent<IVideoDialogProps, IVideoDialogState> {
-  private textFieldVideoRef: React.RefObject<HTMLDivElement>;
-  constructor(props: IVideoDialogProps) {
-    super(props);
-
-    this.state = {
-      videoURL: "",
-      videoInvalid: false,
-    }
-
-    this.textFieldVideoRef = React.createRef();
-
-    this.focusVideoTextField = this.focusVideoTextField.bind(this);
-    this.acceptVideo = this.acceptVideo.bind(this);
-    this.updateVideoURL = this.updateVideoURL.bind(this);
-    this.closeDialog = this.closeDialog.bind(this);
-  }
-  public focusVideoTextField() {
-    this.textFieldVideoRef.current && this.textFieldVideoRef.current.focus();
-  }
-  public acceptVideo() {
-    const status = this.props.acceptVideo(this.state.videoURL);
-    if (status) {
-      this.props.closeDialogVideo();
-    } else {
-      this.setState({
-        videoInvalid: true,
-      });
-    }
-  }
-  public updateVideoURL(e: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      videoURL: e.target.value,
-    });
-  }
-  public closeDialog() {
-    this.props.closeDialogVideo();
-
-    this.setState({
-      videoURL: "",
-      videoInvalid: false,
-    });
-  }
-  public render() {
-    return (
-      <Dialog
-        fullScreen={false}
-        open={this.props.videoDialogOpen}
-        onClose={this.closeDialog}
-        onOpen={this.focusVideoTextField}
-        title={this.props.i18nLoadVideoTitle}
-        buttons={
-          <Button onClick={this.acceptVideo}>
-            {this.props.i18nLoadVideoSubmit}
-          </Button>
-        }
-      >
-        <div>
-          <TextField
-            fullWidth={true}
-            value={this.state.videoURL}
-            onChange={this.updateVideoURL}
-            label={this.props.i18nLoadVideoLabel}
-            placeholder={this.props.i18nLoadVideoPlaceholder}
-            inputRef={this.textFieldVideoRef}
-          />
-          <div>{this.state.videoInvalid ? this.props.i18nLoadVideoInvalid : null}</div>
-        </div>
-      </Dialog>
-    );
-  }
-}
+  Button, TextField, FilledInput, FormControl, InputLabel, MenuItem, Select,
+} from "../../../mui-core";
+import { Dialog } from "../../dialog";
+import { ITemplateArgsContext } from "..";
+import { RichElement } from "../../../../internal/text/serializer";
 
 interface ILinkDialogProps {
   acceptLink: (url: string, tvalue: string) => boolean;
   closeDialogLink: () => void;
   linkDialogOpen: boolean;
-  info: ISlateEditorInfoType;
+  currentContext: ITemplateArgsContext;
   originalSelectedElement: RichElement;
   supportsExternalLinks: boolean;
   i18nSetLinkTitle: string;
@@ -142,6 +23,8 @@ interface ILinkDialogProps {
   i18nSetLinkTemplatedLabel: string;
   i18nSetLinkTemplatedPlaceholder: string;
   i18nSetLinkTemplatedUnspecified: string;
+  templateBoxClassName: string;
+  templateTextClassName: string;
 }
 
 interface ILinkDialogTemplateOption {
@@ -184,8 +67,8 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
     const linkPropertiesToUse: ILinkDialogTemplateOption[] = [];
     let selectedContextValue: string = "";
 
-    this.props.info.currentContext && Object.keys(this.props.info.currentContext.properties).forEach((key) => {
-      const property = this.props.info.currentContext.properties[key];
+    this.props.currentContext && Object.keys(this.props.currentContext.properties).forEach((key) => {
+      const property = this.props.currentContext.properties[key];
       if (property.type !== "link") {
         return;
       }
@@ -277,8 +160,8 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
           <div>{this.state.linkInvalid ? this.props.i18nSetLinkInvalid : null}</div>
           {
             this.state.linkTemplateOptions.length ?
-              <div>
-                {this.props.i18nSetLinkTemplated}
+              <div className={this.props.templateBoxClassName}>
+                <div className={this.props.templateTextClassName}>{this.props.i18nSetLinkTemplated}</div>
                 <FormControl
                   variant="filled"
                 >

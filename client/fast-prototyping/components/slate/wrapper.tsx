@@ -10,8 +10,11 @@ import {
 } from "../../mui-core";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
-import { FileLoadErrorDialog, LinkDialog, VideoDialog } from "./dialogs";
 import { WrapperDrawer } from "./drawer";
+import { FileLoadErrorDialog } from "./dialogs/file";
+import { LinkDialog } from "./dialogs/link";
+import { VideoDialog } from "./dialogs/video";
+import { TemplateTextDialog } from "./dialogs/template-text";
 
 const style = createStyles({
   selectionInput: {
@@ -63,6 +66,9 @@ const style = createStyles({
     position: "relative",
     flex: "none",
   },
+  editorDrawerNoAnimate: {
+    transition: "none",
+  },
   editorDrawerBody: {
     width: "300px",
     height: "100%",
@@ -74,6 +80,7 @@ const style = createStyles({
     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
     backgroundColor: "#f5f5f5",
     padding: "1rem",
+    overflowY: "auto",
   },
   editor: (props: ISlateEditorWrapperBaseProps) => {
     const shouldShowInvalidEditor = !props.info.currentValid;
@@ -127,6 +134,17 @@ const style = createStyles({
     flex: "1 1 auto",
     height: "100%",
   },
+  linkTemplateOptionsBox: {
+    display: "flex",
+    flexDirection: "column",
+    padding: "1rem 0 0 0",
+  },
+  linkTemplateOptionsText: {
+    width: "100%",
+    textAlign: "center",
+    color: "#aaa",
+    paddingBottom: "1rem",
+  },
 });
 
 interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
@@ -138,6 +156,7 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
   toggleDrawer: () => void;
   insertContainer: () => void;
+  requestTemplateText: () => void;
 }
 
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
@@ -344,7 +363,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatAddTemplateText}
               disabled={!props.info.currentBlock}
               onMouseDown={props.helpers.blockBlur}
-              onClick={null}
+              onClick={props.requestTemplateText}
               onMouseUp={props.helpers.releaseBlur}
             >
               <TextFieldsIcon />
@@ -378,6 +397,7 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
 export interface MaterialUISlateWrapperState {
   videoDialogOpen: boolean;
   linkDialogOpen: boolean;
+  templateTextDialogOpen: boolean;
   drawerOpen: boolean;
   originalSelectedElement: RichElement;
 }
@@ -387,12 +407,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   private inputFileRef: React.RefObject<HTMLInputElement>;
   private originalSelectionArea: Range;
   private refocusTimeout: NodeJS.Timeout;
+  private noAnimate: boolean = false;
   constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
     this.state = {
       videoDialogOpen: false,
       linkDialogOpen: false,
+      templateTextDialogOpen: false,
 
       // keep SSR compatibility
       drawerOpen: false,
@@ -408,8 +430,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.requestFile = this.requestFile.bind(this);
     this.requestVideo = this.requestVideo.bind(this);
     this.requestLink = this.requestLink.bind(this);
+    this.requestTemplateText = this.requestTemplateText.bind(this);
     this.closeDialogVideo = this.closeDialogVideo.bind(this);
     this.closeDialogLink = this.closeDialogLink.bind(this);
+    this.closeDialogTemplateText = this.closeDialogTemplateText.bind(this);
     this.acceptVideo = this.acceptVideo.bind(this);
     this.onFileEventedReFocus = this.onFileEventedReFocus.bind(this);
     this.refocus = this.refocus.bind(this);
@@ -417,11 +441,15 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.toggleDrawer = this.toggleDrawer.bind(this);
     this.acceptLink = this.acceptLink.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
+    this.insertTemplateText = this.insertTemplateText.bind(this);
   }
   public componentDidMount() {
     if (this.shouldHaveDrawer()) {
+      this.noAnimate = true;
       this.setState({
         drawerOpen: localStorage.getItem("SLATE_DRAWER_OPEN") === "true",
+      }, () => {
+        this.noAnimate = false;
       });
     }
   }
@@ -468,6 +496,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       videoDialogOpen: true,
     });
   }
+  public requestTemplateText() {
+    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.setState({
+      templateTextDialogOpen: true,
+    });
+  }
   public requestLink() {
     this.originalSelectionArea = this.props.helpers.editor.selection;
     this.setState({
@@ -487,6 +521,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       linkDialogOpen: false,
     });
   }
+  public closeDialogTemplateText() {
+    this.refocus();
+    this.setState({
+      templateTextDialogOpen: false,
+    });
+  }
   public insertContainer() {
     this.props.helpers.insertContainer();
   }
@@ -495,6 +535,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   }
   public acceptLink(linkURL: string, linkTValue: string) {
     return this.props.helpers.toggleLink(linkURL, linkTValue, this.originalSelectionArea);
+  }
+  public insertTemplateText(label: string, value: string) {
+    this.props.helpers.insertTemplateText(label, value, this.originalSelectionArea);
   }
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
@@ -579,10 +622,25 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nSetLinkTemplatedPlaceholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
         i18nSetLinkTemplatedUnspecified={this.props.i18nRichInfo.setLink.templatedUnspecified}
         i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
-        info={this.props.info}
+        currentContext={this.props.info.currentContext}
         linkDialogOpen={this.state.linkDialogOpen}
         originalSelectedElement={this.state.originalSelectedElement}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
+        templateBoxClassName={this.props.classes.linkTemplateOptionsBox}
+        templateTextClassName={this.props.classes.linkTemplateOptionsText}
+      />
+    ) : null;
+
+    const templateTextDialog = this.props.info.isRichText && this.props.featureSupport.supportsTemplating ? (
+      <TemplateTextDialog
+        insertTemplateText={this.insertTemplateText}
+        closeTemplateTextDialog={this.closeDialogTemplateText}
+        templateTextDialogOpen={this.state.templateTextDialogOpen}
+        currentContext={this.props.info.currentContext}
+        i18nInsertTemplateTextLabel={this.props.i18nRichInfo.addTemplateText.label}
+        i18nInsertTemplateTextPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
+        i18nInsertTemplateTextSubmit={this.props.i18nRichInfo.addTemplateText.submit}
+        i18nInsertTemplateTextTitle={this.props.i18nRichInfo.addTemplateText.title}
       />
     ) : null;
 
@@ -598,12 +656,19 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           toggleDrawer={this.toggleDrawer}
           requestLink={this.requestLink}
           insertContainer={this.insertContainer}
+          requestTemplateText={this.requestTemplateText}
         />
         <div className={this.props.classes.editorContainer}>
           <div className={"rich-text " + this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
-          <div className={this.props.classes.editorDrawer + (this.state.drawerOpen ? " open" : "")}>
+          <div
+            className={
+              this.props.classes.editorDrawer +
+              (this.state.drawerOpen ? " open" : "") +
+              (this.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
+            }
+          >
             <div className={this.props.classes.editorDrawerBody}>
               {this.state.drawerOpen ? <WrapperDrawer {...this.props}/> : null}
             </div>
@@ -612,6 +677,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         {fileLoadErrorDialog}
         {videoDialog}
         {linkDialog}
+        {templateTextDialog}
         {imageInput}
         {fileInput}
       </>

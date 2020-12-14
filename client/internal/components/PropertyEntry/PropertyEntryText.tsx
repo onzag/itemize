@@ -84,6 +84,13 @@ export interface IPropertyEntryI18nRichTextInfo {
   styleActive: string;
   styleHover: string;
   classes: string;
+  settings: string;
+  styles: string;
+  templating: string;
+  actions: string;
+  each: string;
+  context: string;
+  uiHandler: string;
 
   loadVideo: {
     invalid: string;
@@ -754,6 +761,13 @@ export default class PropertyEntryText
         styleActive: i18nInLanguage.rich_style_active,
         styleHover: i18nInLanguage.rich_style_hover,
         classes: i18nInLanguage.rich_classes,
+        settings: i18nInLanguage.rich_settings,
+        styles: i18nInLanguage.rich_styles,
+        templating: i18nInLanguage.rich_templating,
+        actions: i18nInLanguage.rich_actions,
+        each: i18nInLanguage.rich_each,
+        context: i18nInLanguage.rich_context,
+        uiHandler: i18nInLanguage.rich_ui_handler,
 
         loadVideo: {
           title: i18nInLanguage.video_loader_title,

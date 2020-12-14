@@ -20,6 +20,27 @@ import { IContainer } from "../../../internal/text/serializer/container";
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
   label: string;
+
+  /**
+   * A handler component to use during the edition of a component
+   * that matches this ui handler signature
+   */
+  handler?: React.ComponentType;
+  /**
+   * Extra arguments to pass to the handler component itself
+   * every instance of this given handler will be passed the same
+   * extra argument, it can be used to specify that the handler
+   * is being used in edit mode and as such render differently
+   * and have different functionality
+   */
+  handlerExtraArgs?: any;
+  /**
+   * Pass extra attributes to the props of the handler
+   * for the rich text, these include
+   * "selected" for when the rich text editor is selecting
+   * "helpers" for the rich text helpers
+   */
+  handlerPassSlateInfo?: boolean;
 }
 
 /**
@@ -274,6 +295,10 @@ export interface IHelperFunctions {
    * Inserts a custom element
    */
   insertCustom: (type: string, at?: Range) => void;
+  /**
+   * Inserts a template text
+   */
+  insertTemplateText: (label: string, value: string, at?: Range) => void;
 
   /**
    * Makes a quote out of the current element
@@ -682,6 +707,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertImage = this.insertImage.bind(this);
     this.insertVideo = this.insertVideo.bind(this);
     this.insertFile = this.insertFile.bind(this);
+    this.insertTemplateText = this.insertTemplateText.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
     this.insertCustom = this.insertCustom.bind(this);
     this.toggleQuote = this.toggleQuote.bind(this);
@@ -725,7 +751,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           { at: path.concat(0) }
         );
       }
-    // if it's an element
+      // if it's an element
     } else if (Element.isElement(node)) {
       const managedChildrenExistance = node.children.map((v) => true);
       // the total current nodes
@@ -888,6 +914,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return element.containment === "inline" || element.containment === "void-inline";
   }
   public isVoid(element: RichElement) {
+    if (element.uiHandler) {
+      return true;
+    }
     return element.containment === "void-block" || element.containment === "void-inline";
   }
   public breakList() {
@@ -1318,14 +1347,57 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
   public renderElement(props: RenderElementProps) {
     const { attributes, children, element } = props;
-    let className: string = null;
-    if (
+
+    const isSelected = (
       (element as any) === this.state.currentBlock ||
       (element as any) === this.state.currentElement ||
       (element as any) === this.state.currentSuperBlock
-    ) {
+    );
+
+    const uiHandler = (element as any as RichElement).uiHandler;
+    if (uiHandler) {
+      const uiHandlerArgs = (element as any as RichElement).uiHandlerArgs;
+
+      const propertiesFromContext =
+        this.state.currentContext.properties[uiHandler] ||
+        this.props.rootContext.properties[uiHandler];
+
+      if (
+        !propertiesFromContext ||
+        propertiesFromContext.type !== "ui-handler" ||
+        !propertiesFromContext.handler
+      ) {
+        return (
+          <div>
+            <span>{`UI Handled [${uiHandler}]`}</span>
+            <span>You are missing a handler descrption for the given UI Handler as such it can't be rendered</span>
+          </div>
+        );
+      }
+      const HandlerComponent = propertiesFromContext.handler;
+      const handlerExtraArgs = propertiesFromContext.handlerExtraArgs;
+      const passExtraInfo = propertiesFromContext.handlerPassSlateInfo;
+
+      const extraInfoArgs = passExtraInfo ?
+        {
+          helpers: this.getHelpers(),
+          selected: isSelected,
+        } : {};
+
+      return (
+        <HandlerComponent
+          {...uiHandlerArgs}
+          {...handlerExtraArgs}
+          {...extraInfoArgs}
+        />
+      );
+    }
+
+    let className: string = null;
+    if (isSelected) {
       className = "selected";
     }
+
     return SERIALIZATION_REGISTRY.REACTIFY[element.type as string](element as any, false, { ...attributes, children, className }) as any;
   }
   public renderText(props: RenderLeafProps) {
@@ -1436,6 +1508,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.editor.insertNode(imageNode as any);
     } catch (err) {
     }
+  }
+  public async insertTemplateText(label: string, value: string, at?: Range) {
+    if (at) {
+      await this.focusAt(at);
+    }
+    const textNode: IText = {
+      ...this.state.currentText,
+      text: label,
+      templateText: value,
+    }
+
+    this.editor.insertNode(textNode as any);
   }
   /**
    * Will insert a video given the information
@@ -1978,6 +2062,81 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     });
   }
 
+  public getHelpers() {
+    const helpers: IHelperFunctions = {
+      editor: this.editor,
+      Transforms,
+      Range,
+      ReactEditor,
+
+      selectPath: this.selectPath,
+
+      deleteSelectedNode: this.deleteSelectedNode,
+
+      focus: this.focus,
+      focusAt: this.focusAt,
+
+      formatToggleBold: this.formatToggleBold,
+      formatToggleItalic: this.formatToggleItalic,
+      formatToggleUnderline: this.formatToggleUnderline,
+      insertContainer: this.insertContainer,
+      insertCustom: this.insertCustom,
+      insertFile: this.insertFile,
+      insertImage: this.insertImage,
+      insertVideo: this.insertVideo,
+      insertTemplateText: this.insertTemplateText,
+      toggleLink: this.toggleLink,
+      toggleList: this.toggleList,
+      toggleQuote: this.toggleQuote,
+      toggleTitle: this.toggleTitle,
+      setActiveStyle: this.setActiveStyle,
+      setContext: this.setContext,
+      setForEach: this.setForEach,
+      setHoverStyle: this.setHoverStyle,
+      setStyle: this.setStyle,
+      setRichClasses: this.setRichClasses,
+      setAction: this.setAction,
+
+      blockBlur: this.blockBlur,
+      releaseBlur: this.releaseBlur,
+    }
+
+    return helpers;
+  }
+
+  public getFeatureSupport() {
+    const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
+    const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
+
+    const newFeatureSupport: IAccessibleFeatureSupportOptions = {
+      ...this.props.features,
+
+      availableContainers: this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers"),
+      availableCustoms: availableCustoms,
+      availableRichClasses,
+
+      canInsertContainer: this.state.currentBlock && this.props.features.supportsContainers,
+      canInsertCustom: this.state.currentBlock && this.props.features.supportsCustom && !!availableCustoms.length,
+      canInsertFile: this.state.currentBlock && this.props.features.supportsFiles,
+      canInsertImage: this.state.currentBlock && this.props.features.supportsImages,
+      canInsertLink: this.state.currentBlock && this.props.features.supportsLinks,
+      canInsertList: this.state.currentBlock && this.props.features.supportsLists,
+      canInsertQuote: this.state.currentBlock && this.props.features.supportsQuote,
+      canInsertRichClass: this.state.currentBlock && this.props.features.supportsRichClasses && !!availableRichClasses.length,
+      canInsertTitle: this.state.currentText && this.props.features.supportsTitle,
+      canInsertVideo: this.state.currentBlock && this.props.features.supportsVideos,
+      canSetActionFunction: this.state.currentBlock && this.props.features.supportsTemplating,
+      canSetActiveStyle: this.state.currentBlock && this.props.features.supportsTemplating,
+      canSetDynamicHref: this.state.currentBlock && this.props.features.supportsTemplating,
+      canSetHoverStyle: this.state.currentBlock && this.props.features.supportsTemplating,
+      canSetLoop: this.state.currentBlock && this.props.features.supportsTemplating,
+      canSetStyle: this.state.currentBlock && this.props.features.supportsCustomStyles,
+      canSetUIHandler: this.state.currentBlock && this.props.features.supportsTemplating,
+    };
+
+    return newFeatureSupport;
+  }
+
   public render() {
     let children: React.ReactNode = (
       <Editable
@@ -2009,77 +2168,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         selectedAnchor: this.state.selectedAnchor,
       }
 
-      const helpers: IHelperFunctions = {
-        editor: this.editor,
-        Transforms,
-        Range,
-        ReactEditor,
-
-        selectPath: this.selectPath,
-
-        deleteSelectedNode: this.deleteSelectedNode,
-
-        focus: this.focus,
-        focusAt: this.focusAt,
-
-        formatToggleBold: this.formatToggleBold,
-        formatToggleItalic: this.formatToggleItalic,
-        formatToggleUnderline: this.formatToggleUnderline,
-        insertContainer: this.insertContainer,
-        insertCustom: this.insertCustom,
-        insertFile: this.insertFile,
-        insertImage: this.insertImage,
-        insertVideo: this.insertVideo,
-        toggleLink: this.toggleLink,
-        toggleList: this.toggleList,
-        toggleQuote: this.toggleQuote,
-        toggleTitle: this.toggleTitle,
-        setActiveStyle: this.setActiveStyle,
-        setContext: this.setContext,
-        setForEach: this.setForEach,
-        setHoverStyle: this.setHoverStyle,
-        setStyle: this.setStyle,
-        setRichClasses: this.setRichClasses,
-        setAction: this.setAction,
-
-        blockBlur: this.blockBlur,
-        releaseBlur: this.releaseBlur,
-      }
-
-      const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
-      const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
-
-      const newFeatureSupport: IAccessibleFeatureSupportOptions = {
-        ...this.props.features,
-
-        availableContainers: this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers"),
-        availableCustoms: availableCustoms,
-        availableRichClasses,
-
-        canInsertContainer: this.state.currentBlock && this.props.features.supportsContainers,
-        canInsertCustom: this.state.currentBlock && this.props.features.supportsCustom && !!availableCustoms.length,
-        canInsertFile: this.state.currentBlock && this.props.features.supportsFiles,
-        canInsertImage: this.state.currentBlock && this.props.features.supportsImages,
-        canInsertLink: this.state.currentBlock && this.props.features.supportsLinks,
-        canInsertList: this.state.currentBlock && this.props.features.supportsLists,
-        canInsertQuote: this.state.currentBlock && this.props.features.supportsQuote,
-        canInsertRichClass: this.state.currentBlock && this.props.features.supportsRichClasses && !!availableRichClasses.length,
-        canInsertTitle: this.state.currentText && this.props.features.supportsTitle,
-        canInsertVideo: this.state.currentBlock && this.props.features.supportsVideos,
-        canSetActionFunction: this.state.currentBlock && this.props.features.supportsTemplating,
-        canSetActiveStyle: this.state.currentBlock && this.props.features.supportsTemplating,
-        canSetDynamicHref: this.state.currentBlock && this.props.features.supportsTemplating,
-        canSetHoverStyle: this.state.currentBlock && this.props.features.supportsTemplating,
-        canSetLoop: this.state.currentBlock && this.props.features.supportsTemplating,
-        canSetStyle: this.state.currentBlock && this.props.features.supportsCustomStyles,
-        canSetUIHandler: this.state.currentBlock && this.props.features.supportsTemplating,
-      };
       children = (
         <Wrapper
           {...this.props.wrapperArgs}
           info={info}
-          helpers={helpers}
-          featureSupport={newFeatureSupport}
+          helpers={this.getHelpers()}
+          featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
         >

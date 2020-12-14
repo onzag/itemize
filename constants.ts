@@ -376,6 +376,13 @@ export const LOCALE_I18N = [
   "rich_style_active",
   "rich_style_hover",
   "rich_classes",
+  "rich_settings",
+  "rich_styles",
+  "rich_templating",
+  "rich_actions",
+  "rich_each",
+  "rich_context",
+  "rich_ui_handler",
 
   // for filling the booleans and other things
   "yes",

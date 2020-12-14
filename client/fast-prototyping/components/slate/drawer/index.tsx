@@ -8,6 +8,7 @@ import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/PropertyEntry/PropertyEntryText";
 import { localeReplacer } from "../../../../../util";
+import { ActionsOptions } from "./actions";
 
 const templatedInteractiveActions = [
   "click",
@@ -135,6 +136,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
       case "STYLES":
         infoPanel = StylesOptions(props);
         break;
+      case "ACTIONS":
+        infoPanel = ActionsOptions(props);
+        break;
     }
 
     settingsForNode = (
@@ -151,7 +155,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
                     className={props.classes.tab}
                     label={<SettingsIcon />}
                     value="MAIN"
-                    title="general options"
+                    title={props.i18nRichInfo.settings}
                   />
                   {
                     props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
@@ -160,7 +164,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
                           className={props.classes.tab}
                           label={<BorderStyleIcon />}
                           value="STYLES"
-                          title="configure styles"
+                          title={props.i18nRichInfo.styles}
                         />
                       ) :
                       null
@@ -172,7 +176,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
                           className={props.classes.tab}
                           label={<WebIcon />}
                           value="TEMPLATING"
-                          title="templating"
+                          title={props.i18nRichInfo.templating}
                         />
                       ) :
                       null
@@ -184,7 +188,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
                           className={props.classes.tab}
                           label={<TouchAppIcon />}
                           value="ACTIONS"
-                          title="actions"
+                          title={props.i18nRichInfo.actions}
                         />
                       ) :
                       null
