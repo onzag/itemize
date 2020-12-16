@@ -92,6 +92,8 @@ export interface IPropertyEntryI18nRichTextInfo {
   each: string;
   context: string;
   uiHandler: string;
+  type: string;
+  standalone: string;
 
   loadVideo: {
     invalid: string;
@@ -777,6 +779,8 @@ export default class PropertyEntryText
         each: i18nInLanguage.rich_each,
         context: i18nInLanguage.rich_context,
         uiHandler: i18nInLanguage.rich_ui_handler,
+        type: i18nInLanguage.rich_type,
+        standalone: i18nInLanguage.rich_standalone,
 
         loadVideo: {
           title: i18nInLanguage.video_loader_title,

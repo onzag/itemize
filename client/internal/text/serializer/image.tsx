@@ -28,7 +28,7 @@ export function registerImage(registry: ISerializationRegistryType) {
     if (img.sizes) {
       attrs.sizes = img.sizes;
     }
-  
+
     if (img.standalone) {
       const standaloneImage = serializeElementBase(
         registry,
@@ -48,23 +48,23 @@ export function registerImage(registry: ISerializationRegistryType) {
         null,
         null,
       ) as HTMLAnchorElement;
-  
+
       const imageContainer = DOMWindow.document.createElement("div");
       imageContainer.className = "image-container";
       imageComponent.appendChild(imageContainer);
-  
+
       const imagePad = DOMWindow.document.createElement("div");
       imagePad.className = "image-pad";
-  
+
       const width = img.width;
       const height = img.height;
       const ratio = height / width;
       const percentage = ratio * 100;
       const padStyle = "padding-bottom:" + percentage + "%";
-  
+
       imagePad.setAttribute("style", padStyle);
       imageContainer.appendChild(imagePad);
-  
+
       const standaloneImage = serializeElementBase(
         registry,
         {},
@@ -74,25 +74,25 @@ export function registerImage(registry: ISerializationRegistryType) {
         null,
       );
       imagePad.appendChild(standaloneImage);
-  
+
       // add the src to the standalone image
       if ((standaloneImage as HTMLImageElement).src) {
         imageComponent.href = (standaloneImage as HTMLImageElement).src;
       }
-  
+
       return imageComponent;
     }
   }
-  
+
   function deserializeImage(node: HTMLDivElement | HTMLImageElement): IImage {
     // first we need to check everything is fine
     const img = node.tagName === "IMG" ? node : node.querySelector("img") as HTMLImageElement;
     if (!img) {
       return null;
     }
-  
+
     const base = deserializeElementBase(node);
-  
+
     // and extract the info according to the specs
     // the spec says srcset sizes and src will be stripped but can be available
     return {
@@ -124,6 +124,32 @@ export function registerImage(registry: ISerializationRegistryType) {
       ...customProps,
     };
     if (image.standalone) {
+      if (newCustomProps.children) {
+        delete newCustomProps.children;
+        return (
+          <div {...(newCustomProps as any)}>
+            {
+              reactifyElementBase(
+                registry,
+                active,
+                image,
+                "img",
+                null,
+                null,
+                {
+                  alt: image.alt,
+                  sizes: image.sizes,
+                  src: image.src,
+                  srcSet: image.srcSet,
+                } as any,
+                null,
+              )
+            }
+            {customProps.children}
+          </div>
+        );
+      }
+
       (newCustomProps as any).alt = image.alt;
       (newCustomProps as any).sizes = image.sizes;
       (newCustomProps as any).src = image.src;
@@ -160,8 +186,8 @@ export function registerImage(registry: ISerializationRegistryType) {
       (children: React.ReactNode) => {
         return (
           <div className="image-container">
-            <div className="image-pad" style={{paddingBottom: padPercentage}}>
-              <img alt={image.alt} sizes={image.sizes} src={image.src} srcSet={image.srcSet}/>
+            <div className="image-pad" style={{ paddingBottom: padPercentage }}>
+              <img alt={image.alt} sizes={image.sizes} src={image.src} srcSet={image.srcSet} />
               {children}
             </div>
           </div>

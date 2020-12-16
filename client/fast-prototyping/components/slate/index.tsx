@@ -324,6 +324,13 @@ export interface IHelperFunctions {
   toggleLink: (url: string, templateValue: string, at?: Range) => boolean;
 
   /**
+   * does an arbitrary update
+   * @param args 
+   * @param anchor 
+   */
+  set: (args: any, anchor: Path) => void;
+
+  /**
    * Sets the current style for the element
    */
   setStyle: (style: string, anchor: Path) => void;
@@ -758,6 +765,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.toggleList = this.toggleList.bind(this);
     this.toggleLink = this.toggleLink.bind(this);
     this.setStyle = this.setStyle.bind(this);
+    this.set = this.set.bind(this);
     this.setHoverStyle = this.setHoverStyle.bind(this);
     this.setActiveStyle = this.setActiveStyle.bind(this);
     this.setRichClasses = this.setRichClasses.bind(this);
@@ -1972,6 +1980,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   };
 
   /**
+   * Abitrary update
+   */
+  public set(args: any, anchor: Path) {
+    Transforms.setNodes(this.editor, args, { at: anchor });
+  };
+  /**
    * Sets the current style for the element
    */
   public setStyle(style: string, anchor: Path) {
@@ -2175,6 +2189,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setForEach: this.setForEach,
       setHoverStyle: this.setHoverStyle,
       setStyle: this.setStyle,
+      set: this.set,
       setRichClasses: this.setRichClasses,
       setAction: this.setAction,
       setUIHandler: this.setUIHandler,

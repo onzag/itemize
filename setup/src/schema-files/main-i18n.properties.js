@@ -69,6 +69,8 @@ rich_actions = actions
 rich_each = loop for each
 rich_context = context
 rich_ui_handler = ui handler
+rich_type = type
+rich_standalone = standalone
 
 file_uploader_placeholder_active = drop your files here...
 image_uploader_placeholder_active = drop your pictures here...
@@ -229,6 +231,8 @@ rich_actions = actions
 rich_each = loop for each
 rich_context = context
 rich_ui_handler = ui handler
+rich_type = type
+rich_standalone = standalone
 
 file_uploader_placeholder_active = pudota tiedostosi tähän...
 image_uploader_placeholder_active = pudota kuvatiedostosi tähän...
@@ -389,6 +393,8 @@ rich_actions = actions
 rich_each = loop for each
 rich_context = context
 rich_ui_handler = ui handler
+rich_type = type
+rich_standalone = standalone
 
 file_uploader_placeholder_active = drop your files here...
 image_uploader_placeholder_active = drop your pictures here...
@@ -549,6 +555,8 @@ rich_actions = actions
 rich_each = loop for each
 rich_context = context
 rich_ui_handler = ui handler
+rich_type = type
+rich_standalone = standalone
 
 file_uploader_placeholder_active = Dateien hier her ziehen...
 image_uploader_placeholder_active = Bilder hier her ziehen...
@@ -709,6 +717,8 @@ rich_actions = acciones
 rich_each = bucle
 rich_context = contexto
 rich_ui_handler = administrador de ui
+rich_type = tipo
+rich_standalone = imagen independiente
 
 file_uploader_placeholder_active = suelta tus archivos aquí...
 image_uploader_placeholder_active = suelta tus fotos aquí...
@@ -869,6 +879,8 @@ rich_actions = actions
 rich_each = loop for each
 rich_context = context
 rich_ui_handler = ui handler
+rich_type = type
+rich_standalone = standalone
 
 file_uploader_placeholder_active = ضع ملفاتك هنا
 image_uploader_placeholder_active = ضع صورك هنا

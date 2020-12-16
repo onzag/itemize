@@ -384,6 +384,8 @@ export const LOCALE_I18N = [
   "rich_each",
   "rich_context",
   "rich_ui_handler",
+  "rich_type",
+  "rich_standalone",
 
   // for filling the booleans and other things
   "yes",
