@@ -316,6 +316,22 @@ export const ENDPOINT_ERRORS = {
 };
 
 /**
+ * Extra i18n properties that are used for the generation
+ * of the validation email and the recovery email
+ */
+export const USER_EXTRA_CUSTOM_I18N = [
+  "validate_account_fragment_id",
+  "validate_account",
+  "validate_account_user",
+  "validate_account_email_user",
+  "forgot_password_link_target",
+  "forgot_password_fragment_id",
+  "forgot_password_title",
+  "validate_account_user",
+  "validate_account_email_user",
+];
+
+/**
  * This is for small use anywhere language data
  */
 export const LOCALE_I18N = [

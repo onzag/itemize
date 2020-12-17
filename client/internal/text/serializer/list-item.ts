@@ -1,6 +1,6 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, deserializeElement, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, deserializeElement, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
@@ -23,7 +23,12 @@ export function registerListItem(registry: ISerializationRegistryType) {
     return li;
   }
 
-  function reactifyListItem(li: IListItem, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyListItem(
+    li: IListItem,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     return reactifyElementBase(
       registry,
       active,
@@ -33,6 +38,7 @@ export function registerListItem(registry: ISerializationRegistryType) {
       null,
       customProps,
       li.children,
+      templateOptions,
     );
   }
 

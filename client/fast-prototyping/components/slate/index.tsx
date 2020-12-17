@@ -349,7 +349,7 @@ export interface IHelperFunctions {
   /**
    * Sets an UI handler in the given anchor with the given args
    */
-  setUIHandler: (key: string, args: {[key: string]: string}, anchor: Path) => void;
+  setUIHandler: (key: string, args: { [key: string]: string }, anchor: Path) => void;
   /**
    * Sets the for-each loop key
    */
@@ -2026,7 +2026,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
   }
 
-  public setUIHandler(value: string, args: {[key: string]: string}, anchor: Path) {
+  public setUIHandler(value: string, args: { [key: string]: string }, anchor: Path) {
     Transforms.setNodes(this.editor, {
       uiHandler: value,
       uiHandlerArgs: args,
@@ -2279,14 +2279,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       );
     }
     return (
-      <>
-        <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
-          {children}
-        </Slate>
-        <code>
-          {JSON.stringify(this.state.internalValue, null, 2)}
-        </code>
-      </>
+      <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
+        {children}
+      </Slate>
     )
   }
 }

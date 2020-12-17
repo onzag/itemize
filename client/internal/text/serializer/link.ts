@@ -1,13 +1,13 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
-import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function registerLink(registry: ISerializationRegistryType) {
   function serializeLink(link: ILink) {
     const attrs: IAttrs = {};
     if (link.thref) {
-      attrs["data-thref"] = link.thref;
+      attrs["data-href"] = link.thref;
     } else if (link.href) {
       attrs.href = link.href;
     }
@@ -46,7 +46,12 @@ export function registerLink(registry: ISerializationRegistryType) {
     return link;
   }
 
-  function reactifyLink(link: ILink, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyLink(
+    link: ILink,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     const newCustomProps = {
       ...customProps,
     };
@@ -66,6 +71,7 @@ export function registerLink(registry: ISerializationRegistryType) {
       null,
       newCustomProps,
       link.children,
+      templateOptions,
     );
   }
 

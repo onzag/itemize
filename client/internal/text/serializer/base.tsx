@@ -227,6 +227,12 @@ class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifie
   }
 }
 
+export interface IReactifyTemplateOptions {
+  args?: any,
+  key?: number | string,
+  ignoreContextualChanges?: boolean;
+};
+
 export function reactifyElementBase(
   registry: ISerializationRegistryType,
   active: boolean,
@@ -236,10 +242,63 @@ export function reactifyElementBase(
   wrapChildren: (node: React.ReactNode) => React.ReactNode,
   props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
   children: Array<RichElement | IText>,
+  templateOptions?: IReactifyTemplateOptions,
 ) {
+  let currentTemplateOptions = templateOptions;
+  if (currentTemplateOptions && !currentTemplateOptions.ignoreContextualChanges) {
+    if (currentTemplateOptions && base.context) {
+      currentTemplateOptions = {
+        args: currentTemplateOptions.args ? currentTemplateOptions.args[base.context] : null,
+        key: currentTemplateOptions.key,
+      }
+    }
+    if (currentTemplateOptions && base.forEach) {
+      const loopElement = currentTemplateOptions.args && currentTemplateOptions.args[base.forEach];
+      if (Array.isArray(loopElement)) {
+        return (
+          <React.Fragment key={currentTemplateOptions.key}>
+            {loopElement.map((loopContext, index) => {
+              return reactifyElementBase(
+                registry,
+                active,
+                base,
+                Tag,
+                baseClass,
+                wrapChildren,
+                props,
+                children,
+                {
+                  args: loopContext,
+                  key: index,
+                  ignoreContextualChanges: true,
+                }
+              );
+            })}
+          </React.Fragment>
+        );
+      } else {
+        return null;
+      }
+    }
+  }
+
+  if (base.uiHandler && currentTemplateOptions) {
+    const Handler: any = currentTemplateOptions.args && currentTemplateOptions.args[base.uiHandler];
+    if (Handler) {
+      return (<Handler {...base.uiHandlerArgs}/>);
+    } else {
+      return null;
+    }
+  }
+
   const finalProps = {
     ...props,
   };
+
+  if (currentTemplateOptions && typeof currentTemplateOptions.key !== "undefined") {
+    finalProps.key = currentTemplateOptions.key;
+  }
+
   if (!active) {
     finalProps.className = (finalProps.className || "") + " inactive";
   } else {
@@ -266,13 +325,22 @@ export function reactifyElementBase(
     };
   }
 
-  if (!props.children && children) {
-    finalProps.children = children.map((c) => {
+  if (templateOptions && base.html) {
+    delete finalProps.children;
+    finalProps.dangerouslySetInnerHTML = templateOptions.args && templateOptions.args[base.html];
+  } else if (!props.children && children) {
+    finalProps.children = children.map((c, index: number) => {
+      const specificChildTemplateOptions = currentTemplateOptions ? {
+        ...currentTemplateOptions,
+        key: index,
+      } : null;
       if ((c as IText).text) {
-        return registry.REACTIFY.text(c, active);
+        return registry.REACTIFY.text(c, active, null, specificChildTemplateOptions);
       } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        return registry.REACTIFY[(c as RichElement).type](c, active);
+        return registry.REACTIFY[(c as RichElement).type](c, active, null, specificChildTemplateOptions);
       }
+
+      return null;
     });
   }
 

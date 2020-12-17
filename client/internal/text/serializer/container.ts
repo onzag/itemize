@@ -1,7 +1,7 @@
 import React from "react";
 import { ISerializationRegistryType, RichElement } from ".";
 import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "..";
-import { serializeElementBase, deserializeElementBase, IElementBase, deserializeElement, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, deserializeElement, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 
 export function registerContainer(registry: ISerializationRegistryType) {
   const boundDeserializeElement = deserializeElement.bind(null, registry);
@@ -35,7 +35,12 @@ export function registerContainer(registry: ISerializationRegistryType) {
     return container;
   }
 
-  function reactifyContainer(container: IContainer, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyContainer(
+    container: IContainer,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     return reactifyElementBase(
       registry,
       active,
@@ -45,6 +50,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       null,
       customProps,
       container.children,
+      templateOptions,
     );
   }
 

@@ -12,7 +12,7 @@ import {
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
-import { deserialize } from "../../../internal/text";
+import { deserialize, reactify } from "../../../internal/text";
 
 /**
  * The current intersection observer
@@ -142,11 +142,7 @@ function lazyloaderExecute(element: HTMLElement) {
  * The rich text viewer props
  */
 interface IPropertyViewRichTextViewerProps {
-  disableLinks: boolean;
   children?: string;
-  isTemplate?: boolean;
-  disableInnerHTMLTemplating?: boolean;
-  templateArgs?: any;
 }
 
 /**
@@ -185,7 +181,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     this.cheapdiv = DOMWindow.document.createElement("div");
 
     this.state = {
-      html: this.getHTML(props.children, props.disableLinks, props.isTemplate, props.disableInnerHTMLTemplating, props.templateArgs),
+      html: this.getHTML(props.children),
     }
   }
 
@@ -194,7 +190,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
    * that is going to be rendered instead for the inner html
    * @param html 
    */
-  public getHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableInnerHTMLTemplating: boolean, templateArgs: any) {
+  public getHTML(html: string) {
     // with no html it's null
     if (!html) {
       return null;
@@ -207,15 +203,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 
     // so first we get all the images
     this.cheapdiv.querySelectorAll("img").forEach((img: HTMLImageElement) => {
-      let a: HTMLAnchorElement = null;
-      if (!disableLinks) {
-        // this will wrap our image, for SEO purposes as well as to
-        // have a click to it
-        a = DOMWindow.document.createElement("a");
-        a.href = img.src;
-        a.title = img.alt || "";
-      }
-
       // yes the src can be a blob, if the image hasn't been uploaded
       // yet, this is a valid protocol, and since it's local, lazyloading
       // preparations make no sense
@@ -228,13 +215,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         img.dataset.sizes = img.sizes;
         img.removeAttribute("sizes");
       }
-
-      if (!disableLinks) {
-        // now we replace the img with the a link
-        img.parentNode.replaceChild(a, img);
-        // and add the image inside the a link
-        a.appendChild(img);
-      }
     });
 
     // we do the same with iframes
@@ -244,10 +224,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         iframe.removeAttribute("src");
       }
     });
-
-    if (isTemplate) {
-      // TODO
-    }
 
     // and return the fresh inner html
     return this.cheapdiv.innerHTML;
@@ -276,9 +252,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
    * updates the html
    * @param html the html to update for
    */
-  public updateHTML(html: string, disableLinks: boolean, isTemplate: boolean, disableInnerHTMLTemplating: boolean, templateArgs: any) {
+  public updateHTML(html: string) {
     this.setState({
-      html: this.getHTML(html, disableLinks, isTemplate, disableInnerHTMLTemplating, templateArgs),
+      html: this.getHTML(html),
     });
   }
 
@@ -334,13 +310,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
     if (
-      nextProps.children !== this.props.children ||
-      nextProps.disableLinks !== this.props.disableLinks ||
-      nextProps.isTemplate !== this.props.isTemplate ||
-      nextProps.disableInnerHTMLTemplating !== this.props.disableInnerHTMLTemplating ||
-      !equals(nextProps.templateArgs, this.props.templateArgs)
+      nextProps.children !== this.props.children
     ) {
-      this.updateHTML(nextProps.children, nextProps.disableLinks, nextProps.isTemplate, nextProps.disableInnerHTMLTemplating, nextProps.templateArgs);
+      this.updateHTML(nextProps.children);
     }
     // see only when the html changes
     return this.state.html !== nextState.html;
@@ -353,6 +325,29 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     )
   }
 }
+
+interface ITemplatedPropertyViewRichTextRendererProps extends IPropertyViewRichTextViewerProps {
+  templateArgs: any;
+}
+
+export class TemplatedPropertyViewRichTextRenderer extends React.Component<
+  ITemplatedPropertyViewRichTextRendererProps
+> {
+  constructor(props: ITemplatedPropertyViewRichTextRendererProps) {
+    super(props);
+  }
+  public shouldComponentUpdate(nextProps: ITemplatedPropertyViewRichTextRendererProps) {
+    return (
+      nextProps.children !== this.props.children ||
+      !equals(nextProps.templateArgs, this.props.templateArgs)
+    );
+  }
+  public render() {
+    const deserializedValue = deserialize(this.props.children);
+    return reactify(deserializedValue, this.props.templateArgs);
+  }
+}
+
 
 /**
  * The property view text renderer
@@ -372,16 +367,19 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   }
 
   if (props.isRichText) {
-    return (
-      <PropertyViewRichTextViewer
-        disableLinks={!!props.args.disableLinks}
-        isTemplate={!!props.args.makeTemplate}
-        templateArgs={props.args.templateArgs}
-        disableInnerHTMLTemplating={!!props.args.disableInnerHTMLTemplating}
-      >
-        {props.currentValue}
-      </PropertyViewRichTextViewer>
-    );
+    if (props.args.makeTemplate) {
+      return (
+        <TemplatedPropertyViewRichTextRenderer templateArgs={props.args.templateArgs}>
+          {props.currentValue}
+        </TemplatedPropertyViewRichTextRenderer>
+      );
+    } else {
+      return (
+        <PropertyViewRichTextViewer>
+          {props.currentValue}
+        </PropertyViewRichTextViewer>
+      );
+    }
   } else if (props.subtype === "plain") {
     return (
       <div className="plain-text">

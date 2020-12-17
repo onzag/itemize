@@ -1,6 +1,6 @@
 import React from "react";
 import { DOMWindow } from "../../../../util";
-import { deserializeElement } from "./base";
+import { deserializeElement, IReactifyTemplateOptions } from "./base";
 import { IContainer, registerContainer } from "./container";
 import { ICustom, registerCustom } from "./custom";
 import { IFile, registerFile } from "./file";
@@ -32,7 +32,12 @@ export interface ISerializationRegistryType {
     text: (n: Node) => IText;
   };
   REACTIFY: {
-    [type: string]: (element: RichElement | IText, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => React.ReactNode;
+    [type: string]: (
+      element: RichElement | IText,
+      active: boolean,
+      customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+      templateArgs?: IReactifyTemplateOptions,
+    ) => React.ReactNode;
   };
 }
 

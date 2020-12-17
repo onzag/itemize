@@ -1,7 +1,7 @@
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 import { IText } from "./text";
 
 export function registerFile(registry: ISerializationRegistryType) {
@@ -65,7 +65,12 @@ export function registerFile(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyFile(file: IFile, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyFile(
+    file: IFile,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     const newCustomProps = {
       ...customProps,
     };
@@ -93,6 +98,7 @@ export function registerFile(registry: ISerializationRegistryType) {
       },
       newCustomProps,
       null,
+      templateOptions,
     );
   }
 

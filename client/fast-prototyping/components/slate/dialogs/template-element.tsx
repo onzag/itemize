@@ -67,11 +67,13 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
     if (this.state.value) {
       this.props.insertTemplateElement(this.state.label || this.state.value, this.state.value);
     }
+    this.closeDialog();
   }
   public updateTextValue(e: React.ChangeEvent<HTMLInputElement>) {
+    const option = this.state.options.find((o) => o.value === e.target.value);
     this.setState({
       value: e.target.value,
-      label: e.target.textContent,
+      label: option && option.label,
     });
   }
   public closeDialog() {

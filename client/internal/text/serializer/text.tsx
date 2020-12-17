@@ -1,5 +1,6 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
+import { IReactifyTemplateOptions } from "./base";
 
 export const STANDARD_TEXT_NODE = {
   bold: false,
@@ -138,7 +139,12 @@ export function registerText(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyText(text: IText, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyText(
+    text: IText,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     const newCustomProps = {
       ...customProps
     };

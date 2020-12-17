@@ -19,6 +19,7 @@ import {
   OWNER_METAROLE,
   ANYONE_METAROLE,
   GUEST_METAROLE,
+  USER_EXTRA_CUSTOM_I18N,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -268,6 +269,7 @@ export function checkItemDefinition(
   // in all languages, note how we move the traceback location
   checkI18nCustomConsistency(
     rawData.i18nData,
+    parentModule.name === "users" && rawData.name === "user",
     actualTraceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 
@@ -1102,6 +1104,7 @@ export function checkPropertyDefinition(
  */
 export function checkI18nCustomConsistency(
   rawData: IRawJSONI18NDataType,
+  isUserIdef: boolean,
   traceback: Traceback,
 ) {
   // so we first analyze all the keys in order to extract all
@@ -1142,8 +1145,23 @@ export function checkI18nCustomConsistency(
             );
           }
         });
-      }
+      } 
     });
+
+    // now if we are in the special user item definition
+    if (isUserIdef) {
+      // we need to ensure that the extra keys for validation and recovery
+      // are present
+      USER_EXTRA_CUSTOM_I18N.forEach((key) => {
+        if (!analysisData.keys.includes(key)) {
+          throw new CheckUpError(
+            "Custom i18n in locale " + analysisData.localeKey + " is missing required custom key '" +
+            key,
+            traceback,
+          );
+        }
+      });
+    }
   });
 }
 
@@ -1175,6 +1193,7 @@ export function checkModule(
   // check the i18n consistency so that custom keys are valid
   checkI18nCustomConsistency(
     rawData.i18nData,
+    false,
     traceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 

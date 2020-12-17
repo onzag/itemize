@@ -1,7 +1,7 @@
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 import { IText } from "./text";
 
 export function registerVideo(registry: ISerializationRegistryType) {
@@ -60,7 +60,12 @@ export function registerVideo(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyVideo(video: IVideo, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyVideo(
+    video: IVideo,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     let iframeSrc: string;
     if (video.origin === "youtube") {
       iframeSrc = `https://youtube.com/embed/${video.src}?rel=0`;
@@ -84,6 +89,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
       },
       customProps,
       null,
+      templateOptions,
     );
   }
 

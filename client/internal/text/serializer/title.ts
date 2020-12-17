@@ -1,6 +1,6 @@
 import React from "react";
 import { ISerializationRegistryType } from ".";
-import { deserializeElement, deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "./base";
+import { deserializeElement, deserializeElementBase, IElementBase, IReactifyTemplateOptions, reactifyElementBase, serializeElementBase } from "./base";
 import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
@@ -24,7 +24,12 @@ export function registerTitle(registry: ISerializationRegistryType) {
     return title;
   }
   
-  function reactifyTitle(title: ITitle, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyTitle(
+    title: ITitle,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     return reactifyElementBase(
       registry,
       active,
@@ -34,6 +39,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
       null,
       customProps,
       title.children,
+      templateOptions,
     );
   }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { RichElement, ISerializationRegistryType } from ".";
 import { CUSTOM_CLASS_PREFIX } from "..";
-import { serializeElementBase, deserializeElementBase, deserializeElement, IElementBase, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, deserializeElement, IElementBase, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 
 export function registerCustom(registry: ISerializationRegistryType) {
   const boundDeserializeElement = deserializeElement.bind(null, registry);
@@ -35,7 +35,12 @@ export function registerCustom(registry: ISerializationRegistryType) {
     return custom;
   }
 
-  function reactifyCustom(custom: ICustom, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyCustom(
+    custom: ICustom,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     return reactifyElementBase(
       registry,
       active,
@@ -45,6 +50,7 @@ export function registerCustom(registry: ISerializationRegistryType) {
       null,
       customProps,
       custom.children,
+      templateOptions,
     );
   }
 

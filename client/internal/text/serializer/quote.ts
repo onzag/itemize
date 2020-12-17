@@ -1,6 +1,6 @@
 import React from "react";
 import { ISerializationRegistryType} from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, deserializeElement } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, deserializeElement, IReactifyTemplateOptions } from "./base";
 import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
@@ -32,7 +32,12 @@ export function registerQuote(registry: ISerializationRegistryType) {
     return quote;
   }
 
-  function reactifyQuote(quote: IQuote, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,) {
+  function reactifyQuote(
+    quote: IQuote,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     return reactifyElementBase(
       registry,
       active,
@@ -42,6 +47,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
       null,
       customProps,
       quote.children,
+      templateOptions,
     );
   }
 

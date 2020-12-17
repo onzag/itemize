@@ -1,7 +1,7 @@
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase } from "./base";
+import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase, IReactifyTemplateOptions } from "./base";
 import { IText } from "./text";
 
 export function registerImage(registry: ISerializationRegistryType) {
@@ -119,7 +119,12 @@ export function registerImage(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyImage(image: IImage, active: boolean, customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+  function reactifyImage(
+    image: IImage,
+    active: boolean,
+    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
+    templateOptions?: IReactifyTemplateOptions,
+  ) {
     const newCustomProps = {
       ...customProps,
     };
@@ -164,6 +169,7 @@ export function registerImage(registry: ISerializationRegistryType) {
         null,
         newCustomProps,
         null,
+        templateOptions,
       );
     }
 
@@ -195,6 +201,7 @@ export function registerImage(registry: ISerializationRegistryType) {
       },
       newCustomProps,
       null,
+      templateOptions,
     );
   }
 

@@ -1,12 +1,12 @@
+import React from "react";
 import { IPropertyDefinitionSupportedSingleFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { DOMPurify, fileURLAbsoluter, DOMWindow } from "../../../util";
+import { DOMPurify, fileURLAbsoluter } from "../../../util";
 import { imageSrcSetRetriever } from "../../components/util";
 import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
-import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement } from "./serializer";
-import equals from "deep-equal";
+import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement, SERIALIZATION_REGISTRY } from "./serializer";
 import { IText } from "./serializer/text";
 
 
@@ -389,11 +389,6 @@ export function postprocess(
     node.parentElement && node.parentElement.removeChild(node);
   }
 
-  if (node.classList && !options.supportsRichClasses) {
-    const classList = Array.from(node.classList);
-    
-  }
-
   if (node.style && !options.supportsCustomStyles) {
     node.removeAttribute("style");
     SUPPORTED_TEMPLATE_STYLES.forEach((attr) => {
@@ -505,17 +500,25 @@ const NULL_DOCUMENT = deserialize(null);
  * 
  * The property should be a template for this to be usable
  */
-export function reactify() {
+export function reactify(
+  document: IRootLevelDocument,
+  args?: any,
+) {
+  if (document === NULL_DOCUMENT) {
+    return null;
+  }
 
-}
-
-/**
- * Converts a template into a react component it takes a serialized
- * value as an input and then makes this be usable and react components
- * can be stacked inside it
- * 
- * The property should be a template for this to be usable
- */
-export function reactifyTemplate() {
-
+  return (
+    <>
+      {
+        document.children.map((c, index) => {
+          let templatingArgs = {
+            args: args,
+            key: index,
+          };
+          return SERIALIZATION_REGISTRY.REACTIFY[c.type](c, true, null, templatingArgs);
+        })
+      }
+    </>
+  );
 }
