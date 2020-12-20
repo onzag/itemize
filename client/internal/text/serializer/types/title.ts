@@ -1,19 +1,48 @@
-import React from "react";
-import { ISerializationRegistryType } from ".";
-import { deserializeElement, deserializeElementBase, IElementBase, IReactifyTemplateOptions, reactifyElementBase, serializeElementBase } from "./base";
+/**
+ * Contains the serialization, reactification and deserialization functions
+ * for the title element
+ * 
+ * @packageDocumentation
+ */
+
+import { title } from "process";
+import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
+/**
+ * The function that registers and adds the title element in the given
+ * registry
+ * @param registry the registry to modify
+ */
 export function registerTitle(registry: ISerializationRegistryType) {
-  const boundDeserializeElement = deserializeElement.bind(null, registry);
+
+  /**
+   * converts a given title rich element into its
+   * HTML form
+   * @param title the title rich element
+   * @returns an HTML element
+   */
   function serializeTitle(title: ITitle) {
+    // we just call the base function
     return serializeElementBase(registry, title, title.subtype, null, null, title.children);
   }
   
+  /**
+   * Deserializes a given HTML element that is already
+   * known as a title into the given title form
+   * @param node the node in question
+   * @returns a title rich element
+   */
   function deserializeTitle(node: HTMLElement): ITitle {
+    // first we get the base
     const base = deserializeElementBase(node);
-    const children = Array.from(node.childNodes).map(boundDeserializeElement).filter((n) => n !== null) as any[];
+    // process the children
+    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as any[];
+
+    // and then build the title form
     const title: ITitle = {
       ...base,
       type: "title",
@@ -21,28 +50,35 @@ export function registerTitle(registry: ISerializationRegistryType) {
       subtype: node.tagName.toLowerCase() as any,
       children: children.length ? children : [STANDARD_TEXT_NODE],
     }
+
+    // return it
     return title;
   }
   
-  function reactifyTitle(
-    title: ITitle,
-    active: boolean,
-    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
-    templateOptions?: IReactifyTemplateOptions,
-  ) {
+  /**
+   * Reactifies a title that is already
+   * into a rich element form
+   * @param arg the reactification arg
+   */
+  function reactifyTitle(arg: IReactifyArg<ITitle>) {
+    // return by reactification
     return reactifyElementBase(
+      // the registry
       registry,
-      active,
-      title,
-      title.subtype,
+      // the tag we are using is the same of the subtype, h1, h2, h3
+      arg.element.subtype,
+      // no base class
       null,
+      // the children to use
+      arg.element.children,
+      // no wrap children function
       null,
-      customProps,
-      title.children,
-      templateOptions,
+      // and the arg itself
+      arg,
     );
   }
 
+  // add all to the registry
   registry.REACTIFY.title = reactifyTitle;
   registry.SERIALIZE.title = serializeTitle;
   registry.DESERIALIZE.byTag.H1 = deserializeTitle;

@@ -1,10 +1,30 @@
-import React from "react";
-import { DOMWindow } from "../../../../util";
-import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase, IReactifyTemplateOptions } from "./base";
-import { IText } from "./text";
+/**
+ * Contains the serialization, reactification and deserialization functions
+ * for the video element
+ * 
+ * @packageDocumentation
+ */
 
+
+import React from "react";
+import { DOMWindow } from "../../../../../util";
+import { IReactifyArg, ISerializationRegistryType } from "..";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
+import { IText, STANDARD_TEXT_NODE } from "./text";
+
+/**
+ * The function that registers and adds the video element in the given
+ * registry
+ * @param registry the registry to modify
+ */
 export function registerVideo(registry: ISerializationRegistryType) {
+
+  /**
+   * converts a given video rich element into its
+   * HTML form
+   * @param video the video rich element
+   * @returns an HTML element
+   */
   function serializeVideo(video: IVideo) {
     // make the main container with the right class
     const mainContainer = serializeElementBase(registry, video, "div", "video", null, null);
@@ -35,13 +55,25 @@ export function registerVideo(registry: ISerializationRegistryType) {
     return mainContainer;
   }
 
+
+  /**
+   * Deserializes a given HTML element that is already
+   * known as a video into the given video form
+   * @param node the node in question
+   * @returns a video rich element
+   */
   function deserializeVideo(node: HTMLDivElement): IVideo {
+    // we need to find an iframe
     const iframe = node.querySelector("iframe") as HTMLIFrameElement;
+    // no iframe, it won't work
     if (!iframe) {
       return null;
     }
+
+    // now we can get the base
     const base = deserializeElementBase(node);
 
+    // and return based on the base
     return {
       ...base,
       type: "video",
@@ -49,36 +81,36 @@ export function registerVideo(registry: ISerializationRegistryType) {
       src: iframe.dataset.videoSrc,
       origin: iframe.dataset.videoOrigin as any,
       children: [
-        {
-          text: "",
-          bold: false,
-          italic: false,
-          underline: false,
-          templateText: null,
-        }
+        STANDARD_TEXT_NODE,
       ]
     };
   }
 
-  function reactifyVideo(
-    video: IVideo,
-    active: boolean,
-    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
-    templateOptions?: IReactifyTemplateOptions,
-  ) {
+  /**
+   * Reactifies a title that is already
+   * into a rich element form
+   * @param arg the reactification arg
+   */
+  function reactifyVideo(arg: IReactifyArg<IVideo>) {
+    // let's build the source for the iframe
     let iframeSrc: string;
-    if (video.origin === "youtube") {
-      iframeSrc = `https://youtube.com/embed/${video.src}?rel=0`;
+    if (arg.element.origin === "youtube") {
+      iframeSrc = `https://youtube.com/embed/${arg.element.src}?rel=0`;
     } else {
-      iframeSrc = `https://player.vimeo.com/video/${video.src}?title=0&byline=0&portrait=0&badge=0`;
+      iframeSrc = `https://player.vimeo.com/video/${arg.element.src}?title=0&byline=0&portrait=0&badge=0`;
     }
 
+    // now we might call the reactification
     return reactifyElementBase(
+      // the registry
       registry,
-      active,
-      video,
+      // we will be using a div to start with
       "div",
+      // the video will be the base class
       "video",
+      // no children itself
+      null,
+      // the wrapping function that sets up the iframe
       (children: React.ReactNode) => {
         return (
           <div className="video-container">
@@ -87,12 +119,12 @@ export function registerVideo(registry: ISerializationRegistryType) {
           </div>
         );
       },
-      customProps,
-      null,
-      templateOptions,
+      // the arg itself
+      arg,
     );
   }
 
+  // add to the registry
   registry.REACTIFY.video = reactifyVideo;
   registry.SERIALIZE.video = serializeVideo;
   registry.DESERIALIZE.byClassName.video = deserializeVideo;

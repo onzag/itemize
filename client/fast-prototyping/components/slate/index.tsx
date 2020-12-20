@@ -12,11 +12,11 @@ import { IInsertedFileInformationType } from "../../../internal/components/Prope
 import { copyElementBase } from "../../../internal/text/serializer/base";
 import { IImage } from "../../../internal/text/serializer/image";
 import { IFile } from "../../../internal/text/serializer/file";
-import { IVideo } from "../../../internal/text/serializer/video";
+import { IVideo } from "../../../internal/text/serializer/types/video";
 import { mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
-import { IContainer } from "../../../internal/text/serializer/container";
-import { IParagraph } from "../../../internal/text/serializer/paragraph";
+import { IContainer } from "../../../internal/text/serializer/types/container";
+import { IParagraph } from "../../../internal/text/serializer/types/paragraph";
 
 interface ITemplateArg {
   type: "text" | "link" | "html" | "ui-handler" | "function";
@@ -940,12 +940,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             { at: path.concat(0) }
           );
         }
-      } else if (nodeAsRichElement.containment === "list-item") {
+      } else if (nodeAsRichElement.containment === "list-superblock") {
         const newNode = Node.get(this.editor, path);
         let offset = 0;
         for (let i = 0; i < (newNode.children as any).length; i++) {
           const child = newNode.children[i] as any as RichElement;
-          if (Element.isElement(child) && child.containment === "list-item") {
+          if (Element.isElement(child) && child.containment === "list-superblock") {
             Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
             offset += child.children.length - 1;
           } else if (Text.isText(child) || child.type !== "list-item") {
@@ -1182,7 +1182,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           }
 
           // if we have a superblock or list-item element that contains lists
-          if (currentElement.containment === "superblock" || currentElement.containment === "list-item") {
+          if (currentElement.containment === "superblock" || currentElement.containment === "list-superblock") {
             currentSuperBlock = currentElement;
             superBlockAnchor.push(n);
           }
@@ -1850,7 +1850,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             ...copyElementBase(anchorData.currentSuperBlock),
             type: "list",
             listType: type,
-            containment: "list-item",
+            containment: "list-superblock",
             children: [],
           },
           { split: false, at: anchorData.superBlockAnchor },
@@ -1865,7 +1865,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           ...copyElementBase(anchorData.currentBlock),
           type: "list",
           listType: type,
-          containment: "list-item",
+          containment: "list-superblock",
           children: [],
         },
         { split: !isCollapsed, at: isCollapsed ? anchorData.blockAnchor : undefined },

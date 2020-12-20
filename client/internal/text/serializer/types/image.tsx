@@ -1,12 +1,34 @@
+/**
+ * Contains the serialization, reactification and deserialization functions
+ * for the image element
+ * 
+ * @packageDocumentation
+ */
+
 import React from "react";
-import { DOMWindow } from "../../../../util";
-import { ISerializationRegistryType } from ".";
-import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase, IReactifyTemplateOptions } from "./base";
+import { DOMWindow } from "../../../../../util";
+import { IReactifyArg, ISerializationRegistryType } from "..";
+import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase } from "../base";
 import { IText } from "./text";
 
+/**
+ * The function that registers and adds the image in the given
+ * registry
+ * @param registry the registry to modify
+ */
 export function registerImage(registry: ISerializationRegistryType) {
+
+  /**
+   * The function that serializes the image into HTML
+   * @param img the image element
+   * @returns an HTML node
+   */
   function serializeImage(img: IImage) {
+    // first we need to build the special
+    // attributes it should pass to
     const attrs: IAttrs = {};
+
+    // these pass in the data src information
     if (img.width) {
       attrs["data-src-width"] = img.width.toString();
     }
@@ -16,9 +38,13 @@ export function registerImage(registry: ISerializationRegistryType) {
     if (img.srcId) {
       attrs["data-src-id"] = img.srcId;
     }
+
+    // these is for the alt
     if (img.alt) {
       attrs.alt = img.alt;
     }
+
+    // source, sourceset and sizes
     if (img.src) {
       attrs.src = img.src;
     }
@@ -29,7 +55,11 @@ export function registerImage(registry: ISerializationRegistryType) {
       attrs.sizes = img.sizes;
     }
 
+    // for a standalone image, we pass it right
+    // as an image element
     if (img.standalone) {
+      // so we render directly into an image with
+      // the given attributes
       const standaloneImage = serializeElementBase(
         registry,
         img,
@@ -40,6 +70,9 @@ export function registerImage(registry: ISerializationRegistryType) {
       );
       return standaloneImage;
     } else {
+      // otherwise we create the a component that will
+      // act as a container, note how we don't pass
+      // the attributes to this one
       const imageComponent = serializeElementBase(
         registry,
         img,
@@ -49,22 +82,30 @@ export function registerImage(registry: ISerializationRegistryType) {
         null,
       ) as HTMLAnchorElement;
 
+      // now we create the container
       const imageContainer = DOMWindow.document.createElement("div");
       imageContainer.className = "image-container";
       imageComponent.appendChild(imageContainer);
 
+      // the pad
       const imagePad = DOMWindow.document.createElement("div");
       imagePad.className = "image-pad";
 
+      // width, height, ratio and percentage and so on
+      // in order to calculate the padding for the image pad
       const width = img.width;
       const height = img.height;
       const ratio = height / width;
       const percentage = ratio * 100;
       const padStyle = "padding-bottom:" + percentage + "%";
 
+      // now the styles for the padd
       imagePad.setAttribute("style", padStyle);
       imageContainer.appendChild(imagePad);
 
+      // now we can build the standalone image, we pass
+      // nothing as the base in order to cheat and consider
+      // that there are no special attributes
       const standaloneImage = serializeElementBase(
         registry,
         {},
@@ -73,24 +114,36 @@ export function registerImage(registry: ISerializationRegistryType) {
         attrs,
         null,
       );
+
+      // and we padd it
       imagePad.appendChild(standaloneImage);
 
-      // add the src to the standalone image
+      // add the src to the image so that SEO works
+      // well with it
       if ((standaloneImage as HTMLImageElement).src) {
         imageComponent.href = (standaloneImage as HTMLImageElement).src;
       }
 
+      // return it
       return imageComponent;
     }
   }
 
+  /**
+   * Converts a HTML element that is already considered an image
+   * element into the given rich element form
+   * @param node the node in question
+   * @returns an image element structure
+   */
   function deserializeImage(node: HTMLDivElement | HTMLImageElement): IImage {
+
     // first we need to check everything is fine
     const img = node.tagName === "IMG" ? node : node.querySelector("img") as HTMLImageElement;
     if (!img) {
       return null;
     }
 
+    // now we get the base of the given node
     const base = deserializeElementBase(node);
 
     // and extract the info according to the specs
@@ -119,89 +172,118 @@ export function registerImage(registry: ISerializationRegistryType) {
     };
   }
 
-  function reactifyImage(
-    image: IImage,
-    active: boolean,
-    customProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
-    templateOptions?: IReactifyTemplateOptions,
-  ) {
+  /**
+   * Reactifies the image that is already
+   * into a rich element form
+   * @param arg the reactification arg
+   */
+  function reactifyImage(arg: IReactifyArg<IImage>) {
+    // prepare the custom props
     const newCustomProps = {
-      ...customProps,
+      ...arg.customProps,
     };
-    if (image.standalone) {
+
+    // if we are talking about
+    // a standalone image
+    if (arg.element.standalone) {
+      // now we need to check for the precense
+      // of children, because img cannot really
+      // have children as it is, this can happen when
+      // an editor such as slate wants to add children
+      // even to an standalone image in order to make
+      // it selectable
       if (newCustomProps.children) {
+        // for that we delete such children
+        // from the new property
         delete newCustomProps.children;
+
+        // and instead wrap everything into a div
+        // that will take these custom properties
+        // and put the children at the bottom
         return (
           <div {...(newCustomProps as any)}>
             {
               reactifyElementBase(
                 registry,
-                active,
-                image,
                 "img",
                 null,
                 null,
-                {
-                  alt: image.alt,
-                  sizes: image.sizes,
-                  src: image.src,
-                  srcSet: image.srcSet,
-                } as any,
                 null,
+                {
+                  ...arg,
+                  customProps: ({
+                    alt: arg.element.alt,
+                    sizes: arg.element.sizes,
+                    src: arg.element.src,
+                    srcSet: arg.element.srcSet,
+                  } as any)
+                },
               )
             }
-            {customProps.children}
+            {arg.customProps.children}
           </div>
         );
       }
 
-      (newCustomProps as any).alt = image.alt;
-      (newCustomProps as any).sizes = image.sizes;
-      (newCustomProps as any).src = image.src;
-      (newCustomProps as any).srcSet = image.srcSet;
+      // so being standalone without children
+      // we can decide to add these properties
+      // into the property list for custom
+      (newCustomProps as any).alt = arg.element.alt;
+      (newCustomProps as any).sizes = arg.element.sizes;
+      (newCustomProps as any).src = arg.element.src;
+      (newCustomProps as any).srcSet = arg.element.srcSet;
 
       return reactifyElementBase(
         registry,
-        active,
-        image,
         "img",
         null,
         null,
-        newCustomProps,
         null,
-        templateOptions,
+        {
+          ...arg,
+          customProps: newCustomProps,
+        }
       );
     }
 
-    if (active) {
-      (newCustomProps as any).href = image.src;
+    // now here back to the non-standalone
+    // if we are not active
+    if (arg.active) {
+      // we add the href to the given image
+      (newCustomProps as any).href = arg.element.src;
     }
 
-    const width = image.width;
-    const height = image.height;
+    // now we can setup the padding in the
+    // image-pad
+    const width = arg.element.width;
+    const height = arg.element.height;
     const ratio = height / width;
     const percentage = ratio * 100;
     const padPercentage = percentage + "%";
 
+    // now here we can use the wrap children
+    // in order to wrap the passed children
+    // into their own given area where they
+    // should be
     return reactifyElementBase(
       registry,
-      active,
-      image,
       "a",
       "image",
+      null,
       (children: React.ReactNode) => {
         return (
           <div className="image-container">
             <div className="image-pad" style={{ paddingBottom: padPercentage }}>
-              <img alt={image.alt} sizes={image.sizes} src={image.src} srcSet={image.srcSet} />
+              <img alt={arg.element.alt} sizes={arg.element.sizes} src={arg.element.src} srcSet={arg.element.srcSet} />
               {children}
             </div>
           </div>
         );
       },
-      newCustomProps,
-      null,
-      templateOptions,
+      {
+        ...arg,
+        customProps: newCustomProps
+      }
     );
   }
 

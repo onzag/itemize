@@ -1,12 +1,33 @@
-import React from "react";
-import { ISerializationRegistryType, RichElement } from ".";
-import { IText } from "./text";
+/**
+ * This file contains the base functionality to prepare serialization
+ * and deserialization of every and each component, the base properties
+ * are the properties that every node has
+ * 
+ * @packageDocumentation
+ */
 
+import React from "react";
+import { DOMWindow } from "../../../../util";
+import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
+import { IText } from "./types/text";
+import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";
+
+/**
+ * Converts a style property string into a camel case based one
+ * this is basically to convert things like text-align into textAlign
+ * for use within react
+ * @param str the string to convert
+ */
 function convertStylePropertyToCamelCase(str: string) {
+  // first we split the dashes
   const splitted = str.split("-");
+
+  // if it's just one then we return that just one
   if (splitted.length === 1) {
     return splitted[0];
   }
+
+  // otherwise we do this process of capitalization
   return (
     splitted[0] +
     splitted
@@ -16,22 +37,40 @@ function convertStylePropertyToCamelCase(str: string) {
   );
 };
 
+/**
+ * Converts a style string such a text-align:center;padding:0; into a
+ * react style object
+ * @param str the style string
+ */
 export function convertStyleStringToReactObject(str: string) {
+  // no string, then null
   if (!str) {
     return null;
   }
 
+  // now we build the style
   const style = {};
+  // so we split each ;
   str.split(";").forEach((el) => {
+
+    // and now we can trim each
     const elTrimmed = el.trim();
+
+    // if we have nothing, then return and
+    // go for the next one
     if (!elTrimmed) {
       return;
     }
+
+    // now we can get both the property and the value
     const [property, value] = el.split(":");
+
+    // if we don't have any
     if (!property || !value) {
       return;
     }
 
+    // and now we can try to format the property name
     const formattedProperty = convertStylePropertyToCamelCase(property.trim());
     const formattedValue = value.trim();
 
@@ -40,20 +79,32 @@ export function convertStyleStringToReactObject(str: string) {
       // as such this will be prevented
       return;
     }
+
+    // now we set the style in the object
     style[formattedProperty] = formattedValue;
   });
 
+  // if we got nothing
   if (Object.keys(style).length === 0) {
     return null;
   }
 
+  // return the style
   return style;
 };
 
+/**
+ * An interface to refer to attributes
+ * of a given element that is used during serialization
+ */
 export interface IAttrs {
   [attr: string]: string;
 }
 
+/**
+ * A list of translation of basic properties
+ * @ignore
+ */
 const translations = {
   html: "data-html",
   style: "style",
@@ -84,6 +135,18 @@ const translations = {
   wheel: "data-on-wheel",
 }
 
+/**
+ * Serializes an element from its form
+ * as a RichElement to a HTML element
+ * @param registry the registry to use
+ * @param base the base element
+ * @param tag the tag to use to build this element
+ * @param baseClass the base class to use, eg. image, container, etc...
+ * @param attrs the attributes to use
+ * @param children the children that also need to be serialized under it
+ * note that they need to be explictly set even if they are in the base
+ * @returns a html element
+ */
 export function serializeElementBase(
   registry: ISerializationRegistryType,
   base: IElementBase,
@@ -92,232 +155,211 @@ export function serializeElementBase(
   attrs: IAttrs,
   children: Array<RichElement | IText>,
 ): HTMLElement {
-  const elementComponent = document.createElement(tag);
+  // first we need to create the element itself as a DOM element
+  const elementComponent = DOMWindow.document.createElement(tag);
+
+  // if we have a base class we add it to the list
   if (baseClass) {
     elementComponent.classList.add(baseClass);
   }
+
+  // if we have attributes, we add each of those
   if (attrs) {
     Object.keys(attrs).forEach((attr) => {
       elementComponent.setAttribute(attr, attrs[attr]);
     });
   }
+
+  // if we have a rich class list in the base
   if (base.richClassList) {
     base.richClassList.forEach((c) => {
       elementComponent.classList.add("rich-text--" + c);
     });
   }
 
+  // now we go over each one of the properties of the base
   Object.keys(base).forEach((k) => {
+    // and check for a translation
     if (translations[k]) {
+      // set it if there's such
       elementComponent.setAttribute(translations[k], base[k]);
     }
   });
 
+  // if we have ui handles to set
   if (base.uiHandlerArgs) {
+    // we set them
     Object.keys(base.uiHandlerArgs).forEach((arg) => {
       elementComponent.dataset[arg] = base.uiHandlerArgs[arg];
     });
   }
 
+  // fi we have specified children
   if (children) {
+    // then we loop into them
     children.forEach((c) => {
+      // if it's a text node
       if ((c as IText).text) {
+        // then we use the text conversion function
         const textNode: Node = registry.SERIALIZE.text(c as IText);
         elementComponent.appendChild(textNode);
       } else if (registry.SERIALIZE[(c as RichElement).type]) {
+        // if it's another type then we pick the function
         const fn = registry.SERIALIZE[(c as RichElement).type];
+        // get the child element
         const childElement = fn(c as RichElement);
+        // and push that
         elementComponent.appendChild(childElement);
       }
     });
   }
 
+  // return it
   return elementComponent;
 }
 
-interface IReactifiedElementWithHoverAndActiveProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
-  Tag: string;
-  styleHover: React.CSSProperties;
-  styleActive: React.CSSProperties;
-}
-
-interface IReactifiedElementWithHoverAndActiveState {
-  hover: boolean;
-  active: boolean;
-}
-
-class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifiedElementWithHoverAndActiveProps, IReactifiedElementWithHoverAndActiveState> {
-  constructor(props: IReactifiedElementWithHoverAndActiveProps) {
-    super(props);
-
-    this.state = {
-      hover: false,
-      active: false,
-    }
-
-    this.onHoverStart = this.onHoverStart.bind(this);
-    this.onHoverEnd = this.onHoverEnd.bind(this);
-    this.onActiveEnd = this.onActiveEnd.bind(this);
-    this.onActiveStart = this.onActiveStart.bind(this);
-  }
-
-  public onHoverStart(originalFn: (arg: React.MouseEvent<HTMLElement, MouseEvent>) => void, e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    this.setState({
-      hover: true,
-    });
-
-    originalFn && originalFn(e);
-  }
-
-  public onHoverEnd(originalFn: (arg: React.MouseEvent<HTMLElement, MouseEvent>) => void, e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    this.setState({
-      hover: false,
-    });
-
-    originalFn && originalFn(e);
-  }
-
-  public onActiveStart(originalFn: (arg: React.MouseEvent<HTMLElement, MouseEvent>) => void, e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    this.setState({
-      active: true,
-    });
-
-    originalFn && originalFn(e);
-  }
-
-  public onActiveEnd(originalFn: (arg: React.MouseEvent<HTMLElement, MouseEvent>) => void, e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    this.setState({
-      active: false,
-    });
-
-    originalFn && originalFn(e);
-  }
-
-  public render() {
-    const Tag = this.props.Tag;
-
-    const standardProps = {
-      ...this.props,
-    };
-    delete standardProps.Tag;
-    delete standardProps.styleHover;
-    delete standardProps.styleActive;
-
-    const styleUsed = {
-      ...this.props.style,
-      ...(this.state.hover ? this.props.styleHover : null),
-      ...(this.state.active ? this.props.styleActive : null),
-    };
-
-    standardProps.style = styleUsed;
-
-    if (this.props.styleHover) {
-      standardProps.onMouseEnter = this.onHoverStart.bind(null, this.props.onMouseEnter);
-      standardProps.onMouseLeave = this.onHoverEnd.bind(null, this.props.onMouseLeave);
-    }
-
-    if (this.props.styleActive) {
-      standardProps.onTouchStart = this.onActiveStart.bind(null, this.props.onTouchStart);
-      standardProps.onTouchEnd = this.onActiveEnd.bind(null, this.props.onTouchEnd);
-      standardProps.onMouseDown = this.onActiveStart.bind(null, this.props.onMouseDown);
-      standardProps.onMouseUp = this.onActiveEnd.bind(null, this.props.onMouseUp);
-    }
-
-    return <Tag {...standardProps} />;
-  }
-}
-
-export interface IReactifyTemplateOptions {
-  args?: any,
-  key?: number | string,
-  ignoreContextualChanges?: boolean;
-};
-
+/**
+ * Reactifies an element so that it can be given its react
+ * form, basically converts the element into a react one
+ *
+ * @param registry the registry that is currently in use
+ * @param Tag the tag we are using for the component to render
+ * @param baseClass the base class that should have
+ * @param children represents the children in the serialized form, as in RichElement or text nodes
+ * that it has as children and should be used, that is of course unless these children are overriden
+ * by other nodes
+ * @param wrapChildren a function that is given so that you can return new children to wrap the current
+ * children, basically define your own children wrappage, for example, images and videos provide their
+ * own custom children nested structure
+ * @param arg the reactification argument that is passed originally to the reactification function
+ * and provides the fine customization details as well as custom children in case and whether it should
+ * be a template or not
+ */
 export function reactifyElementBase(
   registry: ISerializationRegistryType,
-  active: boolean,
-  base: IElementBase,
   Tag: string,
   baseClass: string,
-  wrapChildren: (node: React.ReactNode) => React.ReactNode,
-  props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
   children: Array<RichElement | IText>,
-  templateOptions?: IReactifyTemplateOptions,
+  wrapChildren: (node: React.ReactNode) => React.ReactNode,
+  arg: IReactifyArg<RichElement | IText>,
 ) {
-  let currentTemplateOptions = templateOptions;
-  if (currentTemplateOptions && !currentTemplateOptions.ignoreContextualChanges) {
-    if (currentTemplateOptions && base.context) {
-      currentTemplateOptions = {
-        args: currentTemplateOptions.args ? currentTemplateOptions.args[base.context] : null,
-        key: currentTemplateOptions.key,
-      }
+  // so first we take the element that we are supposed to reactify
+  const base: IElementBase = arg.element as IElementBase;
+
+  // let's create these in the meantime
+  let currentTemplateArgs = arg.templateArgs;
+  let currentTemplateRootArgs = arg.templateRootArgs || arg.templateArgs;
+
+  // if we have a template and we are rendering as template
+  if (arg.asTemplate && !arg.templateIgnoreContextualChanges) {
+    // first we need to find the context
+    if (currentTemplateArgs && base.context) {
+      // and change it accordingly
+      currentTemplateArgs = currentTemplateArgs[base.context] || null;
     }
-    if (currentTemplateOptions && base.forEach) {
-      const loopElement = currentTemplateOptions.args && currentTemplateOptions.args[base.forEach];
+
+    // then we got to use the foreach context if we have one
+    if (base.forEach) {
+
+      // and such we find what we are supposed to loop for
+      const loopElement = currentTemplateArgs && currentTemplateArgs[base.forEach];
+
+      // hopefully it'll be an array
       if (Array.isArray(loopElement)) {
+
+        // so now we loop and return a fragment
         return (
-          <React.Fragment key={currentTemplateOptions.key}>
+          <React.Fragment key={arg.key}>
             {loopElement.map((loopContext, index) => {
+              // note how we re-reactify the current element
+              // but telling it to ignore contextual changes
+              // because we have already done them here
               return reactifyElementBase(
                 registry,
-                active,
-                base,
                 Tag,
                 baseClass,
-                wrapChildren,
-                props,
                 children,
+                wrapChildren,
                 {
-                  args: loopContext,
+                  active: arg.active,
+                  element: base as RichElement,
+                  asTemplate: true,
+                  customProps: arg.customProps,
                   key: index,
-                  ignoreContextualChanges: true,
+                  templateArgs: loopContext,
+                  templateRootArgs: currentTemplateRootArgs,
+                  templateIgnoreContextualChanges: true,
                 }
               );
             })}
           </React.Fragment>
         );
       } else {
+        // it's not an iterable, we can't render a thing
         return null;
       }
     }
   }
 
-  if (base.uiHandler && currentTemplateOptions) {
-    const Handler: any = currentTemplateOptions.args && currentTemplateOptions.args[base.uiHandler];
+  // now we do this if we have UI handlers
+  // for the given element and we are working out
+  // as a template
+  if (arg.asTemplate && base.uiHandler) {
+
+    // and we find the given handler, either from the current context
+    // or the root context
+    const Handler: any = (
+      currentTemplateArgs && currentTemplateArgs[base.uiHandler]
+    ) || (
+      currentTemplateRootArgs && currentTemplateRootArgs[base.uiHandler]
+    );
+
+    // if we have it, we use it
     if (Handler) {
-      return (<Handler {...base.uiHandlerArgs}/>);
+      return (<Handler {...base.uiHandlerArgs} />);
     } else {
       return null;
     }
   }
 
+  // now we can define the props
+  // given all of the before failed
   const finalProps = {
-    ...props,
+    ...arg.customProps,
   };
 
-  if (currentTemplateOptions && typeof currentTemplateOptions.key !== "undefined") {
-    finalProps.key = currentTemplateOptions.key;
+  // if we have a key, we use it
+  if (arg.key !== "undefined") {
+    finalProps.key = arg.key;
   }
 
-  if (!active) {
+  // define the class for active and inactive
+  if (!arg.active) {
     finalProps.className = (finalProps.className || "") + " inactive";
   } else {
     finalProps.className = (finalProps.className || "") + " active";
   }
 
+  // add the base class
   if (baseClass) {
     finalProps.className = (finalProps.className || "") + " " + baseClass;
   }
+
+  // the rich classes
   if (base.richClassList) {
     base.richClassList.forEach((c) => {
       finalProps.className = (finalProps.className || "") + " rich-text--" + c;
     });
   }
 
-  if (base.html && !active) {
+  // and set it up as template in the class if
+  // html has been defined from the context as data-html
+  // which is a templating attribute
+  if (base.html && !arg.active) {
     finalProps.className = (finalProps.className || "") + " template";
   }
 
+  // now we can define the style
   if (base.style) {
     finalProps.style = {
       ...convertStyleStringToReactObject(base.style),
@@ -325,31 +367,50 @@ export function reactifyElementBase(
     };
   }
 
-  if (templateOptions && base.html) {
+  // if we are working as a template and we have a html data attribute
+  if (arg.asTemplate && base.html) {
+    // we remove the children if we have them
     delete finalProps.children;
-    finalProps.dangerouslySetInnerHTML = templateOptions.args && templateOptions.args[base.html];
-  } else if (!props.children && children) {
+    // and define the dangerously set inner html
+    finalProps.dangerouslySetInnerHTML = currentTemplateArgs && currentTemplateArgs[base.html];
+  } else if (!finalProps.children && children) {
+    // otherwise if no children have been defined in the given
+    // custom properties, then we are going to instantiate
+    // based on the children we are requested to render
+    // by the base element
     finalProps.children = children.map((c, index: number) => {
-      const specificChildTemplateOptions = currentTemplateOptions ? {
-        ...currentTemplateOptions,
+      // we use these options and we add the key
+      // in there
+      const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
+        asTemplate: arg.asTemplate,
+        active: arg.active,
+        element: c,
+        templateArgs: currentTemplateArgs,
+        templateRootArgs: currentTemplateRootArgs,
         key: index,
-      } : null;
+      };
+
+      // and then we call the reactify
       if ((c as IText).text) {
-        return registry.REACTIFY.text(c, active, null, specificChildTemplateOptions);
+        return registry.REACTIFY.text(specificChildTemplateOptions);
       } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        return registry.REACTIFY[(c as RichElement).type](c, active, null, specificChildTemplateOptions);
+        return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
       }
 
+      // ohteriwse null
       return null;
     });
   }
 
+  // if we have a function to wrap children
   if (wrapChildren) {
-    const children = finalProps.children;
-    finalProps.children = wrapChildren(children);
+    // that's what we use as children
+    finalProps.children = wrapChildren(finalProps.children);
   }
 
+  // if we have these templating options
   if (base.styleActive || base.styleHover) {
+    // then we fetch them
     const styleActive = convertStyleStringToReactObject(base.styleActive);
     const styleHover = convertStyleStringToReactObject(base.styleHover);
 
@@ -361,22 +422,35 @@ export function reactifyElementBase(
       styleHover,
     };
 
+    // and now we return with the dynamic component
     return (
       <ReactifiedElementWithHoverAndActive {...propsForThis} />
     )
   }
 
+  // otherwise we return based on the simple tag
   return (
     <Tag {...finalProps} />
   );
 }
 
+/**
+ * Deseriazes a element that is an HTML element into its RichElement
+ * base form, so it extracts all the generic data-x properties and styles
+ * and whatnot that are shared in between all the rich elements
+ * 
+ * @param node the node in question
+ */
 export function deserializeElementBase(node: HTMLElement): IElementBase {
+  // no node, no properties
   if (!node) {
     return {};
   }
 
+  // now we can get up an element base
   const result: IElementBase = {};
+
+  // if we have a class list
   if (node.classList) {
     node.classList.forEach((c) => {
       if (c.startsWith("rich-text--")) {
@@ -386,6 +460,10 @@ export function deserializeElementBase(node: HTMLElement): IElementBase {
     });
   }
 
+  // now we check our translations lists that we had
+  // defined before in our translations list which translates
+  // several properties into the given base element property
+  // when there's a 1-1 relationship
   Object.keys(translations).forEach((tKey) => {
     const attr = translations[tKey] as string;
     const value = node.getAttribute(attr);
@@ -394,61 +472,17 @@ export function deserializeElementBase(node: HTMLElement): IElementBase {
     }
   });
 
+  // now for the ui handler if we got one
+  // from our translation that added into the result
   if (result.uiHandler && node.dataset) {
+    // we got to extract every dataset property
+    // as an attribute for the ui handler
     Object.keys(node.dataset).forEach((datasetKey) => {
       result.uiHandlerArgs[datasetKey] = node.dataset[datasetKey];
     });
   }
 
-  return result;
-}
-
-export function deserializeElement(registry: ISerializationRegistryType, node: Node): RichElement | IText {
-  const tagName = (node as HTMLElement).tagName;
-  if (!tagName) {
-    return registry.DESERIALIZE.text(node);
-  }
-  const classList = (node as HTMLElement).classList;
-
-  let result: RichElement | IText = null;
-  if (classList) {
-    const foundPrefix = Object.keys(registry.DESERIALIZE.byClassNamePrefix).find((prefix) => {
-      return classList.forEach((v) => v.startsWith(prefix));
-    });
-
-    if (foundPrefix) {
-      result = registry.DESERIALIZE.byClassNamePrefix[foundPrefix](node) as any;
-    }
-
-    const foundExactClass = Object.keys(registry.DESERIALIZE.byClassName).find((className) => {
-      return classList.contains(className);
-    });
-
-    if (foundExactClass) {
-      result = registry.DESERIALIZE.byClassName[foundExactClass](node) as any;
-    }
-  }
-
-  if (registry.DESERIALIZE.byTag[tagName]) {
-    result = registry.DESERIALIZE.byTag[tagName](node) as any;
-  }
-
-  if ((result as RichElement).children) {
-    const lastChild: any = (result as RichElement).children[(result as RichElement).children.length - 1];
-    if (lastChild.containment === "inline") {
-      const lastTextNode = lastChild.children[lastChild.children.length - 1];
-      const lastNode = {
-        bold: false,
-        italic: false,
-        underline: false,
-        ...copyElementBase(lastTextNode),
-        templateText: null,
-        text: "",
-      } as IText;
-      (result as RichElement).children.push(lastNode as any);
-    }
-  }
-
+  // and we then return that
   return result;
 }
 
@@ -615,12 +649,25 @@ export interface IElementBase {
   wheel?: string;
 }
 
+/**
+ * @ignore
+ * We are adding all the properties that exists in
+ * a rich element that are in common of all
+ * the rich elements these include all the properties
+ * that have a one-to-one translation and the ones
+ * that do not
+ */
 const ELEMENT_BASE_KEYS = [
   ...Object.keys(translations),
   "richClassList",
   "uiHandlerArgs",
 ];
 
+/**
+ * Clones the base of an element of all the properties in common
+ * and leaves all the ones that are not in common
+ * @param src 
+ */
 export function copyElementBase(src: IElementBase): IElementBase {
   if (!src) {
     return {};

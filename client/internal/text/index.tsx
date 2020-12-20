@@ -7,13 +7,13 @@ import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement, SERIALIZATION_REGISTRY } from "./serializer";
-import { IText } from "./serializer/text";
-
+import { IText } from "./serializer/types/text";
+import { DOMWindow } from "../../../util";
 
 /**
  * Sanitazation standard configuraton
  */
-export const PROPERTY_VIEW_SANITIZE_CONFIG = {
+export const SANITIZE_CONFIG = {
   // iframes are allowed, no sources are expected from the server side anyway
   ADD_TAGS: ["iframe"],
   // but src are still allowed here for a simple reason, as they are defined by the post processing hook
@@ -97,19 +97,66 @@ export const SUPPORTED_HANDLERS = [
   "ui",
 ];
 
+/**
+ * Represents the context that is used in order
+ * to postprocess a santized entry so that it can
+ * be constructed into html that can be
+ * displayed to the user
+ */
 interface IPostProcessingContext {
+  /**
+   * A related media property that is assigned
+   */
   mediaProperty: PropertyDefinition;
+  /**
+   * The current files that media property is containing
+   * in the given slot
+   */
   currentFiles: IPropertyDefinitionSupportedSingleFilesType[];
+  /**
+   * The configuration the system is running at
+   */
   config: IConfigRawJSONDataType;
+  /**
+   * The item definition in question the media property
+   * and the current property the value is given
+   * was taken from, remember this is used to create the
+   * URL
+   */
   itemDefinition: ItemDefinition;
+  /**
+   * The include it came from, this is used to create the URL
+   * as well
+   */
   include: Include;
+  /**
+   * The id in question, used to create the url
+   */
   forId: number;
+  /**
+   * The version in question, used to create the url
+   */
   forVersion: string;
+  /**
+   * The container id, used to extract the external url
+   * for the given files
+   */
   containerId: string;
+  /**
+   * Whether files should be cached, basically appends the sw-cacheable
+   * so that the service workers cache it
+   */
   cacheFiles: boolean;
 }
 
+/**
+ * The feature set that is supported in a given
+ * sanitization or other context
+ */
 export interface IFeatureSupportOptions {
+  /**
+   * Whether it supports images
+   */
   supportsImages: boolean;
   /**
    * The accept type that the input should accept
@@ -117,7 +164,13 @@ export interface IFeatureSupportOptions {
    * it doesn't support images, or when viewing
    */
   supportsImagesAccept: string;
+  /**
+   * Whether it supports videos
+   */
   supportsVideos: boolean;
+  /**
+   * Whether files are supporeted
+   */
   supportsFiles: boolean;
   /**
    * The accept type that the input should accept
@@ -125,12 +178,35 @@ export interface IFeatureSupportOptions {
    * it doesn't support files, or when viewing
    */
   supportsFilesAccept: string;
+  /**
+   * Whether links are acceptable
+   */
   supportsLinks: boolean;
+  /**
+   * Whether external links specifying an external
+   * protocol outside the current page are acceptable
+   */
   supportsExternalLinks: boolean;
+  /**
+   * Whether lists are acceptable, ul, ol etc...
+   */
   supportsLists: boolean;
+  /**
+   * Whether quotes are acceptable
+   */
   supportsQuote: boolean;
+  /**
+   * Whether titles are acceptable
+   */
   supportsTitle: boolean;
+  /**
+   * Whether custom styles using the style tag
+   * are acceptable
+   */
   supportsCustomStyles: boolean;
+  /**
+   * Whether templating is supported
+   */
   supportsTemplating: boolean;
 
   /**
@@ -176,7 +252,7 @@ export function sanitize(
   value: string,
 ) {
   DOMPurify.addHook("afterSanitizeElements", postprocess.bind(this, context, options));
-  const newValue = DOMPurify.sanitize(value, PROPERTY_VIEW_SANITIZE_CONFIG);
+  const newValue = DOMPurify.sanitize(value, SANITIZE_CONFIG);
   DOMPurify.removeAllHooks();
   return newValue;
 }
@@ -489,20 +565,202 @@ export function deserialize(html: string | Node[]) {
 /**
  * @ignore
  */
-const NULL_DOCUMENT = deserialize(null);
+export const NULL_DOCUMENT = deserialize(null);
 
 /**
- * This is like a deserialization process where a deserialized and
- * santized data input is converted into react
+ * Processes the initialization of a single node
+ * @param node the node in questions
+ * @param templateArgsContext the arg context we are currently in
+ */
+function processTemplateNodeInitialization(
+  node: HTMLElement,
+  templateArgsContext: any,
+) {
+  // has a text handler
+  const textKey = node.dataset.text;
+  if (textKey) {
+    const text: string = templateArgsContext[textKey];
+    if (typeof text !== "string") {
+      // we do not log because this will hit the server side
+    } else {
+      node.textContent = text;
+    }
+  }
+
+  // set the thref key
+  const threfKey = node.dataset.href;
+  if (threfKey) {
+    const thref: string = templateArgsContext[threfKey];
+    if (typeof thref !== "string") {
+      // we do not log because this will hit the server side
+    } else {
+      node.setAttribute("href", thref);
+    }
+  }
+
+  // has a HTML handler
+  const htmlKey = node.dataset.html;
+  if (htmlKey) {
+    const html: string = node[htmlKey];
+
+    if (typeof html !== "string") {
+      // we do not log because this will hit the server side
+    } else {
+      node.innerHTML = html;
+    }
+  }
+}
+
+
+/**
+ * Processes the intialization of a template, by processing
+ * the child nodes of a given node
+ * @param node the node we are working with
+ * @param templateArgsContext the template args we are currently working with
+ */
+function processTemplateInitialization(
+  node: HTMLElement,
+  templateArgsContext: any,
+) {
+  // first we check if we have child nodes to loop
+  node.hasChildNodes() && node.childNodes.forEach((childNode) => {
+    // we consider it an html element
+    const childNodeASHTMLElement = childNode as HTMLElement;
+
+    // so the args we are working with, this is going to be
+    // the context we will be working with
+    let templateArgsNewContext = templateArgsContext;
+
+    // and whether we should leave the children of this
+    // node unhandled
+    let leaveNodeChildrenUnhandled: boolean = false;
+
+    // cheap cheesy way to check if we are working with a HTML Element
+    // that has a dataset in it, no need for fancy checks since we are only interested
+    // in such elements and we can be sure we have an html element
+    if (typeof childNodeASHTMLElement.dataset !== "undefined" && childNodeASHTMLElement.dataset) {
+
+      // update the context for children
+      const contextKey = childNodeASHTMLElement.dataset.context;
+      if (contextKey) {
+        templateArgsNewContext = templateArgsContext[contextKey];
+      }
+
+      // so now we got to see if we have a for loop
+      const forEachKey = childNodeASHTMLElement.dataset.forEach;
+      if (forEachKey) {
+        // we will unhandle then
+        leaveNodeChildrenUnhandled = true;
+        // and this is what we are looping for
+        const forArgument = templateArgsNewContext[forEachKey];
+        // we grab the next sibling so that we can properly repeat
+        const nextSibling = childNodeASHTMLElement.nextSibling;
+
+        // so we loop
+        forArgument.forEach((forEachContext: any, index: number) => {
+          // now we make a clone of what we are looping for
+          const clone = childNodeASHTMLElement.cloneNode(true) as HTMLElement;
+          // if we have a next sibling
+          if (nextSibling) {
+            // we insert before it
+            childNodeASHTMLElement.parentElement.insertBefore(clone, nextSibling);
+          } else {
+            childNodeASHTMLElement.parentElement.appendChild(clone);
+          }
+
+          // and now we call for the initialization of this node itself
+          processTemplateNodeInitialization(
+            clone,
+            forEachContext,
+          );
+
+          // if we don't expect children to be unhandled
+          if (clone.hasChildNodes()) {
+            // we handle them per clone result
+            processTemplateInitialization(
+              clone,
+              forEachContext,
+            );
+          }
+        });
+
+        // now we can remove the original
+        childNodeASHTMLElement.parentElement.removeChild(childNodeASHTMLElement);
+      } else {
+        // otherwise if we have no for loop, we just process the node itself
+        processTemplateNodeInitialization(
+          childNodeASHTMLElement,
+          templateArgsNewContext,
+        );
+      }
+    }
+
+    // and if we did not decide to leave the children of the node unhandled and
+    // we have children
+    if (childNodeASHTMLElement.hasChildNodes()) {
+      // lets recurse into them for their processing
+      processTemplateInitialization(
+        childNodeASHTMLElement,
+        templateArgsNewContext,
+      );
+    }
+  });
+}
+
+/**
+ * Performs a simple template rendering
+ * from a string based HTML template based on the text specs
  * 
- * this is mainly used to convert the raw text as it is into react
- * and not for usage for templating
+ * Note that this method does not support UI Handlers
+ * it is used for producing a string by doing a simple pass
+ * on a template
+ * 
+ * It also does not support dynamic styles
+ * 
+ * If you want the template to render nicely you might want
+ * to run it before over the sanitize function
+ * 
+ * eg. renderTemplate(sanitize(...), {...args})
+ * 
+ * for proper templates with full blown functionality you should
+ * use the renderTemplateDynamically method
+ * 
+ * @param template the template in question
+ * @param args the arguments
+ */
+export function renderTemplate(
+  template: string,
+  args: any,
+): string {
+  const cheapdiv = DOMWindow.document.createElement("div");
+  cheapdiv.innerHTML = template;
+
+  processTemplateInitialization(
+    cheapdiv,
+    args,
+  );
+
+  return cheapdiv.innerHTML;
+}
+
+/**
+ * Compiles the template but it does as a react element in which
+ * way it supports the whole range of the componentry, including
+ * dynamic styles and UI handling
  * 
  * The property should be a template for this to be usable
+ * 
+ * eg. renderTemplateDynamically(deserialize(sanitize(...)), {...args})
+ * 
+ * note how this method differs from the renderTemplate method as it
+ * takes a document instead
+ * 
+ * @param document the root level document
+ * @param args the arguments to render the template with
  */
-export function reactify(
+export function renderTemplateDynamically(
   document: IRootLevelDocument,
-  args?: any,
+  args: any,
 ) {
   if (document === NULL_DOCUMENT) {
     return null;
@@ -512,11 +770,13 @@ export function reactify(
     <>
       {
         document.children.map((c, index) => {
-          let templatingArgs = {
-            args: args,
+          return SERIALIZATION_REGISTRY.REACTIFY[c.type]({
+            asTemplate: true,
+            active: true,
+            element: c,
             key: index,
-          };
-          return SERIALIZATION_REGISTRY.REACTIFY[c.type](c, true, null, templatingArgs);
+            templateArgs: args,
+          });
         })
       }
     </>
