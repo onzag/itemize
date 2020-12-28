@@ -136,7 +136,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.each}
         value={currentNode.forEach || null}
         options={allEachContexts}
-        anchor={props.info.selectedAnchor}
+        anchor={props.info.currentSelectedNodeAnchor}
         onChange={props.helpers.setForEach}
       />
       <SingleTemplatingElement
@@ -144,7 +144,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.context}
         value={currentNode.context || null}
         options={allContexts}
-        anchor={props.info.selectedAnchor}
+        anchor={props.info.currentSelectedNodeAnchor}
         onChange={props.helpers.setContext}
       />
     </div>

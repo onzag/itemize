@@ -6,9 +6,9 @@
  * @packageDocumentation
  */
 
-import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from ".";
-import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "..";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";
+import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "../..";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 
 /**
  * The function that registers and adds the container in the given

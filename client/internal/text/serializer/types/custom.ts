@@ -6,9 +6,9 @@
  * @packageDocumentation
  */
 
-import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg } from ".";
-import { CUSTOM_CLASS_PREFIX } from "..";
-import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "./base";
+import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg } from "..";
+import { CUSTOM_CLASS_PREFIX } from "../..";
+import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 
 /**
  * The function that registers and adds the custom in the given

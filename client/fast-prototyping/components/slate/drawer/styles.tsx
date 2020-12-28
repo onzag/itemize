@@ -79,11 +79,11 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     const selectedNode: RichElement = props.info.currentSelectedNode as any;
     if (
       !equals(selectedNode.richClassList || [], state.value) &&
-      !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
+      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.richClassList || [],
-        valueForAnchor: props.info.selectedAnchor,
+        valueForAnchor: props.info.currentSelectedNodeAnchor,
       }
     }
 
@@ -95,7 +95,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     const selectedNode: RichElement = props.info.currentSelectedNode as any;
     this.state = {
       value: selectedNode.richClassList || [],
-      valueForAnchor: props.info.selectedAnchor,
+      valueForAnchor: props.info.currentSelectedNodeAnchor,
     };
 
     this.onRichClassListChange = this.onRichClassListChange.bind(this);
@@ -104,12 +104,12 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     let newValue: string[] = e.target.value;
     this.setState({
       value: newValue,
-      valueForAnchor: this.props.info.selectedAnchor,
+      valueForAnchor: this.props.info.currentSelectedNodeAnchor,
     });
     if (newValue.length === 0) {
       newValue = null;
     }
-    this.props.helpers.setRichClasses(newValue, this.props.info.selectedAnchor);
+    this.props.helpers.setRichClasses(newValue, this.props.info.currentSelectedNodeAnchor);
   }
   public render() {
     return (
@@ -156,7 +156,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles ?
           <SingleStyle
-            anchor={props.info.selectedAnchor}
+            anchor={props.info.currentSelectedNodeAnchor}
             onChange={props.helpers.setStyle}
             name={props.i18nRichInfo.style}
             styleValue={currentNode.style}
@@ -166,7 +166,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles && props.featureSupport.supportsTemplating ?
           <SingleStyle
-            anchor={props.info.selectedAnchor}
+            anchor={props.info.currentSelectedNodeAnchor}
             onChange={props.helpers.setHoverStyle}
             name={props.i18nRichInfo.styleHover}
             styleValue={currentNode.styleHover}
@@ -176,7 +176,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles && props.featureSupport.supportsTemplating ?
           <SingleStyle
-            anchor={props.info.selectedAnchor}
+            anchor={props.info.currentSelectedNodeAnchor}
             onChange={props.helpers.setActiveStyle}
             name={props.i18nRichInfo.styleActive}
             styleValue={currentNode.styleActive}

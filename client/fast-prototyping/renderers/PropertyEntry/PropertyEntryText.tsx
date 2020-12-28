@@ -11,8 +11,7 @@
 import React from "react";
 import {
   InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
-  Button, WithStyles, withStyles, createStyles,
-  Alert,
+  WithStyles, withStyles, createStyles, Alert,
 } from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { SlateEditor } from "../../components/slate";
@@ -141,7 +140,7 @@ export const style = createStyles({
   }
 });
 
-interface IPropertyEntryTextRendererState {
+interface IPropertyEntryTextRendererState {
   focused: boolean;
 }
 
@@ -227,13 +226,15 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         currentValid={this.props.currentValid}
         currentLoadError={this.props.lastLoadedFileError}
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
-        Wrapper={MaterialUISlateWrapper}
+        Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         rootI18n={this.props.i18nRoot}
-        wrapperArgs={{
-          i18nGenericError: this.props.i18nGenericError,
-          i18nOk: this.props.i18nOk,
-          i18nRichInfo: this.props.i18nRichInfo,
-        }}
+        wrapperArgs={
+          this.props.args.wrapperArgs || {
+            i18nGenericError: this.props.i18nGenericError,
+            i18nOk: this.props.i18nOk,
+            i18nRichInfo: this.props.i18nRichInfo,
+          }
+        }
       />
 
     // we return the component, note how we set the thing to focused

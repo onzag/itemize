@@ -5,7 +5,6 @@
  * @packageDocumentation
  */
 
-
 import React from "react";
 import { DOMWindow } from "../../../../../util";
 import { IReactifyArg, ISerializationRegistryType } from "..";

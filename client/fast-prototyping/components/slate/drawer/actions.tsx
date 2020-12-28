@@ -143,7 +143,7 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
             name={v}
             actionValue={currentNode[v] || null}
             options={allOptions}
-            anchor={props.info.selectedAnchor}
+            anchor={props.info.currentSelectedNodeAnchor}
             onChange={props.helpers.setAction}
           />
         ))

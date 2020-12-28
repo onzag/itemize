@@ -12,8 +12,8 @@ import {
   FormControlLabel,
   Switch,
 } from "../../../mui-core";
-import { IContainer } from "../../../../internal/text/serializer/container";
-import { ITitle } from "../../../../internal/text/serializer/title";
+import { IContainer } from "../../../../internal/text/serializer/types/container";
+import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/image";
 import { Path } from "slate";
 
@@ -27,11 +27,11 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     const selectedNode: IContainer = props.info.currentSelectedNode as any;
     if (
       (selectedNode.containerType || "") !== state.value &&
-      !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
+      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.containerType || "",
-        valueForAnchor: props.info.selectedAnchor,
+        valueForAnchor: props.info.currentSelectedNodeAnchor,
       }
     }
 
@@ -45,7 +45,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 
     this.state = {
       value: selectedNode.containerType || "",
-      valueForAnchor: props.info.selectedAnchor,
+      valueForAnchor: props.info.currentSelectedNodeAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -60,7 +60,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 
     this.props.helpers.set({
       containerType: newValue,
-    }, this.props.info.selectedAnchor);
+    }, this.props.info.currentSelectedNodeAnchor);
   }
 
   public render() {
@@ -112,11 +112,11 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     const selectedNode: ITitle = props.info.currentSelectedNode as any;
     if (
       (selectedNode.subtype || "") !== state.value &&
-      !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
+      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.subtype || "",
-        valueForAnchor: props.info.selectedAnchor,
+        valueForAnchor: props.info.currentSelectedNodeAnchor,
       }
     }
 
@@ -129,7 +129,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.state = {
       value: selectedNode.subtype || "",
-      valueForAnchor: props.info.selectedAnchor,
+      valueForAnchor: props.info.currentSelectedNodeAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -144,7 +144,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.props.helpers.set({
       subtype: newValue,
-    }, this.props.info.selectedAnchor);
+    }, this.props.info.currentSelectedNodeAnchor);
   }
 
   public render() {
@@ -201,12 +201,12 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
         (selectedNode.alt || "") !== state.altValue ||
         selectedNode.standalone !== state.standalone
       ) &&
-      !Path.equals(props.info.selectedAnchor, state.valueForAnchor)
+      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         altValue: selectedNode.alt || "",
         standalone: selectedNode.standalone,
-        valueForAnchor: props.info.selectedAnchor,
+        valueForAnchor: props.info.currentSelectedNodeAnchor,
       }
     }
 
@@ -221,7 +221,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.state = {
       altValue: selectedNode.alt || "",
       standalone: selectedNode.standalone,
-      valueForAnchor: props.info.selectedAnchor,
+      valueForAnchor: props.info.currentSelectedNodeAnchor,
     }
 
     this.updateAlt = this.updateAlt.bind(this);
@@ -232,7 +232,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   public actuallyUpdateAlt() {
     this.props.helpers.set({
       alt: this.state.altValue,
-    }, this.props.info.selectedAnchor);
+    }, this.props.info.currentSelectedNodeAnchor);
   }
 
   public updateAlt(e: React.ChangeEvent<HTMLInputElement>) {
@@ -251,7 +251,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.props.helpers.set({
       standalone: e.target.checked,
-    }, this.props.info.selectedAnchor);
+    }, this.props.info.currentSelectedNodeAnchor);
   }
 
   public render() {

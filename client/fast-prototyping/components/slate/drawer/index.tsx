@@ -87,22 +87,22 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   }, []);
 
   let pathData: React.ReactNode;
-  if (props.info.selectedOriginAnchor) {
-    const isTextAnchorTemplateRelevant = !!props.info.currentSelectedNodeOrigin.templateText;
+  if (props.info.currentSelectedTextNodeAnchor) {
+    const isTextAnchorTemplateRelevant = !!props.info.currentSelectedTextNode.templateText;
 
     let currentRichElement = {
       children: props.info.currentValue,
     } as any;
     let pathSoFar: Path = [];
-    pathData = props.info.selectedOriginAnchor.map((p, index) => {
+    pathData = props.info.currentSelectedTextNodeAnchor.map((p, index) => {
       currentRichElement = currentRichElement.children[p];
       pathSoFar.push(p);
 
-      if (!isTextAnchorTemplateRelevant && index === props.info.selectedOriginAnchor.length - 1) {
+      if (!isTextAnchorTemplateRelevant && index === props.info.currentSelectedTextNodeAnchor.length - 1) {
         return null;
       }
 
-      const isSelected = Path.equals(props.info.selectedAnchor, pathSoFar);
+      const isSelected = Path.equals(props.info.currentSelectedNodeAnchor, pathSoFar);
       const info = getInfoOf(currentRichElement, props.i18nRichInfo);
 
       return (

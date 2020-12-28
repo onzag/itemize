@@ -83,11 +83,11 @@ const style = createStyles({
     overflowY: "auto",
   },
   editor: (props: ISlateEditorWrapperBaseProps) => {
-    const shouldShowInvalidEditor = !props.info.currentValid;
+    const shouldShowInvalidEditor = !props.state.currentValid;
     return {
       "flex": "1 1 100%",
       "position": "relative",
-      "padding": props.info.isRichText ? "1rem" : "0 1rem 1rem 1rem",
+      "padding": props.state.isRichText ? "1rem" : "0 1rem 1rem 1rem",
       // this is the colur when the field is out of focus
       "&::before": {
         left: 0,
@@ -161,7 +161,7 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
 }
 
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
-  if (!props.info.isRichText) {
+  if (!props.state.isRichText) {
     return null;
   }
   return (
@@ -170,8 +170,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         <IconButton
           tabIndex={-1}
           title={props.i18nRichInfo.formatBoldLabel}
-          disabled={!props.info.currentText}
-          color={props.info.currentText && props.info.currentText.bold ? "primary" : "default"}
+          disabled={!props.state.currentText}
+          color={props.state.currentText && props.state.currentText.bold ? "primary" : "default"}
           onMouseDown={props.helpers.blockBlur}
           onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleBold}
@@ -181,8 +181,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         <IconButton
           tabIndex={-1}
           title={props.i18nRichInfo.formatItalicLabel}
-          disabled={!props.info.currentText}
-          color={props.info.currentText && props.info.currentText.italic ? "primary" : "default"}
+          disabled={!props.state.currentText}
+          color={props.state.currentText && props.state.currentText.italic ? "primary" : "default"}
           onMouseDown={props.helpers.blockBlur}
           onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleItalic}
@@ -192,8 +192,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         <IconButton
           tabIndex={-1}
           title={props.i18nRichInfo.formatUnderlineLabel}
-          disabled={!props.info.currentText}
-          color={props.info.currentText && props.info.currentText.underline ? "primary" : "default"}
+          disabled={!props.state.currentText}
+          color={props.state.currentText && props.state.currentText.underline ? "primary" : "default"}
           onMouseDown={props.helpers.blockBlur}
           onMouseUp={props.helpers.releaseBlur}
           onClick={props.helpers.formatToggleUnderline}
@@ -215,7 +215,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatLinkLabel}
-              color={props.info.currentElement && props.info.currentElement.type === "link" ? "primary" : "default"}
+              color={props.state.currentElement && props.state.currentElement.type === "link" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertLink}
               onClick={props.requestLink}
               onMouseDown={props.helpers.blockBlur}
@@ -230,7 +230,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatTitleLabel}
-              color={props.info.currentBlock && props.info.currentBlock.type === "title" ? "primary" : "default"}
+              color={props.state.currentBlockElement && props.state.currentBlockElement.type === "title" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertTitle}
               onClick={props.helpers.toggleTitle.bind(null, "h1", null)}
               onMouseDown={props.helpers.blockBlur}
@@ -245,7 +245,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatQuoteLabel}
-              color={props.info.currentBlock && props.info.currentBlock.type === "quote" ? "primary" : "default"}
+              color={props.state.currentBlockElement && props.state.currentBlockElement.type === "quote" ? "primary" : "default"}
               disabled={!props.featureSupport.canInsertQuote}
               onClick={props.helpers.toggleQuote.bind(null, null)}
               onMouseDown={props.helpers.blockBlur}
@@ -261,8 +261,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               tabIndex={-1}
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
-                props.info.currentSuperBlock && props.info.currentSuperBlock.type === "list" &&
-                  props.info.currentSuperBlock.listType === "numbered" ? "primary" : "default"
+                props.state.currentSuperBlockElement && props.state.currentSuperBlockElement.type === "list" &&
+                  props.state.currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "numbered", null)}
@@ -279,8 +279,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               tabIndex={-1}
               title={props.i18nRichInfo.formatListBulletedLabel}
               color={
-                props.info.currentSuperBlock && props.info.currentSuperBlock.type === "list" &&
-                  props.info.currentSuperBlock.listType === "bulleted" ? "primary" : "default"
+                props.state.currentSuperBlockElement && props.state.currentSuperBlockElement.type === "list" &&
+                  props.state.currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
@@ -362,7 +362,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatAddTemplateText}
-              disabled={!props.info.currentBlock}
+              disabled={!props.state.currentBlockElement}
               onMouseDown={props.helpers.blockBlur}
               onClick={props.requestTemplateText}
               onMouseUp={props.helpers.releaseBlur}
@@ -376,7 +376,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <IconButton
               tabIndex={-1}
               title={props.i18nRichInfo.formatAddTemplateHTML}
-              disabled={!props.info.currentBlock}
+              disabled={!props.state.currentBlockElement}
               onMouseDown={props.helpers.blockBlur}
               onClick={props.requestTemplateHTML}
               onMouseUp={props.helpers.releaseBlur}
@@ -532,7 +532,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.originalSelectionArea = this.props.helpers.editor.selection;
     this.setState({
       linkDialogOpen: true,
-      originalSelectedElement: this.props.info.currentElement,
+      originalSelectedElement: this.props.state.currentElement,
     });
   }
   public closeDialogVideo() {
@@ -614,7 +614,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     ) : null;
 
     const fileLoadErrorDialog =
-      this.props.info.isRichText &&
+      this.props.state.isRichText &&
         (
           this.props.featureSupport.supportsImages ||
           this.props.featureSupport.supportsFiles
@@ -628,7 +628,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           />
         ) : null;
 
-    const videoDialog = this.props.info.isRichText && this.props.featureSupport.supportsVideos ? (
+    const videoDialog = this.props.state.isRichText && this.props.featureSupport.supportsVideos ? (
       <VideoDialog
         acceptVideo={this.acceptVideo}
         closeDialogVideo={this.closeDialogVideo}
@@ -643,7 +643,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
 
 
 
-    const linkDialog = this.props.info.isRichText && this.props.featureSupport.supportsLinks ? (
+    const linkDialog = this.props.state.isRichText && this.props.featureSupport.supportsLinks ? (
       <LinkDialog
         acceptLink={this.acceptLink}
         closeDialogLink={this.closeDialogLink}
@@ -657,7 +657,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nSetLinkTemplatedPlaceholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
         i18nSetLinkTemplatedUnspecified={this.props.i18nRichInfo.setLink.templatedUnspecified}
         i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
-        currentContext={this.props.info.currentContext}
+        currentContext={this.props.state.currentContext}
         linkDialogOpen={this.state.linkDialogOpen}
         originalSelectedElement={this.state.originalSelectedElement}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
@@ -666,12 +666,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
-    const templateTextDialog = this.props.info.isRichText && this.props.featureSupport.supportsTemplating ? (
+    const templateTextDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
       <TemplateElementDialog
         insertTemplateElement={this.insertTemplateText}
         closeTemplateElementDialog={this.closeDialogTemplateText}
         templateElementDialogOpen={this.state.templateTextDialogOpen}
-        currentContext={this.props.info.currentContext}
+        currentContext={this.props.state.currentContext}
         i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateText.label}
         i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateText.submit}
@@ -680,12 +680,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
-    const templateHTMLDialog = this.props.info.isRichText && this.props.featureSupport.supportsTemplating ? (
+    const templateHTMLDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
       <TemplateElementDialog
         insertTemplateElement={this.insertTemplateHTML}
         closeTemplateElementDialog={this.closeDialogTemplateHTML}
         templateElementDialogOpen={this.state.templateHTMLDialogOpen}
-        currentContext={this.props.info.currentContext}
+        currentContext={this.props.state.currentContext}
         i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateHTML.label}
         i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateHTML.placeholder}
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateHTML.submit}
@@ -710,7 +710,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           requestTemplateHTML={this.requestTemplateHTML}
         />
         <div className={this.props.classes.editorContainer}>
-          <div className={"rich-text " + this.props.classes.editor + (this.props.info.isFocused ? " focused" : "")}>
+          <div className={"rich-text " + this.props.classes.editor + (this.props.state.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
           <div
