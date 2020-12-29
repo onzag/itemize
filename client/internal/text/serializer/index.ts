@@ -51,6 +51,12 @@ export interface IReactifyArg<T> {
    */
   active: boolean;
   /**
+   * Whether the element is considered selected, it should only really be true if active
+   * is false, as it's in edit mode and can be selected, it adds the selected class
+   * to the reactification
+   */
+  selected: boolean;
+  /**
    * Give the element custom properties, these properties will override the way the element
    * is bound, you can pass children via these props
    */

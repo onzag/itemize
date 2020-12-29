@@ -2183,23 +2183,40 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }, 30);
     }, 300);
   }
+
+  /**
+   * the render element function to be used in slate editor
+   * @param props the properties that slate provides to render the component
+   */
   public renderElement(props: RenderElementProps) {
+    // first we extract all these stuffs
     const { attributes, children, element } = props;
 
+    // now we check if we are in a selected elelement
+    // because the component is immutable, we can do this
     const isSelected = (
       (element as any) === this.state.currentBlockElement ||
       (element as any) === this.state.currentElement ||
       (element as any) === this.state.currentSuperBlockElement
     );
 
+    // let's check for a ui handler
     const uiHandler = (element as any as RichElement).uiHandler;
+
+    // if we have one
     if (uiHandler) {
+
+      // we extract the arguments for the ui handler that are in the rich element
       const uiHandlerArgs = (element as any as RichElement).uiHandlerArgs;
 
+      // and now we try to get the ui handler from the context itself
+      // either the root or the one in the property itself
       const propertiesFromContext =
         this.state.currentContext.properties[uiHandler] ||
         this.props.rootContext.properties[uiHandler];
 
+      // if we don't find a UI handler
+      // let's put a message about it
       if (
         !propertiesFromContext ||
         propertiesFromContext.type !== "ui-handler" ||
@@ -2208,20 +2225,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         return (
           <div>
             <span>{`UI Handled [${uiHandler}]`}</span>
-            <span>You are missing a handler descrption for the given UI Handler as such it can't be rendered</span>
+            <span>You are missing the given UI Handler as such it can't be rendered</span>
           </div>
         );
       }
+
+      // now we can get the component, extra args and whatnot
       const HandlerComponent = propertiesFromContext.handler;
       const handlerExtraArgs = propertiesFromContext.handlerExtraArgs;
       const passExtraInfo = propertiesFromContext.handlerPassSlateInfo;
 
+      // the extra info that should be passed if necessary
       const extraInfoArgs = passExtraInfo ?
         {
           helpers: this.getHelpers(),
           selected: isSelected,
         } : {};
 
+      // now we can use the handler component that is given via the ui handler
       return (
         <HandlerComponent
           {...uiHandlerArgs}
@@ -2231,74 +2252,140 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       );
     }
 
-    let className: string = null;
-    if (isSelected) {
-      className = "selected";
-    }
-
+    // and now we call the reactification
     return SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
       active: false,
+      selected: isSelected,
       element: element as any,
       asTemplate: false,
-      customProps: { ...attributes, children, className },
+      customProps: { ...attributes, children },
     }) as any;
   }
+
+  /**
+   * the function that is called by slate to render text
+   * @param props the properties given by slate to render a text leaf
+   */
   public renderText(props: RenderLeafProps) {
+    // first we extract the attributes
     const { attributes, children, leaf } = props;
+
+    // now we use the serialization registry in order
+    // to make the calls
     return SERIALIZATION_REGISTRY.REACTIFY.text({
       active: false,
+      selected: false,
       element: leaf as any,
       asTemplate: false,
       customProps: {...attributes, children},
     }) as any;
   }
+
+  /**
+   * The change function that is called via slate when a change occurs
+   * this function hits every time on every change of the rich text
+   * @param newValue the new value of the children of the document
+   */
   public onChange(newValue: Node[]) {
+
+    // first we clear the timeout of the blur
+    // this is used during the blur blocking so now
+    // the field won't be blurred because a change occured
+    // but it will at the end depend on the editor selection
+    // whether it ends up being blurred or not
     clearTimeout(this.blurTimeout);
+
+    // if there's a selection
     if (this.editor.selection) {
+      // we are on focus
       this.onFocusedChange(this.editor.selection.anchor.path, newValue);
     } else {
+      // otherwise we are blurred
       this.onBlurredChange(newValue);
     }
 
+    // always remark the flag as false as this change is a normal change
     this.lastChangeWasSelectedDelete = false;
 
+    // and if the new value is not the same as the old children of the document
+    // as these values are immutable and we just override them
     if (newValue !== this.state.internalValue.children as any) {
+      // we update, the reason the value might be equal is because the change
+      // triggers for changes in the selection
       this.setValue(newValue);
     }
   }
+
+  /**
+   * The blocking blur function it is a helper function that is called usually on the toolbars
+   * to prevent the field from blurring on mousedown, ups events, as this will cause a blur only
+   * to cause a refocus, this prevents that
+   */
   public blockBlur() {
     clearTimeout(this.blurTimeout);
     this.blurBlocked = true;
   }
+
+  /**
+   * This is part of the blur blocking event chain and releases
+   * the blocking of the blur event
+   */
   public releaseBlur() {
     this.blurBlocked = false;
   }
 
-  public selectPath(selectPath: Path) {
+  /**
+   * given a node path, that should represent either an element or a text node
+   * this allows such a path to be selected and be marked into the selection
+   * @param p the path to select
+   */
+  public selectPath(p: Path) {
+    // first we need to find the actual node that is referred to that path
     let finalNode: any = this.state.internalValue;
-    selectPath.forEach((v) => {
+    p.forEach((v) => {
       finalNode = finalNode.children[v];
     });
+
+    // now we can update the state
     this.setState({
-      currentSelectedNodeAnchor: selectPath,
+      currentSelectedNodeAnchor: p,
       currentSelectedNode: finalNode,
     });
   }
 
+  /**
+   * Deletes the selected node that has been selected, either the current default
+   * or one that has been manually selected using selectPath
+   */
   public deleteSelectedNode() {
+    // first we mark to say that the last was selected delete, remember as defined
+    // this is used because during the normalization the anchors might corrupt during the
+    // call to onchange as the selected anchors are now messed up, so this flag
+    // ensures to clear up the anchors just after the transform
     this.lastChangeWasSelectedDelete = true;
 
+    // so we delete which will call onchange and normalization
     Transforms.delete(this.editor, {
       at: this.state.currentSelectedNodeAnchor,
     });
 
+    // and now we can refocus
     ReactEditor.focus(this.editor);
   };
 
+  /**
+   * A helper function to call react focus back into the editor
+   */
   public focus() {
     ReactEditor.focus(this.editor);
   }
 
+  /**
+   * An async function that is a bit of a hack to focus at a given
+   * range, because of the way slate works it needs to be async
+   * @param at the range to focus at
+   * @returns a void promise once it's done
+   */
   public async focusAt(at: Range) {
     return new Promise((r) => {
       setTimeout(() => {
@@ -2314,23 +2401,34 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Will insert an image based on a given file that has
    * been taken as an input
+   * 
+   * Note that there is an insert file function that should be given
+   * as prop and that's what this function will call, if an error occurred
+   * it should have been fed as a prop as well, so this function always
+   * returns a void promise
+   * 
    * @param file the file
    * @param standalone whether to make it a standalone image
-   * @param at a range to insert it at
+   * @param at a range to insert it at (optional)
+   * @returns a void promise once it's done
    */
   public async insertImage(file: File, standalone: boolean, at?: Range): Promise<void> {
+    // we try
     try {
+      // now let's see what we get
       const data = await this.props.onInsertFile(file, true);
 
+      // let's refocus
       if (at) {
         await this.focusAt(at);
       }
 
       if (!data) {
-        // soething went wrong there should be an error in the state
+        // something went wrong there should be an error in the props
         return;
       }
 
+      // now we can build the image node that we should add in the tree
       const imageNode: IImage = {
         type: "image",
         containment: "void-block",
@@ -2353,28 +2451,65 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         standalone,
       };
 
+      // and we call the insert node
       this.editor.insertNode(imageNode as any);
     } catch (err) {
     }
   }
+
+  /**
+   * Will insert a bit of template text that is used for templating purposes
+   * 
+   * @param label the label to give it
+   * @param value the value that it gets
+   * @param at at which range to insert it (optional)
+   * @returns a void promise
+   */
   public async insertTemplateText(label: string, value: string, at?: Range) {
+
+    // if we have a range to insert at
     if (at) {
+      // we focus there
       await this.focusAt(at);
     }
+
+    // now we pick the current text node, if possible
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.focus.path) : null)) as IText;
+
+    // now we make the text node
     const textNode: IText = {
-      ...this.state.currentText,
+      bold: false,
+      italic: false,
+      underline: false,
+      ...currentText, // note how we override here
       text: label,
       templateText: value,
     }
 
+    // and insert right there
     this.editor.insertNode(textNode as any);
   }
+
+  /**
+   * Will insert a bit of template html that is used for templating purposes, work similar
+   * to template text, except it uses html content instead
+   * 
+   * @param label 
+   * @param value 
+   * @param at 
+   */
   public async insertTemplateHTML(label: string, value: string, at?: Range) {
     if (at) {
       await this.focusAt(at);
     }
+
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.focus.path) : null)) as IText;
+
     const textNode: IText = {
-      ...this.state.currentText,
+      bold: false,
+      italic: false,
+      underline: false,
+      ...currentText,
       text: label,
       templateText: null,
     }

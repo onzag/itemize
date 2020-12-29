@@ -282,6 +282,7 @@ export function reactifyElementBase(
                 wrapChildren,
                 {
                   active: arg.active,
+                  selected: arg.selected,
                   element: base as RichElement,
                   asTemplate: true,
                   customProps: arg.customProps,
@@ -340,6 +341,11 @@ export function reactifyElementBase(
     finalProps.className = (finalProps.className || "") + " active";
   }
 
+  // define the class for selection
+  if (arg.selected) {
+    finalProps.className = (finalProps.className || "") + " selected";
+  }
+
   // add the base class
   if (baseClass) {
     finalProps.className = (finalProps.className || "") + " " + baseClass;
@@ -384,6 +390,7 @@ export function reactifyElementBase(
       const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
         asTemplate: arg.asTemplate,
         active: arg.active,
+        selected: arg.selected,
         element: c,
         templateArgs: currentTemplateArgs,
         templateRootArgs: currentTemplateRootArgs,
