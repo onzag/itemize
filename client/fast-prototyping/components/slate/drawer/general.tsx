@@ -14,7 +14,7 @@ import {
 } from "../../../mui-core";
 import { IContainer } from "../../../../internal/text/serializer/types/container";
 import { ITitle } from "../../../../internal/text/serializer/types/title";
-import { IImage } from "../../../../internal/text/serializer/image";
+import { IImage } from "../../../../internal/text/serializer/types/image";
 import { Path } from "slate";
 
 interface IGeneralOptionsState {
@@ -24,14 +24,14 @@ interface IGeneralOptionsState {
 
 class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
-    const selectedNode: IContainer = props.info.currentSelectedNode as any;
+    const selectedNode: IContainer = props.state.currentSelectedNode as any;
     if (
       (selectedNode.containerType || "") !== state.value &&
-      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.containerType || "",
-        valueForAnchor: props.info.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedNodeAnchor,
       }
     }
 
@@ -41,11 +41,11 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: IContainer = props.info.currentSelectedNode as any;
+    const selectedNode: IContainer = props.state.currentSelectedNode as any;
 
     this.state = {
       value: selectedNode.containerType || "",
-      valueForAnchor: props.info.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedNodeAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -60,7 +60,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 
     this.props.helpers.set({
       containerType: newValue,
-    }, this.props.info.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedNodeAnchor);
   }
 
   public render() {
@@ -109,14 +109,14 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 
 class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
-    const selectedNode: ITitle = props.info.currentSelectedNode as any;
+    const selectedNode: ITitle = props.state.currentSelectedNode as any;
     if (
       (selectedNode.subtype || "") !== state.value &&
-      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.subtype || "",
-        valueForAnchor: props.info.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedNodeAnchor,
       }
     }
 
@@ -125,11 +125,11 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: ITitle = props.info.currentSelectedNode as any;
+    const selectedNode: ITitle = props.state.currentSelectedNode as any;
 
     this.state = {
       value: selectedNode.subtype || "",
-      valueForAnchor: props.info.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedNodeAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -144,7 +144,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.props.helpers.set({
       subtype: newValue,
-    }, this.props.info.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedNodeAnchor);
   }
 
   public render() {
@@ -195,18 +195,18 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   private altUpdateTimeout: NodeJS.Timer;
 
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralImageOptionsState) {
-    const selectedNode: IImage = props.info.currentSelectedNode as any;
+    const selectedNode: IImage = props.state.currentSelectedNode as any;
     if (
       (
         (selectedNode.alt || "") !== state.altValue ||
         selectedNode.standalone !== state.standalone
       ) &&
-      !Path.equals(props.info.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
     ) {
       return {
         altValue: selectedNode.alt || "",
         standalone: selectedNode.standalone,
-        valueForAnchor: props.info.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedNodeAnchor,
       }
     }
 
@@ -216,12 +216,12 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: IImage = props.info.currentSelectedNode as any;
+    const selectedNode: IImage = props.state.currentSelectedNode as any;
 
     this.state = {
       altValue: selectedNode.alt || "",
       standalone: selectedNode.standalone,
-      valueForAnchor: props.info.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedNodeAnchor,
     }
 
     this.updateAlt = this.updateAlt.bind(this);
@@ -232,7 +232,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   public actuallyUpdateAlt() {
     this.props.helpers.set({
       alt: this.state.altValue,
-    }, this.props.info.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedNodeAnchor);
   }
 
   public updateAlt(e: React.ChangeEvent<HTMLInputElement>) {
@@ -251,7 +251,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.props.helpers.set({
       standalone: e.target.checked,
-    }, this.props.info.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedNodeAnchor);
   }
 
   public render() {
@@ -276,7 +276,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
 export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   let specificNodeOptions: React.ReactNode = null;
-  switch ((props.info.currentSelectedNode as any).type) {
+  switch ((props.state.currentSelectedNode as any).type) {
     case "container":
       specificNodeOptions = <GeneralContainerOptions {...props} />
       break;

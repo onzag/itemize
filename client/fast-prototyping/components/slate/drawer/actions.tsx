@@ -122,9 +122,9 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
 }
 
 export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
-  const currentNode = props.info.currentSelectedNode as RichElement;
-  const allOptions = props.info.currentContext ? Object.keys(props.info.currentContext.properties).map((p) => {
-    const value = props.info.currentContext.properties[p];
+  const currentNode = props.state.currentSelectedNode as RichElement;
+  const allOptions = props.state.currentContext ? Object.keys(props.state.currentContext.properties).map((p) => {
+    const value = props.state.currentContext.properties[p];
     if (value.type !== "function") {
       return null;
     }
@@ -143,7 +143,7 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
             name={v}
             actionValue={currentNode[v] || null}
             options={allOptions}
-            anchor={props.info.currentSelectedNodeAnchor}
+            anchor={props.state.currentSelectedNodeAnchor}
             onChange={props.helpers.setAction}
           />
         ))

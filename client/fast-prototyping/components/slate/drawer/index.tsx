@@ -87,22 +87,22 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   }, []);
 
   let pathData: React.ReactNode;
-  if (props.info.currentSelectedTextNodeAnchor) {
-    const isTextAnchorTemplateRelevant = !!props.info.currentSelectedTextNode.templateText;
+  if (props.state.currentSelectedTextNodeAnchor) {
+    const isTextAnchorTemplateRelevant = !!props.state.currentSelectedTextNode.templateText;
 
     let currentRichElement = {
-      children: props.info.currentValue,
+      children: props.state.currentValue,
     } as any;
     let pathSoFar: Path = [];
-    pathData = props.info.currentSelectedTextNodeAnchor.map((p, index) => {
+    pathData = props.state.currentSelectedTextNodeAnchor.map((p, index) => {
       currentRichElement = currentRichElement.children[p];
       pathSoFar.push(p);
 
-      if (!isTextAnchorTemplateRelevant && index === props.info.currentSelectedTextNodeAnchor.length - 1) {
+      if (!isTextAnchorTemplateRelevant && index === props.state.currentSelectedTextNodeAnchor.length - 1) {
         return null;
       }
 
-      const isSelected = Path.equals(props.info.currentSelectedNodeAnchor, pathSoFar);
+      const isSelected = Path.equals(props.state.currentSelectedNodeAnchor, pathSoFar);
       const info = getInfoOf(currentRichElement, props.i18nRichInfo);
 
       return (
@@ -121,8 +121,8 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   }
 
   let settingsForNode: React.ReactNode = null;
-  if (props.info.currentSelectedNode) {
-    const selectedNodeInfo = getInfoOf(props.info.currentSelectedNode, props.i18nRichInfo);
+  if (props.state.currentSelectedNode) {
+    const selectedNodeInfo = getInfoOf(props.state.currentSelectedNode, props.i18nRichInfo);
 
     let actualLocation = location;
     if (actualLocation !== "MAIN" && selectedNodeInfo.isText) {

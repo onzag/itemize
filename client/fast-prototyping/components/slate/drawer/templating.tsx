@@ -4,7 +4,6 @@ import React from "react";
 import { MaterialUISlateWrapperWithStyles } from "../wrapper";
 import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@material-ui/core";
 import { Path } from "slate";
-import equals from "deep-equal";
 
 interface ISingleTemplatingElementOption {
   value: string;
@@ -100,14 +99,14 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
 }
 
 export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
-  const currentNode = props.info.currentSelectedNode as RichElement;
+  const currentNode = props.state.currentSelectedNode as RichElement;
   const allUIHandlers: ISingleTemplatingElementOption[] = [];
   const allEachContexts: ISingleTemplatingElementOption[] = [];
   const allContexts: ISingleTemplatingElementOption[] = [];
 
-  if (props.info.currentContext) {
-    Object.keys(props.info.currentContext.properties).forEach((p) => {
-      const value = props.info.currentContext.properties[p];
+  if (props.state.currentContext) {
+    Object.keys(props.state.currentContext.properties).forEach((p) => {
+      const value = props.state.currentContext.properties[p];
       if (value.type !== "context" && value.type !== "ui-handler") {
         return null;
       }
@@ -136,7 +135,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.each}
         value={currentNode.forEach || null}
         options={allEachContexts}
-        anchor={props.info.currentSelectedNodeAnchor}
+        anchor={props.state.currentSelectedNodeAnchor}
         onChange={props.helpers.setForEach}
       />
       <SingleTemplatingElement
@@ -144,7 +143,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.context}
         value={currentNode.context || null}
         options={allContexts}
-        anchor={props.info.currentSelectedNodeAnchor}
+        anchor={props.state.currentSelectedNodeAnchor}
         onChange={props.helpers.setContext}
       />
     </div>
