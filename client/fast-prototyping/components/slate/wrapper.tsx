@@ -1,3 +1,13 @@
+/**
+ * This file contains the fast prototyping wrapper that uses the material UI elements
+ * in order to create the slate editor for the PropertyViewText
+ * 
+ * The wrapper component is added as a property to the slate editor itself so other wrappers
+ * can be added as replacement, you can also design your own wrapper based on this one
+ * 
+ * @packageDocumentation
+ */
+
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React from "react";
 import { ISlateEditorWrapperBaseProps } from ".";
@@ -16,6 +26,9 @@ import { LinkDialog } from "./dialogs/link";
 import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
 
+/**
+ * Defining a bunch of styles for the wrapper
+ */
 const style = createStyles({
   selectionInput: {
     width: "100%",
@@ -147,23 +160,102 @@ const style = createStyles({
   },
 });
 
+/**
+ * These are the base props that this wrapper uses, note how we extend the base wrapper props as defined
+ * in the slate editor itself, and add the styles for the classes and these i18n info
+ * 
+ * If you wonder how the i18n information is to be added, in the PropertyEntryText when creating
+ * the slate editor as a component the wrapper can receive wrapperArgs so these args are passed
+ * when the editor is created with the wrapper itself
+ */
+export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
+  /**
+   * A generic error message
+   */
+  i18nGenericError: string;
+  /**
+   * A generic ok
+   */
+  i18nOk: string;
+  /**
+   * The whole of the i18n rich information that is given by default
+   */
+  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+};
+
+/**
+ * These are the rich text editor toolbar properties they basically take the same
+ * that the entire wrapper does, but adding these functions and flags taken from
+ * the state of the wrapper or other functions
+ */
 interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
-  requestImage: () => void;
-  requestFile: () => void;
-  requestVideo: () => void;
-  requestLink: () => void;
-  shouldHaveDrawer: () => boolean;
+  /**
+   * Whether the drawer is open, the drawer is the side drawer that contains
+   * a lot of functionality to edit the currently selected element
+   */
   drawerOpen: boolean;
+
+  /**
+   * call to request an image, opens a dialog so requires a state
+   */
+  requestImage: () => void;
+
+  /**
+   * Call to request a file, opens a dialog so requires a state
+   */
+  requestFile: () => void;
+
+  /**
+   * Call to request a video, opens a dialog so requires a state
+   */
+  requestVideo: () => void;
+
+  /**
+   * Call to request a link, opens a dialog so requires a state
+   */
+  requestLink: () => void;
+
+  /**
+   * A function that specifies whether the drawer should
+   * exist
+   * @returns a boolean as the answer
+   */
+  shouldHaveDrawer: () => boolean;
+
+  /**
+   * Toggle the drawer open or close
+   */
   toggleDrawer: () => void;
+
+  /**
+   * Call to insert a container, opens a dialog so requires a state
+   */
   insertContainer: () => void;
+
+  /**
+   * Call to insert a template text bit from the context, opens a dialog so requires a state
+   */
   requestTemplateText: () => void;
+
+  /**
+   * Call to insert a template html bit from the context, opens a dialog so requires a state
+   */
   requestTemplateHTML: () => void;
 }
 
+/**
+ * This is the function component that represents the toolbar for the wrapper
+ * @param props the entire rich text editor toolbar props with all the added functions
+ */
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
+  // no rich text
   if (!props.state.isRichText) {
+    // no toolbar
     return null;
   }
+
+  // now we can create the component itself
+  // there is not much to say on how this all works
   return (
     <AppBar position="relative" variant="outlined" color="default" className={props.classes.appbar}>
       <Toolbar className={props.classes.toolbar}>
@@ -403,44 +495,112 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
   );
 }
 
-export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
-  i18nGenericError: string;
-  i18nOk: string;
-  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
-};
-
+/**
+ * This is the state for the wrapper
+ * the state is necessary as the wrapper can hold dialogs open
+ * and the drawer itself
+ */
 export interface MaterialUISlateWrapperState {
+  /**
+   * Specifies whether the video dialog to input the url for the video is open
+   */
   videoDialogOpen: boolean;
+
+  /**
+   * Specifies whether the link dialog to input links and template links is open
+   */
   linkDialogOpen: boolean;
+
+  /**
+   * Specifies whether the link dialog to input templated text is open
+   */
   templateTextDialogOpen: boolean;
+
+  /**
+   * Specifies whether the link dialog to input templated html is open
+   */
   templateHTMLDialogOpen: boolean;
+
+  /**
+   * Specifies the state of the drawer
+   */
   drawerOpen: boolean;
-  originalSelectedElement: RichElement;
+
+  /**
+   * When opening a dialog and losing focus to the slate rich text editor content editable
+   * we lose access to the anchors and current elements now that we are in focus of something
+   * else so we need to store the element that was the current element that was in focus
+   * before that happened
+   */
+  elementThatWasCurrentBeforeLosingFocus: RichElement;
 }
 
+/**
+ * This represents the unwrapped class that is used for the wrapper, it is not
+ * the exported one because it needs to be withStyles for stylization
+ */
 class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState> {
+  /**
+   * The ref object for the input object for image input
+   */
   private inputImageRef: React.RefObject<HTMLInputElement>;
+
+  /**
+   * The ref object for the input object for any file input
+   */
   private inputFileRef: React.RefObject<HTMLInputElement>;
+
+  /**
+   * This is the range that was in place before losing focus, it is used because
+   * when opening some dialog, the insertion or change needs to happen at a given
+   * selection range, but that is lost when losing focus, so we need to remember it
+   */
   private originalSelectionArea: Range;
+
+  /**
+   * this is used to ensure a refocus after the native dialogs for file and for image that
+   * are used to get a file are closed; while we need to wait for the input event to trigger
+   * we don't know if that happens first as there are no guarantees so we delay it a little bit
+   * and the change event might not even trigger
+   */
   private refocusTimeout: NodeJS.Timeout;
+
+  /**
+   * The drawer being open or closed is stored in local storage, which is not available in the server
+   * side, and the drawer animates when it's opened and closed, so this variable is always false at the
+   * start, the drawer is always closed at the start, however, if we need to open the drawer at the start
+   * on mount we don't want any animation so we toggle this flag temporarily, it doesn't need to be part
+   * of the state as it's only used there
+   */
   private noAnimate: boolean = false;
+
+  /**
+   * Constructs a new material ui based wrapper for the slate editor
+   * @param props the base properties that every wrapper gets extended for this specific wrapper
+   */
   constructor(props: MaterialUISlateWrapperWithStyles) {
+
+    // super calling
     super(props);
 
+    // setup the initial state
     this.state = {
       videoDialogOpen: false,
       linkDialogOpen: false,
       templateTextDialogOpen: false,
       templateHTMLDialogOpen: false,
+      elementThatWasCurrentBeforeLosingFocus: null,
 
-      // keep SSR compatibility
+      // keep SSR compatibility by keeping the drawer closed at the start
+      // as we cannot read local storage in the server side
       drawerOpen: false,
-      originalSelectedElement: null,
     }
 
+    // create the refs
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
 
+    // bind all the functions
     this.onImageLoad = this.onImageLoad.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
     this.requestImage = this.requestImage.bind(this);
@@ -463,17 +623,34 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.closeDialogTemplateHTML = this.closeDialogTemplateHTML.bind(this);
     this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
   }
+
+  /**
+   * During the mount event
+   */
   public componentDidMount() {
+    // if we should have a drawer
     if (this.shouldHaveDrawer()) {
+      // we turn off the animation in case
       this.noAnimate = true;
+      // and set the state of the drawer based on the local storage value
       this.setState({
         drawerOpen: localStorage.getItem("SLATE_DRAWER_OPEN") === "true",
       }, () => {
+        // and re-enable the animation
+        // if the drawer opened it won't animate
+        // this keeps SSR compatibility
         this.noAnimate = false;
       });
     }
   }
+
+  /**
+   * Specifies on whether it should have a drawer
+   * @returns a boolean on this fact
+   */
   public shouldHaveDrawer() {
+    // a drawer is only necessary if we support all of these
+    // beause that's what we configure in the drawer
     return !!(
       this.props.featureSupport.supportsTemplating ||
       this.props.featureSupport.supportsCustomStyles ||
@@ -482,113 +659,285 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       this.props.featureSupport.supportsRichClasses
     );
   }
+
+  /**
+   * Executes in order to open the dialog in order to request an image
+   * via this file upload dialog
+   */
   public requestImage() {
+    // we add the focus listener for the refocus when the dialog closes
     document.body.addEventListener("focus", this.onFileEventedReFocus, { capture: true });
+    // get the original selection area
     this.originalSelectionArea = this.props.helpers.editor.selection;
+    // trigger a click
     this.inputImageRef.current.click();
   }
+
+  /**
+   * Executes in order to open the dialog in order to request an file
+   * via this file upload dialog
+   */
+  public requestFile() {
+    // we add the focus listener for the refocus when the dialog closes
+    document.body.addEventListener("focus", this.onFileEventedReFocus, { capture: true });
+    // get the original selection area
+    this.originalSelectionArea = this.props.helpers.editor.selection;
+    // trigger a click
+    this.inputFileRef.current.click();
+  }
+
+  /**
+   * Opens/closes the drawer
+   */
   public toggleDrawer() {
+    // we take the new state that we will be using as the opposite of  the current
     const newState = !this.state.drawerOpen;
+
+    // put it in the state
     this.setState({
       drawerOpen: newState,
     });
+
+    // and put it in local storage
     localStorage.setItem("SLATE_DRAWER_OPEN", JSON.stringify(newState));
   }
+
+  /**
+   * Refocuses as the original selection area that was focused
+   * mainly used by dialogs once they haave closed
+   */
   public refocus() {
     this.props.helpers.focusAt(this.originalSelectionArea);
   }
+
+  /**
+   * Triggers once the document has recovered focus from the file
+   * dialog that is native for the file upload
+   */
   public onFileEventedReFocus() {
+    // remove the old listener from the body
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
 
     // we do it this way because this is a hacky way and we are not sure
-    // on whether the focus event will trigger before the input event, it should
-    // trigger first, but we make no assumptions
+    // on whether the focus event will trigger before the input event,
+    // that comes from the file input dialog, the input should come first
+    // as the file is to upload, but we make no assumptions
     this.refocusTimeout = setTimeout(this.refocus, 30);
   }
-  public requestFile() {
-    document.body.addEventListener("focus", this.onFileEventedReFocus, { capture: true });
-    this.originalSelectionArea = this.props.helpers.editor.selection;
-    this.inputFileRef.current.click();
-  }
+
+  /**
+   * Triggers the state change to open the html based dialog for
+   * requesting a video
+   */
   public requestVideo() {
+    // save the selection area before losing focus
     this.originalSelectionArea = this.props.helpers.editor.selection;
+    // set the state to open the dialog
     this.setState({
       videoDialogOpen: true,
     });
   }
+
+  /**
+   * Triggers the state change to open the html based dialog for
+   * requesting insertion of a template text bit
+   */
   public requestTemplateText() {
+    // save the selection area before losing focus
     this.originalSelectionArea = this.props.helpers.editor.selection;
+    // set the state to open the dialog
     this.setState({
       templateTextDialogOpen: true,
     });
   }
+
+  /**
+   * Triggers the state change to open the html based dialog for
+   * requesting insertion of a template html bit
+   */
   public requestTemplateHTML() {
+    // save the selection area before losing focus
     this.originalSelectionArea = this.props.helpers.editor.selection;
+    // set the state to open the dialog
     this.setState({
       templateHTMLDialogOpen: true,
     });
   }
+
+  /**
+   * Triggers the state change to open the html based dialog for
+   * requesting insertion of a link or template link if available
+   */
   public requestLink() {
+    // save the selection area before losing focus
     this.originalSelectionArea = this.props.helpers.editor.selection;
+    // now we open the dialog and we also save
+    // the current element because we might be opening
+    // in order to modify the current link
     this.setState({
       linkDialogOpen: true,
-      originalSelectedElement: this.props.state.currentElement,
+      elementThatWasCurrentBeforeLosingFocus: this.props.state.currentElement,
     });
   }
+
+  /**
+   * Closes the dialog for the video input
+   */
   public closeDialogVideo() {
+    // refocus back to where we were focused originally as we
+    // saved before opening the dialog
     this.refocus();
+    // close the dialog
     this.setState({
       videoDialogOpen: false,
     });
   }
+
+  /**
+   * Closes the dialog for the link input
+   */
   public closeDialogLink() {
+    // refocus back to where we were focused originally as we
+    // saved before opening the dialog
     this.refocus();
+    // change the state to close the dialog
     this.setState({
       linkDialogOpen: false,
     });
   }
+
+  /**
+   * Closes the dialog for the template text input
+   */
   public closeDialogTemplateText() {
+    // refocus back to where we were focused originally as we
+    // saved before opening the dialog
     this.refocus();
+    // change the state to close the dialog
     this.setState({
       templateTextDialogOpen: false,
     });
   }
+
+  /**
+   * Closes the dialog for the template html input
+   */
   public closeDialogTemplateHTML() {
+    // refocus back to where we were focused originally as we
+    // saved before opening the dialog
     this.refocus();
+    // change the state to close the dialog
     this.setState({
       templateHTMLDialogOpen: false,
     });
   }
+
+  /**
+   * Inserts a container, a basic one in place
+   */
   public insertContainer() {
+    // basically just calls the helper to insert the container
     this.props.helpers.insertContainer();
   }
+
+  /**
+   * This function gets executed before the dialog for the video
+   * closes in order to accept the video url
+   * @param videoURL the video url in question
+   * @returns a boolean on whether the insertion succeeded
+   */
   public acceptVideo(videoURL: string) {
+    // we need to pass the original selection area to tell the helper
+    // where we are about to insert that video, in which range
+    // this will cause a refocus there
     return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea);
   }
+
+  /**
+   * This function gets executed before the dialog for the video
+   * closes in order to accept the video url
+   * @param videoURL the video url in question
+   * @returns a boolean on whether the insertion succeeded
+   */
   public acceptLink(linkURL: string, linkTValue: string) {
+    // we need to pass the original selection area to tell the helper
+    // where we are about to insert that link, in which range
+    // this will cause a refocus there
     return this.props.helpers.toggleLink(linkURL, linkTValue, this.originalSelectionArea);
   }
+
+  /**
+   * Inserts a template text bit in the last location that was
+   * selected
+   * @param label the label that will be shown 
+   * @param value the value off the context to be taken to replace
+   */
   public insertTemplateText(label: string, value: string) {
+    // we need to pass the original selection area to tell the helper
+    // where we are about to insert that template text, in which range
+    // this will cause a refocus there
     this.props.helpers.insertTemplateText(label, value, this.originalSelectionArea);
   }
+
+  /**
+   * Inserts a template html in the last location that was
+   * selected
+   * @param label the label that will be shown 
+   * @param value the value off the context to be taken to replace
+   */
   public insertTemplateHTML(label: string, value: string) {
+    // we need to pass the original selection area to tell the helper
+    // where we are about to insert that template html, in which range
+    // this will cause a refocus there
     this.props.helpers.insertTemplateHTML(label, value, this.originalSelectionArea);
   }
+
+  /**
+   * This function gets called once the image input calls the on change event
+   * which means it has been loaded by the input itself and it's available for
+   * reading
+   * @param e the change event that contains the file 
+   */
   public async onImageLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    // remove the listener for the whole input for the refocus back into the field
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
+    // clear a timeout in case there is one for this refocus, since the event
+    // might refer to a cancel, then we need to ensure it is cancelled
+    // as this function itself will refocus after the image is inserted
     clearTimeout(this.refocusTimeout);
+    // now we pick the image
     const file = e.target.files[0];
     e.target.value = "";
+    // and insert it
     this.props.helpers.insertImage(file, false, this.originalSelectionArea);
   }
+
+  /**
+   * This function gets called once the file input calls the on change event
+   * which means it has been loaded by the input itself and it's available for
+   * reading
+   * @param e the change event that contains the file
+   */
   public async onFileLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    // remove the listener for the whole input for the refocus back into the field
     document.body.removeEventListener("focus", this.onFileEventedReFocus, { capture: true });
+    // clear a timeout in case there is one for this refocus, since the event
+    // might refer to a cancel, then we need to ensure it is cancelled
+    // as this function itself will refocus after the image is inserted
     clearTimeout(this.refocusTimeout);
+    // now we pick the file
     const file = e.target.files[0];
     e.target.value = "";
+    // and insert it
     this.props.helpers.insertFile(file, this.originalSelectionArea);
   }
+
+  /**
+   * Standard render function from the wrapper
+   */
   public render() {
+
+    // first we build the iamge input if we support it
     const imageInput = this.props.featureSupport.supportsImages ? (
       <input
         ref={this.inputImageRef}
@@ -601,6 +950,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
+    // now the general file input
     const fileInput = this.props.featureSupport.supportsFiles ? (
       <input
         ref={this.inputFileRef}
@@ -613,6 +963,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
+    // the file load error dialog that shows an error
+    // based on the current load error
     const fileLoadErrorDialog =
       this.props.state.isRichText &&
         (
@@ -628,6 +980,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           />
         ) : null;
 
+    // the video dialog that allows for inserting
+    // videos in the rich text based on the url
     const videoDialog = this.props.state.isRichText && this.props.featureSupport.supportsVideos ? (
       <VideoDialog
         acceptVideo={this.acceptVideo}
@@ -641,8 +995,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
-
-
+    // the link dialog that allows for inserting links
+    // and tempalte links on the markup
     const linkDialog = this.props.state.isRichText && this.props.featureSupport.supportsLinks ? (
       <LinkDialog
         acceptLink={this.acceptLink}
@@ -659,13 +1013,15 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
         currentContext={this.props.state.currentContext}
         linkDialogOpen={this.state.linkDialogOpen}
-        originalSelectedElement={this.state.originalSelectedElement}
+        originalSelectedElement={this.state.elementThatWasCurrentBeforeLosingFocus}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
         templateBoxClassName={this.props.classes.linkTemplateOptionsBox}
         templateTextClassName={this.props.classes.linkTemplateOptionsText}
       />
     ) : null;
 
+    // the template text dialog that allows to insert templated text fragments
+    // to the markup itself
     const templateTextDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
       <TemplateElementDialog
         insertTemplateElement={this.insertTemplateText}
@@ -680,6 +1036,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
+    // the template html dialog that allows to insert templated html fragments
+    // to the markup itself
     const templateHTMLDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
       <TemplateElementDialog
         insertTemplateElement={this.insertTemplateHTML}
@@ -694,6 +1052,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
+    // now we build the rich text editor itself
     return (
       <>
         <RichTextEditorToolbar
@@ -737,4 +1096,5 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   }
 }
 
+// export the thing with styles
 export const MaterialUISlateWrapper = withStyles(style)(MaterialUISlateWrapperClass);

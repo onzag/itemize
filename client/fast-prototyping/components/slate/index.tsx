@@ -25,6 +25,7 @@ import { IParagraph } from "../../../internal/text/serializer/types/paragraph";
 import { IFile } from "../../../internal/text/serializer/types/file";
 import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
+import { ICustom } from "../../../internal/text/serializer/types/custom";
 
 /**
  * The template argument is used in a template context in order
@@ -258,7 +259,7 @@ function calculateStylesheet(stylesheet: CSSStyleSheet) {
 
       // now we take the class name
       const className = s.substr(1);
-      
+
       // and we check whether it matches any of our prefixes that
       // make it a valid class of the given type
       if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
@@ -278,7 +279,7 @@ function calculateStylesheet(stylesheet: CSSStyleSheet) {
  * text editor
  * @ignore
  */
-const ALL_PROMISE = new Promise(async (resolve) => {
+const ALL_PROMISE = new Promise<void>(async (resolve) => {
   // if we are already loaded then we are done
   if (ALL_IS_LOADED) {
     resolve();
@@ -459,6 +460,7 @@ export interface IHelperFunctions {
    * this selection is silent and does not affect other than the current
    * selected path based on the information, it does not cause a caret
    * change or anything of the sorts
+   * @param path the path to select
    */
   selectPath: (path: Path) => void;
 
@@ -473,6 +475,7 @@ export interface IHelperFunctions {
   focus: () => void;
   /**
    * Focuses at the desired location
+   * @param at the range to insert at
    */
   focusAt: (at: Range) => void;
 
@@ -480,18 +483,21 @@ export interface IHelperFunctions {
    * Will insert an image based on a given file that has
    * been taken as an input
    * @param file the file
+   * @param at an optional range to insert at
    * @param standalone whether to make it a standalone image
    */
   insertImage: (file: File, standalone: boolean, at?: Range) => void;
   /**
    * Will insert a video given the information
    * @param url the url of the video, only youtube and vimeo supported as origin
+   * @param at an optional range to insert at
    * @returns a boolean true if the video was properly inserted, false if the video url was invalid
    */
   insertVideo: (url: string, at?: Range) => boolean;
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
+   * @param at an optional range to insert at
    */
   insertFile: (file: File, at?: Range) => void;
   /**
@@ -500,26 +506,44 @@ export interface IHelperFunctions {
    * insert a standard container
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
+   * @param type the container type
+   * @param at an optional range to insert at
    */
   insertContainer: (type?: string, at?: Range) => void;
   /**
    * Inserts a custom element
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
+   * @param type the custom type
+   * @param at an optional range to insert at
    */
   insertCustom: (type: string, at?: Range) => void;
   /**
    * Inserts a template text
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
+   * @param label the label to use for the template text
+   * @param value the actual value for the template text to be used off the context
+   * @param at an optional range to insert at
    */
   insertTemplateText: (label: string, value: string, at?: Range) => void;
   /**
    * Inserts a template html fragment
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
+   * @param label the label to use for the template html
+   * @param value the actual value for the template html to be used off the context
+   * @param at an optional range to insert at
    */
   insertTemplateHTML: (label: string, value: string, at?: Range) => void;
+  /**
+   * Inserts an UI handled container
+   * @param type the type of the container
+   * @param value the ui handler identifier in the context
+   * @param args the args for the ui handler
+   * @param at an optional range to insert at
+   */
+  insertUIHandledContainer: (type: string, value: string, args: { [key: string]: string }, at?: Range) => void;
 
   /**
    * Makes a quote out of the current element
@@ -1152,8 +1176,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           };
         }
 
-      // if we don't have an internal value we need to use the given
-      // string
+        // if we don't have an internal value we need to use the given
+        // string
       } else {
         // and deserialize it based on the props
         const newInternalValue = props.isRichText ?
@@ -1287,6 +1311,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleItalic = this.formatToggleItalic.bind(this);
     this.formatToggleUnderline = this.formatToggleUnderline.bind(this);
     this.setAction = this.setAction.bind(this);
+    this.insertUIHandledContainer = this.insertUIHandledContainer.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchorsAndContext = this.calculateAnchorsAndContext.bind(this);
@@ -1338,7 +1363,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         );
       }
 
-    // if it's an element
+      // if it's an element
     } else if (Element.isElement(node)) {
       const managedChildrenExistance = node.children.map((v) => true);
       // the total current nodes
@@ -1465,8 +1490,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           );
         }
 
-      // now for inlines that can only truly have
-      // texts as children
+        // now for inlines that can only truly have
+        // texts as children
       } else if (nodeAsRichElement.containment === "inline") {
         // get the node again
         const newNode = Node.get(this.editor, path);
@@ -1495,10 +1520,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           );
         }
 
-      // now for standard basic superblocks
-      // superblocks can only have blocks as children
-      // as well as other superblocks, they are made
-      // to be containers for the most part
+        // now for standard basic superblocks
+        // superblocks can only have blocks as children
+        // as well as other superblocks, they are made
+        // to be containers for the most part
       } else if (nodeAsRichElement.containment === "superblock") {
         // we get the node
         const newNode = Node.get(this.editor, path);
@@ -1523,9 +1548,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           );
         }
 
-      // list superblocks are equally superblocks but they can only contain
-      // list-item as children, these are blocks indeed, but that's the only
-      // allowed type
+        // list superblocks are equally superblocks but they can only contain
+        // list-item as children, these are blocks indeed, but that's the only
+        // allowed type
       } else if (nodeAsRichElement.containment === "list-superblock") {
         // get the node
         const newNode = Node.get(this.editor, path);
@@ -1703,7 +1728,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // or whatnot, etc...
       this.breakList();
 
-    // otherwise if we have a selection, and the selection is collapsed
+      // otherwise if we have a selection, and the selection is collapsed
     } else if (selection && Range.isCollapsed(selection)) {
       // we must avoid removing current location if such is empty
       // this is because eg. if we have a bold text
@@ -1713,7 +1738,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.ignoreCurrentLocationToRemoveEmpty = true;
       Transforms.delete(this.editor, { unit, reverse: true });
       this.ignoreCurrentLocationToRemoveEmpty = false;
-    // otherwise
+      // otherwise
     } else {
       // do a normal delete
       Transforms.delete(this.editor, { unit, reverse: true });
@@ -2075,10 +2100,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // remains even after the selection only if
       // we have not just deleted that node
       this.state.currentSelectedNodeAnchor &&
-      !this.lastChangeWasSelectedDelete ? [
-        this.state.currentSelectedNodeAnchor,
-        this.state.currentSelectedTextNodeAnchor,
-      ] : null,
+        !this.lastChangeWasSelectedDelete ? [
+          this.state.currentSelectedNodeAnchor,
+          this.state.currentSelectedTextNodeAnchor,
+        ] : null,
     );
     this.setState({
       focused: false,
@@ -2277,7 +2302,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       selected: false,
       element: leaf as any,
       asTemplate: false,
-      customProps: {...attributes, children},
+      customProps: { ...attributes, children },
     }) as any;
   }
 
@@ -2474,7 +2499,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // now we pick the current text node, if possible
-    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.focus.path) : null)) as IText;
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.anchor.path) : null)) as IText;
 
     // now we make the text node
     const textNode: IText = {
@@ -2492,19 +2517,25 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
   /**
    * Will insert a bit of template html that is used for templating purposes, work similar
-   * to template text, except it uses html content instead
+   * to template text, except it uses html content instead to replace the inner html
    * 
-   * @param label 
-   * @param value 
-   * @param at 
+   * @param label the label to be given to the element to be added
+   * @param value the value that will be used from the context
+   * @param at an optional range where to be inserted
    */
   public async insertTemplateHTML(label: string, value: string, at?: Range) {
+
+    // if we have a range to insert at
     if (at) {
+      // we focus there
       await this.focusAt(at);
     }
 
-    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.focus.path) : null)) as IText;
+    // now we pick the current text node, if possible
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.anchor.path) : null)) as IText;
 
+    // and create a text node based on that
+    // which is where we put the label
     const textNode: IText = {
       bold: false,
       italic: false,
@@ -2514,12 +2545,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       templateText: null,
     }
 
+    // and now we build a paragraph node to put the text there
     const blockNode: IParagraph = {
       children: [textNode],
       containment: "block",
       type: "paragraph",
     };
 
+    // and a container to make it be the inner html
+    // container
     const superBlock: IContainer = {
       children: [blockNode],
       containment: "superblock",
@@ -2528,29 +2562,43 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       html: value,
     }
 
+    // now we can insert that node
     this.editor.insertNode(superBlock as any);
   }
+
   /**
    * Will insert a video given the information
    * @param url the url of the video
    * @param at a partial range to insert at
+   * @returns a boolean on whether it succeeded
    */
   public insertVideo(url: string, at?: Range): boolean {
+
+    // first we parse the url, we only support youtube or vimeo
+    // urls for the video
     const parsedURL = new URL(url);
     let src: string;
     let origin: string;
     let status: boolean = false;
 
+    // first we are going to check for youtube
+    // urls
     if (
       parsedURL.hostname === "youtube.com" ||
       parsedURL.hostname === "www.youtube.com" ||
       parsedURL.hostname === "youtu.be"
     ) {
+      // set it as youtube in the origin
       origin = "youtube";
+
+      // check for classic youtube urls
       const isClassicYTUrl = (
         parsedURL.hostname === "youtube.com" ||
         parsedURL.hostname === "www.youtube.com"
       );
+
+      // and then we can check for these as we try
+      // to get the source id
       if (
         isClassicYTUrl &&
         parsedURL.pathname.startsWith("/embed/")
@@ -2575,19 +2623,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         src = parsedURL.pathname.split("/")[1];
       }
 
+      // we have succeded
       status = true;
+
+      // now for vimeo
     } else if (
       parsedURL.host === "player.vimeo.com"
     ) {
+      // much simpler
       origin = "vimeo";
       src = parsedURL.pathname.split("/")[2];
       status = true
     }
 
+    // now we can do this part async
     (async () => {
+      // and set the focus
       if (at) {
         await this.focusAt(at);
       }
+
+      // and insert the video if we have been
+      // considered succesful
       if (status) {
         const videoNode: IVideo = {
           type: "video",
@@ -2605,30 +2662,39 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           src,
         }
 
+        // insert the video node
         this.editor.insertNode(videoNode as any);
       }
     })();
 
+    // return the status
     return status;
   };
   /**
-   * Will insert a file based on the information given
+   * Will insert a file based on the information given it uses
+   * the standard on insert file function in order to perfom it
+   *
    * @param file the file to insert
    * @param at a partial range to insert at
    */
   public async insertFile(file: File, at?: Range) {
+    // so we try
     try {
+      // we call the insert file function, and pass false because
+      // we are not dealing with an image
       const data = await this.props.onInsertFile(file, false);
 
+      // now we focus
       if (at) {
         await this.focusAt(at);
       }
 
       if (!data) {
-        // soething went wrong there should be an error in the state
+        // something went wrong there should be an error in the state
         return;
       }
 
+      // now we can build the file node
       const fileNode: IFile = {
         type: "file",
         containment: "void-inline",
@@ -2648,31 +2714,60 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         srcId: data.result.id,
       };
 
+      // and insert it
       this.editor.insertNode(fileNode as any);
     } catch (err) {
     }
   };
+
   /**
    * Will insert a container at the given location
-   * @param type optional, the container type, otherwise will
-   * insert a standard container
+   * @param type optional, the container type, otherwise will insert a standard container
+   * @param at an optional range
    */
   public async insertContainer(type?: string, at?: Range) {
+    // if we are provided a range
     if (at) {
+      // we focus at it
       await this.focusAt(at);
     }
 
+    // first we get the current text
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.anchor.path) : null)) as IText;
+
+    // also the current block based on such text
+    let currentBlockElement: RichElement = this.state.currentBlockElement;
+    // if it's not in the state, we need to find it, for that we need to have a current text
+    // found and an at attribute to search for
+    if (!currentBlockElement && currentText && at) {
+      // we build a path
+      let currentPath = [...at.anchor.path];
+      while ((!currentBlockElement || currentBlockElement.containment !== "block") && currentPath.length) {
+        currentPath.pop();
+        currentBlockElement = Node.get(this.editor, currentPath) as any as RichElement;
+      }
+    }
+
+    // now we can insert a node based on the current block
+    // which is most likely a paragraph
     Transforms.insertNodes(this.editor, {
-      ...this.state.currentBlockElement,
+      type: "paragraph",
+      // we use the current block element here in case we don't find it
+      // the type is on top for case of emergency
+      ...currentBlockElement,
       children: [
         {
-          ...this.state.currentText,
+          bold: false,
+          italic: false,
+          underline: false,
+          ...currentText,
           text: "",
           templateText: null,
         }
       ]
     });
 
+    // now we can make the container
     const containerNode: IContainer = {
       type: "container",
       containment: "superblock",
@@ -2680,28 +2775,95 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: type || null,
     };
 
+    // and wrap the thing
     Transforms.wrapNodes(this.editor, containerNode as any);
 
+    // then refocus
     ReactEditor.focus(this.editor);
   };
+
   /**
    * Inserts a custom element
+   * @param type the type for the custom element
+   * @param at an optional at range to insert the custom at
    */
-  public insertCustom(type: string, at?: Range) {
+  public async insertCustom(type: string, at?: Range) {
+    // if we are provided a range
+    if (at) {
+      // we focus at it
+      await this.focusAt(at);
+    }
 
+    // first we get the current text
+    const currentText: IText = (this.state.currentText || (at ? Node.get(this.editor, at.anchor.path) : null)) as IText;
+
+    // also the current block based on such text
+    let currentBlockElement: RichElement = this.state.currentBlockElement;
+    // if it's not in the state, we need to find it, for that we need to have a current text
+    // found and an at attribute to search for
+    if (!currentBlockElement && currentText && at) {
+      // we build a path
+      let currentPath = [...at.anchor.path];
+      while ((!currentBlockElement || currentBlockElement.containment !== "block") && currentPath.length) {
+        currentPath.pop();
+        currentBlockElement = Node.get(this.editor, currentPath) as any as RichElement;
+      }
+    }
+
+    // now we can insert a node based on the current block
+    // which is most likely a paragraph
+    Transforms.insertNodes(this.editor, {
+      type: "paragraph",
+      // we use the current block element here in case we don't find it
+      // the type is on top for case of emergency
+      ...currentBlockElement,
+      children: [
+        {
+          bold: false,
+          italic: false,
+          underline: false,
+          ...currentText,
+          text: "",
+          templateText: null,
+        }
+      ]
+    });
+
+    // now we can make the custom
+    const customNode: ICustom = {
+      type: "custom",
+      containment: "superblock",
+      children: [],
+      customType: type,
+    };
+
+    // and wrap the thing
+    Transforms.wrapNodes(this.editor, customNode as any);
+
+    // then refocus
+    ReactEditor.focus(this.editor);
   };
 
   /**
    * Makes a quote out of the current element
+   * @param at toggle at the given range, this will cause a focus
    */
   public async toggleQuote(at?: Range) {
+    // if we are offered a range
     if (at) {
+      // use it
       await this.focusAt(at);
     }
 
+    // now we got to check if we are collapsed
     const isCollapsed = Range.isCollapsed(at || this.editor.selection);
+    // and get the anchor data from the at, or from the state
     const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
+    // if our current block element is a quote
     if (anchorData.currentBlockElement.type === "quote") {
+      // then we would actually want to wrap into a paragraph so
+      // that the quote itself is normalized out and it goes back
+      // into a paragraph
       Transforms.wrapNodes(
         this.editor,
         {
@@ -2712,7 +2874,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         },
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
+
+    // otherwise we want to wrap into a quote
     } else {
+      // so we do
       Transforms.wrapNodes(
         this.editor,
         {
@@ -2724,20 +2889,30 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
     }
+
+    // FOCUS
     ReactEditor.focus(this.editor);
   };
+
   /**
    * Makes a title out of the current element
+   * @param type the title type
+   * @param at an optional range
    */
   public async toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", at?: Range) {
+    // if we are provided a range
     if (at) {
+      // let's focus at it there
       await this.focusAt(at);
     }
 
+    // then let's get this information to know the state and if it's collapsed
     const isCollapsed = Range.isCollapsed(at || this.editor.selection);
     const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
 
+    // if we are already wrapped in it and we need to toggle
     if (anchorData.currentBlockElement.type === "title" && anchorData.currentBlockElement.subtype === type) {
+      // then we wrap back into a paragraph to normalize the title back into a paragraph
       Transforms.wrapNodes(
         this.editor,
         {
@@ -2749,6 +2924,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
     } else {
+      // otherwise we wrap into the new title
       Transforms.wrapNodes(
         this.editor,
         {
@@ -2761,21 +2937,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
     }
+
+    // Focus
     ReactEditor.focus(this.editor);
   };
+
   /**
    * Makes a list out of the current element
+   * @param type the type of the list that is to be toggled, either bulleted or number
+   * @param at an optional range
    */
   public async toggleList(type: "bulleted" | "numbered", at?: Range) {
+
+    // if we have a range we focus at it
     if (at) {
       await this.focusAt(at);
     }
 
+    // now we need to check for the collapsing information and anchor data
     const isCollapsed = Range.isCollapsed(at || this.editor.selection);
     const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
 
+    // if we have a current super block and which is a list already
     if (anchorData.currentSuperBlockElement && anchorData.currentSuperBlockElement.type === "list") {
+      // if the super block is not of the same list type, then we basically rewrap
+      // to normalize it out
       if (anchorData.currentSuperBlockElement.listType !== type) {
+        // so here we rewrap with the new list type
         Transforms.wrapNodes(
           this.editor,
           {
@@ -2788,9 +2976,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           { split: false, at: anchorData.currentSuperBlockElementAnchor },
         );
       } else {
+        // otherwise we just break the list
+        // which will delete the list if all is chosen or whatever
+        // is chosen will be broken
         this.breakList();
       }
     } else {
+      // otherwise we wrap into a new list
       Transforms.wrapNodes(
         this.editor,
         {
@@ -2803,25 +2995,43 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
     }
+
+    // focus
     ReactEditor.focus(this.editor);
   };
+
   /**
    * Makes a link out of the current element
+   * @param url the url that we are using (null if using tvalue)
+   * @param tvalue the template value to use (null if providing url)
+   * @param at an optional range to pass
+   * @returns a boolean if the link was valid and successful
    */
   public toggleLink(url: string, tvalue: string, at?: Range): boolean {
+    // if we don't support a link
     if (!this.props.features.supportsLinks) {
+      // we have failed
       return false;
     }
 
+    // otherwise let's find what url we are using
     let urlToUse: string = url;
+    // if there are no tvalue's given
     if (!tvalue && url) {
+      // we attempt to parse it
       try {
+        // and so we do in order to check locality
         const urlParsed = new URL(url);
         const isLocal = urlParsed.hostname === location.hostname;
+
+        // now as feature support maybe only local urls be allowed
         const onlyLocal = !this.props.features.supportsExternalLinks;
+        // if it's such the case adn it's not a local url
         if (onlyLocal && !isLocal) {
+          // we have failed
           return false;
         } else if (isLocal) {
+          // otherwise we rewrite the url
           urlToUse = urlParsed.pathname + urlParsed.search + urlParsed.hash;
         }
       } catch {
@@ -2829,21 +3039,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     }
 
+    // now if there is no link, no tvalue and no url
     const noLink = !tvalue && !url;
 
+    // let's get this information
     const isCollapsed = Range.isCollapsed(at || this.editor.selection);
     const anchorData = at ? this.calculateAnchorsAndContext(at.anchor.path) : this.state;
 
     (async () => {
+      // and now we can focus
       if (at) {
         await this.focusAt(at);
       }
+
+      // if we are collapsed, we want to wrap
+      // the entire element
       if (isCollapsed) {
+
+        // so we are going to check if we already just
+        // have a link in place
         if (
           anchorData.currentElement &&
           anchorData.currentElement.type === "link"
         ) {
+          // if we have a url to a tvalue
           if (urlToUse || tvalue) {
+            // then we update the current link
             Transforms.setNodes(
               this.editor,
               {
@@ -2853,12 +3074,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
               { at: anchorData.currentElementAnchor }
             );
           } else {
+            // otherwise we unwrap the given link
             Transforms.unwrapNodes(
               this.editor,
               { at: anchorData.currentElementAnchor }
             );
           }
+
+        // now if have link information to be used to create a link
         } else if (!noLink) {
+          // we do so by wrapping
           Transforms.wrapNodes(
             this.editor,
             {
@@ -2871,11 +3096,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             { split: false, at: anchorData.currentBlockElementAnchor, match: (n: any) => n.containment === "inline" || Text.isText(n) },
           );
         }
+
+      // otherwise if we are not collapsed
       } else {
+        // if we are within a link
         if (
           anchorData.currentElement &&
           anchorData.currentElement.type === "link"
         ) {
+          // then we reset the nodes
           if (urlToUse || tvalue) {
             Transforms.setNodes(
               this.editor,
@@ -2886,12 +3115,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
               { split: true, match: (n: any) => n.type === "link" }
             );
           } else {
+            // or we unwrap them if the link value or tvalue
+            // is not given so we have no link
             Transforms.unwrapNodes(
               this.editor,
               { split: true, match: (n: any) => n.type === "link" },
             );
           }
         } else {
+          // otherwise if we are not within the link
+          // we wrap with a link
           Transforms.wrapNodes(
             this.editor,
             {
@@ -2905,46 +3138,62 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           );
         }
       }
+
+      // and then we focus
       ReactEditor.focus(this.editor);
     })();
 
+    // we have succeeded
     return true;
   };
 
   /**
-   * Abitrary update
+   * Abitrary update, does an arbitrary update for an element or node
+   * at the given path
+   * @param args an object to update that should be partial of the element rich properties
+   * @param anchor the node anchor to update
    */
   public set(args: any, anchor: Path) {
     Transforms.setNodes(this.editor, args, { at: anchor });
   };
+
   /**
    * Sets the current style for the element
+   * @param style the style to be set, this should be a style string
+   * @param anchor the element anchor to update
    */
   public setStyle(style: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
       style,
     }, { at: anchor });
   };
+
   /**
    * Sets the template hover style for the element
+   * @param style the style to be set, this should be a style string
+   * @param anchor the element anchor to update
    */
   public setHoverStyle(style: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
       styleHover: style,
     }, { at: anchor });
   };
+
   /**
    * Sets the active style for the element
+   * @param style the style to be set, this should be a style string
+   * @param anchor the element anchor to update
    */
   public setActiveStyle(style: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
       styleActive: style,
     }, { at: anchor });
   };
+
   /**
    * Sets the rich classes of the element
-   * @param classes 
-   * @param anchor 
+   * @param classes an array of string that represent the rich classes
+   * @param anchor the element anchor
    */
   public setRichClasses(classes: string[], anchor: Path) {
     Transforms.setNodes(this.editor, {
@@ -2952,12 +3201,35 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
   };
 
+  /**
+   * Sets a given action for usage within templating
+   * as an event listener
+   * 
+   * Note that using this function is risky if the structure to provide a given
+   * key is not understood properly, keys should be valid
+   * 
+   * @param key the key for the action, should be something like, click, mouseenter, etc...
+   * @param value the value for the property
+   * @param anchor the anchor for the element that is to be assigned the listener to turn interactive
+   */
   public setAction(key: string, value: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
       [key]: value,
     }, { at: anchor });
   }
 
+  /**
+   * Sets an UI handler to a given element so that it is ui handled
+   * 
+   * This is an avanced option for ui handling
+   * 
+   * normally you would use this function for updating an already inserted
+   * ui handled component
+   * 
+   * @param value the value for the ui handler that should be taken out of the context
+   * @param args the args for the ui handler
+   * @param anchor the anchor where to insert at
+   */
   public setUIHandler(value: string, args: { [key: string]: string }, anchor: Path) {
     Transforms.setNodes(this.editor, {
       uiHandler: value,
@@ -2966,15 +3238,51 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Will insert a container at the given location and assign it an UI handler
+   * @param type the container type
+   * @param value the value for the ui handler that should be taken out of the context
+   * @param args the args for the ui handler
+   * @param at an optional range
+   */
+  public async insertUIHandledContainer(type: string, value: string, args: { [key: string]: string }, at?: Range) {
+    // if we are provided a range
+    if (at) {
+      // we focus at it
+      await this.focusAt(at);
+    }
+
+    // now we can make the container
+    const containerNode: IContainer = {
+      type: "container",
+      containment: "superblock",
+      children: [],
+      containerType: type || null,
+      uiHandler: value,
+      uiHandlerArgs: args,
+    };
+
+    // and insert the thing
+    Transforms.insertNodes(this.editor, containerNode as any);
+
+    // then refocus
+    ReactEditor.focus(this.editor);
+  };
+
+  /**
    * Sets the context key
+   * @param value the value for the new context key
+   * @param anchor the anchor where to set the context key at
    */
   public setContext(value: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
       context: value,
     }, { at: anchor });
   };
+
   /**
   * Sets the for-each loop key
+  * @param value the value for the new context key
+  * @param anchor the anchor where to set the context key at
   */
   public setForEach(value: string, anchor: Path) {
     Transforms.setNodes(this.editor, {
@@ -2986,7 +3294,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Formats the current text as bold
    */
   public formatToggleBold() {
-    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+    // if we have a selection and the points are equal
+    // basically the same as a collapsed selection
+    if (this.editor.selection && Point.equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      // then we insert an empty text node, it will remain alive
+      // by virtue of it being the same location as our cursor so
+      // normalization won't remove it
       Transforms.insertNodes(
         this.editor,
         {
@@ -2996,19 +3309,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         },
       );
     } else {
+      // otherwise we just toggle
       Transforms.setNodes(
         this.editor,
         { bold: !this.state.currentText.bold },
         { match: n => Text.isText(n), split: true }
       );
     }
+    // now we need to refocus
     ReactEditor.focus(this.editor);
   }
+
   /**
    * formats the current text as italic
    */
   public formatToggleItalic() {
-    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+    // if we have a selection and the points are equal
+    // basically the same as a collapsed selection
+    if (this.editor.selection && Point.equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      // then we insert an empty text node, it will remain alive
+      // by virtue of it being the same location as our cursor so
+      // normalization won't remove it
       Transforms.insertNodes(
         this.editor,
         {
@@ -3018,19 +3339,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         },
       );
     } else {
+      // otherwise we just toggle
       Transforms.setNodes(
         this.editor,
         { italic: !this.state.currentText.italic },
         { match: n => Text.isText(n), split: true }
       );
     }
+
+    // now we need to refocus
     ReactEditor.focus(this.editor);
   };
+
   /**
    * formats the current text as italic
    */
   public formatToggleUnderline() {
-    if (this.editor.selection && equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+    // if we have a selection and the points are equal
+    // basically the same as a collapsed selection
+    if (this.editor.selection && Point.equals(this.editor.selection.anchor, this.editor.selection.focus)) {
+      // then we insert an empty text node, it will remain alive
+      // by virtue of it being the same location as our cursor so
+      // normalization won't remove it
       Transforms.insertNodes(
         this.editor,
         {
@@ -3040,23 +3370,57 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         },
       );
     } else {
+      // otherwise we just toggle
       Transforms.setNodes(
         this.editor,
         { underline: !this.state.currentText.underline },
         { match: n => Text.isText(n), split: true }
       );
     }
+    // now we need to refocus
     ReactEditor.focus(this.editor);
   };
 
-  private availableFilteringFunction(feature: string, featureAll: string, featureList: string, i18nLocation: string): IAvailableElementCSSClassName[] {
+  /**
+   * This is a helper function that is used in order to extract the available
+   * classes that we have for usage within rich classes, container, and customs
+   * considering what we have found in the all promise for all what is available
+   * because there might be filters for them, and we need to find the labels and whatnot
+   * of what we can actually use
+   * 
+   * @param feature the feature we are searching for basically, supportsCustom, supportsRichClasses and supportsContainers
+   * that we decide on whether we support that feature
+   * @param featureAll the all name for the feature in the state and where it is located in the state that we are meant to await
+   * basically allCustoms, allRichClasses and allContainers
+   * @param featureList the list of supported that is given in the feature support of the property so basically
+   * supportedCustoms, supportedRichClasses and supportedContainers
+   * @param i18nLocation the location for the i18n data in the i18n root, basically custom, containers and rich
+   */
+  private availableFilteringFunction(
+    feature: string,
+    featureAll: string,
+    featureList: string,
+    i18nLocation: string,
+  ): IAvailableElementCSSClassName[] {
+
+    // so we do it in one line because apparently we don't care about readability
+    // and will fix it with comments
     return (
+      // we pick the feature of the eg. supportsCustom, supportsRichClasses out of the feature support to see
+      // if we support that feature at all
       this.props.features[feature] ?
+        // if we do we pick from the state what we have found in the stylesheet
+        // of the classes for that feature as we have awaited
         (this.state[featureAll] as string[]).filter((c) =>
+          // and we filter based on our feature list, if we have one of course, otherwise all pass
           this.props.features[featureList] ? this.props.features[featureList].includes(c) : true
         ) :
         []
     ).map((c) => {
+      // and now we map in order to give it a label based on the root i18n data
+      // as we have described before, and they are found in the i18n location that
+      // they have been defined by default by this text editor element
+      // and we search into the i18n root
       return {
         value: c,
         label: (
@@ -3064,23 +3428,35 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           this.props.rootI18n.custom &&
           this.props.rootI18n.custom[i18nLocation] &&
           (
+            // both the default and by replacing
             this.props.rootI18n.custom[i18nLocation][c] ||
             this.props.rootI18n.custom[i18nLocation][c.replace(/-/g, "_")]
           )
         ) || c
+        // and if we find nothing we use the value itself
       }
     });
   }
 
+  /**
+   * Triggers on the keydown of the slate editor itself
+   * @param e the event
+   */
   public onKeyDown(e: React.KeyboardEvent) {
+    // on alt+enter we want to insert a super block break
     if (e.key === "Enter" && e.altKey) {
       this.insertSuperblockBreak();
     }
   }
 
+  /**
+   * Basic old school component did mount
+   */
   public async componentDidMount() {
-    // ensure SSR compatibility
+    // now we can await for our all promise here
     await ALL_PROMISE;
+    // and fit the information there as we have gotten
+    // our arrays filled from the stylesheet
     this.setState({
       allContainers: ALL_CONTAINERS,
       allCustom: ALL_CUSTOM,
@@ -3088,6 +3464,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     });
   }
 
+  /**
+   * Provides the helpers that are used by the editor
+   * to construct rich text data
+   */
   public getHelpers() {
     const helpers: IHelperFunctions = {
       editor: this.editor,
@@ -3125,6 +3505,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setRichClasses: this.setRichClasses,
       setAction: this.setAction,
       setUIHandler: this.setUIHandler,
+      insertUIHandledContainer: this.insertUIHandledContainer,
 
       blockBlur: this.blockBlur,
       releaseBlur: this.releaseBlur,
@@ -3133,10 +3514,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return helpers;
   }
 
+  /**
+   * Provides the feature support information that is used by the editor
+   * to know what it can and can't do
+   */
   public getFeatureSupport() {
+    // we get these from the available filtering functions
     const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
     const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
 
+    // and extend based on the features
     const newFeatureSupport: IAccessibleFeatureSupportOptions = {
       ...this.props.features,
 
@@ -3166,7 +3553,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return newFeatureSupport;
   }
 
+  /**
+   * Render function
+   */
   public render() {
+    // make the editable
     let children: React.ReactNode = (
       <Editable
         onKeyDown={this.onKeyDown}
@@ -3175,9 +3566,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         renderLeaf={this.renderText}
       />
     );
+
+    // and pick on the wrapper, hopefully we have one
+    // it'd be weird not to have one
     const Wrapper = this.props.Wrapper;
+
+    // if we have a wrapper
     if (Wrapper) {
-      const info: ISlateEditorStateType = {
+
+      // we get the state that we will feed
+      const state: ISlateEditorStateType = {
         currentValid: this.props.currentValid,
         isFocused: this.state.focused,
         currentContext: this.state.currentContext,
@@ -3197,10 +3595,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSelectedNodeAnchor: this.state.currentSelectedNodeAnchor,
       }
 
+      // and we feed the thing in the wrapper as the new children
+      // that is now wrapper inside the wrapper
       children = (
         <Wrapper
           {...this.props.wrapperArgs}
-          info={info}
+          state={state}
           helpers={this.getHelpers()}
           featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
@@ -3210,10 +3610,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         </Wrapper>
       );
     }
+
+    // now we can return
     return (
-      <Slate editor={this.editor} value={this.state.internalValue.children as any} onChange={this.onChange}>
+      <Slate
+        editor={this.editor}
+        value={this.state.internalValue.children as any}
+        onChange={this.onChange}
+      >
         {children}
       </Slate>
-    )
+    );
   }
 }
