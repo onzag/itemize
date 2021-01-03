@@ -12,7 +12,7 @@ import {
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
-import { deserialize, reactify } from "../../../internal/text";
+import { deserialize, renderTemplateDynamically } from "../../../internal/text";
 
 /**
  * The current intersection observer
@@ -330,6 +330,10 @@ interface ITemplatedPropertyViewRichTextRendererProps extends IPropertyViewRichT
   templateArgs: any;
 }
 
+/**
+ * The rich text renderer that is used for templted components, and fed
+ * its specific args
+ */
 export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   ITemplatedPropertyViewRichTextRendererProps
 > {
@@ -344,7 +348,7 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   }
   public render() {
     const deserializedValue = deserialize(this.props.children);
-    return reactify(deserializedValue, this.props.templateArgs);
+    return renderTemplateDynamically(deserializedValue, this.props.templateArgs);
   }
 }
 

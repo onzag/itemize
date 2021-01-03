@@ -1013,7 +1013,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
         currentContext={this.props.state.currentContext}
         linkDialogOpen={this.state.linkDialogOpen}
-        originalSelectedElement={this.state.elementThatWasCurrentBeforeLosingFocus}
+        selectedElement={this.state.elementThatWasCurrentBeforeLosingFocus}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
         templateBoxClassName={this.props.classes.linkTemplateOptionsBox}
         templateTextClassName={this.props.classes.linkTemplateOptionsText}

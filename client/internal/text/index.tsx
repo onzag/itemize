@@ -776,6 +776,7 @@ export function renderTemplateDynamically(
             element: c,
             key: index,
             templateArgs: args,
+            selected: false,
           });
         })
       }

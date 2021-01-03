@@ -1,3 +1,9 @@
+/**
+ * This is the dialogs that shows when the user wants to insert
+ * a templated element bit, both html and text type
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { ITemplateArgsContext } from "..";
 import {
@@ -5,30 +11,92 @@ import {
 } from "../../../mui-core";
 import { Dialog } from "../../dialog";
 
+/**
+ * These are the dialog props for such dialog there is only one dialog
+ * component that is used for both dialogs
+ */
 interface ITemplateElementDialogProps {
+  /**
+   * Function that triggers once the input is accepted and is requested
+   * to input
+   * @param label the human readable label that was chosen
+   * @param value the value that was chosen
+   */
   insertTemplateElement: (label: string, value: string) => void;
+  /**
+   * Function that triggers when the dialog closes
+   */
   closeTemplateElementDialog: () => void;
+  /**
+   * The current context where the template element options are taken
+   */
   currentContext: ITemplateArgsContext;
+  /**
+   * Whether the dialog should be open
+   */
   templateElementDialogOpen: boolean;
+  /**
+   * The title for the dialog
+   */
   i18nInsertTemplateElementTitle: string;
+  /**
+   * The label for the submit button
+   */
   i18nInsertTemplateElementSubmit: string;
+  /**
+   * The label for the select input
+   */
   i18nInsertTemplateElementLabel: string;
+  /**
+   * The placeholder for the select input
+   */
   i18nInsertTemplateElementPlaceholder: string;
+  /**
+   * The type of input for templated, text or html
+   * are the only supported
+   */
   elementType: "text" | "html";
 }
 
+/**
+ * These are the options we have got
+ * for the select
+ */
 interface ITemplateElementOption {
   value: string;
   label: string;
 };
 
+/**
+ * And this is the state the dialog contains for the
+ * state that is must hold consisting of
+ */
 interface ITemplateElementState {
+  /**
+   * The value that it currently holds
+   */
   value: string;
+  /**
+   * The label that it should display
+   */
   label: string;
+  /**
+   * And all the available options that have been taken
+   * from the context
+   */
   options: ITemplateElementOption[],
 }
 
+/**
+ * This is the dialog that allows for the input of both text and html fragments
+ * into the rich text in order to build templates with dynamic content
+ */
 export class TemplateElementDialog extends React.PureComponent<ITemplateElementDialogProps, ITemplateElementState> {
+
+  /**
+   * Constructs a new dialog
+   * @param props the props specific for this dialog
+   */
   constructor(props: ITemplateElementDialogProps) {
     super(props);
 
@@ -39,52 +107,92 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
     }
 
     this.onOpeningDialog = this.onOpeningDialog.bind(this);
-    this.acceptText = this.acceptText.bind(this);
-    this.updateTextValue = this.updateTextValue.bind(this);
+    this.accept = this.accept.bind(this);
+    this.updateValue = this.updateValue.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
   }
+
+  /**
+   * Triggers when the dialog is opening and its used to setup
+   * the initial state
+   */
   public onOpeningDialog() {
+    // now we need to get all the options we can use
     const templateHTMLPropertiesToUse: ITemplateElementOption[] = [];
 
+    // and for that we grab the current context
     this.props.currentContext && Object.keys(this.props.currentContext.properties).forEach((key) => {
       const property = this.props.currentContext.properties[key];
+
+      // but they must be the given element type
       if (property.type !== this.props.elementType) {
+        // otherwise continue;
         return;
       }
+
+      // now we can add the option to our option list
       templateHTMLPropertiesToUse.push({
         value: key,
         label: property.label || key,
       });
     });
 
+    // and set the state
     this.setState({
       value: null,
       label: null,
       options: templateHTMLPropertiesToUse,
     });
   }
-  public acceptText() {
+
+  /**
+   * Triggers once the input has been accepted
+   * and it should be done into the rich text
+   */
+  public accept() {
+    // if we got a value
     if (this.state.value) {
+      // we then insert
       this.props.insertTemplateElement(this.state.label || this.state.value, this.state.value);
     }
+
+    // otherwise close
     this.closeDialog();
   }
-  public updateTextValue(e: React.ChangeEvent<HTMLInputElement>) {
+
+  /**
+   * Triggers once the value has changed and needs to be update
+   * @param e the event coming from the select
+   */
+  public updateValue(e: React.ChangeEvent<HTMLInputElement>) {
+    // first we need to see the option where it came from
     const option = this.state.options.find((o) => o.value === e.target.value);
+
+    // and then we can update the state
     this.setState({
       value: e.target.value,
       label: option && option.label,
     });
   }
+
+  /**
+   * Triggers once the dialog closes
+   */
   public closeDialog() {
+    // call the function in the props
     this.props.closeTemplateElementDialog();
 
+    // clear the state
     this.setState({
       value: null,
       label: null,
       options: [],
     });
   }
+
+  /**
+   * Render function
+   */
   public render() {
     return (
       <Dialog
@@ -94,7 +202,7 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
         onOpening={this.onOpeningDialog}
         title={this.props.i18nInsertTemplateElementTitle}
         buttons={
-          <Button onClick={this.acceptText}>
+          <Button onClick={this.accept}>
             {this.props.i18nInsertTemplateElementSubmit}
           </Button>
         }
@@ -111,7 +219,7 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
             </InputLabel>
             <Select
               value={this.state.value || ""}
-              onChange={this.updateTextValue}
+              onChange={this.updateValue}
               variant="filled"
               input={
                 <FilledInput
