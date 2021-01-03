@@ -1618,6 +1618,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (
       // if we are simply collapsed
       Range.isCollapsed(this.editor.selection) &&
+      // and we have a superblock
+      this.state.currentSuperBlockElement &&
       // and we are within a list and a list item
       this.state.currentSuperBlockElement.type === "list" &&
       this.state.currentBlockElement.type === "list-item" &&
@@ -1636,6 +1638,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     ) {
       // we need to break the list
       this.breakList();
+      return;
+    }
+
+    // if we are dealing with a void element like an image
+    // we don't want to clone it
+    if (this.editor.isVoid(this.state.currentBlockElement as any)) {
+      // then we want to insert an empty paragraph
+      Transforms.insertNodes(this.editor, {
+        type: "paragraph",
+        containment: "block",
+        children: [
+          {
+            ...this.state.currentText,
+            text: "",
+            templateText: null,
+          }
+        ]
+      });
       return;
     }
 
@@ -1662,6 +1682,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // if the end we are dealing with is exactly
     // at this last point and offset so we are right
     // at the end of the given block
+    // we do this to avoid copying template text elements
+    // when we deal with text so that they don't also
+    // become template text
     if (
       end.offset === finalBlockOffset &&
       Path.equals(finalBlockPath, end.path)
