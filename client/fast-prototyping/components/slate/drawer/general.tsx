@@ -1,3 +1,10 @@
+/**
+ * Gives the general options for the current selected component, general options
+ * depend on the rich element that is currently chosen, it also provides a delete
+ * option to delete the node
+ * @packageDocumentation
+ */
+
 import React from "react";
 import { MaterialUISlateWrapperWithStyles } from "../wrapper";
 import {
@@ -17,13 +24,42 @@ import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
 import { Path } from "slate";
 
+/**
+ * The state of the general option selector for the given item
+ * they all use the same state even when they are all different
+ * components
+ */
 interface IGeneralOptionsState {
+  /**
+   * The current value as in the state, we store the value here
+   * and we keep it here because there's a delay when updating these
+   * values from the rich element content
+   */
   value: string;
+  /**
+   * The anchor where it comes from we also store the anchor to know if it has
+   * changed which means it's another element, otherwise we assume that the state
+   * value is the right value
+   */
   valueForAnchor: Path;
 }
 
+/**
+ * This is the component that showns when modifying the general options
+ * for a container, basically allows to choose the container type from the available list
+ */
 class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
+
+  /**
+   * We need the derived function in order to be able to update the value of the
+   * selector in case, this is the more efficient way in these cases where things
+   * are slightly out of sync
+   */
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
+
+    // for that we check if the value is not the same as the one in the state, which happens
+    // whenever changing, but in order to actually change it we only do so if it's a different
+    // element anchor we are at
     const selectedNode: IContainer = props.state.currentSelectedNode as any;
     if (
       (selectedNode.containerType || "") !== state.value &&
@@ -38,6 +74,10 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     return null;
   }
 
+  /**
+   * This is the constructor for the container options
+   * @param props the entire wrapper props that are passed here
+   */
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
@@ -51,6 +91,11 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     this.onUpdate = this.onUpdate.bind(this);
   }
 
+  /**
+   * This triggers on update of the change of the select field
+   * in question that allows to change the container type
+   * @param e the event coming from the select
+   */
   public onUpdate(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.value;
 
@@ -58,11 +103,17 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
       value: newValue,
     });
 
+    // we use the helper set for the container type
+    // which does an arbitrary partial value update at the selected
+    // anchor
     this.props.helpers.set({
       containerType: newValue,
     }, this.props.state.currentSelectedNodeAnchor);
   }
 
+  /**
+   * The render function
+   */
   public render() {
     return (
       <div className={this.props.classes.box}>
@@ -107,8 +158,21 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
   }
 }
 
+/**
+ * Allows for the title element to be selected a title type, basically h1, h2, h3...
+ */
 class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
+
+  /**
+   * We need the derived function in order to be able to update the value of the
+   * selector in case, this is the more efficient way in these cases where things
+   * are slightly out of sync
+   */
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
+
+    // for that we check if the value is not the same as the one in the state, which happens
+    // whenever changing, but in order to actually change it we only do so if it's a different
+    // element anchor we are at
     const selectedNode: ITitle = props.state.currentSelectedNode as any;
     if (
       (selectedNode.subtype || "") !== state.value &&
@@ -122,6 +186,11 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     return null;
   }
+
+  /**
+   * This is the constructor for the title type options
+   * @param props the entire wrapper props that are passed here
+   */
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
@@ -135,6 +204,11 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.onUpdate = this.onUpdate.bind(this);
   }
 
+  /**
+   * This triggers on update of the change of the select field
+   * in question that allows to change the container type
+   * @param e the event coming from the select
+   */
   public onUpdate(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.value;
 
@@ -142,11 +216,17 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
       value: newValue,
     });
 
+    // we use the helper set for the title subtype
+    // which does an arbitrary partial value update at the selected
+    // anchor
     this.props.helpers.set({
       subtype: newValue,
     }, this.props.state.currentSelectedNodeAnchor);
   }
 
+  /**
+   * The render function
+   */
   public render() {
     return (
       <div className={this.props.classes.box}>
@@ -185,16 +265,50 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
   }
 }
 
+/**
+ * The general image option uses a different state
+ * because it has 2 properties that is has to track of
+ */
 interface IGeneralImageOptionsState {
+  /**
+   * Whether it's a standalone image type, that is not wrapped
+   * by image pad and whatnot
+   */
   standalone: boolean;
+  /**
+   * The alt value that is used for screen readers
+   */
   altValue: string;
+  /**
+   * The anchor that the image is selected for as we follow the same
+   * pattern as the other editor
+   */
   valueForAnchor: Path;
 }
 
+/**
+ * Provides the image options in order to specify the alt of the image as well
+ * as the form of the image, standalone or full, where the image is not wrapped
+ * and not padded, often used by the editor in order to build into custom styles
+ */
 class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralImageOptionsState> {
+  /**
+   * We build a timer for updating the alt, because the alt is text and not a selector
+   * updating the alt on each keystroke can be overkill, since we have a state anyway
+   * we can just wait some milliseconds
+   */
   private altUpdateTimeout: NodeJS.Timer;
 
+  /**
+   * We need the derived function in order to be able to update the value of the
+   * selector in case, this is the more efficient way in these cases where things
+   * are slightly out of sync
+   */
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralImageOptionsState) {
+
+    // for that we check if the value is not the same as the one in the state, which happens
+    // whenever changing, but in order to actually change it we only do so if it's a different
+    // element anchor we are at
     const selectedNode: IImage = props.state.currentSelectedNode as any;
     if (
       (
@@ -213,6 +327,10 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     return null;
   }
 
+  /**
+   * This is the constructor for the image form options
+   * @param props the entire wrapper props that are passed here
+   */
   constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
@@ -229,31 +347,57 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.updateStandalone = this.updateStandalone.bind(this);
   }
 
+  /**
+   * Performs the actually update of the alt based on the
+   * state and when the timer has finally ellapsed
+   */
   public actuallyUpdateAlt() {
+    // here we use the arbitrary partial value set function
+    // to update the node at the given anchor
     this.props.helpers.set({
       alt: this.state.altValue,
     }, this.props.state.currentSelectedNodeAnchor);
   }
 
+  /**
+   * Performs the state update of the alt into the state
+   * and delays the execution of the update in the node
+   * in order to avoid doing a tree update of the rich text
+   * on every key stroke
+   * @param e the change event in the input
+   */
   public updateAlt(e: React.ChangeEvent<HTMLInputElement>) {
+    // update the state
     this.setState({
       altValue: e.target.value,
     });
 
+    // now we clear a possibly existant previous timeout
     clearTimeout(this.altUpdateTimeout);
+    // and then we create a new timeout in 300 ms
     this.altUpdateTimeout = setTimeout(this.actuallyUpdateAlt, 300);
   }
 
+  /**
+   * Updates the standalone state of the image, both in the state and
+   * in the node itself
+   * @param e the change event from the checkbox that allows to select this
+   */
   public updateStandalone(e: React.ChangeEvent<HTMLInputElement>) {
+    // change the state
     this.setState({
       standalone: e.target.checked,
     });
 
+    // use the partial value setter to set the value of standalone at the given node
     this.props.helpers.set({
       standalone: e.target.checked,
     }, this.props.state.currentSelectedNodeAnchor);
   }
 
+  /**
+   * The render function
+   */
   public render() {
     return (
       <div className={this.props.classes.box}>
@@ -274,8 +418,17 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   }
 }
 
+/**
+ * Provides the drawer section with all the general options of a given component
+ * these general options are the specific options for the generic components
+ * @param props all the entire wrapper props
+ */
 export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
+  // we need to build the node and some nodes just don't
+  // have any options
   let specificNodeOptions: React.ReactNode = null;
+
+  // so we got to get in the type
   switch ((props.state.currentSelectedNode as any).type) {
     case "container":
       specificNodeOptions = <GeneralContainerOptions {...props} />
@@ -288,6 +441,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
       break;
   }
 
+  // and return
   return (
     <>
       {specificNodeOptions}
