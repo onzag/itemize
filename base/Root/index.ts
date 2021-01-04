@@ -16,9 +16,7 @@ import ItemDefinition from "./Module/ItemDefinition";
  */
 // tslint:disable-next-line: interface-name
 export interface Ii18NType {
-  [langLocale: string]: {
-    [key: string]: string;
-  };
+  [langLocale: string]: any;
 }
 
 // The interface for locale data for translation contains

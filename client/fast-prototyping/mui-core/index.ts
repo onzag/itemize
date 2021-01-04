@@ -13,6 +13,7 @@ import Paper from "@material-ui/core/Paper";
 import Avatar from "@material-ui/core/Avatar";
 import Snackbar from "@material-ui/core/Snackbar";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -34,6 +35,18 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import LinkIcon from '@material-ui/icons/Link';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import BorderStyleIcon from '@material-ui/icons/BorderStyle';
+import TouchAppIcon from '@material-ui/icons/TouchApp';
+import PictureInPictureIcon from '@material-ui/icons/PictureInPicture';
+import WebIcon from '@material-ui/icons/Web';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import DeleteIcon from '@material-ui/icons/Delete';
+import SettingsIcon from '@material-ui/icons/Settings';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
 import {
   createStyles,
   withStyles,
@@ -71,6 +84,7 @@ import Select from "@material-ui/core/Select";
 import FilledInput from "@material-ui/core/FilledInput";
 import Tooltip from "@material-ui/core/Tooltip";
 import Grid from "@material-ui/core/Grid";
+import NativeSelect from '@material-ui/core/NativeSelect';
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -251,4 +265,18 @@ export {
   CardMedia,
   CardActionArea,
   CropSquareIcon,
+  MoreHorizIcon,
+  ExpandLessIcon,
+  LinkIcon,
+  Breadcrumbs,
+  BorderStyleIcon,
+  TouchAppIcon,
+  PictureInPictureIcon,
+  WebIcon,
+  AddCircleIcon,
+  CheckBoxOutlineBlankIcon,
+  NativeSelect,
+  DeleteIcon,
+  SettingsIcon,
+  TextFieldsIcon,
 }

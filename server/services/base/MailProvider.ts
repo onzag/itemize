@@ -12,7 +12,7 @@ import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../.
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { renderTemplate } from "../../../util";
+import { renderTemplate } from "../../../client/internal/text";
 import { Cache } from "../../cache";
 import type { IGQLValue } from "../../../gql-querier";
 import Root from "../../../base/Root";

@@ -187,8 +187,8 @@ export default class PropertyEntryDateTime extends
 
       autoFocus: this.props.autoFocus || false,
 
-      i18nCancel: this.props.i18n[this.props.language].cancel,
-      i18nOk: this.props.i18n[this.props.language].ok,
+      i18nCancel: this.props.i18n[this.props.language].cancel as string,
+      i18nOk: this.props.i18n[this.props.language].ok as string,
 
       onChange: this.props.onChange,
       onChangeByMoment: this.handleOnChange,

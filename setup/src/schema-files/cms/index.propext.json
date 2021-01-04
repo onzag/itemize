@@ -11,7 +11,17 @@
             "mediaProperty": "attachments",
             "supportsImages": true,
             "supportsVideos": true,
-            "supportsFiles": true
+            "supportsFiles": true,
+            "supportsContainers": false,
+            "supportsCustom": false,
+            "supportsExternalLinks": false,
+            "supportsLinks": false,
+            "supportsQuote": false,
+            "supportsRichClasses": false,
+            "supportsTitle": true,
+            "supportsCustomStyles": false,
+            "supportsTemplating": false,
+            "supportsLists": true
         }
     },
     {

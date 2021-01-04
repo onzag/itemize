@@ -9,10 +9,10 @@ import equals from "deep-equal";
 import uuid from "uuid";
 import { DOMPurify, checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
-import { propertyViewPostProcessingHook, PROPERTY_VIEW_SANITIZE_CONFIG } from "../PropertyView/PropertyViewText";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
+import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
 
 /**
  * Information about the file that has just been inserted
@@ -36,6 +36,101 @@ export interface IInsertedFileInformationType {
   isImage: boolean;
 }
 
+export interface IPropertyEntryI18nRichTextInfo {
+  formatBoldLabel: string;
+  formatItalicLabel: string;
+  formatUnderlineLabel: string;
+  formatLinkLabel: string;
+  formatTitleLabel: string;
+  formatQuoteLabel: string;
+  formatListNumberedLabel: string;
+  formatListBulletedLabel: string;
+  formatAddImageLabel: string;
+  formatAddVideoLabel: string;
+  formatAddFileLabel: string;
+  formatAddContainerLabel: string;
+  formatAddCustomLabel: string;
+  formatSetStyleLabel: string;
+  formatSetHoverStyleLabel: string;
+  formatSetActiveStyleLabel: string;
+  formatSetClassLabel: string;
+  formatSetEventHandlers: string;
+  formatSetContext: string;
+  formatMakeLoop: string;
+  formatSetUIHandlerLabel: string;
+  formatSetUIHandlerArgLabel: string;
+  formatSetUIHandlerArgName: string;
+  formatSetUIHandlerArgValue: string;
+  formatAddTemplateText: string;
+  formatAddTemplateHTML: string;
+  formatDeleteElement: string;
+  formatMore: string;
+
+  container: string;
+  text: string;
+  custom: string;
+  file: string;
+  image: string;
+  link: string;
+  list: string;
+  listItem: string;
+  paragraph: string;
+  quote: string;
+  title: string;
+  video: string;
+  styled: string;
+  template: string;
+  interactive: string;
+  style: string;
+  styleActive: string;
+  styleHover: string;
+  classes: string;
+  settings: string;
+  styles: string;
+  templating: string;
+  actions: string;
+  each: string;
+  context: string;
+  uiHandler: string;
+  type: string;
+  standalone: string;
+
+  loadVideo: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    title: string;
+    submit: string;
+  };
+
+  setLink: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    placeholderLocalOnly: string;
+    templated: string;
+    templatedLabel: string;
+    templatedPlaceholder: string;
+    templatedUnspecified: string;
+    title: string;
+    submit: string;
+  };
+
+  addTemplateText: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
+
+  addTemplateHTML: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
+}
+
 /**
  * The entry text renderer props that every renderer is going to get
  * in order to render text
@@ -45,61 +140,21 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * For rich text contains the information about
    * building the standard toolbar that is expected
    */
-  i18nFormat: {
-    formatBoldLabel: string;
-    formatItalicLabel: string;
-    formatUnderlineLabel: string;
-    formatTitleLabel: string;
-    formatQuoteLabel: string;
-    formatListNumberedLabel: string;
-    formatListBulletedLabel: string;
-    formatAddImageLabel: string;
-    formatAddVideoLabel: string;
-    formatAddFileLabel: string;
-  };
+  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+  /**
+   * The i18n root
+   */
+  i18nRoot: any;
 
   /**
-   * For rich text contains locale information that
-   * are used in order to specify the load video dialog
-   * that takes an url
+   * Rich text features
    */
-  i18nLoadVideo: {
-    invalid: string;
-    label: string;
-    placeholder: string;
-    title: string;
-    submit: string;
-  };
+  features: IFeatureSupportOptions;
 
   /**
    * Whether it is rich text
    */
   isRichText: boolean;
-
-  /**
-   * Whether it supports image loading
-   */
-  supportsImages: boolean;
-  /**
-   * Whether it supports file loading
-   */
-  supportsFiles: boolean;
-  /**
-   * Whether it supports videos
-   */
-  supportsVideos: boolean;
-  /**
-   * The accept for the input accept="property" of the linked media
-   * property so you can filter by that, all files are included
-   */
-  mediaPropertyAcceptsFiles: string;
-  /**
-   * The accept for the input accept="property" of the linked media
-   * property so you can filter by that, it's basically a narrowed
-   * down version of mediaPropertyAcceptsFiles that only includes
-   * image mime types
-   */
-  mediaPropertyAcceptsImages: string;
 
   /**
    * A generic error that is included for building the interface
@@ -402,7 +457,7 @@ export default class PropertyEntryText
       });
       return null;
 
-    // otherwise in the generic files
+      // otherwise in the generic files
     } else if (!isExpectingImage && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsFiles)) {
       this.setState({
         lastLoadedFileError: "file_uploader_invalid_type",
@@ -441,7 +496,7 @@ export default class PropertyEntryText
       height: null,
       isImage: false,
     };
-    
+
     // however if we are expecting images or the file to add is an image,
     // we need the image metadata
     if (isExpectingImage || addedFile.type.startsWith("image")) {
@@ -452,7 +507,7 @@ export default class PropertyEntryText
         // on load
         img.onload = () => {
           // we build the metadata
-          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
           const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
           addedFile.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
@@ -542,21 +597,71 @@ export default class PropertyEntryText
 
     const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
     const supportsMedia = !!mediaPropertyId && isRichText;
-    const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
-    const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
-    const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
     const i18nInLanguage = this.props.i18n[this.props.language];
+
+    let features: IFeatureSupportOptions = null;
+    if (isRichText) {
+      const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
+      const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
+      const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
+      const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
+      const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
+      const supportsLists = this.props.property.getSpecialProperty("supportsLists");
+      const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
+      const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
+      const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
+      const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
+      const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
+      const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
+      const supportedRichClasses = this.props.property.getSpecialProperty("supportedRichClasses");
+      const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
+      const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
+      const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
+
+      features = {
+        supportsFiles,
+        supportsImages,
+        supportsFilesAccept: this.cachedMediaPropertyAcceptsFiles,
+        supportsImagesAccept: this.cachedMediaPropertyAcceptsImages,
+        supportsVideos,
+        supportsLists,
+        supportsContainers,
+        supportsCustom,
+        supportsExternalLinks,
+        supportsLinks,
+        supportsQuote,
+        supportsRichClasses,
+        supportsTitle,
+        supportsCustomStyles,
+        supportsTemplating,
+        supportedRichClasses,
+        supportedCustoms,
+        supportedContainers,
+      }
+    }
 
     let currentValue = this.props.state.value as string;
     // we only want to purify values that haven't been manually set by the user, other
     // than that we can trust the value, it'd be a waste
-    if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) { 
+    if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
         this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-      DOMPurify.addHook("afterSanitizeElements", propertyViewPostProcessingHook.bind(this, this.cachedMediaProperty, currentFiles, supportsImages, supportsVideos, supportsFiles));
-      currentValue = DOMPurify.sanitize(currentValue, PROPERTY_VIEW_SANITIZE_CONFIG);
-      DOMPurify.removeAllHooks();
+      currentValue = sanitize(
+        {
+          cacheFiles: this.props.cacheFiles,
+          config: this.props.config,
+          containerId: this.props.containerId,
+          currentFiles,
+          forId: this.props.forId,
+          forVersion: this.props.forVersion,
+          include: this.props.include,
+          itemDefinition: this.props.itemDefinition,
+          mediaProperty: this.cachedMediaProperty,
+        },
+        features,
+        currentValue,
+      );
     }
 
     let invalidReason = this.props.state.invalidReason;
@@ -617,36 +722,106 @@ export default class PropertyEntryText
 
       autoFocus: this.props.autoFocus || false,
 
-      i18nFormat: {
+      i18nRoot: this.props.i18n[this.props.language],
+      i18nRichInfo: isRichText ? {
         formatBoldLabel: i18nInLanguage.format_bold,
         formatItalicLabel: i18nInLanguage.format_italic,
         formatUnderlineLabel: i18nInLanguage.format_underline,
         formatTitleLabel: i18nInLanguage.format_title,
+        formatLinkLabel: i18nInLanguage.format_link,
         formatQuoteLabel: i18nInLanguage.format_quote,
         formatListNumberedLabel: i18nInLanguage.format_list_numbered,
         formatListBulletedLabel: i18nInLanguage.format_list_bulleted,
         formatAddImageLabel: i18nInLanguage.format_add_image,
         formatAddVideoLabel: i18nInLanguage.format_add_video,
         formatAddFileLabel: i18nInLanguage.format_add_file,
-      },
+        formatAddContainerLabel: i18nInLanguage.format_add_container,
+        formatAddCustomLabel: i18nInLanguage.format_add_custom,
+        formatMakeLoop: i18nInLanguage.format_make_loop,
+        formatSetActiveStyleLabel: i18nInLanguage.format_set_active_style,
+        formatSetClassLabel: i18nInLanguage.format_set_class,
+        formatSetEventHandlers: i18nInLanguage.format_set_event_handlers,
+        formatSetContext: i18nInLanguage.format_set_context,
+        formatSetHoverStyleLabel: i18nInLanguage.format_set_hover_style,
+        formatSetStyleLabel: i18nInLanguage.format_set_style,
+        formatSetUIHandlerArgLabel: i18nInLanguage.format_set_ui_handler_arg,
+        formatSetUIHandlerArgName: i18nInLanguage.format_set_ui_handler_arg_name,
+        formatSetUIHandlerArgValue: i18nInLanguage.format_set_ui_handler_arg_value,
+        formatSetUIHandlerLabel: i18nInLanguage.format_set_ui_handler,
+        formatAddTemplateHTML: i18nInLanguage.format_add_template_html,
+        formatAddTemplateText: i18nInLanguage.format_add_template_text,
+        formatDeleteElement: i18nInLanguage.format_delete_element,
+        formatMore: i18nInLanguage.format_more,
 
-      i18nLoadVideo: {
-        title: i18nInLanguage.video_loader_title,
-        label: i18nInLanguage.video_loader_label,
-        placeholder: i18nInLanguage.video_loader_placeholder,
-        invalid: i18nInLanguage.video_loader_invalid,
-        submit: i18nInLanguage.video_loader_submit,
-      },
+        container: i18nInLanguage.rich_container,
+        text: i18nInLanguage.rich_text,
+        custom: i18nInLanguage.rich_custom,
+        file: i18nInLanguage.rich_file,
+        image: i18nInLanguage.rich_image,
+        link: i18nInLanguage.rich_link,
+        list: i18nInLanguage.rich_list,
+        listItem: i18nInLanguage.rich_list_item,
+        paragraph: i18nInLanguage.rich_paragraph,
+        quote: i18nInLanguage.rich_quote,
+        title: i18nInLanguage.rich_title,
+        video: i18nInLanguage.rich_video,
+        styled: i18nInLanguage.rich_styled_component,
+        template: i18nInLanguage.rich_template_component,
+        interactive: i18nInLanguage.rich_interactive_component,
+        style: i18nInLanguage.rich_style,
+        styleActive: i18nInLanguage.rich_style_active,
+        styleHover: i18nInLanguage.rich_style_hover,
+        classes: i18nInLanguage.rich_classes,
+        settings: i18nInLanguage.rich_settings,
+        styles: i18nInLanguage.rich_styles,
+        templating: i18nInLanguage.rich_templating,
+        actions: i18nInLanguage.rich_actions,
+        each: i18nInLanguage.rich_each,
+        context: i18nInLanguage.rich_context,
+        uiHandler: i18nInLanguage.rich_ui_handler,
+        type: i18nInLanguage.rich_type,
+        standalone: i18nInLanguage.rich_standalone,
 
-      i18nGenericError: i18nInLanguage["generic_error"],
-      i18nOk: i18nInLanguage["ok"],
+        loadVideo: {
+          title: i18nInLanguage.video_loader_title,
+          label: i18nInLanguage.video_loader_label,
+          placeholder: i18nInLanguage.video_loader_placeholder,
+          invalid: i18nInLanguage.video_loader_invalid,
+          submit: i18nInLanguage.video_loader_submit,
+        },
 
-      supportsImages,
-      supportsFiles,
-      supportsVideos,
-      mediaPropertyAcceptsFiles: this.cachedMediaPropertyAcceptsFiles,
-      mediaPropertyAcceptsImages: this.cachedMediaPropertyAcceptsImages,
+        setLink: {
+          title: i18nInLanguage.link_setter_title,
+          label: i18nInLanguage.link_setter_label,
+          placeholder: i18nInLanguage.link_setter_placeholder,
+          placeholderLocalOnly: i18nInLanguage.link_setter_placeholder_local_only,
+          templated: i18nInLanguage.link_setter_templated,
+          templatedLabel: i18nInLanguage.link_setter_templated_label,
+          templatedPlaceholder: i18nInLanguage.link_setter_templated_placeholder,
+          templatedUnspecified: i18nInLanguage.link_setter_templated_unspecified,
+          invalid: i18nInLanguage.link_setter_invalid,
+          submit: i18nInLanguage.link_setter_submit,
+        },
 
+        addTemplateText: {
+          title: i18nInLanguage.add_template_text_title,
+          label: i18nInLanguage.add_template_text_label,
+          placeholder: i18nInLanguage.add_template_text_placeholder,
+          submit: i18nInLanguage.add_template_text_submit,
+        },
+
+        addTemplateHTML: {
+          title: i18nInLanguage.add_template_html_title,
+          label: i18nInLanguage.add_template_html_label,
+          placeholder: i18nInLanguage.add_template_html_placeholder,
+          submit: i18nInLanguage.add_template_html_submit,
+        },
+      } : null,
+
+      i18nGenericError: i18nInLanguage.generic_error,
+      i18nOk: i18nInLanguage.ok,
+
+      features,
       isRichText,
 
       lastLoadedFileError,

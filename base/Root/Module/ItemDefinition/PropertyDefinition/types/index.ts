@@ -307,7 +307,7 @@ export interface IPropertyDefinitionSupportedType {
    */
   specialProperties?: Array<{
     name: string;
-    type: "number" | "string" | "boolean" | "property-set" | "any",
+    type: "number" | "string" | "boolean" | "property-set" | "any" | "array-string" | "array-number" | "array-boolean",
     required?: boolean | Array<string>;
   }>;
   /**

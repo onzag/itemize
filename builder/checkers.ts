@@ -19,6 +19,7 @@ import {
   OWNER_METAROLE,
   ANYONE_METAROLE,
   GUEST_METAROLE,
+  USER_EXTRA_CUSTOM_I18N,
 } from "../constants";
 import "source-map-support/register";
 import {
@@ -268,6 +269,7 @@ export function checkItemDefinition(
   // in all languages, note how we move the traceback location
   checkI18nCustomConsistency(
     rawData.i18nData,
+    parentModule.name === "users" && rawData.name === "user",
     actualTraceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 
@@ -931,7 +933,7 @@ export function checkPropertyDefinition(
           `type '${rawData.type}' requires specialProperties field for '${property.name}'`,
           traceback,
         );
-      } else if (isRequired && !rawData.specialProperties[property.name]) {
+      } else if (isRequired && typeof rawData.specialProperties[property.name] === "undefined") {
         throw new CheckUpError(
           `type '${rawData.type}' requires special property '${property.name}'`,
           traceback.newTraceToBit("specialProperties"),
@@ -941,11 +943,32 @@ export function checkPropertyDefinition(
         rawData.specialProperties[property.name] &&
         property.type !== "any"
       ) {
-        if (property.type !== "property-set" && typeof rawData.specialProperties[property.name] !== property.type) {
+        if (
+          property.type !== "property-set" &&
+          !property.type.startsWith("array-") &&
+          typeof rawData.specialProperties[property.name] !== property.type
+        ) {
           throw new CheckUpError(
             `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
             traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
           );
+        } else if (property.type.startsWith("array-")) {
+          const expectedType = property.type.substr(6);
+          if (!Array.isArray(rawData.specialProperties[property.name])) {
+            throw new CheckUpError(
+              `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
+              traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+            );
+          }
+
+          rawData.specialProperties[property.name].forEach((v: any, index: number) => {
+            if (typeof v !== expectedType) {
+              throw new CheckUpError(
+                `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}' but one found not to match`,
+                traceback.newTraceToBit("specialProperties").newTraceToBit(property.name).newTraceToBit(index),
+              );
+            }
+          });
         } else if (property.type === "property-set") {
           ajvCheck(
             checkSpecialPropertyValueSetSchemaValidate,
@@ -1081,6 +1104,7 @@ export function checkPropertyDefinition(
  */
 export function checkI18nCustomConsistency(
   rawData: IRawJSONI18NDataType,
+  isUserIdef: boolean,
   traceback: Traceback,
 ) {
   // so we first analyze all the keys in order to extract all
@@ -1121,8 +1145,23 @@ export function checkI18nCustomConsistency(
             );
           }
         });
-      }
+      } 
     });
+
+    // now if we are in the special user item definition
+    if (isUserIdef) {
+      // we need to ensure that the extra keys for validation and recovery
+      // are present
+      USER_EXTRA_CUSTOM_I18N.forEach((key) => {
+        if (!analysisData.keys.includes(key)) {
+          throw new CheckUpError(
+            "Custom i18n in locale " + analysisData.localeKey + " is missing required custom key '" +
+            key,
+            traceback,
+          );
+        }
+      });
+    }
   });
 }
 
@@ -1154,6 +1193,7 @@ export function checkModule(
   // check the i18n consistency so that custom keys are valid
   checkI18nCustomConsistency(
     rawData.i18nData,
+    false,
     traceback.newTraceToLocation(rawData.i18nDataLocation),
   );
 

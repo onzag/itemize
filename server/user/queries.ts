@@ -473,8 +473,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           version: languageToUse,
           itemDefinition: fragmentIdef,
           args: {
+            ...extractedProperties,
             validate_account_link: validateLink,
-            validate_account_properties: extractedProperties,
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,
@@ -659,8 +659,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           version: languageToUse,
           itemDefinition: fragmentIdef,
           args: {
+            ...extractedProperties,
             forgot_password_link: resetPasswordLink,
-            forgot_password_properties: extractedProperties,
           },
           property: fragmentIdef.getPropertyDefinitionFor("content", true),
           subject,

@@ -316,6 +316,22 @@ export const ENDPOINT_ERRORS = {
 };
 
 /**
+ * Extra i18n properties that are used for the generation
+ * of the validation email and the recovery email
+ */
+export const USER_EXTRA_CUSTOM_I18N = [
+  "validate_account_fragment_id",
+  "validate_account",
+  "validate_account_user",
+  "validate_account_email_user",
+  "forgot_password_link_target",
+  "forgot_password_fragment_id",
+  "forgot_password_title",
+  "validate_account_user",
+  "validate_account_email_user",
+];
+
+/**
  * This is for small use anywhere language data
  */
 export const LOCALE_I18N = [
@@ -328,17 +344,64 @@ export const LOCALE_I18N = [
   // N$ or $N depending if currency symbol goes before or after
   "currency_format",
 
-  // For quilljs editor
+  // For the given text editor
   "format_bold",
   "format_italic",
   "format_underline",
   "format_title",
   "format_quote",
+  "format_link",
   "format_list_numbered",
   "format_list_bulleted",
   "format_add_image",
   "format_add_file",
   "format_add_video",
+  "format_add_container",
+  "format_add_custom",
+  "format_set_style",
+  "format_set_hover_style",
+  "format_set_active_style",
+  "format_set_class",
+  "format_set_event_handlers",
+  "format_set_context",
+  "format_make_loop",
+  "format_set_ui_handler",
+  "format_set_ui_handler_arg",
+  "format_set_ui_handler_arg_name",
+  "format_set_ui_handler_arg_value",
+  "format_add_template_text",
+  "format_add_template_html",
+  "format_delete_element",
+  "format_more",
+
+  // extra rich element information
+  "rich_container",
+  "rich_text",
+  "rich_custom",
+  "rich_file",
+  "rich_image",
+  "rich_link",
+  "rich_list",
+  "rich_list_item",
+  "rich_paragraph",
+  "rich_quote",
+  "rich_title",
+  "rich_video",
+  "rich_styled_component",
+  "rich_template_component",
+  "rich_style",
+  "rich_style_active",
+  "rich_style_hover",
+  "rich_classes",
+  "rich_settings",
+  "rich_styles",
+  "rich_templating",
+  "rich_actions",
+  "rich_each",
+  "rich_context",
+  "rich_ui_handler",
+  "rich_type",
+  "rich_standalone",
 
   // for filling the booleans and other things
   "yes",
@@ -379,6 +442,30 @@ export const LOCALE_I18N = [
   "video_loader_placeholder",
   "video_loader_invalid",
   "video_loader_submit",
+
+  // for links
+  "link_setter_title",
+  "link_setter_label",
+  "link_setter_placeholder",
+  "link_setter_placeholder_local_only",
+  "link_setter_templated",
+  "link_setter_templated_label",
+  "link_setter_templated_placeholder",
+  "link_setter_templated_unspecified",
+  "link_setter_invalid",
+  "link_setter_submit",
+
+  // for template text
+  "add_template_text_title",
+  "add_template_text_label",
+  "add_template_text_placeholder",
+  "add_template_text_submit",
+
+  // for template html
+  "add_template_html_title",
+  "add_template_html_label",
+  "add_template_html_placeholder",
+  "add_template_html_submit",
 
   // for search utilites
   "no_results",
