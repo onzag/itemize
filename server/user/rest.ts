@@ -7,12 +7,12 @@ import bcyrpt from "bcrypt";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 
 export interface IValidateUserTokenDataType {
-  validateUserId: number;
+  validateUserId: string;
   validateUserEmail: string;
 }
 
 export interface IUnsubscribeUserTokenDataType {
-  unsubscribeUserId: number;
+  unsubscribeUserId: string;
   unsubscribeProperty: string;
 }
 
@@ -137,7 +137,7 @@ export function userRestServices(appData: IAppDataType) {
   });
 
   router.get("/redirected-login", async (req, res) => {
-    const userId = parseInt(req.query.userid as string);
+    const userId = req.query.userid as string;
     const password = req.query.password as string;
     const token = req.query.token as string;
 
@@ -148,7 +148,7 @@ export function userRestServices(appData: IAppDataType) {
       redirect = "/";
     }
 
-    if ((isNaN(userId) || userId <= 0) || (!password && !token)) {
+    if (!userId || (!password && !token)) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
       logger.error(
         "userRestServices/redirected-login: user id not provided or password nor token provided",
@@ -281,7 +281,7 @@ export function userRestServices(appData: IAppDataType) {
   });
 
   router.get("/unsubscribe", async (req, res) => {
-    const userId = parseInt(req.query.userid as string);
+    const userId = req.query.userid as string;
     const token = req.query.token as string;
     const noRedirect = !!req.query.noredirect;
 

@@ -314,7 +314,7 @@ export default class CacheWorker {
    */
   public async setCachedValue(
     queryName: string,
-    id: number,
+    id: string,
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
@@ -360,7 +360,7 @@ export default class CacheWorker {
    */
   public async deleteCachedValue(
     queryName: string,
-    id: number,
+    id: string,
     version: string,
   ): Promise<boolean> {
     console.log("REQUESTED TO DELETE", queryName, id, version);
@@ -401,7 +401,7 @@ export default class CacheWorker {
    */
   public async mergeCachedValue(
     queryName: string,
-    id: number,
+    id: string,
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
@@ -462,7 +462,7 @@ export default class CacheWorker {
    */
   public async getCachedValue(
     queryName: string,
-    id: number,
+    id: string,
     version: string,
     requestedFields?: IGQLRequestFields,
   ): Promise<ICacheMatchType> {
@@ -523,9 +523,9 @@ export default class CacheWorker {
    */
   public async updateRecordsOnCachedSearch(
     searchQueryName: string,
-    createdByIfKnown: number,
+    createdByIfKnown: string,
     parentTypeIfKnown: string,
-    parentIdIfKnown: number,
+    parentIdIfKnown: string,
     parentVersionIfKnown: string,
     newRecords: IGQLSearchRecord[],
     modifiedRecords: IGQLSearchRecord[],

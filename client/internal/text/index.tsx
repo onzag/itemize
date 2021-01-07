@@ -132,7 +132,7 @@ interface IPostProcessingContext {
   /**
    * The id in question, used to create the url
    */
-  forId: number;
+  forId: string;
   /**
    * The version in question, used to create the url
    */

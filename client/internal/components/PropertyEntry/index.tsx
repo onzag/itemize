@@ -199,7 +199,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    * Automatically Provided check base.tsx
    * retrieved from the item-definition.tsx context
    */
-  forId: number;
+  forId: string;
   /**
    * The slot version in question, or null
    * 
@@ -458,11 +458,6 @@ const handlerRegistry:
     // The standard field handles string, as it's just a texfield
     renderer: "PropertyEntryField",
     handler: PropertyEntryField,
-  },
-  integer: {
-    // The standard field also handles integers, as it's written in the same form
-    renderer: "PropertyEntryField",
-    handler: PropertyEntryField,
     subhandler: {
       // for the subtype reference we use another whole
       // different handler
@@ -475,6 +470,11 @@ const handlerRegistry:
         includeTokenDataAndSSR: true,
       },
     },
+  },
+  integer: {
+    // The standard field also handles integers, as it's written in the same form
+    renderer: "PropertyEntryField",
+    handler: PropertyEntryField,
   },
   number: {
     // The standard field handles numbers as well, as it's just a texfield

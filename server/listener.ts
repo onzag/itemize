@@ -276,7 +276,7 @@ export class Listener {
     );
   }
   public sendKickEvent(
-    userId: number,
+    userId: string,
   ) {
     this.onReceiveKickEvent(userId);
     const redisEvent: IRedisEvent = {
@@ -290,7 +290,7 @@ export class Listener {
     this.redisGlobalPub.redisClient.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify(redisEvent));
   }
   public onReceiveKickEvent(
-    userId: number,
+    userId: string,
   ) {
     Object.keys(this.listeners).forEach((socketKey) => {
       const socket = this.listeners[socketKey].socket;

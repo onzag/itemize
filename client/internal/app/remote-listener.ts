@@ -439,7 +439,7 @@ export class RemoteListener {
   public addItemDefinitionListenerFor(
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
-    forId: number,
+    forId: string,
     forVersion: string,
   ) {
     // first we build this qualified identifier that will act as key
@@ -503,7 +503,7 @@ export class RemoteListener {
   public removeItemDefinitionListenerFor(
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
-    forId: number,
+    forId: string,
     forVersion: string,
   ) {
     // so we build the same identifier
@@ -631,7 +631,7 @@ export class RemoteListener {
    */
   public addOwnedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
-    createdBy: number,
+    createdBy: string,
     lastModified: string,
     callback: () => any,
   ) {
@@ -695,7 +695,7 @@ export class RemoteListener {
   public removeOwnedSearchListenerFor(
     callback: () => any,
     itemDefinitionOrModuleQualifiedPathName: string,
-    createdBy: number,
+    createdBy: string,
   ) {
     // first we build the qualified identifier
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
@@ -772,7 +772,7 @@ export class RemoteListener {
   public addParentedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
-    parentId: number,
+    parentId: string,
     parentVersion: string,
     lastModified: string,
     callback: () => any,
@@ -846,7 +846,7 @@ export class RemoteListener {
     callback: () => any,
     itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
-    parentId: number,
+    parentId: string,
     parentVersion: string,
   ) {
     // first we get the identifier
@@ -1129,7 +1129,7 @@ export class RemoteListener {
    * process to identify with the websocket is done
    * @returns void or a void promise for when it's done
    */
-  private onIdentificationDone() {
+  private onIdentificationDone(): Promise<void> {
     if (this.offline) {
       return;
     }

@@ -70,11 +70,11 @@ export function getFieldsAndArgs(
     propertiesForArgs?: string[],
     includesForArgs?: string[],
     policiesForArgs?: [string, string, string][],
-    appliedOwner?: number,
+    appliedOwner?: string,
     userRole: string;
-    userId: number;
+    userId: string;
     itemDefinitionInstance: ItemDefinition;
-    forId: number;
+    forId: string;
     forVersion: string;
     uniteFieldsWithAppliedValue?: boolean;
     propertyOverrides?: IPropertyOverride[];
@@ -307,7 +307,7 @@ function getQueryArgsFor(
   args: IGQLArgs,
   token: string,
   language: string,
-  id?: number,
+  id?: string,
   version?: string,
 ) {
   // basic args, the base args usually are for policies and whatnot
@@ -340,7 +340,7 @@ function getQueryArgsFor(
  */
 function storeAndCombineStorageValuesFor(
   itemDefinition: ItemDefinition,
-  id: number,
+  id: string,
   version: string,
   value: IGQLValue,
   fields: IGQLRequestFields,
@@ -433,7 +433,7 @@ export async function runGetQueryFor(
     returnWorkerCachedValues: boolean,
     returnWorkerCachedValuesIfNoInternet?: boolean;
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     language: string,
     token: string,
@@ -590,7 +590,7 @@ export async function runDeleteQueryFor(
   arg: {
     args: IGQLArgs,
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     token: string,
     language: string,
@@ -679,7 +679,7 @@ export async function runAddQueryFor(
     language: string,
     listenerUUID: string,
     cacheStore: boolean,
-    forId: number,
+    forId: string,
     forVersion: string,
     containerId: string,
     waitAndMerge?: boolean,
@@ -736,7 +736,7 @@ export async function runAddQueryFor(
   if (!error) {
     const mergedResults = storeAndCombineStorageValuesFor(
       arg.itemDefinition,
-      value.id as number,
+      value.id as string,
       (value.version as string) || null,
       value,
       arg.fields,
@@ -777,7 +777,7 @@ export async function runEditQueryFor(
     itemDefinition: ItemDefinition,
     token: string,
     language: string,
-    id: number,
+    id: string,
     version: string,
     listenerUUID: string,
     cacheStore: boolean,
@@ -883,10 +883,10 @@ interface IRunSearchQueryArg {
   fields: IGQLRequestFields,
   itemDefinition: ItemDefinition,
   orderBy: IOrderByRuleType;
-  createdBy: number;
+  createdBy: string;
   parentedBy: {
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
   };
   cachePolicy: "by-owner" | "by-parent" | "none",

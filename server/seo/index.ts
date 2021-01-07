@@ -28,7 +28,7 @@ export interface ISEOParametrizer {
  * the ISEOCollectionRequest
  */
 export interface ISEOCollectedData {
-  id: number;
+  id: string;
   version: string;
   created_at: string;
   [extraProperty: string]: any;

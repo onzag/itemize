@@ -26,14 +26,17 @@ export function buildColumn(
   columnData: ISQLColumnDefinitionType,
   tableBuilder: Knex.CreateTableBuilder,
 ): Knex.ColumnBuilder {
+  // we need to use the special type that represents the id type
+  const actualType = columnData.type === "id" ? "string" : columnData.type;
+
   // now we need to execute, if there's no function in the table
   // creator or if it's marked as necessary to use a specific function
   const tableColumnExec: Knex.ColumnBuilder =
-    !tableBuilder[columnData.type] || typesForceSpecific.includes(columnData.type) ?
+    !tableBuilder[actualType] || typesForceSpecific.includes(actualType) ?
     // we use a specific function
-    tableBuilder.specificType(columnName, columnData.type) :
+    tableBuilder.specificType(columnName, actualType) :
     // otherwise we use the actual type
-    tableBuilder[columnData.type](columnName);
+    tableBuilder[actualType](columnName);
 
   // if it's not null
   if (columnData.notNull) {

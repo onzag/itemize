@@ -12,7 +12,6 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
-  PREFIX_SEARCH,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -72,7 +71,7 @@ export interface IActionResponseWithValue extends IBasicActionResponse {
 }
 
 export interface ILoadCompletedPayload extends IActionResponseWithValue {
-  forId: number;
+  forId: string;
   forVersion: string;
 }
 
@@ -80,7 +79,7 @@ export interface ILoadCompletedPayload extends IActionResponseWithValue {
  * A response given by submit and delete
  */
 export interface IActionResponseWithId extends IBasicActionResponse {
-  id: number;
+  id: string;
   version: string;
 }
 
@@ -222,13 +221,13 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   parentedBy?: {
     module: string,
     itemDefinition: string,
-    id: number,
+    id: string,
     version?: string,
   };
   action?: "add" | "edit",
-  submitForId?: number;
+  submitForId?: string;
   submitForVersion?: string;
-  inBehalfOf?: number;
+  inBehalfOf?: string;
   propertyOverrides?: IPropertyOverride[];
   includeOverrides?: IIncludeOverride[];
   waitAndMerge?: boolean;
@@ -248,11 +247,11 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   searchByProperties: string[];
   searchByIncludes?: string[];
   orderBy?: IOrderByRuleType;
-  createdBy?: number;
+  createdBy?: string;
   parentedBy?: {
     module: string,
     itemDefinition: string,
-    id: number,
+    id: string,
     version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
@@ -281,7 +280,7 @@ export interface IItemContextType {
   state: IItemStateType;
   // the id of which it was pulled from, this might be
   // null
-  forId: number;
+  forId: string;
   // the version of which it was pulled from
   forVersion: string;
   // with ids a not found flag might be set if the item
@@ -331,7 +330,7 @@ export interface IItemContextType {
   searchId: string;
   searchWasRestored: boolean;
   // a search owner, or null, for the createdBy argument
-  searchOwner: number;
+  searchOwner: string;
   // passed onto the search to tell it if results that are retrieved
   // and then updated should be cached into the cache using the
   // long term strategy, this is usually true when cachePolicy is something
@@ -396,12 +395,12 @@ export interface IItemContextType {
   onPropertyEnforce: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
-    givenForId: number,
+    givenForId: string,
     givenForVersion: string,
   ) => void;
   onPropertyClearEnforce: (
     property: PropertyDefinition,
-    givenForId: number,
+    givenForId: string,
     givenForVersion: string,
   ) => void;
 
@@ -462,7 +461,7 @@ export interface IItemProviderProps {
   /**
    * the id, specifying an id makes a huge difference
    */
-  forId?: number;
+  forId?: string;
   /**
    * the version
    */
@@ -636,8 +635,8 @@ interface IActualItemProviderSearchState {
   searchOffset: number;
   searchCount: number;
   searchId: string;
-  searchOwner: number;
-  searchParent: [string, number, string];
+  searchOwner: string;
+  searchParent: [string, string, string];
   searchShouldCache: boolean;
   searchRequestedProperties: string[];
   searchRequestedIncludes: string[];
@@ -725,7 +724,7 @@ export class ActualItemProvider extends
    * that we will only apply the value for the last loading
    * value and not overwrite if we have changed such value hot
    */
-  private lastLoadingForId: number = null;
+  private lastLoadingForId: string = null;
   private lastLoadingForVersion: string = null;
 
   /**
@@ -1013,7 +1012,7 @@ export class ActualItemProvider extends
         changed = true;
       } else {
         if (!(window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
-          .find((m: [number, string]) => m[0] === forId && m[1] === forVersion)) {
+          .find((m: [string, string]) => m[0] === forId && m[1] === forVersion)) {
           changed = true;
           (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([forId, forVersion]);
         }
@@ -2027,7 +2026,7 @@ export class ActualItemProvider extends
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforceOrClearFinal(
-    givenForId: number,
+    givenForId: string,
     givenForVersion: string,
   ) {
     this.props.itemDefinitionInstance.triggerListeners(
@@ -2043,7 +2042,7 @@ export class ActualItemProvider extends
   public onPropertyEnforce(
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
-    givenForId: number,
+    givenForId: string,
     givenForVersion: string,
     internal?: boolean,
   ) {
@@ -2058,7 +2057,7 @@ export class ActualItemProvider extends
   }
   public onPropertyClearEnforce(
     property: PropertyDefinition,
-    givenForId: number,
+    givenForId: string,
     givenForVersion: string,
     internal?: boolean,
   ) {
@@ -2721,7 +2720,7 @@ export class ActualItemProvider extends
       getQueryFields = totalValues.getQueryFields;
     }
 
-    let recievedId: number = null;
+    let recievedId: string = null;
     let receivedVersion: string = null;
     if (error) {
       if (!this.isUnmounted) {
@@ -2743,7 +2742,7 @@ export class ActualItemProvider extends
         });
       }
 
-      recievedId = value.id as number;
+      recievedId = value.id as string;
       receivedVersion = value.version as string || null;
       this.props.itemDefinitionInstance.applyValue(
         recievedId,
@@ -2874,7 +2873,7 @@ export class ActualItemProvider extends
     }
 
     // and the cache policy by parenting
-    let searchParent: [string, number, string] = null;
+    let searchParent: [string, string, string] = null;
     if (options.cachePolicy === "by-parent" && !options.parentedBy) {
       throw new Error("A by owner cache policy requires parentedBy option to be set");
     } else if (options.parentedBy) {

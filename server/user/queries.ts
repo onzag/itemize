@@ -15,7 +15,7 @@ import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize } from "../../util";
 
 interface RecoverPasswordTokenType {
-  resetPasswordUserId: number;
+  resetPasswordUserId: string;
   resetPasswordTempTokenCode: number;
 };
 
@@ -452,8 +452,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const validateLink = (
           process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
         ) +
-          "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + decoded.id;
-        const templateIdToUse = parseInt(i18nData.custom.validate_account_fragment_id, 10);
+          "/rest/user/validate-email?token=" + encodeURIComponent(validateToken) + "&id=" + encodeURIComponent(decoded.id);
+        const templateIdToUse = i18nData.custom.validate_account_fragment_id;
 
         const subject = capitalize(i18nData.custom.validate_account);
 
@@ -638,9 +638,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const resetPasswordLink = (
           process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
         ) +
-          i18nData.custom.forgot_password_link_target + "?token=" + encodeURIComponent(resetToken) + "&id=" + userId;
+          i18nData.custom.forgot_password_link_target + "?token=" +
+          encodeURIComponent(resetToken) + "&id=" +
+          encodeURIComponent(userId);
 
-        const templateIdToUse = parseInt(i18nData.custom.forgot_password_fragment_id, 10);
+        const templateIdToUse = i18nData.custom.forgot_password_fragment_id;
         const subject = capitalize(i18nData.custom.forgot_password_title);
 
         const extractedProperties: any = {};

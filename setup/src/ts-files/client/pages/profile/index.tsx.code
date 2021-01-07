@@ -26,7 +26,7 @@ interface IProfileProps {
  * @returns a react element
  */
 export function Profile(props: IProfileProps)<0>{
-	const currentUserId = parseInt(props.match.params.id, 10) || null;
+	const currentUserId = props.match.params.id;
 	const properties = [
 		"username",
 		"app_language",

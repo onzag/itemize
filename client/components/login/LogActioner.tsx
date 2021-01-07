@@ -21,12 +21,12 @@ type ActionerFn = (actioner: {
    * Performs a login action, username and password field in the user item definition context
    * should be filled for this; username can be an email for this
    */
-  login: (cleanWhenSuccessful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
+  login: (cleanWhenSuccessful?: boolean) => Promise<{id: string, role: string, error: EndpointErrorType}>,
   /**
    * Performs a signup action, username and password field in the user item definition context
    * should be filled as well; username cannot be an email for signup, validation should apply
    */
-  signup: (cleanWhenSuccessful?: boolean) => Promise<{id: number, role: string, error: EndpointErrorType}>,
+  signup: (cleanWhenSuccessful?: boolean) => Promise<{id: string, role: string, error: EndpointErrorType}>,
   /**
    * Performs a logout action
    */
@@ -121,7 +121,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
    * @returns a promise with the user id, user role, or an error
    */
   public async login(cleanWhenSuccessful: boolean = true): Promise<{
-    id: number;
+    id: string;
     role: string;
     error: EndpointErrorType;
   }> {
@@ -196,7 +196,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
    * @returns a promise with the user id, user role, or an error
    */
   public async signup(cleanWhenSuccessful: boolean = true): Promise<{
-    id: number;
+    id: string;
     role: string;
     error: EndpointErrorType;
   }> {

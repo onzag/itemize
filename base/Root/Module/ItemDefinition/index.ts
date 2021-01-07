@@ -312,7 +312,7 @@ export interface IItemStateType {
   /**
    * The id that was used
    */
-  forId: number;
+  forId: string;
   /**
    * The version that was used
    */
@@ -1055,7 +1055,7 @@ export default class ItemDefinition {
    * @param name the name of the item
    * @returns a boolean
    */
-  public hasAtLeastOneActiveInstanceOf(id: number, version: string, name: string): boolean {
+  public hasAtLeastOneActiveInstanceOf(id: string, version: string, name: string): boolean {
     // we need a list of possible candidates
     // the might currently contain checks if an include
     // contains the include with the given name
@@ -1079,7 +1079,7 @@ export default class ItemDefinition {
    * @param includeId the id of the item
    * @returns a boolean on whether it does
    */
-  public hasAnActiveIncludeInstanceOfId(id: number, version: string, includeId: string): boolean {
+  public hasAnActiveIncludeInstanceOfId(id: string, version: string, includeId: string): boolean {
     const candidate = this.includeInstances
       .find((i) => i.getId() === includeId);
 
@@ -1189,7 +1189,7 @@ export default class ItemDefinition {
    * @retrns the item definition state without extenral checks
    */
   public getStateNoExternalChecking(
-    id: number,
+    id: string,
     version: string,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
@@ -1260,7 +1260,7 @@ export default class ItemDefinition {
    * @returns a promise for the item definition state
    */
   public async getState(
-    id: number,
+    id: string,
     version: string,
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
@@ -1312,7 +1312,7 @@ export default class ItemDefinition {
   }
 
   public applyState(
-    id: number,
+    id: string,
     version: string,
     state: IItemStateType,
   ) {
@@ -1346,7 +1346,7 @@ export default class ItemDefinition {
    * to false as it's been used applyValue on it, it's been set now by the computer
    */
   public applyValue(
-    id: number,
+    id: string,
     version: string,
     value: IGQLValue,
     excludeExtensions: boolean,
@@ -1415,7 +1415,7 @@ export default class ItemDefinition {
    * @param excludeExtensions whether to exclude extensions of all this
    */
   public restoreValueFor(
-    id: number,
+    id: string,
     version: string,
     excludeExtensions?: boolean,
   ) {
@@ -1441,9 +1441,9 @@ export default class ItemDefinition {
    * (or id if owner is object id, which is only relevant for users honestly)
    * @param id the id of the state
    * @param version the version of the slot
-   * @returns a number, will return UNSPECIFIED_OWNER if it cannot find anything
+   * @returns a string, will return UNSPECIFIED_OWNER if it cannot find anything
    */
-  public getAppliedValueOwnerIfAny(id: number, version: string): number {
+  public getAppliedValueOwnerIfAny(id: string, version: string): string {
     const mergedID = id + "." + (version || "");
     if (
       !this.stateHasAppliedValueTo[mergedID] ||
@@ -1454,9 +1454,9 @@ export default class ItemDefinition {
     }
 
     if (this.isOwnerObjectId()) {
-      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as number;
+      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as string;
     }
-    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as number;
+    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as string;
   }
 
   /**
@@ -1471,7 +1471,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param blockId the block identifier
    */
-  public addBlockCleanFor(id: number, version: string, blockId: string): void {
+  public addBlockCleanFor(id: string, version: string, blockId: string): void {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
@@ -1488,7 +1488,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param blockId the given blockage id
    */
-  public removeBlockCleanFor(id: number, version: string, blockId: string) {
+  public removeBlockCleanFor(id: string, version: string, blockId: string) {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
@@ -1510,7 +1510,7 @@ export default class ItemDefinition {
    * @returns a boolean where true refers to whether it was cleaned and false it was restored
    * because the cleaning was blocked from performing
    */
-  public cleanValueFor(id: number, version: string, excludeExtensions?: boolean, force?: boolean): boolean {
+  public cleanValueFor(id: string, version: string, excludeExtensions?: boolean, force?: boolean): boolean {
     const mergedID = id + "." + (version || "");
 
     if (!force && this.cleansBlocked[mergedID]) {
@@ -1548,7 +1548,7 @@ export default class ItemDefinition {
    * @param version the version
    * @returns a boolean on whether it does or not
    */
-  public hasAppliedValueTo(id: number, version: string): boolean {
+  public hasAppliedValueTo(id: string, version: string): boolean {
     const mergedID = id + "." + (version || "");
     return this.stateHasAppliedValueTo[mergedID];
   }
@@ -1558,7 +1558,7 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public getInternalState(id: number, version: string): any {
+  public getInternalState(id: string, version: string): any {
     const mergedID = id + "." + (version || "");
     return this.stateInternal[mergedID] || null;
   }
@@ -1569,7 +1569,7 @@ export default class ItemDefinition {
    * @param version 
    * @param value 
    */
-  public setInternalState(id: number, version: string, value: any) {
+  public setInternalState(id: string, version: string, value: any) {
     const mergedID = id + "." + (version || "");
     this.stateInternal[mergedID] = value;
   }
@@ -1579,7 +1579,7 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public cleanInternalState(id: number, version: string) {
+  public cleanInternalState(id: string, version: string) {
     const mergedID = id + "." + (version || "");
     delete this.stateInternal[mergedID];
   }
@@ -1590,7 +1590,7 @@ export default class ItemDefinition {
    * @param version the version
    * @returns the applied value structure
    */
-  public getGQLAppliedValue(id: number, version: string): IItemDefinitionGQLValueType {
+  public getGQLAppliedValue(id: string, version: string): IItemDefinitionGQLValueType {
     const mergedID = id + "." + (version || "");
     const appliedGQLValue = this.stateGQLAppliedValue[mergedID] || null;
     return appliedGQLValue;
@@ -1700,8 +1700,8 @@ export default class ItemDefinition {
   public buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
   ) {
     if (action === ItemDefinitionIOActions.DELETE) {
       return null;
@@ -1777,8 +1777,8 @@ export default class ItemDefinition {
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
@@ -1923,8 +1923,8 @@ export default class ItemDefinition {
    */
   public checkRoleCanVersion(
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     throwError: boolean,
   ) {
     if (!this.isVersioned()) {
@@ -2023,8 +2023,8 @@ export default class ItemDefinition {
    */
   public checkRoleAccessForParenting(
     role: string,
-    userId: number,
-    parentOwnerUserId: number,
+    userId: string,
+    parentOwnerUserId: string,
     throwError: boolean,
   ) {
     let hasParentingRoleAccess = false;
@@ -2217,7 +2217,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param listener the listener
    */
-  public addListener(event: string, id: number, version: string, listener: ListenerType) {
+  public addListener(event: string, id: string, version: string, listener: ListenerType) {
     const mergedID = id + "." + (version || "");
     if (!this.listeners[event]) {
       this.listeners[event] = {};
@@ -2233,7 +2233,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param listener the listener
    */
-  public removeListener(event: string, id: number, version: string, listener: ListenerType) {
+  public removeListener(event: string, id: string, version: string, listener: ListenerType) {
     const mergedID = id + "." + (version || "");
     if (!this.listeners[event] || !this.listeners[event][mergedID]) {
       return;
@@ -2255,7 +2255,7 @@ export default class ItemDefinition {
    * @param callId a call id, it's an unique identifier for this event, it will be autogenerated if not provided
    * and it's the best to leave it be autogenerated
    */
-  public triggerListeners(event: string, id: number, version: string, but?: ListenerType, callId?: string) {
+  public triggerListeners(event: string, id: string, version: string, but?: ListenerType, callId?: string) {
     if (this.lastListenerCallId !== callId) {
       this.lastListenerCallId = callId || uuid.v4();
       if (this.extensionsInstance) {

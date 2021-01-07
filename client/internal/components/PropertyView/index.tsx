@@ -78,7 +78,7 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
    * Automatically Provided check base.tsx
    * retrieved from the item-definition.tsx context
    */
-  forId: number;
+  forId: string;
   /**
    * The slot version in question, or null
    * 
@@ -272,17 +272,17 @@ const handlerRegistry:
   string: {
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
-  },
-  integer: {
-    renderer: "PropertyViewSimple",
-    handler: PropertyViewSimple,
     subhandler: {
       reference: {
         renderer: "PropertyViewSimple",
         handler: PropertyViewReference,
         includeTokenDataAndSSR: true,
       }
-    }
+    },
+  },
+  integer: {
+    renderer: "PropertyViewSimple",
+    handler: PropertyViewSimple,
   },
   number: {
     renderer: "PropertyViewSimple",

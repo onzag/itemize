@@ -48,7 +48,7 @@ export interface IOTriggerArgType {
    * The id of the item we are working with, it is null for
    * CREATE, but it is set for CREATED and others
    */
-  id: number;
+  id: string;
   /**
    * The version of the item we are working with, it is null for
    * CREATE, but it is set for CREATED and others
@@ -59,7 +59,7 @@ export interface IOTriggerArgType {
    */
   user: {
     role: string;
-    id: number;
+    id: string;
     customData: any;
   },
   /**
@@ -75,7 +75,7 @@ export interface ISearchTriggerArgType {
   args: IGQLArgs;
   user: {
     role: string;
-    id: number;
+    id: string;
     customData: any;
   };
   forbid: (message: string) => void;

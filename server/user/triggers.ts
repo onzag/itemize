@@ -24,7 +24,7 @@ export const customUserTriggers: ITriggerRegistry = {
           const oldSessionId = arg.value.sessionId;
 
           if (newSessionId && newSessionId !== oldSessionId) {
-            arg.appData.listener.sendKickEvent(arg.value.id as number);
+            arg.appData.listener.sendKickEvent(arg.value.id as string);
           }
 
           const newUsername = arg.update.username;

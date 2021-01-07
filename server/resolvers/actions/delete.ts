@@ -61,7 +61,7 @@ export async function deleteItemDefinition(
   // confirmation for deleting users, we also need to
   // gather the created_by and blocked_at to check the rights
   // of the user
-  let userId: number;
+  let userId: string;
   let containerId: string;
   const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
     {
@@ -170,7 +170,7 @@ export async function deleteItemDefinition(
         update: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -191,7 +191,7 @@ export async function deleteItemDefinition(
         update: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -222,7 +222,7 @@ export async function deleteItemDefinition(
       update: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
-      id: resolverArgs.args.id as number,
+      id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
@@ -244,7 +244,7 @@ export async function deleteItemDefinition(
       update: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
-      id: resolverArgs.args.id as number,
+      id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,

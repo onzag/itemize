@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { GraphQLString, GraphQLInt, GraphQLObjectType } from "graphql";
+import { GraphQLString, GraphQLObjectType } from "graphql";
 
 /**
  * This is the token object that specifies the shape that token information
@@ -25,7 +25,7 @@ const TOKEN_OBJECT = new GraphQLObjectType({
       type: GraphQLString,
     },
     id: {
-      type: GraphQLInt,
+      type: GraphQLString,
     },
     role: {
       type: GraphQLString,

@@ -178,7 +178,7 @@ export async function getItemDefinition(
         update: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.READ,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -198,7 +198,7 @@ export async function getItemDefinition(
         update: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.READ,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -343,7 +343,7 @@ export async function getItemDefinitionList(
             update: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
-            id: value.id as number,
+            id: value.id as string,
             version: value.version as string || null,
             user: {
               role: tokenData.role,
@@ -363,7 +363,7 @@ export async function getItemDefinitionList(
             update: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
-            id: value.id as number,
+            id: value.id as string,
             version: value.version as string || null,
             user: {
               role: tokenData.role,
@@ -486,7 +486,7 @@ export async function getModuleList(
             update: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
-            id: value.id as number,
+            id: value.id as string,
             version: value.version as string || null,
             user: {
               role: tokenData.role,
@@ -506,7 +506,7 @@ export async function getModuleList(
             update: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
-            id: value.id as number,
+            id: value.id as string,
             version: value.version as string || null,
             user: {
               role: tokenData.role,

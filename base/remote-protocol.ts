@@ -75,7 +75,7 @@ export interface IChangedFeedbackEvent {
   /**
    * The slot id of that item definition
    */
-  id: number;
+  id: string;
   /**
    * The version of that item definition
    */
@@ -132,7 +132,7 @@ export const OWNED_SEARCH_RECORDS_EVENT = "owned-search-records";
  * check [[IOwnedSearchRegisterRequest]]
  */
 export interface IOwnedSearchRecordsEvent extends IBaseSearchRecordsEvent {
-  createdBy: number;
+  createdBy: string;
 }
 
 /**
@@ -146,7 +146,7 @@ export const PARENTED_SEARCH_RECORDS_EVENT = "parented-search-records";
  */
 export interface IParentedSearchRecordsEvent extends IBaseSearchRecordsEvent {
   parentType: string;
-  parentId: number;
+  parentId: string;
   parentVersion: string;
 }
 
@@ -194,7 +194,7 @@ export const REGISTER_REQUEST = "register";
  */
 export interface IRegisterRequest {
   itemDefinition: string;
-  id: number;
+  id: string;
   version: string;
 }
 
@@ -205,7 +205,7 @@ export const RegisterRequestSchema = {
       type: "string",
     },
     id: {
-      type: "number",
+      type: "string",
     },
     version: {
       type: ["string", "null"],
@@ -228,7 +228,7 @@ export const UNREGISTER_REQUEST = "unregister";
  */
 export interface IUnregisterRequest {
   itemDefinition: string;
-  id: number;
+  id: string;
   version: string;
 }
 
@@ -239,7 +239,7 @@ export const UnregisterRequestSchema = {
       type: "string",
     },
     id: {
-      type: "number",
+      type: "string",
     },
     version: {
       type: ["string", "null"],
@@ -263,7 +263,7 @@ export const FEEDBACK_REQUEST = "feedback";
  */
 export interface IFeedbackRequest {
   itemDefinition: string;
-  id: number;
+  id: string;
   version: string;
 }
 
@@ -274,7 +274,7 @@ export const FeedbackRequestSchema = {
       type: "string",
     },
     id: {
-      type: "number",
+      type: "string",
     },
     version: {
       type: ["string", "null"],
@@ -308,7 +308,7 @@ export const OWNED_SEARCH_REGISTER_REQUEST = "owned-search-register";
  * check [[IOwnedSearchRecordsAddedEvent]]
  */
 export interface IOwnedSearchRegisterRequest extends IBaseSearchRegisterRequest {
-  createdBy: number;
+  createdBy: string;
 }
 
 export const OwnedSearchRegisterRequestSchema = {
@@ -318,7 +318,7 @@ export const OwnedSearchRegisterRequestSchema = {
       type: "string",
     },
     createdBy: {
-      type: "number",
+      type: "string",
     },
   },
   required: [
@@ -338,7 +338,7 @@ export const PARENTED_SEARCH_REGISTER_REQUEST = "parented-search-register";
  */
 export interface IParentedSearchRegisterRequest extends IBaseSearchRegisterRequest {
   parentType: string;
-  parentId: number;
+  parentId: string;
   parentVersion: string;
 }
 export const ParentedSearchRegisterRequestSchema = {
@@ -351,7 +351,7 @@ export const ParentedSearchRegisterRequestSchema = {
       type: "string",
     },
     parentId: {
-      type: "number",
+      type: "string",
     },
     parentVersion: {
       type: ["string", "null"],
@@ -382,7 +382,7 @@ export const OWNED_SEARCH_UNREGISTER_REQUEST = "owned-search-unregister";
  * The unregister version of [[IOwnedSearchRegisterRequest]]
  */
 export interface IOwnedSearchUnregisterRequest extends IBaseSearchUnregisterRequest {
-  createdBy: number;
+  createdBy: string;
 }
 export const OwnedSearchUnregisterRequestSchema = {
   type: "object",
@@ -391,7 +391,7 @@ export const OwnedSearchUnregisterRequestSchema = {
       type: "string",
     },
     createdBy: {
-      type: "number",
+      type: "string",
     },
   },
   required: [
@@ -409,7 +409,7 @@ export const PARENTED_SEARCH_UNREGISTER_REQUEST = "parented-search-unregister";
  */
 export interface IParentedSearchUnregisterRequest extends IBaseSearchUnregisterRequest {
   parentType: string;
-  parentId: number;
+  parentId: string;
   parentVersion: string;
 }
 export const ParentedSearchUnregisterRequestSchema = {
@@ -422,7 +422,7 @@ export const ParentedSearchUnregisterRequestSchema = {
       type: "string",
     },
     parentId: {
-      type: "number",
+      type: "string",
     },
     parentVersion: {
       type: ["string", "null"],
@@ -463,7 +463,7 @@ export const OWNED_SEARCH_FEEDBACK_REQUEST = "owned-search-feedback";
  * The feedback version of [[IParentedSearchRegisterRequest]]
  */
 export interface IOwnedSearchFeedbackRequest extends IBaseSearchFeedbackRequest {
-  createdBy: number;
+  createdBy: string;
 }
 
 export const OwnedSearchFeedbackRequestSchema = {
@@ -476,7 +476,7 @@ export const OwnedSearchFeedbackRequestSchema = {
       type: ["string", "null"],
     },
     createdBy: {
-      type: "number",
+      type: "string",
     },
   },
   required: [
@@ -495,7 +495,7 @@ export const PARENTED_SEARCH_FEEDBACK_REQUEST = "parented-search-feedback";
  */
 export interface IParentedSearchFeedbackRequest extends IBaseSearchFeedbackRequest {
   parentType: string;
-  parentId: number;
+  parentId: string;
   parentVersion: string;
 }
 export const ParentedSearchFeedbackRequestSchema = {
@@ -511,7 +511,7 @@ export const ParentedSearchFeedbackRequestSchema = {
       type: "string",
     },
     parentId: {
-      type: "number",
+      type: "string",
     },
     parentVersion: {
       type: ["string", "null"],

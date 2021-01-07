@@ -9,7 +9,7 @@ import PropertyDefinition, { PropertyDefinitionValueType, IPropertyDefinitionExa
 import { getConversionIds } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 
 export interface IPropertyEntryReferenceOption {
-  id: number;
+  id: string;
   text: string;
 };
 
@@ -17,7 +17,7 @@ export interface IReferrencedPropertySet {
   [propertyId: string]: PropertyDefinitionValueType;
 }
 
-export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<number> {
+export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRendererProps<string> {
   isNullable: boolean;
   i18nUnspecified: string;
 
@@ -27,9 +27,9 @@ export interface IPropertyEntryReferenceRendererProps extends IPropertyEntryRend
   currentFindError: EndpointErrorType;
   currentSearchError: EndpointErrorType;
 
-  onChangeSearch: (str: string, preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
-  loadAllPossibleValues: (limit: number, preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
-  refilterPossibleValues: (preventIds?: number[], preventEqualityWithProperties?: string[]) => void;
+  onChangeSearch: (str: string, preventIds?: string[], preventEqualityWithProperties?: string[]) => void;
+  loadAllPossibleValues: (limit: number, preventIds?: string[], preventEqualityWithProperties?: string[]) => void;
+  refilterPossibleValues: (preventIds?: string[], preventEqualityWithProperties?: string[]) => void;
   onSelect: (option: IPropertyEntryReferenceOption) => void;
   onCancel: () => void;
   dismissSearchError: () => void;
@@ -47,27 +47,27 @@ interface IPropertyEntryReferenceState {
 }
 
 export default class PropertyEntryReference
-  extends React.Component<IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>, IPropertyEntryReferenceState> {
+  extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>, IPropertyEntryReferenceState> {
 
   private searchTimeout: NodeJS.Timeout;
-  private currentlyFindingValueFor: [number, string];
+  private currentlyFindingValueFor: [string, string];
   private lastSearchId: number;
 
   private lastSearchArgumentLoadAll: boolean;
   private lastSearchArgumentLimit: number;
-  private lastSearchArgumentPreventIds: number[];
+  private lastSearchArgumentPreventIds: string[];
   private lastSearchArgumentPreventEqualityWithProperties: string[];
 
   private lastCachedSearch: IPropertyEntryReferenceOption[];
   private lastCachedSearchPreventedProperties: PropertyDefinition[];
   private lastCachedSearchPreventedPropertiesIds: string[];
-  private lastCachedSearchPreventedIds: number[];
+  private lastCachedSearchPreventedIds: string[];
 
   private ssrServerOnlyValue: string;
 
   private isUnmounted = false;
 
-  constructor(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>) {
+  constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>) {
     super(props);
 
     this.state = {
@@ -91,7 +91,7 @@ export default class PropertyEntryReference
     this.changeListener = this.changeListener.bind(this);
   }
 
-  public changeListener(id: number, version: string) {
+  public changeListener(id: string, version: string) {
     // we check that the change occured in our own version
     if (
       this.lastSearchId &&
@@ -117,7 +117,7 @@ export default class PropertyEntryReference
     ) {
       const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
       this.findCurrentStrValue(
-        this.props.state.value as number,
+        this.props.state.value as string,
         filterByLanguage ? this.props.language : null,
       );
     }
@@ -131,7 +131,7 @@ export default class PropertyEntryReference
     }
   }
 
-  public toggleListener(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props, fn: string) {
+  public toggleListener(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps> = this.props, fn: string) {
     const propertySet = props.property.getSpecialProperty("referencedFilteringPropertySet") as IReferrencedPropertySet || {};
     // first we need the standard form not of our target item definition
     // but rather the one we are currently working within, hence the difference
@@ -174,15 +174,15 @@ export default class PropertyEntryReference
     });
   }
 
-  public addListeners(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props) {
+  public addListeners(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps> = this.props) {
     this.toggleListener(props, "addChangeListener");
   }
 
-  public removeListeners(props: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps> = this.props) {
+  public removeListeners(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps> = this.props) {
     this.toggleListener(props, "removeChangeListener");
   }
 
-  public async search(loadAll?: boolean, limit?: number, preventIds?: number[], preventEqualityWithProperties?: string[]) {
+  public async search(loadAll?: boolean, limit?: number, preventIds?: string[], preventEqualityWithProperties?: string[]) {
     const searchId = (new Date()).getTime();
     this.lastSearchId = searchId;
     this.lastSearchArgumentLoadAll = loadAll;
@@ -304,12 +304,12 @@ export default class PropertyEntryReference
 
     // the reason we use the last rather than from the argument is that
     // we might have gotten a refilter we were doing the search
-    const actualPreventIds: number[] = (this.lastSearchArgumentPreventIds || []).filter((id) => id !== null);
+    const actualPreventIds: string[] = (this.lastSearchArgumentPreventIds || []).filter((id) => id !== null);
     if (this.lastSearchArgumentPreventEqualityWithProperties) {
       this.lastSearchArgumentPreventEqualityWithProperties.forEach((p) => {
         const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
         const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
-        if (typeof value === "number") {
+        if (typeof value === "string") {
           actualPreventIds.push(value);
         } else if (value !== null) {
           console.warn(
@@ -326,7 +326,7 @@ export default class PropertyEntryReference
     const options: IPropertyEntryReferenceOption[] = result.results.map((r) => (
       {
         text: (r && r.DATA && r.DATA[dProp.getId()]).toString(),
-        id: (r && r.id) as number,
+        id: (r && r.id) as string,
       }
     )).sort((a: IPropertyEntryReferenceOption, b: IPropertyEntryReferenceOption) => {
       if (a.text < b.text) { return -1; }
@@ -348,7 +348,7 @@ export default class PropertyEntryReference
 
     // this can happen if the search is cancelled before the user has finished typing
     // resulting in an unset value that might be in the searchbox at the end
-    if (this.props.state.value === null || isNaN(this.props.state.value as number)) {
+    if (this.props.state.value === null || this.props.state.value === "") {
       const foundInList = options.find((o) => o.text === (this.props.state.internalValue || ""));
       if (foundInList) {
         this.props.onChange(foundInList.id, (this.props.state.internalValue || ""));
@@ -401,7 +401,7 @@ export default class PropertyEntryReference
   }
 
   public async beforeSSRRender(): Promise<void> {
-    const id = this.props.state.value as number;
+    const id = this.props.state.value as string;
     if (
       !id
     ) {
@@ -423,7 +423,7 @@ export default class PropertyEntryReference
     }
   }
 
-  public getSSRFoundValue(forId: number, forVersion: string): string {
+  public getSSRFoundValue(forId: string, forVersion: string): string {
     if (!forId || !this.props.ssr) {
       return null;
     }
@@ -449,7 +449,7 @@ export default class PropertyEntryReference
     return pMatch.toString();
   }
 
-  public async findCurrentStrValue(forId: number, forVersion: string) {
+  public async findCurrentStrValue(forId: string, forVersion: string) {
     if (
       this.currentlyFindingValueFor &&
       this.currentlyFindingValueFor[0] === forId &&
@@ -526,18 +526,18 @@ export default class PropertyEntryReference
     );
   }
 
-  public loadAllPossibleValues(limit: number, preventIds?: number[], preventEqualityWithProperties?: string[]) {
+  public loadAllPossibleValues(limit: number, preventIds?: string[], preventEqualityWithProperties?: string[]) {
     this.search(true, limit, preventIds, preventEqualityWithProperties);
   }
 
-  public refilter(id: number, version: string) {
+  public refilter(id: string, version: string) {
     // we check that the change occured in our own version
     if ((id || null) === (this.props.forId || null) && (version || null) === (this.props.forVersion || null)) {
       this.refilterPossibleValues(this.lastCachedSearchPreventedIds, this.lastCachedSearchPreventedPropertiesIds)
     }
   }
 
-  public refilterPossibleValues(preventIds?: number[], preventEqualityWithProperties?: string[]) {
+  public refilterPossibleValues(preventIds?: string[], preventEqualityWithProperties?: string[]) {
     this.lastSearchArgumentPreventIds = preventIds;
     this.lastSearchArgumentPreventEqualityWithProperties = preventEqualityWithProperties;
 
@@ -554,12 +554,12 @@ export default class PropertyEntryReference
       stdSelfIdef = this.props.itemDefinition.getStandardCounterpart();
     }
 
-    const actualPreventIds: number[] = (preventIds || []).filter((id) => id !== null);
+    const actualPreventIds: string[] = (preventIds || []).filter((id) => id !== null);
     if (preventEqualityWithProperties) {
       preventEqualityWithProperties.forEach((p) => {
         const prop = stdSelfIdef.getPropertyDefinitionFor(p, true);
         const value = prop.getCurrentValue(this.props.forId, this.props.forVersion || null);
-        if (typeof value === "number") {
+        if (typeof value === "string") {
           actualPreventIds.push(value);
         } else if (value !== null) {
           console.warn(
@@ -594,8 +594,8 @@ export default class PropertyEntryReference
     }
   }
 
-  public onChangeSearch(str: string, preventIds?: number[], preventEqualityWithProperties?: string[]) {
-    let value: number = str.trim().length ? NaN : null;
+  public onChangeSearch(str: string, preventIds?: string[], preventEqualityWithProperties?: string[]) {
+    let value: string = str.trim().length ? "" : null;
     let foundInList = this.state.currentOptions.find((o) => o.text === str);
     if (!foundInList && this.lastCachedSearch) {
       foundInList = this.lastCachedSearch.find((o) => o.text === str);
@@ -646,7 +646,7 @@ export default class PropertyEntryReference
   }
 
   public componentDidUpdate(
-    prevProps: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>,
+    prevProps: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>,
   ) {
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
     if (
@@ -655,7 +655,7 @@ export default class PropertyEntryReference
       !this.props.state.enforced
     ) {
       this.findCurrentStrValue(
-        this.props.state.value as number,
+        this.props.state.value as string,
         filterByLanguage ? this.props.language : null,
       );
     } else if (
@@ -664,7 +664,7 @@ export default class PropertyEntryReference
       prevProps.language !== this.props.language
     ) {
       this.findCurrentStrValue(
-        this.props.state.value as number,
+        this.props.state.value as string,
         this.props.language,
       );
     }
@@ -680,7 +680,7 @@ export default class PropertyEntryReference
   }
 
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryHandlerProps<number, IPropertyEntryReferenceRendererProps>,
+    nextProps: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>,
     nextState: IPropertyEntryReferenceState
   ) {
     // This is optimized to only update for the thing it uses
@@ -743,7 +743,7 @@ export default class PropertyEntryReference
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
       currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(
-        this.props.state.value as number,
+        this.props.state.value as string,
         filterByLanguage ? this.props.language : null,
       ) || this.ssrServerOnlyValue || "",
       currentValueIsFullfilled: !!this.props.state.value,

@@ -111,7 +111,7 @@ export async function addItemDefinition(
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
-    itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as number, true);
+    itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as string, true);
   } else if (resolverArgs.args.version) {
     throw new EndpointError({
       message: "Specifying version without a for_id is not allowed",
@@ -407,7 +407,7 @@ export async function addItemDefinition(
     dictionary,
     containerId,
     isNowParenting ? {
-      id: gqlValueToConvert.parent_id as number,
+      id: gqlValueToConvert.parent_id as string,
       version: gqlValueToConvert.parent_version as string,
       type: gqlValueToConvert.parent_type as string,
     } : null,

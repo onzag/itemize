@@ -35,7 +35,7 @@ export interface IServerSideTokenDataType {
   role: string;
 
   // id and session id, present or not
-  id: number;
+  id: string;
   sessionId?: number;
 
   // custom token data that might exist
@@ -124,11 +124,11 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
  */
 export async function validateParentingRules(
   appData: IAppDataType,
-  parentId: number,
+  parentId: string,
   parentVersion: string,
   parentType: string,
   itemDefinition: ItemDefinition,
-  userId: number,
+  userId: string,
   role: string,
 ) {
   const isParenting = !!(parentId || parentVersion || parentType);
@@ -623,7 +623,7 @@ export async function validateTokenIsntBlocked(
   );
 }
 
-export async function checkUserExists(cache: Cache, id: number) {
+export async function checkUserExists(cache: Cache, id: string) {
   let sqlResult: ISQLTableRowValue;
   try {
     sqlResult = await cache.requestValue(
@@ -756,7 +756,7 @@ export function filterAndPrepareGQLValue(
 export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
   gqlArgValue: IGQLValue,
-  id: number,
+  id: string,
   version: string,
   referredInclude?: Include,
   referredParentOfInclude?: ItemDefinition,
@@ -984,7 +984,7 @@ export async function runPolicyCheck(
   arg: {
     policyTypes: string[],
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     role: string,
     gqlArgValue: IGQLValue,
@@ -994,7 +994,7 @@ export async function runPolicyCheck(
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
     parentModule?: string,
     parentType?: string,
-    parentId?: number,
+    parentId?: string,
     parentVersion?: string,
     preParentValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
   },

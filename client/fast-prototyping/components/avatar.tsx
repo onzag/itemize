@@ -189,7 +189,7 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
    * The id of the user currently logged, it is used
    * for 
    */
-  id: number;
+  id: string;
   /**
    * The username of this user
    */
@@ -274,7 +274,7 @@ class SimpleAvatar extends React.PureComponent<SimpleAvatarProps> {
 class ActualAvatar extends React.PureComponent<IAvatarProps> {
   public render() {
     // so we assign a random color based on the user id
-    const numberColorClassName = this.props.id ? this.props.classes["randomColor" + (this.props.id % 10)] : "";
+    const numberColorClassName = this.props.id ? this.props.classes["randomColor" + (this.props.id.charCodeAt(0) % 10)] : "";
 
     // now the flag logic
     const flag = this.props.countryCode && countries[this.props.countryCode] ? (
@@ -374,8 +374,8 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
           <Reader id="role">{
             (role: string) => (
               <Reader id="id">
-                {(id: number) => {
-                  const numberColorClassName = id ? props.classes["randomColor" + (id % 10)] : "";
+                {(id: string) => {
+                  const numberColorClassName = id ? props.classes["randomColor" + (id.charCodeAt(0) % 10)] : "";
                   const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
                   const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
 

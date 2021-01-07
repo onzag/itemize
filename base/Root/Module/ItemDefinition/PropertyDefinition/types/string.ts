@@ -55,7 +55,16 @@ const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%",
  */
 export type PropertyDefinitionSupportedStringType = string;
 
-export const exactStringSearchSubtypes = ["comprehensive-locale", "language", "country", "currency", "role", "exact-identifier", "exact-value"];
+export const exactStringSearchSubtypes = [
+  "comprehensive-locale",
+  "language",
+  "country",
+  "currency",
+  "role",
+  "exact-identifier",
+  "exact-value",
+  "reference",
+];
 
 /**
  * The behaviour of strings is described by this type
@@ -139,7 +148,19 @@ const typeValue: IPropertyDefinitionSupportedType = {
   localEqual: standardLocalEqual,
 
   nullableDefault: "",
-  supportedSubtypes: ["email", "identifier", "exact-identifier", "locale", "comprehensive-locale", "language", "country", "currency", "role", "exact-value"],
+  supportedSubtypes: [
+    "email",
+    "identifier",
+    "exact-identifier",
+    "locale",
+    "comprehensive-locale",
+    "language",
+    "country",
+    "currency",
+    "role",
+    "exact-value",
+    "reference",
+  ],
 
   validate: (s: PropertyDefinitionSupportedStringType, p: IPropertyDefinitionRawJSONDataType) => {
     if (typeof s !== "string") {
@@ -149,6 +170,10 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
 
     const subtype = p.subtype;
+
+    if (subtype === "reference" && s === "") {
+      return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+    }
 
     if (subtype === "email" && !EMAIL_REGEX.test(s)) {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
@@ -198,6 +223,42 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.TEXT,
   allowsMinMaxLengthDefined: true,
+
+  specialProperties: [
+    {
+      name: "referencedModule",
+      type: "string",
+      required: ["reference"],
+    },
+    {
+      name: "referencedItemDefinition",
+      type: "string",
+      required: ["reference"],
+    },
+    {
+      name: "referencedSearchProperty",
+      type: "string",
+      required: ["reference"],
+    },
+    {
+      name: "referencedDisplayProperty",
+      type: "string",
+      required: ["reference"],
+    },
+    {
+      name: "referencedFilteringPropertySet",
+      type: "property-set",
+    },
+    {
+      name: "referencedFilterByLanguage",
+      type: "boolean",
+    },
+    {
+      name: "referencedFilterByCreatedBySelf",
+      type: "boolean",
+    },
+  ],
+
   // i18n attributes required
   i18n: {
     base: CLASSIC_BASE_I18N,

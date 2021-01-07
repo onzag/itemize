@@ -87,7 +87,7 @@ export async function editItemDefinition(
   // entire item definition value that is in the database
   // there's an easy way to request that, and now, we do it
   // at the same time we run the policy check
-  let userId: number;
+  let userId: string;
   let containerId: string;
 
   // so we run the policy check for edit, this item definition,
@@ -269,7 +269,7 @@ export async function editItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: IOTriggerActions.EDIT,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -295,7 +295,7 @@ export async function editItemDefinition(
         update: gqlValueToConvert,
         extraArgs,
         action: IOTriggerActions.EDIT,
-        id: resolverArgs.args.id as number,
+        id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
@@ -334,7 +334,7 @@ export async function editItemDefinition(
       update: gqlValueToConvert,
       extraArgs,
       action: IOTriggerActions.EDITED,
-      id: resolverArgs.args.id as number,
+      id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
@@ -355,7 +355,7 @@ export async function editItemDefinition(
       update: gqlValueToConvert,
       extraArgs,
       action: IOTriggerActions.EDITED,
-      id: resolverArgs.args.id as number,
+      id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,

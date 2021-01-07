@@ -23,7 +23,7 @@ export interface IReferredTokenStructure {
   /**
    * Specifies an user id that the token should be built for
    */
-  onBehalfOf?: number;
+  onBehalfOf?: string;
   /**
    * Specifies the role that the token should have, if you don't specify
    * a role and don't have anyone on whom it's made in behalf of, then it'll

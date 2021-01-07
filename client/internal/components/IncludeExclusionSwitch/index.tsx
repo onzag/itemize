@@ -10,7 +10,7 @@
 //   include: Include;
 //   state: IIncludeState;
 //   onChange: (newExclusionState: IncludeExclusionState) => void;
-//   forId: number;
+//   forId: string;
 //   forVersion: string;
 //   theme?: Partial<IIncludeExclusionSwitchThemeType>;
 // }

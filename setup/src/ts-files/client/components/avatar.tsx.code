@@ -6,7 +6,7 @@ import { IPropertyDefinitionState } from "@onzag/itemize/base/Root/Module/ItemDe
 
 import { Avatar as FastPrototypingAvatar } from "@onzag/itemize/client/fast-prototyping/components/avatar";
 
-type profileURLFn = (id: number) => string;
+type profileURLFn = (id: string) => string;
 
 interface IAvatarProps {
 	size?: "small" | "medium" | "large";
@@ -45,7 +45,7 @@ export function Avatar(props: IAvatarProps)<0>{
 	// so this is the standard logic
 	return (
 		<Reader id="id">
-			{(id: number) => (
+			{(id: string) => (
 				<Reader id="profile_picture">
 					{(profilePictureValue: PropertyDefinitionSupportedFileType) => (
 						<Reader id="role">

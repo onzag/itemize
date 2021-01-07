@@ -56,7 +56,7 @@ export default function restServices(appData: IAppDataType) {
     // so we get the value that has been parsed from the body
     const value: any = req.body.value;
     // we get the id
-    const id: number = req.body.id;
+    const id: string = req.body.id;
     // we get the version
     const version: string = req.body.version;
 
@@ -64,7 +64,7 @@ export default function restServices(appData: IAppDataType) {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     // check that they are valid
-    if (typeof id !== "number" && id !== null) {
+    if (typeof id !== "string" && id !== null) {
       res.status(400);
       res.end(JSON.stringify({
         message: "Invalid input on id",
