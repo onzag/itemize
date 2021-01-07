@@ -184,7 +184,7 @@ export class Cache {
    * @param version the version or null
    * @param value the value to store
    */
-  private forceCacheInto(idefTable: string, id: number, version: string, value: ISQLTableRowValue) {
+  private forceCacheInto(idefTable: string, id: string, version: string, value: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     CAN_LOG_DEBUG && logger.debug(
       "Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier,
@@ -203,10 +203,10 @@ export class Cache {
 
   public triggerSearchListenersFor(
     itemDefinition: ItemDefinition,
-    createdBy: number,
+    createdBy: string,
     parent: {
       type: string,
-      id: number,
+      id: string,
       version: string,
     },
     record: IGQLSearchRecord,
@@ -302,14 +302,14 @@ export class Cache {
    */
   public async requestCreation(
     itemDefinition: ItemDefinition,
-    forId: number,
+    forId: string,
     version: string,
     value: IGQLArgs,
-    createdBy: number,
+    createdBy: string,
     dictionary: string,
     containerId: string,
     parent: {
-      id: number,
+      id: string,
       version: string,
       type: string,
     },
@@ -359,12 +359,7 @@ export class Cache {
     sqlModData.version = version || "";
     sqlModData.container_id = containerId;
 
-    if (forId && version === null) {
-      throw new EndpointError({
-        message: "You can't specify your own id for values without version",
-        code: ENDPOINT_ERRORS.FORBIDDEN,
-      });
-    } else if (!forId && version) {
+    if (!forId && version) {
       throw new EndpointError({
         message: "You can't specify a version without a standard for_id value",
         code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -388,19 +383,21 @@ export class Cache {
         });
       }
 
-      // otherwise let's find the unversioned value
-      const unversionedValue = await this.requestValue(
-        itemDefinition,
-        forId,
-        null,
-      );
+      if (version) {
+        // otherwise let's find the unversioned value if a version was specified
+        const unversionedValue = await this.requestValue(
+          itemDefinition,
+          forId,
+          null,
+        );
 
-      // if no such value of any version exists
-      if (!unversionedValue) {
-        throw new EndpointError({
-          message: "Theres no unversioned value for this version creation",
-          code: ENDPOINT_ERRORS.FORBIDDEN,
-        });
+        // if no such value of any version exists
+        if (!unversionedValue) {
+          throw new EndpointError({
+            message: "Theres no unversioned value for this version creation",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
       }
     }
 
@@ -567,7 +564,7 @@ export class Cache {
    */
   public async requestUpdateSimple(
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     update: IGQLArgs,
     dictionary: string,
@@ -621,11 +618,11 @@ export class Cache {
    */
   public async requestUpdate(
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     update: IGQLArgs,
     currentValue: IGQLValue,
-    editedBy: number,
+    editedBy: string,
     dictionary: string,
     containerId: string,
     listenerUUID: string,
@@ -925,7 +922,7 @@ export class Cache {
  */
   private async deletePossibleChildrenOf(
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
   ) {
     // first we need to find if there is even such a rule and in which modules so we can
@@ -1013,7 +1010,7 @@ export class Cache {
    */
   public async requestDelete(
     itemDefinition: ItemDefinition,
-    id: number,
+    id: string,
     version: string,
     dropAllVersions: boolean,
     containerId: string,
@@ -1113,7 +1110,7 @@ export class Cache {
 
     // performs the proper deletetition of whatever is in there
     // it takes the record that represents what we are deleting, the parent (or null) and the creator
-    const performProperDeleteOf = async (record: IGQLSearchRecord, parent: { id: number; version: string; type: string }, createdBy: number) => {
+    const performProperDeleteOf = async (record: IGQLSearchRecord, parent: { id: string; version: string; type: string }, createdBy: string) => {
       // got to cascade and delete all the children, this method should be able to execute after
       this.deletePossibleChildrenOf(itemDefinition, id, record.version);
       // got to trigger the search listeners saying we have just lost an item
@@ -1289,7 +1286,7 @@ export class Cache {
    * @param id the user id
    */
   public async requestToken(
-    id: number,
+    id: string,
   ) {
     const user = await this.requestValue("MOD_users__IDEF_user", id, null);
     if (!user) {
@@ -1324,7 +1321,7 @@ export class Cache {
    */
   public async requestValue(
     itemDefinitionOrQualifiedName: ItemDefinition | string,
-    id: number,
+    id: string,
     version: string,
     options?: {
       refresh?: boolean,
@@ -1447,7 +1444,7 @@ export class Cache {
    * @param data the entire SQL result
    * @returns a void promise when done
    */
-  public async onChangeInformed(itemDefinition: string, id: number, version: string, data?: ISQLTableRowValue) {
+  public async onChangeInformed(itemDefinition: string, id: string, version: string, data?: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + itemDefinition + "." + id.toString() + "." + (version || "");
     try {
       const value = await this.redisClient.exists(idefQueryIdentifier);
@@ -1507,7 +1504,7 @@ export class Cache {
     }
   }
 
-  public async onChangeInformedNoData(itemDefinition: string, id: number, version: string) {
+  public async onChangeInformedNoData(itemDefinition: string, id: string, version: string) {
     await this.onChangeInformed(itemDefinition, id, version, undefined);
   }
 }

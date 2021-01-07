@@ -162,7 +162,7 @@ export class Collector {
    * @param id the id we want
    * @param version the version we want
    */
-  public async collect(idef: ItemDefinition, id: number, version: string): Promise<void> {
+  public async collect(idef: ItemDefinition, id: string, version: string): Promise<void> {
     // now we build the merged id
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 

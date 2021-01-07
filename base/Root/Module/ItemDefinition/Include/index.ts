@@ -350,8 +350,8 @@ export default class Include {
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
@@ -373,8 +373,8 @@ export default class Include {
   public buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
   ) {
     // for delete we cant request anything
     if (action === ItemDefinitionIOActions.DELETE) {
@@ -413,7 +413,7 @@ export default class Include {
    * @param version the version for the given exclusion state slot id
    * @returns a boolean whether it's excluded or not
    */
-  public getExclusionState(id: number, version: string): IncludeExclusionState {
+  public getExclusionState(id: string, version: string): IncludeExclusionState {
     // let's check if it's excluded by force
     const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate(id, version);
 
@@ -464,7 +464,7 @@ export default class Include {
    * @param version the version for the given exclusion state slot id
    * @returns a boolean that tells whether if it can be toggled
    */
-  public canExclusionBeSet(id: number, version: string): boolean {
+  public canExclusionBeSet(id: string, version: string): boolean {
     // if it's excluded by force the default is false, you cannot toggle
     // anything excluded by force
     const isExcludedByForce = this.excludedIf && this.excludedIf.evaluate(id, version);
@@ -503,7 +503,7 @@ export default class Include {
    * @param version the version for the given exclusion state slot id
    * @param value the value for the exclusion state
    */
-  public setExclusionState(id: number, version: string, value: IncludeExclusionState) {
+  public setExclusionState(id: string, version: string, value: IncludeExclusionState) {
     const mergedID = id + "." + (version || null);
     this.stateExclusion[mergedID] = value;
     this.stateExclusionModified[mergedID] = true;
@@ -561,7 +561,7 @@ export default class Include {
    * @returns the applied value
    */
   public getAppliedExclusionState(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -577,7 +577,7 @@ export default class Include {
    * previous cached results
    * @returns the state of the include
    */
-  public getStateNoExternalChecking(id: number, version: string, emulateExternalChecking?: boolean): IIncludeState {
+  public getStateNoExternalChecking(id: string, version: string, emulateExternalChecking?: boolean): IIncludeState {
     const exclusionState = this.getExclusionState(id, version);
     const mergedID = id + "." + (version || "");
     return {
@@ -601,7 +601,7 @@ export default class Include {
    * @param version the version
    * @returns a promise for the state of the include
    */
-  public async getState(id: number, version: string): Promise<IIncludeState> {
+  public async getState(id: string, version: string): Promise<IIncludeState> {
     const exclusionState = this.getExclusionState(id, version);
     const mergedID = id + "." + (version || "");
     return {
@@ -631,7 +631,7 @@ export default class Include {
    * to false as it's been used applyValue on it, it's been set now by the computer
    */
   public applyValue(
-    id: number,
+    id: string,
     version: string,
     value: IGQLValue,
     exclusionState: IncludeExclusionState,
@@ -680,7 +680,7 @@ export default class Include {
    * @param version the slot version
    */
   public cleanValueFor(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -698,7 +698,7 @@ export default class Include {
    * @param version the slot version
    */
   public restoreValueFor(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");

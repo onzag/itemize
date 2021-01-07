@@ -108,6 +108,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   readRoleAccess?: string[];
   parentingRoleAccess?: string[];
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  customIdRoleAccess?: string[];
   canCreateInBehalf?: boolean;
   canCreateInBehalfRoleAccess?: string[];
   canCreateInBehalfTargetRoles?: string[];
@@ -692,6 +693,10 @@ async function buildItemDefinition(
     if (actualEvaledFileData.canCreateInBehalfTargetRoles) {
       finalValue.createInBehalfTargetRoles = actualEvaledFileData.canCreateInBehalfTargetRoles;
     }
+  }
+
+  if (actualEvaledFileData.customIdRoleAccess) {
+    finalValue.customIdRoleAccess = actualEvaledFileData.customIdRoleAccess;
   }
 
   if (actualEvaledFileData.ownerIsObjectId) {

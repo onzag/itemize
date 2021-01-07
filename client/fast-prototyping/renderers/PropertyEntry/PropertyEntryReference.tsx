@@ -282,7 +282,7 @@ class ActualPropertyEntryReferenceRenderer
    * for that renderer
    */
   public onChangeBySelect(
-    value: number,
+    value: string,
   ) {
     if (value === null) {
       this.props.onChange(null, null);
@@ -604,7 +604,7 @@ class ActualPropertyEntryReferenceRenderer
         onRestore={this.props.onRestore}
         nullValue={nullValue}
         isNullable={this.props.isNullable}
-        isNumeric={true}
+        isNumeric={false}
       />
     );
   }

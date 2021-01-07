@@ -28,7 +28,7 @@ export interface ISSRRule {
    */
   forUser: {
     token: string;
-    id: number;
+    id: string;
     role: string;
     customData: any;
   };

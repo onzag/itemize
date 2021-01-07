@@ -50,7 +50,7 @@ export enum PropertyInvalidReason {
   MUST_BE_SPECIFIED = "MUST_BE_SPECIFIED",
 }
 
-type PropertyDefinitionListenerType = (id: number, version: string, newValue: PropertyDefinitionSupportedType) => void;
+type PropertyDefinitionListenerType = (id: string, version: string, newValue: PropertyDefinitionSupportedType) => void;
 
 /**
  * A conditition for conditional values
@@ -379,7 +379,7 @@ export type PropertyDefinitionCheckerFunctionType =
     include: Include,
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
-    id: number,
+    id: string,
     version: string,
   ) => Promise<boolean>;
 
@@ -399,7 +399,7 @@ async function clientSideIndexChecker(
   include: Include,
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
-  id: number,
+  id: string,
   version: string,
 ) {
   const mergedID = id + "." + (version || "");
@@ -949,7 +949,7 @@ export default class PropertyDefinition {
    * @returns an object that specifies whether the value is enforced, and the value itself if true
    * the value can be null
    */
-  public getEnforcedValue(id: number, version: string): {
+  public getEnforcedValue(id: string, version: string): {
     enforced: boolean;
     value?: PropertyDefinitionSupportedType;
   } {
@@ -1012,7 +1012,7 @@ export default class PropertyDefinition {
    * @param version the version
    * @returns a boolean
    */
-  public isCurrentlyHidden(id: number, version: string) {
+  public isCurrentlyHidden(id: string, version: string) {
     return this.rawData.hidden ||
       (this.rawData.hiddenIfEnforced ? this.getEnforcedValue(id, version).enforced : false) ||
       (this.hiddenIf && this.hiddenIf.evaluate(id, version)) || false;
@@ -1095,7 +1095,7 @@ export default class PropertyDefinition {
    * @param verson the slot version
    * @returns the current value
    */
-  public getCurrentValue(id: number, version: string): PropertyDefinitionSupportedType {
+  public getCurrentValue(id: string, version: string): PropertyDefinitionSupportedType {
     // first we check for a possible enforced value
     const possibleEnforcedValue = this.getEnforcedValue(id, version);
 
@@ -1146,7 +1146,7 @@ export default class PropertyDefinition {
    * @returns the applied value
    */
   public getAppliedValue(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -1162,7 +1162,7 @@ export default class PropertyDefinition {
    * @returns the current value state
    */
   public getStateNoExternalChecking(
-    id: number,
+    id: string,
     version: string,
     emulateExternalChecking?: boolean,
   ): IPropertyDefinitionState {
@@ -1257,7 +1257,7 @@ export default class PropertyDefinition {
    * @param version the version
    * @returns a promise for the current value state
    */
-  public async getState(id: number, version: string): Promise<IPropertyDefinitionState> {
+  public async getState(id: string, version: string): Promise<IPropertyDefinitionState> {
 
     const mergedID = id + "." + (version || "");
     if (this.canCacheState && this.stateLastCachedWithExternal[mergedID]) {
@@ -1438,7 +1438,7 @@ export default class PropertyDefinition {
    * @param value the value that has tobe super enforced
    */
   public setSuperEnforced(
-    id: number,
+    id: string,
     version: string,
     value: PropertyDefinitionSupportedType,
   ) {
@@ -1480,7 +1480,7 @@ export default class PropertyDefinition {
    * @param version the slot version
    */
   public clearSuperEnforced(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -1546,7 +1546,7 @@ export default class PropertyDefinition {
    * @param internalValue the internal value
    */
   public setCurrentValue(
-    id: number,
+    id: string,
     version: string,
     newValue: PropertyDefinitionSupportedType,
     internalValue: any,
@@ -1606,7 +1606,7 @@ export default class PropertyDefinition {
    * by the item definition apply state function to apply a new state
    */
   public applyValue(
-    id: number,
+    id: string,
     version: string,
     value: PropertyDefinitionSupportedType,
     modifiedState: boolean,
@@ -1675,7 +1675,7 @@ export default class PropertyDefinition {
    * @param version the slot version
    */
   public cleanValueFor(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -1700,7 +1700,7 @@ export default class PropertyDefinition {
    * @param version the version
    */
   public restoreValueFor(
-    id: number,
+    id: string,
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
@@ -1731,7 +1731,7 @@ export default class PropertyDefinition {
    * @returns the invalid reason as a string
    */
   public isValidValueNoExternalChecking(
-    id: number,
+    id: string,
     version: string,
     value: PropertyDefinitionSupportedType,
     emulateExternalChecking?: boolean,
@@ -1792,7 +1792,7 @@ export default class PropertyDefinition {
    * @returns the invalid reason as a string
    */
   public async isValidValue(
-    id: number,
+    id: string,
     version: string,
     value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
@@ -2103,8 +2103,8 @@ export default class PropertyDefinition {
   public buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
   ) {
     // for delete, you shouldn't really be getting anything
     if (action === ItemDefinitionIOActions.DELETE) {
@@ -2153,8 +2153,8 @@ export default class PropertyDefinition {
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     throwError: boolean,
   ) {
     // first we get all the roles that have the access

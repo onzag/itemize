@@ -17,7 +17,7 @@ export interface ISSRCollectedQueryType {
   /**
    * The id
    */
-  id: number,
+  id: string,
   /**
    * The version or null
    */
@@ -73,7 +73,7 @@ export interface ISSRContextType {
     /**
      * id of the user
      */
-    id: number;
+    id: string;
     /**
      * Token of the user, now due to security considerations
      * and since this is equal to the cookie, the cookie value

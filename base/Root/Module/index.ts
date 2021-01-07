@@ -867,8 +867,8 @@ export default class Module {
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {

@@ -261,7 +261,7 @@ export async function searchModule(
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
-                id: r.id as number,
+                id: r.id as string,
                 version: r.version as string || null,
                 user: {
                   role: tokenData.role,
@@ -281,7 +281,7 @@ export async function searchModule(
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
-                id: r.id as number,
+                id: r.id as string,
                 version: r.version as string || null,
                 user: {
                   role: tokenData.role,
@@ -598,7 +598,7 @@ export async function searchItemDefinition(
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
-                id: r.id as number,
+                id: r.id as string,
                 version: r.version as string || null,
                 user: {
                   role: tokenData.role,
@@ -618,7 +618,7 @@ export async function searchItemDefinition(
                 update: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
-                id: r.id as number,
+                id: r.id as string,
                 version: r.version as string || null,
                 user: {
                   role: tokenData.role,

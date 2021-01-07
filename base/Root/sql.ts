@@ -74,6 +74,9 @@ export interface ISQLColumnDefinitionType {
      */
     level: number;
   };
+  /**
+   * An index definition
+   */
   index?: ISQLTableIndexType;
   /**
    * An optional extension that is required for this
@@ -149,23 +152,23 @@ export function getSQLTablesSchemaForRoot(knex: Knex, root: Root): ISQLSchemaDef
         },
       },
       id: {
-        type: "integer",
+        type: "string",
         notNull: true,
       },
       version: {
-        type: "text",
+        type: "string",
         notNull: true,
       },
       module: {
-        type: "text",
+        type: "string",
         notNull: true
       },
       type: {
-        type: "text",
+        type: "string",
         notNull: true
       },
       created_by: {
-        type: "integer",
+        type: "string",
         index: {
           id: CREATED_BY_INDEX,
           level: 0,

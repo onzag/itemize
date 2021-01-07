@@ -22,7 +22,7 @@ export interface IPropertySetterBaseProps {
    * The slot id that is to be used, or null
    * retrieved from the item-definition.tsx context
    */
-  forId: number;
+  forId: string;
   /**
    * The slot version that is to be used, or null
    * retrieved from the item-definition.tsx context
@@ -37,12 +37,12 @@ export interface IPropertySetterBaseProps {
    * The enforcement function
    * retrieved from the item-definition.tsx context
    */
-  onEnforce: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, forId: number, forVersion: string) => void;
+  onEnforce: (property: PropertyDefinition, value: PropertyDefinitionSupportedType, forId: string, forVersion: string) => void;
   /**
    * The clear enforcement function
    * retrieved from the item-definition.tsx context
    */
-  onClearEnforcement: (property: PropertyDefinition, forId: number, forVersion: string) => void;
+  onClearEnforcement: (property: PropertyDefinition, forId: string, forVersion: string) => void;
 }
 
 /**

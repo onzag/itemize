@@ -30,7 +30,7 @@ export interface ILangLocalesType {
   };
 }
 
-type RequestManagerFn = (itemDefinition: ItemDefinition, id: number, version: string) => Promise<void>;
+type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
 
 /**
  * This is the raw processed form of the root
@@ -192,7 +192,7 @@ export default class Root {
     this.requestManager = manager;
   }
 
-  public async callRequestManager(itemDefinition: ItemDefinition, id: number, version: string) {
+  public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string) {
     await this.requestManager(itemDefinition, id, version);
   }
 

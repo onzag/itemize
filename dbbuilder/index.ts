@@ -21,6 +21,7 @@ import { IDBConfigRawJSONDataType } from "../config";
 import { prepareExtensions } from "./extensions";
 import dump from "./dump";
 import loadDump from "./load-dump";
+import { postprocessIdTriggers, prepareIdTrigger } from "./id";
 
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
@@ -214,9 +215,16 @@ async function buildDatabase(
   newDatabaseSchema: ISQLSchemaDefinitionType,
 ): Promise<ISQLSchemaDefinitionType> {
   await prepareExtensions(knex, newDatabaseSchema);
+  await prepareIdTrigger(knex);
 
   let transitoryCurrentSchema = await buildTables(knex, currentDatabaseSchema, newDatabaseSchema);
   transitoryCurrentSchema = await buildIndexes(knex, transitoryCurrentSchema, newDatabaseSchema);
   transitoryCurrentSchema = await buildForeignKeys(knex, transitoryCurrentSchema, newDatabaseSchema);
+
+  await postprocessIdTriggers(
+    knex,
+    transitoryCurrentSchema,
+  );
+
   return transitoryCurrentSchema;
 }

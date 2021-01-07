@@ -31,7 +31,7 @@ export interface IMountedItem {
   itemDefinition: string;
   isExtensions: boolean;
   isSearchMode: boolean;
-  id: number;
+  id: string;
   version: string;
   wasContentLoadedFromMemory: boolean;
   wasFound: boolean;

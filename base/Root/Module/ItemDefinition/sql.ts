@@ -49,7 +49,7 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
   const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
     [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: {
-      type: "integer",
+      type: "string",
       notNull: true,
       foreignKey: {
         id: "ITEM_TO_MODULE_CONNECTION",

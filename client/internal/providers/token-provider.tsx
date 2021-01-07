@@ -25,7 +25,7 @@ export interface IActualTokenProviderState {
   /**
    * The user id
    */
-  id: number;
+  id: string;
   /**
    * The user role
    */
@@ -98,7 +98,7 @@ export interface ITokenContextType extends IActualTokenProviderState {
    * is used in the initial login
    * @returns a promise with the id, role and a possible error
    */
-  login: (username: string, password: string, token: string) => Promise<{id: number, role: string, error: EndpointErrorType}>;
+  login: (username: string, password: string, token: string) => Promise<{id: string, role: string, error: EndpointErrorType}>;
   /**
    * logout function, for the logoutAll functionality check the LogActioner as it's a complex function
    * the token provider only manages simple functionality about the current app state
@@ -240,7 +240,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     password: string,
     token: string,
     doNotShowLoginError?: boolean,
-  ): Promise<{id: number, role: string, error: EndpointErrorType}> {
+  ): Promise<{id: string, role: string, error: EndpointErrorType}> {
 
     // if we are already logging in
     if (this.state.isLoggingIn) {
@@ -279,7 +279,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     const isOffline = error && error.code === ENDPOINT_ERRORS.CANT_CONNECT;
 
     // so we need to set these
-    let tokenDataId: number = null;
+    let tokenDataId: string = null;
     let tokenDataRole: string = null;
     let tokenDataToken: string = null;
 
@@ -288,7 +288,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       // then let's get the token data our server has given us
       const tokenData = data.data && data.data.token;
       // as well as these
-      tokenDataId = tokenData ? tokenData.id as number : null;
+      tokenDataId = tokenData ? tokenData.id as string : null;
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;
       tokenDataToken = tokenData ? tokenData.token as string : null;
 
@@ -313,7 +313,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     } else {
       // otherwise if we are offline, we are going to trust our cookies
       // for the result
-      tokenDataId = parseInt(getCookie("id")) || null;
+      tokenDataId = getCookie("id") || null;
       tokenDataRole = getCookie("role") || GUEST_METAROLE;
       tokenDataToken = getCookie("token");
     }
@@ -321,7 +321,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     // now this will be our new state
     const newState: IActualTokenProviderState = {
       isLoggingIn: false,
-      id: tokenDataId as number,
+      id: tokenDataId as string,
       token: tokenDataToken as string,
       role: tokenDataRole as string,
       isReady: true,
@@ -374,7 +374,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         // we get the cached value for this query
         const cachedValue =
           await CacheWorkerInstance.instance.getCachedValue(
-            "GET_MOD_users__IDEF_user", tokenDataId as number, null, fields);
+            "GET_MOD_users__IDEF_user", tokenDataId as string, null, fields);
 
         // and if we got one, we will update
         if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
@@ -448,7 +448,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
             // we do merge the thing if possible
             const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
             CacheWorkerInstance.instance.mergeCachedValue(
-              "GET_MOD_users__IDEF_user", tokenDataId as number, null, newCachedValue, fields,
+              "GET_MOD_users__IDEF_user", tokenDataId as string, null, newCachedValue, fields,
             );
           }
         }
@@ -457,7 +457,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     // and now we return the info about this
     return {
-      id: tokenDataId as number || null,
+      id: tokenDataId as string || null,
       role: tokenDataRole as string || GUEST_METAROLE,
       error: error || null,
     };
@@ -485,7 +485,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     // now we loop over the destruction markers
     Object.keys(destructionMarkers).forEach((qualifiedPathName: string) => {
-      destructionMarkers[qualifiedPathName].forEach((marker: [number, string]) => {
+      destructionMarkers[qualifiedPathName].forEach((marker: [string, string]) => {
         // and delete everything within it
         CacheWorkerInstance.instance.deleteCachedValue(
           PREFIX_GET + qualifiedPathName,

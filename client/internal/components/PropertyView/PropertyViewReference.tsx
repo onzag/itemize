@@ -42,7 +42,7 @@ const LOAD_TIME = (new Date()).getTime();
 export default class PropertyViewReference
   extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
 
-  private currentlyFindingValueFor: [number, string];
+  private currentlyFindingValueFor: [string, string];
   private ssrServerOnlyValue: string;
 
   constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>) {
@@ -83,7 +83,7 @@ export default class PropertyViewReference
       // we can call the find function that will set the current str value
       const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
       this.findCurrentStrValue(
-        this.props.state.value as number,
+        this.props.state.value as string,
         filterByLanguage ? this.props.language : null,
       );
     }
@@ -129,7 +129,7 @@ export default class PropertyViewReference
    * @param forVersion for the given version
    * @returns a string value or null if nothing found
    */
-  public getSSRFoundValue(forId: number, forVersion: string): string {
+  public getSSRFoundValue(forId: string, forVersion: string): string {
     if (!forId || !this.props.ssr) {
       return null;
     }
@@ -164,7 +164,7 @@ export default class PropertyViewReference
   }
 
   public async beforeSSRRender(): Promise<void> {
-    const id = this.props.useAppliedValue ? this.props.state.stateAppliedValue as number : this.props.state.value as number;
+    const id = this.props.useAppliedValue ? this.props.state.stateAppliedValue as string : this.props.state.value as string;
     if (
       !id
     ) {
@@ -191,7 +191,7 @@ export default class PropertyViewReference
    * @param forId 
    * @param forVersion 
    */
-  public async findCurrentStrValue(forId: number, forVersion: string) {
+  public async findCurrentStrValue(forId: string, forVersion: string) {
     // avoid if currently searching for the same thing
     if (
       this.currentlyFindingValueFor &&
@@ -280,8 +280,8 @@ export default class PropertyViewReference
     // we need to know if we are filtering by language
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
     // the current value we have
-    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as number;
-    const oldValue = (prevProps.useAppliedValue ? prevProps.state.stateAppliedValue : prevProps.state.value) as number;
+    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
+    const oldValue = (prevProps.useAppliedValue ? prevProps.state.stateAppliedValue : prevProps.state.value) as string;
     // and equally there might be an internal value already set by an entry which represents the value
     // for this thing, if there's one, let's use that value rather than anything else
     const internalValue =
@@ -342,20 +342,20 @@ export default class PropertyViewReference
         i18nData && i18nData.null_value : null;
     }
 
-    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as number;
+    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
     const internalValue =
       !this.props.useAppliedValue || (
         this.props.useAppliedValue && this.props.state.stateAppliedValue === this.props.state.value
       ) ? this.props.state.internalValue : null;
 
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
-    const currentValue = (value === null || isNaN(value)) ?
+    const currentValue = (value === null || value === "") ?
       nullValueLabel :
       (
         internalValue ||
         this.state.currentStrValue ||
         this.getSSRFoundValue(
-          this.props.useAppliedValue ? this.props.state.stateAppliedValue as number : this.props.state.value as number,
+          this.props.useAppliedValue ? this.props.state.stateAppliedValue as string : this.props.state.value as string,
           filterByLanguage ? this.props.language : null,
         ) || this.ssrServerOnlyValue || ""
       );

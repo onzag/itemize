@@ -26,7 +26,7 @@ export interface IGQLSearchRecord {
   /**
    * The id for the pg id
    */
-  id: number;
+  id: string;
   /**
    * The version for the pg version
    */
@@ -297,11 +297,11 @@ export class GQLQuery {
           // So we create a new entire entry for this
           const queryClone = {...q};
           const usedAliases = this.processedQueries.map(q => q.alias);
-          let id: number = 2;
-          let newAlias = queryClone.name + "_" + id;
+          let numberToSuffix: number = 2;
+          let newAlias = queryClone.name + "_" + numberToSuffix;
           while (usedAliases.includes(newAlias)) {
-            id++;
-            newAlias = queryClone.name + "_" + id;
+            numberToSuffix++;
+            newAlias = queryClone.name + "_" + numberToSuffix;
           }
           queryClone.alias = newAlias;
 

@@ -136,7 +136,7 @@ export async function ssrGenerator(
     // So in this case we have an SSR rule, which is good for SEO, we need to extract our
     // user from the token we get
     let userAfterValidate: {
-      id: number,
+      id: string,
       role: string,
       token: string,
       customData: any,

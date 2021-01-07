@@ -87,20 +87,26 @@ export async function addItemDefinition(
 
   // if we are specifying a for_id
   if (resolverArgs.args.for_id) {
-    if (!resolverArgs.args.version) {
-      throw new EndpointError({
-        message: "Specifying for_id without a version is not allowed",
-        code: ENDPOINT_ERRORS.FORBIDDEN,
-      });
+    const hasNoVersion = !resolverArgs.args.version;
+    if (hasNoVersion) {
+      itemDefinition.checkRoleCanCustomId(tokenData.role, true);
     }
 
+    // we get the unversioned value anyway just in case
     const unversionedValue = await appData.cache.requestValue(
       itemDefinition,
       resolverArgs.args.for_id,
       null,
     );
-    // if no such value of any version exists
-    if (!unversionedValue) {
+
+    // if we have an unversioned value already existing
+    // we cannot simply override with add 
+    if (unversionedValue && hasNoVersion) {
+      throw new EndpointError({
+        message: "The value for that id already exists",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    } else if (!unversionedValue) {
       throw new EndpointError({
         message: "Theres no unversioned value for this version creation",
         code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -111,7 +117,10 @@ export async function addItemDefinition(
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
-    itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as number, true);
+
+    if (!hasNoVersion) {
+      itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as string, true);
+    }
   } else if (resolverArgs.args.version) {
     throw new EndpointError({
       message: "Specifying version without a for_id is not allowed",
@@ -407,7 +416,7 @@ export async function addItemDefinition(
     dictionary,
     containerId,
     isNowParenting ? {
-      id: gqlValueToConvert.parent_id as number,
+      id: gqlValueToConvert.parent_id as string,
       version: gqlValueToConvert.parent_version as string,
       type: gqlValueToConvert.parent_type as string,
     } : null,

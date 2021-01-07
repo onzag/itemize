@@ -203,7 +203,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       subject: string;
       itemDefinition: string | ItemDefinition;
       property: string | PropertyDefinition;
-      id: number;
+      id: string;
       version?: string;
       args: any;
       unsubscribeMailto?: string;
@@ -365,11 +365,11 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     arg: {
       fromUsername: string,
       fromEmailHandle: string,
-      to: number | IGQLValue | ISQLTableRowValue | Array<number | IGQLValue | ISQLTableRowValue>;
+      to: string | IGQLValue | ISQLTableRowValue | Array<string | IGQLValue | ISQLTableRowValue>;
       subject: string;
       itemDefinition: string | ItemDefinition;
       property: string | PropertyDefinition;
-      id: number;
+      id: string;
       version?: string;
       args: any;
       canUnsubscribe: boolean;
@@ -443,10 +443,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       // we need the user value, if we have a number
       // we will have to request it from the cache
       let userData: ISQLTableRowValue | IGQLValue = u;
-      if (typeof userData === "number") {
+      if (typeof userData === "string") {
         userData = await this.cache.requestValue(
           this.userIdef,
-          userData as number,
+          userData as string,
           null,
         );
       }

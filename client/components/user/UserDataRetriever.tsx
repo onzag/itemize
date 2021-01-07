@@ -13,7 +13,7 @@ import { TokenContext } from "../../internal/providers/token-provider";
  */
 interface IUserDataRetrieverProps {
   children: (arg: {
-    id: number;
+    id: string;
     role: string;
   }) => React.ReactNode;
 }

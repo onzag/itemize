@@ -42,7 +42,6 @@ export type PropertyDefinitionSupportedIntegerType = number;
 const typeValue: IPropertyDefinitionSupportedType = {
   // an integer is represented as a number
   json: "number",
-  supportedSubtypes: ["reference"],
   gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("integer"),
   sqlIn: stardardSQLInFn,
@@ -79,11 +78,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     } else if (n > MAX_SUPPORTED_INTEGER) {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (
-      n < MIN_SUPPORTED_INTEGER ||
-      (
-        property.subtype === "reference" &&
-        n <= 0
-      )
+      n < MIN_SUPPORTED_INTEGER
     ) {
       return PropertyInvalidReason.TOO_SMALL;
     }
@@ -105,39 +100,5 @@ const typeValue: IPropertyDefinitionSupportedType = {
     tooSmallErrorInclude: [null],
     tooLargeErrorInclude: [null],
   },
-  specialProperties: [
-    {
-      name: "referencedModule",
-      type: "string",
-      required: ["reference"],
-    },
-    {
-      name: "referencedItemDefinition",
-      type: "string",
-      required: ["reference"],
-    },
-    {
-      name: "referencedSearchProperty",
-      type: "string",
-      required: ["reference"],
-    },
-    {
-      name: "referencedDisplayProperty",
-      type: "string",
-      required: ["reference"],
-    },
-    {
-      name: "referencedFilteringPropertySet",
-      type: "property-set",
-    },
-    {
-      name: "referencedFilterByLanguage",
-      type: "boolean",
-    },
-    {
-      name: "referencedFilterByCreatedBySelf",
-      type: "boolean",
-    },
-  ],
 };
 export default typeValue;

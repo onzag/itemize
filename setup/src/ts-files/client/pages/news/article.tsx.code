@@ -110,7 +110,7 @@ const articleContentStyles = (theme: Theme) => createStyles({
 	},
 });
 
-const profileURLFn = (id: number) => `/profile/${id}`;
+const profileURLFn = (id: string) => `/profile/${id}`;
 
 /**
  * The article content displays the content for a given article inside
@@ -136,7 +136,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 							<Reader id="title">{(title: string) => title}</Reader>
 						</Typography>
 						<Reader id="created_by">
-							{(createdBy: number) => (
+							{(createdBy: string) => (
 								<ModuleProvider module="users">
 									<ItemProvider
 										itemDefinition="user"
@@ -216,7 +216,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
  * @returns a react element
  */
 export function Article(props: IArticleProps)<0>{
-	const articleId = parseInt(props.match.params.id, 10) || null;
+	const articleId = props.match.params.id;
 	return (
 		<>
 			<ModuleProvider module="cms">

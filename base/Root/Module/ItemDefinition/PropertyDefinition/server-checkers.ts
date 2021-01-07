@@ -30,7 +30,7 @@ export async function serverSideIndexChecker(
   include: Include,
   property: PropertyDefinition,
   value: PropertyDefinitionSupportedType,
-  id: number,
+  id: string,
   version: string,
 ) {
   // if the value is null then it's valid

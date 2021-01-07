@@ -9,7 +9,7 @@ import Knex from "knex";
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 
 /**
- * Builds all the foreign keys
+ * Builds all the extensions as they are required to be processed
  * @param knex the knex instance
  * @param newDatabaseSchema the new database schema as requested
  */

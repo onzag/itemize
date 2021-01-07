@@ -224,7 +224,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 															</div>
 														</div>
 														<Reader id="created_by">
-															{(createdBy: number) => (
+															{(createdBy: string) => (
 																<ModuleProvider module="users">
 																	<ItemProvider
 																		itemDefinition="user"

@@ -200,7 +200,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   remoteListener: RemoteListener;
   searchId: string;
   searchWasRestored: boolean;
-  searchOwner: number;
+  searchOwner: string;
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;
   searchRequestedProperties: string[];
@@ -322,7 +322,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // we apply the value, whatever we have gotten this will affect all the instances
       // that use the same value
       itemDefintionInQuestion.applyValue(
-        sr.id as number,
+        sr.id as string,
         sr.version as string,
         sr,
         false,
@@ -331,8 +331,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       );
 
       // and then we trigger the change listener for all the instances
-      itemDefintionInQuestion.triggerListeners("change", sr.id as number, sr.version as string);
-      itemDefintionInQuestion.triggerListeners("load", sr.id as number, sr.version as string);
+      itemDefintionInQuestion.triggerListeners("change", sr.id as string, sr.version as string);
+      itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
     });
   }
   public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
@@ -579,7 +579,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             let mergedQueryFields = this.props.searchFields;
             // we try to get the current applied value, in case there's any
             const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(
-              value.id as number, value.version as string);
+              value.id as string, value.version as string);
 
             // and if we have one, which matches our last modified date
             if (
@@ -601,7 +601,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
             // we apply such thing here
             itemDefintionInQuestion.applyValue(
-              valueToApply.id as number,
+              valueToApply.id as string,
               valueToApply.version as string,
               valueToApply,
               false,

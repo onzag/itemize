@@ -208,7 +208,7 @@ export default class ConditionalRuleSet {
    * @param version the version used to retrieve values as well
    * @returns a boolean on whether the conditional rule set passes or not
    */
-  public evaluate(id: number, version: string): boolean {
+  public evaluate(id: string, version: string): boolean {
     // if this is a property type conditional rule set
     let result: boolean = false;
 

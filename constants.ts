@@ -620,7 +620,7 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
  */
 export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
   id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "The id of the item",
   },
   version: {
@@ -632,7 +632,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "The type (qualified name) of the item",
   },
   parent_id: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "If exists, a parent id of this item",
   },
   parent_version: {
@@ -652,7 +652,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "When the item was created",
   },
   created_by: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "The id of the user who created this item",
   },
   edited_at: {
@@ -660,7 +660,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Whenever the item was modified, otherwise null",
   },
   edited_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "Whoever modified this item, otherwise null",
   },
   reviewed_at: {
@@ -668,7 +668,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "When a moderator or admin reviewed this item",
   },
   reviewed_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "The user id who reviewed it",
   },
   last_modified: {
@@ -691,7 +691,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "Basically makes the block be temporary and will be automatically lifted by the database",
   },
   blocked_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "By whom it was blocked",
   },
   blocked_reason: {
@@ -699,7 +699,7 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     description: "A written text of why it was blocked",
   },
   flagged_by: {
-    type: GraphQLList && GraphQLList(GraphQLInt),
+    type: GraphQLList && GraphQLList(GraphQLString),
     description: "Users who flagged this item",
   },
   flagged_reasons: {
@@ -721,7 +721,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
   addedIndexes: string[],
 ) => ({
   id: {
-    type: "serial",
+    type: "id",
     notNull: true,
     index: {
       id: "PRIMARY_KEY",
@@ -747,7 +747,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     notNull: true,
   },
   parent_id: {
-    type: "integer",
+    type: "string",
     index: combinedIndexes.includes("parent_id") ? {
       id: COMBINED_INDEX,
       type: "btree",
@@ -796,7 +796,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     } : null,
   },
   created_by: {
-    type: "integer",
+    type: "string",
     notNull: true,
     index: combinedIndexes.includes("created_by") ? {
       id: COMBINED_INDEX,
@@ -812,13 +812,13 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     type: "datetime",
   },
   edited_by: {
-    type: "integer",
+    type: "string",
   },
   reviewed_at: {
     type: "datetime",
   },
   reviewed_by: {
-    type: "integer",
+    type: "string",
   },
   last_modified: {
     type: "datetime",
@@ -830,13 +830,13 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     type: "datetime",
   },
   blocked_by: {
-    type: "integer",
+    type: "string",
   },
   blocked_reason: {
     type: "text",
   },
   flagged_by: {
-    type: "int[]",
+    type: "text[]",
   },
   flagged_reasons: {
     type: "text[]",
@@ -968,7 +968,7 @@ export const DATE_FORMAT = "YYYY-MM-DD";
  */
 const SEARCH_RECORD_FIELDS = {
   id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
   },
   type: {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
@@ -1122,11 +1122,11 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
     description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
   },
   created_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "An specified owner to filter by (this affects permissions)",
   },
   parent_id: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "a parent id for the item (must be specified with parent_type)",
   },
   parent_version: {
@@ -1173,11 +1173,11 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
     description: "An order type",
   },
   created_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "An specified owner to filter by (this affects permissions)",
   },
   parent_id: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "a parent id for the item (must be specified with parent_type)",
   },
   parent_version: {
@@ -1204,7 +1204,7 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
 export const RESERVED_GETTER_PROPERTIES = {
   ...BASE_QUERY_PROPERTIES,
   id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
+    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     description: "the id for that item",
   },
   version: {
@@ -1235,7 +1235,7 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
     description: "the records to fetch for that item",
   },
   created_by: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "An specified owner to filter by (this affects permissions)",
   },
 };
@@ -1250,11 +1250,11 @@ export const RESERVED_ADD_PROPERTIES = {
     description: "An uuid to identify the creator of this action",
   },
   in_behalf_of: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "an user id that will be the true owner",
   },
   parent_id: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "a parent id that will namespace this item (must be specified with parent_module and idef)",
   },
   parent_version: {
@@ -1270,7 +1270,7 @@ export const RESERVED_ADD_PROPERTIES = {
     description: "the storage id where storage data is stored according to definitions",
   },
   for_id: {
-    type: GraphQLInt,
+    type: GraphQLString,
     description: "If specified create this item for this given id, the id must already exist and be of the same type," +
       " this comes in handy for versioning as you need to specify an id to create different versions, please avoid collisions or" +
       " it will raise an error",
@@ -1338,7 +1338,7 @@ export const UNIT_SUBTYPES = [
  * null is the user value of &GUEST hence it should not hold
  * the same value
  */
-export const UNSPECIFIED_OWNER = -1;
+export const UNSPECIFIED_OWNER = "UNSPECIFIED";
 
 /**
  * Resources that are protected from fetching without specifying the devkey

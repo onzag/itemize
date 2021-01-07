@@ -7,7 +7,7 @@
 
 import Include, { IIncludeRawJSONDataType, IIncludeState, IncludeExclusionState } from "./Include";
 import PropertyDefinition,
-  { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
+{ IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRawJsonI18NSpecificLocaleDataType } from "..";
 import {
   PREFIXED_CONCAT,
@@ -236,6 +236,12 @@ export interface IItemDefinitionRawJSONDataType {
   createInBehalfRoleAccess?: string[];
 
   /**
+   * A list of roles which this item definition is allowed to
+   * be used to make custom ids
+   */
+  customIdRoleAccess?: string[];
+
+  /**
    * A list of roles which the item definition is allowed to create
    * in behalf to
    */
@@ -312,7 +318,7 @@ export interface IItemStateType {
   /**
    * The id that was used
    */
-  forId: number;
+  forId: string;
   /**
    * The version that was used
    */
@@ -595,11 +601,11 @@ export default class ItemDefinition {
     // parent module
     this.importedChildDefinitions =
       rawJSON.importedChildDefinitions ?
-      rawJSON.importedChildDefinitions.map(
-        (d) => ({
-          fullName: d.join("/"),
-          definition: this.parentModule.getItemDefinitionFor(d),
-        })) : [];
+        rawJSON.importedChildDefinitions.map(
+          (d) => ({
+            fullName: d.join("/"),
+            definition: this.parentModule.getItemDefinitionFor(d),
+          })) : [];
 
     // assigning the property definition by using the
     // properties and instantiating those as well
@@ -1055,7 +1061,7 @@ export default class ItemDefinition {
    * @param name the name of the item
    * @returns a boolean
    */
-  public hasAtLeastOneActiveInstanceOf(id: number, version: string, name: string): boolean {
+  public hasAtLeastOneActiveInstanceOf(id: string, version: string, name: string): boolean {
     // we need a list of possible candidates
     // the might currently contain checks if an include
     // contains the include with the given name
@@ -1079,7 +1085,7 @@ export default class ItemDefinition {
    * @param includeId the id of the item
    * @returns a boolean on whether it does
    */
-  public hasAnActiveIncludeInstanceOfId(id: number, version: string, includeId: string): boolean {
+  public hasAnActiveIncludeInstanceOfId(id: string, version: string, includeId: string): boolean {
     const candidate = this.includeInstances
       .find((i) => i.getId() === includeId);
 
@@ -1189,7 +1195,7 @@ export default class ItemDefinition {
    * @retrns the item definition state without extenral checks
    */
   public getStateNoExternalChecking(
-    id: number,
+    id: string,
     version: string,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
@@ -1212,7 +1218,7 @@ export default class ItemDefinition {
           Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
             policies[policyType][policyName] =
               this.getPropertiesForPolicy(policyType, policyName)
-              .map((pd) => pd.getStateNoExternalChecking(id, version, emulateExternalChecking));
+                .map((pd) => pd.getStateNoExternalChecking(id, version, emulateExternalChecking));
           });
         }
       });
@@ -1260,7 +1266,7 @@ export default class ItemDefinition {
    * @returns a promise for the item definition state
    */
   public async getState(
-    id: number,
+    id: string,
     version: string,
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: string[],
@@ -1312,7 +1318,7 @@ export default class ItemDefinition {
   }
 
   public applyState(
-    id: number,
+    id: string,
     version: string,
     state: IItemStateType,
   ) {
@@ -1346,7 +1352,7 @@ export default class ItemDefinition {
    * to false as it's been used applyValue on it, it's been set now by the computer
    */
   public applyValue(
-    id: number,
+    id: string,
     version: string,
     value: IGQLValue,
     excludeExtensions: boolean,
@@ -1415,7 +1421,7 @@ export default class ItemDefinition {
    * @param excludeExtensions whether to exclude extensions of all this
    */
   public restoreValueFor(
-    id: number,
+    id: string,
     version: string,
     excludeExtensions?: boolean,
   ) {
@@ -1441,9 +1447,9 @@ export default class ItemDefinition {
    * (or id if owner is object id, which is only relevant for users honestly)
    * @param id the id of the state
    * @param version the version of the slot
-   * @returns a number, will return UNSPECIFIED_OWNER if it cannot find anything
+   * @returns a string, will return UNSPECIFIED_OWNER if it cannot find anything
    */
-  public getAppliedValueOwnerIfAny(id: number, version: string): number {
+  public getAppliedValueOwnerIfAny(id: string, version: string): string {
     const mergedID = id + "." + (version || "");
     if (
       !this.stateHasAppliedValueTo[mergedID] ||
@@ -1454,9 +1460,9 @@ export default class ItemDefinition {
     }
 
     if (this.isOwnerObjectId()) {
-      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as number;
+      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as string;
     }
-    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as number;
+    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as string;
   }
 
   /**
@@ -1471,7 +1477,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param blockId the block identifier
    */
-  public addBlockCleanFor(id: number, version: string, blockId: string): void {
+  public addBlockCleanFor(id: string, version: string, blockId: string): void {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
@@ -1488,7 +1494,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param blockId the given blockage id
    */
-  public removeBlockCleanFor(id: number, version: string, blockId: string) {
+  public removeBlockCleanFor(id: string, version: string, blockId: string) {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
@@ -1510,7 +1516,7 @@ export default class ItemDefinition {
    * @returns a boolean where true refers to whether it was cleaned and false it was restored
    * because the cleaning was blocked from performing
    */
-  public cleanValueFor(id: number, version: string, excludeExtensions?: boolean, force?: boolean): boolean {
+  public cleanValueFor(id: string, version: string, excludeExtensions?: boolean, force?: boolean): boolean {
     const mergedID = id + "." + (version || "");
 
     if (!force && this.cleansBlocked[mergedID]) {
@@ -1548,7 +1554,7 @@ export default class ItemDefinition {
    * @param version the version
    * @returns a boolean on whether it does or not
    */
-  public hasAppliedValueTo(id: number, version: string): boolean {
+  public hasAppliedValueTo(id: string, version: string): boolean {
     const mergedID = id + "." + (version || "");
     return this.stateHasAppliedValueTo[mergedID];
   }
@@ -1558,7 +1564,7 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public getInternalState(id: number, version: string): any {
+  public getInternalState(id: string, version: string): any {
     const mergedID = id + "." + (version || "");
     return this.stateInternal[mergedID] || null;
   }
@@ -1569,7 +1575,7 @@ export default class ItemDefinition {
    * @param version 
    * @param value 
    */
-  public setInternalState(id: number, version: string, value: any) {
+  public setInternalState(id: string, version: string, value: any) {
     const mergedID = id + "." + (version || "");
     this.stateInternal[mergedID] = value;
   }
@@ -1579,7 +1585,7 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public cleanInternalState(id: number, version: string) {
+  public cleanInternalState(id: string, version: string) {
     const mergedID = id + "." + (version || "");
     delete this.stateInternal[mergedID];
   }
@@ -1590,7 +1596,7 @@ export default class ItemDefinition {
    * @param version the version
    * @returns the applied value structure
    */
-  public getGQLAppliedValue(id: number, version: string): IItemDefinitionGQLValueType {
+  public getGQLAppliedValue(id: string, version: string): IItemDefinitionGQLValueType {
     const mergedID = id + "." + (version || "");
     const appliedGQLValue = this.stateGQLAppliedValue[mergedID] || null;
     return appliedGQLValue;
@@ -1642,7 +1648,7 @@ export default class ItemDefinition {
    */
   public getRolesWithSearchAccess() {
     return (
-      this.rawData.searchRoleAccess ||
+      this.rawData.searchRoleAccess ||
       this.parentModule.rawData.searchRoleAccess ||
       [ANYONE_METAROLE]
     );
@@ -1700,8 +1706,8 @@ export default class ItemDefinition {
   public buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
   ) {
     if (action === ItemDefinitionIOActions.DELETE) {
       return null;
@@ -1714,11 +1720,11 @@ export default class ItemDefinition {
     // now let's get the roles that have access to the action
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
-    (
-      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     if (!idefLevelAccess) {
       return null;
@@ -1777,8 +1783,8 @@ export default class ItemDefinition {
   public checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     requestedFields: IGQLRequestFields,
     throwError: boolean,
   ) {
@@ -1790,11 +1796,11 @@ export default class ItemDefinition {
     // if anyone is included, or anyone logged is included and you are not
     // a guest, or your role is included
     const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
-    (
-      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     // if you got not access
     if (!idefLevelAccess) {
@@ -1809,8 +1815,8 @@ export default class ItemDefinition {
           ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
         if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
           errorMessage += ", this error might have been avoided if an owner had" +
-          " been specified which matched yourself as there's a self rule, if performing a search" +
-          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+            " been specified which matched yourself as there's a self rule, if performing a search" +
+            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
         }
         throw new EndpointError({
           message: errorMessage,
@@ -1872,7 +1878,7 @@ export default class ItemDefinition {
       if (!canCreateInBehalf && throwError) {
         throw new EndpointError({
           message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
-          ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
+            ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
@@ -1923,8 +1929,8 @@ export default class ItemDefinition {
    */
   public checkRoleCanVersion(
     role: string,
-    userId: number,
-    ownerUserId: number,
+    userId: string,
+    ownerUserId: string,
     throwError: boolean,
   ) {
     if (!this.isVersioned()) {
@@ -1941,21 +1947,57 @@ export default class ItemDefinition {
     const roles = this.getRolesForVersioning();
 
     const versioningAccess = roles.includes(ANYONE_METAROLE) ||
-    (
-      roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      roles.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || roles.includes(role);
+      (
+        roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        roles.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || roles.includes(role);
 
     if (!versioningAccess && throwError) {
       throw new EndpointError({
         message: `Forbidden, role ${role} cannot version resource ${this.getName()}` +
-        ` only roles ${roles.join(", ")} can do so`,
+          ` only roles ${roles.join(", ")} can do so`,
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
     return versioningAccess;
+  }
+
+  /**
+   * Provides the roles that are allowed custom ids
+   */
+  public getRolesForCustomId() {
+    if (this.rawData.customIdRoleAccess) {
+      return this.rawData.customIdRoleAccess;
+    }
+    return [];
+  }
+
+  /**
+   * Checks whether a given role can provide a custom id
+   * @param role the role of the user
+   * @param throwError whether to throw an error in case of failure
+   */
+  public checkRoleCanCustomId(
+    role: string,
+    throwError: boolean,
+  ) {
+    const roles = this.getRolesForCustomId();
+    const customIdAccess = roles.includes(ANYONE_METAROLE) ||
+      (
+        roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || roles.includes(role);
+
+    if (!customIdAccess && throwError) {
+      throw new EndpointError({
+        message: `Forbidden, role ${role} cannot custom id resource ${this.getName()}` +
+          ` only roles ${roles.join(", ")} can do so`,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    return customIdAccess;
   }
 
   /**
@@ -2023,25 +2065,25 @@ export default class ItemDefinition {
    */
   public checkRoleAccessForParenting(
     role: string,
-    userId: number,
-    parentOwnerUserId: number,
+    userId: string,
+    parentOwnerUserId: string,
     throwError: boolean,
   ) {
     let hasParentingRoleAccess = false;
     if (this.rawData.parentingRoleAccess) {
       hasParentingRoleAccess = this.rawData.parentingRoleAccess.includes(ANYONE_METAROLE) ||
-      (
-        this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-      ) || (
-        this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
-      ) || this.rawData.parentingRoleAccess.includes(role);
+        (
+          this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+        ) || (
+          this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
+        ) || this.rawData.parentingRoleAccess.includes(role);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!hasParentingRoleAccess && throwError) {
         throw new EndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
-          ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
+            ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
@@ -2118,8 +2160,8 @@ export default class ItemDefinition {
   ): boolean {
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
-      .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
-      .some((pd) => pd.isUnique());
+        .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
+        .some((pd) => pd.isUnique());
     if (existInFirstLayer) {
       return true;
     } else if (ignoreIncludes) {
@@ -2217,7 +2259,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param listener the listener
    */
-  public addListener(event: string, id: number, version: string, listener: ListenerType) {
+  public addListener(event: string, id: string, version: string, listener: ListenerType) {
     const mergedID = id + "." + (version || "");
     if (!this.listeners[event]) {
       this.listeners[event] = {};
@@ -2233,7 +2275,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param listener the listener
    */
-  public removeListener(event: string, id: number, version: string, listener: ListenerType) {
+  public removeListener(event: string, id: string, version: string, listener: ListenerType) {
     const mergedID = id + "." + (version || "");
     if (!this.listeners[event] || !this.listeners[event][mergedID]) {
       return;
@@ -2255,7 +2297,7 @@ export default class ItemDefinition {
    * @param callId a call id, it's an unique identifier for this event, it will be autogenerated if not provided
    * and it's the best to leave it be autogenerated
    */
-  public triggerListeners(event: string, id: number, version: string, but?: ListenerType, callId?: string) {
+  public triggerListeners(event: string, id: string, version: string, but?: ListenerType, callId?: string) {
     if (this.lastListenerCallId !== callId) {
       this.lastListenerCallId = callId || uuid.v4();
       if (this.extensionsInstance) {
@@ -2334,6 +2376,6 @@ export default class ItemDefinition {
    * @returns a boolean
    */
   public isOwnerObjectId() {
-    return this.rawData.ownerIsObjectId || false;
+    return this.rawData.ownerIsObjectId || false;
   }
 }
