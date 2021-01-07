@@ -95,6 +95,16 @@ export interface IItemizeConstantsConfig {
    */
   MAX_REMOTE_LISTENERS_PER_SOCKET?: number;
   /**
+   * The maximum len of the custom id
+   */
+  MAX_CUSTOM_ID_LENGTH?: number;
+  /**
+   * The custom id regex that every custom id
+   * as well as standard self generated id
+   * should live up to
+   */
+  CUSTOM_ID_REGEX?: RegExp;
+  /**
    * Usernames that are not allowed to be taken
    * by users, defaults to admin and unsubscribe
    * it will prevent new users to creating accounts
@@ -212,6 +222,17 @@ export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIM
  * The maximum amount of remote listeners a socket supports
  */
 export const MAX_REMOTE_LISTENERS_PER_SOCKET = R_ITEMIZE_CONSTANTS_CONFIG.MAX_REMOTE_LISTENERS_PER_SOCKET || 100;
+
+/**
+ * The maximum size of the custom id
+ */
+export const MAX_CUSTOM_ID_LENGTH = R_ITEMIZE_CONSTANTS_CONFIG.MAX_CUSTOM_ID_LENGTH || 256;
+
+/**
+* The id regex that every single user provided id as well
+* as custom id should match
+*/
+export const CUSTOM_ID_REGEX = R_ITEMIZE_CONSTANTS_CONFIG.CUSTOM_ID_REGEX || /^[a-zA-Z0-9_-]+$/;
 
 /**
  * The protected usernames that cannot be taken by the users

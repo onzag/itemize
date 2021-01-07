@@ -10,7 +10,9 @@
 import Knex from "knex";
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX,
+  DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER,
+  MAX_CUSTOM_ID_LENGTH, CUSTOM_ID_REGEX,
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
@@ -225,7 +227,7 @@ export class Cache {
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
+      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
       itemDefinitionBasedOwnedEvent,
     );
     this.listener.triggerOwnedSearchListeners(
@@ -239,7 +241,7 @@ export class Cache {
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
+      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
       moduleBasedOwnedEvent,
     );
     this.listener.triggerOwnedSearchListeners(
@@ -259,7 +261,7 @@ export class Cache {
         newLastModified: record.last_modified,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)",
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (item definition)",
         itemDefinitionBasedParentedEvent,
       );
       this.listener.triggerParentedSearchListeners(
@@ -272,13 +274,51 @@ export class Cache {
         qualifiedPathName: modQualifiedPathName,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)",
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (module)",
         moduleBasedParentedEvent,
       );
       this.listener.triggerParentedSearchListeners(
         moduleBasedParentedEvent,
         null, // TODO add the listener uuid, maybe?
       );
+    }
+  }
+
+  /**
+   * Throws an error if the id is invalid and cannot
+   * be used, mainly used for custom ids, but will check any
+   * id anyway
+   * @param id the id to check
+   */
+  public checkIdValidity(id: string) {
+    if (id === null || typeof id === "undefined") {
+      return;
+    } else if (id === UNSPECIFIED_OWNER) {
+      throw new EndpointError({
+        message: "The id cannot be the special value of " + UNSPECIFIED_OWNER,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    } else if (id === "") {
+      throw new EndpointError({
+        message: "The id is empty",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    if (id.length > MAX_CUSTOM_ID_LENGTH) {
+      throw new EndpointError({
+        message: "The id is too long",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    const isValid = CUSTOM_ID_REGEX.test(id);
+
+    if (!isValid) {
+      throw new EndpointError({
+        message: "The id is not valid as it should follow the " + CUSTOM_ID_REGEX.toString() + " regex rule",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
     }
   }
 
@@ -315,6 +355,9 @@ export class Cache {
     },
     listenerUUID: string,
   ): Promise<ISQLTableRowValue> {
+    // check the validity of the id
+    this.checkIdValidity(forId);
+
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
@@ -791,7 +834,7 @@ export class Cache {
       await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
+        "Cache.requestUpdate [SERIOUS]: could not consume item definition streams, data is corrupted",
         {
           errMessage: err.message,
           errStack: err.stack,
@@ -806,7 +849,7 @@ export class Cache {
       await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
+        "Cache.requestUpdate [SERIOUS]: could not consume module streams, data is corrupted",
         {
           errMessage: err.message,
           errStack: err.stack,
