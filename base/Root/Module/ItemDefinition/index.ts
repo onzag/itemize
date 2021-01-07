@@ -7,7 +7,7 @@
 
 import Include, { IIncludeRawJSONDataType, IIncludeState, IncludeExclusionState } from "./Include";
 import PropertyDefinition,
-  { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
+{ IPropertyDefinitionRawJSONDataType, IPropertyDefinitionState } from "./PropertyDefinition";
 import Module, { IModuleRawJSONDataType, ListenerType, IRawJSONI18NDataType, IRawJsonI18NSpecificLocaleDataType } from "..";
 import {
   PREFIXED_CONCAT,
@@ -234,6 +234,12 @@ export interface IItemDefinitionRawJSONDataType {
    * used to create in behalf
    */
   createInBehalfRoleAccess?: string[];
+
+  /**
+   * A list of roles which this item definition is allowed to
+   * be used to make custom ids
+   */
+  customIdRoleAccess?: string[];
 
   /**
    * A list of roles which the item definition is allowed to create
@@ -595,11 +601,11 @@ export default class ItemDefinition {
     // parent module
     this.importedChildDefinitions =
       rawJSON.importedChildDefinitions ?
-      rawJSON.importedChildDefinitions.map(
-        (d) => ({
-          fullName: d.join("/"),
-          definition: this.parentModule.getItemDefinitionFor(d),
-        })) : [];
+        rawJSON.importedChildDefinitions.map(
+          (d) => ({
+            fullName: d.join("/"),
+            definition: this.parentModule.getItemDefinitionFor(d),
+          })) : [];
 
     // assigning the property definition by using the
     // properties and instantiating those as well
@@ -1212,7 +1218,7 @@ export default class ItemDefinition {
           Object.keys(this.policyPropertyDefinitions[policyType]).map((policyName) => {
             policies[policyType][policyName] =
               this.getPropertiesForPolicy(policyType, policyName)
-              .map((pd) => pd.getStateNoExternalChecking(id, version, emulateExternalChecking));
+                .map((pd) => pd.getStateNoExternalChecking(id, version, emulateExternalChecking));
           });
         }
       });
@@ -1488,7 +1494,7 @@ export default class ItemDefinition {
    * @param version the version
    * @param blockId the given blockage id
    */
-  public removeBlockCleanFor(id: string, version: string, blockId: string) {
+  public removeBlockCleanFor(id: string, version: string, blockId: string) {
     const mergedID = id + "." + (version || "");
 
     if (this.cleansBlocked[mergedID]) {
@@ -1642,7 +1648,7 @@ export default class ItemDefinition {
    */
   public getRolesWithSearchAccess() {
     return (
-      this.rawData.searchRoleAccess ||
+      this.rawData.searchRoleAccess ||
       this.parentModule.rawData.searchRoleAccess ||
       [ANYONE_METAROLE]
     );
@@ -1714,11 +1720,11 @@ export default class ItemDefinition {
     // now let's get the roles that have access to the action
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
-    (
-      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     if (!idefLevelAccess) {
       return null;
@@ -1790,11 +1796,11 @@ export default class ItemDefinition {
     // if anyone is included, or anyone logged is included and you are not
     // a guest, or your role is included
     const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
-    (
-      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role);
 
     // if you got not access
     if (!idefLevelAccess) {
@@ -1809,8 +1815,8 @@ export default class ItemDefinition {
           ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
         if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
           errorMessage += ", this error might have been avoided if an owner had" +
-          " been specified which matched yourself as there's a self rule, if performing a search" +
-          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+            " been specified which matched yourself as there's a self rule, if performing a search" +
+            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
         }
         throw new EndpointError({
           message: errorMessage,
@@ -1872,7 +1878,7 @@ export default class ItemDefinition {
       if (!canCreateInBehalf && throwError) {
         throw new EndpointError({
           message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
-          ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
+            ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
@@ -1941,21 +1947,57 @@ export default class ItemDefinition {
     const roles = this.getRolesForVersioning();
 
     const versioningAccess = roles.includes(ANYONE_METAROLE) ||
-    (
-      roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-    ) || (
-      roles.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || roles.includes(role);
+      (
+        roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        roles.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || roles.includes(role);
 
     if (!versioningAccess && throwError) {
       throw new EndpointError({
         message: `Forbidden, role ${role} cannot version resource ${this.getName()}` +
-        ` only roles ${roles.join(", ")} can do so`,
+          ` only roles ${roles.join(", ")} can do so`,
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
     return versioningAccess;
+  }
+
+  /**
+   * Provides the roles that are allowed custom ids
+   */
+  public getRolesForCustomId() {
+    if (this.rawData.customIdRoleAccess) {
+      return this.rawData.customIdRoleAccess;
+    }
+    return [];
+  }
+
+  /**
+   * Checks whether a given role can provide a custom id
+   * @param role the role of the user
+   * @param throwError whether to throw an error in case of failure
+   */
+  public checkRoleCanCustomId(
+    role: string,
+    throwError: boolean,
+  ) {
+    const roles = this.getRolesForCustomId();
+    const customIdAccess = roles.includes(ANYONE_METAROLE) ||
+      (
+        roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || roles.includes(role);
+
+    if (!customIdAccess && throwError) {
+      throw new EndpointError({
+        message: `Forbidden, role ${role} cannot custom id resource ${this.getName()}` +
+          ` only roles ${roles.join(", ")} can do so`,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    return customIdAccess;
   }
 
   /**
@@ -2030,18 +2072,18 @@ export default class ItemDefinition {
     let hasParentingRoleAccess = false;
     if (this.rawData.parentingRoleAccess) {
       hasParentingRoleAccess = this.rawData.parentingRoleAccess.includes(ANYONE_METAROLE) ||
-      (
-        this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-      ) || (
-        this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
-      ) || this.rawData.parentingRoleAccess.includes(role);
+        (
+          this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+        ) || (
+          this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
+        ) || this.rawData.parentingRoleAccess.includes(role);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!hasParentingRoleAccess && throwError) {
         throw new EndpointError({
           message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
-          ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
+            ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
@@ -2118,8 +2160,8 @@ export default class ItemDefinition {
   ): boolean {
     const existInFirstLayer: boolean =
       this.getAllPropertyDefinitionsAndExtensions()
-      .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
-      .some((pd) => pd.isUnique());
+        .filter((pd) => !onlyCheckProperties ? true : onlyCheckProperties.includes(pd.getId()))
+        .some((pd) => pd.isUnique());
     if (existInFirstLayer) {
       return true;
     } else if (ignoreIncludes) {
@@ -2334,6 +2376,6 @@ export default class ItemDefinition {
    * @returns a boolean
    */
   public isOwnerObjectId() {
-    return this.rawData.ownerIsObjectId || false;
+    return this.rawData.ownerIsObjectId || false;
   }
 }

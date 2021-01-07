@@ -359,12 +359,7 @@ export class Cache {
     sqlModData.version = version || "";
     sqlModData.container_id = containerId;
 
-    if (forId && version === null) {
-      throw new EndpointError({
-        message: "You can't specify your own id for values without version",
-        code: ENDPOINT_ERRORS.FORBIDDEN,
-      });
-    } else if (!forId && version) {
+    if (!forId && version) {
       throw new EndpointError({
         message: "You can't specify a version without a standard for_id value",
         code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -388,19 +383,21 @@ export class Cache {
         });
       }
 
-      // otherwise let's find the unversioned value
-      const unversionedValue = await this.requestValue(
-        itemDefinition,
-        forId,
-        null,
-      );
+      if (version) {
+        // otherwise let's find the unversioned value if a version was specified
+        const unversionedValue = await this.requestValue(
+          itemDefinition,
+          forId,
+          null,
+        );
 
-      // if no such value of any version exists
-      if (!unversionedValue) {
-        throw new EndpointError({
-          message: "Theres no unversioned value for this version creation",
-          code: ENDPOINT_ERRORS.FORBIDDEN,
-        });
+        // if no such value of any version exists
+        if (!unversionedValue) {
+          throw new EndpointError({
+            message: "Theres no unversioned value for this version creation",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
       }
     }
 

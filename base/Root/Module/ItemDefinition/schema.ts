@@ -223,6 +223,12 @@ export default {
     ownerIsObjectId: {
       type: "boolean",
     },
+    customIdRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     canCreateInBehalf: {
       type: "boolean",
     },
