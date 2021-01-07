@@ -86,7 +86,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           // kind of requests so they must have this shape
           // other sort of tokens cannot be used in this
           if (
-            typeof decoded.id !== "number" ||
+            typeof decoded.id !== "string" ||
             typeof decoded.role !== "string" ||
             typeof decoded.sessionId !== "number"
           ) {

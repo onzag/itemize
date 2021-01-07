@@ -11,9 +11,9 @@ import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 const ID_TRIGGER = `CREATE OR REPLACE FUNCTION id12()
 RETURNS TRIGGER AS $$
 DECLARE
-  key TEXT
-  partial_query TEXT
-  found TEXT
+  key TEXT;
+  partial_query TEXT;
+  found TEXT;
 BEGIN
   IF NEW.id IS NOT NULL THEN
     RETURN NEW;

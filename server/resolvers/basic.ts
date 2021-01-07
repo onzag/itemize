@@ -84,7 +84,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
       if (!result.custom || result.isRealUser) {
         throwErr = (
-          typeof result.id !== "number" ||
+          typeof result.id !== "string" ||
           typeof result.role !== "string" ||
           typeof result.sessionId !== "number"
         );

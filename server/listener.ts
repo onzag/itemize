@@ -338,10 +338,11 @@ export class Listener {
       try {
         result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
         invalid = (
-          typeof result.id !== "number" ||
+          typeof result.id !== "string" ||
           typeof result.role !== "string" ||
           typeof result.sessionId !== "number"
         );
+        invalidReason = "invalid token shape";
       } catch (err) {
         invalid = true;
         invalidReason = "invalid token";
