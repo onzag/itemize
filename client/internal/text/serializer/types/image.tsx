@@ -9,7 +9,7 @@ import React from "react";
 import { DOMWindow } from "../../../../../util";
 import { IReactifyArg, ISerializationRegistryType } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase } from "../base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the image in the given
@@ -160,15 +160,7 @@ export function registerImage(registry: ISerializationRegistryType) {
       width: parseInt(img.dataset.srcWidth) || null,
       height: parseInt(img.dataset.srcHeight) || null,
       standalone: node.tagName === "IMG",
-      children: [
-        {
-          text: "",
-          bold: false,
-          italic: false,
-          underline: false,
-          templateText: null,
-        }
-      ]
+      children: [STANDARD_TEXT_NODE]
     };
   }
 

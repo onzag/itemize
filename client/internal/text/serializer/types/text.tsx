@@ -19,7 +19,6 @@ export const STANDARD_TEXT_NODE = {
   bold: false,
   italic: false,
   underline: false,
-  templateText: null as string,
   text: "",
 };
 
@@ -64,15 +63,6 @@ export function registerText(registry: ISerializationRegistryType) {
       final = u;
     }
 
-    // template text just adds a span to add the dataset text
-    // that is referred to setup templated text
-    if (text.templateText) {
-      const span = document.createElement("span");
-      span.dataset.text = text.templateText;
-      span.appendChild(final);
-      final = span;
-    }
-
     // and return that
     return final;
   }
@@ -104,27 +94,18 @@ export function registerText(registry: ISerializationRegistryType) {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
       // it's bold
       textValue.bold = true;
-      // and maybe templated
-      textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
       return textValue;
-
     // we do the same we did before for I
     } else if (nodeAsHTMLElement.tagName === "I") {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
       textValue.italic = true;
-      textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
       return textValue;
     // Underline
     } else if (nodeAsHTMLElement.tagName === "U") {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
       textValue.underline = true;
-      textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
       return textValue;
     // and span
-    } else if (nodeAsHTMLElement.tagName === "SPAN") {
-      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
-      textValue.templateText = nodeAsHTMLElement.dataset.text || textValue.templateText;
-      return textValue;
     }
 
     // now if it's a text node and it's not an HTML element
@@ -210,7 +191,6 @@ export function registerText(registry: ISerializationRegistryType) {
       bold: false,
       italic: false,
       underline: false,
-      templateText: null,
     };
   }
 
@@ -251,18 +231,6 @@ export function registerText(registry: ISerializationRegistryType) {
       newCustomProps.children = arg.element.text;
     }
 
-    // add template text
-    if (arg.element.templateText && !arg.active) {
-      newCustomProps.className = (newCustomProps.className || "") + " template";
-      newCustomProps.title = arg.element.templateText;
-    }
-
-    // set the templated text if we are doing this as template
-    if (arg.asTemplate && arg.element.templateText && !arg.customProps.children) {
-      const childContent = arg.templateArgs && arg.templateArgs[arg.element.templateText];
-      newCustomProps.children = childContent;
-    }
-
     // we return directly, no use of base because this is a text node
     // itself, the reactification does it in a single level
     // because text editor would like it so
@@ -277,7 +245,6 @@ export function registerText(registry: ISerializationRegistryType) {
   registry.DESERIALIZE.byTag.B = deserializeText;
   registry.DESERIALIZE.byTag.STRONG = deserializeText;
   registry.DESERIALIZE.byTag.I = deserializeText;
-  registry.DESERIALIZE.byTag.SPAN = deserializeText;
   registry.DESERIALIZE.text = deserializeText;
 }
 
@@ -301,8 +268,4 @@ export interface IText {
    * Whether the text is underline
    */
   underline: boolean;
-  /**
-   * templated content
-   */
-  templateText: string;
 }

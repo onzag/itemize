@@ -112,7 +112,7 @@ export interface IContainer extends IElementBase {
   /**
    * refers to be able to contain blocks or other super blocks, etc...
    */
-  containment: "superblock",
+  containment: "superblock";
   /**
    * A container type, might be null
    */

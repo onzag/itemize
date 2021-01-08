@@ -53,7 +53,8 @@ const templatedInteractiveActions = [
  */
 const templatedAttributes = [
   "thref",
-  "templateText",
+  "textContent",
+  "html",
   "forEach",
   "context",
   "uiHandler",
@@ -145,10 +146,6 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // but for that to be set we need to have something selected
   // in the rich text editor state
   if (props.state.currentSelectedTextNodeAnchor) {
-    // we need to check if we are going to show the text node, by default the text nodes
-    // don't show unless they are templated
-    const isTextAnchorTemplateRelevant = !!props.state.currentSelectedTextNode.templateText;
-
     // and now let's find what we will choose
     let currentRichElement = {
       children: props.state.currentValue,
@@ -161,9 +158,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
       currentRichElement = currentRichElement.children[p];
       pathSoFar.push(p);
 
-      // if it's not relevant, and we are right now at the last step and the next one will
+      // if we are right now at the last step and the next one will
       // be the text node, then we stop the mapping
-      if (!isTextAnchorTemplateRelevant && index === props.state.currentSelectedTextNodeAnchor.length - 1) {
+      if (index === props.state.currentSelectedTextNodeAnchor.length - 1) {
         // we return null, since this is a react component, nothing will render
         // note how the map is just an array of react components for the react component
         // path data itself

@@ -107,6 +107,7 @@ export interface IAttrs {
  */
 const translations = {
   html: "data-html",
+  textContent: "data-text",
   style: "style",
   styleHover: "data-style-hover",
   styleActive: "data-style-active",
@@ -361,7 +362,7 @@ export function reactifyElementBase(
   // and set it up as template in the class if
   // html has been defined from the context as data-html
   // which is a templating attribute
-  if (base.html && !arg.active) {
+  if ((base.html || base.textContent) && !arg.active) {
     finalProps.className = (finalProps.className || "") + " template";
   }
 
@@ -379,6 +380,11 @@ export function reactifyElementBase(
     delete finalProps.children;
     // and define the dangerously set inner html
     finalProps.dangerouslySetInnerHTML = currentTemplateArgs && currentTemplateArgs[base.html];
+  } else if (arg.asTemplate && base.textContent) {
+    // we remove the children if we have them
+    delete finalProps.children;
+    // and define the text content
+    finalProps.children = currentTemplateArgs && currentTemplateArgs[base.textContent];
   } else if (!finalProps.children && children) {
     // otherwise if no children have been defined in the given
     // custom properties, then we are going to instantiate
@@ -530,6 +536,12 @@ export interface IElementBase {
    * of the given element
    */
   html?: string;
+  /**
+   * For templating
+   * Represents replacement for textual content
+   * of the given element
+   */
+  textContent?: string;
   /**
    * For templating
    * Represents a chosen ui handler and it applies to the property

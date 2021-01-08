@@ -44,6 +44,7 @@ format_delete_element = delete element
 format_more = more options
 
 rich_container = container
+rich_inline = inline
 rich_text = text
 rich_custom = custom
 rich_file = file
@@ -206,6 +207,7 @@ format_delete_element = delete element
 format_more = lisää
 
 rich_container = container
+rich_inline = inline
 rich_text = text
 rich_custom = custom
 rich_file = file
@@ -368,6 +370,7 @@ format_delete_element = delete element
 format_more = more options
 
 rich_container = container
+rich_inline = inline
 rich_text = text
 rich_custom = custom
 rich_file = file
@@ -530,6 +533,7 @@ format_delete_element = delete element
 format_more = more options
 
 rich_container = container
+rich_inline = inline
 rich_text = text
 rich_custom = custom
 rich_file = file
@@ -692,6 +696,7 @@ format_delete_element = eliminar elemento
 format_more = más opciones
 
 rich_container = contenedor
+rich_inline = inline
 rich_text = texto
 rich_custom = elemento personalizado
 rich_file = archivo
@@ -854,6 +859,7 @@ format_delete_element = delete element
 format_more = more options
 
 rich_container = container
+rich_inline = inline
 rich_text = text
 rich_custom = custom
 rich_file = file

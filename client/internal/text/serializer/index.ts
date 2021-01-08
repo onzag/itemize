@@ -15,12 +15,13 @@ import { IImage, registerImage } from "./types/image";
 import { ILink, registerLink } from "./types/link";
 import { IParagraph, registerParagraph } from "./types/paragraph";
 import { IQuote, registerQuote } from "./types/quote";
-import { IText, registerText } from "./types/text";
+import { IText, registerText, STANDARD_TEXT_NODE } from "./types/text";
 import { ITitle, registerTitle } from "./types/title";
 import { IVideo, registerVideo } from "./types/video";
-import uuidv5 from "uuid/v5";
 import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
+import { IInline, registerInline } from "./types/inline";
+import uuidv5 from "uuid/v5";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -133,7 +134,7 @@ export interface ISerializationRegistryType {
    * into a react component
    */
   REACTIFY: {
-    [type: string]: (arg: IReactifyArg<RichElement | IText>) => React.ReactNode;
+    [type: string]: (arg: IReactifyArg<RichElement | IText>) => React.ReactNode;
   };
 }
 
@@ -155,6 +156,7 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
 // NOW we register all the elements that are part of this
 // by passing them to the function
 registerContainer(SERIALIZATION_REGISTRY);
+registerInline(SERIALIZATION_REGISTRY);
 registerCustom(SERIALIZATION_REGISTRY);
 registerFile(SERIALIZATION_REGISTRY);
 registerImage(SERIALIZATION_REGISTRY);
@@ -171,7 +173,7 @@ registerListItem(SERIALIZATION_REGISTRY);
  * This is what a rich element can be, it can be all these
  * but it's not a text
  */
-export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage | IFile | IVideo | IList | IListItem;
+export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage | IFile | IVideo | IList | IListItem | IInline;
 
 /**
  * Represents the root level document and a id
@@ -234,7 +236,10 @@ export function serialize(root: IRootLevelDocument): HTMLElement[] | string {
   // when it's not rich, we go for our last element
   const lastElement = root.children[root.children.length - 1];
   // if our last element is literally an empty paragraph then we consider such a thing needs dropping
-  const lastNeedsDropping = lastElement.type === "paragraph" && (lastElement.children[0] as IText).text === "";
+  const lastNeedsDropping =
+    lastElement.type === "paragraph" &&
+    (lastElement.children[0] as IText).text === "" &&
+    lastElement.children.length === 1;
   // and as such we define what children we are going to process
   const childrenToProcess = lastNeedsDropping ? [...root.children] : root.children;
 
@@ -278,7 +283,7 @@ function serializeElement(element: RichElement) {
     // then return that
     return childElement;
   }
-  
+
   // otherwise we give null
   return null;
 }
@@ -351,15 +356,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
         {
           type: "paragraph",
           containment: "block",
-          children: [
-            {
-              bold: false,
-              italic: false,
-              underline: false,
-              text: "",
-              templateText: null,
-            }
-          ]
+          children: [STANDARD_TEXT_NODE]
         }
       ] :
       finalChildren,
@@ -404,7 +401,7 @@ export function deserializeElement(node: Node): RichElement | IText {
       const foundExactClass = Object.keys(SERIALIZATION_REGISTRY.DESERIALIZE.byClassName).find((className) => {
         return classList.contains(className);
       });
-  
+
       // if we find it we call it
       if (foundExactClass) {
         result = SERIALIZATION_REGISTRY.DESERIALIZE.byClassName[foundExactClass](node) as any;
@@ -418,30 +415,81 @@ export function deserializeElement(node: Node): RichElement | IText {
     result = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
   }
 
-  // if there are children in the result
-  if ((result as RichElement).children) {
-    // we need to find the last child of this
-    const lastChild: any = (result as RichElement).children[(result as RichElement).children.length - 1];
+  // if there are children in the result and they happen
+  // to be some inline in them we need to ensure there are
+  // empty text nodes between the inlines so they
+  // can be selected properly
+  if (
+    (result as RichElement).children &&
+    (result as RichElement).children.length &&
+    (result as RichElement).children.some((r: any) => r.containment === "inline")
+  ) {
+    // so we prepare a modified array
+    let modifiedArrayVersion: any[] = [];
 
-    // if the last child is an inline element
-    if (lastChild.containment === "inline") {
-      // then we should check our last text node, so as to add the capability
-      // to add a caret after this last child inline element
-      const lastTextNode = lastChild.children[lastChild.children.length - 1];
+    // and now we loop in each one of the children
+    (result as RichElement).children.forEach((currentNode: any, index: number) => {
+      if (currentNode.containment === "inline") {
+        // get our current, prev, and next node from the parsed values
+        const prevNode: any = (result as RichElement).children[index - 1];
+        const nextNode: any = (result as RichElement).children[index + 1];
 
-      // so we add it
-      const lastNode = {
-        bold: false,
-        italic: false,
-        underline: false,
-        ...copyElementBase(lastTextNode),
-        templateText: null,
-        text: "",
-      } as IText;
+        // we need these texts from reference and they are taken from
+        // the currentNode, inside the inline element, in order to populate
+        // the gaps
+        const textNodeStart = currentNode.children[0];
+        const textNodeEnd = currentNode.children[currentNode.children.length - 1];
 
-      // and push it there
-      (result as RichElement).children.push(lastNode as any);
-    }
+        // and now we get our last node from the modified array version
+        // since it can be different from our standard as we keep adding these
+        // spacer gaps, we are trying to spot a gap, eg, when two inlines are together
+        const lastNodeInModified = modifiedArrayVersion[modifiedArrayVersion.length - 1];
+
+        // if there's no previous node, eg at the start of a paragraph there is an inline
+        // or when the previous is not a text, we need a spacer gap
+        // but we only need it if it's not already there in our modified
+        // array version eg. when two inlines are right next to each other
+        // one will add to the end, so this new one is not necessary
+        if (
+          (!prevNode || typeof prevNode.text === "undefined") &&
+          (!lastNodeInModified || typeof lastNodeInModified.text === "undefined")
+        ) {
+          // we use the start text as a reference for the spacer gap
+          const textReference = {
+            bold: false,
+            italic: false,
+            underline: false,
+            ...copyElementBase(textNodeStart),
+            text: "",
+          }
+
+          // and now we push it
+          modifiedArrayVersion.push(textReference);
+        }
+
+        // now we add our inline
+        modifiedArrayVersion.push(currentNode);
+
+        // and now we repeat the same process for the next node
+        // that should be between the inline
+        if (!nextNode || typeof nextNode.text === "undefined") {
+          const textReference = {
+            bold: false,
+            italic: false,
+            underline: false,
+            ...copyElementBase(textNodeEnd),
+            text: "",
+          }
+
+          modifiedArrayVersion.push(textReference);
+        }
+      } else {
+        // for whatever else we just add the node
+        modifiedArrayVersion.push(currentNode);
+      }
+    });
+
+    (result as RichElement).children = modifiedArrayVersion;
   }
 
   // return the given result
@@ -484,7 +532,6 @@ export function deserializePlain(data: string, comparer?: IRootLevelDocument) {
             italic: false,
             underline: false,
             text: c,
-            templateText: null,
           },
         ],
       }

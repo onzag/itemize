@@ -67,6 +67,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatMore: string;
 
   container: string;
+  inline: string;
   text: string;
   custom: string;
   file: string;
@@ -754,6 +755,7 @@ export default class PropertyEntryText
         formatMore: i18nInLanguage.format_more,
 
         container: i18nInLanguage.rich_container,
+        inline: i18nInLanguage.rich_inline,
         text: i18nInLanguage.rich_text,
         custom: i18nInLanguage.rich_custom,
         file: i18nInLanguage.rich_file,

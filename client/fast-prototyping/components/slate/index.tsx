@@ -13,7 +13,8 @@ import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeaf
 import { withHistory, HistoryEditor } from "slate-history";
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
-import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX, IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
+import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
+  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
@@ -27,6 +28,7 @@ import { IFile } from "../../../internal/text/serializer/types/file";
 import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import { ICustom } from "../../../internal/text/serializer/types/custom";
+import { IInline } from "../../../internal/text/serializer/types/inline";
 
 /**
  * Combine both interfaces
@@ -1425,7 +1427,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             totalNodes !== 1 &&
             // is not the ending of an inline element, as there should be an empty text node after
             // that in the end of the line
-            !(Element.isElement(prev) && this.editor.isInline(prev) && !next)
+            !(Element.isElement(prev) && this.editor.isInline(prev) && (!next || !Text.isText(next))) &&
+            // is not the start of an inline element, as there should be an empty text node after it
+            // before the start of the line
+            !(Element.isElement(next) && this.editor.isInline(next) && (!prev || !Text.isText(prev)))
           ) {
             // delete it
             Transforms.delete(this.editor, { at: path.concat(n) });
@@ -1449,7 +1454,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           }
 
           // now if we don't have a text node after our inline element
-          if (!next) {
+          if (!next || !Text.isText(next)) {
             // let's pick the last text element
             const lastText = (current as any).children[(current as any).children.length - 1];
             // and insert it after the inline
@@ -1460,11 +1465,34 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
                 italic: false,
                 underline: false,
                 ...copyElementBase(lastText),
-                templateText: null,
                 text: "",
               },
               { at: path.concat(n + 1) }
             );
+
+            n++;
+            totalNodes++;
+          }
+
+          // now if we don't have a prev node after our inline element
+          if (!prev || !Text.isText(prev)) {
+            // let's pick the first text element
+            const firstText = (current as any).children[0];
+            // and insert it after the inline
+            Transforms.insertNodes(
+              this.editor,
+              {
+                bold: false,
+                italic: false,
+                underline: false,
+                ...copyElementBase(firstText),
+                text: "",
+              },
+              { at: path.concat(n - 1) }
+            );
+
+            n++;
+            totalNodes++;
           }
         }
 
@@ -1668,7 +1696,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {
             ...this.state.currentText,
             text: "",
-            templateText: null,
           }
         ]
       });
@@ -1716,7 +1743,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {
             ...this.state.currentText,
             text: "",
-            templateText: null,
           }
         ]
       });
@@ -1899,7 +1925,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {
             ...this.state.currentText,
             text: "",
-            templateText: null,
           }
         ]
       }, { at: nextAnchor });
@@ -2022,12 +2047,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedNode = currentElement;
       // and the context is our current context
       currentSelectedNodeContext = currentContext;
-      // if we have a text element that is templatizeable, then
-      // that will be our new selected node and anchor
-      if (currentText && currentText.templateText) {
-        currentSelectedNodeAnchor = anchor;
-        currentSelectedNode = currentText;
-      }
     } else {
       // otherwise here, we are going to pick and trust
       // the values we are given, the anchors
@@ -2503,7 +2522,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {
             bold: false,
             italic: false,
-            templateText: null,
             text: "",
             underline: false,
           }
@@ -2549,11 +2567,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       underline: false,
       ...currentText, // note how we override here
       text: label,
-      templateText: value,
     }
 
+    // and now we build a paragraph node to put the text there
+    const inlineNode: IInline = {
+      children: [textNode],
+      containment: "inline",
+      type: "inline",
+      textContent: value,
+    };
+
     // and insert right there
-    this.editor.insertNode(textNode as any);
+    this.editor.insertNode(inlineNode as any);
   }
 
   /**
@@ -2583,7 +2608,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       underline: false,
       ...currentText,
       text: label,
-      templateText: null,
     }
 
     // and now we build a paragraph node to put the text there
@@ -2694,7 +2718,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             {
               bold: false,
               italic: false,
-              templateText: null,
               text: "",
               underline: false,
             }
@@ -2743,7 +2766,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {
             bold: false,
             italic: false,
-            templateText: null,
             text: "",
             underline: false,
           }
@@ -2803,7 +2825,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           underline: false,
           ...currentText,
           text: "",
-          templateText: null,
         }
       ]
     });
@@ -2865,7 +2886,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           underline: false,
           ...currentText,
           text: "",
-          templateText: null,
         }
       ]
     });

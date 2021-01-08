@@ -9,7 +9,7 @@ import React from "react";
 import { DOMWindow } from "../../../../../util";
 import { IReactifyArg, ISerializationRegistryType } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the file in the given
@@ -93,15 +93,7 @@ export function registerFile(registry: ISerializationRegistryType) {
       extension: fileExtensionNode.textContent,
       size: fileSizeNode.textContent,
       src: node.dataset.src,
-      children: [
-        {
-          text: "",
-          bold: false,
-          italic: false,
-          underline: false,
-          templateText: null,
-        },
-      ],
+      children: [STANDARD_TEXT_NODE],
     };
   }
 
