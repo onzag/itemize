@@ -581,7 +581,9 @@ export class RemoteListener {
 
       // otherwise we will add to the delayed feedback list
     } else if (
-      this.delayedFeedbacks.every((df) => df.itemDefinition !== request.itemDefinition || df.id !== request.id)
+      !this.delayedFeedbacks.some(
+        (df) => df.itemDefinition === request.itemDefinition && df.id === request.id && df.version === request.version
+      )
     ) {
       this.delayedFeedbacks.push(request);
       setTimeout(this.consumeDelayedFeedbacks, 70);
