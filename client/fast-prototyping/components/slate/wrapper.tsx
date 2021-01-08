@@ -10,13 +10,13 @@
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React from "react";
-import { ISlateEditorWrapperBaseProps } from ".";
+import { ISlateEditorStateType, ISlateEditorWrapperBaseProps, ITemplateArgsContext } from ".";
 import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
-  TextFieldsIcon, CodeIcon,
+  TextFieldsIcon, CodeIcon, Badge,
 } from "../../mui-core";
 import { Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -60,6 +60,13 @@ const style = createStyles({
   },
   tab: {
     minWidth: "auto",
+  },
+  badge: {
+    transform: "scale(1) translate(0%, 0%)",
+  },
+  badgeDisabled: {
+    transform: "scale(1) translate(0%, 0%)",
+    opacity: 0.5,
   },
   elementTitle: {
     textTransform: "capitalize",
@@ -196,6 +203,11 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
 
   /**
+   * The current state
+   */
+  state: ISlateEditorStateType;
+
+  /**
    * call to request an image, opens a dialog so requires a state
    */
   requestImage: () => void;
@@ -252,6 +264,22 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
   if (!props.state.isRichText) {
     // no toolbar
     return null;
+  }
+
+  let templateTextAmount = 0;
+  let templateHTMLAmount = 0;
+
+  if (props.featureSupport.supportsTemplating && props.state.currentContext) {
+    Object.keys(props.state.currentContext.properties).forEach((key) => {
+      const property = props.state.currentContext.properties[key];
+
+      // but they must be the given element type
+      if (property.type === "text") {
+        templateTextAmount++;
+      } else if (property.type === "html") {
+        templateHTMLAmount++;
+      }
+    });
   }
 
   // now we can create the component itself
@@ -450,31 +478,43 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             null
         }
         {
-          props.featureSupport.supportsTemplating ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddTemplateText}
-              disabled={!props.state.currentBlockElement}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.requestTemplateText}
-              onMouseUp={props.helpers.releaseBlur}
+          templateTextAmount ?
+            <Badge
+              badgeContent={templateTextAmount}
+              color="secondary"
+              classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
             >
-              <TextFieldsIcon />
-            </IconButton> :
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTemplateText}
+                disabled={!props.state.currentBlockElement}
+                onMouseDown={props.helpers.blockBlur}
+                onClick={props.requestTemplateText}
+                onMouseUp={props.helpers.releaseBlur}
+              >
+                <TextFieldsIcon />
+              </IconButton>
+            </Badge> :
             null
         }
         {
-          props.featureSupport.supportsTemplating ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddTemplateHTML}
-              disabled={!props.state.currentBlockElement}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.requestTemplateHTML}
-              onMouseUp={props.helpers.releaseBlur}
+          templateHTMLAmount ?
+            <Badge
+              badgeContent={templateHTMLAmount}
+              color="secondary"
+              classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
             >
-              <CodeIcon />
-            </IconButton> :
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTemplateHTML}
+                disabled={!props.state.currentBlockElement}
+                onMouseDown={props.helpers.blockBlur}
+                onClick={props.requestTemplateHTML}
+                onMouseUp={props.helpers.releaseBlur}
+              >
+                <CodeIcon />
+              </IconButton>
+            </Badge> :
             null
         }
         <div className={props.classes.moreOptionsSpacer} />
@@ -1080,7 +1120,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
             }
           >
             <div className={this.props.classes.editorDrawerBody}>
-              {this.state.drawerOpen ? <WrapperDrawer {...this.props}/> : null}
+              {this.state.drawerOpen ? <WrapperDrawer {...this.props} /> : null}
             </div>
           </div>
         </div>

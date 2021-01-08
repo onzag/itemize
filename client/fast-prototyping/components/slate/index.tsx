@@ -1997,6 +1997,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           }
         }
       });
+    } else {
+      currentContext = this.props.rootContext || null;
     }
 
     // now for our selection, by default it's all null
