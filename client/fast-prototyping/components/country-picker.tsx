@@ -8,6 +8,7 @@ import React from "react";
 import { capitalize } from "../../components/localization";
 import { Button, Menu, MenuItem } from "../mui-core";
 import AppCountryRetriever from "../../components/localization/AppCountryRetriever";
+import { LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
  * The props of the countrypicker
@@ -21,6 +22,15 @@ interface ICountryPickerProps {
    * Whether to use the country code rather than the native name
    */
   useCode?: boolean;
+  /**
+   * Whether null is a valid value
+   */
+  allowUnspecified?: boolean;
+  /**
+   * A label to give to the unspecified value, rather than the default
+   * which is the i18n standard unspecified value
+   */
+  unspecifiedLabel?: string;
   /**
    * handle the country change yourself rather than the default
    * which changes the application country, this allows
@@ -84,15 +94,45 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
     }
   }
   public render() {
+    if (this.props.allowUnspecified && !this.props.handleCountryChange) {
+      throw new Error(
+        "CountryPicker allowUnspecified is set to true " +
+        "but no manual handleCountryChange function was specified",
+      );
+    }
+
+    if (this.props.allowUnspecified && !this.props.unspecifiedLabel) {
+      return (
+        <LocaleContext.Consumer>
+          {(localeContext) => (
+            <CountryPicker {...this.props} unspecifiedLabel={localeContext.i18n[localeContext.language].unspecified}/>
+          )}
+        </LocaleContext.Consumer>
+      );
+    }
+
     return (
       <AppCountryRetriever>
         {(countryData) => {
           let currentCountry = countryData.currentCountry;
-          if (this.props.currentCode) {
-            currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode);
+          if (typeof this.props.currentCode !== "undefined") {
+            currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode) || null;
           }
           if (currentCountry === null) {
-            return null;
+            currentCountry = {
+              capital: null,
+              code: null,
+              continent: null,
+              currency: null,
+              emoji: null,
+              emojiU: null,
+              languages: null,
+              latitude: null,
+              longitude: null,
+              name: this.props.unspecifiedLabel,
+              native: this.props.unspecifiedLabel,
+              phone: null,
+            }
           }
 
           const menu = this.state.anchorEl ? <Menu
@@ -120,7 +160,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                 startIcon={currentCountry.emoji}
                 onClick={this.handleButtonSelectClick}
               >
-                {this.props.useCode ? currentCountry.code : currentCountry.native}
+                {this.props.useCode && currentCountry.code ? currentCountry.code : currentCountry.native}
               </Button>
               {menu}
             </React.Fragment>

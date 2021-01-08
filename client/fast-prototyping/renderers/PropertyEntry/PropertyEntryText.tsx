@@ -186,9 +186,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     });
   }
   public render() {
-    // this is the editor value
-    const editorValue = this.props.currentValue as string || "";
-
     // the icon as usual
     let icon: React.ReactNode;
     if (this.props.canRestore) {
@@ -228,6 +225,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         rootI18n={this.props.i18nRoot}
+        placeholder={this.props.placeholder}
         wrapperArgs={
           this.props.args.wrapperArgs || {
             i18nGenericError: this.props.i18nGenericError,

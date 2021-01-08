@@ -8,8 +8,9 @@
 
 import React from "react";
 import equals from "deep-equal";
-import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text, NodeEntry, Point } from 'slate';
-import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
+import { createEditor, Transforms, Range, Editor, Element, Node, Path, Text, NodeEntry, Point } from "slate";
+import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
+import { withHistory, HistoryEditor } from "slate-history";
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
 import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX, IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
@@ -26,6 +27,11 @@ import { IFile } from "../../../internal/text/serializer/types/file";
 import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import { ICustom } from "../../../internal/text/serializer/types/custom";
+
+/**
+ * Combine both interfaces
+ */
+interface ItemizeEditor extends ReactEditor, HistoryEditor {};
 
 /**
  * The template argument is used in a template context in order
@@ -438,12 +444,17 @@ export interface IHelperFunctions {
    * This is the editor instance of the given
    * editor
    */
-  editor: ReactEditor;
+  editor: ItemizeEditor;
   /**
    * This is the react editor class itself
    * provided by slate
    */
   ReactEditor: typeof ReactEditor;
+  /**
+   * This is the history editor class itself
+   * provided by slate
+   */
+  HistoryEditor: typeof HistoryEditor;
   /**
    * This is the transforms class itself
    * provided by slate
@@ -942,6 +953,11 @@ interface ISlateEditorProps {
    * this function is given by the handler in this way to the renderer
    */
   onInsertFile: (file: File, isExpectingImage?: boolean) => Promise<IInsertedFileInformationType>;
+  /**
+   * A placeholder to be used to be displayed, it only displays when the value
+   * is considered to be the null document
+   */
+  placeholder?: string;
 }
 
 /**
@@ -1092,7 +1108,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Represents the react editor element that is created
    * using slate
    */
-  private editor: ReactEditor;
+  private editor: ItemizeEditor;
   /**
    * This is the update timeout that is used in order to run onChange events when
    * the user stops typing and not on every keystroke, because rich text is expensive
@@ -1260,7 +1276,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now we build the slate editor
     const rawEditor = createEditor();
     // with react of course ;)
-    this.editor = withReact(rawEditor);
+    this.editor = withReact(withHistory(rawEditor));
 
     // setting up the functions to override
     // the defaults
@@ -3469,6 +3485,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // on alt+enter we want to insert a super block break
     if (e.key === "Enter" && e.altKey) {
       this.insertSuperblockBreak();
+    } else if (e.key === "z" && e.ctrlKey && !e.shiftKey) {
+      this.editor.undo();
+    } else if ((e.key === "y" && e.ctrlKey) || (e.key === "z" && e.ctrlKey && e.shiftKey)) {
+      this.editor.redo();
     }
   }
 
@@ -3497,6 +3517,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms,
       Range,
       ReactEditor,
+      HistoryEditor,
 
       selectPath: this.selectPath,
 
@@ -3587,6 +3608,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         onBlur={this.onNativeBlur}
         renderElement={this.renderElement}
         renderLeaf={this.renderText}
+        placeholder={this.props.placeholder}
       />
     );
 

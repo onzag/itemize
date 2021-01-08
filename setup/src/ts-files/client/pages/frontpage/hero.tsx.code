@@ -36,7 +36,7 @@ export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) 
 					{(languageData) => (
 						<ItemProvider
 							itemDefinition="fragment"
-							forId={1}
+							forId="HEADER"
 							forVersion={languageData.currentLanguage.code}
 							loadUnversionedFallback={true}
 							longTermCaching={true}
