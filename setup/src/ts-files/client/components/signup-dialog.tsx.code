@@ -118,12 +118,12 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 								<form>
 									<Entry
 										id="username"
-										onChange={actioner.dismissError}
+										onEntryDrivenChange={actioner.dismissError}
 										showAsInvalid={!!actioner.error}
 										icon={<AccountCircleIcon/>}
 										autoFocus={true}
 									/>
-									<Entry id="password" onChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
+									<Entry id="password" onEntryDrivenChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 									<AppLanguageRetriever>
 										{(languageData) => (
 											<Setter id="app_language" value={languageData.currentLanguage.code}/>

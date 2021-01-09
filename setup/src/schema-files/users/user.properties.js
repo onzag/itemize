@@ -59,6 +59,7 @@ custom.reset_password_field_alt_label = new password
 custom.reset_password_field_alt_placeholder = new password
 custom.reset_password_action = update password
 
+custom.validate_account_fragment_id = ACCOUNT_VALIDATION_EMAIL
 custom.validate_account = activate your account
 custom.validate_account_template_name =
 custom.validate_account_email_user = validate
@@ -69,6 +70,7 @@ custom.validate_account_success_title = success!
 custom.unsubscribe_success = you have been unsubscribed
 custom.unsubscribe_success_title = success
 
+custom.forgot_password_fragment_id = ACCOUNT_RECOVERY_EMAIL
 custom.forgot_password = forgot password
 custom.forgot_password_template_name =
 custom.forgot_password_email_user = recovery
@@ -195,6 +197,7 @@ custom.reset_password_field_alt_label = nueva contraseña
 custom.reset_password_field_alt_placeholder = nueva contraseña
 custom.reset_password_action = actualize la contraseña
 
+custom.validate_account_fragment_id = ACCOUNT_VALIDATION_EMAIL
 custom.validate_account = active su cuenta
 custom.validate_account_template_name =
 custom.validate_account_email_user = activar
@@ -205,6 +208,7 @@ custom.validate_account_success_title = ¡validación exitosa!
 custom.unsubscribe_success = usted ya no está suscrito
 custom.unsubscribe_success_title = ¡acción exitosa!
 
+custom.forgot_password_fragment_id = ACCOUNT_RECOVERY_EMAIL
 custom.forgot_password = He olvidado mi contraseña
 custom.forgot_password_template_name =
 custom.forgot_password_email_user = recuperar

@@ -112,6 +112,21 @@
         {
             "id": "about_me",
             "type": "text",
+            "specialProperties": {
+                "supportsVideos": false,
+                "supportsImages": false,
+                "supportsFiles": false,
+                "supportsLists": false,
+                "supportsContainers": false,
+                "supportsCustom": false,
+                "supportsExternalLinks": true,
+                "supportsLinks": true,
+                "supportsQuote": false,
+                "supportsRichClasses": false,
+                "supportsTitle": true,
+                "supportsCustomStyles": false,
+                "supportsTemplating": false
+            },
             "subtype": "html",
             "nullable": true,
             "searchable": false,

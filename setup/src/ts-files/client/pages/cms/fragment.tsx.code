@@ -19,7 +19,7 @@ import {
 } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate"
+import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate";
 import Route from "@onzag/itemize/client/components/navigation/Route";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
@@ -51,6 +51,34 @@ const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
 		label: "Header",
 		properties: {},
 	},
+	"ACCOUNT_VALIDATION_EMAIL": {
+		type: "context",
+		label: "Account Validation Email",
+		properties: {
+			validate_account_link: {
+				type: "link",
+				label: "Validation Link",
+			},
+			username: {
+				type: "text",
+				label: "Username",
+			},
+		},
+	},
+	"ACCOUNT_RECOVERY_EMAIL": {
+		type: "context",
+		label: "Account Recovery Email",
+		properties: {
+			forgot_password_link: {
+				type: "link",
+				label: "Recovery Link",
+			},
+			username: {
+				type: "text",
+				label: "Username",
+			},
+		},
+	},
 }
 const ALL_FRAGMENTS = Object.keys(FRAGMENTS);
 
@@ -79,7 +107,7 @@ const fragmentStyles = createStyles({
 
 const FragmentIndex = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
 	return (
-		<Container maxWidth="md" className={props.classes.container + " trusted"}>
+		<Container maxWidth="md" className={props.classes.container}>
 			<Paper className={props.classes.paper}>
 				<List>
 					{ALL_FRAGMENTS.map((f) => {
