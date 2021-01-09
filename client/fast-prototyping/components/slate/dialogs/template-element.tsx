@@ -55,7 +55,7 @@ interface ITemplateElementDialogProps {
    * The type of input for templated, text or html
    * are the only supported
    */
-  elementType: "text" | "html";
+  elementType: "text" | "html";
 }
 
 /**
@@ -64,7 +64,7 @@ interface ITemplateElementDialogProps {
  */
 interface ITemplateElementOption {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
 };
 
 /**
@@ -167,11 +167,22 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
   public updateValue(e: React.ChangeEvent<HTMLInputElement>) {
     // first we need to see the option where it came from
     const option = this.state.options.find((o) => o.value === e.target.value);
+    let label: string = null;
+
+    // hack method to extract the string value that is displaying
+    // from whatever node type is being used, eg i18n types
+    if (option) {
+      const foundLabelElementId = "slate-template-element-for-" + encodeURIComponent(option.value);
+      const element = document.getElementById(foundLabelElementId);
+      if (element) {
+        label = element.textContent.trim();
+      }
+    }
 
     // and then we can update the state
     this.setState({
       value: e.target.value,
-      label: option && option.label,
+      label,
     });
   }
 
@@ -218,7 +229,7 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
               {this.props.i18nInsertTemplateElementLabel}
             </InputLabel>
             <Select
-              value={this.state.value || ""}
+              value={this.state.value || ""}
               onChange={this.updateValue}
               variant="filled"
               input={
@@ -232,9 +243,17 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
                 // render the valid values that we display and choose
                 this.state.options.map((vv) => {
                   // the i18n value from the i18n data
-                  return <MenuItem key={vv.value} value={vv.value}>{
-                    vv.label
-                  }</MenuItem>;
+                  return (
+                    <MenuItem
+                      key={vv.value}
+                      value={vv.value}
+                      id={"slate-template-element-for-" + encodeURIComponent(vv.value)}
+                    >
+                      {
+                        vv.label
+                      }
+                    </MenuItem>
+                  );
                 })
               }
             </Select>

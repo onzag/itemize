@@ -105,7 +105,7 @@ interface ILinkDialogProps {
  */
 interface ILinkDialogTemplateOption {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
 };
 
 /**

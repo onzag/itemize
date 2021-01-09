@@ -1,28 +1,66 @@
+/**
+ * This file contains the fragments that are used accross the application
+ * to create content fragments in different languages, if you don't need fragments
+ * feel free do delete them from the schema and delete this file as well as remove
+ * all the references from the cms/index.tsx file
+ */
+
 import React from "react";
 
-import { ItemProvider, IActionResponseWithId } from "@onzag/itemize/client/providers/item";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
-import View from "@onzag/itemize/client/components/property/View";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
-import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { Paper, createStyles, withStyles, WithStyles,
-	Container, TextField, Box, Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import {
+	Paper, createStyles, withStyles, WithStyles,
+	Container, Box, List, ListItem, ListItemText,
+	ExtensionIcon, ListItemIcon,
+} from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
+import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate"
+import Route from "@onzag/itemize/client/components/navigation/Route";
+import Link from "@onzag/itemize/client/components/navigation/Link";
+import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 
 /**
- * The fragment styles
+ * The most important bit that defines what fragments are available to modify
+ * from within the CMS, these use custom keys; and you might add as many of
+ * them as you like, they are defined by template args since every fragment
+ * is allowed to be a template and can be rendered as such (even if it doesn't have to)
+ * in cms/index.propext.json you can find out the content property and what it
+ * supports
+ */
+const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
+	/**
+	 * In this example you can see the header, the header uses a custom ID
+	 * and is loaded in the frontpage by passing it as ID for the fragment
+	 * item definition
+	 * 
+	 * This defines the context, now we are using hardcoded contexts in here
+	 * that don't support for multilingual design, because of the labels
+	 * we are giving in, which are in english
+	 * 
+	 * Labels can however also be i18n element types, as react nodes are allowed
+	 * so that enables multilingual functionality if required, for the purpose
+	 * of this basic CMS simple strings are used
+	 */
+	"HEADER": {
+		type: "context",
+		label: "Header",
+		properties: {},
+	},
+}
+const ALL_FRAGMENTS = Object.keys(FRAGMENTS);
+
+/**
+ * The fragment styles that are used
+ * in the page itself
  */
 const fragmentStyles = createStyles({
 	paper: {
 		padding: "1rem",
-	},
-	paper2: {
-		padding: "1rem",
-		marginTop: "1rem",
 	},
 	container: {
 		paddingTop: "1rem",
@@ -30,23 +68,78 @@ const fragmentStyles = createStyles({
 	box: {
 		paddingBottom: "1rem",
 	},
+	listItem: {
+		borderBottom: "solid 1px #ccc",
+		transition: "backgroundColor 0.3s",
+		"&:hover": {
+			backgroundColor: "rgba(0,0,0,0.05)",
+		},
+	},
 });
 
-const redirectOnSuccess = (status: IActionResponseWithId) =>
-	`/cms/fragment?id=${status.id}&version=${status.version || ""}`;
+const FragmentIndex = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
+	return (
+		<Container maxWidth="md" className={props.classes.container + " trusted"}>
+			<Paper className={props.classes.paper}>
+				<List>
+					{ALL_FRAGMENTS.map((f) => {
+						const fragmentContext = FRAGMENTS[f];
+						return (
+							<Link to={"/cms/fragment/" + f} key={f}>
+								<ListItem className={props.classes.listItem}>
+									<ListItemIcon>
+										<ExtensionIcon />
+									</ListItemIcon>
+									<ListItemText primary={fragmentContext.label} secondary={f}/>
+								</ListItem>
+							</Link>
+						);
+					})}
+				</List>
+			</Paper>
+		</Container>
+	);
+});
+
+export function Fragment() {
+	return (
+		<>
+			<Route
+				path="/cms/fragment"
+				exact={true}
+				component={FragmentIndex}
+			/>
+			<Route path="/cms/fragment/:id"
+				exact={true}
+				component={SingleFragment}
+			/>
+		</>
+	);
+};
+
+interface ISingleFragmentProps extends WithStyles<typeof fragmentStyles> {
+	match: {
+		params: {
+			id: string;
+		};
+	};
+}
 
 /**
  * The fragment section itself that allows modifying and creating new fragments
  * @param props the fragment styles
  * @returns a react element
  */
-export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
+const SingleFragment = withStyles(fragmentStyles)((props: ISingleFragmentProps) => {
+	const fragmentId = props.match.params.id;
 	return (
-		<LocationStateReader defaultState={{ id: "", version: "" }} stateIsInQueryString={true}>
+		<LocationStateReader defaultState={{ version: "" }} stateIsInQueryString={true}>
 			{(locationState, setState) => {
-				const updateLocationState = (which: string, e: React.ChangeEvent<HTMLInputElement>) => {
+				// here we will use a language picker down there to specify the version
+				// of the fragment so multiple version fragments can be loaded
+				const updateVersionState = (code: string) => {
 					setState({
-						[which]: e.target.value,
+						version: code,
 					}, true);
 				};
 				return (
@@ -59,45 +152,31 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 						]}
 						includePolicies={false}
 						longTermCaching={false}
-						forId={locationState.id || null}
+						forId={fragmentId}
 						forVersion={locationState.version || null}
 					>
 						<Container maxWidth="md" className={props.classes.container + " trusted"}>
 							<Paper className={props.classes.paper}>
-
-								<I18nRead id="id" capitalize={true}>
-									{(i18nId: string) => (
-										<TextField
-											fullWidth={true}
-											value={locationState.id}
-											type="number"
-											onChange={updateLocationState.bind(null, "id")}
-											placeholder={i18nId}
-										/>
-									)}
-								</I18nRead>
-								<I18nRead id="version" capitalize={true}>
-									{(i18nVersion: string) => (
-										<TextField
-											fullWidth={true}
-											value={locationState.version}
-											onChange={updateLocationState.bind(null, "version")}
-											placeholder={i18nVersion}
-										/>
-									)}
-								</I18nRead>
+								<Box className={props.classes.box}>
+									<LanguagePicker
+										currentCode={locationState.version || null}
+										allowUnspecified={true}
+										handleLanguageChange={updateVersionState}
+									/>
+								</Box>
 
 								<Entry id="title" />
 								<Entry
 									id="content"
 									rendererArgs={{
-										requestAltOnImages: true,
-										supportsRawMode: true,
+										context: FRAGMENTS[fragmentId] || null,
 									}}
 								/>
 
 								<SubmitButton
 									i18nId="submit"
+									buttonVariant="contained"
+									buttonColor="primary"
 									options={{
 										properties: [
 											"title",
@@ -105,19 +184,9 @@ export const Fragment = withStyles(fragmentStyles)((props: WithStyles<typeof fra
 											"attachments",
 										],
 									}}
-									redirectOnSuccess={redirectOnSuccess}
-									redirectReplace={true}
 								/>
 
 							</Paper>
-
-							<Paper className={props.classes.paper2}>
-								<ItemLoader>
-									<Typography variant="h4"><View id="title" /></Typography>
-									<View id="content" />
-								</ItemLoader>
-							</Paper>
-
 						</Container>
 
 						<SubmitActioner>

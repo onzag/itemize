@@ -16,7 +16,7 @@ import { Path } from "slate";
  */
 interface ISingleTemplatingElementOption {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
 }
 
 /**

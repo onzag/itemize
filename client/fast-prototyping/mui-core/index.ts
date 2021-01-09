@@ -47,6 +47,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SettingsIcon from '@material-ui/icons/Settings';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
+import ExtensionIcon from '@material-ui/icons/Extension';
 import {
   createStyles,
   withStyles,
@@ -279,4 +280,5 @@ export {
   DeleteIcon,
   SettingsIcon,
   TextFieldsIcon,
+  ExtensionIcon,
 }

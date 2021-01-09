@@ -85,8 +85,10 @@ interface ITemplateArg {
    * }
    * 
    * where name is the actual value used, and label is a good i18n label
+   * 
+   * A react node can also be given to pass the i18n component
    */
-  label: string;
+  label: string | React.ReactNode;
 
   /**
    * A handler component to use during the edition of a component
@@ -169,8 +171,10 @@ export interface ITemplateArgsContext {
   /**
    * A human readable label for this given context value
    * it should be in the given language
+   * 
+   * A react node can be given, used for passing the I18n component
    */
-  label: string;
+  label: string | React.ReactNode;
   /**
    * If the context is an array or iterable, then mark it as such
    */

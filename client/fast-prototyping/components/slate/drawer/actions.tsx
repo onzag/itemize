@@ -43,7 +43,7 @@ const EVENTS = [
  */
 interface ISingleActionOption {
   value: string;
-  label: string;
+  label: string | React.ReactNode;
 }
 
 /**
