@@ -268,6 +268,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
 
   let templateTextAmount = 0;
   let templateHTMLAmount = 0;
+  let templateLinkAmount = 0;
 
   if (props.featureSupport.supportsTemplating && props.state.currentContext) {
     Object.keys(props.state.currentContext.properties).forEach((key) => {
@@ -278,8 +279,32 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         templateTextAmount++;
       } else if (property.type === "html") {
         templateHTMLAmount++;
+      } else if (property.type === "link") {
+        templateLinkAmount++;
       }
     });
+  }
+
+  let linkBaseComponent = props.featureSupport.supportsLinks ? (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatLinkLabel}
+      color={props.state.currentElement && props.state.currentElement.type === "link" ? "primary" : "default"}
+      disabled={!props.featureSupport.canInsertLink}
+      onClick={props.requestLink}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <LinkIcon />
+    </IconButton>
+  ) : null;
+
+  if (props.featureSupport.supportsLinks && templateLinkAmount) {
+    linkBaseComponent = <Badge
+      badgeContent={templateLinkAmount}
+      color="secondary"
+      classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
+    >{linkBaseComponent}</Badge>
   }
 
   // now we can create the component itself
@@ -330,21 +355,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <Divider orientation="vertical" className={props.classes.divider} /> :
             null
         }
-        {
-          props.featureSupport.supportsLinks ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatLinkLabel}
-              color={props.state.currentElement && props.state.currentElement.type === "link" ? "primary" : "default"}
-              disabled={!props.featureSupport.canInsertLink}
-              onClick={props.requestLink}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <LinkIcon />
-            </IconButton> :
-            null
-        }
+        { linkBaseComponent }
         {
           props.featureSupport.supportsTitle ?
             <IconButton
