@@ -3589,6 +3589,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * to know what it can and can't do
    */
   public getFeatureSupport() {
+    // Happens for plaintext which has no features
+    // since it doesn't support any
+    if (this.props.features === null) {
+      return null;
+    }
+
     // we get these from the available filtering functions
     const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
     const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");

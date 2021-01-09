@@ -711,6 +711,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * @returns a boolean on this fact
    */
   public shouldHaveDrawer() {
+    // basically not rich text
+    if (!this.props.featureSupport) {
+      return false;
+    }
     // a drawer is only necessary if we support all of these
     // beause that's what we configure in the drawer
     return !!(
@@ -1000,7 +1004,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   public render() {
 
     // first we build the iamge input if we support it
-    const imageInput = this.props.featureSupport.supportsImages ? (
+    const imageInput = this.props.state.isRichText && this.props.featureSupport.supportsImages ? (
       <input
         ref={this.inputImageRef}
         type="file"
@@ -1013,7 +1017,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     ) : null;
 
     // now the general file input
-    const fileInput = this.props.featureSupport.supportsFiles ? (
+    const fileInput = this.props.state.isRichText && this.props.featureSupport.supportsFiles ? (
       <input
         ref={this.inputFileRef}
         type="file"
