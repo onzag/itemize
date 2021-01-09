@@ -355,7 +355,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             <Divider orientation="vertical" className={props.classes.divider} /> :
             null
         }
-        { linkBaseComponent }
+        {linkBaseComponent}
         {
           props.featureSupport.supportsTitle ?
             <IconButton
@@ -578,6 +578,15 @@ export interface MaterialUISlateWrapperState {
   drawerOpen: boolean;
 
   /**
+   * The drawer being open or closed is stored in local storage, which is not available in the server
+   * side, and the drawer animates when it's opened and closed, so this variable is always false at the
+   * start, the drawer is always closed at the start, however, if we need to open the drawer at the start
+   * on mount we don't want any animation so we toggle this flag temporarily, it doesn't need to be part
+   * of the state as it's only used there
+   */
+  noAnimate: boolean;
+
+  /**
    * When opening a dialog and losing focus to the slate rich text editor content editable
    * we lose access to the anchors and current elements now that we are in focus of something
    * else so we need to store the element that was the current element that was in focus
@@ -617,15 +626,6 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   private refocusTimeout: NodeJS.Timeout;
 
   /**
-   * The drawer being open or closed is stored in local storage, which is not available in the server
-   * side, and the drawer animates when it's opened and closed, so this variable is always false at the
-   * start, the drawer is always closed at the start, however, if we need to open the drawer at the start
-   * on mount we don't want any animation so we toggle this flag temporarily, it doesn't need to be part
-   * of the state as it's only used there
-   */
-  private noAnimate: boolean = false;
-
-  /**
    * Constructs a new material ui based wrapper for the slate editor
    * @param props the base properties that every wrapper gets extended for this specific wrapper
    */
@@ -645,6 +645,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       // keep SSR compatibility by keeping the drawer closed at the start
       // as we cannot read local storage in the server side
       drawerOpen: false,
+      noAnimate: true,
     }
 
     // create the refs
@@ -681,16 +682,26 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   public componentDidMount() {
     // if we should have a drawer
     if (this.shouldHaveDrawer()) {
-      // we turn off the animation in case
-      this.noAnimate = true;
       // and set the state of the drawer based on the local storage value
       this.setState({
         drawerOpen: localStorage.getItem("SLATE_DRAWER_OPEN") === "true",
+        noAnimate: true,
       }, () => {
-        // and re-enable the animation
-        // if the drawer opened it won't animate
-        // this keeps SSR compatibility
-        this.noAnimate = false;
+        // We need to wait 300 seconds because as usual
+        // some bug in react causes states to stack
+        setTimeout(() => {
+          // and re-enable the animation
+          // if the drawer opened it won't animate
+          // this keeps SSR compatibility
+          this.setState({
+            noAnimate: false,
+          })
+        }, 300);
+      });
+    } else {
+      // otherwise animation is enabled
+      this.setState({
+        noAnimate: false,
       });
     }
   }
@@ -1127,7 +1138,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
             className={
               this.props.classes.editorDrawer +
               (this.state.drawerOpen ? " open" : "") +
-              (this.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
+              (this.state.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
             }
           >
             <div className={this.props.classes.editorDrawerBody}>
