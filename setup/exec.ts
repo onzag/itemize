@@ -11,7 +11,7 @@ import sudo from "sudo-prompt";
  * @param code the code we execute
  * @returns a void promise
  */
-export function execAsync(code: string) {
+export function execAsync(code: string): Promise<void> {
   console.log(code);
   // this is the promise
   return new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ export function execAsync(code: string) {
  * @param icns
  * @returns a void promise
  */
-export function execSudo(code: string, name: string, icns?: string) {
+export function execSudo(code: string, name: string, icns?: string): Promise<void> {
   console.log(code);
   return new Promise((resolve, reject) => {
     sudo.exec(

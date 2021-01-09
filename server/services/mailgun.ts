@@ -6,7 +6,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   private mailgun: Mailgun.Mailgun;
   private cantReceiveEmail: boolean = false;
 
-  public async initialize() {
+  public async initialize(): Promise<void> {
     this.mailgun = new Mailgun(this.config);
 
     const allRoutes = await this.mailgun.get("/routes", {
@@ -22,7 +22,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
     if (allRoutes && allRoutes.items) {
       const ourRoute = allRoutes.items.find((r: any) => r.description === customID);
       if (!ourRoute) {
-        await (new Promise((resolve) => {
+        await (new Promise<void>((resolve) => {
           this.mailgun.post(
             "/routes",
             {

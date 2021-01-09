@@ -110,7 +110,7 @@ const importedSrcPool: string[] = [];
  * This function imports a file given a url
  * @param src the source url
  */
-export function importScript(src: string) {
+export function importScript(src: string): Promise<void> {
   // if the file has already been imported
   if (importedSrcPool.includes(src)) {
     // resolve right away
@@ -125,7 +125,7 @@ export function importScript(src: string) {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
     document.body.appendChild(script);
-    script.onload = resolve;
+    script.onload = () => { resolve() };
     script.onerror = reject;
     script.async = true;
     script.src = src;
