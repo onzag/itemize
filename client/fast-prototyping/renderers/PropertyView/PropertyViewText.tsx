@@ -319,10 +319,8 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public render() {
     return (
-      <>
-        <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
-      </>
-    )
+      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
+    );
   }
 }
 

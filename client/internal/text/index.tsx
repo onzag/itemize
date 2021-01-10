@@ -258,16 +258,6 @@ export function sanitize(
 }
 
 /**
- * clean all attributes in a html element
- * @param node the node to clean for
- */
-function cleanAllAttribs(node: HTMLElement) {
-  Array.prototype.slice.call(node.attributes).forEach((attr: any) => {
-    node.removeAttribute(attr.name);
-  });
-}
-
-/**
  * The postprocessing hook that cleans and sets the attributes
  * right for the rich text in order to follow the standards
  * given by the text-specs.md file
@@ -290,7 +280,6 @@ export function postprocess(
     if (options.supportsVideos) {
       const videoSrc = node.dataset.videoSrc || "";
       const origin = node.dataset.videoOrigin || "";
-      cleanAllAttribs(node);
 
       (node as HTMLIFrameElement).allowFullscreen = true;
 
@@ -322,7 +311,8 @@ export function postprocess(
       const alt = (node as HTMLImageElement).alt || "";
       const srcHeight = node.dataset.srcHeight;
       const srcWidth = node.dataset.srcWidth;
-      cleanAllAttribs(node);
+
+      node.removeAttribute("loading");
 
       if (!srcId || !currentFile) {
         node.parentElement && node.parentElement.removeChild(node);
@@ -364,7 +354,6 @@ export function postprocess(
     if (options.supportsFiles) {
       const srcId = node.dataset.srcId;
       const src = node.dataset.src;
-      cleanAllAttribs(node);
       const currentFile = context.currentFiles && context.currentFiles.find((f) => f.id === srcId);
 
       if (currentFile) {
