@@ -799,6 +799,14 @@ export class ActualItemProvider extends
   constructor(props: IActualItemProviderProps) {
     super(props);
 
+    if (
+      typeof document !== "undefined" &&
+      window.TESTING &&
+      process.env.NODE_ENV === "development"
+    ) {
+      this.internalUUID = uuid.v4();
+    }
+
     // Just binding all the functions to ensure their context is defined
     this.onPropertyChange = this.onPropertyChange.bind(this);
     this.onPropertyRestore = this.onPropertyRestore.bind(this);
@@ -1094,7 +1102,6 @@ export class ActualItemProvider extends
     }
 
     if (window.TESTING && process.env.NODE_ENV === "development") {
-      this.internalUUID = uuid.v4();
       this.mountOrUpdateIdefForTesting();
     }
   }
@@ -1684,13 +1691,13 @@ export class ActualItemProvider extends
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         forId, forVersion,
       );
-      if (window.TESTING && process.env.NODE_ENV === "development") {
-        this.mountOrUpdateIdefForTesting(true);
-      }
       if (
         appliedGQLValue &&
         requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
       ) {
+        if (window.TESTING && process.env.NODE_ENV === "development") {
+          this.mountOrUpdateIdefForTesting(true);
+        }
         const completedValue = this.loadValueCompleted({
           value: appliedGQLValue.rawValue,
           error: null,

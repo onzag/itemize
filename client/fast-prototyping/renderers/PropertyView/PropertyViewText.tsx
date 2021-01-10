@@ -208,11 +208,11 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
       // preparations make no sense
       if (!img.src.startsWith("blob:")) {
         // we move all these attributes to the dataset
-        img.dataset.srcset = img.srcset;
+        img.dataset.srcset = img.getAttribute("srcset");
         img.removeAttribute("srcset");
-        img.dataset.src = img.src;
+        img.dataset.src = img.getAttribute("src");
         img.removeAttribute("src");
-        img.dataset.sizes = img.sizes;
+        img.dataset.sizes = img.getAttribute("sizes");
         img.removeAttribute("sizes");
       }
     });
@@ -220,7 +220,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     // we do the same with iframes
     this.cheapdiv.querySelectorAll("iframe").forEach((iframe: HTMLIFrameElement) => {
       if (!iframe.src.startsWith("blob:")) {
-        iframe.dataset.src = iframe.src;
+        iframe.dataset.src = iframe.getAttribute("src");
         iframe.removeAttribute("src");
       }
     });

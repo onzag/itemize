@@ -18,7 +18,7 @@ class Tests extends Test<0>{
         // include a test branch
         this.define(
             "Itemize Tests",
-            new ItemizeTest(HTTPS, HOST, PORT)
+            new ItemizeTest(HTTPS, HOST, PORT, this.puppet)
         );
 
         // you might define your own assertions

@@ -73,7 +73,11 @@ async function copyAndProcessDirectoryLevelFor(
     // and the final filename we are going to use, by default the same
     let finalFileName: string = fileNameInDirectory;
     if (readAsUtf8) {
-      finalFileName = fileNameInDirectory.replace(/\.code$/, "").replace(/\.js$/, "");
+      if (fileNameInDirectory.endsWith(".js.code")) {
+        finalFileName = fileNameInDirectory.replace(/\.code$/, "");
+      } else {
+        finalFileName = fileNameInDirectory.replace(/\.code$/, "").replace(/\.js$/, "");
+      }
     }
   
     // and the utf8 read content
@@ -281,7 +285,7 @@ export default async function srcSetup(arg: ISetupConfigType): Promise<ISetupCon
     options = await copyAllFilesFor(
       arg.standardConfig,
       "tests",
-      path.join(__dirname, "..", "..", "..", "setup", "src", "ts-tests-files"),
+      path.join(__dirname, "..", "..", "..", "setup", "src", "js-tests-files"),
       options,
     );
   }

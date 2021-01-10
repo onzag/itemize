@@ -174,7 +174,7 @@ export class RedisTest extends Test {
                   "mutation{EDIT_MOD_users__IDEF_user(token: " +
                   JSON.stringify(this.testingUserInfo.testToken) +
                   ",id:" +
-                  this.testingUserInfo.testUser.id +
+                  JSON.stringify(this.testingUserInfo.testUser.id) +
                   ",version:null,language:" +
                   JSON.stringify(this.testingUserInfo.testUser.app_language) +
                   ",listener_uuid:null,app_country:" +

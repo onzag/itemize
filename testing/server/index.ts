@@ -87,7 +87,7 @@ export class ServerTest extends Test {
 
     const malformedTestToken = await jwtSign(
       {
-        id: testUser.id.toString(),
+        id: 1,
         role: testUser.role,
         sessionId: (testUser.session_id || 0).toString(),
       },

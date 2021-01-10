@@ -171,7 +171,8 @@ export class ExplorerText extends Test {
             return;
           }
           this.it(
-            "Should have a matching provider for " + q.idef + " with id " + q.id + " and version " + q.version,
+            "Should have a matching provider for " + JSON.stringify(q.idef) + " with id " +
+            JSON.stringify(q.id) + " and version " + JSON.stringify(q.version),
             () => {
               const foundItem = this.currentTestingContext.mountedItems.find(
                 (i) => i.itemDefinition === q.idef && i.id === q.id && i.version === q.version
@@ -182,6 +183,7 @@ export class ExplorerText extends Test {
               }
 
               if (!foundItem.wasContentLoadedFromMemory) {
+                console.log(foundItem);
                 assert.fail("The provider informed not using the information given by the SSR attribute");
               }
 
