@@ -9,7 +9,7 @@
  */
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ISlateEditorStateType, ISlateEditorWrapperBaseProps, ITemplateArgsContext } from ".";
 import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
@@ -260,6 +260,11 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
  * @param props the entire rich text editor toolbar props with all the added functions
  */
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
+  const [isReady, makeReady] = useState(false);
+  useEffect(() => {
+    makeReady(true);
+  }, []);
+
   // no rich text
   if (!props.state.isRichText) {
     // no toolbar
@@ -299,12 +304,54 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
     </IconButton>
   ) : null;
 
-  if (props.featureSupport.supportsLinks && templateLinkAmount) {
+  if (props.featureSupport.supportsLinks && templateLinkAmount && isReady) {
     linkBaseComponent = <Badge
       badgeContent={templateLinkAmount}
       color="secondary"
       classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
     >{linkBaseComponent}</Badge>
+  }
+
+  let templateTextBaseComponent: React.ReactNode = null;
+
+  if (templateTextAmount && isReady) {
+    templateTextBaseComponent = <Badge
+      badgeContent={templateTextAmount}
+      color="secondary"
+      classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
+    >
+      <IconButton
+        tabIndex={-1}
+        title={props.i18nRichInfo.formatAddTemplateText}
+        disabled={!props.state.currentBlockElement}
+        onMouseDown={props.helpers.blockBlur}
+        onClick={props.requestTemplateText}
+        onMouseUp={props.helpers.releaseBlur}
+      >
+        <TextFieldsIcon />
+      </IconButton>
+    </Badge>
+  }
+
+  let templateHTMLBaseComponent: React.ReactNode = null;
+
+  if (templateHTMLAmount && isReady) {
+    templateHTMLBaseComponent = <Badge
+      badgeContent={templateHTMLAmount}
+      color="secondary"
+      classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
+    >
+      <IconButton
+        tabIndex={-1}
+        title={props.i18nRichInfo.formatAddTemplateHTML}
+        disabled={!props.state.currentBlockElement}
+        onMouseDown={props.helpers.blockBlur}
+        onClick={props.requestTemplateHTML}
+        onMouseUp={props.helpers.releaseBlur}
+      >
+        <CodeIcon />
+      </IconButton>
+    </Badge>
   }
 
   // now we can create the component itself
@@ -488,46 +535,8 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             </IconButton> :
             null
         }
-        {
-          templateTextAmount ?
-            <Badge
-              badgeContent={templateTextAmount}
-              color="secondary"
-              classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTemplateText}
-                disabled={!props.state.currentBlockElement}
-                onMouseDown={props.helpers.blockBlur}
-                onClick={props.requestTemplateText}
-                onMouseUp={props.helpers.releaseBlur}
-              >
-                <TextFieldsIcon />
-              </IconButton>
-            </Badge> :
-            null
-        }
-        {
-          templateHTMLAmount ?
-            <Badge
-              badgeContent={templateHTMLAmount}
-              color="secondary"
-              classes={{ badge: props.state.currentBlockElement ? props.classes.badge : props.classes.badgeDisabled }}
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTemplateHTML}
-                disabled={!props.state.currentBlockElement}
-                onMouseDown={props.helpers.blockBlur}
-                onClick={props.requestTemplateHTML}
-                onMouseUp={props.helpers.releaseBlur}
-              >
-                <CodeIcon />
-              </IconButton>
-            </Badge> :
-            null
-        }
+        {templateTextBaseComponent}
+        {templateHTMLBaseComponent}
         <div className={props.classes.moreOptionsSpacer} />
         {
           props.shouldHaveDrawer() ?
