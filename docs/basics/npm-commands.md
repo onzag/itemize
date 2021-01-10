@@ -6,6 +6,20 @@ Runs the typescript transpiler to build the server build
 
 Runs the typescript transpiler to build the server build
 
+## npm run test-development
+
+Runs the tests in development mode, this is the recommended mode as it will test using features that are only available for development servers and build; it does expect a development server.
+
+By default the standard test that is written automatically during the setup contains these environment variables.
+
+ - `HTTPS` should be true or false, specifies whether the server should be done via https, default is false
+ - `HOST` should be the host to use to connect, default is localhost
+ - `PORT` should be the port to use to connect, default is 8000
+
+## npm run test-production
+
+Runs the test in production mode, this mode is not recommended as it will not be able to perform the full range of tests, and it is aimed to run against production servers and builds, it supports the same options as the development mode
+
 ## npm run webpack
 
 Runs the webpack transpiler to create the web production builds, note that the production builds do not mean that they are only accessible when the web is ran with production configuration, there's a difference between the web app production/development builds and the server development/production environment, while in your application client data using NODE_ENV refers to this mode, in your server data NODE_ENV refers to the three values, and they can be combined.

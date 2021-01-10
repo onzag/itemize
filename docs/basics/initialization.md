@@ -75,25 +75,7 @@ Missing resource file: contact/en.html
 
 This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
 
-### Start a development environment (optional)
-
-`npm run start-dev-environment development`
-
-This will spawn both redis and postgreSQL using your development configuration
-
-### Update your database
-
-`npm run build-database development`
-
-This will build the database
-
-### Run a local server
-
-`npm run start-dev-server development`
-
-Starts a local server that is listening at port 8000, go to localhost:8000 and your server must be setup up and running.
-
-### Start a development environment (optional)
+### Start a development environment (optional but necessary if you don't have an external database/redis)
 
 `npm run start-dev-environment development`
 
@@ -103,7 +85,7 @@ Remember to stop the dev environment once you are done
 
 `npm run stop-dev-environment development`
 
-### Update the database
+### Update your database
 
 `npm run build-database development`
 
@@ -114,16 +96,6 @@ This will build the database
 `npm run start-dev-server`
 
 This will start the development server locally and listening at localhost:8000
-
-Note that if you didn't setup the openstack containers which are necessary for handling files, you will get this error when starting:
-
-`error: initializeServer [SERIOUS]: Invalid seo container id for the openstack container 'MAIN' {"timestamp":"2020-09-16T16:42:46.165Z"}`
-
-This is fine and the server should work just fine, just seo didn't initialize for building the `sitemap.xml` files, however files will not work properly due to the missing openstack configuration, itemize is made to work despite of this, and you will get warnings such as:
-
-`warn: processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted {"timestamp":"2020-09-16T17:34:46.167Z"}`
-
-These warnings and errors will go away when you setup openstack containers, if you didn't do it during setup, check out how to do it manually at [Openstack Setup](./openstack.md), you might easily get rid of the seo container error by disabling seo via the environment variable `NO_SEO=true`
 
 ### Access your application
 
@@ -161,7 +133,7 @@ And that should show the relevant lines, note that the date 2020-09-16 should be
 
 ### Setup the npm token
 
-Itemize currently is not open source, as such it needs a npm token for correct functioning, after you have been added to the repository refer to npmjs.com and create a read-only token at `https://www.npmjs.com/settings/username/token` then do the following.
+Itemize requires you to use the npm token in order to build and ship your application, this is partly because it's a more robust method that replicates how you currently build in your environment, since itemize uses npm and the npm registry, in order to specify your token you need to do
 
 `echo "YOUR_TOKEN_HERE" > .npm-token`
 

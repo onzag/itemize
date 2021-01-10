@@ -1,5 +1,9 @@
 # Documentation
 
+Itemize documentation is rather extensive, there are many API's and a lot of functionality; knowledge of the full range of customization is not necessary to succesfully build and ship an app with itemize.
+
+Itemize source code was designed to be as legible and understandable as possible, every prop that is meant to be used by the developer is commented and explained to what effects it has, we recommend diving in the source code of the resource you are importing if you wish you understand its internals.
+
 ## Tutorials
  - [AirBnB website](./tutorials/airbnb/start.md)
 
@@ -14,19 +18,23 @@
  - [Fast Prototyping](./basics/fast-prototyping.md)
  - [SSR](./basics/ssr.md)
  - [SEO](./basics/seo.md)
+ - [Testing](./basics/testing.md)
  - [Server Environment Variables](./basics/server-env-variables.md)
  - [Clusters and Infraestructure](./basics/clusters.md)
  - [Deploying a Cluster](./basics/deploying.md)
 
 ## Customization
+
  - [Moving away from fast protoyping](./customization/customization.md)
  - [Customizing Rendering of Entry/View](./customization/custom-renderers.md)
 
-## Natively supported 3rd party API's
+## 3rd party API's
+
  - [Navigation](./3rdparty/navigation.md)
  - [GeoLocation IP](./3rdparty/geolocation-ip.md)
  - [Storage](./3rdparty/storage.md)
  - [Currency](./3rdparty/currency.md)
+ - [Mail](./3rdparty/mail.md)
 
 ## Development
 
@@ -44,7 +52,7 @@
 
 ## Advanced
 
- - [Integration with 3rd parties](./advanced/integration.md)
+ - [Custom 3rd parties](./advanced/integration.md)
  - [GeoDNS](./advanced/geodns.md)
  - [Specifications of the text type](./advanced/text-specs.md)
  - [Rich Text Templating](./advanced/templating.md)

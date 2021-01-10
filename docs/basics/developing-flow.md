@@ -128,6 +128,10 @@ You should have your own local repository of itemize for this, and do the change
  4. `npm run webpack-dev` or `npm run webpack` (within the project directory)
  5. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
 
+### Testing debugging
+
+Special functions available in the window named `ENABLE_TESTING` and `DISABLE_TESTING` allow to enable the testing mode as it is used during by the tests ran by the puppetter browser, this allows to debug tests.
+
 ## More information
 
 For more information about the commands shown in here, you might refer to [NPM Commands](./npm-commands.md)
