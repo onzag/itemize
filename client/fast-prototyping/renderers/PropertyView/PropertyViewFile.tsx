@@ -59,7 +59,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
     // image loading it's unecessary to have them removed as the browser
     // will handle it natively
     this.state = {
-      loaded: false,
+      loaded: this.props.args.lazyLoad ? false : true,
     }
   }
 
