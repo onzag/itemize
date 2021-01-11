@@ -18,4 +18,4 @@ Now we are ready to turn this template website into something that is more remin
 
 ## Next Step
 
-[Next](./schemas.md)
+[Next](./01-schemas.md)

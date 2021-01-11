@@ -1,4 +1,4 @@
-[Prev](./start.md)
+[Prev](./README.md)
 
 # Schemas
 
@@ -41,6 +41,10 @@ Pretty self explanatory, now we want to add an `unit.json` file which will defin
     ]
 }
 ```
+
+So far your folder structure should look as:
+
+![hosting folder structure](./hosting-folder-structure.png)
 
 Now lets start adding properties, one of the things we need is a title so we add such, we will define it as a simple text entry, without any other special properties
 
@@ -189,7 +193,7 @@ Note that references are not checked, and it's possible to put an arbitrary stri
 
 Because we don't want our unit owner to be able to put any user they want here, we will make the field readOnly by the owner of the unit, and none else will be able to read it (by default everything is public), also we will disable editing, none can edit this field (we will take care of bookings later).
 
-## Building the Schema
+## Preparing the Schema
 
 After adding the module to our root tree as such
 
@@ -205,5 +209,14 @@ After adding the module to our root tree as such
 }
 ```
 
-You should then rebuild using `npm run build-data` however, it will fail, that's because we have missing our schema properties in the languages we support.
+You should then rebuild using `npm run build-data` however, it will fail, that's because we have missing our schema properties in the languages we support, the error you should get will be the following:
 
+![required file error](./required-file-error.png)
+
+## Adding the missing properties
+
+The itemize builder will tell you what you are missing and what should come in the given missing files, however, for the purpose of this tutorial you might use the following definitions, note that you might need to add them in different languages if you are supporting more than just english
+
+## Next Step
+
+[Next](./02-adding.md)
