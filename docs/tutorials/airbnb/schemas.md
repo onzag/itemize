@@ -6,6 +6,8 @@ The itemize default template project comes with JSON schemas that define the kin
 
 The only necessary files in the schemas folder are `main-i18n.properties`, `root.json`, `root.properties`, and the ones contained in the `users` folder as itemize will complain if these are missing.
 
+![schema structure](./schema-structure.png)
+
  - `main-i18n.properties` contains main language properties to be used in the UI, anything included here is required.
  - `root.json` is the base of the schema and specifies the children modules
  - `root.properties` specifies root i18n information, of which only `app_name`, `app_short_name` and `app_description` are required, the rest are simply custom properties to use accross your app that fit your specific app needs.

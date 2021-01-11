@@ -481,7 +481,7 @@ export class SEOGenerator {
 
           // and we will make the query if there's no cached result for it
           if (!this.seoCache[cachedKey]) {
-            const splittedModule = collectionPoint.item[0].split("/");
+            const splittedModule = collectionPoint.module.split("/");
             const splittedIdef = collectionPoint.item && collectionPoint.item.split("/");
             if (splittedModule[0] === "") {
               splittedModule.shift();
@@ -597,8 +597,8 @@ export class SEOGenerator {
     return arg.collectedResults.map((cr) => {
       return cr.collected.map((r) => ({
         params: {
-          id: r.id.toString(),
-          version: r.version.toString(),
+          id: r.id,
+          version: r.version,
         },
       }));
     }).flat();
