@@ -355,6 +355,28 @@ properties.booked_by.label = reservado por
 properties.booked_by.placeholder = reservado por
 ```
 
+## Update the database
+
+Now that the schema is ready and all the translations are provided for what we currently want to achieve we want to add the support to hold such values in the database, this is a delicate process, granted we are in a development environment so it should be fairly straightforward
+
+`npm run build-database development`
+
+And just blast enter answering yes to every question, it will create all the constaints and tables that are necessary in the development database.
+
+Due to the database and schema update you should restart your server, so that it picks up on those changes.
+
+## What you achieved
+
+ 1. Updated the database to support the type of data we want to plug.
+ 2. Created realtime endpoints to retrieve such data.
+ 3. Created enpoints to allow to securely search for such data.
+ 4. Supported two languages.
+ 5. Enabled the application to be able to cache these resources offline (you might notice an update app message on your application currently as itemize has caught on the changes), this is because the client side cache has been updated as well.
+
+So we are pretty much done on the server side and are ready to start adding the fields right into our application and start making what is important the functionality for the app that our users will interact with.
+
+We will come back later for the server side as we want to make our application more complex and create custom behaviours.
+
 ## Next Step
 
-[Next](./02-adding.md)
+[Next](./02-ui.md)
