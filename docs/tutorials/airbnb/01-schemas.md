@@ -160,7 +160,7 @@ Now we need some special properties to define our booking status first we add a 
 {
     "id": "booked",
     "type": "boolean",
-    "hidden": false
+    "hidden": true
 }
 ```
 
