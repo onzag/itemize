@@ -1,6 +1,12 @@
 # Airbnb tutorial
 
-In this tutorial we will build a fully functional hosting website, as a progressive web app, with geographical support, address autocompletition, realtime, offline functionality, and users; this website will of course not be as complete as something like Airbnb, but it shows the things you will be capable of performing with Itemize.
+So you dear programmer got an idea, one that will disrupt your local community, you have noticed that the hosting market is not as available locally and you want to create a hosting solution; you need investment but in order to get investment you need a MVP, once you realize the scope of your project, you realize a MVP will take months, and cost you a lot of time; so either you reduce the scope, take more time, or hire someone.
+
+Or you use itemize fast prototyping and get it build and done in less than a week.
+
+## Scope
+
+In this tutorial we will build a fully functional hosting website, that will double as a totally functional MVP, as a progressive web app, with geographical support, address autocompletition, realtime, offline functionality, and users; this website will of course not be as complete as something like Airbnb, but it shows the things you will be capable of performing with Itemize.
 
 You should be able to do all this using fast prototyping in only a couple of hours, and the website will be fully functional and you could even ship it as a single cluster for your local community (for a multicluster build there are additional steps and actual expenses on server infraestructure).
 

@@ -379,4 +379,4 @@ We will come back later for the server side as we want to make our application m
 
 ## Next Step
 
-[Next](./02-ui.md)
+[Next](./02-adding.md)
