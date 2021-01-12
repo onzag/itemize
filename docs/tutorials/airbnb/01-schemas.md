@@ -143,7 +143,7 @@ Now we want to be able to define the type of our unit, for such will use a simpl
 
 ```json
 {
-    "id": "type",
+    "id": "unit_type",
     "type": "string",
     "subtype": "exact-value",
     "values": [
@@ -159,7 +159,8 @@ Now we need some special properties to define our booking status first we add a 
 ```json
 {
     "id": "booked",
-    "type": "boolean"
+    "type": "boolean",
+    "hidden": false
 }
 ```
 
@@ -183,7 +184,8 @@ It's a simple boolean that specifies whether the current unit is booked however 
         }
     },
     "readRoleAccess": ["&OWNER"],
-    "editRoleAccess": []
+    "editRoleAccess": [],
+    "searchable": false
 }
 ```
 
@@ -215,7 +217,143 @@ You should then rebuild using `npm run build-data` however, it will fail, that's
 
 ## Adding the missing properties
 
-The itemize builder will tell you what you are missing and what should come in the given missing files, however, for the purpose of this tutorial you might use the following definitions, note that you might need to add them in different languages if you are supporting more than just english
+The itemize builder will tell you what you are missing and what should come in the given missing files, however, for the purpose of this tutorial you might just copy and paste the following definitions, given we decided to use both english and spanish this should suffice.
+
+ - `index.properties`
+
+```properties
+[en]
+
+name = hosting
+search_field_label = search hosting
+search_field_placeholder = search hosting
+search_keywords = hosting
+search_value_too_large = search is too long
+
+[es]
+
+name = hospedaje
+search_field_label = buscar hospedaje
+search_field_placeholder = buscar hospedaje
+search_keywords = hospedaje
+search_value_too_large = la búsqueda es demasiado larga
+```
+
+ - `unit.properties`
+
+```properties
+[en]
+
+name = hosting unit
+search_field_label = search hosting
+search_field_placeholder = search hosting
+search_keywords = unit
+search_value_too_large = search is too long
+
+properties.title.label = title
+properties.title.placeholder = add a title to your hosting unit
+properties.title.search.label = filter by title
+properties.title.search.placeholder = filter by title
+properties.title.error.NOT_NULLABLE = title cannot be missing
+properties.title.error.TOO_LARGE = title is too long
+
+properties.description.label = description
+properties.description.placeholder = write a description
+properties.description.search.label = search in description
+properties.description.search.placeholder = search in description
+properties.description.error.NOT_NULLABLE = description cannot be missing
+properties.description.error.TOO_LARGE = description is too long
+properties.description.error.MEDIA_PROPERTY_TOO_LARGE = too many files attached
+
+properties.image.label = image
+properties.image.placeholder = provide an image for your unit
+properties.image.error.NOT_NULLABLE = you must provide an image
+properties.image.error.TOO_LARGE = the image is too large, it must not exceed 5MB
+
+properties.address.label = address
+properties.address.placeholder = provide the unit address
+properties.address.search.label = destination
+properties.address.search.placeholder = where are you going?
+properties.address.search.radius.label = search radius
+properties.address.search.radius.placeholder = search radius
+properties.address.error.RADIUS_MUST_BE_SPECIFIED = need to provide a radius
+properties.address.error.RADIUS_TOO_MANY_DECIMALS = search radius has too many decimals
+properties.address.error.RADIUS_TOO_LARGE = search radius is too large
+properties.address.error.RADIUS_TOO_SMALL = search radius is too small
+properties.address.error.RADIUS_INVALID_VALUE = search radius is invalid
+properties.address.error.TOO_LARGE = the address is too long
+properties.address.error.NOT_NULLABLE = you must provide an address
+
+properties.unit_type.label = unit type
+properties.unit_type.placeholder = provide the unit type
+properties.unit_type.search.label = unit type
+properties.unit_type.search.placeholder = choose the unit type
+properties.unit_type.values.room = private room
+properties.unit_type.values.apartment = apartment
+properties.unit_type.values.house = entire house
+properties.unit_type.null_value = unspecified
+properties.unit_type.search.null_value = any type
+properties.unit_type.error.NOT_NULLABLE = you must provide an unit type
+
+properties.booked_by.label = booked by
+properties.booked_by.placeholder = booked by
+
+[es]
+
+name = unidad de hospedaje
+search_field_label = buscar hospedaje
+search_field_placeholder = buscar hospedaje
+search_keywords = unit
+search_value_too_large = la búsqueda es demasiado larga
+
+properties.title.label = título
+properties.title.placeholder = añada un título a su hospedaje
+properties.title.search.label = filtrar por título
+properties.title.search.placeholder = filtrar por título
+properties.title.error.NOT_NULLABLE = el título no puede quedarse en blanco
+properties.title.error.TOO_LARGE = el título es demasiado largo
+
+properties.description.label = descripción
+properties.description.placeholder = escriba una descripción
+properties.description.search.label = buscar en la descripción
+properties.description.search.placeholder = buscar en la descripción
+properties.description.error.NOT_NULLABLE = falta la descripción
+properties.description.error.TOO_LARGE = la descripción es muy larga
+properties.description.error.MEDIA_PROPERTY_TOO_LARGE = ha añadido demasiados archivos
+
+properties.image.label = imágen
+properties.image.placeholder = provea una imagen de su unidad
+properties.image.error.NOT_NULLABLE = debe proveer una imágen
+properties.image.error.TOO_LARGE = el archivo es muy grande, no debe pasar de los 5MB
+
+properties.address.label = dirección
+properties.address.placeholder = provea la dirección de su unidad
+properties.address.search.label = destino
+properties.address.search.placeholder = ¿Hacia donde te diriges?
+properties.address.search.radius.label = radio de búsqueda
+properties.address.search.radius.placeholder = radio de búsqueda
+properties.address.error.RADIUS_MUST_BE_SPECIFIED = debe proveer un radio de búsqueda
+properties.address.error.RADIUS_TOO_MANY_DECIMALS = el radio de búsqueda tiene demasiados decimales
+properties.address.error.RADIUS_TOO_LARGE = el radio de búsqueda es muy grande
+properties.address.error.RADIUS_TOO_SMALL = el radio de búsqueda es muy pequeño
+properties.address.error.RADIUS_INVALID_VALUE = radio de búsqueda inválido
+properties.address.error.TOO_LARGE = la dirección es demasiado larga
+properties.address.error.NOT_NULLABLE = debe proveer una dirección
+
+properties.unit_type.label = tipo de unidad
+properties.unit_type.placeholder = indique el tipo de unidad
+properties.unit_type.search.label = tipo de unidad
+properties.unit_type.search.placeholder = escoja el tipo de unidad
+properties.unit_type.values.room = habitación privada
+properties.unit_type.values.apartment = apartamento
+properties.unit_type.values.house = casa
+properties.unit_type.null_value = sin especifica
+properties.unit_type.search.null_value = cualquiera
+properties.unit_type.error.NOT_NULLABLE = debe específicar el tipo de unidad
+
+properties.booked_by.label = reservado por
+properties.booked_by.placeholder = reservado por
+```
 
 ## Next Step
 
