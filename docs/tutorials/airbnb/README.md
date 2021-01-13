@@ -16,7 +16,7 @@ This tutorial will use both english and spanish as a demonstration, the tutorial
 
 Please make sure you have followed the [Initialization](../../basics/initialization.md) steps and that your project is up and running with the default fast prototyping configuration, remember to specify english and spanish during the setup as itemize will not provide the default spanish configuration that it holds unless done at setup time; so ensure that when you are requested `supportedLanguages` you provide `en, es` as values, and when requested for the dictionaries, the key should be `en, es` and the values `english` and `spanish`, your setup step should look like.
 
-![supported languages](./supported-languages.png)
+![supported languages](./images/supported-languages.png)
 
 The rest of the setup can be simply a matter of blasting enter and using the default configuration, it will take a while as itemize will attempt to install development dependencies in order to enable typescript. Then you can keep on the steps as defined in [Initialization](../../basics/initialization.md) until the server is up and running.
 
