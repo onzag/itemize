@@ -4,15 +4,15 @@
 
 In this step we are going to build the UI that the user is going to use in order to add hosting units with your server up and running (and you logged as the admin user) you should currently have something as:
 
-![catbnb initial](./catbnb-initial.png)
+![catbnb initial](./images/catbnb-initial.png)
 
 Or if you are logged in (log in as admin with the password that itemize generated that should be in your logs) the navigation bar should come as:
 
-![catbnb navbar](./catbnb-navbar.png)
+![catbnb navbar](./images/catbnb-navbar.png)
 
 Which after accessing the burger menu makes you realize what your options are:
 
-![catbnb navbar open](./catbnb-navbar-open.png)
+![catbnb navbar open](./images/catbnb-navbar-open.png)
 
 So now we need:
 
@@ -47,7 +47,7 @@ Now given that we want to fast develop, we just need to run `npm run webpack-dev
 
 And the moment you attempt to open the menu, the app crashed, what happened?...
 
-![localization error](./localization-error.png)
+![localization error](./images/localization-error.png)
 
 This demonstrates one of the behaviors of itemize, it is extremely strict if something doesn't look right (this should be caught by the tests); on purpose itemize will crash when something is not properly translated, because having a website with missing text and translations is unacceptable for your users.
 
@@ -69,7 +69,7 @@ Remember this only works because we are developing, and our cache is disabled as
 
 Your menu should now look like:
 
-![catbnb new menu](./catbnb-new-menu.png)
+![catbnb new menu](./images/catbnb-new-menu.png)
 
 Click it!... and then there's nothing, because there's no such page as `/hosting`
 
@@ -226,15 +226,15 @@ Read the comments so you can see what is happening, once it's ready you can add 
 
 In the App() function, now refresh your browser.
 
-![hosting page initial](./hosting-page-initial.png)
+![hosting page initial](./images/hosting-page-initial.png)
 
 But of course as expected nothing is displayed, we simply do not have any hosting units at all to be shown here; but if you check your network you should notice this response:
 
-![hosting page network response](./hosting-page-network-response.png)
+![hosting page network response](./images/hosting-page-network-response.png)
 
 not only that but if you type into the search field, you will realize a new search is performed automatically with the new attributes:
 
-![hosting page network request](./hosting-page-network-request.png)
+![hosting page network request](./images/hosting-page-network-request.png)
 
 that is because we are using automatic search, and because we have specified to store searches in navigation we can in fact navigate back and forward our searches using your browser native navigation.
 
@@ -260,7 +260,7 @@ And add the button on top on your list
 
 It should look like:
 
-![Hosting Page List with Button](./hosting-page-list-with-button.png)
+![Hosting Page List with Button](./images/hosting-page-list-with-button.png)
 
 Now we need to add the page that goes to hosting new we add the new dependencies
 
@@ -391,15 +391,15 @@ custom.submit = crear nueva unidad
 
 Now you should rebuild the data and schemas via `npm run build-data`and also `npm run webpack-dev` refresh your browser add button should take you to the following screen.
 
-![Hosting Unit Create Screen](./hosting-unit-create-screen.png)
+![Hosting Unit Create Screen](./images/hosting-unit-create-screen.png)
 
 Now press the create button without filling anything just to poke every field and cause an error, so that we can see our actioner error display in action.
 
-![Hosting Unit Create Error](./hosting-unit-create-error.png)
+![Hosting Unit Create Error](./images/hosting-unit-create-error.png)
 
 However you might realize something is not quite right, writting an address doesn't work at all; and clicking on the map causes a bunch of `???` to appear and if you check the network requests being generated you see several `400` and when you inspect you see the following message
 
-![Geo Error](./geo-error.png)
+![Geo Error](./images/geo-error.png)
 
 This is because you haven't specified a provider for addresses in your configuration, itemize can't do magic and provide addresses just without configuration it can only provide mapping thanks to the guys at OSM (but you can write your own custom renderer to use google maps, bing, etc...), as the time of this writting itemize has a HERE Maps provider that you can use by default.
 
@@ -421,6 +421,27 @@ Then change the value of `locationSearch` in both your sensitive json configurat
 
 Now you need to restart the server.
 
-![Geo Working](./geo-working.png)
+![Geo Working](./images/geo-working.png)
 
-![Geo Working 2](./geo-working-2.png)
+![Geo Working 2](./images/geo-working-2.png)
+
+## Add a new property
+
+Once you do, you should be able to add a new property; it will redirect you to an empty page given that you haven't setup anything regarding the editing page that it should open.
+
+But if you go back you will realize the property is now visible in the list.
+
+![Hosting page functional](./images/hosting-page-functional.png)
+
+## What you achieved
+
+ 1. Created a page to view all your listings.
+ 2. Created a page to create new listings.
+ 3. Each page was created to handle both languages.
+ 4. Errors handling for all the requests.
+
+So we are now ready for editing
+
+## Next Step
+
+[Next](./03-editing.md)

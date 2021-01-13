@@ -6,7 +6,7 @@ The itemize default template project comes with JSON schemas that define the kin
 
 The only necessary files in the schemas folder are `main-i18n.properties`, `root.json`, `root.properties`, and the ones contained in the `users` folder as itemize will complain if these are missing.
 
-![schema structure](./schema-structure.png)
+![schema structure](./images/schema-structure.png)
 
  - `main-i18n.properties` contains main language properties to be used in the UI, anything included here is required.
  - `root.json` is the base of the schema and specifies the children modules
@@ -44,7 +44,7 @@ Pretty self explanatory, now we want to add an `unit.json` file which will defin
 
 So far your folder structure should look as:
 
-![hosting folder structure](./hosting-folder-structure.png)
+![hosting folder structure](./images/hosting-folder-structure.png)
 
 Now lets start adding properties, one of the things we need is a title so we add such, we will define it as a simple text entry, without any other special properties
 
@@ -213,7 +213,7 @@ After adding the module to our root tree as such
 
 You should then rebuild using `npm run build-data` however, it will fail, that's because we have missing our schema properties in the languages we support, the error you should get will be the following:
 
-![required file error](./required-file-error.png)
+![required file error](./images/required-file-error.png)
 
 ## Adding the missing properties
 
