@@ -54,7 +54,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
     super(props);
 
     this.refImg = React.createRef<HTMLImageElement>();
-    
+
     // loaded represents the properties src and srcset when using native
     // image loading it's unecessary to have them removed as the browser
     // will handle it natively
@@ -100,7 +100,7 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
 
     // if it's in view we set it as loaded
     if (isInView) {
-      this.setState({loaded: true});
+      this.setState({ loaded: true });
       this.removeScrollEvent();
     } else {
       this.attachScrollEvent();
@@ -185,30 +185,50 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       if (this.props.args.NullComponent) {
         const NullComponent = this.props.args.NullComponent;
         const nullArgs = this.props.args.nullComponentArgs;
-        return <NullComponent {...nullArgs}/>;
+        return <NullComponent {...nullArgs} />;
       }
       return null;
     }
     if (this.props.isSupportedImage) {
       const imageClassName: string = this.props.args.imageClassName;
       const imageSizes: string = this.props.args.imageSizes || "70vw";
+
       // since the image is never loaded at start, the src will always be null
       // but data-src will be there, so SEO should be able to figure this one out
       // also including the a tag should find it out
+      const img = (
+        <img
+          ref={this.refImg}
+          srcSet={!this.state.loaded ? null : this.props.imageSrcSet}
+          sizes={imageSizes}
+          data-src={this.props.currentValue.url}
+          src={!this.state.loaded ? null : this.props.currentValue.url}
+          className={imageClassName}
+          loading={this.props.args.lazyLoad ? "lazy" : null}
+          alt={this.props.currentValue.name}
+        />
+      );
+
+      // linking is disabled, might be used for purposes
+      if (this.props.args.disableImageLinking) {
+        return img;
+
+      // in this case the link is there but invisible
+      // this might be preferrable for SEO purposes
+      } else if (this.props.args.hideImageLink) {
+        return (
+          <>
+            {img}
+            <a href={this.props.currentValue.url} style={{display: "none"}}/>
+          </>
+        );
+      }
+
       return (
         <a href={this.props.currentValue.url} title={this.props.currentValue.name}>
-          <img
-            ref={this.refImg}
-            srcSet={!this.state.loaded ? null : this.props.imageSrcSet}
-            sizes={imageSizes}
-            data-src={this.props.currentValue.url}
-            src={!this.state.loaded ? null : this.props.currentValue.url}
-            className={imageClassName}
-            loading={this.props.args.lazyLoad ? "lazy" : null}
-            alt={this.props.currentValue.name}
-          />
+          {img}
         </a>
-      )
+      );
     }
     return (
       <span className="file" onClick={this.props.openFile}>
