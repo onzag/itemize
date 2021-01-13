@@ -4,6 +4,9 @@ Itemize documentation is rather extensive, there are many API's and a lot of fun
 
 Itemize source code was designed to be as legible and understandable as possible, every prop that is meant to be used by the developer is commented and explained to what effects it has, we recommend diving in the source code of the resource you are importing if you wish you understand its internals.
 
+## Introduction
+ - [Introduction](./introduction.md)
+
 ## Tutorials
  - [AirBnB website](./tutorials/airbnb)
 
