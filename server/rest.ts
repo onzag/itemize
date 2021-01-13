@@ -209,6 +209,7 @@ export default function restServices(appData: IAppDataType) {
         message: "A location fetcher hasn't been set",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
       }));
+      return;
     }
 
     if (
@@ -249,6 +250,7 @@ export default function restServices(appData: IAppDataType) {
         message: "A location fetcher hasn't been set",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
       }));
+      return;
     }
 
     if (
@@ -289,6 +291,7 @@ export default function restServices(appData: IAppDataType) {
         message: "A location fetcher hasn't been set",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
       }));
+      return;
     }
 
     if (

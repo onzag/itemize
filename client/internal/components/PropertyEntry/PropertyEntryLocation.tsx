@@ -363,10 +363,15 @@ export default class PropertyEntryLocation
     // now the final results based on this
     let finalResults: IPropertyDefinitionSupportedLocationType[];
     try {
-      finalResults = await fetch(
+      const response = await fetch(
         `/rest/util/location-autocomplete?lat=${countryLatitude}&lng=${countryLongitude}` + 
         `&q=${encodeURIComponent(searchQuery)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
-      ).then((r) => r.json());
+      );
+      if (response.status !== 200) {
+        finalResults = [];
+      } else {
+        finalResults = await response.json();
+      }
     } catch (err) {
       finalResults = [];
     }
@@ -512,12 +517,14 @@ export default class PropertyEntryLocation
     // make the async request to the here API
     let finalResults: IPropertyDefinitionSupportedLocationType[] = [];
     try {
-      finalResults = await fetch(
+      const response = await fetch(
         `/rest/util/location-search?lat=${countryLatitude}&lng=${countryLongitude}` + 
         `&q=${encodeURIComponent(valueToSearch)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
-      ).then((r) => r.json());
+      );
+      if (response.status === 200) {
+        finalResults = await response.json();
+      }
     } catch (err) {
-      finalResults = [];
     }
     
     // due to the async nature some crazy stacking might have happened
@@ -631,10 +638,13 @@ export default class PropertyEntryLocation
     this.geocodeTakingPlace = updateIdentifier;
     try {
       const sep = this.props.i18n[this.props.language].word_separator;
-      updatedResult = await fetch(
+      const response = await fetch(
         `/rest/util/location-geocode?lat=${value.lat}&lng=${value.lng}` + 
         `&q=${encodeURIComponent(value.txt)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
-      ).then((r) => r.json());
+      );
+      if (response.status === 200) {
+        updatedResult = await response.json();
+      }
     } catch (err) {
     }
 

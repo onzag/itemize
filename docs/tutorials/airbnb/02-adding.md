@@ -248,14 +248,179 @@ import Link from "@onzag/itemize/client/components/navigation/Link";
 import AddIcon from '@material-ui/icons/Add';
 ```
 
+And add the button on top on your list
+
 ```tsx
 <Link to="/hosting/new">
     <IconButton>
-        <AddIcon/>
+        <AddIcon />
     </IconButton>
 </Link>
 ```
 
-Note: Very often the IDE might auto imports from a folder named nodejs, this folder is for internal usage only and will absolutely mess your itemize build causing unexpected behaviour.
+It should look like:
 
-Now we need a new function to define that new area, and allow to add a new hosting unit.
+![Hosting Page List with Button](./hosting-page-list-with-button.png)
+
+Now we need to add the page that goes to hosting new we add the new dependencies
+
+```tsx
+import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
+import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
+import { IActionResponseWithId } from "@onzag/itemize/client/providers/item";
+```
+
+And then create our component for that page
+
+```tsx
+/**
+ * triggers when sucesfully created a new hosting unit
+ * @param data a simplified response from the server on data creation
+ * @returns a string that represents the redirect
+ */
+const newHostingRedirectCallback = (data: IActionResponseWithId) => `/hosting/edit/${data.id}`;
+
+/**
+ * Page to add a new hosting unit
+ */
+export function NewHosting() {
+    return (
+        <ItemProvider
+            itemDefinition="unit"
+            // these are the properties that
+            // we have a state for
+            properties={[
+                "title",
+                "description",
+                "attachments",
+                "image",
+                "address",
+                "unit_type",
+                "booked"
+            ]}
+            // and we want to set the booked
+            // property to false, it is not settable
+            // by the user
+            setters={[
+                {
+                    id: "booked",
+                    value: false,
+                }
+            ]}
+        >
+            <Entry id="unit_type" />
+            <Entry id="title" />
+            <Entry id="description" />
+            <Entry id="image" />
+            <Entry id="address" />
+
+            {/* The submit button is a fast prototyping component
+            that implements the standard SubmitActioner component
+            under the hood, this button is just a convenience
+            button that offers quite some functionality and a nice
+            look */}
+            <SubmitButton
+                i18nId="submit"
+                buttonColor="primary"
+                buttonVariant="contained"
+                options={{
+                    properties: [
+                        "title",
+                        "description",
+                        "attachments",
+                        "image",
+                        "address",
+                        "unit_type",
+                        "booked",
+                    ],
+                    // wipe everything we have written in here
+                    // remember that otherwise it will remain in memory
+                    restoreStateOnSuccess: true,
+                }}
+                // on success we want to redirect there
+                redirectOnSuccess={newHostingRedirectCallback}
+                // and replace wherever we redirect
+                redirectReplace={true}
+            />
+
+            {/* Here we grab the submit actioner that is used by the submit
+            button, the reason is that, we need to get some states from it
+            that are of course not available by the button */}
+            <SubmitActioner>
+                {(actioner) => (
+                    // we simply want to show an error in case our action fails
+                    // and we will use this snackbar, and take the error right
+                    // from the actioner, the i18nDisplay component can display
+                    // errors in a localized form, this snackbar uses that
+                    <Snackbar
+                        id="unit-create-error"
+                        severity="error"
+                        i18nDisplay={actioner.submitError}
+                        open={!!actioner.submitError}
+                        onClose={actioner.dismissError}
+                    />
+                )}
+            </SubmitActioner>
+        </ItemProvider>
+    )
+}
+```
+
+And of course add it in the router
+
+```tsx
+<Route
+    path="/hosting/new"
+    exact={true}
+    component={NewHosting}
+/>
+```
+
+Note how we have defined our submit button to read the i18n entity named submit, which doesn't exist, so right now if we were to use this as it is the page will cause the website to crash because there's no such thing as submit inside the item for unit, or the module for housing, so we want to create a new custom id in our unit for submitting at `schema/hosting/unit.properties` add:
+
+```properties
+custom.submit = create housing unit
+```
+
+And in spanish:
+
+```properties
+custom.submit = crear nueva unidad
+```
+
+Now you should rebuild the data and schemas via `npm run build-data`and also `npm run webpack-dev` refresh your browser add button should take you to the following screen.
+
+![Hosting Unit Create Screen](./hosting-unit-create-screen.png)
+
+Now press the create button without filling anything just to poke every field and cause an error, so that we can see our actioner error display in action.
+
+![Hosting Unit Create Error](./hosting-unit-create-error.png)
+
+However you might realize something is not quite right, writting an address doesn't work at all; and clicking on the map causes a bunch of `???` to appear and if you check the network requests being generated you see several `400` and when you inspect you see the following message
+
+![Geo Error](./geo-error.png)
+
+This is because you haven't specified a provider for addresses in your configuration, itemize can't do magic and provide addresses just without configuration it can only provide mapping thanks to the guys at OSM (but you can write your own custom renderer to use google maps, bing, etc...), as the time of this writting itemize has a HERE Maps provider that you can use by default.
+
+## Setup HERE Maps
+
+HERE Maps is what is used by default if no provider is specified within the `/src/server/services.ts` file, as the `HereMapsService` is the default location search provider (you can also write your own) as it should support autocomplete, search and geocode; and while it is there it cannot activate because in the `index.sensitive.json` we have specified `locationSearch` as null, which causes it to become inactive and never load.
+
+In order to activate it, we need to specify an api key, go to `developer.here.com` and grab an API key.
+
+Then change the value of `locationSearch` in both your sensitive json configurations to be as:
+
+```json
+{
+    "locationSearch": {
+        "apiKey": "cASDXas1S-Nf9187_sv_yN7ksdaWD901_AK56X_s1-"
+    }
+}
+```
+
+Now you need to restart the server.
+
+![Geo Working](./geo-working.png)
+
+![Geo Working 2](./geo-working-2.png)
