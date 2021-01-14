@@ -31,16 +31,7 @@ import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
-
-/**
- * The request limiters that are set in the item definition
- * itself, basically only supports the item definition custom
- * properties
- */
-export interface IItemDefinitionRequestLimitersType {
-  condition: "AND" | "OR",
-  custom: string[],
-};
+import { IRequestLimitersType } from "../../../Root";
 
 /**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
@@ -263,7 +254,7 @@ export interface IItemDefinitionRawJSONDataType {
   /**
    * the request limiters
    */
-  requestLimiters?: IItemDefinitionRequestLimitersType;
+  requestLimiters?: IRequestLimitersType;
 }
 
 /**

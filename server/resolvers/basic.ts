@@ -255,171 +255,141 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     return;
   }
 
-  let customLimitersCombined: Array<{
-    modLimiter: boolean;
-    propertyId: string;
-  }> = [];
-  if (modLimiters && modLimiters.custom) {
-    customLimitersCombined = customLimitersCombined.concat(modLimiters.custom.map((l) => ({
-      modLimiter: true,
-      propertyId: l,
-    })));
-  }
-  if (idefLimiters && idefLimiters.custom) {
-    customLimitersCombined = customLimitersCombined.concat(idefLimiters.custom.map((l) => ({
-      modLimiter: false,
-      propertyId: l,
-    })));
-  }
+  [modLimiters, idefLimiters].forEach((limiter, index) => {
+    if (!limiter) {
+      return;
+    }
 
-  let customError: string = null;
-  let customErrorIsModLimiter: boolean = false;
-  let someModCustomLimiterSucceed = false;
-  let someIdefCustomLimiterSucceed = false;
-  if (customLimitersCombined.length) {
-    customLimitersCombined.forEach((v) => {
-      const property = idefOrMod instanceof Module ?
-        mod.getPropExtensionFor(v.propertyId) :
-        idefOrMod.getPropertyDefinitionFor(v.propertyId, true);
+    const isModLimiter = index === 0;
 
-      const expectedConversionIds = getConversionIds(property.rawData);
-      const succeed = expectedConversionIds.every((conversionId: string) => {
-        return typeof args[conversionId] === "undefined";
-      });
+    if (limiter) {
+      let allCustomSet: boolean;
+      let someCustomSet: boolean;
+      let customError: string;
 
-      if (!succeed) {
-        customErrorIsModLimiter = v.modLimiter;
-        if (v.modLimiter) {
-          customError = "Missing custom request search limiter required by limiter set by " + v.propertyId + " in module " +
-            mod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+      if (limiter.custom && limiter.custom.length) {
+        allCustomSet = true;
+        limiter.custom.forEach((v) => {
+          const property = idefOrMod instanceof Module ?
+            mod.getPropExtensionFor(v) :
+            idefOrMod.getPropertyDefinitionFor(v, true);
+
+          const expectedConversionIds = getConversionIds(property.rawData);
+          const succeed = expectedConversionIds.every((conversionId: string) => {
+            return typeof args[conversionId] === "undefined";
+          });
+
+          // if it succeeded
+          if (succeed) {
+            // we can assume some custom was set
+            someCustomSet = true;
+            // if it did not succeed
+          } else {
+            // then not all the custom sets succeeded
+            allCustomSet = false;
+
+            if (isModLimiter) {
+              customError = "Missing custom request search limiter required by limiter set by " + v + " in module " +
+                mod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+            } else {
+              customError = "Missing custom request search limiter required by limiter set by " + v + " in idef " +
+                idefOrMod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+            }
+          }
+        });
+      } else {
+        allCustomSet = true;
+        someCustomSet = true;
+      }
+
+      if (limiter.condition === "AND" && !allCustomSet) {
+        throw new EndpointError({
+          message: customError,
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      }
+
+      let sinceError: string = null;
+      let sinceSucceed = false;
+      if (limiter && limiter.since) {
+        const sinceArg = args.since ? new Date(args.since as string) : null;
+        const hasSince = !!sinceArg;
+        if (!hasSince) {
+          sinceError = "Missing since limiter which is a required limiter"
         } else {
-          customError = "Missing custom request search limiter required by limiter set by " + v.propertyId + " in idef " +
-            idefOrMod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+          const now = (new Date()).getTime();
+          const sinceMs = sinceArg.getTime();
+          if (now - sinceMs > limiter.since) {
+            sinceError = "Since is not respected as it requires a difference of less than " +
+              limiter.since + "ms but " + sinceMs + " provided"
+          } else {
+            sinceSucceed = true;
+          }
         }
       }
-      if (succeed && v.modLimiter && !someModCustomLimiterSucceed) {
-        someModCustomLimiterSucceed = succeed;
-      } else if (succeed && !v.modLimiter && !someIdefCustomLimiterSucceed) {
-        someIdefCustomLimiterSucceed = succeed;
+
+      if (
+        limiter.condition === "AND" &&
+        sinceError
+      ) {
+        throw new EndpointError({
+          message: sinceError,
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
       }
-    });
-  }
 
-  if (
-    modLimiters &&
-    modLimiters.condition === "AND" &&
-    customError &&
-    customErrorIsModLimiter
-  ) {
-    throw new EndpointError({
-      message: customError,
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  } else if (
-    idefLimiters &&
-    idefLimiters.condition === "AND" &&
-    customError &&
-    !customErrorIsModLimiter
-  ) {
-    throw new EndpointError({
-      message: customError,
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
+      let createdBySucceed = false;
+      if (limiter.createdBy) {
+        createdBySucceed = !!(args.created_by);
+      }
 
-  let sinceError: string = null;
-  let sinceSucceed = false;
-  if (modLimiters && modLimiters.since) {
-    const sinceArg = args.since ? new Date(args.since as string) : null;
-    const hasSince = !!sinceArg;
-    if (!hasSince) {
-      sinceError = "Missing since limiter which is a required limiter"
-    } else {
-      const now = (new Date()).getTime();
-      const sinceMs = sinceArg.getTime();
-      if (now - sinceMs > modLimiters.since) {
-        sinceError = "Since is not respected as it requires a difference of less than " +
-          modLimiters.since + "ms but " + sinceMs + " provided"
-      } else {
-        sinceSucceed = true;
+      if (
+        limiter.condition === "AND" &&
+        !createdBySucceed
+      ) {
+        throw new EndpointError({
+          message: "Created by is required as a limiter, yet none was specified",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      }
+
+      let parentingSucceed = false;
+      if (limiter.parenting) {
+        parentingSucceed = !!(args.parent_id && args.parent_type);
+      }
+
+      if (
+        limiter.condition === "AND" &&
+        !parentingSucceed
+      ) {
+        throw new EndpointError({
+          message: "Parenting is required as a limiter, yet none was specified",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      }
+
+      if (limiter.condition === "OR") {
+        const passedCustom = limiter.custom && someCustomSet;
+        const passedSince = limiter.since && sinceSucceed;
+        const passedCreatedBy = limiter.createdBy && createdBySucceed;
+        const passedParenting = limiter.parenting && parentingSucceed;
+    
+        if (
+          passedCustom ||
+          passedSince ||
+          passedCreatedBy ||
+          passedParenting
+        ) {
+          return;
+        }
+    
+        throw new EndpointError({
+          message: `None of the OR request limiting conditions from the ${isModLimiter ? "module" : "item"} passed`,
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
       }
     }
-  }
-
-  if (
-    modLimiters &&
-    modLimiters.condition === "AND" &&
-    sinceError
-  ) {
-    throw new EndpointError({
-      message: sinceError,
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
-
-  let createdBySucceed = false;
-  if (modLimiters && modLimiters.createdBy) {
-    createdBySucceed = !!(args.created_by);
-  }
-
-  if (
-    modLimiters &&
-    modLimiters.condition === "AND" &&
-    !createdBySucceed
-  ) {
-    throw new EndpointError({
-      message: "Created by is required as a limiter, yet none was specified",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
-
-  let parentingSucceed = false;
-  if (modLimiters && modLimiters.parenting) {
-    parentingSucceed = !!(args.parent_id && args.parent_type);
-  }
-
-  if (
-    modLimiters &&
-    modLimiters.condition === "AND" &&
-    !parentingSucceed
-  ) {
-    throw new EndpointError({
-      message: "Parenting is required as a limiter, yet none was specified",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
-
-  if (modLimiters && modLimiters.condition === "OR") {
-    const passedCustom = modLimiters.custom && someModCustomLimiterSucceed;
-    const passedSince = modLimiters.since && sinceSucceed;
-    const passedCreatedBy = modLimiters.createdBy && createdBySucceed;
-    const passedParenting = modLimiters.parenting && parentingSucceed;
-
-    if (
-      passedCustom ||
-      passedSince ||
-      passedCreatedBy ||
-      passedParenting
-    ) {
-      return;
-    }
-
-    throw new EndpointError({
-      message: "None of the OR request limiting conditions from the module passed",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
-
-  if (idefLimiters && idefLimiters.condition === "OR") {
-    const passedCustom = modLimiters.custom && someIdefCustomLimiterSucceed;
-    if (passedCustom) {
-      return;
-    }
-    throw new EndpointError({
-      message: "None of the OR request limiting conditions from the item definition passed",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
-  }
+  });
 }
 
 /**

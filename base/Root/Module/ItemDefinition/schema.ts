@@ -283,12 +283,21 @@ export default {
           type: "string",
           enum: ["AND", "OR"],
         },
+        since: {
+          type: "boolean",
+        },
+        createdBy: {
+          type: "boolean",
+        },
+        parenting: {
+          type: "boolean",
+        },
         custom: {
           type: "array",
           items: {
             type: "string",
           }
-        }
+        },
       },
       additionalProperties: false,
       required: ["condition", "custom"],

@@ -368,10 +368,6 @@ export function getGQLQueryFieldsForItemDefinition(
     };
 
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
-      if (!p.isExtension()) {
-        return;
-      }
-
       const description = p.getPropertyDefinitionDescription();
       if (!description.sqlOrderBy) {
         return;

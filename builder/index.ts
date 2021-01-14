@@ -10,14 +10,14 @@ import PropertyDefinition, {
   IPropertyDefinitionRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Include";
-import { IModuleRawJSONDataType, IRawJSONI18NDataType, IModuleRequestLimitersType } from "../base/Root/Module";
+import { IModuleRawJSONDataType, IRawJSONI18NDataType } from "../base/Root/Module";
 import {
-  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType, IItemDefinitionRequestLimitersType, IItemDefinitionParentingRawJSONDataType,
+  IItemDefinitionRawJSONDataType, IPoliciesRawJSONDataType, IItemDefinitionParentingRawJSONDataType,
 } from "../base/Root/Module/ItemDefinition";
 import {
   PropertyDefinitionSearchInterfacesType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { IRootRawJSONDataType } from "../base/Root";
+import { IRequestLimitersType, IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -89,7 +89,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   searchable?: boolean;
   maxSearchResults?: number;
   maxSearchRecords?: number;
-  requestLimiters?: IModuleRequestLimitersType;
+  requestLimiters?: IRequestLimitersType;
 }
 
 /**
@@ -121,7 +121,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   versionIsLanguageAndCountry?: boolean;
   versionIsLanguage?: boolean;
   versionIsCountry?: boolean;
-  requestLimiters?: IItemDefinitionRequestLimitersType;
+  requestLimiters?: IRequestLimitersType;
 }
 
 export default async function build() {

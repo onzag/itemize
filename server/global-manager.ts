@@ -229,12 +229,11 @@ export class GlobalManager {
       );
       this.idefNeedsMantenience.push(idef);
 
-      const mod = idef.getParentModule();
-      const requestLimiters = mod.getRequestLimiters();
+      const requestLimiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
       const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
-          "GlobalManager.processIdef: item definition need mantenience but module holds no AND since request limiter " + idef.getQualifiedPathName(),
+          "GlobalManager.processIdef: item definition need mantenience but item definition nor module holds no AND since request limiter " + idef.getQualifiedPathName(),
         );
       }
     }
@@ -365,8 +364,7 @@ export class GlobalManager {
     includePropertiesThatNeedMantenience.forEach((includePropArray) => {
       totalPropertiesThatNeedMantenience = totalPropertiesThatNeedMantenience.concat(includePropArray);
     });
-    const mod = idef.getParentModule();
-    const limiters = mod.getRequestLimiters();
+    const limiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
     const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
   }

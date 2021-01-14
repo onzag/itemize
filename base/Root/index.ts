@@ -30,6 +30,20 @@ export interface ILangLocalesType {
   };
 }
 
+/**
+ * The request limiters that are set in the module
+ * to limit the requests and the form of these requests
+ * the reason these limiters are in the module is because
+ * they are also used for optimization and matenience operations
+ */
+export interface IRequestLimitersType {
+  condition: "AND" | "OR",
+  since?: number,
+  createdBy?: boolean,
+  parenting?: boolean,
+  custom?: string[],
+}
+
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
 
 /**

@@ -24,7 +24,7 @@ import {
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
-import Root from "..";
+import Root, { IRequestLimitersType } from "..";
 import { EndpointError } from "../../errors";
 import { IGQLRequestFields } from "../../../gql-querier";
 
@@ -105,20 +105,6 @@ export interface IRawJSONI18NDataType {
  * and item definitions
  */
 export type ListenerType = () => any;
-
-/**
- * The request limiters that are set in the module
- * to limit the requests and the form of these requests
- * the reason these limiters are in the module is because
- * they are also used for optimization and matenience operations
- */
-export interface IModuleRequestLimitersType {
-  condition: "AND" | "OR",
-  since?: number,
-  createdBy?: boolean,
-  parenting?: boolean,
-  custom?: string[],
-};
 
 /**
  * This is the raw shape of a module after it has been
@@ -236,7 +222,7 @@ export interface IModuleRawJSONDataType {
    * required at module level, these are basically args
    * And AND index will ensure to add an ordered btree index to these
    */
-  requestLimiters?: IModuleRequestLimitersType;
+  requestLimiters?: IRequestLimitersType;
 }
 
 /**
