@@ -507,6 +507,11 @@ export interface IItemProviderProps {
    */
   automaticSearch?: IActionSearchOptions;
   /**
+   * Forces the automatic search to happen even if the search already holds
+   * a state
+   */
+  automaticSearchForce?: boolean;
+  /**
    * Makes automatic search happen only on mount
    */
   automaticSearchIsOnlyInitial?: boolean;
@@ -1078,18 +1083,29 @@ export class ActualItemProvider extends
 
     // this used to be done in the constructor, but it just happens
     // that it won't work with SSR
+    let searchIdLoadedFromLocation: string = null;
     if (this.props.loadSearchFromNavigation) {
-      this.loadSearch();
+      searchIdLoadedFromLocation = this.loadSearch();
     }
 
-    // the search listener might have triggered during the mount callback,
-    // which means this function won't see the new state and won't trigger
-    // automatic search so we use this variable to check it
-    const searchIdToCheckAgainst = this.changedSearchListenerLastCollectedSearchId ?
-      this.changedSearchListenerLastCollectedSearchId.id : this.state.searchId;
-    if (this.props.automaticSearch && !searchIdToCheckAgainst) {
-      this.initialAutomaticNextSearch = true;
-      this.search(this.props.automaticSearch);
+    if (this.props.automaticSearch) {
+      // the search listener might have triggered during the mount callback,
+      // which means this function won't see the new state and won't trigger
+      // automatic search so we use this variable to check it
+      const searchIdToCheckAgainst = this.changedSearchListenerLastCollectedSearchId ?
+        this.changedSearchListenerLastCollectedSearchId.id : this.state.searchId;
+
+      if (
+        // no search id at all, not in the state, not on the changed listener, nowhere
+        (!searchIdToCheckAgainst && !searchIdLoadedFromLocation) ||
+        // search is forced and we didn't load from location
+        (this.props.automaticSearchForce && !searchIdLoadedFromLocation)
+      ) {
+        // this variable that is passed into the search is used to set the initial
+        // state in case it needs to be saved in the history
+        this.initialAutomaticNextSearch = true;
+        this.search(this.props.automaticSearch);
+      }
     }
 
     if (this.props.markForDestructionOnLogout) {
@@ -2772,7 +2788,12 @@ export class ActualItemProvider extends
     this.props.onSubmit && this.props.onSubmit(result);
     return result;
   }
-  public loadSearch(): void {
+
+  /**
+   * Loads the search from the location
+   * @returns the search id that it managed to collect
+   */
+  public loadSearch(): string {
     const searchId = (
       this.props.location.state &&
       this.props.location.state[this.props.loadSearchFromNavigation] &&
@@ -2817,6 +2838,8 @@ export class ActualItemProvider extends
       ...searchState,
       searchWasRestored: true,
     });
+
+    return searchId;
   }
   public async search(
     options: IActionSearchOptions,
