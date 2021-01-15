@@ -2825,40 +2825,31 @@ export class ActualItemProvider extends
       return null;
     }
 
-    const mustClear: boolean = !searchId;
-    if (!mustClear) {
+    if (searchId) {
       const searchIdefState = this.props.location.state[this.props.loadSearchFromNavigation].searchIdefState;
       this.props.itemDefinitionInstance.applyState(
         this.props.forId || null,
         this.props.forVersion || null,
         searchIdefState,
       );
-    } else {
-      this.props.itemDefinitionInstance.cleanValueFor(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        true,
-      );
+      const searchState = this.props.location.state[this.props.loadSearchFromNavigation].searchState;
+      this.setState({
+        itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+          this.props.forId || null,
+          this.props.forVersion || null,
+          !this.props.disableExternalChecks,
+          this.props.itemDefinitionInstance.isInSearchMode() ?
+            getPropertyListForSearchMode(
+              this.props.properties || [],
+              this.props.itemDefinitionInstance.getStandardCounterpart()
+            ) : this.props.properties || [],
+          this.props.includes || [],
+          !this.props.includePolicies,
+        ),
+        ...searchState,
+        searchWasRestored: true,
+      });
     }
-
-    const searchState = mustClear ? null : this.props.location.state[this.props.loadSearchFromNavigation].searchState;
-
-    this.setState({
-      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        !this.props.disableExternalChecks,
-        this.props.itemDefinitionInstance.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            this.props.properties || [],
-            this.props.itemDefinitionInstance.getStandardCounterpart()
-          ) : this.props.properties || [],
-        this.props.includes || [],
-        !this.props.includePolicies,
-      ),
-      ...searchState,
-      searchWasRestored: true,
-    });
 
     return searchId;
   }

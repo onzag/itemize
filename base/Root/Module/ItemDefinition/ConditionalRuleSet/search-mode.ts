@@ -45,7 +45,12 @@ export function buildSearchModeConditionalRuleSet(
     // we get the rule as a property
     const newRuleAsProperty = (newRule as IConditionalRuleSetRawJSONDataPropertyType);
     // if the property in question is not &this, which is the shorthand for the current property
-    if (newRuleAsProperty.property !== "&this") {
+    if (
+      newRuleAsProperty.property !== "&this" &&
+      newRuleAsProperty.property !== "search" &&
+      newRuleAsProperty.property !== "created_by" &&
+      newRuleAsProperty.property !== "since"
+    ) {
       // we ge the converted rule set id from the given property
       const converted = getConversionRulesetId(otherKnownProperties[
         newRuleAsProperty.property

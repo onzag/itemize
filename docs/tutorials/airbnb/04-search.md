@@ -225,6 +225,76 @@ In the `<ItemProvider>` of the `Search` component you should add this bit of cod
 
 You might notice that such option is already in place in the component at the item provider in your own listings, this means that now they won't share the same state as each will clear the other, but remember these two components are sharing the same memory slot; so they cannot appear together, in that case you should rely on a different version to ensure they use different slots.
 
-## Request limiting and search error
+## Limiting Search
 
-You might notice that if you don't write anything as your destination you do still get search results, this is due to search not being limited and a search being possible when 
+You might notice that if you don't write anything as your destination you do still get search results, this is due to search not being limited and a search being possible when nothing is specified.
+
+We want then to limit the search and provide a nice human readable error for when this happen, note that any kind of listing is a search, and we have to remember that in our listing, we are searching by creator whereas in the frontpage we are searching by address.
+
+Go to your schema to change the way your search schema interacts at `schema/hosting/unit.json` find your address and change the property to be like:
+
+```json
+{
+    "id": "address",
+    "type": "location",
+    "specialProperties": {
+        "maxSearchRadius": 100,
+        "searchRadiusInitialPrefill": 50,
+        "searchRadiusUnit": "km",
+        "searchRadiusImperialUnit": "mi"
+    },
+    "searchInvalidIf": [
+        {
+            "if": {
+                "property": "created_by",
+                "comparator": "equals",
+                "value": {
+                    "exactValue": null
+                },
+                "gate": "and",
+                "condition": {
+                    "property": "&this",
+                    "comparator": "equals",
+                    "value": {
+                        "exactValue": null
+                    }
+                }
+            },
+            "error": "NEEDS_AN_ADDRESS"
+        }
+    ]
+}
+```
+
+In itemize there are three special properties, that exist only in search mode, `created_by`, `since`, and `search`; these are variant free and specify values that are search specific for filtering, in this case created_by refers to the creator that we specify in our self list, so the search won't be forbidden.
+
+What this makes now is impossible to make a search without specifying creator or an address, so global searches are now forbidden thanks to this; this is simple schema based security, there are ways for fine tuning security using triggers, but that's another topic we will explore later.
+
+We will now try to build and we are going to get an error when doing `npm run build-data`
+
+![Unit Build Error](./images/unit-build-error.jpg)
+
+This is because we are missing the `NEEDS_AN_ADDRESS` error message, for that we are going to add it to our `unit.properties`
+
+```properties
+properties.address.error.NEEDS_AN_ADDRESS = you must provide an address
+```
+
+And in spanish
+
+```properties
+properties.address.error.NEEDS_AN_ADDRESS = debe proveer una dirección
+```
+
+At this point everything should work normally, however just for testing go to our `hosting/index.tsx` file and search for the search functionality that builds up the list and comment out the `createdBy` line, this should cause search not to work anymore due to the newly introduced security policy.
+
+```tsx
+// we specify that the creator must be us
+// createdBy: userData.id,
+```
+
+However if you refresh the page you will notice that it works just fine still, well rember `storeResultsInNavigation: "unit-search"` this line? it is picking your search results from the navigation, you will need to open a new page (remember to keep devtools open not to hit the service worker), and load the page, and you should be met with the security policy
+
+![Search Error](./images/search-error.png)
+
+Anyway, let's go back to the previous code and uncomment that line, so we are back to our functional build.
