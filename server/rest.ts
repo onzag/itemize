@@ -216,12 +216,11 @@ export default function restServices(appData: IAppDataType) {
       !req.query.lat || isNaN(req.query.lat as any) ||
       !req.query.lng || isNaN(req.query.lng as any) ||
       !req.query.lang ||
-      !req.query.sep ||
-      !req.query.q
+      !req.query.sep
     ) {
       res.status(400);
       res.end(JSON.stringify({
-        message: "Invalid request, needs parameters, lat, lng, lang, sep and q",
+        message: "Invalid request, needs parameters, lat, lng, lang and sep",
         code: ENDPOINT_ERRORS.UNSPECIFIED,
       }));
       return;
@@ -230,7 +229,7 @@ export default function restServices(appData: IAppDataType) {
     const finalResult = await appData.locationSearchService.requestGeocodeFor(
       req.query.lat as string,
       req.query.lng as string,
-      req.query.q as string,
+      req.query.q as string || null,
       req.query.lang as string,
       req.query.sep as string,
     );

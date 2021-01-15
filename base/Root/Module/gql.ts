@@ -260,7 +260,6 @@ export function getGQLQueryFieldsForModule(
     });
 
     const searchArgs = {
-      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
       // as you can realize the arguments exclude the base and make it into input mode
       // that means no RESERVED_BASE_PROPERTIES
       ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
@@ -269,6 +268,7 @@ export function getGQLQueryFieldsForModule(
         propertiesAsInput: true,
         optionalForm: true,
       }),
+      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
     };
 
     fields = {

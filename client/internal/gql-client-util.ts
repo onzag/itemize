@@ -884,6 +884,7 @@ interface IRunSearchQueryArg {
   itemDefinition: ItemDefinition,
   orderBy: IOrderByRuleType;
   createdBy: string;
+  since: string;
   parentedBy: {
     itemDefinition: ItemDefinition,
     id: string,
@@ -982,6 +983,10 @@ export async function runSearchQueryFor(
 
   if (arg.createdBy) {
     searchArgs.created_by = arg.createdBy;
+  }
+
+  if (arg.since) {
+    searchArgs.since = arg.since;
   }
 
   if (arg.parentedBy) {

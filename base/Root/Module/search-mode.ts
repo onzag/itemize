@@ -64,6 +64,24 @@ export function buildSearchModeModule(
       nullable: true,
       maxLength: MAX_SEARCH_FIELD_LENGTH,
       i18nData: searchI18nData,
+      searchable: false,
+    });
+    newModule.propExtensions.push({
+      id: "created_by",
+      type: "string",
+      nullable: true,
+      maxLength: 255,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
+    });
+    newModule.propExtensions.push({
+      id: "since",
+      type: "datetime",
+      nullable: true,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
     });
   }
 

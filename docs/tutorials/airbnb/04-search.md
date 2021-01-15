@@ -227,4 +227,4 @@ You might notice that such option is already in place in the component at the it
 
 ## Request limiting and search error
 
-You might notice that even if you don't write anything you get search results, 
+You might notice that if you don't write anything as your destination you do still get search results, this is due to search not being limited and a search being possible when 

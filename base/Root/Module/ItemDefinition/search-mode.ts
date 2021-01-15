@@ -67,6 +67,24 @@ export function buildSearchModeItemDefinition(
       nullable: true,
       maxLength: MAX_SEARCH_FIELD_LENGTH,
       i18nData: searchI18nData,
+      searchable: false,
+    });
+    newItemDef.properties.push({
+      id: "created_by",
+      type: "string",
+      nullable: true,
+      maxLength: 255,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
+    });
+    newItemDef.properties.push({
+      id: "since",
+      type: "datetime",
+      nullable: true,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
     });
 
     // now we go over the includes, aka the items

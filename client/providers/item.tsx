@@ -37,8 +37,8 @@ import { Location } from "history";
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
-    if (propertyId === "search") {
-      result.push("search");
+    if (propertyId === "search" || propertyId === "created_by" || propertyId === "since") {
+      result.push(propertyId);
       return;
     }
     const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
@@ -242,12 +242,33 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
  * The options for searching
  */
 export interface IActionSearchOptions extends IActionCleanOptions {
+  /**
+   * The properties to be used to request, these have to be part
+   * of your schema
+   */
   requestedProperties: string[];
+  /**
+   * The requested includes (EXPERIMENTAL)
+   */
   requestedIncludes?: string[];
+  /**
+   * The properties to be used to search with
+   * you have access to three other special properties
+   * that only exist within search mode "search", "created_by" and "since"
+   */
   searchByProperties: string[];
   searchByIncludes?: string[];
   orderBy?: IOrderByRuleType;
+  /**
+   * By whom it was created, note that this option takes priority
+   * over the created_by property that exists within the search mode
+   */
   createdBy?: string;
+  /**
+   * The since attribute, note that this option takes priority
+   * over the since property that exists within the search mode
+   */
+  since?: string;
   parentedBy?: {
     module: string,
     itemDefinition: string,
@@ -2857,6 +2878,13 @@ export class ActualItemProvider extends
     if (this.state.searching) {
       return null;
     }
+
+    if (options.searchByProperties.includes("created_by") && options.createdBy) {
+      throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
+    } else if (options.searchByProperties.includes("since") && options.since) {
+      throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
+    }
+
     // we need the standard counterpart given we are in search mode right now, 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
     // first we calculate the properties that are to be submitted, by using the standard counterpart
@@ -3031,6 +3059,7 @@ export class ActualItemProvider extends
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
       createdBy: options.createdBy || null,
+      since: options.since || null,
       orderBy: options.orderBy || {
         created_at: {
           priority: 0,

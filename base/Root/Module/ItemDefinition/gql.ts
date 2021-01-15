@@ -385,7 +385,6 @@ export function getGQLQueryFieldsForItemDefinition(
     });
 
     const searchArgs = {
-      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
       ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
         retrievalMode: false,
         propertiesAsInput: true,
@@ -393,6 +392,7 @@ export function getGQLQueryFieldsForItemDefinition(
         optionalForm: true,
         includePolicy: null,
       }),
+      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
     };
 
     // for the list we just make a list of our basic externalized output with DATA type
