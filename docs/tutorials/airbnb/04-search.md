@@ -298,3 +298,50 @@ However if you refresh the page you will notice that it works just fine still, w
 ![Search Error](./images/search-error.png)
 
 Anyway, let's go back to the previous code and uncomment that line, so we are back to our functional build.
+
+## Filter by type
+
+We also would like to allow the user to filter by type and that's easy to achieve, first we need to add the state for the "unit_type" in both the search by property, and the state properties.
+
+At the top of the provider:
+
+```tsx
+<ItemProvider
+    properties={[
+        "address",
+        "unit_type"
+    ]}
+```
+
+And in the search button
+
+```tsx
+{
+    searchByProperties: [
+        "address",
+        "unit_type",
+    ]
+}
+```
+
+And simply add a new entry
+
+```tsx
+<Entry id="unit_type" searchVariant="search" />
+```
+
+And now your page looks like
+
+![Search With Filter](./images/search-with-filter.png)
+
+## What you achieved
+
+ 1. Edited the frontpage to search listings by address given a radius.
+ 2. Allowed to search by listing type.
+ 3. Added security policies to prevent a global search.
+
+So we are now ready for creating bookings.
+
+## Next
+
+[Next](./04-search.md)
