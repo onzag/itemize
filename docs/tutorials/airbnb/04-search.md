@@ -272,7 +272,7 @@ What this makes now is impossible to make a search without specifying creator or
 
 We will now try to build and we are going to get an error when doing `npm run build-data`
 
-![Unit Build Error](./images/unit-build-error.jpg)
+![Unit Build Error](./images/unit-build-error.png)
 
 This is because we are missing the `NEEDS_AN_ADDRESS` error message, for that we are going to add it to our `unit.properties`
 
