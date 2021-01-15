@@ -340,8 +340,8 @@ And now your page looks like
  2. Allowed to search by listing type.
  3. Added security policies to prevent a global search.
 
-So we are now ready for creating bookings.
+So we are now ready for creating booking requests.
 
 ## Next
 
-[Next](./04-search.md)
+[Next](./05-request.md)
