@@ -31,7 +31,7 @@ import uuid from "uuid";
 import { flattenRawGQLValueOrFields } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
-import { IRequestLimitersType } from "../../../Root";
+import { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 
 /**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
@@ -1198,7 +1198,7 @@ export default class ItemDefinition {
     version: string,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
-    onlyIncludeIncludes?: string[],
+    onlyIncludeIncludes?: {[include: string]: string[]},
     excludePolicies?: boolean,
   ): IItemStateType {
     const properties = onlyIncludeProperties ?
@@ -1225,11 +1225,11 @@ export default class ItemDefinition {
 
     let includes: IIncludeState[];
     if (onlyIncludeIncludes) {
-      includes = onlyIncludeIncludes.map((ii) =>
-        this.getIncludeFor(ii).getStateNoExternalChecking(id, version, emulateExternalChecking));
+      includes = Object.keys(onlyIncludeIncludes).map((ii) =>
+        this.getIncludeFor(ii).getStateNoExternalChecking(id, version, onlyIncludeIncludes[ii], emulateExternalChecking));
     } else {
       includes = this.includeInstances.map((ii) =>
-        ii.getStateNoExternalChecking(id, version, emulateExternalChecking));
+        ii.getStateNoExternalChecking(id, version, null, emulateExternalChecking));
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
@@ -1268,7 +1268,7 @@ export default class ItemDefinition {
     id: string,
     version: string,
     onlyIncludeProperties?: string[],
-    onlyIncludeIncludes?: string[],
+    onlyIncludeIncludes?: {[include: string]: string[]},
     excludePolicies?: boolean,
   ): Promise<IItemStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
@@ -1295,9 +1295,11 @@ export default class ItemDefinition {
 
     let includes: IIncludeState[];
     if (onlyIncludeIncludes) {
-      includes = await Promise.all(onlyIncludeIncludes.map((ii) => this.getIncludeFor(ii).getState(id, version)));
+      includes = await Promise.all(Object.keys(onlyIncludeIncludes).map(
+        (ii) => this.getIncludeFor(ii).getState(id, version, onlyIncludeIncludes[ii])),
+      );
     } else {
-      includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id, version)));
+      includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id, version, null)));
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
@@ -1713,11 +1715,12 @@ export default class ItemDefinition {
    * @param userId 
    * @param ownerUserId 
    */
-  public buildFieldsForRoleAccess(
+  public async buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
   ) {
     if (action === ItemDefinitionIOActions.DELETE) {
       return null;
@@ -1734,7 +1737,7 @@ export default class ItemDefinition {
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role);
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
     if (!idefLevelAccess) {
       return null;
@@ -1758,23 +1761,23 @@ export default class ItemDefinition {
       });
     }
 
-    this.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    await Promise.all(this.getAllPropertyDefinitionsAndExtensions().map(async (pd) => {
       if (pd.isRetrievalDisabled()) {
         return;
       }
-      const propertyFields = pd.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+      const propertyFields = await pd.buildFieldsForRoleAccess(action, role, userId, ownerUserId, rolesManager);
       if (propertyFields) {
         requestFields[pd.getId()] = propertyFields;
       }
-    });
+    }));
 
-    this.getAllIncludes().forEach((include) => {
-      const includeFields = include.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+    await Promise.all(this.getAllIncludes().map(async (include) => {
+      const includeFields = await include.buildFieldsForRoleAccess(action, role, userId, ownerUserId, rolesManager);
       if (includeFields) {
         requestFields[INCLUDE_PREFIX + include.getId()] = includeFields;
         requestFields[INCLUDE_PREFIX + include.getId() + EXCLUSION_STATE_SUFFIX] = {};
       }
-    });
+    }));
 
     return requestFields;
   }
@@ -1790,12 +1793,13 @@ export default class ItemDefinition {
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
    * @returns a boolean on whether the user is allowed
    */
-  public checkRoleAccessFor(
+  public async checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
     requestedFields: IGQLRequestFields,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     if (ownerUserId === null) {
@@ -1810,7 +1814,7 @@ export default class ItemDefinition {
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role);
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
     // if you got not access
     if (!idefLevelAccess) {
@@ -1844,7 +1848,7 @@ export default class ItemDefinition {
     }
 
     // otherwise we go in the requested fields, in each one of them
-    return Object.keys(requestedFields).every((requestedField) => {
+    for (const requestedField of Object.keys(requestedFields)) {
       // and we check if it's an item (or a exclusion state)
       if (requestedField.startsWith(INCLUDE_PREFIX)) {
         // so now we extract the item name from that
@@ -1855,15 +1859,25 @@ export default class ItemDefinition {
         // request the include
         const include = this.getIncludeFor(requestedFieldItemName);
         // and check the role access for it
-        return include.checkRoleAccessFor(
-          action, role, userId, ownerUserId, requestedFields[requestedField], throwError,
+        const hasAccess = await include.checkRoleAccessFor(
+          action, role, userId, ownerUserId, requestedFields[requestedField], rolesManager, throwError,
         );
+
+        if (!hasAccess) {
+          return false;
+        }
       } else {
         // also for the property
         const propDef = this.getPropertyDefinitionFor(requestedField, true);
-        return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
+        const hasAccess = await propDef.checkRoleAccessFor(action, role, userId, ownerUserId, rolesManager, throwError);
+        if (!hasAccess) {
+          return false;
+        }
       }
-    });
+    }
+
+    // if all of them pass then we can return true
+    return true;
   }
 
   /**
@@ -1874,14 +1888,20 @@ export default class ItemDefinition {
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
    * @return a boolean on whether the user is allowed
    */
-  public checkRoleCanCreateInBehalf(role: string, targetRole: string, throwError: boolean) {
+  public async checkRoleCanCreateInBehalf(
+    role: string,
+    targetRole: string,
+    rolesManager: ICustomRoleManager,
+    throwError: boolean,
+  ) {
     let canCreateInBehalf = false;
     if (this.rawData.canCreateInBehalf) {
       canCreateInBehalf = !this.rawData.createInBehalfRoleAccess ||
         this.rawData.createInBehalfRoleAccess.includes(ANYONE_METAROLE) ||
         (
           this.rawData.createInBehalfRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-        ) || this.rawData.createInBehalfRoleAccess.includes(role);
+        ) || this.rawData.createInBehalfRoleAccess.includes(role) ||
+        await rolesManager.checkRoleAccessFor(this.rawData.createInBehalfRoleAccess);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
@@ -1937,10 +1957,11 @@ export default class ItemDefinition {
    * @param ownerUserId the owner of the current unversioned value
    * @param throwError whether to throw an error in case of failure
    */
-  public checkRoleCanVersion(
+  public async checkRoleCanVersion(
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     if (!this.isVersioned()) {
@@ -1961,7 +1982,7 @@ export default class ItemDefinition {
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         roles.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || roles.includes(role);
+      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
 
     if (!versioningAccess && throwError) {
       throw new EndpointError({
@@ -1989,15 +2010,16 @@ export default class ItemDefinition {
    * @param role the role of the user
    * @param throwError whether to throw an error in case of failure
    */
-  public checkRoleCanCustomId(
+  public async checkRoleCanCustomId(
     role: string,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     const roles = this.getRolesForCustomId();
     const customIdAccess = roles.includes(ANYONE_METAROLE) ||
       (
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-      ) || roles.includes(role);
+      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
 
     if (!customIdAccess && throwError) {
       throw new EndpointError({
@@ -2017,10 +2039,11 @@ export default class ItemDefinition {
    * @param ownerUserId the owner of the current unversioned value
    * @param throwError whether to throw an error in case of failure
    */
-  public checkRoleCanReadOwner(
+  public async checkRoleCanReadOwner(
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     const roles = this.getRolesWithReadOwnerAccess();
@@ -2030,7 +2053,7 @@ export default class ItemDefinition {
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         roles.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || roles.includes(role);
+      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
 
     if (!onwerReadAccess && throwError) {
       throw new EndpointError({
@@ -2106,10 +2129,11 @@ export default class ItemDefinition {
    * @param throwError whether to throw an error
    * @returns a boolean on whether parenting is allowed
    */
-  public checkRoleAccessForParenting(
+  public async checkRoleAccessForParenting(
     role: string,
     userId: string,
     parentOwnerUserId: string,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     let hasParentingRoleAccess = false;
@@ -2119,7 +2143,8 @@ export default class ItemDefinition {
           this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
         ) || (
           this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
-        ) || this.rawData.parentingRoleAccess.includes(role);
+        ) || this.rawData.parentingRoleAccess.includes(role) ||
+        await rolesManager.checkRoleAccessFor(this.rawData.parentingRoleAccess);
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 

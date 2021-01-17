@@ -142,7 +142,6 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   itemDefinition="user"
                   forId={user.id}
                   disableExternalChecks={true}
-                  assumeOwnership={true}
                   properties={props.avatarContextProperties}
                   longTermCaching={true}
                   markForDestructionOnLogout={true}

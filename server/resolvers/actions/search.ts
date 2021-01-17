@@ -35,6 +35,7 @@ import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
 import { IOTriggerActions } from "../triggers";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -110,12 +111,28 @@ export async function searchModule(
   CAN_LOG_DEBUG && logger.debug(
     "searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
   );
-  searchModeCounterpart.checkRoleAccessFor(
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: null,
+    item: null,
+    module: mod,
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.SEARCHING,
+    owner: resolverArgs.args.created_by || null,
+    parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
+      id: resolverArgs.args.parent_id,
+      type: resolverArgs.args.parent_type,
+      version: resolverArgs.args.parent_version || null,
+    } : null,
+  });
+  await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
     ownerToCheckAgainst,
     searchingFields,
+    rolesManager,
     true,
   );
 
@@ -144,12 +161,13 @@ export async function searchModule(
     if (!fieldsToRequest.includes("blocked_at")) {
       fieldsToRequest.push("blocked_at");
     }
-    mod.checkRoleAccessFor(
+    await mod.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.id,
       ownerToCheckAgainst,
       requestedFieldsInMod,
+      rolesManager,
       true,
     );
   }
@@ -179,12 +197,12 @@ export async function searchModule(
 
   if (created_by) {
     // we need to check for all the possible results we might get
-    mod.getAllChildDefinitionsRecursive().forEach((idef) => {
+    await Promise.all(mod.getAllChildDefinitionsRecursive().map(async (idef) => {
       // we need to check whether the user can read the owner field for that creator
       // that is specifying, this is because you are reading the owner if you are
       // searching by it, indirectly
-      idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, true);
-    });
+      await idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
+    }));
     queryModel.andWhere("created_by", created_by);
   }
 
@@ -404,13 +422,29 @@ export async function searchItemDefinition(
     searchingFields,
   );
 
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: null,
+    item: itemDefinition,
+    module: itemDefinition.getParentModule(),
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.SEARCHING,
+    owner: resolverArgs.args.created_by || null,
+    parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
+      id: resolverArgs.args.parent_id,
+      type: resolverArgs.args.parent_type,
+      version: resolverArgs.args.parent_version || null,
+    } : null,
+  });
+
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
   if (created_by) {
     // we need to check whether the user can read the owner field for that creator
     // that is specifying, this is because you are reading the owner if you are
     // searching by it, indirectly
-    itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, true);
+    await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
     ownerToCheckAgainst = created_by;
   }
 
@@ -426,12 +460,13 @@ export async function searchItemDefinition(
   CAN_LOG_DEBUG && logger.debug(
     "searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName(),
   );
-  searchModeCounterpart.checkRoleAccessFor(
+  await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
     ownerToCheckAgainst,
     searchingFields,
+    rolesManager,
     true,
   );
 
@@ -480,12 +515,13 @@ export async function searchItemDefinition(
       fieldsToRequest.push("blocked_at");
     }
 
-    itemDefinition.checkRoleAccessFor(
+    await itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.id,
       ownerToCheckAgainst,
       requestedFieldsInIdef,
+      rolesManager,
       true,
     );
   }

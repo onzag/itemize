@@ -24,7 +24,7 @@ import {
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
-import Root, { IRequestLimitersType } from "..";
+import Root, { ICustomRoleManager, IRequestLimitersType } from "..";
 import { EndpointError } from "../../errors";
 import { IGQLRequestFields } from "../../../gql-querier";
 
@@ -847,21 +847,23 @@ export default class Module {
    * @param userId the user id of the user attempting the action
    * @param ownerUserId the owner of that item definition
    * @param requestedFields the requested fields (single properties will be checked as well)
+   * @param rolesManager a roles manager instance
    * @param throwError whether to throw an error if failed (otherwise returns a boolean)
    * @returns a boolean on whether the user is granted role access
    */
-  public checkRoleAccessFor(
+  public async checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
     requestedFields: IGQLRequestFields,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     const modLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
       rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role);
+    ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
     if (!modLevelAccess) {
       if (throwError) {
@@ -883,10 +885,15 @@ export default class Module {
       return false;
     }
 
-    return Object.keys(requestedFields).every((requestedField) => {
+    for (const requestedField of Object.keys(requestedFields)) {
       const propDef = this.getPropExtensionFor(requestedField);
-      return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
-    });
+      const hasAccess = await propDef.checkRoleAccessFor(action, role, userId, ownerUserId, rolesManager, throwError);
+      if (!hasAccess) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**

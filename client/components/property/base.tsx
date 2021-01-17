@@ -427,9 +427,10 @@ export function EntryViewReadSet(
                             pElement[2] === property.getId());
                       } else if (includeContextualValue) {
                         // for the includes we do something similar as well
-                        isPoked = !!itemContextualValue.pokedElements.includes.find((iId) => {
+                        const pokeInclude = Object.keys(itemContextualValue.pokedElements.includes).find((iId) => {
                           return iId === includeContextualValue.include.getId();
                         });
+                        isPoked = pokeInclude && pokeInclude.includes(property.getId());
                       } else {
                         // and for a specific property
                         isPoked = !!itemContextualValue.pokedElements.properties.find((pId) => {

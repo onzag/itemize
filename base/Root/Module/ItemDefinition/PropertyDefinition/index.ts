@@ -27,6 +27,7 @@ import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
 import { IGQLFile } from "../../../../../gql-querier";
 import Include from "../Include";
+import { ICustomRoleManager } from "../../../../Root";
 
 /**
  * These are the main errors a property is able to give
@@ -2100,11 +2101,12 @@ export default class PropertyDefinition {
    * @param userId the user id
    * @param ownerUserId the owner of the item definition for this property
    */
-  public buildFieldsForRoleAccess(
+  public async buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
   ) {
     // for delete, you shouldn't really be getting anything
     if (action === ItemDefinitionIOActions.DELETE) {
@@ -2129,7 +2131,7 @@ export default class PropertyDefinition {
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role);
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
     // if no access then null
     if (!hasAccess) {
@@ -2150,11 +2152,12 @@ export default class PropertyDefinition {
    * @param throwError whether to throw an EndpointError during failure rather than returning a boolean
    * @returns a boolean on whether it has been granted access
    */
-  public checkRoleAccessFor(
+  public async checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     // first we get all the roles that have the access
@@ -2167,7 +2170,7 @@ export default class PropertyDefinition {
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role);
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
     // if we don't have access and we are requested to throw an error
     if (!hasAccess && throwError) {

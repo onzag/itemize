@@ -12,7 +12,9 @@ import { logger, IAppDataType } from "../../server";
 import { UNSPECIFIED_OWNER } from "../../constants";
 import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
 import { ISSRRule } from ".";
-import { IOTriggerActions } from "../../server/resolvers/triggers";
+import { IOTriggerActions } from "../resolvers/triggers";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../resolvers/roles";
+import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 
 /**
  * This is what a collection result looks like
@@ -218,12 +220,37 @@ export class Collector {
       signature = rowValue.type + "." + rowValue.id + "." + (rowValue.version || "") + "." + rowValue.last_modified;
     }
 
+    const rolesManager = new CustomRoleManager(
+      this.appData.customRoles,
+      {
+        cache: this.appData.cache,
+        knex: this.appData.knex,
+        environment: CustomRoleGranterEnvironment.RETRIEVING,
+        item: idef,
+        module: idef.getParentModule(),
+        owner: rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : null,
+        parent: rowValue && rowValue.parent_id ? {
+          id: rowValue.parent_id,
+          type: rowValue.parent_type,
+          version: rowValue.parent_version,
+        } : null,
+        tokenData: this.appliedRule.forUser,
+        value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
+          this.appData.knex,
+          this.appData.cache.getServerData(),
+          idef,
+          rowValue,
+        ) : null,
+      }
+    );
+
     // now we build the fileds for the given role access
-    const fields: IGQLRequestFields = idef.buildFieldsForRoleAccess(
+    const fields: IGQLRequestFields = await idef.buildFieldsForRoleAccess(
       ItemDefinitionIOActions.READ,
       this.appliedRule.forUser.role,
       this.appliedRule.forUser.id,
       rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : UNSPECIFIED_OWNER,
+      rolesManager,
     );
 
     // and if we have fields at all, such user might not even have access to them at all

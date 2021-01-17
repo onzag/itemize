@@ -66,13 +66,15 @@ export function getFieldsAndArgs(
     properties?: string[],
     differingPropertiesOnlyForArgs?: boolean;
     differingIncludesOnlyForArgs?: boolean;
-    includes?: string[],
+    includes?: {
+      [include: string]: string[],
+    },
     propertiesForArgs?: string[],
-    includesForArgs?: string[],
+    includesForArgs?: {
+      [include: string]: string[],
+    },
+    includeModeration: boolean,
     policiesForArgs?: [string, string, string][],
-    appliedOwner?: string,
-    userRole: string;
-    userId: string;
     itemDefinitionInstance: ItemDefinition;
     forId: string;
     forVersion: string;
@@ -119,25 +121,12 @@ export function getFieldsAndArgs(
     requestFields[p] = {};
   });
 
-  const moderationRoles = options.itemDefinitionInstance.getRolesWithModerationAccess();
-  const canReadModerationFields =
-    moderationRoles.includes(ANYONE_METAROLE) ||
-    (moderationRoles.includes(ANYONE_LOGGED_METAROLE) && options.userRole !== GUEST_METAROLE) ||
-    moderationRoles.includes(options.userRole);
   // and if our role allows it, we add the moderation fields
-  if (canReadModerationFields) {
+  if (options.includeModeration) {
     MODERATION_FIELDS.forEach((mf) => {
       requestFields.DATA[mf] = {};
     });
   }
-
-  // we get the applied owner of this item, basically what we have loaded
-  // for this user created_by or id if the item is marked as if its id
-  // is the owner, in the case of null, the applied owner is -1
-  const appliedOwner = options.appliedOwner || options.itemDefinitionInstance.getAppliedValueOwnerIfAny(
-    options.forId || null,
-    options.forVersion || null,
-  );
 
   if (options.includeFields) {
     if (options.properties && options.properties.length) {
@@ -150,30 +139,21 @@ export function getFieldsAndArgs(
         }
       });
     }
-    if (options.includes && options.includes.length) {
-      options.includes.forEach((iId) => {
+    if (options.includes) {
+      Object.keys(options.includes).forEach((iId) => {
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
         // and now we get the qualified identifier that grapqhl expects
         const qualifiedId = include.getQualifiedIdentifier();
         requestFields.DATA[include.getQualifiedExclusionStateIdentifier()] = {};
         requestFields.DATA[qualifiedId] = {};
 
+        const requestedSinkingProperties = options.includes[iId];
+
         // we need the sinking properties
         // as only the sinking properties manage
-        include.getSinkingProperties().forEach((sp) => {
-          // we always check for role access and whether we can retrieve it or not
-          if (
-            !sp.isRetrievalDisabled() &&
-            sp.checkRoleAccessFor(
-              ItemDefinitionIOActions.READ,
-              options.userRole,
-              options.userId,
-              appliedOwner,
-              false,
-            )
-          ) {
-            requestFields.DATA[qualifiedId][include.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
-          }
+        requestedSinkingProperties.forEach((spId) => {
+          const sp = include.getSinkingPropertyFor(spId);
+          requestFields.DATA[qualifiedId][include.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getRequestFields();
         });
 
         if (Object.keys(requestFields.DATA[qualifiedId]).length === 0) {
@@ -206,8 +186,8 @@ export function getFieldsAndArgs(
         argumentsForQuery[pd.getId()] = currentValue;
       });
     }
-    if (options.includesForArgs && options.includesForArgs.length) {
-      options.includesForArgs.forEach((iId) => {
+    if (options.includesForArgs) {
+      Object.keys(options.includesForArgs).forEach((iId) => {
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
         const currentOverride = options.includeOverrides && options.includeOverrides.find((o) => o.id === iId);
 
@@ -215,7 +195,7 @@ export function getFieldsAndArgs(
         const qualifiedId = include.getQualifiedIdentifier();
         const qualifiedExlcusionStateId = include.getQualifiedExclusionStateIdentifier();
         const exclusionState = currentOverride && currentOverride.exclusionState ? currentOverride.exclusionState : include.getExclusionState(options.forId || null, options.forVersion || null);
-        
+
         if (options.differingIncludesOnlyForArgs) {
           const appliedExclusion = include.getAppliedExclusionState(options.forId || null, options.forVersion || null);
           if (appliedExclusion !== exclusionState) {
@@ -240,40 +220,32 @@ export function getFieldsAndArgs(
         // we add it to the data, and we add it to the arguments
         argumentsForQuery[qualifiedId] = {};
 
+        const requiredSinkingProperties = options.includesForArgs[iId];
+
         // we need the sinking properties
         // as only the sinking properties manage
-        include.getSinkingProperties().forEach((sp) => {
-          const hasRoleAccessToIncludeProperty = sp.checkRoleAccessFor(
-            !options.forId ? ItemDefinitionIOActions.CREATE : ItemDefinitionIOActions.EDIT,
-            options.userRole,
-            options.userId,
-            appliedOwner,
-            false,
-          );
-    
-          if (
-            hasRoleAccessToIncludeProperty
-          ) {
-            const currentPropertyOverride = currentOverride && currentOverride.overrides && currentOverride.overrides.find((o) => o.id === sp.getId());
-            const currentValue = currentPropertyOverride ? currentPropertyOverride.value : sp.getCurrentValue(
-              options.forId || null, options.forVersion || null);
-            if (options.differingIncludesOnlyForArgs) {
-              const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
-              const isEqual = sp.getPropertyDefinitionDescription().localEqual({
-                itemDefinition: options.itemDefinitionInstance,
-                property: sp,
-                include,
-                a: appliedGQLValue,
-                b: currentValue,
-                id: sp.getId(),
-                prefix: include.getPrefixedQualifiedIdentifier(),
-              });
-              if (isEqual) {
-                return;
-              }
+        requiredSinkingProperties.forEach((spId) => {
+          const sp = include.getSinkingPropertyFor(spId);
+
+          const currentPropertyOverride = currentOverride && currentOverride.overrides && currentOverride.overrides.find((o) => o.id === sp.getId());
+          const currentValue = currentPropertyOverride ? currentPropertyOverride.value : sp.getCurrentValue(
+            options.forId || null, options.forVersion || null);
+          if (options.differingIncludesOnlyForArgs) {
+            const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
+            const isEqual = sp.getPropertyDefinitionDescription().localEqual({
+              itemDefinition: options.itemDefinitionInstance,
+              property: sp,
+              include,
+              a: appliedGQLValue,
+              b: currentValue,
+              id: sp.getId(),
+              prefix: include.getPrefixedQualifiedIdentifier(),
+            });
+            if (isEqual) {
+              return;
             }
-            argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
           }
+          argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
         });
 
         if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
@@ -292,7 +264,7 @@ export function getFieldsAndArgs(
 
   options.itemDefinitionInstance.getPropertiesForPolicy
 
-  return {requestFields, argumentsForQuery};
+  return { requestFields, argumentsForQuery };
 }
 
 /**
@@ -1148,7 +1120,7 @@ export async function runSearchQueryFor(
     if (data && count === null) {
       count = records.length;
     }
-  
+
     return {
       error,
       results: null,
@@ -1167,7 +1139,7 @@ export async function runSearchQueryFor(
         last_modified: (v.DATA && (v.DATA as any).last_modified) || null
       }))
     ) as IGQLSearchRecord[] || null;
-  
+
     return {
       error,
       results: data && data.results as IGQLValue[],

@@ -153,7 +153,7 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
     });
 
     // we do the same with includes
-    const hasInvalidToPokeInclude =this.props.elementsToPoke.includes.some((iId) => {
+    const hasInvalidToPokeInclude =Object.keys(this.props.elementsToPoke.includes).some((iId) => {
       if (!this.props.itemContext.state.includes) {
         return false;
       }

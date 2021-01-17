@@ -19,7 +19,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IOTriggerActions } from "../triggers";
 import { IGQLValue } from "../../../gql-querier";
-import Module from "../../../base/Root/Module";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -123,18 +123,43 @@ export async function deleteItemDefinition(
     },
   );
 
+  const currentWholeValueAsGQL: IGQLValue = convertSQLValueToGQLValueForItemDefinition(
+    appData.knex,
+    appData.cache.getServerData(),
+    itemDefinition,
+    wholeSqlStoredValue,
+  );
+
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: currentWholeValueAsGQL,
+    item: itemDefinition,
+    module: itemDefinition.getParentModule(),
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.REMOVAL,
+    owner: wholeSqlStoredValue ?
+      (itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by) : null,
+    parent: wholeSqlStoredValue && wholeSqlStoredValue.parent_id ? {
+      id: wholeSqlStoredValue.parent_id,
+      type: wholeSqlStoredValue.parent_type,
+      version: wholeSqlStoredValue.parent_version,
+    } : null,
+  });
+
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant
   // for the delete action
   CAN_LOG_DEBUG && logger.debug(
     "deleteItemDefinition: checking role access for delete",
   );
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.DELETE,
     tokenData.role,
     tokenData.id,
     userId,
     null,
+    rolesManager,
     true,
   );
 
@@ -145,21 +170,10 @@ export async function deleteItemDefinition(
   // and extract the triggers from the registry
   const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-
-  let currentWholeValueAsGQL: IGQLValue;
-
   // if we got any of them
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {
-    // we need to use the gql stored value for the trigger
-    currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-      appData.knex,
-      appData.cache.getServerData(),
-      itemDefinition,
-      wholeSqlStoredValue,
-    );
-
     if (moduleTrigger) {
       // we execute the trigger
       await moduleTrigger({

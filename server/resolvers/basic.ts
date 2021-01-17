@@ -24,6 +24,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import Knex from "knex";
+import { ICustomRoleManager } from "../../base/Root";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -130,6 +131,7 @@ export async function validateParentingRules(
   itemDefinition: ItemDefinition,
   userId: string,
   role: string,
+  rolesManager: ICustomRoleManager,
 ) {
   const isParenting = !!(parentId || parentVersion || parentType);
   if (!isParenting && itemDefinition.mustBeParented()) {
@@ -177,7 +179,7 @@ export async function validateParentingRules(
       });
     }
     const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
-    itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, true);
+    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, rolesManager, true);
   }
 
   CAN_LOG_SILLY && logger.silly(

@@ -44,6 +44,14 @@ export interface IRequestLimitersType {
   custom?: string[];
 }
 
+/**
+ * This is what a custom role manager should look like
+ * for custom role management
+ */
+export interface ICustomRoleManager {
+  checkRoleAccessFor: (roles: string[]) => Promise<boolean>;
+}
+
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
 
 /**

@@ -215,7 +215,7 @@ export interface IActionCleanOptions {
 export interface IActionSubmitOptions extends IActionCleanOptions {
   properties: string[];
   differingOnly?: boolean;
-  includes?: string[];
+  includes?: {[include: string]: string[]};
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean | Promise<boolean>;
   parentedBy?: {
@@ -250,14 +250,14 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   /**
    * The requested includes (EXPERIMENTAL)
    */
-  requestedIncludes?: string[];
+  requestedIncludes?: {[include: string]: string[]};
   /**
    * The properties to be used to search with
    * you have access to three other special properties
    * that only exist within search mode "search", "created_by" and "since"
    */
   searchByProperties: string[];
-  searchByIncludes?: string[];
+  searchByIncludes?: {[include: string]: string[]};
   orderBy?: IOrderByRuleType;
   /**
    * By whom it was created, note that this option takes priority
@@ -286,7 +286,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
 
 export interface IPokeElementsType {
   properties: string[];
-  includes: string[];
+  includes: {[include: string]: string[]};
   policies: PolicyPathType[];
 }
 
@@ -360,7 +360,7 @@ export interface IItemContextType {
   // to the search function
   searchFields: any;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: string[];
+  searchRequestedIncludes: {[include: string]: string[]};
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -369,12 +369,6 @@ export interface IItemContextType {
   // poked makes it so that every field shows its true state
   // they are poked
   pokedElements: IPokeElementsType;
-  // specifies whether the current user can create
-  canCreate: boolean;
-  // specifies whether the current user can delete
-  canEdit: boolean;
-  // do I really have to explain this one too?
-  canDelete: boolean;
   // makes it so that it reloads the value, the loadValue function
   // usually is executed on componentDidMount, pass deny cache in order to
   // do a hard refresh and bypass the cache
@@ -494,16 +488,9 @@ export interface IItemProviderProps {
    */
   loadUnversionedFallback?: boolean;
   /**
-   * this is an important flag, if ownership is assumed this means
-   * that when automatic fetching of properties it will do so assuming
-   * the current user is the owner, so OWNER rules pass, put an example,
-   * loading the current user, you have the current user id, and you need
-   * to load the user data, if you assume ownership, fields like email will
-   * be fetched, without it, they will not be fetched, use this field
-   * careful as fetching fields without the right credentials
-   * might trigger an error
+   * Allows to load the moderation fields
    */
-  assumeOwnership?: boolean;
+  loadModerationFields?: boolean;
   /**
    * whether this is about the search counterpart for using
    * with searches, this opens a whole can of worms
@@ -560,7 +547,7 @@ export interface IItemProviderProps {
   /**
    * only includes the items specified in the list in the state
    */
-  includes?: string[];
+  includes?: {[include: string]: string[]};
   /**
    * excludes the policies from being part of the state
    */
@@ -665,7 +652,7 @@ interface IActualItemProviderSearchState {
   searchParent: [string, string, string];
   searchShouldCache: boolean;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: string[];
+  searchRequestedIncludes: {[include: string]: string[]};
   searchFields: any;
 };
 
@@ -687,9 +674,6 @@ interface IActualItemProviderState extends IActualItemProviderSearchState {
   deleting: boolean;
   deleted: boolean;
   pokedElements: IPokeElementsType;
-  canEdit: boolean;
-  canDelete: boolean;
-  canCreate: boolean;
 }
 
 /**
@@ -795,7 +779,7 @@ export class ActualItemProvider extends
               props.properties || [],
               props.itemDefinitionInstance.getStandardCounterpart()
             ) : props.properties || [],
-          props.includes || [],
+          props.includes || {},
           !props.includePolicies,
         ),
       };
@@ -853,9 +837,6 @@ export class ActualItemProvider extends
     this.onPropertyEnforceOrClearFinal = this.onPropertyEnforceOrClearFinal.bind(this);
     this.dismissSubmitted = this.dismissSubmitted.bind(this);
     this.dismissDeleted = this.dismissDeleted.bind(this);
-    this.canEdit = this.canEdit.bind(this);
-    this.canCreate = this.canCreate.bind(this);
-    this.canDelete = this.canDelete.bind(this);
     this.cleanWithProps = this.cleanWithProps.bind(this);
     this.clean = this.clean.bind(this);
     this.poke = this.poke.bind(this);
@@ -929,11 +910,9 @@ export class ActualItemProvider extends
         includeArgs: false,
         includeFields: true,
         uniteFieldsWithAppliedValue: true,
-        includes: this.props.includes || [],
+        includes: this.props.includes || {},
         properties: this.props.properties || [],
-        appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
-        userId: this.props.tokenData.id,
-        userRole: this.props.tokenData.role,
+        includeModeration: this.props.loadModerationFields,
         itemDefinitionInstance: this.props.itemDefinitionInstance,
         forId: this.props.forId || null,
         forVersion: this.props.forVersion || null,
@@ -959,7 +938,7 @@ export class ActualItemProvider extends
       searchParent: null,
       searchShouldCache: false,
       searchFields: null,
-      searchRequestedIncludes: [],
+      searchRequestedIncludes: {},
       searchRequestedProperties: [],
     };
     const internalState = this.props.itemDefinitionInstance.getInternalState(
@@ -989,7 +968,7 @@ export class ActualItemProvider extends
             this.props.properties || [],
             this.props.itemDefinitionInstance.getStandardCounterpart()
           ) : this.props.properties || [],
-        this.props.includes || [],
+        this.props.includes || {},
         !this.props.includePolicies,
       ),
       // and we pass all this state
@@ -1019,13 +998,9 @@ export class ActualItemProvider extends
 
       pokedElements: {
         properties: [],
-        includes: [],
+        includes: {},
         policies: [],
       },
-
-      canEdit: this.canEdit(),
-      canDelete: this.canDelete(),
-      canCreate: this.canCreate(),
     };
   }
   public injectSubmitBlockPromise(p: Promise<any>) {
@@ -1279,7 +1254,7 @@ export class ActualItemProvider extends
     return updatedIntoSomethingThatInvalidatesTheState ||
       !equals(this.state, nextState) ||
       (nextProps.forId || null) !== (this.props.forId || null) ||
-      !!nextProps.assumeOwnership !== !!this.props.assumeOwnership ||
+      !!nextProps.loadModerationFields !== !!this.props.loadModerationFields ||
       nextProps.children !== this.props.children ||
       nextProps.localeData !== this.props.localeData ||
       nextProps.tokenData.id !== this.props.tokenData.id ||
@@ -1469,7 +1444,7 @@ export class ActualItemProvider extends
                 this.props.properties || [],
                 this.props.itemDefinitionInstance.getStandardCounterpart()
               ) : this.props.properties || [],
-            this.props.includes || [],
+            this.props.includes || {},
             !this.props.includePolicies,
           ),
         });
@@ -1489,21 +1464,11 @@ export class ActualItemProvider extends
       (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role ||
-      prevProps.assumeOwnership !== this.props.assumeOwnership ||
+      prevProps.loadModerationFields !== this.props.loadModerationFields ||
       itemDefinitionWasUpdated
     ) {
       if (!this.props.avoidLoading) {
         await this.loadValue();
-      }
-
-      // the rules on whether you can create, edit or delete change
-      // depending on these variables, so we recalculate them
-      if (!this.isUnmounted) {
-        this.setState({
-          canEdit: this.canEdit(),
-          canDelete: this.canDelete(),
-          canCreate: this.canCreate(),
-        });
       }
     }
 
@@ -1594,7 +1559,7 @@ export class ActualItemProvider extends
       searchParent: null,
       searchShouldCache: false,
       searchFields: null,
-      searchRequestedIncludes: [],
+      searchRequestedIncludes: {},
       searchRequestedProperties: [],
     };
     const internalState = this.props.itemDefinitionInstance.getInternalState(
@@ -1642,7 +1607,7 @@ export class ActualItemProvider extends
             this.props.properties || [],
             this.props.itemDefinitionInstance.getStandardCounterpart()
           ) : this.props.properties || [],
-        this.props.includes || [],
+        this.props.includes || {},
         !this.props.includePolicies,
       ),
       // also search might do this, and it's true anyway
@@ -1713,11 +1678,9 @@ export class ActualItemProvider extends
       includeArgs: false,
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
-      includes: this.props.includes || [],
+      includes: this.props.includes || {},
       properties: this.props.properties || [],
-      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
+      includeModeration: this.props.loadModerationFields,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: forId,
       forVersion: forVersion,
@@ -1973,7 +1936,7 @@ export class ActualItemProvider extends
           this.props.properties || [],
           this.props.itemDefinitionInstance.getStandardCounterpart()
         ) : this.props.properties || [],
-      this.props.includes || [],
+      this.props.includes || {},
       !this.props.includePolicies,
     );
 
@@ -2166,7 +2129,7 @@ export class ActualItemProvider extends
   public checkItemStateValidity(
     options: {
       properties: string[],
-      includes?: string[],
+      includes?: {[include: string]: string[]},
       policies?: PolicyPathType[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
@@ -2221,11 +2184,11 @@ export class ActualItemProvider extends
       return false;
     }
 
-    const allIncludedIncludesAreValid = !options.includes ? true : options.includes.every((iId) => {
+    const allIncludedIncludesAreValid = !options.includes ? true : Object.keys(options.includes).every((iId) => {
       const i = this.state.itemState.includes.find((i) => i.includeId === iId);
       // and now we get the sinking property ids
       const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
-      const sinkingPropertyIds = include.getSinkingPropertiesIds();
+      const sinkingPropertyIds = options.includes[iId];
 
       // and we extract the state only if it's a sinking property
       return i.itemState.properties.every((p) => {
@@ -2329,7 +2292,7 @@ export class ActualItemProvider extends
         this.setState({
           pokedElements: {
             properties: [],
-            includes: [],
+            includes: {},
             policies: options.policies || [],
           },
         });
@@ -2351,12 +2314,10 @@ export class ActualItemProvider extends
       includeArgs: false,
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
-      includesForArgs: [],
+      includesForArgs: {},
       propertiesForArgs: [],
       policiesForArgs: options.policies || [],
-      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
+      includeModeration: false,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId,
       forVersion: this.props.forVersion || null,
@@ -2389,7 +2350,7 @@ export class ActualItemProvider extends
           deleted: false,
           pokedElements: {
             properties: [],
-            includes: [],
+            includes: {},
             policies: options.policies || [],
           },
         });
@@ -2405,7 +2366,7 @@ export class ActualItemProvider extends
           notFound: true,
           pokedElements: {
             properties: [],
-            includes: [],
+            includes: {},
             policies: (options.policies || []),
           },
         });
@@ -2446,7 +2407,7 @@ export class ActualItemProvider extends
         this.setState({
           pokedElements: {
             properties: [],
-            includes: [],
+            includes: {},
             policies: [],
           }
         });
@@ -2607,7 +2568,7 @@ export class ActualItemProvider extends
     const isValid = this.checkItemStateValidity(options);
     const pokedElements = {
       properties: options.properties,
-      includes: options.includes || [],
+      includes: options.includes || {},
       policies: options.policies || [],
     }
 
@@ -2656,14 +2617,12 @@ export class ActualItemProvider extends
       uniteFieldsWithAppliedValue: true,
       differingPropertiesOnlyForArgs: options.differingOnly,
       differingIncludesOnlyForArgs: options.differingOnly,
-      includes: this.props.includes || [],
+      includes: this.props.includes || {},
       properties: this.props.properties || [],
-      includesForArgs: options.includes || [],
+      includesForArgs: options.includes || {},
+      includeModeration: false,
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
-      appliedOwner: this.props.assumeOwnership ? this.props.tokenData.id : null,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
@@ -2843,7 +2802,7 @@ export class ActualItemProvider extends
               this.props.properties || [],
               this.props.itemDefinitionInstance.getStandardCounterpart()
             ) : this.props.properties || [],
-          this.props.includes || [],
+          this.props.includes || {},
           !this.props.includePolicies,
         ),
         ...searchState,
@@ -2886,13 +2845,13 @@ export class ActualItemProvider extends
     // now we use this function to check that everything is valid
     const isValid = this.checkItemStateValidity({
       properties: propertiesForArgs,
-      includes: options.searchByIncludes || [],
+      includes: options.searchByIncludes || {},
     });
 
     // if it's invalid let's return the emulated error
     const pokedElements: IPokeElementsType = {
       properties: propertiesForArgs,
-      includes: options.searchByIncludes || [],
+      includes: options.searchByIncludes || {},
       policies: [],
     };
     if (!isValid) {
@@ -2983,10 +2942,8 @@ export class ActualItemProvider extends
       includeArgs: true,
       includeFields: false,
       propertiesForArgs,
-      includesForArgs: options.searchByIncludes || [],
-      appliedOwner: options.createdBy,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
+      includesForArgs: options.searchByIncludes || {},
+      includeModeration: false,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
@@ -2997,10 +2954,8 @@ export class ActualItemProvider extends
       includeArgs: false,
       includeFields: true,
       properties: options.requestedProperties,
-      includes: options.requestedIncludes || [],
-      appliedOwner: options.createdBy,
-      userId: this.props.tokenData.id,
-      userRole: this.props.tokenData.role,
+      includes: options.requestedIncludes || {},
+      includeModeration: false,
       itemDefinitionInstance: standardCounterpart,
       forId: null,
       forVersion: null,
@@ -3109,7 +3064,7 @@ export class ActualItemProvider extends
         searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || [],
+        searchRequestedIncludes: options.requestedIncludes || {},
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -3179,7 +3134,7 @@ export class ActualItemProvider extends
         searchShouldCache: !!options.cachePolicy,
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
-        searchRequestedIncludes: options.requestedIncludes || [],
+        searchRequestedIncludes: options.requestedIncludes || {},
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -3352,55 +3307,12 @@ export class ActualItemProvider extends
         searchFields: null,
         searchOwner: null,
         searchShouldCache: false,
-        searchRequestedIncludes: [],
+        searchRequestedIncludes: {},
         searchRequestedProperties: [],
         searchResults: null,
         searchRecords: null,
       });
     }
-  }
-  public canDelete() {
-    if (this.props.forId === null) {
-      return false;
-    }
-    return this.props.itemDefinitionInstance.checkRoleAccessFor(
-      ItemDefinitionIOActions.DELETE,
-      this.props.tokenData.role,
-      this.props.tokenData.id,
-      this.props.assumeOwnership ?
-        (this.props.tokenData.id || UNSPECIFIED_OWNER) :
-        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null),
-      {},
-      false,
-    );
-  }
-  public canCreate() {
-    if (this.props.forId !== null) {
-      return false;
-    }
-    return this.props.itemDefinitionInstance.checkRoleAccessFor(
-      ItemDefinitionIOActions.CREATE,
-      this.props.tokenData.role,
-      this.props.tokenData.id,
-      this.props.tokenData.id || UNSPECIFIED_OWNER,
-      {},
-      false,
-    );
-  }
-  public canEdit() {
-    if (this.props.forId === null) {
-      return false;
-    }
-    return this.props.itemDefinitionInstance.checkRoleAccessFor(
-      ItemDefinitionIOActions.EDIT,
-      this.props.tokenData.role,
-      this.props.tokenData.id,
-      this.props.assumeOwnership ?
-        (this.props.tokenData.id || UNSPECIFIED_OWNER) :
-        this.props.itemDefinitionInstance.getAppliedValueOwnerIfAny(this.props.forId || null, this.props.forVersion || null),
-      {},
-      false,
-    );
   }
   public poke(elements: IPokeElementsType) {
     if (this.isUnmounted) {
@@ -3418,7 +3330,7 @@ export class ActualItemProvider extends
     this.setState({
       pokedElements: {
         properties: [],
-        includes: [],
+        includes: {},
         policies: [],
       },
     });
@@ -3512,9 +3424,6 @@ export class ActualItemProvider extends
           dismissSearchResults: this.dismissSearchResults,
           poke: this.poke,
           unpoke: this.unpoke,
-          canCreate: this.state.canCreate,
-          canDelete: this.state.canDelete,
-          canEdit: this.state.canEdit,
           remoteListener: this.props.remoteListener,
           injectSubmitBlockPromise: this.injectSubmitBlockPromise,
           injectedParentContext: this.props.injectedParentContext,

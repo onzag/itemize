@@ -49,6 +49,7 @@ import StorageProvider, { IStorageProvidersObject, IStorageProviderClassType } f
 import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./services/base/UserLocalizationProvider";
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient, setupRedisClient } from "./redis";
+import { ICustomRoleType } from "./resolvers/roles";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -155,10 +156,11 @@ export interface IAppDataType {
   mailService: MailProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
+  registry: RegistryService;
   customServices: {
     [name: string]: ServiceProvider<any>;
   };
-  registry: RegistryService,
+  customRoles: ICustomRoleType[];
 }
 
 export interface IServerDataType {
@@ -189,6 +191,7 @@ export interface IServerCustomizationDataType {
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
+  customRoles?: ICustomRoleType[];
 }
 
 export async function getStorageProviders(
@@ -455,6 +458,7 @@ export async function initializeServer(
         cache,
         null,
         null,
+        [],
         sensitiveConfig,
       );
       // we need to inform that the cluster manager has been reset
@@ -696,6 +700,7 @@ export async function initializeServer(
       cache,
       knex,
       server,
+      custom.customRoles || [],
       sensitiveConfig,
     );
 
@@ -842,6 +847,7 @@ export async function initializeServer(
       logger,
       customServices,
       registry,
+      customRoles: custom.customRoles || [],
       // assigned later during rest setup
       customUserTokenQuery: null,
     };

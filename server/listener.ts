@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { Cache } from "./cache";
 import { Server } from "http";
-import Root from "../base/Root";
+import Root, { ICustomRoleManager } from "../base/Root";
 import ioMain from "socket.io";
 import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
 import Knex from "knex";
@@ -55,14 +55,18 @@ import {
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from ".";
-import { SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER } from "../constants";
+import {
+  SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER
+} from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
+import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
+import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -140,6 +144,7 @@ export class Listener {
   private cache: Cache;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private server: Server;
+  private customRoles: ICustomRoleType[];
 
   constructor(
     buildnumber: string,
@@ -151,6 +156,7 @@ export class Listener {
     cache: Cache,
     knex: Knex,
     server: Server,
+    customRoles: ICustomRoleType[],
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
   ) {
     this.redisGlobalSub = redisGlobalSub;
@@ -162,6 +168,7 @@ export class Listener {
     this.cache = cache;
     this.knex = knex;
     this.sensitiveConfig = sensitiveConfig;
+    this.customRoles = customRoles;
 
     this.cache.setListener(this);
 
@@ -190,7 +197,7 @@ export class Listener {
     this.setupSocketIO();
   }
   public die() {
-    
+
   }
   public async revive() {
     this.listeners = {};
@@ -318,7 +325,7 @@ export class Listener {
   public async identify(
     socket: Socket,
     request: IIdentifyRequest,
-  ) {
+  ) {
     const valid = checkIdentifyRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
@@ -516,20 +523,57 @@ export class Listener {
       return;
     }
     const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
-    const hasAccess = itemDefinition.checkRoleAccessFor(
-      ItemDefinitionIOActions.READ,
-      listenerData.user.role,
-      listenerData.user.id,
-      creator,
-      {},
-      false,
+
+    const rolesManager = new CustomRoleManager(
+      this.customRoles,
+      {
+        cache: this.cache,
+        knex: this.knex,
+        item: itemDefinition,
+        tokenData: listenerData.user,
+        module: itemDefinition.getParentModule(),
+        value: value ? convertSQLValueToGQLValueForItemDefinition(
+          this.knex,
+          this.cache.getServerData(),
+          itemDefinition,
+          value,
+        ) : value,
+        environment: CustomRoleGranterEnvironment.RETRIEVING,
+        owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
+        parent: value && value.parent_id ? {
+          id: value.parent_id,
+          type: value.parent_type,
+          version: value.parent_version || null,
+        } : null,
+      }
     );
-    if (!hasAccess) {
-      CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
-        " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+
+    try {
+      const hasAccess = await itemDefinition.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        creator,
+        {},
+        rolesManager,
+        false,
       );
-      this.emitError(socket, "user has not access", request);
+      if (!hasAccess) {
+        CAN_LOG_DEBUG && logger.debug(
+          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+        );
+        this.emitError(socket, "user has not access", request);
+        return;
+      }
+    } catch (err) {
+      logger.error(
+        "Listener.register: failed to register",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
       return;
     }
 
@@ -543,7 +587,7 @@ export class Listener {
       this.listeners[socket.id].amount++;
     }
   }
-  public ownedSearchRegister(
+  public async ownedSearchRegister(
     socket: Socket,
     request: IOwnedSearchRegisterRequest,
   ) {
@@ -586,14 +630,40 @@ export class Listener {
       this.emitError(socket, "could not find item definition or module", request);
       return;
     } else {
-      hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
-        ItemDefinitionIOActions.READ,
-        listenerData.user.role,
-        listenerData.user.id,
-        UNSPECIFIED_OWNER,
-        {},
-        false,
-      )
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          knex: this.knex,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: request.createdBy,
+          parent: null,
+        }
+      );
+      try {
+        hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          UNSPECIFIED_OWNER,
+          {},
+          rolesManager,
+          false,
+        );
+      } catch (err) {
+        logger.error(
+          "Listener.ownedSearchRegister: failed to register",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+        return;
+      }
     }
     if (!hasAccess) {
       CAN_LOG_DEBUG && logger.debug(
@@ -614,7 +684,7 @@ export class Listener {
       listenerData.amount++;
     }
   }
-  public parentedSearchRegister(
+  public async parentedSearchRegister(
     socket: Socket,
     request: IParentedSearchRegisterRequest,
   ) {
@@ -657,14 +727,44 @@ export class Listener {
       this.emitError(socket, "could not find item definition or module", request);
       return;
     } else {
-      hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
-        ItemDefinitionIOActions.READ,
-        listenerData.user.role,
-        listenerData.user.id,
-        UNSPECIFIED_OWNER,
-        {},
-        false,
-      )
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          knex: this.knex,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: null,
+          parent: {
+            id: request.parentId,
+            type: request.parentType,
+            version: request.parentVersion,
+          },
+        }
+      );
+      try {
+        hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          UNSPECIFIED_OWNER,
+          {},
+          rolesManager,
+          false,
+        );
+      } catch (err) {
+        logger.error(
+          "Listener.parentedSearchRegister: failed to register",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+        return;
+      }
     }
     if (!hasAccess) {
       CAN_LOG_DEBUG && logger.debug(
@@ -729,20 +829,46 @@ export class Listener {
         mod = itemDefinitionOrModule;
       }
 
-      const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
-        ItemDefinitionIOActions.READ,
-        listenerData.user.role,
-        listenerData.user.id,
-        request.createdBy,
-        {},
-        false,
-      )
-      if (!hasAccess) {
-        CAN_LOG_DEBUG && logger.debug(
-          "Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
-          " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          knex: this.knex,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: request.createdBy,
+          parent: null,
+        }
+      );
+      try {
+        const hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          request.createdBy,
+          {},
+          rolesManager,
+          false,
+        )
+        if (!hasAccess) {
+          CAN_LOG_DEBUG && logger.debug(
+            "Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+          );
+          this.emitError(socket, "user has not access", request);
+          return;
+        }
+      } catch (err) {
+        logger.error(
+          "Listener.ownedSearchFeedback: failed to provide feedback",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
         );
-        this.emitError(socket, "user has not access", request);
         return;
       }
 
@@ -841,7 +967,7 @@ export class Listener {
       this.emitError(socket, "socket is unidentified", request);
       return;
     }
-    
+
     const valid = checkParentedSearchFeedbackRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
@@ -872,20 +998,51 @@ export class Listener {
         mod = itemDefinitionOrModule;
       }
 
-      const hasAccess = itemDefinitionOrModule.checkRoleAccessFor(
-        ItemDefinitionIOActions.READ,
-        listenerData.user.role,
-        listenerData.user.id,
-        UNSPECIFIED_OWNER,
-        {},
-        false,
-      )
-      if (!hasAccess) {
-        CAN_LOG_DEBUG && logger.debug(
-          "Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
-          " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          knex: this.knex,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: null,
+          parent: {
+            id: request.parentId,
+            type: request.parentType,
+            version: request.parentVersion,
+          },
+        }
+      );
+
+      try {
+        const hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          UNSPECIFIED_OWNER,
+          {},
+          rolesManager,
+          false,
+        )
+        if (!hasAccess) {
+          CAN_LOG_DEBUG && logger.debug(
+            "Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+          );
+          this.emitError(socket, "user has not access", request);
+          return;
+        }
+      } catch (err) {
+        logger.error(
+          "Listener.parentedSearchFeedback: failed to provide feedback",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
         );
-        this.emitError(socket, "user has not access", request);
         return;
       }
 
@@ -910,7 +1067,7 @@ export class Listener {
 
       const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
 
-      const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+      const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
       const deletedQuery = this.knex.select(["id", "version", "type", "transaction_time"])
         .from(DELETED_REGISTRY_IDENTIFIER).where("module", mod.getQualifiedPathName()).andWhere("parenting_id", parentingId);
       if (requiredType) {
@@ -1025,32 +1182,50 @@ export class Listener {
       return;
     }
     const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
-    const hasAccess = itemDefinition.checkRoleAccessFor(
-      ItemDefinitionIOActions.READ,
-      listenerData.user.role,
-      listenerData.user.id,
-      creator,
-      {},
-      false,
+
+    const rolesManager = new CustomRoleManager(
+      this.customRoles,
+      {
+        cache: this.cache,
+        knex: this.knex,
+        item: itemDefinition,
+        tokenData: listenerData.user,
+        module: itemDefinition.getParentModule(),
+        value: value ? convertSQLValueToGQLValueForItemDefinition(
+          this.knex,
+          this.cache.getServerData(),
+          itemDefinition,
+          value,
+        ) : value,
+        environment: CustomRoleGranterEnvironment.RETRIEVING,
+        owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
+        parent: value && value.parent_id ? {
+          id: value.parent_id,
+          type: value.parent_type,
+          version: value.parent_version || null,
+        } : null,
+      }
     );
-    if (!hasAccess) {
-      CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
-        " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
-      );
-      this.emitError(socket, "user has not access", request);
-      return;
-    }
 
     try {
-      const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
-      if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
+      const hasAccess = await itemDefinition.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        listenerData.user.role,
+        listenerData.user.id,
+        creator,
+        {},
+        rolesManager,
+        false,
+      );
+      if (!hasAccess) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.feedback: could not find " + request.itemDefinition,
+          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
+          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
         );
-        this.emitError(socket, "could not find item definition", request);
+        this.emitError(socket, "user has not access", request);
         return;
       }
+
       if (value) {
         const event: IChangedFeedbackEvent = {
           itemDefinition: request.itemDefinition,

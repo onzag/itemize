@@ -26,6 +26,7 @@ import { EndpointError } from "../../../base/errors";
 import { IGQLSearchRecord } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -88,6 +89,29 @@ export async function getItemDefinition(
     }
   });
 
+  const currentWholeValueAsGQL = selectQueryValue ? convertSQLValueToGQLValueForItemDefinition(
+    appData.knex,
+    appData.cache.getServerData(),
+    itemDefinition,
+    selectQueryValue,
+  ) : null;
+
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: currentWholeValueAsGQL,
+    item: itemDefinition,
+    module: itemDefinition.getParentModule(),
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.RETRIEVING,
+    owner: selectQueryValue ? (itemDefinition.isOwnerObjectId() ? selectQueryValue.id : selectQueryValue.created_by) : null,
+    parent: selectQueryValue && selectQueryValue.parent_id ? {
+      id: selectQueryValue.parent_id,
+      type: selectQueryValue.parent_type,
+      version: selectQueryValue.parent_version,
+    } : null,
+  });
+
   // if we don't have any result, we cannot even check permissions
   // the thing does not exist, returning null
   if (!selectQueryValue) {
@@ -99,12 +123,13 @@ export async function getItemDefinition(
     // to protect because the result comes whole thing
     // null, but still, just to keep some consistency we
     // run this function
-    itemDefinition.checkRoleAccessFor(
+    await itemDefinition.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
       tokenData.id,
       UNSPECIFIED_OWNER,
       requestedFieldsInIdef,
+      rolesManager,
       true,
     );
     CAN_LOG_DEBUG && logger.debug(
@@ -124,12 +149,13 @@ export async function getItemDefinition(
   );
   // now we check the role access, this function will throw an error
   // if that fails, and we only check for the requested fields
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
     userId,
     requestedFieldsInIdef,
+    rolesManager,
     true,
   );
 
@@ -162,13 +188,6 @@ export async function getItemDefinition(
   let toReturnToUser: any = valueToProvide.toReturnToUser;
 
   if (moduleTrigger || itemDefinitionTrigger) {
-    const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-      appData.knex,
-      appData.cache.getServerData(),
-      itemDefinition,
-      selectQueryValue,
-    );
-
     if (moduleTrigger) {
       await moduleTrigger({
         appData,
@@ -210,7 +229,7 @@ export async function getItemDefinition(
     }
   }
 
-  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+  if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
     toReturnToUser.created_by = UNSPECIFIED_OWNER;
   }
 
@@ -275,18 +294,6 @@ export async function getItemDefinitionList(
     ownerToCheckAgainst = created_by;
   }
 
-  CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinitionList: checking role access for read",
-  );
-  itemDefinition.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.id,
-    ownerToCheckAgainst,
-    requestedFieldsInIdef,
-    true,
-  );
-
   // preventing a security leak here by ensuring that the type that we are searching
   // in the list is all consistent for the type of this item definition, when requesting
   // the cache and the query that will be used as a table name, as the type is the same
@@ -329,15 +336,43 @@ export async function getItemDefinitionList(
       const pathOfThisModule = mod.getPath().join("/");
       const pathOfThisIdef = itemDefinition.getPath().join("/");
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+
+      CAN_LOG_DEBUG && logger.debug(
+        "getItemDefinitionList: checking role access for read",
+      );
+      const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+        appData.knex,
+        appData.cache.getServerData(),
+        itemDefinition,
+        value,
+      );
+      const rolesManager = new CustomRoleManager(appData.customRoles, {
+        cache: appData.cache,
+        knex: appData.knex,
+        value: currentWholeValueAsGQL,
+        item: itemDefinition,
+        module: itemDefinition.getParentModule(),
+        tokenData: tokenData,
+        environment: CustomRoleGranterEnvironment.RETRIEVING,
+        owner: itemDefinition.isOwnerObjectId() ? value.id : value.created_by,
+        parent: value.parent_id ? {
+          id: value.parent_id,
+          type: value.parent_type,
+          version: value.parent_version,
+        } : null,
+      });
+      await itemDefinition.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        requestedFieldsInIdef,
+        rolesManager,
+        true,
+      );
 
       if (moduleTrigger || itemDefinitionTrigger) {
-        const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-          appData.knex,
-          appData.cache.getServerData(),
-          itemDefinition,
-          value,
-        );
         if (moduleTrigger) {
           await moduleTrigger({
             appData,
@@ -381,7 +416,7 @@ export async function getItemDefinitionList(
 
       const toReturnToUser = valueToProvide.toReturnToUser;
 
-      if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+      if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
         toReturnToUser.created_by = UNSPECIFIED_OWNER;
       }
 
@@ -437,18 +472,6 @@ export async function getModuleList(
     ownerToCheckAgainst = created_by;
   }
 
-  CAN_LOG_DEBUG && logger.debug(
-    "getModuleList: checking role access for read",
-  );
-  mod.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.id,
-    ownerToCheckAgainst,
-    requestedFieldsInMod,
-    true,
-  );
-
   const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
     resolverArgs.args.records,
   );
@@ -480,13 +503,42 @@ export async function getModuleList(
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
       const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
 
+      const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+        appData.knex,
+        appData.cache.getServerData(),
+        itemDefinition,
+        value,
+      );
+
+      CAN_LOG_DEBUG && logger.debug(
+        "getModuleList: checking role access for read",
+      );
+      const rolesManager = new CustomRoleManager(appData.customRoles, {
+        cache: appData.cache,
+        knex: appData.knex,
+        value: currentWholeValueAsGQL,
+        item: itemDefinition,
+        module: itemDefinition.getParentModule(),
+        tokenData: tokenData,
+        environment: CustomRoleGranterEnvironment.RETRIEVING,
+        owner: itemDefinition.isOwnerObjectId() ? value.id : value.created_by,
+        parent: value.parent_id ? {
+          id: value.parent_id,
+          type: value.parent_type,
+          version: value.parent_version,
+        } : null,
+      });
+      await mod.checkRoleAccessFor(
+        ItemDefinitionIOActions.READ,
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        requestedFieldsInMod,
+        rolesManager,
+        true,
+      );
+
       if (moduleTrigger || itemDefinitionTrigger) {
-        const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-          appData.knex,
-          appData.cache.getServerData(),
-          itemDefinition,
-          value,
-        );
         if (moduleTrigger) {
           await moduleTrigger({
             appData,
@@ -530,7 +582,7 @@ export async function getModuleList(
 
       const toReturnToUser = valueToProvide.toReturnToUser;
 
-      if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+      if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
         toReturnToUser.created_by = UNSPECIFIED_OWNER;
       }
 

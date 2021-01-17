@@ -37,6 +37,7 @@ import { EndpointError } from "../../../base/errors";
 import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -85,11 +86,32 @@ export async function addItemDefinition(
   const containerId: string = resolverArgs.args.container_id;
   validateContainerIdIsReal(containerId, appData.sensitiveConfig);
 
+  // now we must check if we are parenting
+  const isParenting = !!(
+    resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
+  );
+
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: null,
+    item: itemDefinition,
+    module: itemDefinition.getParentModule(),
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.CREATION,
+    owner: resolverArgs.args.in_behalf_of || tokenData.id,
+    parent: isParenting ? {
+      id: resolverArgs.args.parent_id,
+      type: resolverArgs.args.parent_type,
+      version: resolverArgs.args.parent_version || null,
+    } : null,
+  });
+
   // if we are specifying a for_id
   if (resolverArgs.args.for_id) {
     const hasNoVersion = !resolverArgs.args.version;
     if (hasNoVersion) {
-      itemDefinition.checkRoleCanCustomId(tokenData.role, true);
+      await itemDefinition.checkRoleCanCustomId(tokenData.role, rolesManager, true);
     }
 
     // we get the unversioned value anyway just in case
@@ -119,7 +141,7 @@ export async function addItemDefinition(
     }
 
     if (!hasNoVersion) {
-      itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as string, true);
+      await itemDefinition.checkRoleCanVersion(tokenData.role, tokenData.id, unversionedValue.created_by as string, rolesManager, true);
     }
   } else if (resolverArgs.args.version) {
     throw new EndpointError({
@@ -138,10 +160,6 @@ export async function addItemDefinition(
     });
   }
 
-  // now we must check if we are parenting
-  const isParenting = !!(
-    resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
-  );
   await validateParentingRules(
     appData,
     resolverArgs.args.parent_id,
@@ -150,6 +168,7 @@ export async function addItemDefinition(
     itemDefinition,
     tokenData.id,
     tokenData.role,
+    rolesManager,
   );
 
   // now we see which fields are being requested for the answer after adding, first
@@ -189,7 +208,7 @@ export async function addItemDefinition(
       alreadyCheckedUserExisted = true;
       targetRole = targetUser.role;
     }
-    itemDefinition.checkRoleCanCreateInBehalf(tokenData.role, targetRole, true);
+    await itemDefinition.checkRoleCanCreateInBehalf(tokenData.role, targetRole, rolesManager, true);
     finalOwner = resolverArgs.args.in_behalf_of;
     if (!alreadyCheckedUserExisted) {
       await checkUserExists(appData.cache, finalOwner);
@@ -207,12 +226,13 @@ export async function addItemDefinition(
 
   // now we check the role access for the given
   // create action
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.CREATE,
     tokenData.role,
     tokenData.id,
     finalOwner,
     addingFields,
+    rolesManager,
     true,
   );
 
@@ -242,12 +262,13 @@ export async function addItemDefinition(
   // so now we check the role access for the reading of
   // those fields, as you can see we use the userId of the user
   // since he will be the owner as well
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
     finalOwner,
     requestedFieldsThatRepresentPropertiesAndIncludes,
+    rolesManager,
     true,
   );
 
@@ -490,7 +511,7 @@ export async function addItemDefinition(
     });
   }
 
-  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, false)) {
+  if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, rolesManager, false)) {
     (finalOutput as any).created_by = UNSPECIFIED_OWNER;
   }
 

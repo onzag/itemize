@@ -29,6 +29,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -146,6 +147,23 @@ export async function editItemDefinition(
     itemDefinition,
     wholeSqlStoredValue,
   );
+
+  const rolesManager = new CustomRoleManager(appData.customRoles, {
+    cache: appData.cache,
+    knex: appData.knex,
+    value: currentWholeValueAsGQL,
+    item: itemDefinition,
+    module: itemDefinition.getParentModule(),
+    tokenData: tokenData,
+    environment: CustomRoleGranterEnvironment.MODIFYING,
+    owner: itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by,
+    parent: wholeSqlStoredValue.parent_id ? {
+      id: wholeSqlStoredValue.parent_id,
+      type: wholeSqlStoredValue.parent_type,
+      version: wholeSqlStoredValue.parent_version,
+    } : null,
+  });
+
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
   // doesn't matter because the apply function ignores those
@@ -212,21 +230,23 @@ export async function editItemDefinition(
 
   CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for editing");
   // checking the role access for both
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
     tokenData.role,
     tokenData.id,
     userId,
     editingFields,
+    rolesManager,
     true,
   );
   CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for read");
-  itemDefinition.checkRoleAccessFor(
+  await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
     userId,
     requestedFieldsInIdef,
+    rolesManager,
     true,
   );
 
@@ -392,7 +412,16 @@ export async function editItemDefinition(
     ...gqlValue,
   };
 
-  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, false)) {
+  if (
+    !await
+      itemDefinition.checkRoleCanReadOwner(
+        tokenData.role,
+        tokenData.id,
+        (finalOutput as any).created_by,
+        rolesManager,
+        false,
+      )
+  ) {
     (finalOutput as any).created_by = UNSPECIFIED_OWNER;
   }
 

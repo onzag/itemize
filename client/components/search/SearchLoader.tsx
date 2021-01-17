@@ -204,7 +204,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: string[];
+  searchRequestedIncludes: {[include: string]: string[]};
 }
 
 /**

@@ -16,6 +16,7 @@ import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 import { IGQLRequestFields, IGQLValue } from "../../../../../gql-querier";
+import { ICustomRoleManager } from "../../../../Root";
 
 /**
  * These represent the enum of the include and exclusion state of an include
@@ -347,18 +348,24 @@ export default class Include {
    * @param throwError whether to throw an error in failure
    * @returns a boolean on whether it has role access
    */
-  public checkRoleAccessFor(
+  public async checkRoleAccessFor(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
     requestedFields: IGQLRequestFields,
+    rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
-    return Object.keys(requestedFields || {}).every((requestedField) => {
+    for (const requestedField of Object.keys(requestedFields || {})) {
       const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
-      return propDef.checkRoleAccessFor(action, role, userId, ownerUserId, throwError);
-    });
+      const hasAccess = await propDef.checkRoleAccessFor(action, role, userId, ownerUserId, rolesManager, throwError);
+      if (!hasAccess) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -370,11 +377,12 @@ export default class Include {
    * @param ownerUserId the owner of the item definition where the include is localed
    * @returns a graphql fields object
    */
-  public buildFieldsForRoleAccess(
+  public async buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
     role: string,
     userId: string,
     ownerUserId: string,
+    rolesManager: ICustomRoleManager,
   ) {
     // for delete we cant request anything
     if (action === ItemDefinitionIOActions.DELETE) {
@@ -390,18 +398,18 @@ export default class Include {
     const requestFields: IGQLRequestFields = {};
 
     // we go through the sinking properties
-    this.getSinkingProperties().forEach((sp) => {
+    await Promise.all(this.getSinkingProperties().map(async (sp) => {
       // if it is disabled from retrieval it can't be added
       if (sp.isRetrievalDisabled()) {
         return;
       }
       // otherwise we get the fields that can be accessed for the property itself
-      const fieldsForProperty = sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId);
+      const fieldsForProperty = await sp.buildFieldsForRoleAccess(action, role, userId, ownerUserId, rolesManager);
       // and add it to the list if we get it
       if (fieldsForProperty) {
         requestFields[sp.getId()] = fieldsForProperty;
       }
-    });
+    }));
 
     // return it
     return requestFields;
@@ -577,7 +585,12 @@ export default class Include {
    * previous cached results
    * @returns the state of the include
    */
-  public getStateNoExternalChecking(id: string, version: string, emulateExternalChecking?: boolean): IIncludeState {
+  public getStateNoExternalChecking(
+    id: string,
+    version: string,
+    onlySinkingProperties: string[],
+    emulateExternalChecking?: boolean,
+  ): IIncludeState {
     const exclusionState = this.getExclusionState(id, version);
     const mergedID = id + "." + (version || "");
     return {
@@ -587,7 +600,7 @@ export default class Include {
       itemDefinitionName: this.getItemDefinitionName(),
       itemState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
         this.itemDefinition.getStateNoExternalChecking(id, version,
-          emulateExternalChecking, this.rawData.sinkIn || [], [], true),
+          emulateExternalChecking, onlySinkingProperties || this.rawData.sinkIn || [], {}, true),
       stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[mergedID] || false,
       stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
@@ -601,7 +614,11 @@ export default class Include {
    * @param version the version
    * @returns a promise for the state of the include
    */
-  public async getState(id: string, version: string): Promise<IIncludeState> {
+  public async getState(
+    id: string,
+    version: string,
+    onlySinkingProperties: string[],
+  ): Promise<IIncludeState> {
     const exclusionState = this.getExclusionState(id, version);
     const mergedID = id + "." + (version || "");
     return {
@@ -610,7 +627,7 @@ export default class Include {
       includeId: this.getId(),
       itemDefinitionName: this.getItemDefinitionName(),
       itemState: exclusionState === IncludeExclusionState.EXCLUDED ? null :
-        (await this.itemDefinition.getState(id, version, this.rawData.sinkIn || [], [], true)),
+        (await this.itemDefinition.getState(id, version, onlySinkingProperties || this.rawData.sinkIn || [], {}, true)),
       stateExclusion: this.stateExclusion[mergedID] || IncludeExclusionState.ANY,
       stateExclusionModified: this.stateExclusionModified[mergedID] || false,
       stateExclusionHasBeenManuallySet: this.stateExclusionHasBeenManuallySet[mergedID] || false,
