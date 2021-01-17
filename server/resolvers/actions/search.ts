@@ -178,6 +178,13 @@ export async function searchModule(
     .where("blocked_at", null);
 
   if (created_by) {
+    // we need to check for all the possible results we might get
+    mod.getAllChildDefinitionsRecursive().forEach((idef) => {
+      // we need to check whether the user can read the owner field for that creator
+      // that is specifying, this is because you are reading the owner if you are
+      // searching by it, indirectly
+      idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, true);
+    });
     queryModel.andWhere("created_by", created_by);
   }
 
@@ -400,6 +407,10 @@ export async function searchItemDefinition(
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
   if (created_by) {
+    // we need to check whether the user can read the owner field for that creator
+    // that is specifying, this is because you are reading the owner if you are
+    // searching by it, indirectly
+    itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, true);
     ownerToCheckAgainst = created_by;
   }
 

@@ -490,6 +490,10 @@ export async function addItemDefinition(
     });
   }
 
+  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, false)) {
+    (finalOutput as any).created_by = UNSPECIFIED_OWNER;
+  }
+
   CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: GQL output calculated",
     finalOutput,

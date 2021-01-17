@@ -197,6 +197,16 @@ export function checkItemDefinition(
     );
   }
 
+  // these two properties are not allowed between each other
+  // you cannot create in behalf and make it be owned by the object id
+  // at the same time
+  if (rawData.ownerReadRoleAccess && rawData.ownerIsObjectId) {
+    throw new CheckUpError(
+      "Cannot have an ownerReadRoleAccess with ownerIsObjectId",
+      actualTraceback.newTraceToBit("ownerIsObjectId"),
+    );
+  }
+
   // Also these two must be specified together
   if (rawData.mustBeParented && !rawData.canBeParentedBy) {
     throw new CheckUpError(
@@ -228,16 +238,16 @@ export function checkItemDefinition(
       }
 
       // now we try to find the item definition if we have specified one
-      if (parentingRule.itemDefinition) {
+      if (parentingRule.item) {
         // and we extract it if possible
-        const itemDefinitionPath = parentingRule.itemDefinition.split("/");
+        const itemDefinitionPath = parentingRule.item.split("/");
         const parentingItemDefinition = Module.getItemDefinitionRawFor(parentingModule, itemDefinitionPath);
 
         // if we have no result it's an error
         if (!parentingItemDefinition) {
           throw new CheckUpError(
             "Cannot find module for parenting item definition in module",
-            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("itemDefinition"),
+            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("item"),
           );
         }
       }
@@ -253,7 +263,7 @@ export function checkItemDefinition(
   }
 
   // check the request limiters
-  if (rawData.requestLimiters) {
+  if (rawData.requestLimiters && rawData.requestLimiters.custom) {
     rawData.requestLimiters.custom.forEach((propertyId, index) => {
       const propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
       if (!propertyRaw) {

@@ -115,6 +115,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   mustBeParented?: boolean;
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
+  ownerReadRoleAccess?: string[];
   searchable?: boolean;
   versioningRoleAccess?: string[];
   enableVersioning?: boolean;
@@ -701,6 +702,10 @@ async function buildItemDefinition(
 
   if (actualEvaledFileData.ownerIsObjectId) {
     finalValue.ownerIsObjectId = actualEvaledFileData.ownerIsObjectId;
+  }
+
+  if (actualEvaledFileData.ownerReadRoleAccess) {
+    finalValue.ownerReadRoleAccess = actualEvaledFileData.ownerReadRoleAccess;
   }
 
   if (actualEvaledFileData.enableVersioning) {

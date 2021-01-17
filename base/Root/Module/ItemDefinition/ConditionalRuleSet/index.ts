@@ -299,8 +299,16 @@ export default class ConditionalRuleSet {
 
         // null datetimes should be considered so the null check has to be in place
         if (rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "date") {
-          actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
-          actualComparedValue = (new Date(actualComparedValue as string)).getTime();
+          if (actualPropertyValue === "now" || actualPropertyValue === "today") {
+            actualPropertyValue = (new Date()).getTime();
+          } else {
+            actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
+          }
+          if (actualComparedValue === "now" || actualComparedValue === "today") {
+            actualComparedValue = (new Date()).getTime();
+          } else {
+            actualComparedValue = (new Date(actualComparedValue as string)).getTime();
+          }
         } else if (rawDataAsProperty.method === "time") {
           actualComparedValue = (new Date("1970-01-01T" + actualPropertyValue + "Z")).getTime();
           actualComparedValue = (new Date("1970-01-01T" + actualComparedValue + "Z")).getTime();

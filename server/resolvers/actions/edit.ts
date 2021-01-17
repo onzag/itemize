@@ -18,6 +18,7 @@ import {
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
   ENDPOINT_ERRORS,
+  UNSPECIFIED_OWNER,
 } from "../../../constants";
 import {
   convertSQLValueToGQLValueForItemDefinition,
@@ -390,6 +391,10 @@ export async function editItemDefinition(
     DATA: gqlValue,
     ...gqlValue,
   };
+
+  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, false)) {
+    (finalOutput as any).created_by = UNSPECIFIED_OWNER;
+  }
 
   CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: GQL ouput retrieved",

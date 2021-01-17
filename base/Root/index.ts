@@ -37,11 +37,11 @@ export interface ILangLocalesType {
  * they are also used for optimization and matenience operations
  */
 export interface IRequestLimitersType {
-  condition: "AND" | "OR",
-  since?: number,
-  createdBy?: boolean,
-  parenting?: boolean,
-  custom?: string[],
+  condition: "AND" | "OR";
+  since?: number;
+  createdBy?: boolean;
+  parenting?: boolean;
+  custom?: string[];
 }
 
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;

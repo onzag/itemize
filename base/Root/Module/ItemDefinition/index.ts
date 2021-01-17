@@ -83,7 +83,7 @@ export interface IPoliciesRawJSONDataType {
  */
 export interface IItemDefinitionParentingRawJSONDataType {
   module: string;
-  itemDefinition?: string;
+  item?: string;
 }
 
 /**
@@ -208,6 +208,13 @@ export interface IItemDefinitionRawJSONDataType {
    * attribute
    */
   ownerIsObjectId?: boolean;
+
+  /**
+   * If a role doesn't fit the criteria specified in the list the owner of
+   * a given item cannot truly be read and the created_by field becomes
+   * the unspecified owner
+   */
+  ownerReadRoleAccess?: string[];
 
   /**
    * Whether the item definition is searchable, when a module is searchable
@@ -1647,6 +1654,17 @@ export default class ItemDefinition {
   }
 
   /**
+   * Provides the roles that can read the current
+   * creator of the item itself
+   */
+  public getRolesWithReadOwnerAccess() {
+    return (
+      this.rawData.ownerReadRoleAccess ||
+      [ANYONE_METAROLE]
+    );
+  }
+
+  /**
    * Provides the roles that have access to a given
    * action based on the rules that were set
    * @param action the action from the ItemDefinitionIOActions
@@ -1993,6 +2011,39 @@ export default class ItemDefinition {
   }
 
   /**
+   * Checks whether a given role can read the owner of a given item
+   * @param role the role of the user
+   * @param userId the user id of that user
+   * @param ownerUserId the owner of the current unversioned value
+   * @param throwError whether to throw an error in case of failure
+   */
+  public checkRoleCanReadOwner(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    throwError: boolean,
+  ) {
+    const roles = this.getRolesWithReadOwnerAccess();
+
+    const onwerReadAccess = roles.includes(ANYONE_METAROLE) ||
+      (
+        roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        roles.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || roles.includes(role);
+
+    if (!onwerReadAccess && throwError) {
+      throw new EndpointError({
+        message: `Forbidden, role ${role} cannot read the owner of resource ${this.getName()}` +
+          ` only roles ${roles.join(", ")} can do so`,
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
+    return onwerReadAccess;
+  }
+
+  /**
    * Tells whether this item definition has parenting enforced
    * @return a boolean on whether parenting is enforced
    */
@@ -2022,10 +2073,10 @@ export default class ItemDefinition {
     // now we check if we even have rules for parenting
     if (this.rawData.canBeParentedBy) {
       canBeParentedBy = this.rawData.canBeParentedBy.some((parentPossibility) => {
-        if (!parentPossibility.itemDefinition) {
+        if (!parentPossibility.item) {
           return parentPossibility.module === modulePath;
         }
-        return parentPossibility.module === modulePath && parentPossibility.itemDefinition === itemDefinitionPath;
+        return parentPossibility.module === modulePath && parentPossibility.item === itemDefinitionPath;
       });
       if (!canBeParentedBy && throwError) {
         throw new EndpointError({

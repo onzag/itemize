@@ -19,7 +19,7 @@ const gates = ["and", "or", "xor"];
 /**
  * The methods
  */
-const methods = ["default", "string", "datetime"];
+const methods = ["default", "string", "datetime", "date"];
 
 /**
  * The schema

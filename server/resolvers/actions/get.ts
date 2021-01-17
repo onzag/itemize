@@ -210,6 +210,10 @@ export async function getItemDefinition(
     }
   }
 
+  if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+    toReturnToUser.created_by = UNSPECIFIED_OWNER;
+  }
+
   CAN_LOG_DEBUG && logger.debug(
     "getItemDefinition: GQL ouput retrieved",
   );
@@ -375,7 +379,13 @@ export async function getItemDefinitionList(
         }
       }
 
-      return valueToProvide.toReturnToUser;
+      const toReturnToUser = valueToProvide.toReturnToUser;
+
+      if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+        toReturnToUser.created_by = UNSPECIFIED_OWNER;
+      }
+
+      return toReturnToUser;
     },
   ));
 
@@ -518,7 +528,13 @@ export async function getModuleList(
         }
       }
 
-      return valueToProvide.toReturnToUser;
+      const toReturnToUser = valueToProvide.toReturnToUser;
+
+      if (!itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, false)) {
+        toReturnToUser.created_by = UNSPECIFIED_OWNER;
+      }
+
+      return toReturnToUser;
     },
   ));
 

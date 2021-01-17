@@ -127,13 +127,13 @@ const policySchemaNoApplying = {
  * used to refer to other item definitions
  * whatever module they come from
  */
-const itemDefinitionReferenceSchema = {
+const itemReferenceSchema = {
   type: "object",
   properties: {
     module: {
       type: "string",
     },
-    itemDefinition: {
+    item: {
       type: "string",
     },
   },
@@ -223,6 +223,12 @@ export default {
     ownerIsObjectId: {
       type: "boolean",
     },
+    ownerReadRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     customIdRoleAccess: {
       type: "array",
       items: {
@@ -246,7 +252,7 @@ export default {
     },
     canBeParentedBy: {
       type: "array",
-      items: itemDefinitionReferenceSchema,
+      items: itemReferenceSchema,
       minItems: 1,
     },
     mustBeParented: {
@@ -300,7 +306,7 @@ export default {
         },
       },
       additionalProperties: false,
-      required: ["condition", "custom"],
+      required: ["condition"],
     }
   },
   definitions: {
