@@ -48,7 +48,6 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 								"password",
 							]}
 							forId={userData.id}
-							assumeOwnership={true}
 							includePolicies={true}
 							disableExternalChecks={true}
 							avoidLoading={true}

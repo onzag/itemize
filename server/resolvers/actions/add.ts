@@ -97,6 +97,7 @@ export async function addItemDefinition(
     value: null,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
+    root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.CREATION,
     owner: resolverArgs.args.in_behalf_of || tokenData.id,

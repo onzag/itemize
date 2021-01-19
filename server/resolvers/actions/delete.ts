@@ -136,6 +136,7 @@ export async function deleteItemDefinition(
     value: currentWholeValueAsGQL,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
+    root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.REMOVAL,
     owner: wholeSqlStoredValue ?

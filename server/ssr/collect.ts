@@ -229,6 +229,7 @@ export class Collector {
         item: idef,
         module: idef.getParentModule(),
         owner: rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : null,
+        root: this.appData.root,
         parent: rowValue && rowValue.parent_id ? {
           id: rowValue.parent_id,
           type: rowValue.parent_type,

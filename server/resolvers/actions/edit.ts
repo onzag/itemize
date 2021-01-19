@@ -154,6 +154,7 @@ export async function editItemDefinition(
     value: currentWholeValueAsGQL,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
+    root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.MODIFYING,
     owner: itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by,

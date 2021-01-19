@@ -51,7 +51,6 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 							itemDefinition="user"
 							properties={properties}
 							forId={userData.id}
-							assumeOwnership={true}
 							includePolicies={false}
 							disableExternalChecks={true}
 							longTermCaching={true}

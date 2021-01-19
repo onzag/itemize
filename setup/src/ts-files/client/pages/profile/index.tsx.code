@@ -43,7 +43,6 @@ export function Profile(props: IProfileProps)<0>{
 				itemDefinition="user"
 				properties={properties}
 				forId={currentUserId}
-				assumeOwnership={false}
 				includePolicies={false}
 			>
 				<I18nRead id="profile" capitalize={true}>

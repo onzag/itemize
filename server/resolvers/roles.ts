@@ -5,6 +5,7 @@ import { Cache } from "../../server/cache";
 import { IServerSideTokenDataType } from "./basic";
 import equals from "deep-equal";
 import Knex from "knex";
+import Root from "../../base/Root";
 
 export enum CustomRoleGranterEnvironment {
   CREATION = "CREATION",
@@ -23,6 +24,7 @@ interface ICustomRoleGranterArg {
   value: IGQLValue;
   environment: CustomRoleGranterEnvironment;
   owner: string;
+  root: Root;
   parent: {
     id: string;
     type: string;
@@ -32,7 +34,7 @@ interface ICustomRoleGranterArg {
 
 export interface ICustomRoleType {
   role: string;
-  module: string[];
+  module?: string[];
   item?: string[];
   grant: (arg: ICustomRoleGranterArg) => boolean | Promise<boolean>;
   priority?: number;
@@ -47,7 +49,9 @@ export class CustomRoleManager {
     const idefPath = env.item.getPath();
 
     this.filteredRoles = allRoles.filter((r) => {
-      if (!r.item) {
+      if (!r.module) {
+        return true;
+      } else if (!r.item) {
         return equals(r.module, modulePath);
       }
       return equals(r.module, modulePath) && equals(r.item, idefPath);

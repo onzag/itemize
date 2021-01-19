@@ -117,6 +117,7 @@ export async function searchModule(
     value: null,
     item: null,
     module: mod,
+    root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.SEARCHING,
     owner: resolverArgs.args.created_by || null,
@@ -429,6 +430,7 @@ export async function searchItemDefinition(
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
     tokenData: tokenData,
+    root: appData.root,
     environment: CustomRoleGranterEnvironment.SEARCHING,
     owner: resolverArgs.args.created_by || null,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {

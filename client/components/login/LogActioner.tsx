@@ -9,7 +9,7 @@
 import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
-import { ItemContext, IItemContextType } from "../../providers/item";
+import { ItemContext, IItemContextType, IActionSubmitOptions } from "../../providers/item";
 import { MAX_SUPPORTED_INTEGER } from "../../../constants";
 
 /**
@@ -195,7 +195,7 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
    * @param cleanWhenSuccessful whether to clean the unsafe fields (aka password) when succesful, default is true
    * @returns a promise with the user id, user role, or an error
    */
-  public async signup(cleanWhenSuccessful: boolean = true): Promise<{
+  public async signup(cleanWhenSuccessful: boolean = true, customSubmit?: IActionSubmitOptions): Promise<{
     id: string;
     role: string;
     error: EndpointErrorType;
@@ -205,11 +205,24 @@ class ActualLogActioner extends React.Component<IActualLogActionerProps, {}> {
       throw new Error("Attempted to signup an user by overriding user for id " + this.props.itemContextualValue.forId);
     }
 
+    const requiredProperties = ["username", "password", "app_language", "app_country", "app_currency"];
+
+    let submitData: IActionSubmitOptions = customSubmit;
+    if (submitData) {
+      requiredProperties.forEach((p) => {
+        if (!submitData.properties.includes(p)) {
+          throw new Error("A custom login signup must include the property for " + p);
+        }
+      });
+    } else {
+      submitData = {
+        properties: requiredProperties,
+      }
+    }
+
     // basically we trigger the submit from the contextual value so that the idef
     // performs the CREATE action
-    const result = await this.props.itemContextualValue.submit({
-      properties: ["username", "password", "app_language", "app_country", "app_currency"],
-    });
+    const result = await this.props.itemContextualValue.submit(submitData);
 
     // now if there's no error
     if (!result.error) {

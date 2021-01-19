@@ -25,9 +25,7 @@ interface IUserDataRetrieverProps {
  * If you need more information about the user you should use the item definition
  * provider under this data retriever, aka ModuleProvider for users, ItemProvider for
  * user, forId the id used here; then you might read things like email and username
- * 
- * remember to put assumeOwnership as true, while it has little effect, given that there are no
- * includes in the user
+ *
  * 
  * @param props the data retriver props
  * @returns a react element
