@@ -4,6 +4,8 @@ import { ITriggerRegistry } from "../resolvers/triggers";
 import Knex from "knex";
 import { RegistryService } from "./registry";
 import { ItemizeRedisClient } from "../redis";
+import Root from "../../base/Root";
+import { ItemizeRawDatabaseChangeInformer } from "../raw-db";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -23,6 +25,8 @@ export class ServiceProvider<T> {
   public globalKnex: Knex;
   public globalRedisPub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
+  public globalDatabaseChangeInformer: ItemizeRawDatabaseChangeInformer;
+  public globalRoot: Root;
 
   constructor(config: T, registry: RegistryService) {
     this.config = config;
@@ -61,10 +65,12 @@ export class ServiceProvider<T> {
     return express.Router(options);
   }
 
-  public setupGlobalResources(knex: Knex, globalClient: ItemizeRedisClient, globalPub: ItemizeRedisClient) {
+  public setupGlobalResources(knex: Knex, globalClient: ItemizeRedisClient, globalPub: ItemizeRedisClient, root: Root) {
     this.globalKnex = knex;
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;
+    this.globalRoot = root;
+    this.globalDatabaseChangeInformer = new ItemizeRawDatabaseChangeInformer(globalPub, this.globalKnex, this.globalRoot);
   }
 
   /**
@@ -109,8 +115,8 @@ export class ServiceProvider<T> {
         }
 
         const nowTime = (new Date()).getTime();
-        const timeItPassedSinceSeoGenRan = nowTime - this.lastRan;
-        const timeUntilItNeedsToRun = cycleTime - timeItPassedSinceSeoGenRan;
+        const timeItPassedSinceRan = nowTime - this.lastRan;
+        const timeUntilItNeedsToRun = cycleTime - timeItPassedSinceRan;
 
         if (timeUntilItNeedsToRun <= 0) {
           logger.error(

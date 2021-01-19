@@ -85,7 +85,7 @@ export class GlobalManager {
   }
   public async installGlobalService(service: ServiceProvider<any>) {
     this.customServices.push(service);
-    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub);
+    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.root);
     await service.initialize();
   }
   private async addAdminUserIfMissing() {

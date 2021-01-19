@@ -36,6 +36,18 @@ interface IConditionalRuleSetRawJSONDataBaseType {
 }
 
 /**
+ * Provides today in milliseconds
+ */
+function getToday() {
+  const now = new Date();
+  const YYYY = now.getFullYear();
+  const MM = now.getMonth() + 1;
+  const DD = now.getDate();
+
+  return (new Date(YYYY + "-" + MM + "-" + DD)).getTime();
+}
+
+/**
  * this is the raw json of a conditional rule set
  */
 export interface IConditionalRuleSetRawJSONDataPropertyType
@@ -299,18 +311,22 @@ export default class ConditionalRuleSet {
 
         // null datetimes should be considered so the null check has to be in place
         if (rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "date") {
-          if (actualPropertyValue === "now" || actualPropertyValue === "today") {
+          if (actualPropertyValue === "now") {
             actualPropertyValue = (new Date()).getTime();
+          } else if (actualPropertyValue === "today") {
+            actualPropertyValue = getToday();
           } else {
             actualPropertyValue = (new Date(actualPropertyValue as string)).getTime();
           }
-          if (actualComparedValue === "now" || actualComparedValue === "today") {
+          if (actualComparedValue === "now") {
             actualComparedValue = (new Date()).getTime();
+          } else if (actualComparedValue === "today") {
+            actualComparedValue = getToday();
           } else {
             actualComparedValue = (new Date(actualComparedValue as string)).getTime();
           }
         } else if (rawDataAsProperty.method === "time") {
-          actualComparedValue = (new Date("1970-01-01T" + actualPropertyValue + "Z")).getTime();
+          actualPropertyValue = (new Date("1970-01-01T" + actualPropertyValue + "Z")).getTime();
           actualComparedValue = (new Date("1970-01-01T" + actualComparedValue + "Z")).getTime();
         }
 

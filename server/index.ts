@@ -50,6 +50,7 @@ import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient, setupRedisClient } from "./redis";
 import { ICustomRoleType } from "./resolvers/roles";
+import { ItemizeRawDatabaseChangeInformer } from "./raw-db";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -161,6 +162,7 @@ export interface IAppDataType {
     [name: string]: ServiceProvider<any>;
   };
   customRoles: ICustomRoleType[];
+  rawDatabaseChangeInformer: ItemizeRawDatabaseChangeInformer;
 }
 
 export interface IServerDataType {
@@ -848,6 +850,11 @@ export async function initializeServer(
       customServices,
       registry,
       customRoles: custom.customRoles || [],
+      rawDatabaseChangeInformer: new ItemizeRawDatabaseChangeInformer(
+        redisPub,
+        knex,
+        root,
+      ),
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
