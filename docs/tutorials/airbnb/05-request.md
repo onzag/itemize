@@ -569,7 +569,7 @@ This allows you to choose the language, however keep in mind that you always nee
 
 Note how there are 3 elements in the badge, this refers to the templating attributes that can be inserted, now let's try to make a very basic template with an unspecified language (the fallback).
 
-![Basic First Fragment](./image/basic-first-fragment.png)
+![Basic First Fragment](./images/basic-first-fragment.png)
 
 Now after saving attempt a request again and check out the difference in the message that is being sent that is now based on the template
 
