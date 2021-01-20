@@ -155,7 +155,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
     // if we have supported mail storage
     if (sensitiveConfig.mailStorage) {
-      const idef = this.root.pathRegistry[sensitiveConfig.mailStorage] as ItemDefinition;
+      const idef = this.root.registry[sensitiveConfig.mailStorage] as ItemDefinition;
       this.setMessageStorageItemDefinition(idef);
     }
   }
@@ -375,6 +375,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       canUnsubscribe: boolean;
       ignoreUnsubscribe: boolean;
       subscribeProperty: string;
+      confirmationProperties?: string[];
       emailProperty?: string;
       personalize?: string[];
     }
@@ -477,6 +478,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         } else {
           shouldSend = !!userData[arg.subscribeProperty];
         }
+      }
+
+      // other confirmation properties to use
+      if (arg.confirmationProperties && shouldSend) {
+        shouldSend = arg.confirmationProperties.every((confirmationPropertyId) => {
+          // let's get the value from there whether we should send
+          if (userData.DATA) {
+            return !!userData.DATA[confirmationPropertyId];
+          } else {
+            return !!userData[confirmationPropertyId];
+          }
+        });
       }
 
       // if we shouldn't send, then return null

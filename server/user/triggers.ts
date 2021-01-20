@@ -5,7 +5,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import { logger } from "../";
 
 export const customUserTriggers: ITriggerRegistry = {
-  itemDefinition: {
+  item: {
     io: {
       "users/user": async (arg) => {
         // these might not be there on custom builds so we check
@@ -17,17 +17,17 @@ export const customUserTriggers: ITriggerRegistry = {
         // event
         if (
           (arg.action === IOTriggerActions.CREATE || arg.action === IOTriggerActions.EDIT) &&
-          arg.value &&
-          arg.update
+          arg.originalValue &&
+          arg.requestedUpdate
         ) {
-          const newSessionId = arg.update.sessionId;
-          const oldSessionId = arg.value.sessionId;
+          const newSessionId = arg.requestedUpdate.session_id;
+          const oldSessionId = arg.originalValue.session_id;
 
           if (newSessionId && newSessionId !== oldSessionId) {
-            arg.appData.listener.sendKickEvent(arg.value.id as string);
+            arg.appData.listener.sendKickEvent(arg.originalValue.id as string);
           }
 
-          const newUsername = arg.update.username;
+          const newUsername = arg.requestedUpdate.username;
           if (newUsername) {
             if (PROTECTED_USERNAMES.includes(newUsername as string)) {
               arg.forbid("This is a protected username");
@@ -35,8 +35,8 @@ export const customUserTriggers: ITriggerRegistry = {
             }
           }
 
-          if (hasEmail && arg.update.email) {
-            const host = (arg.update.email as string).split("@")[1];
+          if (hasEmail && arg.requestedUpdate.email) {
+            const host = (arg.requestedUpdate.email as string).split("@")[1];
             const isEmailPartOfThisHost =
               host === arg.appData.config.developmentHostname ||
               host === arg.appData.config.productionHostname;
@@ -54,15 +54,15 @@ export const customUserTriggers: ITriggerRegistry = {
           hasEmail &&
           hasEvalidated &&
           (arg.action === IOTriggerActions.CREATE || arg.action === IOTriggerActions.EDIT) &&
-          arg.update
+          arg.requestedUpdate
         ) {
           // so this is the new email, remember this can be null and it
           // can be a partial update in which case it's undefined
-          const newEmail = arg.update.email;
+          const newEmail = arg.requestedUpdate.email;
           // and this is the email that was changed to
           // !arg from means this is a new user that has assigned itself an email
           // or the new Email is not undefined and the new email is not equal to the old
-          const changedEmail = !arg.value || (typeof newEmail !== "undefined" && newEmail !== arg.value.email);
+          const changedEmail = !arg.originalValue || (typeof newEmail !== "undefined" && newEmail !== arg.originalValue.email);
           // newEmail being set is not null, and new email being set is not undefined which means is not
           // being updated at all
           if (
@@ -86,7 +86,7 @@ export const customUserTriggers: ITriggerRegistry = {
             if (!result) {
               // then it's allowed and we mark e_validated as false
               return {
-                ...arg.update,
+                ...arg.requestedUpdate,
                 e_validated: false,
               }
             } else {
@@ -101,7 +101,7 @@ export const customUserTriggers: ITriggerRegistry = {
             // then we set e_vaidated to false, null cannot be a valid
             // email after all
             return {
-              ...arg.update,
+              ...arg.requestedUpdate,
               e_validated: false,
             }
           }

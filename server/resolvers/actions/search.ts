@@ -47,7 +47,7 @@ export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][])
   if (recordsRespectiveNanoSecondAccuracyArray.length === 0) {
     return null;
   }
-  const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev,cur) => {
+  const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev, cur) => {
     return prev.greaterThan(cur) ? prev : cur;
   });
   return maxDate.original;
@@ -268,7 +268,7 @@ export async function searchModule(
           const pathOfThisModule = mod.getPath().join("/");
           const pathOfThisIdef = itemDefinition.getPath().join("/");
           const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-          const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+          const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
@@ -283,8 +283,9 @@ export async function searchModule(
                 appData,
                 itemDefinition,
                 module: mod,
-                value: currentWholeValueAsGQL,
-                update: null,
+                originalValue: currentWholeValueAsGQL,
+                requestedUpdate: null,
+                newValue: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
                 id: r.id as string,
@@ -297,14 +298,15 @@ export async function searchModule(
                 forbid: defaultTriggerForbiddenFunction,
               });
             }
-  
+
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
                 appData,
                 itemDefinition,
                 module: mod,
-                value: currentWholeValueAsGQL,
-                update: null,
+                originalValue: currentWholeValueAsGQL,
+                requestedUpdate: null,
+                newValue: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
                 id: r.id as string,
@@ -339,13 +341,13 @@ export async function searchModule(
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
-      count, 
+      count,
     };
-  
+
     CAN_LOG_DEBUG && logger.debug(
       "searchModule: succeed with records",
     );
-  
+
     return finalResult;
   }
 }
@@ -531,7 +533,7 @@ export async function searchItemDefinition(
   const pathOfThisModule = mod.getPath().join("/");
   const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
-  const idefTrigger = appData.triggers.itemDefinition.search[pathOfThisIdef];
+  const idefTrigger = appData.triggers.item.search[pathOfThisIdef];
 
   if (moduleTrigger || idefTrigger) {
     const args = {
@@ -628,7 +630,7 @@ export async function searchItemDefinition(
           const pathOfThisModule = mod.getPath().join("/");
           const pathOfThisIdef = itemDefinition.getPath().join("/");
           const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-          const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+          const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
@@ -643,8 +645,9 @@ export async function searchItemDefinition(
                 appData,
                 itemDefinition,
                 module: mod,
-                value: currentWholeValueAsGQL,
-                update: null,
+                originalValue: currentWholeValueAsGQL,
+                requestedUpdate: null,
+                newValue: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
                 id: r.id as string,
@@ -657,14 +660,15 @@ export async function searchItemDefinition(
                 forbid: defaultTriggerForbiddenFunction,
               });
             }
-  
+
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
                 appData,
                 itemDefinition,
                 module: mod,
-                value: currentWholeValueAsGQL,
-                update: null,
+                originalValue: currentWholeValueAsGQL,
+                requestedUpdate: null,
+                newValue: null,
                 extraArgs: resolverArgs.args,
                 action: IOTriggerActions.READ,
                 id: r.id as string,
@@ -685,7 +689,7 @@ export async function searchItemDefinition(
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
-      count, 
+      count,
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -701,13 +705,13 @@ export async function searchItemDefinition(
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
-      count, 
+      count,
     };
-  
+
     CAN_LOG_DEBUG && logger.debug(
       "searchItemDefinition: succeed with records",
     );
-  
+
     pooledRoot.cleanState();
     appData.rootPool.release(pooledRoot);
     return finalResult;

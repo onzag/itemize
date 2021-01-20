@@ -260,7 +260,7 @@ export async function editItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let extraArgs: IGQLArgs;
@@ -287,8 +287,9 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: gqlValueToConvert,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: gqlValueToConvert,
+        newValue: null,
         extraArgs,
         action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as string,
@@ -313,8 +314,9 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: gqlValueToConvert,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: gqlValueToConvert,
+        newValue: null,
         extraArgs,
         action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as string,
@@ -346,48 +348,6 @@ export async function editItemDefinition(
     resolverArgs.args.listener_uuid || null,
   );
 
-  if (moduleTrigger) {
-    // we execute the trigger
-    await moduleTrigger({
-      appData,
-      itemDefinition,
-      module: mod,
-      value: currentWholeValueAsGQL,
-      update: gqlValueToConvert,
-      extraArgs,
-      action: IOTriggerActions.EDITED,
-      id: resolverArgs.args.id as string,
-      version: resolverArgs.args.version as string || null,
-      user: {
-        role: tokenData.role,
-        id: tokenData.id,
-        customData: tokenData.customData,
-      },
-      forbid: defaultTriggerInvalidForbiddenFunction,
-    });
-  }
-  // same with the item definition
-  if (itemDefinitionTrigger) {
-    // we call the trigger
-    await itemDefinitionTrigger({
-      appData,
-      itemDefinition,
-      module: mod,
-      value: currentWholeValueAsGQL,
-      update: gqlValueToConvert,
-      extraArgs,
-      action: IOTriggerActions.EDITED,
-      id: resolverArgs.args.id as string,
-      version: resolverArgs.args.version as string || null,
-      user: {
-        role: tokenData.role,
-        id: tokenData.id,
-        customData: tokenData.customData,
-      },
-      forbid: defaultTriggerInvalidForbiddenFunction,
-    });
-  }
-
   CAN_LOG_DEBUG && logger.debug(
     "editItemDefinition: SQL ouput retrieved",
   );
@@ -412,6 +372,50 @@ export async function editItemDefinition(
     DATA: gqlValue,
     ...gqlValue,
   };
+
+  if (moduleTrigger) {
+    // we execute the trigger
+    await moduleTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      originalValue: currentWholeValueAsGQL,
+      requestedUpdate: gqlValueToConvert,
+      newValue: gqlValue,
+      extraArgs,
+      action: IOTriggerActions.EDITED,
+      id: resolverArgs.args.id as string,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
+  // same with the item definition
+  if (itemDefinitionTrigger) {
+    // we call the trigger
+    await itemDefinitionTrigger({
+      appData,
+      itemDefinition,
+      module: mod,
+      originalValue: currentWholeValueAsGQL,
+      requestedUpdate: gqlValueToConvert,
+      newValue: gqlValue,
+      extraArgs,
+      action: IOTriggerActions.EDITED,
+      id: resolverArgs.args.id as string,
+      version: resolverArgs.args.version as string || null,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      forbid: defaultTriggerInvalidForbiddenFunction,
+    });
+  }
 
   if (
     !await

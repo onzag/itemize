@@ -6,6 +6,7 @@ import {
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/date";
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../constants";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
+import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
 
 /**
  * Provides the current value of the date given the
@@ -46,6 +47,7 @@ export interface IPropertyEntryDateTimeRendererProps extends IPropertyEntryRende
   i18nCancel: string;
   i18nOk: string;
   onChangeByMoment: (value: any) => void;
+  dateTimeFormat: string;
 }
 
 export default class PropertyEntryDateTime extends
@@ -169,6 +171,17 @@ export default class PropertyEntryDateTime extends
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];
     }
+    
+    const type = this.props.property.getType() as any;
+
+    let dateTimeFormat: string;
+    if (type === "date") {
+      dateTimeFormat = getLocalizedDateFormat(this.props.language);
+    } else if (type === "time") {
+      dateTimeFormat = getLocalizedTimeFormat(this.props.language);
+    } else {
+      dateTimeFormat = getLocalizedDateTimeFormat(this.props.language);
+    }
 
     const RendererElement = this.props.renderer;
     const rendererArgs = {
@@ -189,7 +202,8 @@ export default class PropertyEntryDateTime extends
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
       momentValue: this.state.value,
-      type: this.props.property.getType() as any,
+      type,
+      dateTimeFormat,
 
       disabled: this.props.state.enforced,
 

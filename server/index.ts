@@ -729,14 +729,16 @@ export async function initializeServer(
     if (MailServiceClass.isGlobal()) {
       throw new Error("The mail service class is global type, and that's not allowed");
     }
-    if (process.env.FAKE_EMAILS === "true") {
+
+    const usesFakeMail = process.env.FAKE_EMAILS === "true";
+    if (usesFakeMail) {
       logger.info(
         "initializeServer: using fake email service",
       );
       // typescript messes the types again
       MailServiceClass = FakeMailService as any;
     }
-    const mailService = sensitiveConfig.mail ?
+    const mailService = (sensitiveConfig.mail || usesFakeMail) ?
       new MailServiceClass(
         sensitiveConfig.mail,
         registry,

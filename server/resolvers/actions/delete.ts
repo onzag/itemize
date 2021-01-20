@@ -169,7 +169,7 @@ export async function deleteItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
   // if we got any of them
   if (
@@ -181,8 +181,9 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: null,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: null,
+        newValue: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as string,
@@ -202,8 +203,9 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: null,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: null,
+        newValue: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as string,
@@ -233,8 +235,9 @@ export async function deleteItemDefinition(
       appData,
       itemDefinition,
       module: mod,
-      value: currentWholeValueAsGQL,
-      update: null,
+      originalValue: currentWholeValueAsGQL,
+      requestedUpdate: null,
+      newValue: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,
@@ -255,8 +258,9 @@ export async function deleteItemDefinition(
       appData,
       itemDefinition,
       module: mod,
-      value: currentWholeValueAsGQL,
-      update: null,
+      originalValue: currentWholeValueAsGQL,
+      requestedUpdate: null,
+      newValue: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,

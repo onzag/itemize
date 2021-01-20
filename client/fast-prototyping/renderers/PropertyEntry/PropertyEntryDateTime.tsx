@@ -14,7 +14,6 @@ import {
   KeyboardTimePicker,
 } from "@material-ui/pickers";
 import { Alert, Typography, createStyles, WithStyles, withStyles, TextField } from "../../mui-core";
-import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
 
 /**
@@ -120,7 +119,6 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
   let component = null;
   if (isReady && props.type === "date") {
     // let's extract the locale format from moment for a long date
-    const L = getLocalizedDateFormat();
     const basicProps = {
       autoOk: true,
       cancelLabel: props.i18nCancel,
@@ -128,7 +126,7 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
       label: props.label,
       placeholder: props.placeholder,
       inputVariant: "filled" as "filled",
-      format: L,
+      format: props.dateTimeFormat,
       className: props.classes.entry,
       fullWidth: true,
       value: props.momentValue,
@@ -169,16 +167,15 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
     }
   } else if (isReady && props.type === "datetime") {
     // let's use the long format with the time format
-    const LLT = getLocalizedDateTimeFormat();
     const basicProps = {
       autoOk: true,
-      ampm: LLT.includes("A"),
+      ampm: props.dateTimeFormat.includes("A"),
       cancelLabel: props.i18nCancel,
       okLabel: props.i18nOk,
       label: props.label,
       placeholder: props.placeholder,
       inputVariant: "filled" as "filled",
-      format: LLT,
+      format: props.dateTimeFormat,
       className: props.classes.entry,
       fullWidth: true,
       value: props.momentValue,
@@ -219,16 +216,15 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
     }
   } else if (isReady && props.type === "time") {
     // and the time only
-    const LT = getLocalizedTimeFormat();
     const basicProps = {
       autoOk: true,
-      ampm: LT.includes("A"),
+      ampm: props.dateTimeFormat.includes("A"),
       cancelLabel: props.i18nCancel,
       okLabel: props.i18nOk,
       label: props.label,
       placeholder: props.placeholder,
       inputVariant: "filled" as "filled",
-      format: LT,
+      format: props.dateTimeFormat,
       className: props.classes.entry,
       fullWidth: true,
       value: props.momentValue,

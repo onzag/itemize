@@ -7,7 +7,7 @@
 import Moment from "moment";
 import { JSDOM } from "jsdom";
 import createDOMPurify from "dompurify";
-import { FILE_SUPPORTED_IMAGE_TYPES } from "./constants";
+import { DATETIME_FORMAT, DATE_FORMAT, FILE_SUPPORTED_IMAGE_TYPES, TIME_FORMAT } from "./constants";
 import { IGQLFile } from "./gql-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
 import Include from "./base/Root/Module/ItemDefinition/Include";
@@ -227,41 +227,35 @@ export function localeReplacerToArray(str: string, ...args: any[]): any[] {
   return result;
 }
 
-/**
- * gets the actual format given a string format
- * this is basically only used to avoid inconsistencies
- * regarding input to create a mask, and it only happens with
- * time basically, but here we can override masks
- * @param value the format string
- * @returns the normalized form
- */
-// export function getNormalizedDateTimeFormat(value: string) {
-//   // Since we cannot have a mask that uses only one H
-//   // we need to return it with two, same for the second
-//   // we canot have a one or two digits situation
-
-//   if (value === "H:mm") {
-//     return "HH:mm";
-//   } else if (value === "h:mm A") {
-//     return "hh:mm A";
-//   }
-
-//   // any other value is tipically allowed
-//   return value;
-// }
-
-export function getLocalizedTimeFormat() {
+export function getLocalizedTimeFormat(locale: string) {
+  Moment.locale(locale);
   const LT = (Moment.localeData() as any)._longDateFormat.LT;
   return LT;
 }
 
-export function getLocalizedDateFormat() {
+export function getLocalizedDateFormat(locale: string) {
+  Moment.locale(locale);
   const L = (Moment.localeData() as any)._longDateFormat.L;
   return L;
 }
 
-export function getLocalizedDateTimeFormat() {
-  return getLocalizedDateFormat() + " " + getLocalizedTimeFormat();
+export function getLocalizedDateTimeFormat(locale: string) {
+  return getLocalizedDateFormat(locale) + " " + getLocalizedTimeFormat(locale);
+}
+
+export function formatDate(locale: string, date: string) {
+  const format = getLocalizedDateFormat(locale);
+  return Moment(date, DATE_FORMAT).format(format);
+}
+
+export function formatTime(locale: string, time: string) {
+  const format = getLocalizedTimeFormat(locale);
+  return Moment(time, TIME_FORMAT).format(format);
+}
+
+export function formatDateTime(locale: string, datetime: string) {
+  const format = getLocalizedDateTimeFormat(locale);
+  return Moment(datetime, DATETIME_FORMAT).format(format);
 }
 
 /**

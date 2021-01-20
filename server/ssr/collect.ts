@@ -269,7 +269,7 @@ export class Collector {
       const mod = idef.getParentModule();
       const pathOfThisModule = mod.getPath().join("/");
       // and extract the triggers from the registry
-      const itemDefinitionTrigger = this.appData.triggers.itemDefinition.io[pathOfThisIdef]
+      const itemDefinitionTrigger = this.appData.triggers.item.io[pathOfThisIdef]
       const moduleTrigger = this.appData.triggers.module.io[pathOfThisModule];
 
       let queryWasForbiddenByTriggers = false;
@@ -280,8 +280,9 @@ export class Collector {
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
-            value: value.actualValue,
-            update: null,
+            originalValue: value.actualValue,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: {},
             action: IOTriggerActions.READ,
             id,
@@ -303,8 +304,9 @@ export class Collector {
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
-            value: value.actualValue,
-            update: null,
+            originalValue: value.actualValue,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: {},
             action: IOTriggerActions.READ,
             id,

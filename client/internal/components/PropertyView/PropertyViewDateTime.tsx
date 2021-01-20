@@ -60,13 +60,13 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     let format: string;
     let dbFormat: string;
     if (type === "date") {
-      format = getLocalizedDateFormat();
+      format = getLocalizedDateFormat(this.props.language);
       dbFormat = DATE_FORMAT;
     } else if (type === "datetime") {
-      format = getLocalizedDateTimeFormat();
+      format = getLocalizedDateTimeFormat(this.props.language);
       dbFormat = DATETIME_FORMAT;
     } else {
-      format = getLocalizedTimeFormat();
+      format = getLocalizedTimeFormat(this.props.language);
       dbFormat = TIME_FORMAT;
     }
 

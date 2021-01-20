@@ -352,7 +352,7 @@ export async function addItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let itemDefinitionSpecificArgs: IGQLArgs = null;
@@ -377,8 +377,9 @@ export async function addItemDefinition(
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        value: null,
-        update: gqlValueToConvert,
+        originalValue: null,
+        requestedUpdate: gqlValueToConvert,
+        newValue: null,
         extraArgs,
         action: IOTriggerActions.CREATE,
         id: null,
@@ -403,8 +404,9 @@ export async function addItemDefinition(
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        value: null,
-        update: gqlValueToConvert,
+        originalValue: null,
+        requestedUpdate: gqlValueToConvert,
+        newValue: null,
         extraArgs,
         action: IOTriggerActions.CREATE,
         id: null,
@@ -478,8 +480,9 @@ export async function addItemDefinition(
       appData,
       itemDefinition: itemDefinition,
       module: mod,
-      value: null,
-      update: gqlValueToConvert,
+      originalValue: null,
+      requestedUpdate: gqlValueToConvert,
+      newValue: gqlValue,
       extraArgs,
       action: IOTriggerActions.CREATED,
       id: value.id,
@@ -497,8 +500,9 @@ export async function addItemDefinition(
       appData,
       itemDefinition: itemDefinition,
       module: mod,
-      value: null,
-      update: gqlValueToConvert,
+      originalValue: null,
+      requestedUpdate: gqlValueToConvert,
+      newValue: gqlValue,
       extraArgs,
       action: IOTriggerActions.CREATED,
       id: value.id,

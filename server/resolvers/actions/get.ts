@@ -183,7 +183,7 @@ export async function getItemDefinition(
   const mod = itemDefinition.getParentModule();
   const pathOfThisModule = mod.getPath().join("/");
   // and extract the triggers from the registry
-  const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef]
+  const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
   let toReturnToUser: any = valueToProvide.toReturnToUser;
@@ -194,8 +194,9 @@ export async function getItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: null,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: null,
+        newValue: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.READ,
         id: resolverArgs.args.id as string,
@@ -214,8 +215,9 @@ export async function getItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        value: currentWholeValueAsGQL,
-        update: null,
+        originalValue: currentWholeValueAsGQL,
+        requestedUpdate: null,
+        newValue: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.READ,
         id: resolverArgs.args.id as string,
@@ -337,7 +339,7 @@ export async function getItemDefinitionList(
       const pathOfThisModule = mod.getPath().join("/");
       const pathOfThisIdef = itemDefinition.getPath().join("/");
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+      const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
       CAN_LOG_DEBUG && logger.debug(
         "getItemDefinitionList: checking role access for read",
@@ -380,8 +382,9 @@ export async function getItemDefinitionList(
             appData,
             itemDefinition,
             module: mod,
-            value: currentWholeValueAsGQL,
-            update: null,
+            originalValue: currentWholeValueAsGQL,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
             id: value.id as string,
@@ -400,8 +403,9 @@ export async function getItemDefinitionList(
             appData,
             itemDefinition,
             module: mod,
-            value: currentWholeValueAsGQL,
-            update: null,
+            originalValue: currentWholeValueAsGQL,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
             id: value.id as string,
@@ -503,7 +507,7 @@ export async function getModuleList(
       const pathOfThisModule = mod.getPath().join("/");
       const pathOfThisIdef = itemDefinition.getPath().join("/");
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
-      const itemDefinitionTrigger = appData.triggers.itemDefinition.io[pathOfThisIdef];
+      const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
         appData.knex,
@@ -547,8 +551,9 @@ export async function getModuleList(
             appData,
             itemDefinition,
             module: mod,
-            value: currentWholeValueAsGQL,
-            update: null,
+            originalValue: currentWholeValueAsGQL,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
             id: value.id as string,
@@ -567,8 +572,9 @@ export async function getModuleList(
             appData,
             itemDefinition,
             module: mod,
-            value: currentWholeValueAsGQL,
-            update: null,
+            originalValue: currentWholeValueAsGQL,
+            requestedUpdate: null,
+            newValue: null,
             extraArgs: resolverArgs.args,
             action: IOTriggerActions.READ,
             id: value.id as string,

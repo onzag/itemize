@@ -19,15 +19,19 @@ export interface IOTriggerArgType {
    */
   appData: IAppDataType;
   /**
-   * the current value that the database is hosting, this value is total
-   * it will be null for CREATE and CREATED
+   * the current value that the database is hosting
    */
-  value: IGQLValue;
+  originalValue: IGQLValue;
+  /**
+   * the new value that it is hosting usually only available
+   * on done requests
+   */
+  newValue: IGQLValue;
   /**
    * A partial arg based update for the value, remember this is a partial
    * value
    */
-  update: IGQLArgs;
+  requestedUpdate: IGQLArgs;
   /**
    * Arguments that are not part of the patch that were passed to graphql
    */
@@ -95,7 +99,7 @@ export interface IBaseTriggerRegistry {
 
 export interface ITriggerRegistry {
   module?: IBaseTriggerRegistry,
-  itemDefinition?: IBaseTriggerRegistry,
+  item?: IBaseTriggerRegistry,
 }
 
 function fixPaths<T>(src: T): T {
@@ -128,7 +132,7 @@ function mergeIOTriggers(
     if (originalUpdateResult) {
       return await triggerB({
         ...arg,
-        update: originalUpdateResult,
+        requestedUpdate: originalUpdateResult,
       });
     } else {
       return await triggerB(arg);
@@ -161,7 +165,7 @@ export function mergeTriggerRegistries(
   ...triggers: ITriggerRegistry[]
 ) {
   const final: ITriggerRegistry = {
-    itemDefinition: {
+    item: {
       io: {},
       search: {},
     },
@@ -177,15 +181,15 @@ export function mergeTriggerRegistries(
       return;
     }
 
-    const iTrigger = t.itemDefinition;
+    const iTrigger = t.item;
     const modTrigger = t.module;
 
     if (iTrigger) {
       if (iTrigger.io) {
         const fixed = fixPaths(iTrigger.io);
         Object.keys(fixed).forEach((path: string) => {
-          final.itemDefinition.io[path] = mergeIOTriggers(
-            final.itemDefinition.io[path],
+          final.item.io[path] = mergeIOTriggers(
+            final.item.io[path],
             fixed[path],
           );
         });
@@ -193,8 +197,8 @@ export function mergeTriggerRegistries(
       if (iTrigger.search) {
         const fixed = fixPaths(iTrigger.search);
         Object.keys(fixed).forEach((path: string) => {
-          final.itemDefinition.search[path] = mergeSearchTriggers(
-            final.itemDefinition.search[path],
+          final.item.search[path] = mergeSearchTriggers(
+            final.item.search[path],
             fixed[path],
           );
         });

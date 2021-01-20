@@ -3,8 +3,10 @@ import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { logger, IServerDataType } from ".";
-import { SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
-  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER, SERVER_MAPPING_TIME } from "../constants";
+import {
+  SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
+  CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER, SERVER_MAPPING_TIME
+} from "../constants";
 import { ISensitiveConfigRawJSONDataType, IConfigRawJSONDataType } from "../config";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
@@ -15,6 +17,7 @@ import { ServiceProvider } from "./services";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient } from "./redis";
+import { ISQLTableRowValue } from "../base/Root/sql";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -136,7 +139,7 @@ export class GlobalManager {
         username = "admin" + (new Date()).getTime();
       }
 
-      const password = uuid.v4().replace(/\-/g,"");
+      const password = uuid.v4().replace(/\-/g, "");
 
       const sqlModData = {
         type: userIdef.getQualifiedPathName(),
@@ -156,17 +159,43 @@ export class GlobalManager {
         app_currency: this.config.fallbackCurrency,
       }
 
+      const moreIdefProperties = userIdef.getAllPropertyDefinitionsAndExtensions();
+      moreIdefProperties.forEach((p) => {
+        const id = p.getId();
+        const isExtension = p.isExtension();
+
+        if ((isExtension && !sqlModData[id]) || (!isExtension && !sqlIdefData[id])) {
+          const value = p.getCurrentValue(null, null);
+          const sqlInValue: ISQLTableRowValue = p.getPropertyDefinitionDescription().sqlIn({
+            dictionary: "english",
+            id,
+            itemDefinition: userIdef,
+            knex: this.knex,
+            prefix: "",
+            property: p,
+            serverData: this.serverData,
+            value,
+          });
+
+          if (isExtension) {
+            Object.assign(sqlModData, sqlInValue);
+          } else {
+            Object.assign(sqlIdefData, sqlInValue);
+          }
+        }
+      });
+
       try {
         await this.knex.transaction(async (transactionKnex) => {
           const insertQueryValueMod = await transactionKnex(moduleTable)
             .insert(sqlModData).returning("*");
-    
+
           sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
           sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
-    
+
           const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
           const insertQueryValueIdef = await insertQueryIdef;
-    
+
           return {
             ...insertQueryValueMod[0],
             ...insertQueryValueIdef[0],
@@ -229,7 +258,7 @@ export class GlobalManager {
       );
       this.idefNeedsMantenience.push(idef);
 
-      const requestLimiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
+      const requestLimiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
       const sinceLimiter = requestLimiters && requestLimiters.condition === "AND" && requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
@@ -262,11 +291,11 @@ export class GlobalManager {
               }
             );
           }
-    
+
           const nowTime = (new Date()).getTime();
           const timeItPassedSinceSeoGenRan = nowTime - this.seoGenLastUpdated;
           const timeUntilSeoGenNeedsToRun = SERVER_MAPPING_TIME - timeItPassedSinceSeoGenRan;
-    
+
           if (timeUntilSeoGenNeedsToRun <= 0) {
             logger.error(
               "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next mapping was negative" +
@@ -301,11 +330,11 @@ export class GlobalManager {
             }
           );
         }
-  
+
         const nowTime = (new Date()).getTime();
         const timeItPassedSinceServerDataLastUpdated = nowTime - this.serverDataLastUpdated;
         const timeUntilItNeedsToUpdate = SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
-  
+
         if (timeUntilItNeedsToUpdate <= 0) {
           logger.error(
             "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
@@ -321,7 +350,7 @@ export class GlobalManager {
         }
       }
     })();
-    
+
     // execute every custom service
     this.customServices.forEach((s) => s.execute());
   }
@@ -364,7 +393,7 @@ export class GlobalManager {
     includePropertiesThatNeedMantenience.forEach((includePropArray) => {
       totalPropertiesThatNeedMantenience = totalPropertiesThatNeedMantenience.concat(includePropArray);
     });
-    const limiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
+    const limiters = idef.getRequestLimiters() || (idef.getParentModule()).getRequestLimiters();
     const since = limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(idef.getQualifiedPathName(), false, totalPropertiesThatNeedMantenience, since);
   }
@@ -406,7 +435,7 @@ export class GlobalManager {
 
     let query = "UPDATE ?? SET";
     let bindings: any[] = [tableName];
-    
+
     query += " " + Object.keys(updateRules).map((columnToSet) => {
       const ruleRawStr = updateRules[columnToSet][0];
       bindings.push(columnToSet);
@@ -424,7 +453,7 @@ export class GlobalManager {
       }).join(",");
     }
 
-    if (sinceLimiter || orWhereRules.length || andWhereRules.length) {
+    if (sinceLimiter || orWhereRules.length || andWhereRules.length) {
       query += " WHERE";
     }
 
@@ -476,7 +505,7 @@ export class GlobalManager {
       this.serverData = {
         [CURRENCY_FACTORS_IDENTIFIER]: this.currencyFactorsProvider ? await this.currencyFactorsProvider.getFactors() : null,
       };
-      await this.informNewServerData(); 
+      await this.informNewServerData();
     } catch (err) {
       logger.error(
         "GlobalManager.calculateServerData [SERIOUS]: failed to calculate server data",
@@ -508,8 +537,8 @@ export class GlobalManager {
       );
       try {
         await this.knex.raw(`INSERT INTO ?? ("code", "factor") VALUES ${valuesContainer} ` +
-        `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, [CURRENCY_FACTORS_IDENTIFIER].concat(valuesAsArray as any));
-      } catch(err) {
+          `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, [CURRENCY_FACTORS_IDENTIFIER].concat(valuesAsArray as any));
+      } catch (err) {
         logger.error(
           "GlobalManager.informNewServerData: [SERIOUS] was unable to update database new currency data",
           {
