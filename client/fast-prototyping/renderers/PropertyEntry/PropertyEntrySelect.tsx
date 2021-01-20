@@ -193,6 +193,7 @@ class ActualPropertyEntrySelectRenderer
           <Select
             value={this.props.currentValue || ""}
             onChange={this.onChange}
+            onBlur={this.props.enableUserSetErrors}
             displayEmpty={true}
             disabled={this.props.disabled}
             variant="filled"

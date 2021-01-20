@@ -215,11 +215,18 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
  */
 type ValueType = string | number | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType;
 
+interface IPropertyEntryFieldState {
+  showUserSetErrors: boolean;
+}
+
 /**
  * The property entry field handler
  */
 export default class PropertyEntryField
-  extends React.Component<IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>> {
+  extends React.Component<
+    IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
+    IPropertyEntryFieldState
+  > {
 
   constructor(props: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>) {
     super(props);
@@ -231,6 +238,12 @@ export default class PropertyEntryField
 
     this.getCurrentCurrency = this.getCurrentCurrency.bind(this);
     this.getCurrentUnit = this.getCurrentUnit.bind(this);
+
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+
+    this.state = {
+      showUserSetErrors: false,
+    }
   }
 
   /**
@@ -324,9 +337,11 @@ export default class PropertyEntryField
 
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
+    nextState: IPropertyEntryFieldState
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
+      nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
@@ -342,6 +357,12 @@ export default class PropertyEntryField
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
 
   /**
@@ -644,7 +665,7 @@ export default class PropertyEntryField
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -777,6 +798,7 @@ export default class PropertyEntryField
       unitIsLockedToPrimaries,
       unitToNode: this.unitToNode,
       onChangeUnit: this.onChangeUnit,
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs}/>

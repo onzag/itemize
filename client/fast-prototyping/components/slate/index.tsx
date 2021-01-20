@@ -866,6 +866,10 @@ export interface ISlateEditorWrapperBaseProps {
  */
 interface ISlateEditorProps {
   /**
+   * An id for the content editable area
+   */
+  id: string;
+  /**
    * A react component that is to wrap the editor
    * normally will be used to create toolbars and add to the functionality
    * that wishes to be added in order to make it fully customizable
@@ -2194,6 +2198,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public shouldComponentUpdate(nextProps: ISlateEditorProps, nextState: ISlateEditorState) {
     const standardUpdate = (
+      nextProps.id !== this.props.id ||
       nextProps.currentValid !== this.props.currentValid ||
       nextState.focused !== this.state.focused ||
       nextProps.Wrapper !== this.props.Wrapper ||
@@ -3636,6 +3641,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // make the editable
     let children: React.ReactNode = (
       <Editable
+        id={this.props.id}
         onKeyDown={this.onKeyDown}
         onBlur={this.onNativeBlur}
         renderElement={this.renderElement}

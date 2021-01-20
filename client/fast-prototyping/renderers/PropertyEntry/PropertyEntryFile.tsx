@@ -134,7 +134,8 @@ interface IPropertyEntryFileRendererWithStylesProps extends IPropertyEntryFileRe
  * @param onSetFile the on set file function from the handler
  * @param files the files the dropper got
  */
-function onDrop(onSetFile: (file: File) => void, files: File[]) {
+function onDrop(enableUserSetErrors: () => void, onSetFile: (file: File) => void, files: File[]) {
+  enableUserSetErrors();
   onSetFile(files[0]);
 }
 
@@ -142,12 +143,18 @@ function onDrop(onSetFile: (file: File) => void, files: File[]) {
  * trigger the upload manually
  * @param dropzoneRef the dropzone reference
  */
-function manuallyTriggerUpload(dropzoneRef: React.MutableRefObject<DropzoneRef>) {
+function manuallyTriggerUpload(enableUserSetErrors: () => void, dropzoneRef: React.MutableRefObject<DropzoneRef>) {
+  enableUserSetErrors();
   // utility for the button to manually trigger upload
   // using the ref when it is disabled
   if (dropzoneRef.current) {
     dropzoneRef.current.open();
   }
+}
+
+function manuallyRemove(enableUserSetErrors: () => void, removeFile: () => void) {
+  enableUserSetErrors();
+  removeFile();
 }
 
 /**
@@ -194,8 +201,8 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
         >{icon}</IconButton> : null}
       </FormLabel>
       <Dropzone
-        onDropAccepted={onDrop.bind(null, props.onSetFile)}
-        onDropRejected={onDrop.bind(null, props.onSetFile)}
+        onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
+        onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
         maxSize={MAX_FILE_SIZE}
         accept={props.accept}
         multiple={false}
@@ -279,7 +286,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
                     variant="contained"
                     color="secondary"
                     aria-label={props.genericDeleteLabel}
-                    onClick={props.onRemoveFile}
+                    onClick={manuallyRemove.bind(null, props.enableUserSetErrors, props.onRemoveFile)}
                   >
                     {props.genericDeleteLabel}
                     <RemoveCircleOutlineIcon className={props.classes.buttonIcon} />
@@ -289,7 +296,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
                     variant="contained"
                     color="primary"
                     aria-label={props.genericSelectLabel}
-                    onClick={manuallyTriggerUpload.bind(null, dropzoneRef)}
+                    onClick={manuallyTriggerUpload.bind(null, props.enableUserSetErrors, dropzoneRef)}
                   >
                     {
                       props.genericSelectLabel

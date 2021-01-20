@@ -2755,8 +2755,14 @@ export class ActualItemProvider extends
         getQueryFields,
         true,
       );
-      this.cleanWithProps(this.props, options, "success", true);
-      this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
+      this.cleanWithProps(this.props, options, "success");
+
+      // clean will props will have triggered the change listeners, but if there's a difference
+      // between what we have cleaned and applied we want to trigger these listeners again for the
+      // received value
+      if (this.props.forId !== recievedId && (this.props.forVersion || null) !== (receivedVersion || null)) {
+        this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
+      }
     }
 
     // happens during an error or whatnot

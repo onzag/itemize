@@ -212,6 +212,7 @@ interface IPropertyEntryLocationState {
    * And the index of the current search result if we have chosen one from it
    */
   searchCurrentlyMarkedValue: number;
+  showUserSetErrors: boolean;
 }
 
 /**
@@ -255,6 +256,7 @@ export default class PropertyEntryLocation
       },
       searchResults: null,
       searchCurrentlyMarkedValue: null,
+      showUserSetErrors: false,
     };
 
     this.onViewportChange = this.onViewportChange.bind(this);
@@ -268,6 +270,7 @@ export default class PropertyEntryLocation
     this.clearSearchResults = this.clearSearchResults.bind(this);
     this.geocode = this.geocode.bind(this);
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
   }
 
   public shouldComponentUpdate(
@@ -289,6 +292,12 @@ export default class PropertyEntryLocation
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyEntryLocationRendererProps>) {
@@ -724,7 +733,7 @@ export default class PropertyEntryLocation
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -809,6 +818,8 @@ export default class PropertyEntryLocation
       nextSearchResultCircular,
       prevSearchResult,
       prevSearchResultCircular,
+
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs} />;

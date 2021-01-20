@@ -66,6 +66,8 @@ function handleOnChange(
   props: IPropertyEntryBooleanRendererWithStylesProps,
   e: React.ChangeEvent<HTMLInputElement>,
 ) {
+  props.enableUserSetErrors();
+
   // we extract the value from the browser event
   const value = e.target.value;
   // if the value is null as a string

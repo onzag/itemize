@@ -607,6 +607,7 @@ class ActualPropertyEntryFieldRenderer
           value={this.props.currentTextualValue}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          onBlur={this.props.enableUserSetErrors}
           InputProps={{
             classes: {
               root: this.props.classes.fieldInput,

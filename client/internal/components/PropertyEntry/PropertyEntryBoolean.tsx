@@ -31,16 +31,26 @@ export interface IPropertyEntryBooleanRendererProps extends IPropertyEntryRender
   nullLabel: string;
 }
 
+interface IPropertyEntryBooleanState {
+  showUserSetErrors: boolean;
+}
+
 /**
  * The property entry boolean handler
  */
 export default class PropertyEntryBoolean extends React.Component<
-  IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>
+  IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>,
+  IPropertyEntryBooleanState
 > {
   constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>) {
     super(props);
 
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+
+    this.state = {
+      showUserSetErrors: false,
+    }
   }
 
   /**
@@ -61,8 +71,10 @@ export default class PropertyEntryBoolean extends React.Component<
   }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedBooleanType, IPropertyEntryBooleanRendererProps>,
+    nextState: IPropertyEntryBooleanState,
   ) {
-    return nextProps.property !== this.props.property ||
+    return nextState.showUserSetErrors !== this.state.showUserSetErrors ||
+      nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
@@ -76,6 +88,11 @@ export default class PropertyEntryBoolean extends React.Component<
       nextProps.renderer !== this.props.renderer ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
   }
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
+  }
   public render() {
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const i18nLabel = this.props.altLabel || (i18nData && i18nData.label);
@@ -84,7 +101,7 @@ export default class PropertyEntryBoolean extends React.Component<
 
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -134,6 +151,7 @@ export default class PropertyEntryBoolean extends React.Component<
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs} />;

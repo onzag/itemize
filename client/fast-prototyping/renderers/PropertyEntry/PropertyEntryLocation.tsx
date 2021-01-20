@@ -572,6 +572,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
           className={this.props.classes.entry}
           label={this.props.label}
           onChange={this.onSearchQueryChange}
+          onBlur={this.props.enableUserSetErrors}
           placeholder={this.props.placeholder}
           value={this.props.searchQuery}
           InputProps={{

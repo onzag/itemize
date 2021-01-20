@@ -200,6 +200,7 @@ interface IPropertyEntryTextState {
    * An error for the last loaded file
    */
   lastLoadedFileError: string;
+  showUserSetErrors: boolean;
 }
 
 /**
@@ -239,6 +240,7 @@ export default class PropertyEntryText
 
     this.state = {
       lastLoadedFileError: null,
+      showUserSetErrors: false,
     }
 
     this.internalFileCache = {};
@@ -247,8 +249,15 @@ export default class PropertyEntryText
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
     this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
 
     this.cacheMediaPropertyInProps(props);
+  }
+
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
 
   public dismissLastLoadedFileError() {
@@ -563,13 +572,14 @@ export default class PropertyEntryText
 
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>,
+    nextState: IPropertyEntryTextState,
   ) {
     if (nextProps.property !== this.props.property) {
       this.cacheMediaPropertyInProps(nextProps);
     }
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.state, nextProps.state) ||
+      !equals(this.state, nextState) ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
@@ -677,7 +687,7 @@ export default class PropertyEntryText
       }
     }
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       !invalidReasonIsMediaProperty && isCurrentlyShownAsInvalid && i18nData &&
@@ -833,6 +843,8 @@ export default class PropertyEntryText
       onRestore: supportsMedia ? this.onRestoreHijacked : this.props.onRestore,
 
       onInsertFile: this.onInsertFile,
+
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs} />

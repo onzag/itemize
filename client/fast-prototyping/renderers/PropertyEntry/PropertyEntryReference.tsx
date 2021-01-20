@@ -448,6 +448,7 @@ class ActualPropertyEntryReferenceRenderer
           placeholder={this.props.placeholder}
           value={this.props.currentTextualValue}
           onChange={this.onChangeByHTMLEvent}
+          onBlur={this.props.enableUserSetErrors}
           onKeyDown={this.onKeyDown}
           InputProps={{
             classes: {
@@ -601,6 +602,7 @@ class ActualPropertyEntryReferenceRenderer
         disabled={this.props.disabled}
         autoFocus={this.props.autoFocus}
         onChange={this.onChangeBySelect}
+        enableUserSetErrors={this.props.enableUserSetErrors}
         onRestore={this.props.onRestore}
         nullValue={nullValue}
         isNullable={this.props.isNullable}

@@ -181,6 +181,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     });
   }
   public onBlur() {
+    this.props.enableUserSetErrors();
     this.setState({
       focused: false,
     });
@@ -211,6 +212,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
 
     const editor =
       <SlateEditor
+        id={this.props.propertyId}
         features={this.props.features}
         value={this.props.currentValue}
         internalValue={this.props.currentInternalValue}
@@ -254,6 +256,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         }
         <div>
           <InputLabel
+            htmlFor={this.props.propertyId}
             classes={{
               root: this.props.classes.label + " " +
                 (this.props.isRichText ? this.props.classes.labelSingleLine : this.props.classes.labelNoToolbar),

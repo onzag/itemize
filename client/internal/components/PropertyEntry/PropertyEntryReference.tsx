@@ -44,6 +44,7 @@ interface IPropertyEntryReferenceState {
   currentOptionsVersion: string;
   currentSearchError: EndpointErrorType;
   currentFindError: EndpointErrorType;
+  showUserSetErrors: boolean;
 }
 
 export default class PropertyEntryReference
@@ -75,6 +76,7 @@ export default class PropertyEntryReference
       currentOptionsVersion: null,
       currentSearchError: null,
       currentFindError: null,
+      showUserSetErrors: false,
     };
 
     this.onChangeSearch = this.onChangeSearch.bind(this);
@@ -89,6 +91,14 @@ export default class PropertyEntryReference
     this.dismissFindError = this.dismissFindError.bind(this);
 
     this.changeListener = this.changeListener.bind(this);
+
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+  }
+
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
 
   public changeListener(id: string, version: string) {
@@ -711,7 +721,7 @@ export default class PropertyEntryReference
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -767,6 +777,8 @@ export default class PropertyEntryReference
 
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
+
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs} />

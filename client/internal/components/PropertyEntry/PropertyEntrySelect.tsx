@@ -44,21 +44,42 @@ export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendere
   currentI18nValue: string;
 }
 
+interface IPropertyEntrySelectState {
+  showUserSetErrors: boolean;
+}
+
 /**
  * The select handler
  */
 export default class PropertyEntrySelect
-  extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntrySelectRendererProps>> {
+  extends React.Component<
+    IPropertyEntryHandlerProps<string, IPropertyEntrySelectRendererProps>,
+    IPropertyEntrySelectState
+  > {
 
   constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntrySelectRendererProps>) {
     super(props);
+
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+
+    this.state = {
+      showUserSetErrors: false,
+    }
+  }
+
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
 
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<string, IPropertyEntrySelectRendererProps>,
+    nextState: IPropertyEntrySelectState,
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
+      nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       !equals(this.props.state, nextProps.state) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
@@ -83,7 +104,7 @@ export default class PropertyEntrySelect
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -140,6 +161,7 @@ export default class PropertyEntrySelect
 
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs}/>

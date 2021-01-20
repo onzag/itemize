@@ -37,6 +37,7 @@ interface IPropertyEntryDateTimeState {
    * and not be here, DO THIS only when necessary
    */
   value: any;
+  showUserSetErrors: boolean;
 }
 
 export interface IPropertyEntryDateTimeRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedDateType> {
@@ -65,8 +66,10 @@ export default class PropertyEntryDateTime extends
         props.state.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
       ),
+      showUserSetErrors: false,
     };
 
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
     this.handleOnChange = this.handleOnChange.bind(this);
   }
   public shouldComponentUpdate(
@@ -89,6 +92,11 @@ export default class PropertyEntryDateTime extends
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !equals(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
   }
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>) {
     // if the value is null we update accordingly
@@ -153,7 +161,7 @@ export default class PropertyEntryDateTime extends
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -193,6 +201,7 @@ export default class PropertyEntryDateTime extends
       onChange: this.props.onChange,
       onChangeByMoment: this.handleOnChange,
       onRestore: this.props.onRestore,
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs}/>

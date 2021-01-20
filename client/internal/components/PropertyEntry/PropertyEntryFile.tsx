@@ -111,6 +111,7 @@ interface IPropertyEntryFileState {
    * The reason why it was rejected
    */
   rejectedReason: string;
+  showUserSetErrors: boolean;
 }
 
 /**
@@ -146,12 +147,14 @@ export default class PropertyEntryFile
     this.state = {
       rejectedValue: null,
       rejectedReason: null,
+      showUserSetErrors: false,
     };
 
     // the functions are binded
     this.onSetFile = this.onSetFile.bind(this);
     this.onRemoveFile = this.onRemoveFile.bind(this);
     this.openFile = this.openFile.bind(this);
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
   }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
@@ -304,6 +307,11 @@ export default class PropertyEntryFile
       null,
     );
   }
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
+  }
   public render() {
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
@@ -317,7 +325,7 @@ export default class PropertyEntryFile
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
-      (this.props.poked || this.props.state.userSet) && invalidReason;
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
     let i18nInvalidReason = null;
     if (
       isCurrentlyShownAsInvalid && i18nData &&
@@ -399,6 +407,8 @@ export default class PropertyEntryFile
       imageSizes,
       prettySize,
       extension,
+
+      enableUserSetErrors: this.enableUserSetErrors,
     };
 
     return <RendererElement {...rendererArgs} />;

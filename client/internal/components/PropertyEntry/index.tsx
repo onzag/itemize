@@ -109,6 +109,13 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   disabled: boolean;
 
   /**
+   * Allows for the display of user set error statuses, normally you
+   * will call this function when your frield has been blurred so that
+   * currentInvalidReason gets populated even if the field is not poked
+   */
+  enableUserSetErrors: () => void;
+
+  /**
    * Standard on change function, every renderer will recieve this function
    * to trigger a change, however sometimes handlers will pass their own
    * change function that is supposed to be used instead of this one so
