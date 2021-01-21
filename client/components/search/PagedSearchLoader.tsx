@@ -91,6 +91,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
   public onSearchDataChange(actualP: number, setState: (qs: {p: string, r: string}) => void, searchId: string, wasRestored: boolean) {
     if (!wasRestored) {
       if (actualP !== 0) {
+        // this is rFlagged
         setState({
           p: "1",
           r: "t",

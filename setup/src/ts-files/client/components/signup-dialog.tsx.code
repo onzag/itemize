@@ -153,7 +153,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 										size="large"
 										aria-label={i18nSignup}
 										startIcon={<DoneIcon />}
-										onClick={actioner.signup.bind(null, true)}
+										onClick={actioner.signup.bind(null, true, null)}
 										fullWidth={true}
 									>
 										{i18nSignup}

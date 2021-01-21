@@ -26,7 +26,7 @@ type ActionerFn = (actioner: {
    * Performs a signup action, username and password field in the user item definition context
    * should be filled as well; username cannot be an email for signup, validation should apply
    */
-  signup: (cleanWhenSuccessful?: boolean) => Promise<{id: string, role: string, error: EndpointErrorType}>,
+  signup: (cleanWhenSuccessful?: boolean, customSubmit?: IActionSubmitOptions) => Promise<{id: string, role: string, error: EndpointErrorType}>,
   /**
    * Performs a logout action
    */

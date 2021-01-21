@@ -75,8 +75,9 @@ First we want to create the request schema, that will be used to define the item
         }
     ],
     "requestLimiters": {
-        "condition": "AND",
-        "parenting": true
+        "condition": "OR",
+        "parenting": true,
+        "createdBy": true
     },
     "mustBeParented": true,
     "canBeParentedBy": [
@@ -602,9 +603,393 @@ if (arg.action === IOTriggerActions.EDIT) {
 
 And as such we have forbidden this from occurring.
 
+## Creating a screen to view my requests and their status
+
+You have noticed that the page just clears up and the url changes when you have just created a reservation, we want to change that and actually view the reservation when you have created them, as well as to have a screen for viewing the requests you have made.
+
+On the same reserve page we want to refactor our `reserve/index.tsx` a little bit so that it can also display existing reservation requests like this
+
+```tsx
+import React from "react";
+
+import { ModuleProvider } from "@onzag/itemize/client/providers/module";
+import { IActionResponseWithId, ItemProvider } from "@onzag/itemize/client/providers/item";
+import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
+import Entry from "@onzag/itemize/client/components/property/Entry";
+import View from "@onzag/itemize/client/components/property/View";
+import { Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
+import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
+import Reader from "@onzag/itemize/client/components/property/Reader";
+
+interface IReserveHostingProps {
+    match: {
+        params: {
+            id: string;
+            rid: string;
+        };
+    };
+}
+
+/**
+ * Page to add or edit a hosting unit
+ */
+export function ReserveHosting(props: IReserveHostingProps) {
+    const idToReserve = props.match.params.id || null;
+    const reservationId = props.match.params.rid || null;
+    const newRequestRedirectCallback = (data: IActionResponseWithId) => `/reserve/${idToReserve}/request/${data.id}`;
+    return (
+        <ModuleProvider module="hosting">
+            <ItemProvider
+                itemDefinition="unit"
+                // we are adding the id here that we plan to load
+                // the null slot is the same as not specified
+                forId={idToReserve}
+                // these are the properties that
+                // we have a state for
+                properties={[
+                    "title",
+                    "description",
+                    "attachments",
+                    "image",
+                    "address",
+                    "unit_type",
+                ]}
+            >
+                {/* we will use the title property and read it raw and use such
+                property value as the title value for the window */}
+                <Reader id="title">
+                    {(title: string) => (
+                        <TitleSetter>
+                            {title}
+                        </TitleSetter>
+                    )}
+                </Reader>
+                <Typography variant="caption">
+                    <View id="unit_type" />
+                </Typography>
+                <Typography variant="h2">
+                    <View id="title" />
+                </Typography>
+                <View id="description" />
+                <View id="image" />
+                <View id="address" />
+            </ItemProvider>
+
+            <hr />
+
+            <ItemProvider
+                itemDefinition="request"
+                properties={[
+                    "message",
+                    "check_in",
+                    "check_out",
+                    "status",
+                ]}
+                forId={reservationId}
+            >
+                {
+                    reservationId ?
+                        <Typography variant="h3">
+                            <View id="status" />
+                        </Typography>
+                        : null
+                }
+                {
+                    reservationId ? <View id="message" /> : <Entry id="message" />
+                }
+                {
+                    reservationId ? <View id="check_in" /> : <Entry id="check_in" />
+                }
+                {
+                    reservationId ? <View id="check_out" /> : <Entry id="check_out" />
+                }
+
+                {
+                    !reservationId ?
+                        <>
+                            <SubmitButton
+                                i18nId="request"
+                                buttonColor="primary"
+                                buttonVariant="contained"
+                                options={{
+                                    properties: [
+                                        "message",
+                                        "check_in",
+                                        "check_out",
+                                    ],
+                                    restoreStateOnSuccess: true,
+                                    parentedBy: {
+                                        module: "hosting",
+                                        itemDefinition: "unit",
+                                        id: idToReserve,
+                                    }
+                                }}
+                                redirectOnSuccess={newRequestRedirectCallback}
+                                redirectReplace={true}
+                            />
+                            <SubmitActioner>
+                                {(actioner) => (
+                                    <Snackbar
+                                        id="request-error"
+                                        severity="error"
+                                        i18nDisplay={actioner.submitError}
+                                        open={!!actioner.submitError}
+                                        onClose={actioner.dismissError}
+                                    />
+                                )}
+                            </SubmitActioner>
+                        </> :
+                        null
+                }
+            </ItemProvider>
+        </ModuleProvider>
+    );
+}
+```
+
+Then you need to add the snippet to the `app.tsx` in order to ensure the routes are setup properly.
+
+```tsx
+<Route path="/reserve/:id" component={ReserveHosting} exact={true}/>
+<Route path="/reserve/:id/request/:rid" component={ReserveHosting} exact={true}/>
+```
+
+And once you have made a booking it should look as
+
+![Reserve View](./images/reserve-view.png)
+
+The next thing to do is that we want to show a list since while this shows on creation we also need to be able to display the same thing as all the requests that a potential client has done, and for that we will need a new menu entry to the list.
+
+```tsx
+{
+    path: "/reservations",
+    icon: <EventSeatIcon />,
+    module: "hosting",
+    idef: "request",
+    i18nProps: {
+      id: "view_reservations",
+      capitalize: true,
+    },
+    roles: ["USER", "ADMIN"],
+}
+```
+
+Now what we want to ensure is to have the `view_reservations` in our properties file for the request schema.
+
+```properties
+custom.view_reservations = view reservations
+```
+
+```properties
+custom.view_reservations = ver reservaciones
+```
+
+And now we should have a menu entry added, remember to run `build-data` and `webpack-dev`
+
+![View Reservations Menu](./images/view-reservations-menu.png)
+
+If we click on it, again we will go to an empty page; now we need to add information into that empty page in order to show the list of the requests we have made, for that we create a new page at `pages/reservations/index.tsx` where we will populate with the following:
+
+```tsx
+import React from "react";
+
+import { ModuleProvider } from "@onzag/itemize/client/providers/module";
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
+import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
+import View from "@onzag/itemize/client/components/property/View";
+import { createStyles, List, ListItem, ListItemText, Typography, withStyles, WithStyles } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
+import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
+import { SearchLoaderWithPagination } from "@onzag/itemize/client/fast-prototyping/components/search-loader-with-pagination";
+import Reader from "@onzag/itemize/client/components/property/Reader";
+import Link from "@onzag/itemize/client/components/navigation/Link";
+
+/**
+ * Some styles for the list of units
+ */
+const hostingStyles = createStyles({
+    image: {
+        width: "30%",
+        display: "inline-block",
+    },
+    listingText: {
+        padding: "0 1rem",
+    },
+    listing: {
+        "transition": "background-color 0.3s",
+        "cursor": "pointer",
+        "&:hover": {
+            backgroundColor: "#eee",
+        },
+    },
+    paginator: {
+        paddingTop: "1rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+});
+
+/**
+ * Page to add or edit a hosting unit
+ */
+export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof hostingStyles>) => {
+    return (
+        <ModuleProvider module="hosting">
+            <UserDataRetriever>
+                {(userData) => (
+                    <ItemProvider
+                        itemDefinition="request"
+                        searchCounterpart={true}
+                        properties={[
+                            "status"
+                        ]}
+                        automaticSearch={{
+                            limit: 100,
+                            offset: 0,
+                            requestedProperties: [
+                                "status",
+                                "check_in",
+                                "check_out",
+                            ],
+                            searchByProperties: [
+                                "status",
+                            ],
+                            createdBy: userData.id,
+                        }}
+                        cleanOnDismount={{
+                            cleanSearchResultsOnAny: true,
+                        }}
+                    >
+                        <I18nRead id="view_reservations">
+                            {(i18nViewReservations: string) => (
+                                <TitleSetter>
+                                    {i18nViewReservations}
+                                </TitleSetter>
+                            )}
+                        </I18nRead>
+
+                        <Entry id="status" searchVariant="search"/>
+
+                        <List>
+                            <SearchLoaderWithPagination id="reservation-search-loader" pageSize={12}>
+                                {(arg, pagination, noResults) => (
+                                    <>
+                                        {
+                                            arg.searchRecords.map((r) => (
+                                                <ItemProvider {...r.providerProps}>
+                                                    <Reader id="parent_id">
+                                                        {(parentId: string) => (
+                                                            <Link to={`/reserve/${parentId}/request/${r.id}`}>
+                                                                <Typography variant="body1">
+                                                                    <View id="status" />
+                                                                </Typography>
+                                                                <Typography variant="caption" color="textSecondary">
+                                                                    <View id="check_in" />{" "}<View id="check_out" />
+                                                                </Typography>
+                                                                <ListItem className={props.classes.listing}>
+                                                                    <ItemProvider
+                                                                        itemDefinition="unit"
+                                                                        forId={parentId}
+                                                                        properties={[
+                                                                            "image",
+                                                                            "title",
+                                                                            "address",
+                                                                        ]}
+                                                                    >
+                                                                        <View
+                                                                            id="image"
+                                                                            rendererArgs={
+                                                                                {
+                                                                                    // we do not want to link images with with <a> tags like
+                                                                                    // the active renderer does by default
+                                                                                    disableImageLinking: true,
+                                                                                    imageSizes: "30vw",
+                                                                                    imageClassName: props.classes.image,
+                                                                                }
+                                                                            }
+                                                                        />
+                                                                        <ListItemText
+                                                                            className={props.classes.listingText}
+                                                                            primary={<View id="title" />}
+                                                                            secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
+                                                                        />
+                                                                    </ItemProvider>
+                                                                </ListItem>
+                                                            </Link>
+                                                        )}
+                                                    </Reader>
+                                                </ItemProvider>
+                                            ))
+                                        }
+                                        <div className={props.classes.paginator}>
+                                            {pagination}
+                                        </div>
+                                    </>
+                                )}
+                            </SearchLoaderWithPagination>
+                        </List>
+                    </ItemProvider>
+                )}
+            </UserDataRetriever>
+        </ModuleProvider >
+    );
+});
+```
+
+And add the respective route entry to the `app.tsx`
+
+```tsx
+<Route path="/reservations" component={Reservations}/>
+```
+
+The result should be the following view
+
+![Reservations View](./images/reservations-view.png)
+
+Yes it is a very rudimentary view, but it gets the job done and it is rather simplistic on what it tries to achieve
+
+## Creating a screen to view reservations and requests (and approving/denying them)
+
+You might notice that the request cannot yet be approved by the host, and we need to create a screen for the host in order to be able to approve the incoming requests (or deny them).
+
 ## Ensuring non-overlapping requests and responses
 
-Something we also don't want is that when a request is being created that it is going to be created on top of previous existing requests that have been approved.
+Something we also don't want is that when a request is being created that it is going to be created on top of previous existing requests that have been approved, as this will just burden the host with a bunch of requests that he/she might be unable to approve because someone is already coming that same day, so we want to ensure this doesn't happen.
+
+For this we will go back to our trigger and this time we will need to access the database directly and write a new rule in our request:
+
+```ts
+// this will trigger before creating when
+// the endpoint is attempting to create a new item
+if (arg.action === IOTriggerActions.CREATE) {
+    const checkIn: string = arg.requestedUpdate.check_in as string;
+    const checkOut: string = arg.requestedUpdate.check_out as string;
+    // The CONNECTOR_SQL_COLUMN_ID_FK_NAME is basically the id, remember that item definition
+    // data has its own table and module as well, but we want to be cheap and not do a join
+    // so we will use this reference to the foreign key of the id because we are cheap
+    const oneOverlappingRequest = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+        // the table name is the qualified name
+        .from(arg.itemDefinition.getQualifiedPathName())
+        // and we are going to search for an overlap between check in and check out
+        .where("status", "APPROVED")
+        .andWhere((clause) => {
+            clause.where((subclause) => {
+                subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<", checkIn);
+            }).orWhere((subclause) => {
+                subclause.where("check_in", ">", checkOut).andWhere("check_out", "<=", checkOut);
+            });
+        });
+
+    if (oneOverlappingRequest) {
+        // we put the id in the error message, the user doesn't see forbidden messages anyway
+        // but it's good for debugging
+        arg.forbid("This request is overlapping with another request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME])
+    }
+}
+```
 
 ## Displaying overlaps in the client side
 

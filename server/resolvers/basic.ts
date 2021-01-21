@@ -331,6 +331,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       }
 
       if (
+        limiter.since &&
         limiter.condition === "AND" &&
         sinceError
       ) {
@@ -346,6 +347,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       }
 
       if (
+        limiter.createdBy &&
         limiter.condition === "AND" &&
         !createdBySucceed
       ) {
@@ -361,6 +363,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       }
 
       if (
+        limiter.parenting &&
         limiter.condition === "AND" &&
         !parentingSucceed
       ) {

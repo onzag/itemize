@@ -707,6 +707,7 @@ export class ActualItemProvider extends
   } = null;
 
   private initialAutomaticNextSearch: boolean = false;
+  private reloadNextSearch: boolean = false;
   /**
    * this is a hack variable, when the server
    * sends a reload event for a search and that causes
@@ -2825,7 +2826,9 @@ export class ActualItemProvider extends
     // were calling search and passing a second argument
     // causing initial automatic to be true
     const initialAutomatic = this.initialAutomaticNextSearch;
+    const isReloadSearch = this.reloadNextSearch;
     this.initialAutomaticNextSearch = false;
+    this.reloadNextSearch = false;
 
     // we extract the hack variable
     const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
@@ -3119,7 +3122,7 @@ export class ActualItemProvider extends
                   searchIdefState: stateOfSearch,
                 }
               },
-              initialAutomatic || rFlagged,
+              initialAutomatic || rFlagged || isReloadSearch,
             );
           }
         });
@@ -3275,6 +3278,7 @@ export class ActualItemProvider extends
     // earlier so we make this hack variable to prevent asking for
     // feedback as we already got feedback
     this.preventSearchFeedbackOnPossibleStaleData = true;
+    this.reloadNextSearch = true;
     this.search(this.lastOptionsUsedForSearch);
   }
   public removePossibleSearchListeners(
