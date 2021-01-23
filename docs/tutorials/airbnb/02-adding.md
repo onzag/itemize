@@ -160,26 +160,11 @@ export function UnitList() {
                             limit: 500,
                             // we specify that the creator must be us
                             createdBy: userData.id,
-                            // and we want the search results to be stored
-                            // in the navigation itself, when the search is done
-                            // the results will be stored and as such we will be able to go
-                            // back and forth, this is often recommended, this id is just
-                            // a random unique id for the navigation
-                            storeResultsInNavigation: "unit-search"
                         }
                     }
-                    // now we tell here what to load, we will use the same id
-                    // as before, the item will avoid search if it finds that a search
-                    // result already exists in navigation, and will load from there
-                    // note that searches are entire stateful values and will
-                    // affect even the values of entries, so our text field id="title"
-                    // will be affected to reflect the search
-                    loadSearchFromNavigation="unit-search"
                     // this is the memory management that is defined in itemize itself
                     // itemize will cache on memory unless told to release such data
-                    // this is useful, for example, for some forms, that you might just
-                    // want to keep on the same value forever, but in this case, we want to wipe
-                    // anyway search results will be stored in navigation history
+                    // this is useful
                     cleanOnDismount={{
                         cleanSearchResultsOnAny: true,
                     }}

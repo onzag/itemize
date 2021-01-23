@@ -955,6 +955,193 @@ Yes it is a very rudimentary view, but it gets the job done and it is rather sim
 
 You might notice that the request cannot yet be approved by the host, and we need to create a screen for the host in order to be able to approve the incoming requests (or deny them).
 
+We want to display that in the hosting view as well as the user view so we want to build some counters for this, on the `user.json` schema and on the `unit.json` schema, we want to add a new property, on both of them:
+
+```json
+{
+    "id": "pending_requests_count",
+    "type": "integer",
+    "default": 0,
+    "hidden": true,
+    "readRoleAccess": ["&OWNER"],
+    "createRoleAccess": [],
+    "editRoleAccess": []
+}
+```
+
+Now you run `npm run build-data` and `npm run build-database development` when asked about the default value for the new column, give `0` as the default value, to ensure that it is not null to start with.
+
+![Default 0](./images/default-0.png)
+
+Now we have a new number property in our users as well as in our units, in itemize it's considered best that if you need to access data that is calculated you can just create a hidden property and keep such updated by the means of triggers; this ensures that you don't have to eg. run an entire search in the client side. With this method you can create counters of any kind.
+
+Now let's start by setting up the triggers regarding this field, first in our CREATED trigger that sent the email, under it we add:
+
+```tsx
+// we are going to do a raw database update, even if we have hostingUnit already
+// and we can calculate what the +1 value will be for the counter using hostingUnit.pending_requests_count
+// and we could use requestUpdateSimple in order to update this value we want to do it this way
+// to show it's possible to do raw updates to the database, also a raw update disables race conditions
+// while a +1 mechanism can not be optimal your query can be as complex as necessary in order to avoid
+// race conditions
+await arg.appData.rawDB.performRawDBUpdate(
+    "hosting/unit",
+    hostingUnit.id,
+    hostingUnit.version,
+    {
+            itemTableUpdate: {
+            // this for example could be changed with a subquery to a count
+            // but we are just going to leave it like this
+            // a count itself would be better for consistency
+            // but this is just for a tutorial
+            pending_requests_count: arg.appData.knex.raw("?? + 1", "pending_requests_count"),
+        }
+    }
+);
+await arg.appData.rawDB.performRawDBUpdate(
+    "users/user",
+    targetUser.id,
+    targetUser.version,
+    {
+        itemTableUpdate: {
+            pending_requests_count: arg.appData.knex.raw("?? + 1", "pending_requests_count"),
+        }
+    }
+);
+```
+
+This is however a demonstration of the capacity of itemize to modify raw rows in place, we could do a simple update via the cache, which is usually one of the best ways to update, however, we want to be paranoid, and think of race conditions, so we want the update to occur at database level and get the result of the update back.
+
+Using rawDB instead of knex, ensures that our changes get published into all the caches, knex is the raw connection itself and won't inform for changes.
+
+Now we have added the trigger that increases the counter once a new request has been created, but now we want a trigger that decreases once a request has been answered.
+
+We will need an entire condition on EDITED:
+
+```tsx
+if (
+    arg.action === IOTriggerActions.EDITED &&
+    arg.originalValue.status === "WAIT" &&
+    arg.newValue.status !== "WAIT"
+) {
+    // yes we can grab the updated value from here, while you might wonder
+    // why is itemize fetching the entire thing, well, in order to update
+    // the caches.
+    const hostingUnit = await arg.appData.rawDB.performRawDBUpdate(
+        "hosting/unit",
+        arg.newValue.parent_id as string,
+        arg.newValue.parent_version as string,
+            {
+                itemTableUpdate: {
+                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+            }
+        }
+    );
+
+    // so we can use the creator on a new raw database update
+    await arg.appData.rawDB.performRawDBUpdate(
+        "users/user",
+        hostingUnit.created_by,
+        null,
+        {
+            itemTableUpdate: {
+                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+            }
+        }
+    );
+}
+```
+
+Now we want to be able to see such counter, note that if you have created any requests previous to this, the counter will not keep such in consideration, other than what they change, this means that it might get to -1 when we answer those requests, this is why it might have been a better idea to use a subquery and count every time, but right now, for the motives of this tutorial we will let it be as a simple counter, it's also more resilliant that way.
+
+So we want to display this counter, on the fast prototyping navbar there's a property on menu entries called badge content, we can use that to display something in it.
+
+We will take our hosting menu entry and update it to:
+
+```tsx
+{
+    path: "/hosting",
+    icon: <HomeWorkIcon />,
+    badgeContent: (
+      <UserDataRetriever>
+        {(userData) => (
+          <ModuleProvider module="users">
+            <ItemProvider
+              itemDefinition="user"
+              forId={userData.id}
+              properties={[
+                "pending_requests_count"
+              ]}
+            >
+              <Reader id="pending_requests_count">{(value: number) => (value || 0)}</Reader>
+            </ItemProvider>
+          </ModuleProvider>
+        )}
+      </UserDataRetriever>
+    ),
+    module: "hosting",
+    idef: "unit",
+    i18nProps: {
+      id: "manage",
+      capitalize: true,
+    },
+    roles: ["USER", "ADMIN"],
+}
+```
+
+After we have done all this lets test our changes, by running `npm run install` and `npm run webpack-dev`, restarting then the server, and refreshing our page, we might then find this view in our menu:
+
+![Initial 0 Manage Units](./images/initial-0-manage-units.png)
+
+We will now use our second user and make a new request, make many, and then you will see that the number is updating in real time.
+
+![Manage Units Badge](./images/manage-units-badge.png)
+
+Now we want to be able to see the same thing but in our hosting view itself, for that we need to add `pending_requests_count` to the `requestedProperties` in the automatic search.
+
+And then replace the rendering function of each item that is in the list with the following code:
+
+```tsx
+<ItemProvider {...r.providerProps}>
+    <Reader id="pending_requests_count">
+        {(count: number) => (
+            <Badge color="primary" badgeContent={count || 0}>
+                <Link to={`/hosting/view/${r.id}`}>
+                    <ListItem className={props.classes.listing}>
+                        <View
+                            id="image"
+                            rendererArgs={
+                                {
+                                    // we do not want to link images with with <a> tags like
+                                    // the active renderer does by default
+                                    disableImageLinking: true,
+                                    // we want the image size to load by 30 viewport width
+                                    // this is used to choose what image resolution to load
+                                    // so they load faster, we want tiny images
+                                    imageSizes: "30vw",
+                                    imageClassName: props.classes.image,
+                                }
+                            }
+                        />
+                        <ListItemText
+                            className={props.classes.listingText}
+                            primary={<View id="title" />}
+                            secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
+                        />
+                    </ListItem>
+                </Link>
+            </Badge>
+        )}
+    </Reader>
+</ItemProvider>
+```
+
+You should be able to see now your list including the list of requests pending that there are:
+
+![Hosting Page Request Count](./images/hosting-page-request-count.png)
+
+We have changed the default behaviour of where the page takes us, now it doesn't take us to the edit area, but rather to a view point that currently displays nothing.
+
 ## Ensuring non-overlapping requests and responses
 
 Something we also don't want is that when a request is being created that it is going to be created on top of previous existing requests that have been approved, as this will just burden the host with a bunch of requests that he/she might be unable to approve because someone is already coming that same day, so we want to ensure this doesn't happen.
