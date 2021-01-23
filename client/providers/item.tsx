@@ -20,7 +20,7 @@ import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../internal/workers/cache";
-import { RemoteListener } from "../internal/app/remote-listener";
+import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
 import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride, IPropertyOverride } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
@@ -1615,6 +1615,11 @@ export class ActualItemProvider extends
       notFound: isNotFound,
     });
   }
+
+  /**
+   * This listener triggers on load and the search
+   * loader triggers it
+   */
   public loadListener() {
     if (this.isUnmounted) {
       return;
@@ -1623,6 +1628,50 @@ export class ActualItemProvider extends
         this.mountCbFns.push(this.loadListener);
       }
       return;
+    }
+
+    // the item must update all its fields and its internal state
+    // as the search did an apply to it
+    this.changeListener();
+
+    const forId = this.props.forId || null;
+    const forVersion = this.props.forVersion || null;
+
+    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+      forId, forVersion,
+    );
+    if (appliedGQLValue) {
+      const completedValue: IActionResponseWithValue = {
+        value: appliedGQLValue.rawValue,
+        error: null,
+      }
+      // we need to cache what we have been just specified
+      if (
+        CacheWorkerInstance.isSupported &&
+        this.props.longTermCaching
+      ) {
+        const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
+        if (appliedGQLValue.rawValue) {
+          CacheWorkerInstance.instance.mergeCachedValue(
+            PREFIX_GET + qualifiedName,
+            forId,
+            forVersion || null,
+            appliedGQLValue.rawValue,
+            appliedGQLValue.requestFields,
+          );
+        } else {
+          CacheWorkerInstance.instance.setCachedValue(
+            PREFIX_GET + qualifiedName,
+            forId,
+            forVersion || null,
+            null,
+            null,
+          );
+        }
+      }
+
+      this.props.onLoad && this.props.onLoad(completedValue);
+      return completedValue;
     }
 
     // we basically just upgrade the state
@@ -1687,6 +1736,32 @@ export class ActualItemProvider extends
       forVersion: forVersion,
     });
 
+    // the reason why we use deny cache here is simple
+    // the search context is a form of a memory cache, it might be loading
+    // still when for some reason it was asked to reload, I can think of a extreme case
+    // when the client loads from memory, a reload is requested, but the search conxtext hasn't
+    // released yet the value
+    if (
+      !denyCache &&
+      this.props.searchContext &&
+      this.props.searchContext.currentlySearching.find(
+        (s) =>
+          s.id === forId &&
+          s.version === forVersion &&
+          s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
+      ) &&
+      requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
+    ) {
+      // now we wait for the search loader to trigger the load event
+      if (!this.isUnmounted) {
+        this.setState({
+          loading: true,
+          loaded: false,
+        });
+      }
+      return null;
+    }
+
     if (!denyCache) {
       // Prevent loading at all if value currently available and memoryCached
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
@@ -1718,7 +1793,8 @@ export class ActualItemProvider extends
         // make it so that when we are exiting the search context it caches
         if (
           CacheWorkerInstance.isSupported &&
-          this.props.longTermCaching
+          this.props.longTermCaching &&
+          !this.props.searchContext
         ) {
           const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
           if (appliedGQLValue.rawValue) {
@@ -1763,25 +1839,6 @@ export class ActualItemProvider extends
       this.setState({
         loaded: false,
       });
-    }
-
-    // the reason why we use deny cache here is simple
-    // the search context is a form of a memory cache, it might be loading
-    // still when for some reason it was asked to reload, I can think of a extreme case
-    // when the client loads from memory, a reload is requested, but the search conxtext hasn't
-    // released yet the value
-    if (
-      !denyCache &&
-      this.props.searchContext &&
-      this.props.searchContext.currentlySearching.find(
-        (s) =>
-          s.id === forId &&
-          s.version === forVersion &&
-          s.type === this.props.itemDefinitionInstance.getQualifiedPathName(),
-      ) &&
-      requestFieldsAreContained(requestFields, this.props.searchContext.searchFields)
-    ) {
-      return null;
     }
 
     const containsExternallyCheckedProperty = this.props.containsExternallyCheckedProperty;
@@ -1989,7 +2046,7 @@ export class ActualItemProvider extends
     if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
       clearTimeout(this.automaticSearchTimeout);
       this.automaticSearchTimeout = setTimeout(() => {
-        // now this is used in cached searches and the reason we need to
+        // now this varibale specifically is used in cached searches and the reason we need to
         // prevent search feedback for this is because we are just refiltering
         // as the properties have changed, we do not need to request for feedback
         // every single time a property changes because it is wasteful
@@ -3044,6 +3101,7 @@ export class ActualItemProvider extends
           options.createdBy,
           lastModified,
           this.onSearchReload,
+          (options.cachePolicy || "none") !== "none",
         );
       } else if (listenPolicy === "by-parent") {
         this.props.remoteListener.addParentedSearchListenerFor(
@@ -3053,6 +3111,7 @@ export class ActualItemProvider extends
           parentedBy.version || null,
           lastModified,
           this.onSearchReload,
+          (options.cachePolicy || "none") !== "none"
         );
       }
     }
@@ -3267,7 +3326,7 @@ export class ActualItemProvider extends
       searchError: null,
     });
   }
-  public onSearchReload() {
+  public onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
     // this function is called when remotely the search
     // is said to update, and it needs to be reloaded
     // however the server has already specified how the data

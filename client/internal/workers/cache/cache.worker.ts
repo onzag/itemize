@@ -309,8 +309,7 @@ export default class CacheWorker {
    * @param version the version of the item definition instance
    * @param partialValue the partial value
    * @param partialFields the fields that represent the partial value
-   * @param touchOrMerge optional, whether this is because of a touch of merge reqeust
-   *                     doesn't do anything in practique, just for logging
+   * @param merge optional, whether this is because of a merge request
    */
   public async setCachedValue(
     queryName: string,
@@ -318,9 +317,9 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
-    touchOrMerge?: boolean,
+    merge?: boolean,
   ): Promise<boolean> {
-    if (!touchOrMerge) {
+    if (!merge) {
       console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
     }
 
@@ -419,17 +418,22 @@ export default class CacheWorker {
       !currentValue.value ||
       partialValue.last_modified !== currentValue.value.last_modified
     ) {
-      // we perform an override
-      return await this.setCachedValue(
-        queryName,
-        id,
-        version,
-        partialValue,
-        partialFields,
-        true,
-      );
+      // we perform an override only if the value is greater
+      const partialValueTime = new NanoSecondComposedDate(partialValue.last_modified as string);
+      const currentValueTime = new NanoSecondComposedDate(currentValue.value.last_modified as string);
+      if (partialValueTime.greaterThan(currentValueTime)) {
+        return await this.setCachedValue(
+          queryName,
+          id,
+          version,
+          partialValue,
+          partialFields,
+          true,
+        );
+      }
     } else {
-      // otherwise we can merge
+      // otherwise there's a current value with the same time signature
+      // and we can merge it
       const mergedFields = deepMerge(
         partialFields,
         currentValue.fields,
@@ -565,6 +569,10 @@ export default class CacheWorker {
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
       const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+
+      if (!currentValue) {
+        return false;
+      }
 
       // the patch has already been applied it must be the same
       // exact patch
@@ -758,6 +766,7 @@ export default class CacheWorker {
         // preloaded
         if (
           requestFieldsAreContained(getListRequestedFields, dbValue.fields) &&
+          // all results preloaded will not be true when the listener triggers
           dbValue.allResultsPreloaded
         ) {
           // now we can actually start using the args to run a local filtering

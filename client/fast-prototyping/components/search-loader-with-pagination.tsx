@@ -23,6 +23,10 @@ interface ISearchLoaderWithPaginationProps {
    */
   pageSize: number;
   /**
+   * Whether to clean on dismount for the search results that have been loaded
+   */
+  cleanOnDismount?: boolean;
+  /**
    * The children that recieves the arguments
    */
   children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
@@ -39,7 +43,7 @@ interface ISearchLoaderWithPaginationProps {
  */
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
   return (
-    <PagedSearchLoader pageSize={props.pageSize}>
+    <PagedSearchLoader pageSize={props.pageSize} cleanOnDismount={props.cleanOnDismount}>
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {
           arg.goToPage(value - 1);

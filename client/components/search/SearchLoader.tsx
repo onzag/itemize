@@ -246,6 +246,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   public getRawSearchResults() {
     return this.props.searchResults;
   }
+  /**
+   * In case we did never loaded using the item definition loader
+   * we need to cleanup the search results still
+   * @param props 
+   */
   public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps) {
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
     (props.searchRecords || []).forEach((r) => {
@@ -331,7 +336,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       );
 
       // and then we trigger the change listener for all the instances
-      itemDefintionInQuestion.triggerListeners("change", sr.id as string, sr.version as string);
       itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
     });
   }
@@ -378,6 +382,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
 
     // and then we set the state, and what we are currently searching, as those records
+    // we are searching everything and the item loader will pick on these searching attributes
+    // and prevent them from loading from network or cache and will only be able to pick
+    // on applied values
     this.setState({
       error: null,
       currentlySearching: currentSearchRecords,
@@ -409,7 +416,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id, searchResult.version);
       if (
         appliedGQLValue &&
-        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields)
+        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
+        appliedGQLValue.flattenedValue.last_modified === searchResult.last_modified
       ) {
         return null;
       }
@@ -427,8 +435,14 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           searchResult.version,
           this.props.searchFields,
         );
-        // if we get nothing
-        if (!cachedResult) {
+
+        // if we get nothing or for some reason our search record doesn't match our signature
+        // this happens easily when the search is done and is listening and when the records
+        // change and new records are provided by the automatic search or otherwise but then
+        // these occurred because something changed and yet our cache was not updated to reflect that
+        // ironically this wouldn't really happen with the cache worker as it needs to update
+        // all its values before that even occurred, but anyway if this is the case
+        if (!cachedResult || cachedResult.value.last_modified !== searchResult.last_modified) {
           // then it's uncached
           uncachedResults.push(searchResult);
           return null;
@@ -444,14 +458,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       }
     }));
 
+    // time has changed, a new search is incoming
     if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
       return;
     }
-
-    // now what we are left are these uncached results
-    this.setState({
-      currentlySearching: uncachedResults,
-    });
 
     // we need to check our worker cache results
     workerCachedResults.forEach((cr) => {
@@ -475,13 +485,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           );
 
           // and then we trigger the change listener for all the instances
-          itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
           itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
         } else {
           // otherwise if it was indeed null, we clean the value
           itemDefintionInQuestion.cleanValueFor(cr.forId, cr.forVersion);
           // and also trigger change
-          itemDefintionInQuestion.triggerListeners("change", cr.forId, cr.forVersion);
           itemDefintionInQuestion.triggerListeners("load", cr.forId, cr.forVersion);
         }
 
@@ -494,6 +502,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           version: cr.forVersion,
         });
       }
+    });
+
+    // now what we are left are these uncached results, these are what we are searching right now
+    // is the rest and this will take some time as well
+    this.setState({
+      currentlySearching: uncachedResults,
     });
 
     // now let's go back to our uncached results
@@ -572,7 +586,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           if (!valueToApply) {
             // we clean the thing and trigger the listeners
             itemDefintionInQuestion.cleanValueFor(forId, forVersion);
-            itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
             itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
           } else {
             // otherwise we will see, first the search fields we used
@@ -610,7 +623,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             );
 
             // and trigger the listeners for change
-            itemDefintionInQuestion.triggerListeners("change", forId, forVersion);
             itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
           }
         });

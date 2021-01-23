@@ -46,6 +46,19 @@ import {
   CURRENCY_FACTORS_UPDATED_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import type { IGQLSearchRecord } from "../../../gql-querier";
+
+/**
+ * This is what the remote listener expects of an argument taken
+ * by the callback
+ */
+export interface IRemoteListenerRecordsCallbackArg {
+  newRecords: IGQLSearchRecord[];
+  modifiedRecords: IGQLSearchRecord[];
+  lostRecords: IGQLSearchRecord[];
+}
+
+type RemoteListenerRecordsCallback = (arg: IRemoteListenerRecordsCallbackArg) => void;
 
 /**
  * The remote listener class creates a websocket connection (as well as it falling back to polling)
@@ -110,7 +123,11 @@ export class RemoteListener {
        * unlike the instances part, these are direct callbacks that act
        * as direct listeners
        */
-      callbacks: any[];
+      callbacks: RemoteListenerRecordsCallback[];
+      /**
+       * Whether to use the long term caching
+       */
+      useCacheWorker: boolean[];
     },
   };
 
@@ -135,7 +152,11 @@ export class RemoteListener {
       /**
        * The callbacks as well
        */
-      callbacks: any[];
+      callbacks: RemoteListenerRecordsCallback[];
+      /**
+       * Whether to use the long term caching
+       */
+      useCacheWorker: boolean[];
     },
   };
 
@@ -447,8 +468,9 @@ export class RemoteListener {
 
     // now we check if we already have a listener for that
     if (this.listeners[qualifiedIdentifier]) {
+      const index = this.listeners[qualifiedIdentifier].parentInstances.indexOf(parentInstance);
       // if we do, then we got to check that we are not re-adding this instance
-      if (!this.listeners[qualifiedIdentifier].parentInstances.includes(parentInstance)) {
+      if (index === -1) {
         // and we add it, just to keep track
         this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
       }
@@ -635,19 +657,24 @@ export class RemoteListener {
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: string,
     lastModified: string,
-    callback: () => any,
+    callback: RemoteListenerRecordsCallback,
+    useCacheWorker: boolean,
   ) {
     // so we build our qualified identifier as well
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
     // if we have any in our owned search listener list
     if (this.ownedSearchListeners[qualifiedIdentifier]) {
+      const index = this.ownedSearchListeners[qualifiedIdentifier].callbacks.indexOf(callback)
       // and if this callback is not included yet
       // this can actually hit here very often since every time that a search gets called
       // in gql and it has a cache policy, it will attempt to add a listener
       // and the same listener might have already been added before
-      if (!this.ownedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+      if (index === -1) {
         // so we push the callback
         this.ownedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+        this.ownedSearchListeners[qualifiedIdentifier].useCacheWorker.push(useCacheWorker);
+      } else {
+        this.ownedSearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
       }
       return;
     }
@@ -661,6 +688,7 @@ export class RemoteListener {
       request,
       callbacks: [callback],
       lastModified,
+      useCacheWorker: [useCacheWorker],
     };
 
     // and attach the owner listener if possible
@@ -695,7 +723,7 @@ export class RemoteListener {
    * @param createdBy the created by user namespace
    */
   public removeOwnedSearchListenerFor(
-    callback: () => any,
+    callback: RemoteListenerRecordsCallback,
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: string,
   ) {
@@ -705,14 +733,18 @@ export class RemoteListener {
     const listenerValue = this.ownedSearchListeners[qualifiedIdentifier];
     // if we have one
     if (listenerValue) {
+      const index = listenerValue.callbacks.findIndex((i) => i === callback);
+
+      if (index === -1) {
+        return;
+      }
+
       // we remove such callback from the list
-      const newListenerValue = {
-        ...listenerValue,
-        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
-      };
+      listenerValue.callbacks.splice(index, 1);
+      listenerValue.useCacheWorker.splice(index, 1);
 
       // if we got no callbacks remaining
-      if (newListenerValue.callbacks.length === 0) {
+      if (listenerValue.callbacks.length === 0) {
         // then we can delete the listener
         delete this.ownedSearchListeners[qualifiedIdentifier];
         // and if we are connected
@@ -731,11 +763,6 @@ export class RemoteListener {
             request,
           );
         }
-
-        // otherwise
-      } else {
-        // just upate the value
-        this.ownedSearchListeners[qualifiedIdentifier] = newListenerValue;
       }
     }
   }
@@ -777,7 +804,8 @@ export class RemoteListener {
     parentId: string,
     parentVersion: string,
     lastModified: string,
-    callback: () => any,
+    callback: RemoteListenerRecordsCallback,
+    useCacheWorker: boolean,
   ) {
     // so we build the id for the parent type
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
@@ -785,12 +813,16 @@ export class RemoteListener {
 
     // and we check if we already have some listener registered for it
     if (this.parentedSearchListeners[qualifiedIdentifier]) {
+      const index = this.parentedSearchListeners[qualifiedIdentifier].callbacks.indexOf(callback)
       // if we did, now we need to check if our callback hasn't been added yet,
       // same reason as before, since every time the search is executed it will
       // attempt to add the callback
-      if (!this.parentedSearchListeners[qualifiedIdentifier].callbacks.includes(callback)) {
+      if (index === -1) {
         // and if it's not there we add it
         this.parentedSearchListeners[qualifiedIdentifier].callbacks.push(callback);
+        this.parentedSearchListeners[qualifiedIdentifier].useCacheWorker.push(useCacheWorker);
+      } else {
+        this.parentedSearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
       }
       return;
     }
@@ -806,6 +838,7 @@ export class RemoteListener {
       request,
       callbacks: [callback],
       lastModified,
+      useCacheWorker: [useCacheWorker],
     };
 
     // and attempt to attach it
@@ -845,7 +878,7 @@ export class RemoteListener {
    * @param parentVersion parent version (or null)
    */
   public removeParentedSearchListenerFor(
-    callback: () => any,
+    callback: RemoteListenerRecordsCallback,
     itemDefinitionOrModuleQualifiedPathName: string,
     parentType: string,
     parentId: string,
@@ -858,14 +891,18 @@ export class RemoteListener {
     const listenerValue = this.parentedSearchListeners[qualifiedIdentifier];
     // we ensure we have one already
     if (listenerValue) {
-      // and then we remove the callback from it for a new value
-      const newListenerValue = {
-        ...listenerValue,
-        callbacks: listenerValue.callbacks.filter((i) => i !== callback),
-      };
+      const index = listenerValue.callbacks.findIndex((i) => i === callback);
+
+      if (index === -1) {
+        return;
+      }
+
+      // we remove such callback from the list
+      listenerValue.callbacks.splice(index, 1);
+      listenerValue.useCacheWorker.splice(index, 1);
 
       // if then we got no callbacks left
-      if (newListenerValue.callbacks.length === 0) {
+      if (listenerValue.callbacks.length === 0) {
         // we can delete the listener
         delete this.parentedSearchListeners[qualifiedIdentifier];
         // and if we are connected
@@ -888,9 +925,6 @@ export class RemoteListener {
         }
 
         // otherwise if there are callbacks left
-      } else {
-        // we just update the value with the new callbacks
-        this.parentedSearchListeners[qualifiedIdentifier] = newListenerValue;
       }
     }
   }
@@ -971,6 +1005,7 @@ export class RemoteListener {
         );
 
         // and if we got a cache worker
+        // since we are deleting we ignore the cache worker policy
         if (CacheWorkerInstance.isSupported) {
           // we do the delete
           CacheWorkerInstance.instance.setCachedValue(
@@ -999,6 +1034,7 @@ export class RemoteListener {
       itemDefinition.cleanValueFor(event.id, event.version);
 
       // and if we got a cache worker
+      // since we are deleting we ignore the cache worker policy
       if (CacheWorkerInstance.isSupported) {
         // we are going to do this to upate such it gets deleted
         // if it exists there
@@ -1039,7 +1075,7 @@ export class RemoteListener {
       ownedListener.lastModified = event.newLastModified;
 
       // and if our cache worker is supported
-      if (CacheWorkerInstance.isSupported) {
+      if (CacheWorkerInstance.isSupported && ownedListener.useCacheWorker.some((w) => w)) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
         if (itemDefinitionOrModule instanceof ItemDefinition) {
@@ -1067,7 +1103,11 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      ownedListener.callbacks.forEach((c) => c());
+      ownedListener.callbacks.forEach((c) => c({
+        newRecords: event.newRecords,
+        lostRecords: event.lostRecords,
+        modifiedRecords: event.modifiedRecords,
+      }));
     }
   }
 
@@ -1096,7 +1136,7 @@ export class RemoteListener {
       parentedListener.lastModified = event.newLastModified;
 
       // and equally we try to add these records
-      if (CacheWorkerInstance.isSupported) {
+      if (CacheWorkerInstance.isSupported && parentedListener.useCacheWorker.some((w) => w)) {
         const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
         let itemDefinition: ItemDefinition;
         if (itemDefinitionOrModule instanceof ItemDefinition) {
@@ -1122,7 +1162,11 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      parentedListener.callbacks.forEach((c) => c());
+      parentedListener.callbacks.forEach((c) => c({
+        newRecords: event.newRecords,
+        lostRecords: event.lostRecords,
+        modifiedRecords: event.modifiedRecords,
+      }));
     }
   }
 

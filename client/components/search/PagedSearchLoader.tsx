@@ -41,6 +41,10 @@ interface IPagedSearchLoaderProps {
    */
   pageSize: number;
   /**
+   * Whether to clean the search results on dismount
+   */
+  cleanOnDismount?: boolean;
+  /**
    * And a children that will use the arg for conditional rendering of the pagination element
    */
   children: (arg: IPagedSearchLoaderArg) => React.ReactNode;
@@ -114,6 +118,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
             <SearchLoader
               pageSize={this.props.pageSize}
               currentPage={actualP}
+              cleanOnDismount={this.props.cleanOnDismount}
               onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
             >
               {(arg) => {
