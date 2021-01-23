@@ -563,13 +563,18 @@ export class Cache {
    * @param dictionary 
    */
   public async requestUpdateSimple(
-    itemDefinition: ItemDefinition,
+    item: ItemDefinition | string,
     id: string,
     version: string,
     update: IGQLArgs,
     dictionary: string,
+    currentRawValueSQL?: ISQLTableRowValue,
   ) {
-    const currentValue = await this.requestValue(itemDefinition, id, version);
+    const itemDefinition = typeof item === "string" ?
+      this.root.registry[item] as ItemDefinition :
+      item;
+
+    const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
     const currentValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
       this.knex,
       this.serverData,
@@ -592,7 +597,7 @@ export class Cache {
   /**
    * Requests an update for an item definition where new values are set for this existent item
    * definition value, these are taken as instructions and no checks are done on it
-   * @param itemDefinition the item definition in question
+   * @param item the item definition in question
    * @param id the id to update
    * @param version the version of that id to update
    * @param update the update in question (partial values are allowed)
@@ -617,7 +622,7 @@ export class Cache {
    * @returns a total combined table row value that can be converted into graphql
    */
   public async requestUpdate(
-    itemDefinition: ItemDefinition,
+    item: ItemDefinition | string,
     id: string,
     version: string,
     update: IGQLArgs,
@@ -627,6 +632,8 @@ export class Cache {
     containerId: string,
     listenerUUID: string,
   ): Promise<ISQLTableRowValue> {
+    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
@@ -997,7 +1004,7 @@ export class Cache {
 
   /**
    * Request the deletition of an item definition value
-   * @param itemDefinition the item definition to delete a value for
+   * @param item the item definition to delete a value for
    * @param id the id to delete for
    * @param version the version to delete for
    * @param dropAllVersions whether to drop all versions
@@ -1009,13 +1016,17 @@ export class Cache {
    * listener uuid ensures only those that needs updates will get them
    */
   public async requestDelete(
-    itemDefinition: ItemDefinition,
+    item: ItemDefinition | string,
     id: string,
     version: string,
     dropAllVersions: boolean,
     containerId: string,
     listenerUUID: string,
   ): Promise<void> {
+    const itemDefinition = typeof item === "string" ?
+      this.root.registry[item] as ItemDefinition :
+      item;
+
     // so first we need to get these two
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
@@ -1310,7 +1321,7 @@ export class Cache {
 
   /**
    * Requests a value from the cache
-   * @param itemDefinitionOrQualifiedName the item definition or a qualified name
+   * @param item the item definition or a qualified name
    * @param id the id to request for
    * @param version the version
    * @param options.refresh whether to skip the cache and request directly from the database and update the cache
@@ -1320,7 +1331,7 @@ export class Cache {
    * @returns a whole sql value that can be converted into graphql if necessary
    */
   public async requestValue(
-    itemDefinitionOrQualifiedName: ItemDefinition | string,
+    item: ItemDefinition | string,
     id: string,
     version: string,
     options?: {
@@ -1331,9 +1342,9 @@ export class Cache {
     const refresh = options && options.refresh;
     const memCache = options && options.useMemoryCache;
 
-    const itemDefinition = typeof itemDefinitionOrQualifiedName === "string" ?
-      this.root.registry[itemDefinitionOrQualifiedName] as ItemDefinition :
-      itemDefinitionOrQualifiedName;
+    const itemDefinition = typeof item === "string" ?
+      this.root.registry[item] as ItemDefinition :
+      item;
 
     const idefTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();

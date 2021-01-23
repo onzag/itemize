@@ -5,7 +5,7 @@ import Knex from "knex";
 import { RegistryService } from "./registry";
 import { ItemizeRedisClient } from "../redis";
 import Root from "../../base/Root";
-import { ItemizeRawDatabaseChangeInformer } from "../raw-db";
+import { ItemizeRawDB } from "../raw-db";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -25,7 +25,7 @@ export class ServiceProvider<T> {
   public globalKnex: Knex;
   public globalRedisPub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
-  public globalDatabaseChangeInformer: ItemizeRawDatabaseChangeInformer;
+  public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
 
   constructor(config: T, registry: RegistryService) {
@@ -70,7 +70,7 @@ export class ServiceProvider<T> {
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;
     this.globalRoot = root;
-    this.globalDatabaseChangeInformer = new ItemizeRawDatabaseChangeInformer(globalPub, this.globalKnex, this.globalRoot);
+    this.globalRawDB = new ItemizeRawDB(globalPub, this.globalKnex, this.globalRoot);
   }
 
   /**

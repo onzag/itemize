@@ -8,12 +8,14 @@
 
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
-import { DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import Knex from "knex";
 import { logger } from ".";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
+import ItemDefinition from "../base/Root/Module/ItemDefinition";
+import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 
 /**
  * The required properties that every row should have
@@ -26,7 +28,7 @@ const requiredProperties = ["id", "version", "type", "created_by", "parent_id", 
  * updates and want to propagate them into your clients to ensure that the realtime attributes
  * get mantained and the caches get properly invalidated
  */
-export class ItemizeRawDatabaseChangeInformer {
+export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
   private knex: Knex;
   private root: Root;
@@ -77,15 +79,15 @@ export class ItemizeRawDatabaseChangeInformer {
     const isRowValid = requiredProperties.every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
-          "ItemizeGlobalServiceChangeInformer.informChangeOnRow: row data is invalid as it misses property " + p,
+          "ItemizeRawDB.informChangeOnRow: row data is invalid as it misses property " + p,
           {
             row,
           }
         );
-        return true;
+        return false;
       }
 
-      return false;
+      return true;
     });
 
     // if it's not valid we return null
@@ -169,8 +171,8 @@ export class ItemizeRawDatabaseChangeInformer {
 
     // and let's start collecting all the events that we need to trigger about these records
     // because we have both parented and owned events, we will start collecting them
-    const collectedOwned: {[key: string]: IOwnedSearchRecordsEvent} = {};
-    const collectedParented: {[key: string]: IParentedSearchRecordsEvent} = {};
+    const collectedOwned: { [key: string]: IOwnedSearchRecordsEvent } = {};
+    const collectedParented: { [key: string]: IParentedSearchRecordsEvent } = {};
 
     // we will loop on the changes
     processedChanges.forEach((c) => {
@@ -207,7 +209,7 @@ export class ItemizeRawDatabaseChangeInformer {
           id: c.row.id,
           last_modified: c.lastModified,
           type: c.row.type,
-          version: c.row.version || null,
+          version: c.row.version || null,
         };
 
         // we add it at the right place
@@ -228,7 +230,7 @@ export class ItemizeRawDatabaseChangeInformer {
           collectedParented[parentedMergedIndexIdentifierOnItem] = {
             parentId: c.row.parent_id,
             parentType: c.row.parent_type,
-            parentVersion: c.row.parent_version || null,
+            parentVersion: c.row.parent_version || null,
             qualifiedPathName: c.itemQualifiedPathName,
             newRecords: [],
             lostRecords: [],
@@ -240,7 +242,7 @@ export class ItemizeRawDatabaseChangeInformer {
           collectedParented[parentedMergedIndexIdentifierOnModule] = {
             parentId: c.row.parent_id,
             parentType: c.row.parent_type,
-            parentVersion: c.row.parent_version || null,
+            parentVersion: c.row.parent_version || null,
             qualifiedPathName: c.moduleQualifiedPathName,
             newRecords: [],
             lostRecords: [],
@@ -254,7 +256,7 @@ export class ItemizeRawDatabaseChangeInformer {
           id: c.row.id,
           last_modified: c.lastModified,
           type: c.row.type,
-          version: c.row.version || null,
+          version: c.row.version || null,
         };
 
         // and we add it to the parented list
@@ -383,5 +385,91 @@ export class ItemizeRawDatabaseChangeInformer {
    */
   public async informRowsHaveBeenAdded(rows: ISQLTableRowValue[], rowDataIsComplete?: boolean) {
     return await this.informChangeOnRows(rows, "created", rowDataIsComplete);
+  }
+
+  /**
+   * Performs a raw database update, use this method in order to update critical data that could
+   * lead to race conditions, otherwise stay by updating through the cache
+   *
+   * @param item 
+   * @param id 
+   * @param version 
+   * @param updater 
+   */
+  public async performRawDBUpdate(
+    item: ItemDefinition | string,
+    id: string,
+    version: string,
+    updater: {
+      moduleTableUpdate?: any;
+      itemTableUpdate?: any;
+    }
+  ): Promise<ISQLTableRowValue> {
+    if (!updater.moduleTableUpdate && !updater.itemTableUpdate) {
+      throw new Error("no module update and no item update was specified into the updater");
+    }
+
+    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+    const mod = itemDefinition.getParentModule();
+
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+
+    const sqlModData = {
+      ...updater.moduleTableUpdate,
+      last_modified: this.knex.fn.now(),
+    };
+
+    const sqlIdefData = updater.itemTableUpdate || {};
+
+    const sqlValue = convertVersionsIntoNullsWhenNecessary(
+      await this.knex.transaction(async (transactionKnex) => {
+        // and add them if we have them, note that the module will always have
+        // something to update because the edited_at field is always added when
+        // edition is taking place
+        const updateQueryMod = transactionKnex(moduleTable)
+          .update(sqlModData).where("id", id).andWhere("version", version || "")
+          .returning("*");
+
+        // for the update query of the item definition we have to take several things
+        // into consideration, first we set it as an empty object
+        let updateOrSelectQueryIdef: any = {};
+        // if we have something to update
+        if (Object.keys(sqlIdefData).length) {
+          // we make the update query
+          updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
+            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+            id,
+          ).andWhere(
+            CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+            version || "",
+          ).returning("*");
+          // otherwise we check if we are just requesting some fields from the idef
+        } else {
+          // and make a simple select query
+          updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
+            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+            id,
+          ).andWhere(
+            CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+            version || "",
+          );
+        }
+        // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
+
+        // now we run both queries
+        const updateQueryValueMod = await updateQueryMod;
+        const updateQueryValueIdef = await updateOrSelectQueryIdef;
+
+        return {
+          ...updateQueryValueMod[0],
+          ...updateQueryValueIdef[0],
+        };
+      }),
+    );
+
+    await this.informRowsHaveBeenModified([sqlValue], true);
+
+    return sqlValue;
   }
 }

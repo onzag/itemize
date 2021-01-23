@@ -8,7 +8,7 @@ import React from "react";
 import Link from "../../../components/navigation/Link";
 import {
   SwipeableDrawer, List, Divider, ListItem, ListItemIcon,
-  ListItemText, createStyles, WithStyles, withStyles
+  ListItemText, createStyles, WithStyles, withStyles, Badge
 } from "../../mui-core";
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
@@ -44,6 +44,10 @@ export interface IMenuEntry {
    * The icon to use
    */
   icon: React.ReactNode,
+  /**
+   * A badge to display
+   */
+  badgeContent?: React.ReactNode;
   /**
    * The module to load in the module provider (optional)
    */
@@ -127,7 +131,7 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
           </ModuleProvider>
         );
 
-    // with only the module itself
+      // with only the module itself
     } else if (entry.module) {
       // we use only the module context
       i18nNodeInfo =
@@ -141,15 +145,22 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
       i18nNodeInfo = <I18nRead {...entry.i18nProps} />;
     }
 
+    let icon: React.ReactNode = (
+      <ListItemIcon>
+        {entry.icon}
+      </ListItemIcon>
+    );
+    if (entry.badgeContent) {
+      icon = <ListItemIcon><Badge color="primary" badgeContent={entry.badgeContent}>{entry.icon}</Badge></ListItemIcon>
+    }
+
     // now we can return this
     return (
       <Link to={entry.path} className={className} propagateClicks={true} key={entry.path}>
         <LocationReader>
           {(arg) => (
             <ListItem button={true} selected={arg.pathname === entry.path}>
-              <ListItemIcon>
-                {entry.icon}
-              </ListItemIcon>
+              {icon}
               <ListItemText>
                 {i18nNodeInfo}
               </ListItemText>
