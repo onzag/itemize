@@ -582,62 +582,64 @@ export async function initializeItemizeApp(
   }
 }
 
-window.GET_MEMORY_STATE = function() {
-  const state: any = {
-    idefs: {},
-    mods: {},
-  };
-
-  function processMod(m: Module) {
-    m.getAllModules().forEach(processMod);
-    m.getAllChildDefinitionsRecursive().forEach(processIdef);
-
-    const absPath = m.getPath().join("/");
-    state.mods[absPath] = {
-      properties: {},
+if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
+  window.GET_MEMORY_STATE = function() {
+    const state: any = {
+      idefs: {},
+      mods: {},
+    };
+  
+    function processMod(m: Module) {
+      m.getAllModules().forEach(processMod);
+      m.getAllChildDefinitionsRecursive().forEach(processIdef);
+  
+      const absPath = m.getPath().join("/");
+      state.mods[absPath] = {
+        properties: {},
+      }
+  
+      m.getAllPropExtensions().forEach((p) => {
+        state.mods[absPath].properties[p.getId()] = processProperty(p);
+      });
     }
-
-    m.getAllPropExtensions().forEach((p) => {
-      state.mods[absPath].properties[p.getId()] = processProperty(p);
-    });
-  }
-
-  function processIdef(idef: ItemDefinition) {
-    const absPath = idef.getAbsolutePath().join("/");
-    state.idefs[absPath] = {
-      appliedValue: (idef as any).stateGQLAppliedValue,
-      internalState: (idef as any).stateInternal,
-      properties: {},
-      includes: {}
+  
+    function processIdef(idef: ItemDefinition) {
+      const absPath = idef.getAbsolutePath().join("/");
+      state.idefs[absPath] = {
+        appliedValue: (idef as any).stateGQLAppliedValue,
+        internalState: (idef as any).stateInternal,
+        properties: {},
+        includes: {}
+      }
+  
+      idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
+        state.idefs[absPath].properties[p.getId()] = processProperty(p);
+      });
+  
+      idef.getAllIncludes().forEach((i) => {
+        state.idefs[absPath].includes[i.getId()] = processInclude(i);
+      });
     }
-
-    idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
-      state.idefs[absPath].properties[p.getId()] = processProperty(p);
-    });
-
-    idef.getAllIncludes().forEach((i) => {
-      state.idefs[absPath].includes[i.getId()] = processInclude(i);
-    });
-  }
-
-  function processProperty(p: PropertyDefinition) {
-    return {
-      values: (p as any).stateValue,
-      appliedValues: (p as any).stateAppliedValue,
-      enforcedValues: (p as any).stateSuperEnforcedValue,
-      internalValues: (p as any).stateInternalValue,
+  
+    function processProperty(p: PropertyDefinition) {
+      return {
+        values: (p as any).stateValue,
+        appliedValues: (p as any).stateAppliedValue,
+        enforcedValues: (p as any).stateSuperEnforcedValue,
+        internalValues: (p as any).stateInternalValue,
+      }
     }
+  
+    function processInclude(i: Include) {
+      const data: any = {};
+      i.getSinkingProperties().forEach((p) => {
+        data[p.getId()] = processProperty(p);
+      });
+      return data;
+    }
+  
+    window.ROOT.getAllModules().forEach(processMod);
+  
+    return state;
   }
-
-  function processInclude(i: Include) {
-    const data: any = {};
-    i.getSinkingProperties().forEach((p) => {
-      data[p.getId()] = processProperty(p);
-    });
-    return data;
-  }
-
-  window.ROOT.getAllModules().forEach(processMod);
-
-  return state;
 }

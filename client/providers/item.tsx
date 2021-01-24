@@ -219,8 +219,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean | Promise<boolean>;
   parentedBy?: {
-    module: string,
-    itemDefinition: string,
+    item: string,
     id: string,
     version?: string,
   };
@@ -270,8 +269,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   since?: string;
   parentedBy?: {
-    module: string,
-    itemDefinition: string,
+    item: string,
     id: string,
     version?: string,
   };
@@ -523,6 +521,16 @@ export interface IItemProviderProps {
    * Makes automatic search happen only on mount
    */
   automaticSearchIsOnlyInitial?: boolean;
+  /**
+   * Make the automatic search refresh immediately
+   * not compatible with automaticSearchIsOnlyInitial
+   * usually the automatic search will stack refreshes for 300ms
+   * in order to allow keystrokes to stack and not update per keystroke
+   * on your entry field but sometimes you would
+   * rather get instant results, as eg. your filters are selects
+   * rather than entries with text
+   */
+  automaticSearchInstant?: boolean;
   /**
    * Load searches from the popstate event, use with the option for
    * storeResultsInNavigation and the same identifier
@@ -2045,14 +2053,21 @@ export class ActualItemProvider extends
     // to retrigger the search when properties change
     if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
       clearTimeout(this.automaticSearchTimeout);
-      this.automaticSearchTimeout = setTimeout(() => {
-        // now this varibale specifically is used in cached searches and the reason we need to
-        // prevent search feedback for this is because we are just refiltering
-        // as the properties have changed, we do not need to request for feedback
-        // every single time a property changes because it is wasteful
+
+      // if the search must be done instantly
+      if (this.props.automaticSearchInstant) {
         this.preventSearchFeedbackOnPossibleStaleData = true;
         this.search(this.props.automaticSearch);
-      }, 300);
+      } else {
+        this.automaticSearchTimeout = setTimeout(() => {
+          // now this varibale specifically is used in cached searches and the reason we need to
+          // prevent search feedback for this is because we are just refiltering
+          // as the properties have changed, we do not need to request for feedback
+          // every single time a property changes because it is wasteful
+          this.preventSearchFeedbackOnPossibleStaleData = true;
+          this.search(this.props.automaticSearch);
+        }, 300);
+      }
     }
   }
   public onPropertyRestore(
@@ -2689,10 +2704,8 @@ export class ActualItemProvider extends
     });
 
     if (options.parentedBy) {
-      const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
-        .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
-      const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
-        options.parentedBy.itemDefinition.split("/"));
+      const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
+        .getParentRoot().registry[options.parentedBy.item] as ItemDefinition;
 
       argumentsForQuery.parent_id = options.parentedBy.id;
       argumentsForQuery.parent_version = options.parentedBy.version || null;
@@ -2953,10 +2966,8 @@ export class ActualItemProvider extends
     } else if (options.parentedBy) {
       // because the parenting rule goes by a path, eg.... module/module  and then idef/idef
       // we need to loop and find it by the path in order to find both
-      const moduleInQuestion = this.props.itemDefinitionInstance.getParentModule()
-        .getParentRoot().getModuleFor(options.parentedBy.module.split("/"));
-      const itemDefinitionInQuestion = moduleInQuestion.getItemDefinitionFor(
-        options.parentedBy.itemDefinition.split("/"));
+      const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
+        .getParentRoot().registry[options.parentedBy.item] as ItemDefinition;
 
       // and that way we calculate the search parent
       searchParent = [
@@ -3034,9 +3045,7 @@ export class ActualItemProvider extends
     let parentedBy = null;
     if (options.parentedBy) {
       const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      const parentIdef =
-        root.getModuleFor(options.parentedBy.module.split("/"))
-          .getItemDefinitionFor(options.parentedBy.itemDefinition.split("/"));
+      const parentIdef = root.registry[options.parentedBy.item] as ItemDefinition;
       parentedBy = {
         itemDefinition: parentIdef,
         id: options.parentedBy.id,

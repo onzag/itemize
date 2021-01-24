@@ -358,8 +358,7 @@ export function ReserveHosting(props: IReserveHostingProps) {
                         ],
                         restoreStateOnSuccess: true,
                         parentedBy: {
-                            module: "hosting",
-                            itemDefinition: "unit",
+                            item: "hosting/unit",
                             id: idToReserve,
                         }
                     }}
@@ -721,8 +720,7 @@ export function ReserveHosting(props: IReserveHostingProps) {
                                     ],
                                     restoreStateOnSuccess: true,
                                     parentedBy: {
-                                        module: "hosting",
-                                        itemDefinition: "unit",
+                                        item: "hosting/unit",
                                         id: idToReserve,
                                     }
                                 }}
@@ -846,6 +844,14 @@ export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof 
                         properties={[
                             "status"
                         ]}
+                        // we want our automatic search to be instant
+                        // the reason is that automatic searches when they are
+                        // refreshing would stack searches and only choose the last
+                        // one, this is to prevent search fields to send a new search
+                        // request on every keystroke, but our status is a select
+                        // not a entry where you type, so instant results are preferred
+                        // and make the app feel more snappy
+                        automaticSearchInstant={true}
                         automaticSearch={{
                             limit: 100,
                             offset: 0,

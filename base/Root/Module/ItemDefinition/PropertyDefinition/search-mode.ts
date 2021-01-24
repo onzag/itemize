@@ -104,6 +104,11 @@ export function buildSearchModePropertyDefinitions(
   // sense to go deeper
   newPropDef.searchable = false;
 
+  // search mode cannot coerce nulls into default
+  if (newPropDef.coerceNullsIntoDefault) {
+    newPropDef.coerceNullsIntoDefault = false;
+  }
+
   if (newPropDef.type === "text") {
     newPropDef.type = "string";
   }
