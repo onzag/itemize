@@ -2457,7 +2457,7 @@ export class ActualItemProvider extends
     options: IActionCleanOptions,
     state: "success" | "fail",
     avoidTriggeringUpdate?: boolean,
-  ): void {
+  ): boolean {
     return this.cleanWithProps(
       this.props,
       options,
@@ -2470,7 +2470,7 @@ export class ActualItemProvider extends
     options: IActionCleanOptions,
     state: "success" | "fail",
     avoidTriggeringUpdate?: boolean,
-  ): void {
+  ): boolean {
     if (!this.isUnmounted) {
       if (
         options.unpokeAfterAny ||
@@ -2613,12 +2613,14 @@ export class ActualItemProvider extends
     }
 
     // NOw we check if we need an update in the listeners and if we are allowed to trigger it
-    if (needsUpdate && !avoidTriggeringUpdate) {
+    let triggeredUpdate: boolean = needsUpdate && !avoidTriggeringUpdate
+    if (triggeredUpdate) {
       props.itemDefinitionInstance.triggerListeners("change", props.forId || null, props.forVersion || null);
     }
     if (needsSearchUpdate && !avoidTriggeringUpdate) {
       props.itemDefinitionInstance.triggerListeners("search-change", props.forId || null, props.forVersion || null);
     }
+    return triggeredUpdate;
   }
   public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
     // the reason we might need to wait for load is because unless we have avoided
@@ -2743,6 +2745,7 @@ export class ActualItemProvider extends
           cacheStore: this.props.longTermCaching,
           waitAndMerge: options.waitAndMerge,
         });
+
         value = totalValues.value;
         error = totalValues.error;
         getQueryFields = totalValues.getQueryFields;
@@ -2826,12 +2829,15 @@ export class ActualItemProvider extends
         getQueryFields,
         true,
       );
-      this.cleanWithProps(this.props, options, "success");
 
-      // clean will props will have triggered the change listeners, but if there's a difference
+      const triggeredAnUpdate = this.cleanWithProps(this.props, options, "success");
+      if (!triggeredAnUpdate) {
+        this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
+
+      // clean will props may have triggered the change listeners, but if there's a difference
       // between what we have cleaned and applied we want to trigger these listeners again for the
       // received value
-      if (this.props.forId !== recievedId && (this.props.forVersion || null) !== (receivedVersion || null)) {
+      } else if (this.props.forId !== recievedId && (this.props.forVersion || null) !== (receivedVersion || null)) {
         this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
       }
     }
