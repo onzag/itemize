@@ -8,6 +8,11 @@
  */
 
 /**
+ * Server given flags
+ */
+const serverFlags = ["CREATE_ONLY", "EDIT_ONLY", "SEARCH_ONLY"];
+
+/**
  * The comparators we support
  */
 const comparators = ["equals", "not-equal", "greater-than", "less-than",
@@ -79,6 +84,10 @@ export default {
           type: "string",
           enum: gates,
         },
+        serverFlag: {
+          type: "string",
+          enum: serverFlags,
+        },
         // condition (any allowed conditions are not checked)
         // even when it'd be possible to do it as a recursive
         // reference with the json schema 7.0 definition for #
@@ -105,6 +114,10 @@ export default {
         gate: {
           type: "string",
           enum: gates,
+        },
+        serverFlag: {
+          type: "string",
+          enum: serverFlags,
         },
         condition: {
           $ref: "ConditionalRuleSet",

@@ -54,8 +54,10 @@ export class CustomRoleManager {
       } else if (!r.item) {
         return equals(r.module, modulePath);
       }
+      
       return equals(r.module, modulePath) && equals(r.item, idefPath);
     });
+
     this.granteds = {};
     this.argEnv = env;
   }
@@ -71,7 +73,7 @@ export class CustomRoleManager {
   async checkRoleAccessFor(allowedRoles: string[]) {
     const allowedRolesByPriority = allowedRoles.map((r) => {
       return this.filteredRoles.find((r2) => r === r2.role);
-    }).filter((r) => !!r).sort((a, b) => a.priority - b.priority);
+    }).filter((r) => !!r).sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
     for (const role of allowedRolesByPriority) {
       if (await this.isRoleGranted(role)) {

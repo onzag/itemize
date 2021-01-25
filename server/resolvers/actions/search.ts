@@ -382,6 +382,8 @@ export async function searchItemDefinition(
       code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
     });
   }
+
+  pooledRoot.setServerFlags(["SEARCH", "SEARCH_ONLY"]);
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(

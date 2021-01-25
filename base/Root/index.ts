@@ -171,6 +171,13 @@ export default class Root {
   private requestManager: RequestManagerFn = null;
 
   /**
+   * Used by the server side to set server flags to flag
+   * other parts of the schema how to operate, mainly
+   * conditional rule set about what it should evaluate
+   */
+  private serverFlags: string[] = null;
+
+  /**
    * Builds a root from raw data
    * @param rawJSON the raw json data
    */
@@ -191,6 +198,7 @@ export default class Root {
    */
   public cleanState() {
     this.rootState = {};
+    this.serverFlags = null;
     this.childModules && this.childModules.forEach((cm) => cm.cleanState());
   }
 
@@ -294,5 +302,17 @@ export default class Root {
    */
   public getI18nDataFor(locale: string) {
     return this.rawData.i18nData[locale] || null;
+  }
+
+  /**
+   * Sets the server flags
+   * @param flags the flags to set
+   */
+  public setServerFlags(flags: string[]) {
+    this.serverFlags = flags;
+  }
+
+  public getServerFlags(): string[] {
+    return this.serverFlags;
   }
 }

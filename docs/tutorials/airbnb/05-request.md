@@ -111,7 +111,7 @@ Right after our `seoRules` on a new object we must add:
     customRoles: [
         {
             role: "OWNER_OF_UNIT",
-            item: ["unit"],
+            item: ["request"],
             module: ["hosting"],
             grant: async (arg) => {
                 // if there's no parent
@@ -995,7 +995,7 @@ await arg.appData.rawDB.performRawDBUpdate(
     hostingUnit.id,
     hostingUnit.version,
     {
-            itemTableUpdate: {
+        itemTableUpdate: {
             // this for example could be changed with a subquery to a count
             // but we are just going to leave it like this
             // a count itself would be better for consistency
@@ -1148,6 +1148,403 @@ You should be able to see now your list including the list of requests pending t
 
 We have changed the default behaviour of where the page takes us, now it doesn't take us to the edit area, but rather to a view point that currently displays nothing.
 
+## Creating the view with the listing and its requests
+
+We want to now create a page for viewing the listing itself and the requests that are involved into it and we will do that in the same view that shows our item, for that we will add a new function into our `hosting/index.tsx` page, for the sake of this tutorial and just to show the capabilities you are dealing with, we will make the results that are displayed be realtime, using a listening policy.
+
+```tsx
+/**
+ * Some styles for the list of units
+ */
+const viewHostingStyles = createStyles({
+    image: {
+        width: "30%",
+        display: "inline-block",
+    },
+    listingText: {
+        padding: "0 1rem",
+    },
+    listing: {
+        "transition": "background-color 0.3s",
+        "cursor": "pointer",
+        "&:hover": {
+            backgroundColor: "#eee",
+        },
+    },
+    paginator: {
+        paddingTop: "1rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+});
+
+interface IViewHostingProps extends WithStyles<typeof viewHostingStyles> {
+    match: {
+        params: {
+            id: string;
+        };
+    };
+}
+
+export const ViewHosting = withStyles(viewHostingStyles)((props: IViewHostingProps) => {
+    const idToView = props.match.params.id || null;
+
+    return (
+        <ItemProvider
+            itemDefinition="unit"
+            forId={idToView}
+            properties={[
+                "title",
+                "image",
+                "unit_type",
+            ]}
+        >
+            <Link to={`/hosting/edit/${idToView}`}>
+                <IconButton>
+                    <EditIcon />
+                </IconButton>
+            </Link>
+
+            <View id="unit_type" />
+            <View id="title" />
+            <View id="image" />
+
+            <hr />
+
+            <ItemProvider
+                itemDefinition="request"
+                searchCounterpart={true}
+                properties={[
+                    "status"
+                ]}
+                automaticSearchInstant={true}
+                automaticSearch={{
+                    // on a traditional search by default the max amount
+                    // of records you can pull is limited to 50, this can
+                    // be changed but 50 will do right now
+                    limit: 50,
+                    offset: 0,
+                    requestedProperties: [
+                        "check_in",
+                        "check_out",
+                    ],
+                    searchByProperties: [
+                        "status",
+                    ],
+                    parentedBy: {
+                        id: props.match.params.id,
+                        version: null,
+                        item: "hosting/unit"
+                    },
+                    // we are performing a traditional search,
+                    // normally when itemize does a search it request
+                    // a list of records and then requests each page
+                    // one by one, this is good if you wish to only download
+                    // what is necessary while keeping the search state to that
+                    // point in time, however we will display all the results
+                    // so we need all the data, in this case, it will be cheaper
+                    // to use a traditional search
+                    traditional: true,
+
+                    // we will aso just for demonstration use a by parent listen policy
+                    // which means that the search will be realtime as well, a traditional
+                    // by parent search is expensive, and normally you wouldn't do that, you
+                    // would want a standard search with a cachePolicy as well; anyway a by parent listen policy will update
+                    // via the parent context, every time the parent gets added, deleted or modified a child
+                    // the search considers itself obsolete, because it is a traditional search
+                    // it has no other way to update other than by calling the server again
+                    // if we had a cache policy it would actually figure out the difference and only
+                    // request the new records, but we will study that on the optimization/offline sections
+                    listenPolicy: "by-parent",
+                }}
+                cleanOnDismount={{
+                    cleanStateOnAny: true,
+                }}
+            >
+                <Entry id="status" searchVariant="search" />
+
+                <List>
+                    {/**
+                 * Note how we use the standard search loader rather than a paged search loader
+                 * this one is standard and not fast prototyping and it is what the paged loader
+                 * is built upon, it also uses pages, but it has no pagination element built in
+                 * because we are anyway displaying the entire thing, we will just use a page the exact
+                 * size of our limit
+                 */}
+                    <SearchLoader
+                        pageSize={50}
+                        currentPage={0}
+
+                        // we are making the search results be static and do not bind to listen for changes
+                        // you might wonder how is this compatible with the listen realtime policy well this is because
+                        // we are telling "individual" results not to update; the search loader keeps results up
+                        // to date by itself because it listens to changes of the records as we have a listen policy
+                        // so we should always use TOTAL when we are listening otherwise you are wasting memory cycles
+                        static="TOTAL"
+                    >
+                        {(arg) => (
+                            arg.searchRecords.map((r) => (
+                                <ItemProvider {...r.providerProps}>
+                                    <Link to={`/hosting/view/${idToView}/request/${r.id}`}>
+                                        <ListItem className={props.classes.listing}>
+
+                                            {/**
+                                         * We will read the creator of this record
+                                         */}
+                                            <Reader id="created_by">
+                                                {(createdBy: string) => (
+                                                    // and now we will render the item
+                                                    <ListItemText
+                                                        className={props.classes.listingText}
+                                                        primary={
+                                                            <ModuleProvider
+                                                                module="users"
+                                                            >
+                                                                <ItemProvider
+                                                                    itemDefinition="user"
+                                                                    properties={[
+                                                                        "username"
+                                                                    ]}
+                                                                    // wait and merge basically means collect as many of these as possible
+                                                                    // and request them all at once, this will prevent having to do a round
+                                                                    // trip per user, as the server is able to process many requests
+                                                                    // at once, it also ensures that if the user is the exact same, then no
+                                                                    // new request will be made and they'll use the same value, wait and merge
+                                                                    // is quite effective to reducing network requests, but it comes at a cost
+                                                                    // 70 ms of delay during collection
+                                                                    waitAndMerge={true}
+                                                                    forId={createdBy}
+
+                                                                    // the user contains an externally checked property (unique index)
+                                                                    // that is the username, and the item provider tries to determine
+                                                                    // if the state is adequate by default, this will cause a network
+                                                                    // request, that is totally unecessary because we don't care whether
+                                                                    // the username is unique or not, we aren't modifying it
+                                                                    disableExternalChecks={true}
+                                                                >
+                                                                    <View id="username" />
+                                                                </ItemProvider>
+                                                            </ModuleProvider>
+                                                        }
+                                                        secondary={
+                                                            <span>
+                                                                <View id="check_in" /><span>{" - "}</span><View id="check_out" />
+                                                            </span>
+                                                        }
+                                                    />
+                                                )}
+                                            </Reader>
+                                        </ListItem>
+                                    </Link>
+                                </ItemProvider>
+                            ))
+                        )}
+                    </SearchLoader>
+                </List>
+            </ItemProvider>
+        </ItemProvider>
+    );
+});
+```
+
+And we should then register it into the router itself at the `Hosting` component
+
+```tsx
+<Route
+    path="/hosting/view/:id"
+    exact={true}
+    component={ViewHosting}
+/>
+```
+
+Now if we go to the view screen, we should see something as:
+
+![Hosting View](./images/hosting-view.png)
+
+And if you change any element of what is currently displayed there, you will realize that it is kept up to date, you might try for example to make a new request for hosting, and it will appear on the list, in realtime, because we have a listening policy.
+
+Even doing things like changing the name of the user will work, not because of the listening policy but rather because of the item loader, also since we have used wait and merge, it ensures that only one request takes place to load and reload the user, or as many as there can be, wait and merge is a very powerful capability of itemize, which allows to collect as many requests as possible before sending them together into one batch for the server to process.
+
+Now we need to see these requests and approve/deny them, in the same hosting page let's add the following functionality.
+
+```tsx
+import { Avatar } from "../../components/avatar";
+
+interface IApproveDenyRequestProps {
+    match: {
+        params: {
+            id: string;
+            rid: string;
+        };
+    };
+}
+
+export function ApproveDenyRequest(props: IApproveDenyRequestProps) {
+    const unitId = props.match.params.id;
+    const requestId = props.match.params.rid;
+
+    return (
+        <ItemProvider
+            itemDefinition="unit"
+            forId={unitId}
+            properties={[
+                "title",
+                "image",
+                "unit_type",
+            ]}
+        >
+            <View id="unit_type" />
+            <View id="title" />
+            <View id="image" />
+
+            <hr />
+
+            <ItemProvider
+                itemDefinition="request"
+                forId={requestId}
+                properties={[
+                    "message",
+                    "check_in",
+                    "check_out",
+                    "status",
+                ]}
+            >
+                <Reader id="created_by">
+                    {(createdBy: string) => (
+                        <ModuleProvider
+                            module="users"
+                        >
+                            <ItemProvider
+                                itemDefinition="user"
+                                properties={[
+                                    "username",
+                                    "profile_picture",
+                                    "app_country",
+                                    "role",
+                                ]}
+                                forId={createdBy}
+                                disableExternalChecks={true}
+                            >
+                                <Avatar size="large" hideFlag={true} fullWidth={true} />
+                                <View id="username" />
+                            </ItemProvider>
+                        </ModuleProvider>
+                    )}
+                </Reader>
+
+                <View id="message" />
+                <View id="check_in" />
+                <View id="check_out" />
+                <View id="status" />
+
+                <Reader id="status">
+                    {(status: string) => {
+                        if (status === "WAIT") {
+                            return (
+                                <>
+                                    <hr />
+                                    <SubmitButton
+                                        i18nId="approve"
+                                        options={{
+                                            properties: [
+                                                "status",
+                                            ],
+                                            unpokeAfterSuccess: true,
+                                            propertyOverrides: [{
+                                                id: "status",
+                                                value: "APPROVED",
+                                            }],
+                                        }}
+                                        buttonVariant="contained"
+                                        buttonColor="primary"
+                                        buttonStartIcon={<DoneOutlineIcon />}
+                                    />
+                                    <SubmitButton
+                                        i18nId="deny"
+                                        options={{
+                                            properties: [
+                                                "status",
+                                            ],
+                                            unpokeAfterSuccess: true,
+                                            propertyOverrides: [{
+                                                id: "status",
+                                                value: "DENIED",
+                                            }],
+                                        }}
+                                        buttonVariant="contained"
+                                        buttonColor="secondary"
+                                        buttonStartIcon={<DoneOutlineIcon />}
+                                    />
+                                </>
+                            );
+                        }
+                        return null;
+                    }}
+                </Reader>
+
+                <SubmitActioner>
+                    {(actioner) => (
+                        <>
+                            <Snackbar
+                                id="request-update-error"
+                                severity="error"
+                                i18nDisplay={actioner.submitError}
+                                open={!!actioner.submitError}
+                                onClose={actioner.dismissError}
+                            />
+                            <Snackbar
+                                id="request-update-success"
+                                severity="success"
+                                i18nDisplay="change_success"
+                                open={actioner.submitted}
+                                onClose={actioner.dismissSubmitted}
+                            />
+                        </>
+                    )}
+                </SubmitActioner>
+            </ItemProvider>
+        </ItemProvider>
+    );
+}
+```
+
+And let's add it to our router.
+
+```tsx
+<Route
+    path="/hosting/view/:id/request/:rid"
+    exact={true}
+    component={ApproveDenyRequest}
+/>
+```
+
+Now we would need to add the missing language fields at `request.properties`
+
+```properties
+custom.approve = approve request
+custom.deny = deny request
+custom.change_success = status change succesful
+```
+
+And in spanish
+
+```properties
+custom.approve = aprovar pedido
+custom.deny = denegar pedido
+custom.change_success = cambio de estado exitoso
+```
+
+We got to run `npm run build-data` due to the changes in the schema and `npm run webpack-dev` to update our app, now we should be able to see the following screen when we are checking a single request.
+
+![Request Status Page](./images/request-status-page.png)
+
+Now we can use the buttons to change the status, and then we get this error:
+
+![Request Status Page Error](./images/request-status-page-error.png)
+
+But what is going on here? why is the server complaining of a date being in the past when we clearly aren't changing the date, well, when you edit an item, itemize will check the entire item for the change; and the rule we have is that our day cannot be in the past, but we want that functionality, so what do we do now?...
+
 ## Ensuring non-overlapping requests and responses
 
 Something we also don't want is that when a request is being created that it is going to be created on top of previous existing requests that have been approved, as this will just burden the host with a bunch of requests that he/she might be unable to approve because someone is already coming that same day, so we want to ensure this doesn't happen.
@@ -1183,6 +1580,8 @@ if (arg.action === IOTriggerActions.CREATE) {
     }
 }
 ```
+
+With this same logic you could create a no-spam functionality, 
 
 ## Displaying overlaps in the client side
 

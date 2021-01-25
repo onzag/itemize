@@ -58,6 +58,8 @@ export async function editItemDefinition(
       code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
     });
   }
+
+  pooledRoot.setServerFlags(["EDIT", "EDIT_ONLY"]);
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(

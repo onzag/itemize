@@ -26,6 +26,10 @@ export type ConditionalRuleComparatorType = "equals" | "not-equal" |
  * Types for the gates that are available
  */
 export type ConditionalRuleGateType = "or" | "and" | "xor";
+/**
+ * Server flags available for the conditional rule set
+ */
+export type ConditionalRuleServerFlagType = "CREATE_ONLY" | "EDIT_ONLY" | "SEARCH_ONLY";
 
 /**
  * DATA TYPES (only used by the data item)
@@ -33,6 +37,7 @@ export type ConditionalRuleGateType = "or" | "and" | "xor";
 interface IConditionalRuleSetRawJSONDataBaseType {
   gate?: ConditionalRuleGateType;
   condition?: IConditionalRuleSetRawJSONDataType;
+  serverFlag?: ConditionalRuleServerFlagType;
 }
 
 /**
@@ -221,6 +226,13 @@ export default class ConditionalRuleSet {
    * @returns a boolean on whether the conditional rule set passes or not
    */
   public evaluate(id: string, version: string): boolean {
+    if (this.rawData.serverFlag) {
+      const serverFlags = this.parentModule.getParentRoot().getServerFlags();
+      if (serverFlags && !serverFlags.includes(this.rawData.serverFlag)) {
+        return false;
+      }
+    }
+
     // if this is a property type conditional rule set
     let result: boolean = false;
 

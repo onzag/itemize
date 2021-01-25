@@ -419,9 +419,14 @@ export default class CacheWorker {
       partialValue.last_modified !== currentValue.value.last_modified
     ) {
       // we perform an override only if the value is greater
-      const partialValueTime = new NanoSecondComposedDate(partialValue.last_modified as string);
-      const currentValueTime = new NanoSecondComposedDate(currentValue.value.last_modified as string);
-      if (partialValueTime.greaterThan(currentValueTime)) {
+      let shouldMerge = !currentValue || !currentValue.value;
+      if (!shouldMerge) {
+        const partialValueTime = new NanoSecondComposedDate(partialValue.last_modified as string);
+        const currentValueTime = new NanoSecondComposedDate(currentValue.value.last_modified as string);
+        shouldMerge = partialValueTime.greaterThan(currentValueTime)
+      }
+      
+      if (shouldMerge) {
         return await this.setCachedValue(
           queryName,
           id,

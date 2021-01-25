@@ -66,6 +66,8 @@ export async function addItemDefinition(
       code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
     });
   }
+
+  pooledRoot.setServerFlags(["CREATE", "CREATE_ONLY"]);
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(
