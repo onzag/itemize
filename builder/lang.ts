@@ -12,9 +12,9 @@ import { LOCALE_I18N, ROOT_REQUIRED_LOCALE_I18N } from "../constants";
 import PropertiesReader from "properties-reader";
 import CheckUpError from "./Error";
 import { Ii18NType, ILangLocalesType } from "../base/Root";
-import { IConfigRawJSONDataType } from "../config";
 import path from "path";
 import { IBuilderBasicConfigType } from "./config";
+import { type } from "os";
 
 /**
  * Given the properties information provides all the key names
@@ -40,6 +40,26 @@ function getAllKeyNames(obj: any, prefix: string) {
   });
   // return the result
   return result;
+}
+
+/**
+ * Merges two properties file, used to merge the root
+ * with the main while ensuring that errors are merged
+ * property
+ * @param base this would be the main i18n data
+ * @param override this would be the root
+ */
+function propertiesMerge(base: any, override: any) {
+  Object.keys(override).forEach((key) => {
+    const value = override[key];
+    if (!base[key]) {
+      base[key] = value;
+    } else if (typeof value !== "string" && typeof base[key] !== "string") {
+      propertiesMerge(base[key], value);
+    } else {
+      base[key] = value;
+    }
+  });
 }
 
 /**
@@ -155,7 +175,10 @@ export async function buildLang(
       });
     });
 
-    result[locale] = {...result[locale], ...propertiesRoot[locale]};
+    // this should overide into the result[locale]
+    // and write into it for all the properties found in the root
+    // for that same locale
+    propertiesMerge(result[locale], propertiesRoot[locale]);
   });
 
   Object.keys(extraGatheredProperties).forEach((locale) => {

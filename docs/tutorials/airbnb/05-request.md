@@ -1545,6 +1545,27 @@ Now we can use the buttons to change the status, and then we get this error:
 
 But what is going on here? why is the server complaining of a date being in the past when we clearly aren't changing the date, well, when you edit an item, itemize will check the entire item for the change; and the rule we have is that our day cannot be in the past, but we want that functionality, so what do we do now?...
 
+We are going to use a server flag for this to specify that a condition is only to be checked during the creation time, and not during the edition, let's go back to our schema and add a server flag right into the condition.
+
+```json
+{
+    "if": {
+            "property": "&this",
+            "comparator": "less-than",
+            "value": {
+            "exactValue": "today"
+        },
+        "method": "date",
+        "serverFlag": "CREATE_ONLY"
+    },
+    "error": "DATE_IS_IN_THE_PAST"
+}
+```
+
+The values for the server flags are `CREATE_ONLY`, `EDIT_ONLY` and `SEARCH_ONLY`, we could also add the create only into the check_out as well, note that these server flags do not affect the client side.
+
+Now if you run `npm run build-data` and restart the server it should work just fine as the considerations of the rule have changed.
+
 ## Ensuring non-overlapping requests and responses
 
 Something we also don't want is that when a request is being created that it is going to be created on top of previous existing requests that have been approved, as this will just burden the host with a bunch of requests that he/she might be unable to approve because someone is already coming that same day, so we want to ensure this doesn't happen.
@@ -1560,28 +1581,85 @@ if (arg.action === IOTriggerActions.CREATE) {
     // The CONNECTOR_SQL_COLUMN_ID_FK_NAME is basically the id, remember that item definition
     // data has its own table and module as well, but we want to be cheap and not do a join
     // so we will use this reference to the foreign key of the id because we are cheap
-    const oneOverlappingRequest = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-        // the table name is the qualified name
-        .from(arg.itemDefinition.getQualifiedPathName())
-        // and we are going to search for an overlap between check in and check out
-        .where("status", "APPROVED")
-        .andWhere((clause) => {
-            clause.where((subclause) => {
-                subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<", checkIn);
-            }).orWhere((subclause) => {
-                subclause.where("check_in", ">", checkOut).andWhere("check_out", "<=", checkOut);
-            });
+    const oneOverlappingRequest = await arg.appData.rawDB.getRawDBQueryBuilderFor(
+        "hosting/request",
+    )
+    .first("id")
+    // and we are going to search for an overlap between check in and check out
+    .where("status", "APPROVED")
+    .andWhere((clause) => {
+        clause.where((subclause) => {
+            subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
+        }).orWhere((subclause) => {
+            subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
         });
+    })
+    .andWhere("parent_id", arg.requestedUpdate.parent_id as string);
 
     if (oneOverlappingRequest) {
         // we put the id in the error message, the user doesn't see forbidden messages anyway
         // but it's good for debugging
-        arg.forbid("This request is overlapping with another request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME])
+        arg.forbid(
+            "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
+            "OVERLAPPING_REQUEST",
+        );
     }
 }
 ```
 
-With this same logic you could create a no-spam functionality, 
+We have just forbidden with a custom error code, as such we need to add such error code to our list, we add it to the `root.properties` file that determines the root base language data, and set a new message for the error.
+
+```properties
+error.OVERLAPPING_REQUEST = the date you are trying to request for is already booked for
+```
+
+And in spanish
+
+```properties
+error.OVERLAPPING_REQUEST = la fecha en la que intenta hacer un pedido ya está reservada
+```
+
+Now rebuild, and give it a try after you have approved a request, you should get the error message.
+
+![Date Overlap Error](./images/date-overlap-error.png)
+
+And your custom message should come by as a warning in the console.
+
+With this method we can also prevent a host from accepting requests if these overlap as well, right into our trigger action
+for the edition.
+
+```ts
+// so when we are updating a request
+// into being approved
+if (
+    arg.requestedUpdate.status &&
+    arg.requestedUpdate.status === "APPROVED"
+) {
+    const checkIn: string = arg.originalValue.check_in as string;
+    const checkOut: string = arg.originalValue.check_out as string;
+    const oneOverlappingRequest = await arg.appData.rawDB.getRawDBQueryBuilderFor(
+        "hosting/request",
+    )
+    .first("id")
+    .where("status", "APPROVED")
+    .andWhere((clause) => {
+        clause.where((subclause) => {
+            subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
+        }).orWhere((subclause) => {
+            subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
+        });
+    })
+    .andWhere("parent_id", arg.originalValue.parent_id as string);
+
+        if (oneOverlappingRequest) {
+            arg.forbid(
+                "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
+                "OVERLAPPING_REQUEST",
+            );
+        }
+    }
+}
+```
 
 ## Displaying overlaps in the client side
 

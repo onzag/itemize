@@ -45,10 +45,10 @@ export interface IServerSideTokenDataType {
   customData?: any;
 }
 
-export function defaultTriggerForbiddenFunction(message: string) {
+export function defaultTriggerForbiddenFunction(message: string, customCode?: string) {
   throw new EndpointError({
     message,
-    code: ENDPOINT_ERRORS.FORBIDDEN,
+    code: customCode || ENDPOINT_ERRORS.FORBIDDEN,
   });
 }
 
@@ -56,11 +56,12 @@ export function defaultTriggerWaitForPromiseFunction() {
   return;
 }
 
-export function defaultTriggerInvalidForbiddenFunction(message: string) {
+export function defaultTriggerInvalidForbiddenFunction(message: string, customCode?: string) {
   logger.error(
     "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED",
     {
       message,
+      customCode,
     }
   );
   return;

@@ -31,7 +31,7 @@ export function evalRawJSON<T>(
     return fn(config.standard);
   // if it's an array, we just map it out
   } else if (Array.isArray(rawJSON)) {
-    return rawJSON.map((iRawJSON) => evalRawJSON(config, iRawJSON)) as any;
+    return (rawJSON as any).map((iRawJSON: any) => evalRawJSON(config, iRawJSON)) as any;
   // if it's not an object or whatever else, we return the value as it is
   } else if (typeof rawJSON !== "object" || rawJSON === null) {
     return rawJSON;

@@ -69,7 +69,7 @@ export interface IOTriggerArgType {
   /**
    * Causes the request to be forbidden
    */
-  forbid: (message: string) => void;
+  forbid: (message: string, customCode?: string) => void;
 }
 
 export interface ISearchTriggerArgType {
@@ -82,7 +82,7 @@ export interface ISearchTriggerArgType {
     id: string;
     customData: any;
   };
-  forbid: (message: string) => void;
+  forbid: (message: string, customCode?: string) => void;
 }
 
 export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue>;

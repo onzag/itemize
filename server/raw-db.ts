@@ -16,6 +16,7 @@ import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
+import Module from "../base/Root/Module";
 
 /**
  * The required properties that every row should have
@@ -385,6 +386,36 @@ export class ItemizeRawDB {
    */
   public async informRowsHaveBeenAdded(rows: ISQLTableRowValue[], rowDataIsComplete?: boolean) {
     return await this.informChangeOnRows(rows, "created", rowDataIsComplete);
+  }
+
+  /**
+   * Provides a db query builder for the given item or a module
+   * @param itemDefinitionOrModule the item or module
+   * @param preventJoin when using an item, if you will not be using properties
+   * that are in the module table, like id, parents, creators, and prop extensions
+   * then you can prevent the join from happening
+   */
+  public getRawDBQueryBuilderFor(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    preventJoin?: boolean,
+  ): Knex.QueryBuilder {
+    const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
+      this.root.registry[itemDefinitionOrModule] :
+      itemDefinitionOrModule;
+    
+    if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
+      const moduleInQuestion = itemDefinitionOrModuleInstance.getParentModule();
+      return this.knex.table(
+        moduleInQuestion.getQualifiedPathName()
+      ).join(
+        itemDefinitionOrModuleInstance.getQualifiedPathName(),
+        (clause) => {
+          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+        });
+    } else {
+      return this.knex.table(itemDefinitionOrModuleInstance.getQualifiedPathName());
+    }
   }
 
   /**
