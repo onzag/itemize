@@ -232,8 +232,20 @@ export async function getItemDefinition(
     }
   }
 
-  if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
-    toReturnToUser.created_by = UNSPECIFIED_OWNER;
+  if (
+    toReturnToUser.DATA &&
+    !await itemDefinition.checkRoleCanReadOwner(
+      tokenData.role,
+      tokenData.id,
+      toReturnToUser.DATA.created_by,
+      rolesManager,
+      false,
+    )
+  ) {
+    if (toReturnToUser.DATA.created_by === toReturnToUser.DATA.edited_by) {
+      toReturnToUser.DATA.edited_by = UNSPECIFIED_OWNER;
+    };
+    toReturnToUser.DATA.created_by = UNSPECIFIED_OWNER;
   }
 
   CAN_LOG_DEBUG && logger.debug(
@@ -422,8 +434,20 @@ export async function getItemDefinitionList(
 
       const toReturnToUser = valueToProvide.toReturnToUser;
 
-      if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
-        toReturnToUser.created_by = UNSPECIFIED_OWNER;
+      if (
+        toReturnToUser.DATA &&
+        !await itemDefinition.checkRoleCanReadOwner(
+          tokenData.role,
+          tokenData.id,
+          toReturnToUser.DATA.created_by,
+          rolesManager,
+          false,
+        )
+      ) {
+        if (toReturnToUser.DATA.created_by === toReturnToUser.DATA.edited_by) {
+          toReturnToUser.DATA.edited_by = UNSPECIFIED_OWNER;
+        };
+        toReturnToUser.DATA.created_by = UNSPECIFIED_OWNER;
       }
 
       return toReturnToUser;
@@ -591,8 +615,20 @@ export async function getModuleList(
 
       const toReturnToUser = valueToProvide.toReturnToUser;
 
-      if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, toReturnToUser.created_by, rolesManager, false)) {
-        toReturnToUser.created_by = UNSPECIFIED_OWNER;
+      if (
+        toReturnToUser.DATA &&
+        !await itemDefinition.checkRoleCanReadOwner(
+          tokenData.role,
+          tokenData.id,
+          toReturnToUser.DATA.created_by,
+          rolesManager,
+          false,
+        )
+      ) {
+        if (toReturnToUser.DATA.created_by === toReturnToUser.DATA.edited_by) {
+          toReturnToUser.DATA.edited_by = UNSPECIFIED_OWNER;
+        };
+        toReturnToUser.DATA.created_by = UNSPECIFIED_OWNER;
       }
 
       return toReturnToUser;

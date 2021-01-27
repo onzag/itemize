@@ -424,12 +424,15 @@ export async function editItemDefinition(
       itemDefinition.checkRoleCanReadOwner(
         tokenData.role,
         tokenData.id,
-        (finalOutput as any).created_by,
+        (finalOutput as any).DATA.created_by,
         rolesManager,
         false,
       )
   ) {
-    (finalOutput as any).created_by = UNSPECIFIED_OWNER;
+    if ((finalOutput as any).DATA.created_by === (finalOutput as any).DATA.edited_by) {
+      (finalOutput as any).DATA.edited_by = UNSPECIFIED_OWNER;
+    }
+    (finalOutput as any).DATA.created_by = UNSPECIFIED_OWNER;
   }
 
   CAN_LOG_DEBUG && logger.debug(

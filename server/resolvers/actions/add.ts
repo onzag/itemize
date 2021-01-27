@@ -106,7 +106,7 @@ export async function addItemDefinition(
     parent: isParenting ? {
       id: resolverArgs.args.parent_id,
       type: resolverArgs.args.parent_type,
-      version: resolverArgs.args.parent_version || null,
+      version: resolverArgs.args.parent_version || null,
     } : null,
   });
 
@@ -305,7 +305,7 @@ export async function addItemDefinition(
       parentModule,
       parentType: resolverArgs.args.parent_type,
       parentId: resolverArgs.args.parent_id,
-      parentVersion: resolverArgs.args.parent_version || null,
+      parentVersion: resolverArgs.args.parent_version || null,
       preParentValidation: (content: ISQLTableRowValue) => {
         // this shouldn't really happen because validateParentingRules should have
         // checked whether it existed, but we check anyway
@@ -315,7 +315,7 @@ export async function addItemDefinition(
           );
           throw new EndpointError({
             message: `There's no parent ${resolverArgs.args.parent_type} with ` +
-            `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
+              `id ${resolverArgs.args.parent_id} and version ${resolverArgs.args.parent_version}`,
             code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
@@ -518,8 +518,19 @@ export async function addItemDefinition(
     });
   }
 
-  if (!await itemDefinition.checkRoleCanReadOwner(tokenData.role, tokenData.id, (finalOutput as any).created_by, rolesManager, false)) {
-    (finalOutput as any).created_by = UNSPECIFIED_OWNER;
+  if (
+    !await itemDefinition.checkRoleCanReadOwner(
+      tokenData.role,
+      tokenData.id,
+      (finalOutput as any).DATA.created_by,
+      rolesManager,
+      false,
+    )
+  ) {
+    if ((finalOutput as any).DATA.created_by === (finalOutput as any).DATA.edited_by) {
+      (finalOutput as any).DATA.edited_by = UNSPECIFIED_OWNER;
+    }
+    (finalOutput as any).DATA.created_by = UNSPECIFIED_OWNER;
   }
 
   CAN_LOG_DEBUG && logger.debug(

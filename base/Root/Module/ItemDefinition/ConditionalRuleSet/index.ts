@@ -18,6 +18,21 @@ import Include from "../Include";
 import Module from "../../../Module";
 
 /**
+ * This function is a copy of that one at util
+ * it is here because we don't want to have to import
+ * from util
+ * @ignore
+ */
+function getToday() {
+  const now = new Date();
+  const YYYY = now.getFullYear();
+  const MM = now.getMonth() + 1;
+  const DD = now.getDate();
+
+  return (new Date(YYYY + "-" + MM + "-" + DD)).getTime();
+}
+
+/**
  * Types for the conditions
  */
 export type ConditionalRuleComparatorType = "equals" | "not-equal" |
@@ -38,18 +53,6 @@ interface IConditionalRuleSetRawJSONDataBaseType {
   gate?: ConditionalRuleGateType;
   condition?: IConditionalRuleSetRawJSONDataType;
   serverFlag?: ConditionalRuleServerFlagType;
-}
-
-/**
- * Provides today in milliseconds
- */
-function getToday() {
-  const now = new Date();
-  const YYYY = now.getFullYear();
-  const MM = now.getMonth() + 1;
-  const DD = now.getDate();
-
-  return (new Date(YYYY + "-" + MM + "-" + DD)).getTime();
 }
 
 /**

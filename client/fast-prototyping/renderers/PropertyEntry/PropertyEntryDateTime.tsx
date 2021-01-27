@@ -147,6 +147,11 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
           focused: "focused",
         },
       },
+
+      shouldDisableDate: props.args.shouldDisableDate,
+      about: props.args.about,
+      disablePast: props.args.disablePast,
+      disableFuture: props.args.disableFuture,
     };
 
     if (window.PHONE_OR_PAD) {

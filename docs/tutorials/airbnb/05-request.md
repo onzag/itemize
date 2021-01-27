@@ -968,10 +968,12 @@ We want to display that in the hosting view as well as the user view so we want 
     "id": "pending_requests_count",
     "type": "integer",
     "default": 0,
+    "nullable": true,
     "hidden": true,
     "readRoleAccess": ["&OWNER"],
     "createRoleAccess": [],
-    "editRoleAccess": []
+    "editRoleAccess": [],
+    "coerceNullsIntoDefault": true
 }
 ```
 
@@ -1592,6 +1594,8 @@ if (arg.action === IOTriggerActions.CREATE) {
             subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
         }).orWhere((subclause) => {
             subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
+        }).orWhere((subclause) => {
+            subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<=", checkOut);
         });
     })
     .andWhere("parent_id", arg.requestedUpdate.parent_id as string);
@@ -1647,16 +1651,17 @@ if (
             subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
         }).orWhere((subclause) => {
             subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
+        }).orWhere((subclause) => {
+            subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<=", checkOut);
         });
     })
     .andWhere("parent_id", arg.originalValue.parent_id as string);
 
-        if (oneOverlappingRequest) {
-            arg.forbid(
-                "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
-                "OVERLAPPING_REQUEST",
-            );
-        }
+    if (oneOverlappingRequest) {
+        arg.forbid(
+            "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
+            "OVERLAPPING_REQUEST",
+        );
     }
 }
 ```
@@ -1664,3 +1669,187 @@ if (
 ## Displaying overlaps in the client side
 
 However how would the user know about these requests that already exist? And not get a terrible forbidden message because of trying to request for a reservation at a date where one was already done?
+
+Well we can indeed use the search functionality to request all the possible overlaps and display them in the client side, and while the fast prototyping itemize renderer does not quite support disabling ranges, we can at least just show them in the date pickers.
+
+While you might wonder, doesn't this cause a leak? where we can now see the user id of each requester, well, if you remember our schema, we had set `"ownerReadRoleAccess": ["&OWNER", "OWNER_OF_UNIT"]` which means that none can actually read this information other than the owner itself and the owner of the unit, as a result our user will be the default `UNSPECIFIED` special identifier.
+
+We will use the check out property to search for any request that is approved that is checked out in the future from our today's date.
+
+Take a note that itemize does not have a compounded viewer for date ranges, you would have to create your own, or use another one from a thrid party; technically you could still choose an invalid date range with this method, as we are only disabling the days that can't be picked for check in or check out but we could still take a date range that picks on those dates by covering them in the range; however this is a non issue since our server will catch those when trying to insert.
+
+Update your `reserve/index.tsx` with the following code from the item definition
+
+```tsx
+<ItemProvider
+    itemDefinition="request"
+    properties={[
+        "message",
+        "check_in",
+        "check_out",
+        "status",
+    ]}
+    forId={reservationId}
+>
+    {
+        reservationId ?
+            <Typography variant="h3">
+                <View id="status" />
+            </Typography>
+            : null
+    }
+
+    {
+        reservationId ? <View id="message" /> : <Entry id="message" />
+    }
+
+    {
+        !reservationId ?
+            // We are adding this code in order to be able to search
+            // for the date ranges that are already reserved for
+            <ItemProvider
+                itemDefinition="request"
+                searchCounterpart={true}
+                setters={[
+                    // We search from the checkout date of everything
+                    // that check outs since today to the future
+                    {
+                        id: "check_out",
+                        searchVariant: "from",
+                        value: getToday(),
+                    },
+                    // and that of course is approved
+                    {
+                        id: "status",
+                        searchVariant: "search",
+                        value: "APPROVED",
+                    },
+                ]}
+                automaticSearch={{
+                    // we do an automatic traditional search for 50 results
+                    // with the given properties
+                    limit: 50,
+                    offset: 0,
+                    traditional: true,
+                    requestedProperties: [
+                        "check_in",
+                        "check_out"
+                    ],
+                    searchByProperties: [
+                        "check_out",
+                        "status",
+                    ],
+                    parentedBy: {
+                        item: "hosting/unit",
+                        id: idToReserve,
+                    },
+                }}
+            >
+                <SearchLoader
+                    static="TOTAL"
+                    pageSize={50}
+                    currentPage={0}
+                    cleanOnDismount={true}
+                >
+                    {(arg) => {
+                        // when we load the search results instead of rendering
+                        // them like it would be usual, we are going to take advantage
+                        // of the traditional search capability to provide results in
+                        // the loader itself, and we grab the data from that and set it
+                        // in a variable that will be ported
+                        const allCheckInsAndOuts = arg.searchRecords.map((r) => {
+                            return {
+                                checkIn: r.searchResult.DATA && parseDate((r.searchResult.DATA as any).check_in),
+                                checkOut: r.searchResult.DATA && parseDate((r.searchResult.DATA as any).check_out),
+                            };
+                        });
+
+                        // using set var we are able to transfer a variable to any part of the
+                        // document, in this case we transfer the data for the date ranges
+                        return <SetVar id="all_check_ins_and_outs" value={allCheckInsAndOuts} />;
+                    }}
+                </SearchLoader>
+            </ItemProvider> :
+            null
+    }
+
+    {
+        reservationId ?
+            <View id="check_in" /> :
+            // and we read it here
+            <ReadVar id="all_check_ins_and_outs">
+                {(value) => {
+                    // so we can build a function to disable the dates
+                    const shouldDisableDate = (checkInTheUserWants: moment.Moment) => {
+                        return value.some((v: any) => {
+                            const checkIn: moment.Moment = v.checkIn;
+                            const checkOut: moment.Moment = v.checkOut;
+
+                            return checkInTheUserWants.isSameOrAfter(checkIn) && checkInTheUserWants.isBefore(checkOut);
+                        });
+                    }
+
+                    // and we pass it as a renderer arg, note that renderer args are specific to the
+                    // renderer, itemize default which is the material ui default supports date disabling
+                    // so it's a renderer property, that only that renderer supports, if you write your own
+                    // custom renderer you might use other args
+                    return <Entry id="check_in" rendererArgs={{ shouldDisableDate }} />
+                }}
+            </ReadVar>
+    }
+    {
+        reservationId ?
+            <View id="check_out" /> :
+            <ReadVar id="all_check_ins_and_outs">
+                {(value) => {
+                    const shouldDisableDate = (checkOutTheUserWants: moment.Moment) => {
+                        return value.some((v: any) => {
+                            const checkIn: moment.Moment = v.checkIn;
+                            const checkOut: moment.Moment = v.checkOut;
+
+                            return checkOutTheUserWants.isAfter(checkIn) && checkOutTheUserWants.isSameOrBefore(checkOut);
+                        });
+                    }
+                    return <Entry id="check_out" rendererArgs={{ shouldDisableDate }} />
+                }}
+            </ReadVar>
+    }
+
+    {
+        !reservationId ?
+            <>
+                <SubmitButton
+                    i18nId="request"
+                    buttonColor="primary"
+                    buttonVariant="contained"
+                    options={{
+                        properties: [
+                            "message",
+                            "check_in",
+                            "check_out",
+                        ],
+                        restoreStateOnSuccess: true,
+                        parentedBy: {
+                            item: "hosting/unit",
+                            id: idToReserve,
+                        }
+                    }}
+                    redirectOnSuccess={newRequestRedirectCallback}
+                    redirectReplace={true}
+                />
+                <SubmitActioner>
+                    {(actioner) => (
+                        <Snackbar
+                            id="request-error"
+                            severity="error"
+                            i18nDisplay={actioner.submitError}
+                            open={!!actioner.submitError}
+                            onClose={actioner.dismissError}
+                        />
+                    )}
+                </SubmitActioner>
+            </> :
+            null
+    }
+</ItemProvider>
+```

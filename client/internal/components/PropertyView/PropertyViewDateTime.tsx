@@ -73,7 +73,7 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     let momentValue: Moment.Moment = null;
     const valueToUse: string = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
     if (valueToUse && valueToUse !== "Invalid Date") {
-      momentValue = Moment(valueToUse, dbFormat).utc();
+      momentValue = Moment(valueToUse, dbFormat);
       if (!momentValue.isValid()) {
         momentValue = null;
       }

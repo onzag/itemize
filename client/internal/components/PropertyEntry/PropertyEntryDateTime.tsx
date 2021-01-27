@@ -25,7 +25,7 @@ function getValue(internalValue: any, actualValue: string, type: string) {
     } else if (type === "time") {
       dbFormat = TIME_FORMAT;
     }
-    return Moment(actualValue, dbFormat).utc();
+    return Moment(actualValue, dbFormat);
   }
   return null;
 }

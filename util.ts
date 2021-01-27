@@ -4,14 +4,17 @@
  * @packageDocumentation
  */
 
-import Moment from "moment";
-import { JSDOM } from "jsdom";
+import MomentDef from "moment";
+import { JSDOM as JSDOMDef } from "jsdom";
 import createDOMPurify from "dompurify";
 import { DATETIME_FORMAT, DATE_FORMAT, FILE_SUPPORTED_IMAGE_TYPES, TIME_FORMAT } from "./constants";
 import { IGQLFile } from "./gql-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
 import Include from "./base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
+
+export const Moment = MomentDef;
+export const JSDOM = JSDOMDef;
 
 /**
  * @ignore
@@ -60,6 +63,27 @@ export function capitalize(str: string) {
     return str.charAt(0) + str.charAt(1).toUpperCase() + str.slice(2);
   }
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Provides today
+ */
+export function getToday() {
+  return Moment(new Date()).format(DATE_FORMAT);
+}
+
+/**
+ * Provides now
+ */
+export function getNow() {
+  return Moment(new Date()).format(DATETIME_FORMAT);
+}
+
+/**
+ * Provides time
+ */
+export function getTime() {
+  return Moment(new Date()).format(TIME_FORMAT);
 }
 
 /**
@@ -245,17 +269,29 @@ export function getLocalizedDateTimeFormat(locale: string) {
 
 export function formatDate(locale: string, date: string) {
   const format = getLocalizedDateFormat(locale);
-  return Moment(date, DATE_FORMAT).format(format);
+  return parseDate(date).format(format);
 }
 
 export function formatTime(locale: string, time: string) {
   const format = getLocalizedTimeFormat(locale);
-  return Moment(time, TIME_FORMAT).format(format);
+  return parseTime(time).format(format);
 }
 
 export function formatDateTime(locale: string, datetime: string) {
   const format = getLocalizedDateTimeFormat(locale);
-  return Moment(datetime, DATETIME_FORMAT).format(format);
+  return parseDateTime(datetime).format(format);
+}
+
+export function parseDate(date: string) {
+  return Moment(date, DATE_FORMAT);
+}
+
+export function parseTime(time: string) {
+  return Moment(time, TIME_FORMAT);
+}
+
+export function parseDateTime(datetime: string) {
+  return Moment(datetime, DATETIME_FORMAT);
 }
 
 /**

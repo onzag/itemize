@@ -321,7 +321,24 @@ export async function searchModule(
             }
           }
 
-          return valueToProvide.toReturnToUser;
+          const toReturnToUser = valueToProvide.toReturnToUser;
+          if (
+            toReturnToUser.DATA &&
+            !await itemDefinition.checkRoleCanReadOwner(
+              tokenData.role,
+              tokenData.id,
+              toReturnToUser.created_by,
+              rolesManager,
+              false
+            )
+          ) {
+            if (toReturnToUser.DATA.created_by === toReturnToUser.DATA.edited_by) {
+              toReturnToUser.DATA.edited_by = UNSPECIFIED_OWNER;
+            };
+            toReturnToUser.DATA.created_by = UNSPECIFIED_OWNER;
+          }
+
+          return toReturnToUser;
         }),
       ),
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
@@ -685,7 +702,24 @@ export async function searchItemDefinition(
             }
           }
 
-          return valueToProvide.toReturnToUser;
+          const toReturnToUser = valueToProvide.toReturnToUser;
+          if (
+            toReturnToUser.DATA &&
+            !await itemDefinition.checkRoleCanReadOwner(
+              tokenData.role,
+              tokenData.id,
+              toReturnToUser.DATA.created_by,
+              rolesManager,
+              false
+            )
+          ) {
+            if (toReturnToUser.DATA.created_by === toReturnToUser.DATA.edited_by) {
+              toReturnToUser.DATA.edited_by = UNSPECIFIED_OWNER;
+            };
+            toReturnToUser.DATA.created_by = UNSPECIFIED_OWNER;
+          }
+
+          return toReturnToUser;
         })
       ),
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
