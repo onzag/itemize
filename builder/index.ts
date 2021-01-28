@@ -1125,7 +1125,10 @@ async function getI18nPropertyData(
     (typeof property.searchable !== "undefined" && !property.searchable) ||
     property.searchOnlyProperty;
 
-  const disableRangedSearch = property.disableRangedSearch || (property.type === "integer" && property.subtype === "reference");
+  const disableRangedSearch =
+    property.disableRangedSearch || 
+    (property.type === "integer" && property.subtype === "reference") ||
+    searchIsDisabled;
 
   let expectedProperties = definition.i18n.base
     .map((b) => ({key: b, required: true}))

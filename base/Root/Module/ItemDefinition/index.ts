@@ -1012,6 +1012,19 @@ export default class ItemDefinition {
   }
 
   /**
+   * Given a string id it specifies whether it is considered
+   * a search only property only available in the search mode
+   * @param id the id of the property
+   * @returns a boolean
+   */
+  public isPropertyInSearchModeOnly(
+    id: string,
+  ): boolean {
+    const isInSearchModeLocal = !!(this.rawData.properties && this.rawData.properties.some((p) => p.id === id && p.searchOnlyProperty));
+    return isInSearchModeLocal || this.parentModule.isPropExtensionInSearchModeOnly(id);
+  }
+
+  /**
    * Provides a property definition based on a policy
    * this is a unique instance that holds its own state
    * and it's reflected in the item definition state
@@ -2252,6 +2265,22 @@ export default class ItemDefinition {
       return PREFIXED_CONCAT(this.parentItemDefinition.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
     }
     return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), ITEM_DEFINITION_PREFIX + this.getName());
+  }
+
+  /**
+   * An utility function that returns the name
+   * of the table that is used in the database
+   */
+  public getTableName(): string {
+    return this.getQualifiedPathName();
+  }
+
+  /**
+   * An utility function that returns the name of the
+   * table that is used for the module
+   */
+  public getModuleTableName(): string {
+    return this.parentModule.getQualifiedPathName();
   }
 
   /**

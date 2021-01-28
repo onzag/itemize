@@ -12,6 +12,7 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
+  INCLUDE_PREFIX,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -37,7 +38,12 @@ import { Location } from "history";
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
-    if (propertyId === "search" || propertyId === "created_by" || propertyId === "since") {
+    if (
+      propertyId === "search" ||
+      propertyId === "created_by" ||
+      propertyId === "since" ||
+      standardCounterpart.isPropertyInSearchModeOnly(propertyId)
+    ) {
       result.push(propertyId);
       return;
     }
@@ -56,6 +62,39 @@ function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: Item
     return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
   }
   return itemDefinition.getPropertyDefinitionFor(actualId, true);
+}
+
+/**
+ * Rips the internal values from the state so it can be
+ * serialized
+ * @param state 
+ */
+function getSerializableSearchState(state: IItemStateType): IItemStateType {
+  const newState: IItemStateType = {
+    ...state,
+    properties: [
+      ...state.properties,
+    ],
+    includes: [
+      ...state.includes
+    ]
+  };
+
+  newState.properties.forEach((p, index) => {
+    newState.properties[index] = {
+      ...p,
+      internalValue: null,
+    };
+  });
+
+  newState.includes.forEach((i, index) => {
+    newState.includes[index] = {
+      ...i,
+      itemState: getSerializableSearchState(i.itemState)
+    };
+  });
+
+  return newState;
 }
 
 /**
@@ -3193,7 +3232,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: stateOfSearch,
+                  searchIdefState: getSerializableSearchState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged || isReloadSearch,
@@ -3263,7 +3302,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: stateOfSearch,
+                  searchIdefState: getSerializableSearchState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged,

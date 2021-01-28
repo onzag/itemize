@@ -630,6 +630,18 @@ export default class Module {
   }
 
   /**
+   * Given a string id it specifies whether it is considered
+   * a search only property only available in the search mode
+   * @param id the id of the property
+   * @returns a boolean
+   */
+  public isPropExtensionInSearchModeOnly(
+    id: string,
+  ): boolean {
+    return !!(this.rawData.propExtensions && this.rawData.propExtensions.some((p) => p.id === id && p.searchOnlyProperty));
+  }
+
+  /**
    * Provides all the prop extensions
    * @returns a list of property definitions
    */
@@ -783,6 +795,14 @@ export default class Module {
       return PREFIXED_CONCAT(this.parentModule.getQualifiedPathName(), MODULE_PREFIX + this.getName());
     }
     return MODULE_PREFIX + this.getName();
+  }
+
+  /**
+   * An utility function that returns the table name
+   * for the module
+   */
+  public getTableName(): string {
+    return this.getQualifiedPathName();
   }
 
   /**
