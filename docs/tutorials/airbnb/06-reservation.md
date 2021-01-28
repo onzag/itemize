@@ -246,9 +246,155 @@ Note however that these search customization attributes are not compatible with 
 
 We have just added the planned check in and out in our main search, which is indeed optional, but now when we click to book we realize that they are not prefilled and we have to fill them again, for that we need to pass these dates there, and to do such we will use a reader at our frontpage and pass it via the url query string.
 
+For that we are going to change our `search.tsx` code where we create the link with the following:
+
+```tsx
+<Reader id="planned_check_in">
+    {(checkIn: string) => (
+        <Reader id="planned_check_out">
+            {(checkOut: string) => (
+                <div className={props.classes.container}>
+                    <SearchLoaderWithPagination id="search-loader" pageSize={12}>
+                        {(arg, pagination, noResults) => (
+                            <>
+                                {
+                                    arg.searchRecords.map((r) => (
+                                        <ItemProvider {...r.providerProps}>
+                                            <Link to={
+                                                // we are changing the way the link works
+                                                checkIn && checkOut ?
+                                                    `/reserve/${r.id}?checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}` :
+                                                    `/reserve/${r.id}`
+                                            }>
+                                                <ListItem className={props.classes.listing}>
+                                                    <View
+                                                        id="image"
+                                                        rendererArgs={
+                                                            {
+                                                                // we do not want to link images with with <a> tags like
+                                                                // the active renderer does by default
+                                                                disableImageLinking: true,
+                                                                // we want the image size to load by 30 viewport width
+                                                                // this is used to choose what image resolution to load
+                                                                // so they load faster, we want tiny images
+                                                                imageSizes: "30vw",
+                                                                imageClassName: props.classes.image,
+                                                            }
+                                                        }
+                                                    />
+                                                    <ListItemText
+                                                        className={props.classes.listingText}
+                                                        primary={<View id="title" />}
+                                                        secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
+                                                    />
+                                                </ListItem>
+                                            </Link>
+                                        </ItemProvider>
+                                    ))
+                                }
+                                <div className={props.classes.paginator}>
+                                    {pagination}
+                                </div>
+                            </>
+                        )}
+                    </SearchLoaderWithPagination>
+                </div>
+            )}
+        </Reader>
+    )}
+</Reader>
+```
+
+You can see how we use the reader in order to figure out the values for our current fields, and then we set them up in the url and encode them, now what is next is that we need to read such values in the next step when we are filling the submit form; at `reserve/index.tsx` we will modify the code regarding our entries with the following
+
+```tsx
+<LocationStateReader
+    stateIsInQueryString={true}
+    defaultState={{ checkIn: undefined as string }}
+>
+    {(state) => (
+        <ReadVar id="all_check_ins_and_outs">
+            {(value) => {
+                // so we can build a function to disable the dates
+                const shouldDisableDate = (checkInTheUserWants: moment.Moment) => {
+                    return value.some((v: any) => {
+                        const checkIn: moment.Moment = v.checkIn;
+                        const checkOut: moment.Moment = v.checkOut;
+
+                        return checkInTheUserWants.isSameOrAfter(checkIn) && checkInTheUserWants.isBefore(checkOut);
+                    });
+                }
+
+                // and we pass it as a renderer arg, note that renderer args are specific to the
+                // renderer, itemize default which is the material ui default supports date disabling
+                // so it's a renderer property, that only that renderer supports, if you write your own
+                // custom renderer you might use other args
+                return <Entry id="check_in" rendererArgs={{ shouldDisableDate }} prefillWith={state.checkIn} />
+            }}
+        </ReadVar>
+    )}
+</LocationStateReader>
+```
+
+Note how we have used the location state reader to extract information about our query string, and used the `prefillWith` property in order to specify a prefill, there's a reason our default state is undefined, because null is a vaild value to prefill with, whereas undefined specifies not to prefill.
+
+Now we do the same exact thing to the check out:
+
+```tsx
+<LocationStateReader
+    stateIsInQueryString={true}
+    defaultState={{ checkOut: undefined as string }}
+>
+    {(state) => (
+        <ReadVar id="all_check_ins_and_outs">
+            {(value) => {
+                const shouldDisableDate = (checkOutTheUserWants: moment.Moment) => {
+                    return value.some((v: any) => {
+                        const checkIn: moment.Moment = v.checkIn;
+                        const checkOut: moment.Moment = v.checkOut;
+
+                        return checkOutTheUserWants.isAfter(checkIn) && checkOutTheUserWants.isSameOrBefore(checkOut);
+                    });
+                }
+                return <Entry id="check_out" rendererArgs={{ shouldDisableDate }} prefillWith={state.checkOut} />
+            }}
+        </ReadVar>
+    )}
+</LocationStateReader>
+```
+
+And it should be fully functional now, after searching you might figure your url bar looks as:
+
+![URL Custom Parameters](./images/url-custom-parameters.png)
+
+And then the prefills should be working
+
+![Date Prefills](./images/date-prefills.png)
+
 ## Adding prices to properties
 
+So everything works good enough so far, however our properties lack a price, which is one of the hardests things to implement, what if our customer is coming from Russia and uses rubles, but the host is using euros, or dollars; this would be such a nighmare to sort by and take care of.
+
+Itemize comes with the currency type, which is built for this exact scenario, it is a searchable, sortable, unit of value that allows itself to fluctuate with market prices; while at the same time keeping offline support. The currency type is very powerful but also very delicate as it has to be mantained right into the database, so it comes at a large expense.
+
+We however want to have prices in our properties so we will leverage the currency type but in order to enable the currency factors, we need an API that will handle the conversion for us.
+
+The default provider for itemize currency factors is [currency layer](https://currencylayer.com/), don't worry about API costs as itemize caches these conversion factors and updates them every so often, it's not realtime currency factoring, even when you could make it basically be so by changing the update time, at a very expensive cost.
+
+After you get the API key, considering you will most likely be on a free plan you need to setup this in your sensitive configuration at `index.sensitive.json` set the values in the `currencyFactors` line to match what currency layer provider expects.
+
+```json
+"currencyFactors": {
+    "apiKey": "MY_API_KEY",
+    "httpsEnabled": false
+}
+```
+
+Your api key will most likely also not be enabled for https usage, since you are likely to be on a free plan, so we disable https, as we are on a development environment, this is not relevant; however in your `index.production.sensitive.json` you might prefer a different plan and use a different key
+
 ## Creating a service to manage reservations
+
+In this part we will explore services, you might remember at the very start we created the `booked` and `booked_by` property in the unit that are supposed to be internally handled but are not so far, they remain unused; in this section we will take use of them.
 
 ### Modifying the unit to be booked once the checkin date comes
 

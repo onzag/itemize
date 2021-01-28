@@ -1,4 +1,4 @@
-[Prev](./08-fragments.md)
+[Prev](./06-reservation.md)
 
 # Redesign
 
@@ -10,3 +10,4 @@ In this section we will write our own custom renderers for several problematic s
 
 ## Story Time
 
+## Fragments to the Rescue

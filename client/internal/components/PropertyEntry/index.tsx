@@ -627,7 +627,7 @@ export default class PropertyEntry extends
   }
 
   public componentDidMount() {
-    if (this.props.prefillWith) {
+    if (typeof this.props.prefillWith !== "undefined") {
       this.props.onChange(this.props.prefillWith, null);
     }
   }
