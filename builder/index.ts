@@ -1122,7 +1122,8 @@ async function getI18nPropertyData(
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
   const searchIsDisabled = !searchable ||
-    (typeof property.searchable !== "undefined" && !property.searchable);
+    (typeof property.searchable !== "undefined" && !property.searchable) ||
+    property.searchOnlyProperty;
 
   const disableRangedSearch = property.disableRangedSearch || (property.type === "integer" && property.subtype === "reference");
 

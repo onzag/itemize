@@ -1853,3 +1853,172 @@ Update your `reserve/index.tsx` with the following code from the item definition
     }
 </ItemProvider>
 ```
+
+And now after rebuilding and refreshing your view should reflect the approved requests.
+
+![Reserve Disable Dates](./images/reserve-disable-dates.png)
+
+And if you check the user account of the host that owns the property.
+
+![Reservations Approved Stay](./images/reservations-approved-stay.png)
+
+Also notice how the data is not leaking, and our creator who made the request to stay in the property is in fact hidden and we do not know the id of such user.
+
+![Reserve Network Analysis](./images/reserve-network-analysis.png)
+
+## Send an email notification regarding the approval/denial
+
+Now we want to be able to send a notification to the requester once their request has been approved or denied, change the place where we update the number of notifications for the `EDITED` trigger in our request to reflect this new code where we send an email after the fact
+
+```tsx
+if (
+    arg.action === IOTriggerActions.EDITED &&
+    arg.originalValue.status === "WAIT" &&
+    arg.newValue.status !== "WAIT"
+) {
+    // yes we can grab the updated value from here, while you might wonder
+    // why is itemize fetching the entire thing, well, in order to update
+    // the caches.
+    const hostingUnit = await arg.appData.rawDB.performRawDBUpdate(
+        "hosting/unit",
+        arg.newValue.parent_id as string,
+        arg.newValue.parent_version as string,
+        {
+            itemTableUpdate: {
+                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+            }
+        }
+    );
+
+    // so we can use the creator on a new raw database update
+    const hostingUser = await arg.appData.rawDB.performRawDBUpdate(
+        "users/user",
+        hostingUnit.created_by,
+        null,
+        {
+            itemTableUpdate: {
+                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+            }
+        }
+    );
+
+    const requesterUser = await arg.appData.cache.requestValue(
+        "users/user",
+        // this is the request, the arg.newValue
+        arg.newValue.created_by as string,
+        null,
+    );
+
+    const requestIdef = arg.appData.root.registry["hosting/request"];
+    const i18nData = requestIdef.getI18nDataFor(requesterUser.app_language);
+
+    arg.appData.mailService.sendTemplateEmail({
+        // this is the email handle to be sent from [user]@mysite.com
+        fromEmailHandle: i18nData.custom.request_notification_email_handle,
+        // this is the username that it will be sent as
+        fromUsername: i18nData.custom.request_notification_email_username,
+        // the subject line
+        subject: localeReplacer(
+            arg.newValue.status === "APPROVED" ?
+                i18nData.custom.request_approved_notification_email_subject :
+                i18nData.custom.request_denied_notification_email_subject,
+            hostingUnit.title,
+        ),
+        // whether the user can unsubscribe via email address, allow users
+        // to unsubscribe as a norm unless they are very critical emails
+        canUnsubscribe: true,
+        // where is the subscription state stored, we will reuse the e_notifications
+        // boolean that exist within the user, if this boolean is false, the email
+        // won't be sent because the user is unsubscribed
+        subscribeProperty: "e_notifications",
+        // the unsubscription email will be sent, but it will not check if the user
+        // is unsubscribed
+        ignoreUnsubscribe: false,
+        // other important properties in order to send the message, we want to ensure
+        // the user is validated and not just spam
+        confirmationProperties: ["e_validated"],
+        // arguments to render the template
+        args: {
+            request_notification_host: hostingUser.username,
+        },
+        // the item definition that we will use as template, we will use a fragment
+        itemDefinition: "cms/fragment",
+        // the id of the item definition we want to use, this is a custom id
+        id: arg.newValue.status === "APPROVED" ? "APPROVAL_EMAIL" : "DENIAL_EMAIL",
+        // the version, so we have different versions per language
+        version: requesterUser.app_language,
+        // the property we want to pull from that item definition
+        property: "content",
+        // who we are sending to
+        to: requesterUser,
+    });
+}
+```
+
+You might notice how we have right now new fragments named `APPROVAL_EMAIL`, `DENIAL_EMAIL` as well as `request_approved_notification_email_subject` and `request_denied_notification_email_subject` are new properties line, so let's first start by adding the fragments at `fragment.tsx`
+
+```tsx
+{
+    "APPROVAL_EMAIL": {
+        type: "context",
+        label: "Request approval email",
+        properties: {
+            request_notification_host: {
+                type: "text",
+                label: "Host",
+            },
+        },
+    },
+    "DENIAL_EMAIL": {
+        type: "context",
+        label: "Request denial email",
+        properties: {
+            request_notification_host: {
+                type: "text",
+                label: "Host",
+            },
+        },
+    },
+}
+```
+
+And now we do need to add the schema translation lines
+
+```properties
+custom.request_approved_notification_email_subject = reservation approved at {0}
+custom.request_denied_notification_email_subject = reservation denied at {0}
+```
+
+And in spanish
+
+```properties
+custom.request_approved_notification_email_subject = reservación aprobada en {0}
+custom.request_denied_notification_email_subject = reservación rechazada en {0}
+```
+
+Now after rebuilding the entire thing, and restarting the server you might realize you have a brand new fragment on the CMS, let's make it something meaningful.
+
+![Fragment Request Approval Denial](./images/fragment-request-approval-denial.png)
+
+![Fragment Request Approval New](./images/fragment-request-approval-new.png)
+
+Now let's approve one of those dangling requests, remember that in order for the order to be effective your users must have an email attached to them so that it can be displayed, such email must also be validated.
+
+![Request Approved Email](./images/request-approved-email.png)
+
+## What you achieved
+
+ 1. Allowed users to create requests and defined a request schema.
+ 2. Defined a custom schema specific role.
+ 3. Created a page to manage and search our reservations and requests.
+ 4. Allowed hosts to accept or deny such requests in their own page.
+ 5. Secured the mechanism and prevented overapping requests from occuring.
+ 6. Made the the host list be realtime.
+ 7. Send emails when requesting, and when being accepted/denied a request for the given target in the right language.
+ 8. Created templates for all these mechanisms a designer can then tackle on.
+
+So we are now ready for managing these reservations in order to be able to put their data into the unit schema to further improve our search mechanism as well as to manage these reservations.
+
+## Next
+
+[Next](./06-reservation.md)

@@ -237,6 +237,9 @@ export default {
     coerceNullsIntoDefault: {
       type: "boolean",
     },
+    searchOnlyProperty: {
+      type: "boolean",
+    },
   },
   additionalProperties: false,
   definitions: {

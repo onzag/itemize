@@ -173,24 +173,6 @@ export async function searchModule(
     );
   }
 
-  const pathOfThisModule = mod.getPath().join("/");
-  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
-
-  if (moduleTrigger) {
-    await moduleTrigger({
-      appData,
-      module: mod,
-      itemDefinition: null,
-      args: resolverArgs.args,
-      user: {
-        role: tokenData.role,
-        id: tokenData.id,
-        customData: tokenData.customData,
-      },
-      forbid: defaultTriggerForbiddenFunction,
-    });
-  }
-
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
   const queryModel = appData.knex.table(mod.getQualifiedPathName())
@@ -213,6 +195,25 @@ export async function searchModule(
 
   if (typeof resolverArgs.args.version_filter !== "undefined") {
     queryModel.andWhere("version", resolverArgs.args.version_filter || "");
+  }
+
+  const pathOfThisModule = mod.getPath().join("/");
+  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+
+  if (moduleTrigger) {
+    await moduleTrigger({
+      appData,
+      module: mod,
+      itemDefinition: null,
+      args: resolverArgs.args,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      query: queryModel,
+      forbid: defaultTriggerForbiddenFunction,
+    });
   }
 
   // now we build the sql query for the module
@@ -549,32 +550,6 @@ export async function searchItemDefinition(
     );
   }
 
-  const pathOfThisModule = mod.getPath().join("/");
-  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
-  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
-  const idefTrigger = appData.triggers.item.search[pathOfThisIdef];
-
-  if (moduleTrigger || idefTrigger) {
-    const args = {
-      appData,
-      module: mod,
-      itemDefinition,
-      args: resolverArgs.args,
-      user: {
-        role: tokenData.role,
-        id: tokenData.id,
-        customData: tokenData.customData,
-      },
-      forbid: defaultTriggerForbiddenFunction,
-    };
-    if (moduleTrigger) {
-      await moduleTrigger(args);
-    }
-    if (idefTrigger) {
-      await idefTrigger(args);
-    }
-  }
-
   // now we build the search query
   const queryModel = appData.knex.table(selfTable)
     .join(moduleTable, (clause) => {
@@ -599,6 +574,33 @@ export async function searchItemDefinition(
       .andWhere("parent_id", resolverArgs.args.parent_id)
       .andWhere("parent_version", resolverArgs.args.parent_version || "")
       .andWhere("parent_type", resolverArgs.args.parent_type);
+  }
+
+  const pathOfThisModule = mod.getPath().join("/");
+  const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
+  const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+  const idefTrigger = appData.triggers.item.search[pathOfThisIdef];
+
+  if (moduleTrigger || idefTrigger) {
+    const args = {
+      appData,
+      module: mod,
+      itemDefinition,
+      args: resolverArgs.args,
+      user: {
+        role: tokenData.role,
+        id: tokenData.id,
+        customData: tokenData.customData,
+      },
+      query: queryModel,
+      forbid: defaultTriggerForbiddenFunction,
+    };
+    if (moduleTrigger) {
+      await moduleTrigger(args);
+    }
+    if (idefTrigger) {
+      await idefTrigger(args);
+    }
   }
 
   // and now we call the function that builds the query itself into

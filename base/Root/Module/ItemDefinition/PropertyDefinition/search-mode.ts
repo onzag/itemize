@@ -35,6 +35,11 @@ export function getConversionIds(
     return [];
   }
 
+  // for a search only property it has no conversion ids
+  if (rawData.searchOnlyProperty) {
+    return [rawData.id];
+  }
+
   // we get the ids, check out how `buildSearchModePropertyDefinitions` does
   // this literally reflects that
   let ids = [rawData.id];
@@ -93,6 +98,12 @@ export function buildSearchModePropertyDefinitions(
     )
   ) {
     return [];
+  }
+
+  // the search mode of a search only property
+  // is of course itself
+  if (rawData.searchOnlyProperty) {
+    return [rawData];
   }
 
   // we create the new property definition via copy

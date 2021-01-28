@@ -387,8 +387,11 @@ export default class Module {
 
     // if we have prop extensions in the raw data we were provided
     if (this.rawData.propExtensions) {
+      const isInSearchMode = this.isInSearchMode();
       // we need to populate the prop extensions
-      this.propExtensions = this.rawData.propExtensions.map((propExtensionRawJSONData) => {
+      this.propExtensions = this.rawData.propExtensions
+        .filter((p) => isInSearchMode ? true : !p.searchOnlyProperty)
+        .map((propExtensionRawJSONData) => {
         // the prop extension constructor is fed the raw json data
         // the current module as the parent module instance
         // no item definition as parent definition instance

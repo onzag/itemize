@@ -243,6 +243,11 @@ export interface IPropertyDefinitionRawJSONDataType {
    * Edit role permissions
    */
   editRoleAccess?: string[];
+  /**
+   * Property is only used for custom
+   * searches
+   */
+  searchOnlyProperty?: boolean;
 }
 
 /**
@@ -2035,6 +2040,14 @@ export default class PropertyDefinition {
    */
   public isCoercedIntoDefaultWhenNull(): boolean {
     return !!this.rawData.coerceNullsIntoDefault;
+  }
+
+  /**
+   * Specifies if a property is used for custom searches
+   * @returns a boolean
+   */
+  public isSearchOnly(): boolean {
+    return !!this.rawData.searchOnlyProperty;
   }
 
   /**

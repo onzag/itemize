@@ -605,9 +605,12 @@ export default class ItemDefinition {
             definition: this.parentModule.getItemDefinitionFor(d),
           })) : [];
 
+    const isInSearchMode = this.isInSearchMode();
+
     // assigning the property definition by using the
     // properties and instantiating those as well
     this.propertyDefinitions = rawJSON.properties ? rawJSON.properties
+      .filter((p) => isInSearchMode ? true : !p.searchOnlyProperty)
       .map((i) => (new PropertyDefinition(i, parentModule,
         this, false))) : [];
 
