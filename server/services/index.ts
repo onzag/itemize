@@ -28,9 +28,19 @@ export class ServiceProvider<T> {
   public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
 
+  public instanceName: string;
+
   constructor(config: T, registry: RegistryService) {
     this.config = config;
     this.registry = registry;
+  }
+
+  public setInstanceName(n: string) {
+    this.instanceName = n;
+  }
+
+  public getInstanceName() {
+    return this.instanceName;
   }
 
   public logInfo(str: string, extra?: any) {

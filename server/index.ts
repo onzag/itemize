@@ -561,6 +561,7 @@ export async function initializeServer(
               ...(config.custom && config.custom[keyName]),
             };
             const customGlobalService = new CustomServiceClass(configData, registry);
+            customGlobalService.setInstanceName(keyName);
             await manager.installGlobalService(customGlobalService);
           })
         );
@@ -783,6 +784,7 @@ export async function initializeServer(
             ...(config.custom && config.custom[keyName]),
           };
           customServices[keyName] = new CustomServiceClass(configData, registry);
+          customServices[keyName].setInstanceName(keyName);
           await customServices[keyName].initialize();
 
           customServicesInstances.push(customServices[keyName]);

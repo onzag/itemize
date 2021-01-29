@@ -570,6 +570,16 @@ But remember to add the `price` to the properties list that we need to fetch.
 
 In this part we will explore services, you might remember at the very start we created the `booked` and `booked_by` property in the unit that are supposed to be internally handled but are not so far, they remain unused; in this section we will take use of them.
 
+We cannot use a trigger to update the value because the trigger only executes during the modification/creation or search, we need to use a service that runs globally and keeps these records updated.
+
+On itemize there are two levels, the global level, which is where your centralized information runs, it is the main source of truth and where postgreSQL resides with global redis, global pubsub, and one tiny nodejs instance (the global manager), whose job is to mantain the database; and then there is the local layer where the redis cache resides and all the extended server instances that actually serve the client; while there's only one global node, there can be as many as necessary local nodes, and they are "meant" to be in different geographical positions; itemize is a CDN by itself.
+
+When we use triggers we do a local update first and then elevate it to the database, unless we do a raw db upgrade which does it the other way around; however for a service we need to do raw db updates only, so in that sense, what we need is a global service that runs on the global manager level.
+
+Let's first create our new test service, create a file at `server/booking-service.ts` and let's set its basics
+
+
+
 ### Modifying the unit to be booked once the checkin date comes
 
 ### Releasing the unit automatically

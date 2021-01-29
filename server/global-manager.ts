@@ -268,6 +268,8 @@ export class GlobalManager {
     }
   }
   public run() {
+    logger.info("GlobalManager.run: running global manager");
+
     // currency factors shoudn't really have its own execution but who knows
     if (this.currencyFactorsProvider) {
       this.currencyFactorsProvider.execute();

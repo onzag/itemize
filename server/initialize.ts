@@ -122,10 +122,10 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
   // adding rest services
   app.use("/rest/user", userRestServices(appData));
-  app.use("/rest", restServices(appData));
   routers.forEach((r) => {
     app.use("/rest/service", r);
   });
+  app.use("/rest", restServices(appData));
 
   const customUserQueriesProcessed = customUserQueries(appData);
   appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;

@@ -91,7 +91,5 @@ module.exports = {
      * Check the documentation to see how to install a given service as well
      * as how to setup a custom service
      */
-    services: {
-
-    },
+    services: require("./dist/server/services").default,
 }`;
