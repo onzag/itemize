@@ -390,7 +390,181 @@ After you get the API key, considering you will most likely be on a free plan yo
 }
 ```
 
-Your api key will most likely also not be enabled for https usage, since you are likely to be on a free plan, so we disable https, as we are on a development environment, this is not relevant; however in your `index.production.sensitive.json` you might prefer a different plan and use a different key
+Your api key will most likely also not be enabled for https usage, since you are likely to be on a free plan, so we disable https, as we are on a development environment, this is not relevant; however in your `index.production.sensitive.json` you might prefer a different plan and use a different key.
+
+You should then restart your server and you will notice something interesting, check the console at a SQL query should be taking place:
+
+![Currency Factors SQL](./images/currency-factors-sql.png)
+
+And if you open your client and inspect your network you will realize the information is relayed to the clients
+
+![Currency Factors Network](./images/currency-factors-network.png)
+
+Now we should take use of ti and add the following to our unit schema:
+
+```json
+{
+    "id": "price",
+    "type": "currency",
+    "nullable": true,
+    "specialProperties": {
+        "preventZero": true
+    }
+}
+```
+
+And set the database to build, because we are accepting null as a valid price, this would mean that the database update should go swiftly, for null pricing we would consider that the unit is free of any pricing, couchsurfing style.
+
+Run the `npm run build-data` and `npm run build-database development` to update the schema and the database, after which you should restart the server.
+
+Now we do need to add a place to edit the price, as well as to visualize those prices in our search list and booking list, for the edit part we will go to `hosting/index.tsx` and search for our page that shows the edition view in `NewEditHosting` add the price property in the properties list to provide them with a state, in the submit information, and add a new entry:
+
+```tsx
+[
+    "title",
+    "description",
+    "attachments",
+    "image",
+    "address",
+    "unit_type",
+    "booked",
+    // we added the price
+    "price",
+]
+```
+
+```tsx
+<Entry id="unit_type" />
+<Entry id="title" />
+<Entry id="description" />
+<Entry id="image" />
+<Entry id="address" />
+{/* We add the entry for the price */}
+<Entry id="price" />
+```
+
+```tsx
+[
+    "title",
+    "description",
+    "attachments",
+    "image",
+    "address",
+    "unit_type",
+    "booked",
+    // we added the price in properties to submit too
+    "price",
+]
+```
+
+And now if we run the webpack build and check our page we should indeed have the following element included
+
+![Price Edit Unit](./images/price-edit-unit.png)
+
+What is more we are also allowed to choose a currency, or at least the default fast prototyping renderer allows you to do that; by default the currency used will be the one that the user has selected, in my case it was euros, so it chooses that.
+
+![Currency Select](./images/currency-select.png)
+
+Now let's add the currency view to the search in the frontpage, in our `frontpage/search.tsx` we need to add to the stateful properties in the item provider:
+
+```tsx
+[
+    "address",
+    "unit_type",
+    // we need to ensure to give these properties
+    // a state
+    "planned_check_in",
+    "planned_check_out",
+
+    "price",
+]
+```
+
+And in the given entries
+
+```tsx
+<Entry id="price" searchVariant="from"/>
+<Entry id="price" searchVariant="to"/>
+```
+
+And in the search by properties and requested properties we need to add the price
+
+```tsx
+{
+    limit: 200,
+    offset: 0,
+    requestedProperties: [
+        "title",
+        "address",
+        "image",
+        "price",
+    ],
+    searchByProperties: [
+        "address",
+        "unit_type",
+        // and we need to be sure to search by them
+        // so they are pushed into the search
+        "planned_check_in",
+        "planned_check_out",
+
+        "price",
+    ],
+    orderBy: {
+        address: {
+            direction: "asc",
+            priority: 0,
+            nulls: "last",
+        },
+    },
+    storeResultsInNavigation: "frontpage-search",
+}
+```
+
+And in the text property that displays the title, let's just hack the price right in there:
+
+```tsx
+<>
+    <View id="price" />
+    {" "}
+    <View id="title" />
+</>
+```
+
+The next step is to rebuild with webpack and to give it a try, let's first try with our standard euros based user.
+
+![Search Filtering By Euros](./images/search-filtering-by-euros.png)
+
+As expected it works, and it filters accordingly, however this sounds easy and all, and maybe the job that a simple number could do, until we try out the currency full potential, and let's create another user now, and make such user russian, by choosing Россия in the country list selector at the bottom of the app.
+
+![Russian Locale](./images/russian-locale.png)
+
+Your currency should update automatically and even your language should attempt to update.
+
+![Russian Locale Warning](./images/russian-locale-warning.png)
+
+So now let's think about it according to google:
+
+![20 Euro](./images/20-euro.png)
+
+So let's give it a go, shall we?
+
+![Search Filtering By Rubles](./images/search-filtering-by-rubles.png)
+
+And it does work, we are in fact able to search by rubles rather than by the original euro currency, and unlike our euro case, the viewer for currency does display the original euro value alognside to specify that the value is actually in another currency, it is possible to disable that, but for now we will let it be.
+
+The currency factors provider we have used by default uses USD, so that's the internal currency for conversions, so it does a 3 way conversion first converting the rubles to USD then converting them to euros, the normalized value is in USD; however it is possible to use any other unit as the normalizer, euros, gold, bitcoin, bananas; for that you would need a different provider (write your own), but it's a thing to keep in mind.
+
+The itemize currency conversion is not perfect nor flawless but it is close enough, prices can be rather volatile; and the currency list is updated during the mantenience process provided by the global manager.
+
+Now you should be able to add this price to every other views that you wish should display such value, eg in the `reserve/index.tsx` we could add:
+
+```tsx
+<Typography variant="h3">
+    <View id="price" />
+</Typography>
+```
+
+But remember to add the `price` to the properties list that we need to fetch.
 
 ## Creating a service to manage reservations
 

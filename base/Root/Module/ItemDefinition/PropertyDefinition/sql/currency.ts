@@ -43,7 +43,7 @@ export function currencySQLIn(arg: ISQLInInfo) {
 
   // otherwise we need to get the conversion information from the server data
   const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][value.currency];
-  const normalized = factor ? (1 / factor) * value.value : null;
+  const normalized = factor ? factor * value.value : null;
 
   return {
     [arg.prefix + arg.id + "_VALUE"]: value.value,
@@ -103,7 +103,14 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     // in these cases we use the normalized values and for that we use the conversion
     const normalized = factor ? factor * fromArg.value : null;
     // so we do
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized);
+    arg.knexBuilder.andWhere((clause) => {
+      clause
+        .where(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized).orWhere((subclause) => {
+        subclause
+          .where(arg.prefix + arg.id + "_VALUE", ">=", fromArg.value)
+          .andWhere(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
+      })
+    });
     searchedByIt = true;
   }
 
@@ -112,7 +119,14 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
     const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][toArg.currency];
     const normalized = factor ? factor * toArg.value : null;
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized);
+    arg.knexBuilder.andWhere((clause) => {
+      clause
+        .where(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized).orWhere((subclause) => {
+        subclause
+          .where(arg.prefix + arg.id + "_VALUE", "<=", toArg.value)
+          .andWhere(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
+      })
+    });
     searchedByIt = true;
   }
 

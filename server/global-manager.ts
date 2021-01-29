@@ -400,14 +400,22 @@ export class GlobalManager {
   private async runFor(tableName: string, isModule: boolean, properties: IMantainProp[], since: number) {
     const sinceLimiter = since ? new Date((new Date()).getTime() - since) : null;
 
+    // let's build the update rules for the mantenience
     const updateRules: any = {};
+
+    // these are the from tables we should select
     const fromRules: Array<{
       from: string,
       as: string,
     }> = [];
+
+    // and and or rules
     const andWhereRules: Array<[string, any[]]> = [];
     const orWhereRules: Array<[string, any[]]> = [];
+
+    // so we lookup all the properties for mantenience rules
     properties.forEach((p) => {
+      // and get one if given
       const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience({
         knex: this.knex,
         serverData: null,
@@ -416,7 +424,10 @@ export class GlobalManager {
         property: p.pdef,
         itemDefinition: p.itemDefinition,
       });
+
+      // if we get one
       if (mantenienceRule) {
+        // we save the data
         updateRules[mantenienceRule.columnToSet] = mantenienceRule.setColumnToRaw;
         if (mantenienceRule.from) {
           fromRules.push({
@@ -433,14 +444,18 @@ export class GlobalManager {
       }
     });
 
+    // now we can build the query
     let query = "UPDATE ?? SET";
+    // and the bindings for that query at the same time
     let bindings: any[] = [tableName];
 
     query += " " + Object.keys(updateRules).map((columnToSet) => {
+      // this specifies what column we are setting and how we are setting it as
       const ruleRawStr = updateRules[columnToSet][0];
       bindings.push(columnToSet);
       bindings = bindings.concat(updateRules[columnToSet][1]);
 
+      // and we set it to the value
       return "?? = " + ruleRawStr;
     }).join(", ");
 

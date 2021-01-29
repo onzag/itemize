@@ -19,6 +19,7 @@ import {
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   INCLUDE_PREFIX,
+  MIN_SUPPORTED_REAL,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy, currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual } from "../sql/currency";
@@ -148,7 +149,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     return a.value === b.value && a.currency === b.currency;
   },
-  validate: (l: IPropertyDefinitionSupportedCurrencyType) => {
+  validate: (l: IPropertyDefinitionSupportedCurrencyType, p) => {
     if (
       typeof l.value !== "number" ||
       typeof l.currency !== "string"
@@ -160,9 +161,22 @@ const typeValue: IPropertyDefinitionSupportedType = {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
-    if (l.value > MAX_SUPPORTED_REAL) {
+    let maxValue = MAX_SUPPORTED_REAL;
+    let minValue = 0;
+    let isZeroPrevented = false;
+    if (p.specialProperties) {
+      if (p.specialProperties.allowNegatives || p.specialProperties.isDebt) {
+        minValue = MIN_SUPPORTED_REAL;
+      }
+      if (p.specialProperties.isDebt) {
+        maxValue = 0;
+      }
+      isZeroPrevented = p.specialProperties.preventZero;
+    }
+  
+    if (maxValue === 0 && isZeroPrevented ? l.value >= maxValue : l.value > maxValue) {
       return PropertyInvalidReason.TOO_LARGE;
-    } else if (l.value < 0) {
+    } else if (minValue === 0 && isZeroPrevented ? l.value <= minValue : l.value < minValue) {
       return PropertyInvalidReason.TOO_SMALL;
     }
     const currencyData = currencies[l.currency];
@@ -187,6 +201,24 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
 
+  specialProperties: [
+    {
+      name: "allowNegatives",
+      type: "boolean",
+      required: false,
+    },
+    {
+      name: "isDebt",
+      type: "boolean",
+      required: false,
+    },
+    {
+      name: "preventZero",
+      type: "boolean",
+      required: false,
+    },
+  ],
+
   // i18n attributes required
   i18n: {
     base: CLASSIC_BASE_I18N,
@@ -196,6 +228,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     searchRange: CLASSIC_SEARCH_RANGED_I18N,
     searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
     tooLargeErrorInclude: true,
+    tooSmallErrorInclude: true,
     tooManyDecimalsErrorInclude: true,
   },
 };
