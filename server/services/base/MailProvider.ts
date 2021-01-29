@@ -8,18 +8,14 @@
  */
 
 import { logger } from "../..";
-import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { renderTemplate } from "../../../client/internal/text";
-import { Cache } from "../../cache";
 import type { IGQLValue } from "../../../gql-querier";
-import Root from "../../../base/Root";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
-import { IServiceProviderClassType, ServiceProvider } from "..";
-import { RegistryService } from "../registry";
+import { ServiceProvider, ServiceProviderType } from "..";
 
 /**
  * The unsubscribe url form
@@ -83,13 +79,6 @@ export interface ISendEmailData {
 }
 
 /**
- * An interface that represents a class for the mail provider
- */
-export interface IMailProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType): MailProvider<T>;
-}
-
-/**
  * This interface represents how an email is
  * received
  */
@@ -108,57 +97,14 @@ export interface IReceiveEmailData {
  * global mode, even if specified
  */
 export default class MailProvider<T> extends ServiceProvider<T> {
-  /**
-   * This is the basic config of the app given by the json file
-   * it's named internalConfig because config is already taken
-   */
-  public internalConfig: IConfigRawJSONDataType;
-  /**
-   * The sensitive config
-   */
-  public sensitiveConfig: ISensitiveConfigRawJSONDataType;
-  /**
-   * The cache
-   */
-  public cache: Cache;
-  /**
-   * The root instance
-   */
-  public root: Root;
-  /**
-   * the user item definition
-   */
-  private userIdef: ItemDefinition;
+  public static getType() {
+    return ServiceProviderType.HYBRID;
+  }
+
   /**
    * the storage item definition
    */
   private storageIdef: ItemDefinition;
-
-  /**
-   * Constructs a new mail provider
-   * @param config the configuration used
-   * @param registry the registry service
-   * @param cache the cache instance
-   * @param root the root instance
-   * @param internalConfig the configuration from the json files
-   * @param sensitiveConfig the sensitive configuration from the json files
-   */
-  constructor(config: T, registry: RegistryService, cache: Cache, root: Root, internalConfig: IConfigRawJSONDataType, sensitiveConfig: ISensitiveConfigRawJSONDataType) {
-    super(config, registry);
-
-    this.internalConfig = internalConfig;
-    this.root = root;
-    this.cache = cache;
-    this.sensitiveConfig = sensitiveConfig;
-    this.userIdef = this.root.getModuleFor(["users"]).getItemDefinitionFor(["user"]);
-    this.storageIdef = null;
-
-    // if we have supported mail storage
-    if (sensitiveConfig.mailStorage) {
-      const idef = this.root.registry[sensitiveConfig.mailStorage] as ItemDefinition;
-      this.setMessageStorageItemDefinition(idef);
-    }
-  }
 
   /**
    * Sets the item definition that is in charge of the storage of the
@@ -212,10 +158,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       },
     }
   ) {
+    const root = this.isInstanceLocal() ? this.localAppData.root : this.globalRoot;
+
     // retrieve the item definition
     const actualItemDefinition =
       typeof arg.itemDefinition === "string" ?
-        this.root.registry[arg.itemDefinition] as ItemDefinition :
+        root.registry[arg.itemDefinition] as ItemDefinition :
         arg.itemDefinition;
 
     // if for some reson we have none to send to
@@ -247,12 +195,22 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     if (arg.id) {
       // let's try to fetcth that value
       try {
-        templateValue = await this.cache.requestValue(actualItemDefinition, arg.id, arg.version || null);
+        templateValue = this.isInstanceLocal() ?
+          await this.localAppData.cache.requestValue(actualItemDefinition, arg.id, arg.version || null) :
+          await this.globalRawDB.getRawDBQueryBuilderFor(actualItemDefinition).first("*").where({
+            id: arg.id,
+            version: arg.version || "",
+          });
 
         // if not found and we have a version, what we assume is a language
         // we fallback to the unversioned
         if (!templateValue && arg.version) {
-          templateValue = await this.cache.requestValue(actualItemDefinition, arg.id, null);
+          templateValue = this.isInstanceLocal() ?
+            await this.localAppData.cache.requestValue(actualItemDefinition, arg.id, null) :
+            await this.globalRawDB.getRawDBQueryBuilderFor(actualItemDefinition).first("*").where({
+              id: arg.id,
+              version: "",
+            });
         }
 
         // now we need the property value
@@ -291,7 +249,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     // build the from handle
-    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.sensitiveConfig.mailDomain}>`;
+    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.appSensitiveConfig.mailDomain}>`;
 
     // setup the args
     const args: ISendEmailData = {
@@ -380,10 +338,13 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       personalize?: string[];
     }
   ) {
+    const root = this.isInstanceGlobal() ? this.globalRoot : this.localAppData.root;
+    const userIdef = root.registry["users/user"] as ItemDefinition;
+
     // first we need the email property
     const emailPropertyUsed = arg.emailProperty || "email";
     // and we expect the user item definition to have it
-    if (!this.userIdef.hasPropertyDefinitionFor(emailPropertyUsed, true)) {
+    if (!userIdef.hasPropertyDefinitionFor(emailPropertyUsed, true)) {
       this.logError(
         "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + emailPropertyUsed + " property in the item definition for user",
         {
@@ -397,7 +358,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     // we need to check the subscribe property too
-    if (arg.subscribeProperty && !this.userIdef.hasPropertyDefinitionFor(arg.subscribeProperty, true)) {
+    if (arg.subscribeProperty && !userIdef.hasPropertyDefinitionFor(arg.subscribeProperty, true)) {
       this.logError(
         "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + arg.subscribeProperty + " property in the item definition for user",
         {
@@ -412,8 +373,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
     // now we need the hostname
     const hostname = process.env.NODE_ENV === "development" ?
-      this.internalConfig.developmentHostname :
-      this.internalConfig.productionHostname;
+      this.appConfig.developmentHostname :
+      this.appConfig.productionHostname;
 
     // and we are going to make this an array
     let actualUsersToSend: any[] = Array.isArray(arg.to) ? arg.to : [arg.to];
@@ -445,11 +406,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       // we will have to request it from the cache
       let userData: ISQLTableRowValue | IGQLValue = u;
       if (typeof userData === "string") {
-        userData = await this.cache.requestValue(
-          this.userIdef,
-          userData as string,
-          null,
-        );
+        userData = this.isInstanceLocal() ?
+          await this.localAppData.cache.requestValue(
+            userIdef,
+            userData as string,
+            null,
+          ) :
+          await this.globalRawDB.getRawDBQueryBuilderFor(
+            userIdef,
+          ).first("*").where({
+            id: userData as string,
+            version: ""
+          });
       }
 
       // if there's no value, there's no user,
@@ -518,7 +486,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           unsubscribeProperty: arg.subscribeProperty,
         }
         // and make up the url based on that
-        const token = await jwtSign(tokenData, this.sensitiveConfig.secondaryJwtKey);
+        const token = await jwtSign(tokenData, this.appSensitiveConfig.secondaryJwtKey);
         const url = "https://" + hostname + "/rest/user/unsubscribe?userid=" + userData.id + "&token=" + encodeURIComponent(token);
         // create the url
         unsubscribeURLs[email] = {

@@ -18,6 +18,7 @@ import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient } from "./redis";
 import { ISQLTableRowValue } from "../base/Root/sql";
+import MailProvider from "./services/base/MailProvider";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -43,9 +44,12 @@ export class GlobalManager {
   private seoGenLastUpdated: number;
   private currencyFactorsProvider: CurrencyFactorsProvider<any>;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  private mailProvider: MailProvider<any>;
   private config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
-  private customServices: ServiceProvider<any>[];
+  private customServices: {
+    [name: string]: ServiceProvider<any>,
+  };
   private registry: RegistryService;
 
   constructor(
@@ -56,6 +60,7 @@ export class GlobalManager {
     config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
+    mailProvider: MailProvider<any>,
     registry: RegistryService,
   ) {
     this.root = root;
@@ -68,10 +73,14 @@ export class GlobalManager {
     this.config = config;
     this.sensitiveConfig = sensitiveConfig;
     this.registry = registry;
+    this.mailProvider = mailProvider;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 
-    this.customServices = [];
+    this.customServices = {};
+
+    mailProvider.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    currencyFactorsProvider.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
@@ -86,10 +95,23 @@ export class GlobalManager {
   public setSEOGenerator(seoGenerator: SEOGenerator) {
     this.seoGenerator = seoGenerator;
   }
-  public async installGlobalService(service: ServiceProvider<any>) {
-    this.customServices.push(service);
-    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.root);
-    await service.initialize();
+  public installGlobalService(service: ServiceProvider<any>) {
+    this.customServices[service.getInstanceName()] = service;
+    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+  }
+  public async initializeServices() {
+    if (this.mailProvider) {
+      await this.mailProvider.initialize();
+    }
+    if (this.currencyFactorsProvider) {
+      await this.currencyFactorsProvider.initialize();
+    }
+
+    await Promise.all(
+      Object.keys(this.customServices).map((sKey) => {
+        return this.customServices[sKey].initialize();
+      })
+    );
   }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
@@ -354,7 +376,7 @@ export class GlobalManager {
     })();
 
     // execute every custom service
-    this.customServices.forEach((s) => s.execute());
+    Object.keys(this.customServices).forEach((s) => this.customServices[s].execute());
   }
   private async runOnce() {
     for (const mod of this.modNeedsMantenience) {

@@ -1,5 +1,4 @@
-import { IServiceProviderClassType, ServiceProvider } from "..";
-import { RegistryService } from "../registry";
+import { ServiceProvider, ServiceProviderType } from "..";
 
 export interface IUserLocalizationType {
   country: string;
@@ -7,13 +6,9 @@ export interface IUserLocalizationType {
   language: string;
 }
 
-export interface IUserLocalizationProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService): UserLocalizationProvider<T>
-}
-
 export default class UserLocalizationProvider<T> extends ServiceProvider<T> {
-  constructor(config: T, registry: RegistryService) {
-    super(config, registry);
+  public static getType() {
+    return ServiceProviderType.LOCAL;
   }
 
   /**

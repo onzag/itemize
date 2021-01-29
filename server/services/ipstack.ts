@@ -3,6 +3,7 @@ import https from "https";
 import { countries } from "../../imported-resources";
 import { logger } from "../";
 import UserLocalizationProvider, { IUserLocalizationType } from "./base/UserLocalizationProvider";
+import { ServiceProviderType } from ".";
 
 interface IPStackResponse {
   ip: string;
@@ -38,6 +39,9 @@ export interface IPStackConfig {
 }
 
 export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
+  public static getType() {
+    return ServiceProviderType.LOCAL;
+  }
   private requestInfoFor(ip: string) {
     return new Promise<IPStackResponse>((resolve, reject) => {
       (this.config.httpsEnabled ? https : http).get(`http://api.ipstack.com/${ip}?access_key=${this.config.apiKey}`, (resp) => {

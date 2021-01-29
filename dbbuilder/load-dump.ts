@@ -109,7 +109,7 @@ export default async function loadDump(configVersion: string, knex: Knex, root: 
 
   const registry = new RegistryService({
     knex,
-  }, null);
+  }, null, config, sensitiveConfig);
   await registry.initialize();
 
   // and the upload containers

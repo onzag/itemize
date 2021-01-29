@@ -1,10 +1,15 @@
 import Mailgun from "mailgun-js";
 import MailProvider, { ISendEmailData } from "./base/MailProvider";
 import type { Router } from "express";
+import { ServiceProviderType } from ".";
 
 export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   private mailgun: Mailgun.Mailgun;
   private cantReceiveEmail: boolean = false;
+
+  public static getType() {
+    return ServiceProviderType.HYBRID;
+  }
 
   public async initialize(): Promise<void> {
     this.mailgun = new Mailgun(this.config);
@@ -15,7 +20,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
     });
 
     const hostname = process.env.NODE_ENV === "development" ?
-      this.internalConfig.developmentHostname : this.internalConfig.productionHostname;
+      this.appConfig.developmentHostname : this.appConfig.productionHostname;
 
     const customID = "MAILGUN_ITEMIZE_TRIGGER_" + hostname;
 
@@ -28,7 +33,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
             {
               priority: 0,
               description: customID,
-              expression: `match_recipient(".*@${this.sensitiveConfig.mailDomain}")`,
+              expression: `match_recipient(".*@${this.appSensitiveConfig.mailDomain}")`,
               action: `store(notify=${JSON.stringify("https://" + hostname + "/rest/service/mailgun/callback")})`
             }, (error, body) => {
               if (error) {

@@ -7,9 +7,7 @@
  * @packageDocumentation
  */
 
-import { ItemizeRedisClient } from "../../redis";
-import { IServiceProviderClassType, ServiceProvider } from "..";
-import { RegistryService } from "../registry";
+import { ServiceProvider, ServiceProviderType } from "..";
 
 /**
  * This is the expected currency factors shape
@@ -34,36 +32,13 @@ export interface ICurrencyFactors {
 }
 
 /**
- * This  interfaces represents a currency factors class
- */
-export interface ICurrencyFactorsProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService, globalCache: ItemizeRedisClient): CurrencyFactorsProvider<T>
-}
-
-/**
  * The currency factors provider base class is an interface class that should
  * be extended in order ot provide the proper currency factors
  */
 export default class CurrencyFactorsProvider<T> extends ServiceProvider<T> {
-  public globalCache: ItemizeRedisClient;
-
-  /**
-   * When built the currency factors provider will receive
-   * automaticallyt the config that exists in the sensitive config
-   * information
-   * 
-   * Do not override this function as the factors is instantiated
-   * automatically and it expects this form
-   * 
-   * @param config 
-   * @param registry the registry service
-   * @param globalCache 
-   */
-  constructor(config: T, registry: RegistryService, globalCache: ItemizeRedisClient) {
-    super(config, registry);
-    this.globalCache = globalCache;
+  public static getType() {
+    return ServiceProviderType.GLOBAL;
   }
-
   /**
    * Should provide the currency factors
    * 

@@ -576,7 +576,83 @@ On itemize there are two levels, the global level, which is where your centraliz
 
 When we use triggers we do a local update first and then elevate it to the database, unless we do a raw db upgrade which does it the other way around; however for a service we need to do raw db updates only, so in that sense, what we need is a global service that runs on the global manager level.
 
-Let's first create our new test service, create a file at `server/booking-service.ts` and let's set its basics
+Let's first create our new test service, create a file at `server/booking-service.ts` and let's make a new very basic service.
+
+```ts
+import { IAppDataType } from "@onzag/itemize/server";
+import { ServiceProvider, ServiceProviderType } from "@onzag/itemize/server/services";
+
+export default class BookingService extends ServiceProvider<null> {
+    static getType() {
+        return ServiceProviderType.GLOBAL;
+    }
+
+    /**
+     * Just to show off we make this
+     * 
+     * There is a static and an instance getRouter method
+     * the static one gets added once per class, the dynamic
+     * gets added per instance
+     * 
+     * So if I had done
+     * 
+     * customServices: {
+     *   bookingService: BookingService,
+     *   bookingService2: BookingService,
+     * }
+     * 
+     * this method will only execute once, not twice
+     */
+    static getRouter(appData: IAppDataType) {
+        const router = this.expressRouter();
+        // the endpoint should be at /rest/service/hello
+        router.get("/hello", (req, res) => {
+            // just as a demonstration we give the build number
+            res.end("world - " + appData.buildnumber);
+        });
+        return router;
+    }
+    public getRunCycleTime() {
+        // run will run every second
+        return 1000;
+    }
+    public run() {
+        this.logInfo("Hello from Booking Service " + this.getInstanceName());
+    }
+}
+```
+
+And then install it in our services list at `services.ts`:
+
+```ts
+import { IServiceCustomizationType } from "@onzag/itemize/server";
+import BookingService from "./booking-service";
+
+// within this file you can change your service providers
+// this file is dinamically imported by the server and other
+// services that might need it and it should not have a direct
+// connection to the server, it's standalone
+// see it as a configuration file
+
+// this file enables to specify custom services eg. for email sending
+// storage, and others, if left emtpy it will use the itemize defaults
+const services: IServiceCustomizationType = {
+    customServices: {
+        bookingService: BookingService,
+    }
+};
+
+// this export being the default is important
+export default services;
+```
+
+Now restart the server, your console should show something as:
+
+![Custom Service](./images/custom-service.png)
+
+And if you navigate to `http://localhost:8000/rest/service/hello` you should be able to see your custom answer:
+
+![Custom Service Endpoint](./images/custom-service-endpoint.png)
 
 
 

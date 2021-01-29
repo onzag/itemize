@@ -6,7 +6,7 @@
 
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import uuidv5 from "uuid/v5";
-import { IServiceProviderClassType, ServiceProvider } from "..";
+import { IServiceProviderClassType, ServiceProvider, ServiceProviderType } from "..";
 import { RegistryService } from "../registry";
 
 /**
@@ -17,21 +17,13 @@ import { RegistryService } from "../registry";
 const NAMESPACE = "d27dba52-42ef-4649-81d2-568f9ba341ff";
 
 /**
- * This represents a location search provider class
- */
-export interface ILocationSearchProviderClassType<T> extends IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService): LocationSearchProvider<T>
-}
-
-/**
  * The location search provider is a base interface type class
  * that specifies how to create a service for location search
  */
 export default class LocationSearchProvider<T> extends ServiceProvider<T> {
-  constructor(config: T, registry: RegistryService) {
-    super(config, registry);
+  public static getType() {
+    return ServiceProviderType.LOCAL;
   }
-
   /**
    * A helping utility that specifies how to make location search ids
    * this is what itemize uses internally and it should be kept consistent

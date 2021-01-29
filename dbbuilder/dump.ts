@@ -256,7 +256,7 @@ export default async function dump(version: string, knex: Knex, root: Root) {
 
   const registry = new RegistryService({
     knex,
-  }, null);
+  }, null, config, sensitiveConfig);
   await registry.initialize();
 
   // and our containers

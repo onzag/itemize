@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import { ServiceProvider } from ".";
+import { ServiceProvider, ServiceProviderType } from ".";
 import type Knex from "knex";
 import { REGISTRY_IDENTIFIER } from "../../constants";
 
@@ -22,6 +22,10 @@ interface IAllKeyResult { [skey: string]: any };
  * runs on the load-dump and dump mechanisms
  */
 export class RegistryService extends ServiceProvider<IRegistryConfig> {
+  public static getType() {
+    return ServiceProviderType.NONE;
+  }
+
   /**
    * Sets a key in the given registry
    * @param pkey the primary key name

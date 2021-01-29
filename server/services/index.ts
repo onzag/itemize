@@ -6,6 +6,9 @@ import { RegistryService } from "./registry";
 import { ItemizeRedisClient } from "../redis";
 import Root from "../../base/Root";
 import { ItemizeRawDB } from "../raw-db";
+import MailProvider from "./base/MailProvider";
+import { IConfigRawJSONDataType } from "../../config";
+import { ISensitiveConfigRawJSONDataType } from "../../config";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -16,23 +19,47 @@ const wait = (time: number) => {
   });
 }
 
+export enum ServiceProviderType {
+  GLOBAL = "GLOBAL",
+  LOCAL = "LOCAL",
+  HYBRID = "HYBRID",
+  NONE = "NONE",
+}
+
 export class ServiceProvider<T> {
   private lastRan: number;
 
   public config: T;
   public registry: RegistryService;
+  public appConfig: IConfigRawJSONDataType;
+  public appSensitiveConfig: ISensitiveConfigRawJSONDataType;
 
   public globalKnex: Knex;
   public globalRedisPub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
   public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
+  public globalMailProvider: MailProvider<any>;
+  public globalCustomServices: {
+    [name: string]: ServiceProvider<any>,
+  };
+
+  public localAppData: IAppDataType;
 
   public instanceName: string;
+  public globalInstance: boolean;
+  public localInstance: boolean;
 
-  constructor(config: T, registry: RegistryService) {
+  constructor(
+    config: T,
+    registry: RegistryService,
+    appConfig: IConfigRawJSONDataType,
+    appSensitiveConfig: ISensitiveConfigRawJSONDataType,
+  ) {
     this.config = config;
     this.registry = registry;
+    this.appConfig = appConfig;
+    this.appSensitiveConfig = appSensitiveConfig;
   }
 
   public setInstanceName(n: string) {
@@ -41,6 +68,14 @@ export class ServiceProvider<T> {
 
   public getInstanceName() {
     return this.instanceName;
+  }
+
+  public isInstanceGlobal() {
+    return this.globalInstance;
+  }
+
+  public isInstanceLocal() {
+    return this.localInstance;
   }
 
   public logInfo(str: string, extra?: any) {
@@ -75,12 +110,29 @@ export class ServiceProvider<T> {
     return express.Router(options);
   }
 
-  public setupGlobalResources(knex: Knex, globalClient: ItemizeRedisClient, globalPub: ItemizeRedisClient, root: Root) {
+  public setupGlobalResources(
+    knex: Knex,
+    globalClient: ItemizeRedisClient,
+    globalPub: ItemizeRedisClient,
+    globalMailProvider: MailProvider<any>,
+    globalCustomServices: {
+      [name: string]: ServiceProvider<any>,
+    },
+    root: Root,
+  ) {
+    this.globalInstance = true;
     this.globalKnex = knex;
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;
     this.globalRoot = root;
     this.globalRawDB = new ItemizeRawDB(globalPub, this.globalKnex, this.globalRoot);
+    this.globalCustomServices = globalCustomServices;
+    this.globalMailProvider = globalMailProvider;
+  }
+
+  public setupLocalResources(appData: IAppDataType) {
+    this.localInstance = true;
+    this.localAppData = appData;
   }
 
   /**
@@ -92,8 +144,8 @@ export class ServiceProvider<T> {
    * 
    * @override
    */
-  public static isGlobal() {
-    return false;
+  public static getType(): ServiceProviderType {
+    return ServiceProviderType.LOCAL;
   }
 
   /**
@@ -232,8 +284,13 @@ export class ServiceProvider<T> {
 }
 
 export interface IServiceProviderClassType<T> {
-  new(config: T, registry: RegistryService): ServiceProvider<T>;
+  new(
+    config: T,
+    registry: RegistryService,
+    appConfig: IConfigRawJSONDataType,
+    appSensitiveConfig: ISensitiveConfigRawJSONDataType,
+  ): ServiceProvider<T>;
   getRouter: (appData: IAppDataType) => express.Router | Promise<express.Router>;
   getTriggerRegistry: () => ITriggerRegistry | Promise<ITriggerRegistry>;
-  isGlobal: () => boolean;
+  getType: () => ServiceProviderType;
 }

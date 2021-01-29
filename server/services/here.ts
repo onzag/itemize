@@ -1,4 +1,5 @@
 import https from "https";
+import { ServiceProviderType } from ".";
 import { IPropertyDefinitionSupportedLocationType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import LocationSearchProvider from "./base/LocationSearchProvider";
 
@@ -26,6 +27,9 @@ export interface IHereMapsConfig {
 }
 
 export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
+  public static getType() {
+    return ServiceProviderType.LOCAL;
+  }
   private processHereResult(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
     return {
       lat: suggestion.position[0],

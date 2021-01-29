@@ -1,6 +1,7 @@
 import fs, { ReadStream } from "fs";
 const fsAsync = fs.promises;
 import path from "path";
+import { ServiceProviderType } from ".";
 import StorageProvider from "./base/StorageProvider";
 
 async function copyDir(src: string, dest: string) {
@@ -21,6 +22,9 @@ async function copyDir(src: string, dest: string) {
 };
 
 export class LocalStorageService extends StorageProvider<null> {
+  public static getType() {
+    return ServiceProviderType.NONE;
+  }
   public async upload(at: string, readStream: ReadStream): Promise<void> {
     const remote = at;
     const targetPath = remote.split("/");

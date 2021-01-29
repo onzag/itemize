@@ -34,23 +34,23 @@ import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
 import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
-import { LocalStorageService } from "./services/local";
+import { LocalStorageService } from "./services/local-storage";
 import { OpenstackService } from "./services/openstack";
 import { IPStackService } from "./services/ipstack";
 import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
-import { ServiceProvider, IServiceProviderClassType } from "./services";
-import { ICurrencyFactorsProviderClassType } from "./services/base/CurrencyFactorsProvider";
-import LocationSearchProvider, { ILocationSearchProviderClassType } from "./services/base/LocationSearchProvider";
-import MailProvider, { IMailProviderClassType } from "./services/base/MailProvider";
-import StorageProvider, { IStorageProvidersObject, IStorageProviderClassType } from "./services/base/StorageProvider";
-import UserLocalizationProvider, { IUserLocalizationProviderClassType } from "./services/base/UserLocalizationProvider";
+import { ServiceProvider, IServiceProviderClassType, ServiceProviderType } from "./services";
+import LocationSearchProvider from "./services/base/LocationSearchProvider";
+import MailProvider from "./services/base/MailProvider";
+import StorageProvider, { IStorageProvidersObject } from "./services/base/StorageProvider";
+import UserLocalizationProvider from "./services/base/UserLocalizationProvider";
 import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient, setupRedisClient } from "./redis";
 import { ICustomRoleType } from "./resolvers/roles";
 import { ItemizeRawDB } from "./raw-db";
+import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -172,15 +172,15 @@ export interface IServerDataType {
 }
 
 export interface IStorageProviders {
-  [type: string]: IStorageProviderClassType<any>;
+  [type: string]: IServiceProviderClassType<any>;
 }
 
 export interface IServiceCustomizationType {
   storageServiceProviders?: IStorageProviders;
-  mailServiceProvider?: IMailProviderClassType<any>;
-  userLocalizationProvider?: IUserLocalizationProviderClassType<any>;
-  currencyFactorsProvider?: ICurrencyFactorsProviderClassType<any>;
-  locationSearchProvider?: ILocationSearchProviderClassType<any>;
+  mailServiceProvider?: IServiceProviderClassType<any>;
+  userLocalizationProvider?: IServiceProviderClassType<any>;
+  currencyFactorsProvider?: IServiceProviderClassType<any>;
+  locationSearchProvider?: IServiceProviderClassType<any>;
   customServices?: {
     [name: string]: IServiceProviderClassType<any>,
   };
@@ -204,11 +204,11 @@ export async function getStorageProviders(
 ): Promise<{
   cloudClients: IStorageProvidersObject;
   instancesUsed: StorageProvider<any>[];
-  classesUsed: IStorageProviderClassType<any>[];
+  classesUsed: IServiceProviderClassType<any>[];
 }> {
   const finalOutput = {
     instancesUsed: [] as StorageProvider<any>[],
-    classesUsed: [] as IStorageProviderClassType<any>[],
+    classesUsed: [] as IServiceProviderClassType<any>[],
     cloudClients: {} as IStorageProvidersObject,
   };
 
@@ -223,7 +223,10 @@ export async function getStorageProviders(
     if (prefix.indexOf("/") !== 0) {
       prefix = "https://" + prefix;
     }
-    const localClient = new LocalStorageService(null, registry, sensitiveConfig.localContainer, prefix);
+    const localClient = new LocalStorageService(null, registry, config, sensitiveConfig);
+    localClient.setPrefix(prefix);
+    localClient.setId(sensitiveConfig.localContainer);
+
     await localClient.initialize();
     finalOutput.instancesUsed.push(localClient);
     // typescript for some reason misses the types
@@ -248,9 +251,15 @@ export async function getStorageProviders(
       }
 
       const type = containerData.type;
-      const ServiceClass = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
+      const ServiceClass: IServiceProviderClassType<any> = (storageServiceProviders && storageServiceProviders[type]) || OpenstackService;
 
-      const client = new ServiceClass(containerData.config, registry, containerIdX, prefix);
+      if (ServiceClass.getType() !== ServiceProviderType.NONE) {
+        throw new Error("The service class for storage is not of type NONE");
+      }
+
+      const client: StorageProvider<any> = (new ServiceClass(containerData.config, registry, config, sensitiveConfig)) as any;
+      client.setPrefix(prefix);
+      client.setId(containerIdX);
       await client.initialize();
       finalOutput.instancesUsed.push(client);
       // typescript misses the types
@@ -521,7 +530,7 @@ export async function initializeServer(
     );
     const registry = new RegistryService({
       knex,
-    }, null);
+    }, null, config, sensitiveConfig);
     await registry.initialize();
 
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
@@ -529,13 +538,39 @@ export async function initializeServer(
         "initializeServer: setting up global manager",
       );
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
-      if (!CurrencyFactorsClass.isGlobal()) {
+      if (CurrencyFactorsClass.getType() !== ServiceProviderType.GLOBAL) {
         throw new Error("Currency factors custom provider class is not a global type");
       }
-      const currencyFactorsService = sensitiveConfig.currencyFactors ?
-        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, redisGlobalClient) :
-        null;
-      currencyFactorsService && await currencyFactorsService.initialize();
+      const currencyFactorsService: CurrencyFactorsProvider<any> = (sensitiveConfig.currencyFactors ?
+        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, config, sensitiveConfig) :
+        null) as any;
+
+      if (sensitiveConfig.mail) {
+        logger.info(
+          "initializeServer: initializing global mail service",
+        );
+      }
+      let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
+      if (MailServiceClass.getType() !== ServiceProviderType.HYBRID) {
+        throw new Error("The mail service class is not a hybrid type, and that's not allowed");
+      }
+
+      const usesFakeMail = process.env.FAKE_EMAILS === "true";
+      if (usesFakeMail) {
+        logger.info(
+          "initializeServer: using fake email service",
+        );
+        // typescript messes the types again
+        MailServiceClass = FakeMailService as any;
+      }
+      const mailService: MailProvider<any> = ((sensitiveConfig.mail || usesFakeMail) ?
+        new MailServiceClass(
+          sensitiveConfig.mail,
+          registry,
+          config,
+          sensitiveConfig,
+        ) : null) as any;
+
       const manager: GlobalManager = new GlobalManager(
         root,
         knex,
@@ -544,28 +579,30 @@ export async function initializeServer(
         config,
         sensitiveConfig,
         currencyFactorsService,
+        mailService,
         registry,
       );
 
       if (serviceCustom && serviceCustom.customServices) {
-        await Promise.all(
-          Object.keys(serviceCustom.customServices).map(async (keyName) => {
-            const CustomServiceClass = serviceCustom.customServices[keyName];
+        Object.keys(serviceCustom.customServices).map(async (keyName) => {
+          const CustomServiceClass = serviceCustom.customServices[keyName];
 
-            if (!CustomServiceClass.isGlobal()) {
-              return;
-            }
+          const type = CustomServiceClass.getType();
+          if (type !== ServiceProviderType.GLOBAL && type !== ServiceProviderType.HYBRID) {
+            return;
+          }
 
-            const configData = {
-              ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
-              ...(config.custom && config.custom[keyName]),
-            };
-            const customGlobalService = new CustomServiceClass(configData, registry);
-            customGlobalService.setInstanceName(keyName);
-            await manager.installGlobalService(customGlobalService);
-          })
-        );
+          const configData = {
+            ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+            ...(config.custom && config.custom[keyName]),
+          };
+          const customGlobalService = new CustomServiceClass(configData, registry, config, sensitiveConfig);
+          customGlobalService.setInstanceName(keyName);
+          manager.installGlobalService(customGlobalService);
+        });
       }
+
+      await manager.initializeServices();
 
       if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
@@ -592,12 +629,15 @@ export async function initializeServer(
 
           let storageClient: StorageProvider<any>;
           if (isLocalInstead) {
-            storageClient = new LocalStorageService(null, registry, sensitiveConfig.seoContainerID, prefix);
+            storageClient = new LocalStorageService(null, registry, config, sensitiveConfig);
           } else {
             const type = seoContainerData.type;
             const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
-            storageClient = new ServiceClass(seoContainerData.config, registry, sensitiveConfig.seoContainerID, prefix);
+            storageClient = (new ServiceClass(seoContainerData.config, registry, config, sensitiveConfig)) as any;
           }
+
+          storageClient.setId(sensitiveConfig.seoContainerID);
+          storageClient.setPrefix(prefix);
 
           await storageClient.initialize();
 
@@ -713,13 +753,12 @@ export async function initializeServer(
       );
     }
     const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
-    if (UserLocalizationServiceClass.isGlobal()) {
-      throw new Error("The user localization service class is a global type, and that's not allowed");
+    if (UserLocalizationServiceClass.getType() !== ServiceProviderType.LOCAL) {
+      throw new Error("The user localization service class is not a local type, and that's not allowed");
     }
-    const userLocalizationService = sensitiveConfig.userLocalization ?
-      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry) :
-      null;
-    userLocalizationService && await userLocalizationService.initialize();
+    const userLocalizationService: UserLocalizationProvider<any> = (sensitiveConfig.userLocalization ?
+      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, config, sensitiveConfig) :
+      null) as any;
 
     if (sensitiveConfig.mail) {
       logger.info(
@@ -727,8 +766,8 @@ export async function initializeServer(
       );
     }
     let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
-    if (MailServiceClass.isGlobal()) {
-      throw new Error("The mail service class is global type, and that's not allowed");
+    if (MailServiceClass.getType() !== ServiceProviderType.HYBRID) {
+      throw new Error("The mail service class is not a hybrid type, and that's not allowed");
     }
 
     const usesFakeMail = process.env.FAKE_EMAILS === "true";
@@ -739,16 +778,13 @@ export async function initializeServer(
       // typescript messes the types again
       MailServiceClass = FakeMailService as any;
     }
-    const mailService = (sensitiveConfig.mail || usesFakeMail) ?
+    const mailService: MailProvider<any> = ((sensitiveConfig.mail || usesFakeMail) ?
       new MailServiceClass(
         sensitiveConfig.mail,
         registry,
-        cache,
-        root,
         config,
         sensitiveConfig,
-      ) : null;
-    mailService && await mailService.initialize();
+      ) : null) as any;
 
     if (sensitiveConfig.locationSearch) {
       logger.info(
@@ -756,12 +792,11 @@ export async function initializeServer(
       );
     }
     const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
-    if (LocationSearchClass.isGlobal()) {
-      throw new Error("The location search service class is global type, and that's not allowed");
+    if (LocationSearchClass.getType() !== ServiceProviderType.LOCAL) {
+      throw new Error("The location search service class is not a local type, and that's not allowed");
     }
-    const locationSearchService = sensitiveConfig.locationSearch ?
-      new LocationSearchClass(sensitiveConfig.locationSearch, registry) : null;
-    locationSearchService && await locationSearchService.initialize();
+    const locationSearchService: LocationSearchProvider<any> = (sensitiveConfig.locationSearch ?
+      new LocationSearchClass(sensitiveConfig.locationSearch, registry, config, sensitiveConfig) : null) as any;
 
     const customServices: {
       [name: string]: ServiceProvider<any>,
@@ -771,28 +806,26 @@ export async function initializeServer(
     const customServiceClassesUsed: IServiceProviderClassType<any>[] = [];
 
     if (serviceCustom && serviceCustom.customServices) {
-      await Promise.all(
-        Object.keys(serviceCustom.customServices).map(async (keyName) => {
-          const CustomServiceClass = serviceCustom.customServices[keyName];
+      Object.keys(serviceCustom.customServices).map(async (keyName) => {
+        const CustomServiceClass = serviceCustom.customServices[keyName];
 
-          if (CustomServiceClass.isGlobal()) {
-            return;
-          }
+        const type = CustomServiceClass.getType();
+        if (type !== ServiceProviderType.LOCAL && type !== ServiceProviderType.HYBRID) {
+          return;
+        }
 
-          const configData = {
-            ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
-            ...(config.custom && config.custom[keyName]),
-          };
-          customServices[keyName] = new CustomServiceClass(configData, registry);
-          customServices[keyName].setInstanceName(keyName);
-          await customServices[keyName].initialize();
+        const configData = {
+          ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
+          ...(config.custom && config.custom[keyName]),
+        };
+        customServices[keyName] = new CustomServiceClass(configData, registry, config, sensitiveConfig);
+        customServices[keyName].setInstanceName(keyName);
 
-          customServicesInstances.push(customServices[keyName]);
-          if (!customServiceClassesUsed.includes(CustomServiceClass)) {
-            customServiceClassesUsed.push(CustomServiceClass);
-          }
-        })
-      );
+        customServicesInstances.push(customServices[keyName]);
+        if (!customServiceClassesUsed.includes(CustomServiceClass)) {
+          customServiceClassesUsed.push(CustomServiceClass);
+        }
+      });
     }
 
     logger.info(
@@ -869,6 +902,24 @@ export async function initializeServer(
     logger.info(
       "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,
     );
+
+    logger.info(
+      "initializeServer: setting local environment of all service providers",
+    );
+    userLocalizationService && userLocalizationService.setupLocalResources(appData);
+    mailService && mailService.setupLocalResources(appData);
+    locationSearchService && locationSearchService.setupLocalResources(appData);
+    storageClients.instancesUsed.forEach((i) => i.setupLocalResources(appData));
+    customServicesInstances.forEach((i) => i.setupLocalResources(appData));
+
+    logger.info(
+      "initializeServer: initializing all the providers",
+    );
+    userLocalizationService && await userLocalizationService.initialize();
+    mailService && await mailService.initialize();
+    locationSearchService && await locationSearchService.initialize();
+    // the storage clients are a none type and initialize immediately
+    await Promise.all(customServicesInstances.map((i) => i.initialize()));
 
     logger.info(
       "initializeServer: setting execution of all service providers",

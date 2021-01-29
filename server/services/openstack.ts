@@ -4,6 +4,7 @@ const fsAsync = fs.promises;
 import path from "path";
 import https from "https";
 import StorageProvider from "./base/StorageProvider";
+import { ServiceProviderType } from ".";
 
 export interface IOpenstackInitializationAttributes {
   provider: "openstack";
@@ -49,6 +50,10 @@ function getContainerPromisified(client: pkgcloud.storage.Client, containerName:
 export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackContainerType> {
   private client: pkgcloud.storage.Client;
   private container: pkgcloud.storage.Container;
+
+  public static getType() {
+    return ServiceProviderType.NONE;
+  }
 
   public async initialize() {
     const clientData: IOpenstackInitializationAttributes = {

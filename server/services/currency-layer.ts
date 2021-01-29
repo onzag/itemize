@@ -1,5 +1,6 @@
 import http from "http";
 import https from "https";
+import { ServiceProviderType } from ".";
 import { logger } from "../";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
 import CurrencyFactorsProvider, { ICurrencyFactors } from "./base/CurrencyFactorsProvider";
@@ -21,13 +22,13 @@ export interface ICurrencyLayerConfig {
 }
 
 export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayerConfig> {
-  public static isGlobal() {
-    return true;
+  public static getType() {
+    return ServiceProviderType.GLOBAL;
   }
 
   private requestInfo() {
     return new Promise<CurrencyLayerResponse>((resolve, reject) => {
-      this.globalCache.redisClient.get(
+      this.globalRedis.redisClient.get(
         CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
@@ -63,7 +64,7 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
                     );
                     reject(new Error(parsedData.error));
                   } else {
-                    this.globalCache.set(
+                    this.globalRedis.redisClient.set(
                       CACHED_CURRENCY_RESPONSE,
                       data,
                     );
