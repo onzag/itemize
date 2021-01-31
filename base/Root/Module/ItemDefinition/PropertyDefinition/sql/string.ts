@@ -21,15 +21,14 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // and we check it...
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
-      arg.knexBuilder.andWhere(
+      arg.whereBuilder.andWhereColumn(
         arg.prefix + arg.id,
         (arg.args[searchName] as string),
       );
     } else {
-      arg.knexBuilder.andWhereRaw(
-        "?? ilike ? escape ?",
+      arg.whereBuilder.andWhere(
+        JSON.stringify(arg.prefix + arg.id) + " ILIKE ? ESCAPE ?",
         [
-          arg.prefix + arg.id,
           "%" + (arg.args[searchName] as string).replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
           "\\",
         ],
@@ -50,18 +49,17 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
 export function stringSQLStrSearch(arg: ISQLStrSearchInfo) {
   // this is due to knex shenanigans, we need to check it
   // it's a limitation
-  if (arg.knexBuilder) {
+  if (arg.whereBuilder) {
     // so we check it
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
-      arg.knexBuilder.andWhere(
+      arg.whereBuilder.andWhereColumn(
         arg.prefix + arg.id,
         arg.search,
       );
     } else {
-      arg.knexBuilder.andWhereRaw(
-        "?? ilike ? escape ?",
+      arg.whereBuilder.andWhere(
+        JSON.stringify(arg.prefix + arg.id) + " ILIKE ? ESCAPE ?",
         [
-          arg.prefix + arg.id,
           "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
           "\\",
         ],

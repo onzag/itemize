@@ -25,11 +25,11 @@ import location, { IPropertyDefinitionSupportedLocationType } from "./location";
 import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import Knex from "@onzag/knex";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import file, { PropertyDefinitionSupportedFileType } from "./file";
 import ItemDefinition from "../..";
 import Include from "../../Include";
+import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 
 /**
  * All the supported property types
@@ -66,7 +66,6 @@ export interface IArgInfo {
 }
 
 export interface ISQLArgInfo extends IArgInfo {
-  knex: Knex;
   serverData: any;
 }
 
@@ -81,14 +80,14 @@ export interface ISQLOutInfo extends ISQLArgInfo {
 
 export interface ISQLSearchInfo extends ISQLArgInfo {
   dictionary: string;
-  knexBuilder: Knex.QueryBuilder;
+  whereBuilder: WhereBuilder;
   args: IGQLArgs;
   isOrderedByIt: boolean;
 }
 
 export interface ISQLStrSearchInfo extends ISQLArgInfo {
   dictionary: string;
-  knexBuilder: Knex.QueryBuilder;
+  whereBuilder: WhereBuilder;
   search: string;
   isOrderedByIt: boolean;
 }
@@ -210,17 +209,17 @@ export interface IPropertyDefinitionSupportedType {
    * data is the graphql value obtained from the search query mode item definition
    * sqlPrefix is a prefix that everything is prefixed in sql, usually for the item
    * id is the id of the property
-   * knexBuilder is the builder that is being used so it can attach the where queries to it
+   * whereBuilder is the builder that is being used so it can attach the where queries to it
    * and dictionary is the postgres dictionary that can be used for sql searches
    * return a boolean on whether it searched by it or it didn't
    * you might also return an array instead of true for adding custom rows to be added
-   * to the selection, these represent arguments for knex.raw for a select query
+   * to the selection, these represent arguments for a raw select query
    */
   sqlSearch: (arg: ISQLSearchInfo) => boolean | [string, any[]];
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it
-   * note that the knexBuilder can be null in this case, because of technical limitations
+   * note that the whereBuilder can be null in this case, because of technical limitations
    * with knex as it only executes subqueries within the subquery and we need to know
    * the select query beforehand
    * return a boolean on whether it searched by it or it didn't

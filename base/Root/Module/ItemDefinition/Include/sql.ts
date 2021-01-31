@@ -18,6 +18,7 @@ import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowV
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
+import { WhereBuilder } from "../../../../../database/WhereBuilder";
 
 /**
  * Provides the table bit that is necessary to store include data
@@ -214,6 +215,7 @@ export function buildSQLQueryForInclude(
   itemDefinition: ItemDefinition,
   include: Include,
   args: IGQLArgs,
+  whereBuilder: WhereBuilder,
   dictionary: string,
 ) {
   // we need all these prefixes
@@ -224,14 +226,14 @@ export function buildSQLQueryForInclude(
   // if the expected exclusion state is to be excluded
   if (expectedExclusionState === IncludeExclusionState.EXCLUDED) {
     // we tell knex that is to be the case
-    knexBuilder.andWhere(exclusionStateQualifiedId, IncludeExclusionState.EXCLUDED);
+    whereBuilder.andWhereColumn(exclusionStateQualifiedId, IncludeExclusionState.EXCLUDED);
   } else {
     // otherwise if we are expecting something else like ANY and INCLUDED
-    knexBuilder.andWhere((builder) => {
+    whereBuilder.andWhere((builder) => {
       // we extract a subquery builder
       builder.andWhere((secondBuilder) => {
         // and make a where query for all the properties
-        secondBuilder.where(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
+        secondBuilder.andWhereColumn(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
 
         // get the args for that specific include
         const includeArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
@@ -242,7 +244,6 @@ export function buildSQLQueryForInclude(
             return;
           }
           buildSQLQueryForProperty(
-            knex,
             serverData,
             itemDefinition,
             include,
@@ -250,7 +251,7 @@ export function buildSQLQueryForInclude(
             includeArgs,
             secondBuilder,
             dictionary,
-            false,            
+            false,
           );
         });
       });
@@ -258,7 +259,7 @@ export function buildSQLQueryForInclude(
       // if we have an specific exclusion state that can be ANY
       if (expectedExclusionState === IncludeExclusionState.ANY) {
         // then we add the excluded state to the subquery
-        builder.orWhere(prefix + EXCLUSION_STATE_SUFFIX, IncludeExclusionState.EXCLUDED);
+        builder.orWhereColumn(prefix + EXCLUSION_STATE_SUFFIX, IncludeExclusionState.EXCLUDED);
       }
     });
   }

@@ -76,13 +76,13 @@ export function textSQLIn(arg: ISQLInInfo) {
   return {
     [arg.prefix + arg.id]: purifiedText,
     [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
-    [arg.prefix + arg.id + "_VECTOR"]: arg.knex.raw(
+    [arg.prefix + arg.id + "_VECTOR"]: [
       "to_tsvector(?, ?)",
       [
         arg.dictionary,
         escapedText,
       ],
-    ),
+    ],
   };
 }
 
@@ -97,23 +97,20 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // TODO improve, this only matches exact words
     // maybe https://github.com/zombodb/zombodb
-    arg.knexBuilder.andWhereRaw(
-      "?? @@ to_tsquery(??, ?)",
+    arg.whereBuilder.andWhere(
+      JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
       [
-        arg.prefix + arg.id + "_VECTOR",
-        arg.prefix + arg.id + "_DICTIONARY",
         arg.args[searchName] as string,
       ],
     );
 
     if (arg.isOrderedByIt) {
       return [
-        "ts_rank(??, to_tsquery(??, ?)) AS ??",
+        "ts_rank(" + JSON.stringify(arg.prefix + arg.id + "_VECTOR") +
+        ", to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)) AS " +
+        JSON.stringify(arg.prefix + arg.id + "_RANK"),
         [
-          arg.prefix + arg.id + "_VECTOR",
-          arg.prefix + arg.id + "_DICTIONARY",
           arg.args[searchName] as string,
-          arg.prefix + arg.id + "_RANK",
         ]
       ];
     }
@@ -133,25 +130,20 @@ export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any
   // TODO improve, this only matches exact words
   // maybe https://github.com/zombodb/zombodb
 
-  // due to technical limitations with knex, sometimes the builder
-  // isn't available
-  arg.knexBuilder && arg.knexBuilder.whereRaw(
-    "?? @@ to_tsquery(??, ?)",
+  arg.whereBuilder && arg.whereBuilder.andWhere(
+    JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
     [
-      arg.prefix + arg.id + "_VECTOR",
-      arg.prefix + arg.id + "_DICTIONARY",
       arg.search,
     ],
   );
 
   if (arg.isOrderedByIt) {
     return [
-      "ts_rank(??, to_tsquery(??, ?)) AS ??",
+      "ts_rank(" + JSON.stringify(arg.prefix + arg.id + "_VECTOR") +
+      ", to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)) AS " +
+      JSON.stringify(arg.prefix + arg.id + "_STRRANK"),
       [
-        arg.prefix + arg.id + "_VECTOR",
-        arg.prefix + arg.id + "_DICTIONARY",
         arg.search,
-        arg.prefix + arg.id + "_STRRANK",
       ]
     ];
   }

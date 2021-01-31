@@ -1,7 +1,6 @@
 import { Test } from "..";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
-import Knex from "@onzag/knex";
 import Module from "../../base/Root/Module";
 import { CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER } from "../../constants";
 

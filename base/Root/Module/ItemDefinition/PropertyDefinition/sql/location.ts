@@ -73,7 +73,7 @@ export function locationSQLIn(arg: ISQLInInfo) {
 
   const value = arg.value as IPropertyDefinitionSupportedLocationType;
   return {
-    [arg.prefix + arg.id + "_GEO"]: arg.knex.raw("ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]),
+    [arg.prefix + arg.id + "_GEO"]: ["ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]],
     [arg.prefix + arg.id + "_ID"]: value.id,
     [arg.prefix + arg.id + "_LAT"]: value.lat,
     [arg.prefix + arg.id + "_LNG"]: value.lng,
@@ -115,17 +115,17 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
     typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
   ) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_GEO", "is not", null);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_GEO", null, "IS NOT");
 
     const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
     const lng = argAsLocation.lng || 0;
     const lat = argAsLocation.lat || 0;
     const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
     const distance = (argAsUnit.normalizedValue || 0) * 1000;
-    arg.knexBuilder.andWhereRaw(
-      "ST_DWithin(??, ST_MakePoint(?,?)::geography, ?)",
+
+    arg.whereBuilder.andWhere(
+      "ST_DWithin(" + JSON.stringify(arg.prefix + arg.id + "_GEO") + ", ST_MakePoint(?,?)::geography, ?)",
       [
-        arg.prefix + arg.id + "_GEO",
         lng,
         lat,
         distance,
@@ -134,9 +134,8 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
 
     if (arg.isOrderedByIt) {
       return [
-        "ST_Distance(??, ST_MakePoint(?,?)::geography) AS ??",
+        "ST_Distance(" + JSON.stringify(arg.prefix + arg.id + "_GEO") + ", ST_MakePoint(?,?)::geography) AS ??",
         [
-          arg.prefix + arg.id + "_GEO",
           lng,
           lat,
           arg.prefix + arg.id + "_CALC_RADIUS",

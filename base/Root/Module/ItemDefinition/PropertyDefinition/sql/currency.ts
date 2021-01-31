@@ -91,8 +91,8 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     const exactArg = arg.args[exactName] as IGQLArgs;
     // we just match it as it is
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
   }
 
   // if we have a from search
@@ -103,12 +103,12 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     // in these cases we use the normalized values and for that we use the conversion
     const normalized = factor ? factor * fromArg.value : null;
     // so we do
-    arg.knexBuilder.andWhere((clause) => {
+    arg.whereBuilder.andWhere((clause) => {
       clause
-        .where(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized).orWhere((subclause) => {
+        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", normalized, ">=").orWhere((subclause) => {
         subclause
-          .where(arg.prefix + arg.id + "_VALUE", ">=", fromArg.value)
-          .andWhere(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
+          .andWhereColumn(arg.prefix + arg.id + "_VALUE", fromArg.value, ">=")
+          .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
       })
     });
     searchedByIt = true;
@@ -119,12 +119,12 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
     const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][toArg.currency];
     const normalized = factor ? factor * toArg.value : null;
-    arg.knexBuilder.andWhere((clause) => {
+    arg.whereBuilder.andWhere((clause) => {
       clause
-        .where(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized).orWhere((subclause) => {
+        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", normalized, "<=").orWhere((subclause) => {
         subclause
-          .where(arg.prefix + arg.id + "_VALUE", "<=", toArg.value)
-          .andWhere(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
+          .andWhereColumn(arg.prefix + arg.id + "_VALUE", toArg.value, "<=")
+          .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
       })
     });
     searchedByIt = true;

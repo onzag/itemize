@@ -19,7 +19,7 @@ export function passwordSQLIn(arg: ISQLInInfo) {
     };
   }
   return  {
-    [arg.prefix + arg.id]: arg.knex.raw("crypt(?, gen_salt('bf',10))", arg.value as string),
+    [arg.prefix + arg.id]: ["crypt(?, gen_salt('bf',10))", [arg.value as string]],
   };
 }
 
@@ -29,14 +29,13 @@ export function passwordSQLIn(arg: ISQLInInfo) {
  * @returns a knex raw execution query
  */
 export function passwordSQLEqual(arg: ISQLEqualInfo) {
-  return arg.knex.raw(
-    "?? = crypt(?, ??)",
+  const columnName = JSON.stringify(arg.prefix + arg.id);
+  return [
+    columnName + " = crypt(?, " + columnName + ")",
     [
-      arg.prefix + arg.id,
       arg.value as string,
-      arg.prefix + arg.id,
     ],
-  );
+  ];
 }
 
 /**

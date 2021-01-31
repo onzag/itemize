@@ -5,12 +5,12 @@
  * @packageDocumentation
  */
 
+import { DatabaseConnection } from "../../database";
 import { ServiceProvider, ServiceProviderType } from ".";
-import type Knex from "@onzag/knex";
 import { REGISTRY_IDENTIFIER } from "../../constants";
 
 interface IRegistryConfig {
-  knex: Knex,
+  databaseConnection: DatabaseConnection,
 };
 
 interface IAllKeyResult { [skey: string]: any };
@@ -38,28 +38,12 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
     const actualSkey = skey || "";
 
     // and then do an upsert
-    await this.config.knex.raw(
-      `INSERT INTO ?? (??, ??, ??, ??, ??) VALUES (?, ?, ?, ?, ?) ` +
-      `ON CONFLICT ("pkey", "skey") DO UPDATE SET ?? = ?, ?? = ?`,
+    await this.config.databaseConnection.query(
+      `INSERT INTO ${JSON.stringify(REGISTRY_IDENTIFIER)} ("pkey", "skey", "value", "created_at", "last_modified") VALUES ($1, $2, $3, NOW(), NOW()) ` +
+      `ON CONFLICT ("pkey", "skey") DO UPDATE SET "last_modified" = NOW(), "value" = $3`,
       [
-        REGISTRY_IDENTIFIER,
-
-        "pkey",
-        "skey",
-        "value",
-        "created_at",
-        "last_modified",
-
         pkey,
         actualSkey,
-        valueStringified,
-        this.config.knex.fn.now(),
-        this.config.knex.fn.now(),
-
-        "last_modified",
-        this.config.knex.fn.now(),
-
-        "value",
         valueStringified,
       ]
     );
@@ -72,9 +56,12 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
    */
   public async getAllInPkey(pkey: string): Promise<IAllKeyResult> {
     // so we selent all rows for the given pkey and select all skey and value
-    const rows = await this.config.knex.select("skey", "value").from(REGISTRY_IDENTIFIER).where({
-      pkey,
-    });
+    const rows = await this.config.databaseConnection.queryRows(
+      `SELECT * FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1`,
+      [
+        pkey,
+      ],
+    );
 
     // now we need to build the result
     const result: IAllKeyResult = {};
@@ -107,11 +94,14 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
    */
   public async getKey(pkey: string, skey?: string) {
     // so we select based on that
-    const row = await this.config.knex.first("value").from(REGISTRY_IDENTIFIER).where({
-      pkey,
-      skey: skey ? skey : "",
-    });
-
+    const row = await this.config.databaseConnection.queryFirst(
+      `SELECT "value" FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1 AND "skey" = $2`,
+      [
+        pkey,
+        skey ? skey : "",
+      ]
+    );
+  
     // if we have a value
     if (row && row.value) {
       // we give it by parsing
@@ -138,11 +128,22 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
    * @param pkey the primary key name
    * @param skey an optional secondary key name
    */
-  public async detKey(pkey: string, skey?: string) {
-    // so we select based on that
-    await this.config.knex.delete(REGISTRY_IDENTIFIER).where({
-      pkey,
-      skey: skey ? skey : "",
-    });
+  public async delKey(pkey: string, skey?: string) {
+    if (skey) {
+      await this.config.databaseConnection.queryFirst(
+        `DELETE FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1 AND "skey" = $2`,
+        [
+          pkey,
+          skey ? skey : "",
+        ]
+      );
+    } else {
+      await this.config.databaseConnection.queryFirst(
+        `DELETE FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1`,
+        [
+          pkey,
+        ]
+      );
+    }
   }
 }

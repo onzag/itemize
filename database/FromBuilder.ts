@@ -1,4 +1,6 @@
-class FromBuilder extends QueryBuilder {
+import { QueryBuilder } from ".";
+
+export class FromBuilder extends QueryBuilder {
   private tables: string[] = [];
   constructor() {
     super();

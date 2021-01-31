@@ -30,9 +30,10 @@ import {
   buildSQLQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
-import Knex from "@onzag/knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import StorageProvider from "../../../../server/services/base/StorageProvider";
+import { WhereBuilder } from "../../../../database/WhereBuilder";
+import { OrderByBuilder } from "../../../../database/OrderByBuilder";
 
 /**
  * Provides the table that is necesary to include this item definition as a whole
@@ -40,11 +41,10 @@ import StorageProvider from "../../../../server/services/base/StorageProvider";
  * be saved when populated, it basically adds up all the table bits
  * from all the properties and all the items, this does not include
  * prop extensions nor module level properties, nor base
- * @param knex a knex instance
  * @param itemDefinition the item definition in question
  * @returns a complete table definition type
  */
-export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefinition): ISQLTableDefinitionType {
   // add all the standard fields
   const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
@@ -78,7 +78,7 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
     Object.assign(
       resultTableSchema,
-      getSQLTableDefinitionForProperty(knex, itemDefinition, null, pd),
+      getSQLTableDefinitionForProperty(itemDefinition, null, pd),
     );
   });
 
@@ -86,7 +86,7 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
   itemDefinition.getAllIncludes().forEach((i) => {
     Object.assign(
       resultTableSchema,
-      getSQLTableDefinitionForInclude(knex, itemDefinition, i),
+      getSQLTableDefinitionForInclude(itemDefinition, i),
     );
   });
 
@@ -108,7 +108,6 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
         }
         // and the columns that are expected to be added to the combined index
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
-          knex,
           serverData: null,
           id: propertyId,
           prefix: "",
@@ -136,7 +135,6 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
           return;
         }
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
-          knex,
           serverData: null,
           id: propertyId,
           prefix: "",
@@ -163,20 +161,19 @@ export function getSQLTableDefinitionForItemDefinition(knex: Knex, itemDefinitio
  * Provides all the schema of all the items, self and its children
  * that are included within this item definition and all the table names
  * that should be used using the qualified name
- * @param knex the knex instance
  * @param itemDefinition the item definition in question
  * @returns a partial sql schema definition for the whole database (adds tables)
  */
-export function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefinition: ItemDefinition): ISQLSchemaDefinitionType {
+export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefinition): ISQLSchemaDefinitionType {
   // we add self
   const result = {
-    [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(knex, itemDefinition),
+    [itemDefinition.getQualifiedPathName()]: getSQLTableDefinitionForItemDefinition(itemDefinition),
   };
   // loop over the children and add each one of them and whatever they have
   itemDefinition.getChildDefinitions().forEach((cIdef) => {
     Object.assign(
       result,
-      getSQLTablesSchemaForItemDefinition(knex, cIdef),
+      getSQLTablesSchemaForItemDefinition(cIdef),
     );
   });
   // return that
@@ -188,7 +185,6 @@ export function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefinition: 
  * to a graphql value for this specific item definition,
  * this includes the prop extensions and the reserved base properties
  * This value is FLATTENED
- * @param knex the knex instance
  * @param serverData the server data we are working with
  * @param itemDefinition the item definition in question
  * @param row the row value, with all the columns it has; the row
@@ -200,7 +196,6 @@ export function getSQLTablesSchemaForItemDefinition(knex: Knex, itemDefinition: 
  * @returns a graphql value
  */
 export function convertSQLValueToGQLValueForItemDefinition(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
@@ -230,7 +225,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(knex, serverData, itemDefinition, null, pd, row),
+      convertSQLValueToGQLValueForProperty(serverData, itemDefinition, null, pd, row),
     );
   });
 
@@ -241,7 +236,6 @@ export function convertSQLValueToGQLValueForItemDefinition(
     Object.assign(
       result,
       convertSQLValueToGQLValueForInclude(
-        knex,
         serverData,
         itemDefinition,
         include,
@@ -258,11 +252,9 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * Converts a graphql value, with all its items and everything it
  * has into a SQL row data value for this specific item definition
  * it doesn't include its prop extensions
- * @param knex the knex instance
  * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param data the graphql data
- * @param knex the knex instance
  * @param uploadsContainer the uploads container from openstack
  * @param uploadsPrefix the uploads prefix of the container
  * @param dictionary the dictionary to use in full text search mode
@@ -276,7 +268,6 @@ export function convertSQLValueToGQLValueForItemDefinition(
  * @returns a sql value
  */
 export function convertGQLValueToSQLValueForItemDefinition(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
@@ -298,7 +289,6 @@ export function convertGQLValueToSQLValueForItemDefinition(
       !partialFields
     ) {
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
-        knex,
         serverData,
         itemDefinition.getParentModule(),
         itemDefinition,
@@ -329,7 +319,6 @@ export function convertGQLValueToSQLValueForItemDefinition(
     ) {
       const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
       const addedFieldsByInclude = convertGQLValueToSQLValueForInclude(
-        knex,
         serverData,
         itemDefinition,
         include,
@@ -359,21 +348,22 @@ export function convertGQLValueToSQLValueForItemDefinition(
 /**
  * Builds a sql query for an item definition so that it can be
  * queried for searches
- * @param knex the knex instance
  * @param serverData the server data
  * @param itemDefinition the item definition that is being requested (normal form)
  * @param args the args from the search mode
- * @param knexBuilder the knex builder instance
+ * @param whereBuilder the where builder instance
+ * @param orderByBuilder the order by builder instance
  * @param dictionary the dictionary being used
  * @param search the search arg value
  * @param orderBy the order by rules
+ * @returns a list of raw added selected fields
  */
 export function buildSQLQueryForItemDefinition(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   args: IGQLArgs,
-  knexBuilder: Knex.QueryBuilder,
+  whereBuilder: WhereBuilder,
+  orderByBuilder: OrderByBuilder,
   dictionary: string,
   search: string,
   orderBy: IOrderByRuleType,
@@ -390,13 +380,12 @@ export function buildSQLQueryForItemDefinition(
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
     const wasSearchedBy = buildSQLQueryForProperty(
-      knex,
       serverData,
       itemDefinition,
       null,
       pd,
       args,
-      knexBuilder,
+      whereBuilder,
       dictionary,
       isOrderedByIt,
     );
@@ -410,56 +399,27 @@ export function buildSQLQueryForItemDefinition(
 
   // then we ned to add all the includes
   itemDefinition.getAllIncludes().forEach((include) => {
-    buildSQLQueryForInclude(knex,
+    buildSQLQueryForInclude(
       serverData,
       itemDefinition,
       include,
       args,
-      knexBuilder,
+      whereBuilder,
       dictionary,
     );
   });
 
   if (search) {
-    // for technical reasons we need to do this twice and use a fake builder
-    // just to know if it needs extra fields
-    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
-      if (!pd.isSearchable()) {
-        return;
-      }
-
-      const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-      const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
-        knex,
-        serverData,
-        itemDefinition,
-        null,
-        pd,
-        args,
-        search,
-        null, // note knex builder being null
-        dictionary,
-        isOrderedByIt,
-      );
-      if (wasStrSearchedBy) {
-        if (Array.isArray(wasStrSearchedBy)) {
-          addedSelectFields.push(wasStrSearchedBy);
-        }
-        includedInStrSearchProperties.push(pd.getId());
-      };
-    });
-
     // because these don't happen in the main, they don't get immediately executed but rather
     // during the await time
-    knexBuilder.andWhere((builder) => {
+    whereBuilder.andWhere((builder) => {
       itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
           return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
-          buildSQLStrSearchQueryForProperty(
-            knex,
+          const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
             serverData,
             itemDefinition,
             null,
@@ -470,6 +430,13 @@ export function buildSQLQueryForItemDefinition(
             dictionary,
             isOrderedByIt,
           );
+
+          if (wasStrSearchedBy) {
+            if (Array.isArray(wasStrSearchedBy)) {
+              addedSelectFields.push(wasStrSearchedBy);
+            }
+            includedInStrSearchProperties.push(pd.getId());
+          };
         });
       });
 
@@ -490,10 +457,9 @@ export function buildSQLQueryForItemDefinition(
     orderBySorted.forEach((pSet) => {
       if (!itemDefinition.hasPropertyDefinitionFor(pSet.property, true)) {
         buildSQLOrderByForInternalRequiredProperty(
-          knex,
           itemDefinition,
           pSet.property,
-          knexBuilder,
+          orderByBuilder,
           pSet.direction,
           pSet.nulls,
         );
@@ -505,12 +471,11 @@ export function buildSQLQueryForItemDefinition(
       const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
 
       buildSQLOrderByForProperty(
-        knex,
         serverData,
         itemDefinition,
         null,
         pd,
-        knexBuilder,
+        orderByBuilder,
         pSet.direction,
         pSet.nulls,
         wasIncludedInSearch,

@@ -1,15 +1,30 @@
-class WithBuilder extends QueryBuilder {
-  private name: string;
-  private asWhat: QueryBuilder;
-  constructor(name: string, asWhat: QueryBuilder) {
+import { QueryBuilder } from ".";
+
+interface IWithRules {
+  name: string;
+  asWhat: QueryBuilder;
+}
+
+export class WithBuilder extends QueryBuilder {
+  private withs: IWithRules[];
+  private query: QueryBuilder;
+  constructor() {
     super();
-
-    this.name = name;
-    this.asWhat = asWhat;
-
-    this.addBindingSource(this.asWhat);
+  }
+  public with(name: string, asWhat: QueryBuilder) {
+    this.withs.push({
+      name,
+      asWhat,
+    });
+    this.addBindingSource(asWhat);
+  }
+  public do(query: QueryBuilder) {
+    this.query = query;
+    this.addBindingSource(query);
   }
   public compile() {
-    return "WITH " + JSON.stringify(this.name) + " AS (" + this.asWhat.compile() + ")"
+    return "WITH " + this.withs.map((w) => {
+      return JSON.stringify(w.name) + " AS (" + w.asWhat.compile() + ")"
+    }).join(", ") + " " + this.query.compile();
   }
 }

@@ -11,7 +11,6 @@ import PropertyDefinition from "../../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
   ConsumeStreamsFnType, ISQLTableIndexType } from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import Knex from "@onzag/knex";
 import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
@@ -19,6 +18,8 @@ import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
+import { WhereBuilder } from "../../../../../../database/WhereBuilder";
+import { OrderByBuilder } from "../../../../../../database/OrderByBuilder";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -136,17 +137,17 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   let searchedByIt: boolean = false;
 
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, arg.args[exactName] as any);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[exactName] as any);
     searchedByIt = true;
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, ">=", arg.args[fromName] as any);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[fromName] as any, ">=");
     searchedByIt = true;
   }
 
   if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
-    arg.knexBuilder.andWhere(arg.prefix + arg.id, "<=", arg.args[toName] as any);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[toName] as any, "<=");
     searchedByIt = true;
   }
 
@@ -156,17 +157,18 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
 /**
  * The standard function that perfoms equality checks within the database
  * @param arg the equal info arg
- * @returns a knex valid search or select query object
+ * @returns a valid args to use in the where expression or an object
+ * for where many
  */
 export function standardSQLEqualFn(arg: ISQLEqualInfo) {
   if (arg.ignoreCase && typeof arg.value === "string") {
-    return arg.knex.raw(
+    return [
       "LOWER(??) = ?",
       [
         arg.prefix + arg.id,
         arg.value.toLowerCase(),
       ],
-    ); 
+    ]; 
   }
 
   return {
@@ -186,14 +188,12 @@ export function standardSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
 /**
  * Provides the table bit that is necessary to include this property and
  * this property alone, that is a table bit
- * @param knex the knex instance
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @returns the partial sql table definition for the property
  */
 export function getSQLTableDefinitionForProperty(
-  knex: Knex,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -205,7 +205,6 @@ export function getSQLTableDefinitionForProperty(
     prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
     id: propertyDefinition.getId(),
     property: propertyDefinition,
-    knex,
     itemDefinition,
     include,
     // server data unavailable
@@ -216,7 +215,6 @@ export function getSQLTableDefinitionForProperty(
 /**
  * Takes row data information that is in the SQL form and converts
  * it into a graphql form, only for this specific property
- * @param knex the knex instance
  * @param serverData the server data
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
@@ -225,7 +223,6 @@ export function getSQLTableDefinitionForProperty(
  * @returns the graphql value for the property
  */
 export function convertSQLValueToGQLValueForProperty(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -253,7 +250,6 @@ export function convertSQLValueToGQLValueForProperty(
   let colValue = sqlOut({
     row,
     prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
-    knex,
     serverData,
     itemDefinition,
     include,
@@ -288,7 +284,6 @@ export function convertSQLValueToGQLValueForProperty(
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is
- * @param knex the knex instance
  * @param serverData the server data
  * @param mod the module
  * @param itemDefinition the item definition that contains the property
@@ -303,7 +298,6 @@ export function convertSQLValueToGQLValueForProperty(
  * included in it
  */
 export function convertGQLValueToSQLValueForProperty(
-  knex: Knex,
   serverData: any,
   mod: Module,
   itemDefinition: ItemDefinition,
@@ -378,7 +372,6 @@ export function convertGQLValueToSQLValueForProperty(
     value: sqlIn({
       value: gqlPropertyValue,
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
-      knex,
       serverData,
       itemDefinition,
       include,
@@ -392,37 +385,34 @@ export function convertGQLValueToSQLValueForProperty(
 
 /**
  * Builds a sql search query from a given property definition, the data
- * coming from the search module, a sql prefix to use, and the knex builder
- * @param knex the knex instance
+ * coming from the search module, a sql prefix to use
  * @param serverData the server data
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param args the args coming from the search module in such format
- * @param knexBuilder the knex building instance
+ * @param whereBuilder the where building instance
  * @param dictionary the dictionary that is being used
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildSQLQueryForProperty(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
   args: IGQLArgs,
-  knexBuilder: Knex.QueryBuilder,
+  whereBuilder: WhereBuilder,
   dictionary: string,
   isOrderedByIt: boolean,
 ) {
   const sqlSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlSearch;
   return sqlSearchFn({
-    knex,
     serverData,
     itemDefinition,
     args,
     prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
     id: propertyDefinition.getId(),
-    knexBuilder,
+    whereBuilder,
     dictionary,
     isOrderedByIt,
     property: propertyDefinition,
@@ -431,40 +421,37 @@ export function buildSQLQueryForProperty(
 
 /**
  * Builds a sql str FTS search query from a given property definition, the data
- * coming from the search module, a sql prefix to use, and the knex builder
- * @param knex the knex instance
+ * coming from the search module, a sql prefix to use, and the builder
  * @param serverData the server data
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param args the args coming from the search module in such format
  * @param search the search string that is being used
- * @param knexBuilder the knex building instance
+ * @param whereBuilder the where building instance
  * @param dictionary the dictionary that is being used
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
 export function buildSQLStrSearchQueryForProperty(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
   args: IGQLArgs,
   search: string,
-  knexBuilder: Knex.QueryBuilder,
+  whereBuilder: WhereBuilder,
   dictionary: string,
   isOrderedByIt: boolean,
 ) {
   const sqlStrSearchFn = propertyDefinition.getPropertyDefinitionDescription().sqlStrSearch;
   if (sqlStrSearchFn) {
     return sqlStrSearchFn({
-      knex,
       serverData,
       itemDefinition,
       search,
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
       id: propertyDefinition.getId(),
-      knexBuilder,
+      whereBuilder,
       dictionary,
       isOrderedByIt,
       property: propertyDefinition,
@@ -489,24 +476,22 @@ const actualNulls = {
 
 /**
  * Builds an order by query for a given property
- * @param knex the knex instance
  * @param serverData the server data that is being used
  * @param itemDefinition the item definition in question
  * @param include the include (or null)
  * @param propertyDefinition the property in question
- * @param knexBuilder the knex builder that is currently building the query
+ * @param orderByBuilder the order by builder that is currently building the query
  * @param direction the direction to be accounted for
  * @param nulls the nulls (first or last)
  * @param wasIncludedInSearch whether this property was included in search
  * @param wasIncludedInStrSearch whether this property was included in the str FTS search
  */
 export function buildSQLOrderByForProperty(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  knexBuilder: Knex.QueryBuilder,
+  orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
   wasIncludedInSearch: boolean,
@@ -518,7 +503,6 @@ export function buildSQLOrderByForProperty(
   if (sqlOrderByFn) {
     // we call it
     const result = sqlOrderByFn({
-      knex,
       serverData,
       itemDefinition,
       include,
@@ -533,10 +517,10 @@ export function buildSQLOrderByForProperty(
 
     // if we have a result at all
     if (result) {
-      // then we add it
-      knexBuilder.orderByRaw(
-        `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,
-        [result[0]]
+      orderByBuilder.orderByColumn(
+        result[0],
+        actualDirection[result[1].toLowerCase()] || "ASC",
+        actualNulls[result[2].toLowerCase()] || "LAST",
       );
     }
   }
@@ -545,18 +529,16 @@ export function buildSQLOrderByForProperty(
 /**
  * Builds the order by functionality for the internal properties, such as
  * created_at, edited_at, etc...
- * @param knex the knex instance
  * @param itemDefinition the item definition
  * @param which basically the column name
- * @param knexBuilder the knex builder
+ * @param orderByBuilder the order by builder
  * @param direction the direction of the order by rule
  * @param nulls whether nulls are first or last
  */
 export function buildSQLOrderByForInternalRequiredProperty(
-  knex: Knex,
   itemDefinition: ItemDefinition,
   which: string,
-  knexBuilder: Knex.QueryBuilder,
+  orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
 ) {
@@ -571,15 +553,15 @@ export function buildSQLOrderByForInternalRequiredProperty(
     nulls,
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
-    knex,
     serverData: null,
   });
 
   // if we have a result, we add it (we should have one, but who knows)
   if (result) {
-    knexBuilder.orderByRaw(
-      `?? ${actualDirection[result[1].toLowerCase()] || "ASC"} NULLS ${actualNulls[result[2].toLowerCase()] || "LAST"}`,
-      [result[0]]
+    orderByBuilder.orderByColumn(
+      result[0],
+      actualDirection[result[1].toLowerCase()] || "ASC",
+      actualNulls[result[2].toLowerCase()] || "LAST",
     );
   }
 }

@@ -1,8 +1,10 @@
-interface ISetBuilderManyRule {
-  [columnName: string]: string | number;
+import { QueryBuilder } from ".";
+
+export interface ISetBuilderManyRule {
+  [columnName: string]: string | number | [string, Array<string | number>];
 }
 
-class SetBuilder extends QueryBuilder {
+export class SetBuilder extends QueryBuilder {
   private rules: string[] = [];
   constructor() {
     super();
@@ -10,20 +12,26 @@ class SetBuilder extends QueryBuilder {
   public setMany(value: ISetBuilderManyRule) {
     Object.keys(value).forEach((columnName) => {
       const columnValue = value[columnName];
-      this.set(columnName, columnValue);
+      this.setColumn(columnName, columnValue);
     });
     return this;
   }
-  public set(columnName: string, value: string | number) {
+  public setColumn(columnName: string, value: string | number | [string, Array<string | number>]) {
     return this.setWithTable(null, columnName, value);
   }
-  public setWithTable(tableName: string, columnName: string, value: string | number) {
-    const rule = (tableName ? JSON.stringify(tableName) + "." : "") + JSON.stringify(columnName) + "=?";
-    return this.setRaw(rule, [value]);
+  public setWithTable(tableName: string, columnName: string, value: string | number | [string, Array<string | number>]) {
+    let rule = (tableName ? JSON.stringify(tableName) + "." : "") + JSON.stringify(columnName) + " = ";
+    if (Array.isArray(value)) {
+      rule += value[0];
+      return this.set(rule, value[1]);
+    } else {
+      rule += "?";
+      return this.set(rule, [value]);
+    }
   }
-  public setRaw(rule: string, bindings?: Array<string | number>) {
+  public set(rule: string, bindings?: Array<string | number>) {
     this.rules.push(rule);
-    bindings.forEach(this.addBindingSource);
+    this.addBindingSources(bindings);
     return this;
   }
   public compile() {

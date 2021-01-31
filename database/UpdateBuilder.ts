@@ -1,4 +1,10 @@
-class UpdateBuilder extends QueryBuilder {
+import { QueryBuilder } from ".";
+import { FromBuilder } from "./FromBuilder";
+import { ReturningBuilder } from "./ReturningBuilder";
+import { SetBuilder } from "./SetBuilder";
+import { WhereBuilder } from "./WhereBuilder";
+
+export class UpdateBuilder extends QueryBuilder {
   private tableName: string;
   private tableAlias: string;
   private isOnly: boolean = false;

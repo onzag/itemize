@@ -19,18 +19,19 @@ import {
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
-import Knex from "@onzag/knex";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import StorageProvider from "../../../server/services/base/StorageProvider";
+import { WhereBuilder } from "../../../database/WhereBuilder";
+import { OrderByBuilder } from "../../../database/OrderByBuilder";
+
 
 /**
  * Provides the table that is necesary to include this module and all
  * its children child definitions into it
- * @param knex the knex instance
  * @param mod the module in question
  * @returns a whole table schema for the module table
  */
-export function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForModule( mod: Module): ISQLTableDefinitionType {
   // first we need to calculate the initial combined and added indexes
   // these are the indexes that get added to the standard module fields
   // we don't want indexes that won't be used in search so we want to check
@@ -84,7 +85,7 @@ export function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTab
   mod.getAllPropExtensions().forEach((pd) => {
     Object.assign(
       resultTableSchema,
-      getSQLTableDefinitionForProperty(knex, null, null, pd),
+      getSQLTableDefinitionForProperty(null, null, pd),
     );
   });
 
@@ -101,7 +102,6 @@ export function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTab
         const property = mod.getPropExtensionFor(propertyId);
         // and the columns that are expected to be added to the combined index
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
-          knex,
           serverData: null,
           id: propertyId,
           prefix: "",
@@ -124,7 +124,6 @@ export function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTab
       limiters.custom.forEach((propertyId: string) => {
         const property = mod.getPropExtensionFor(propertyId);
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
-          knex,
           serverData: null,
           id: propertyId,
           prefix: "",
@@ -151,27 +150,26 @@ export function getSQLTableDefinitionForModule(knex: Knex, mod: Module): ISQLTab
  * Provides the SQL table schemas that are contained
  * within this module, you expect one schema per item definition
  * it contains
- * @param knex the knex instance
  * @param mod the module in question
  * @returns a partial database schema for the module itself, all the child modules, and the item definition
  */
-export function getSQLTablesSchemaForModule(knex: Knex, mod: Module): ISQLSchemaDefinitionType {
+export function getSQLTablesSchemaForModule( mod: Module): ISQLSchemaDefinitionType {
   // this is where it will be contained
   const resultSchema = {
-    [mod.getQualifiedPathName()]: getSQLTableDefinitionForModule(knex, mod),
+    [mod.getQualifiedPathName()]: getSQLTableDefinitionForModule(mod),
   };
   mod.getAllModules().forEach((cModule) => {
     // first with child modules
     Object.assign(
       resultSchema,
-      getSQLTablesSchemaForModule(knex, cModule),
+      getSQLTablesSchemaForModule(cModule),
     );
   });
   // then with child item definitions
   mod.getAllChildItemDefinitions().forEach((cIdef) => {
     Object.assign(
       resultSchema,
-      getSQLTablesSchemaForItemDefinition(knex, cIdef),
+      getSQLTablesSchemaForItemDefinition(cIdef),
     );
   });
   return resultSchema;
@@ -180,7 +178,6 @@ export function getSQLTablesSchemaForModule(knex: Knex, mod: Module): ISQLSchema
 /**
  * Converts a graphql value, with all its items and everything it
  * has into a SQL row data value for this specific module
- * @param knex the knex instance
  * @param mod the module in question
  * @param data the graphql data
  * @param oldData the old stored value for this module
@@ -196,7 +193,6 @@ export function getSQLTablesSchemaForModule(knex: Knex, mod: Module): ISQLSchema
  * @returns the composed row value with the consume streams function
  */
 export function convertGQLValueToSQLValueForModule(
-  knex: Knex,
   serverData: any,
   mod: Module,
   data: IGQLArgs,
@@ -218,7 +214,6 @@ export function convertGQLValueToSQLValueForModule(
       !partialFields
     ) {
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
-        knex,
         serverData,
         mod,
         null,
@@ -251,7 +246,6 @@ export function convertGQLValueToSQLValueForModule(
  * to a graphql value for this specific module, this
  * only includes prop extensions and standard properties
  * and excludes everything else
- * @param knex the knex instance
  * @param serverData the server data information
  * @param mod the module in question
  * @param row the row value, with all the columns it has; the row
@@ -263,7 +257,6 @@ export function convertGQLValueToSQLValueForModule(
  * @returns a graphql value
  */
 export function convertSQLValueToGQLValueForModule(
-  knex: Knex,
   serverData: any,
   mod: Module,
   row: ISQLTableRowValue,
@@ -287,7 +280,7 @@ export function convertSQLValueToGQLValueForModule(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(knex, serverData, null, null, pd, row),
+      convertSQLValueToGQLValueForProperty(serverData, null, null, pd, row),
     );
   });
 
@@ -297,21 +290,21 @@ export function convertSQLValueToGQLValueForModule(
 /**
  * Builds a sql query specific for this module to search
  * within itself in the database
- * @param knex the knex instance
  * @param serverData the server data
  * @param mod the module in question
  * @param args the args for the query from graphql
- * @param knexBuilder the knex builder
+ * @param whereBuilder the where builder
+ * @param orderByBuilder the order by builder
  * @param dictionary the dictionary used
  * @param search the search
  * @param orderBy the order by rule
  */
 export function buildSQLQueryForModule(
-  knex: Knex,
   serverData: any,
   mod: Module,
   args: IGQLArgs,
-  knexBuilder: Knex.QueryBuilder,
+  whereBuilder: WhereBuilder,
+  orderByBuilder: OrderByBuilder,
   dictionary: string,
   search: string,
   orderBy: IOrderByRuleType,
@@ -326,7 +319,7 @@ export function buildSQLQueryForModule(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildSQLQueryForProperty(knex, serverData, null, null, pd, args, knexBuilder, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildSQLQueryForProperty(serverData, null, null, pd, args, whereBuilder, dictionary, isOrderedByIt);
     if (wasSearchedBy) {
       if (Array.isArray(wasSearchedBy)) {
         addedSelectFields.push(wasSearchedBy);
@@ -336,35 +329,22 @@ export function buildSQLQueryForModule(
   });
 
   if (search) {
-    // same doing this twice
-    mod.getAllPropExtensions().forEach((pd) => {
-      if (!pd.isSearchable()) {
-        return;
-      }
-
-      const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-      const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
-        knex, serverData, null, null, pd, args, search, null, dictionary, isOrderedByIt,
-      );
-      if (wasStrSearchedBy) {
-        if (Array.isArray(wasStrSearchedBy)) {
-          addedSelectFields.push(wasStrSearchedBy);
-        }
-        includedInStrSearchProperties.push(pd.getId());
-      };
-    });
-
-
-    knexBuilder.andWhere((builder) => {
+    whereBuilder.andWhere((builder) => {
       mod.getAllPropExtensions().forEach((pd) => {
         if (!pd.isSearchable()) {
           return;
         }
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
-          buildSQLStrSearchQueryForProperty(
-            knex, serverData, null, null, pd, args, search, orBuilder, dictionary, isOrderedByIt,
+          const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
+            serverData, null, null, pd, args, search, orBuilder, dictionary, isOrderedByIt,
           );
+          if (wasStrSearchedBy) {
+            if (Array.isArray(wasStrSearchedBy)) {
+              addedSelectFields.push(wasStrSearchedBy);
+            }
+            includedInStrSearchProperties.push(pd.getId());
+          };
         });
       });
     });
@@ -383,10 +363,9 @@ export function buildSQLQueryForModule(
     orderBySorted.forEach((pSet) => {
       if (!mod.hasPropExtensionFor(pSet.property)) {
         buildSQLOrderByForInternalRequiredProperty(
-          knex,
           null,
           pSet.property,
-          knexBuilder,
+          orderByBuilder,
           pSet.direction,
           pSet.nulls,
         );
@@ -398,12 +377,11 @@ export function buildSQLQueryForModule(
       const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
 
       buildSQLOrderByForProperty(
-        knex,
         serverData,
         null,
         null,
         pd,
-        knexBuilder,
+        orderByBuilder,
         pSet.direction,
         pSet.nulls,
         wasIncludedInSearch,

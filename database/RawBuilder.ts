@@ -1,4 +1,6 @@
-class RawBuilder extends QueryBuilder {
+import { QueryBuilder } from ".";
+
+export class RawBuilder extends QueryBuilder {
   private raw: string;
   constructor(raw: string, bindings?: Array<string | number>) {
     super();
@@ -6,7 +8,7 @@ class RawBuilder extends QueryBuilder {
     this.raw = raw;
 
     if (bindings) {
-      bindings.forEach(this.addBindingSource);
+      this.addBindingSources(bindings);
     }
   }
   public compile() {

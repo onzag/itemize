@@ -7,7 +7,6 @@
  * @packageDocumentation
  */
 
-import Knex from "@onzag/knex";
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER
@@ -30,6 +29,11 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { ItemizeRedisClient } from "./redis";
 import Module from "../base/Root/Module";
+import { IValueToInsert } from "../database/InsertBuilder";
+import { DatabaseConnection } from "../database";
+import { WithBuilder } from "../database/WithBuilder";
+import { UpdateBuilder } from "../database/UpdateBuilder";
+import { SelectBuilder } from "../database/SelectBuilder";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -48,8 +52,8 @@ const CAN_LOG_SILLY = LOG_LEVEL === "silly";
  */
 export class Cache {
   private redisClient: ItemizeRedisClient;
+  private databaseConnection: DatabaseConnection;
   private domain: string;
-  private knex: Knex;
   private storageClients: IStorageProvidersObject;
   private root: Root;
   private serverData: IServerDataType;
@@ -68,12 +72,11 @@ export class Cache {
    * it is instantiaded by te listener at the same time
    *
    * @param redisClient the redis client that is used for storing values
-   * @param knex the knex instance
    * @param root the root of itemize
    */
   constructor(
     redisClient: ItemizeRedisClient,
-    knex: Knex,
+    databaseConnection: DatabaseConnection,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     storageClients: IStorageProvidersObject,
     domain: string,
@@ -81,7 +84,7 @@ export class Cache {
     initialServerData: IServerDataType
   ) {
     this.redisClient = redisClient;
-    this.knex = knex;
+    this.databaseConnection = databaseConnection;
     this.root = root;
     this.storageClients = storageClients;
     this.serverData = initialServerData;
@@ -329,7 +332,6 @@ export class Cache {
     // and the module table, this value is database ready, and hence needs
     // knex and the dictionary to convert fields that need it
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
-      this.knex,
       this.serverData,
       itemDefinition,
       value,
@@ -339,7 +341,6 @@ export class Cache {
       dictionary,
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
-      this.knex,
       this.serverData,
       itemDefinition.getParentModule(),
       value,
@@ -348,13 +349,19 @@ export class Cache {
       this.domain,
       dictionary,
     );
-    const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
-    const sqlIdefData: ISQLTableRowValue = sqlIdefDataComposed.value;
+    const sqlModData: IValueToInsert = sqlModDataComposed.value;
+    const sqlIdefData: IValueToInsert = sqlIdefDataComposed.value;
 
     // this data is added every time when creating
     sqlModData.type = itemDefinition.getQualifiedPathName();
-    sqlModData.created_at = this.knex.fn.now();
-    sqlModData.last_modified = this.knex.fn.now();
+    sqlModData.created_at = [
+      "NOW()",
+      [],
+    ];
+    sqlModData.last_modified = [
+      "NOW()",
+      [],
+    ];
     sqlModData.created_by = createdBy || UNSPECIFIED_OWNER;
     sqlModData.version = version || "";
     sqlModData.container_id = containerId;
@@ -433,14 +440,16 @@ export class Cache {
 
     try {
       sqlValue = convertVersionsIntoNullsWhenNecessary(
-        await this.knex.transaction(async (transactionKnex) => {
+        await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // so we insert in the module, this is very simple
           // we use the transaction in the module table
           // insert the sql data that we got ready, and return
           // the requested columns in sql, there's always at least 1
           // because we always need the id
-          const insertQueryValueMod = await transactionKnex(moduleTable)
-            .insert(sqlModData).returning("*");
+          const insertQuery = transactingDatabase.insert().table(moduleTable);
+          insertQuery.insert(sqlModData).returningBuilder.returningAll();
+
+          const insertQueryValueMod = await transactingDatabase.queryFirst(insertQuery);
 
           // so with that in mind, we add the foreign key column value
           // for combining both and keeping them joined togeher
@@ -448,14 +457,15 @@ export class Cache {
           sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
 
           // so now we create the insert query
-          const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
+          const insertQueryIdef = transactingDatabase.insert().table(selfTable);
+          insertQueryIdef.insert(sqlIdefData).returningBuilder.returningAll();
           // so we call the qery
-          const insertQueryValueIdef = await insertQueryIdef;
+          const insertQueryValueIdef = await transactingDatabase.queryFirst(insertQueryIdef);
 
           // and we return the joined result
           return {
-            ...insertQueryValueMod[0],
-            ...insertQueryValueIdef[0],
+            ...insertQueryValueMod,
+            ...insertQueryValueIdef,
           };
         }),
       );
@@ -576,7 +586,6 @@ export class Cache {
 
     const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
     const currentValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-      this.knex,
       this.serverData,
       itemDefinition,
       currentValue,
@@ -666,7 +675,6 @@ export class Cache {
     // into the SQL value, this is valid in here because
     // we don't want things to be defaulted in the query
     const sqlIdefDataComposed = convertGQLValueToSQLValueForItemDefinition(
-      this.knex,
       this.serverData,
       itemDefinition,
       update,
@@ -677,7 +685,6 @@ export class Cache {
       partialUpdateFields,
     );
     const sqlModDataComposed = convertGQLValueToSQLValueForModule(
-      this.knex,
       this.serverData,
       itemDefinition.getParentModule(),
       update,
@@ -687,8 +694,8 @@ export class Cache {
       dictionary,
       partialUpdateFields,
     );
-    const sqlModData: ISQLTableRowValue = sqlModDataComposed.value;
-    const sqlIdefData: ISQLTableRowValue = sqlIdefDataComposed.value;
+    const sqlModData: IValueToInsert = sqlModDataComposed.value;
+    const sqlIdefData: IValueToInsert = sqlIdefDataComposed.value;
 
     // now we check if we are updating anything at all
     if (
@@ -703,21 +710,20 @@ export class Cache {
 
     // update when it was edited
     if (editedBy) {
-      sqlModData.edited_at = this.knex.fn.now();
+      sqlModData.edited_at = [
+        "NOW()",
+        [],
+      ];
       sqlModData.edited_by = editedBy;
     }
-    sqlModData.last_modified = this.knex.fn.now();
+    sqlModData.last_modified = [
+      "NOW()",
+      [],
+    ];
 
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestUpdate: finalizing SQL data with module data",
-      sqlModData.edited_at ? {
-        ...sqlModData,
-        edited_at: "[this.knex.fn.now()]",
-        last_modified: "[this.knex.fn.now()]",
-      } : {
-          ...sqlModData,
-          last_modified: "[this.knex.fn.now()]",
-        },
+      sqlModData,
     );
 
     CAN_LOG_DEBUG && logger.debug(
@@ -725,34 +731,65 @@ export class Cache {
       sqlIdefData,
     );
 
+    const withQuery = new WithBuilder();
+
+    const moduleUpdateQuery = new UpdateBuilder();
+    moduleUpdateQuery.table(moduleTable);
+    // here we will update our last modified
+    moduleUpdateQuery.setBuilder.setMany(sqlModData);
+    // and join it on id and version match
+    moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
+    moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
+
+    // returning only the module table information
+    moduleUpdateQuery.returningBuilder.returningAll();
+
+    withQuery.with("MTABLE", moduleUpdateQuery);
+
+    if (Object.keys(sqlIdefData).length) {
+      const itemUpdateQuery = new UpdateBuilder();
+      itemUpdateQuery.table(selfTable);
+      // here we will update our last modified
+      itemUpdateQuery.setBuilder.setMany(sqlIdefData);
+      // and join it on id and version match
+      itemUpdateQuery.whereBuilder.andWhereColumn(
+        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+        id,
+      ).andWhereColumn(
+        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+        version || "",
+      );
+
+      // returning only the module table information
+      itemUpdateQuery.returningBuilder.returningAll();
+
+      withQuery.with("ITABLE", itemUpdateQuery);
+    } else {
+      const itemSelectQuery = new SelectBuilder();
+      itemSelectQuery.table(selfTable).selectAll().whereBuilder.andWhereColumn(
+        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+        id,
+      ).andWhereColumn(
+        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+        version || "",
+      );
+
+      withQuery.with("ITABLE", itemSelectQuery);
+    }
+
+    const selectQuery = new SelectBuilder();
+    selectQuery.table("MTABLE").selectAll().limit(1).joinBuilder.join("ITABLE", (rule) => {
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
+    });
+
+    withQuery.do(selectQuery);
+
     // we build the transaction for the action
     let sqlValue: ISQLTableRowValue;
     try {
       sqlValue = convertVersionsIntoNullsWhenNecessary(
-        await this.knex.with("MTABLE", (qb) => {
-          qb.table(moduleTable).update(sqlModData).where("id", id).andWhere("version", version || "").returning("*")
-        }).with("ITABLE", (qb) => {
-          if (Object.keys(sqlIdefData).length) {
-            qb.table(selfTable).update(sqlIdefData).where(
-              CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-              id,
-            ).andWhere(
-              CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-              version || "",
-            ).returning("*");
-          } else {
-            qb.table(selfTable).select("*").where(
-              CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-              id,
-            ).andWhere(
-              CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-              version || "",
-            );
-          }
-        }).first("*").from("MTABLE").join("ITABLE", (clause) => {
-          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-        }),
+        await this.databaseConnection.queryFirst(withQuery),
       );
     } catch (err) {
       logger.error(
@@ -928,11 +965,15 @@ export class Cache {
         // and ask for results from the module table, where parents do match this
         let results: ISQLTableRowValue[];
         try {
-          results = await this.knex.select(["id", "version", "type", "container_id"]).from(mod.getQualifiedPathName()).where({
-            parent_id: id,
-            parent_version: version || "",
-            parent_type: idefQualified,
-          });
+          results = await this.databaseConnection.queryRows(
+            `SELECT "id", "version", "type", "container_id" FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` +
+            `parent_id = $1 AND parent_version = $2 AND parent_type = $3`,
+            [
+              id,
+              version || "",
+              idefQualified,
+            ]
+          );
         } catch (err) {
           logger.error(
             "Cache.deletePossibleChildrenOf (MAYBE-ORPHANED): Failed to attempt to find orphans for deleting",
@@ -1142,30 +1183,47 @@ export class Cache {
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
         // for that we run a transaction
-        const allVersionsDropped: ISQLTableRowValue[] = await this.knex.transaction(async (transactionKnex) => {
+        const allVersionsDropped: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // and we delete based on id and type
-          const allVersionsDroppedInternal: ISQLTableRowValue[] = await transactionKnex(moduleTable).delete().where({
-            id,
-            type: selfTable,
-          }).returning(["version", "parent_id", "parent_type", "parent_version", "created_by"]);
+          const allVersionsDroppedInternal: ISQLTableRowValue[] = await transactingDatabase.queryRows(
+            `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING "version", "parent_id", ` +
+            `"parent_type", "parent_version", "created_by"`,
+            [
+              id,
+              selfTable,
+            ]
+          );
           // but yet we return the version to see what we dropped, and well parenting and creator
 
           // and now we need to store the fact we have lost these records in the deleted registry
-          const trasactionTimes = await Promise.all(allVersionsDroppedInternal.map(async (row) => {
-            const insertQueryValue = await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
-              id,
-              version: version || "",
-              type: selfTable,
-              module: moduleTable,
-              created_by: row.created_by || null,
-              parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
-              transaction_time: transactionKnex.fn.now(),
-            }).returning("transaction_time");
+
+          let trasactionTimes: string[] = []
+          if (allVersionsDroppedInternal.length) {
+            const insertQueryBuilder = transactingDatabase.insert();
+            insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
+
+            allVersionsDroppedInternal.forEach(async (row) => {
+              insertQueryBuilder.insert({
+                id,
+                version: version || "",
+                type: selfTable,
+                module: moduleTable,
+                created_by: row.created_by || null,
+                parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              })
+            });
 
             // but we need the transaction time for each as the new record
             // last_modified is that transaction time
-            return insertQueryValue[0].transaction_time as string;
-          }));
+            insertQueryBuilder.returningBuilder.returningColumn("transaction_time");
+
+            const queryResult = await transactingDatabase.queryRows(insertQueryBuilder);
+            trasactionTimes = queryResult.map((r) => r.transaction_time);
+          }
 
           // now we return these rows we got with version, parent_id, parent_type, parent_version and created_by
           // but we add last_modified based on the insert query
@@ -1202,21 +1260,22 @@ export class Cache {
         });
       } else {
         // otherwise if we are deleting a specific version
-        const row = await this.knex.transaction(async (transactionKnex) => {
+        const row = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // we run this
           // because the index in the item definition cascades
-          const internalDroppedRows = await transactionKnex(moduleTable).delete().where({
-            id,
-            version: version || "",
-            type: selfTable,
-          }).returning(["parent_id", "parent_type", "parent_version", "created_by"]);
+          const interalDroppedRow: ISQLTableRowValue = await transactingDatabase.queryFirst(
+            `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" = $2 AND "type" = $3 RETURNING "version", "parent_id", ` +
+            `"parent_type", "parent_version", "created_by"`,
+            [
+              id,
+              version || "",
+              selfTable,
+            ]
+          );
 
-          // now we got the row we have dropped, it's the first one
-          const interalDroppedRow = internalDroppedRows[0];
-
-          // and now we got to insert that row into the deleted registry
-          // and retrieve the transaction time
-          const insertQueryValue = await transactionKnex(DELETED_REGISTRY_IDENTIFIER).insert({
+          const insertQueryBuilder = transactingDatabase.insert();
+          insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
+          insertQueryBuilder.insert({
             id,
             version: version || "",
             type: selfTable,
@@ -1225,13 +1284,22 @@ export class Cache {
             parenting_id: interalDroppedRow.parent_id ?
               (interalDroppedRow.parent_type + "." + interalDroppedRow.parent_id + "." + interalDroppedRow.parent_version || "") :
               null,
-            transaction_time: transactionKnex.fn.now(),
-          }).returning("transaction_time");
+            transaction_time: [
+              "NOW()",
+              [],
+            ],
+          })
+
+          insertQueryBuilder.returningBuilder.returningColumn("transaction_time");
+
+          // and now we got to insert that row into the deleted registry
+          // and retrieve the transaction time
+          const insertQueryValue = await transactingDatabase.queryFirst(insertQueryBuilder);
 
           // and we set it as last modified
           return {
             ...interalDroppedRow,
-            last_modified: insertQueryValue[0].transaction_time,
+            last_modified: insertQueryValue.transaction_time,
           };
         });
 
@@ -1360,11 +1428,16 @@ export class Cache {
       const queryValue: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
         // let's remember versions as null do not exist in the database, instead it uses
         // the invalid empty string "" value
-        await this.knex.first("*").from(moduleTable)
-          .where("id", id).andWhere("version", version || "").join(idefTable, (clause) => {
-            clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-            clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-          }) || null);
+        await this.databaseConnection.queryFirst(
+          `SELECT * FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" $2 JOIN ${JSON.stringify(idefTable)} ` +
+          `ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version" ` +
+          `LIMIT 1`,
+          [
+            id,
+            version || "",
+          ],
+        ),
+      );
       // we don't wait for this
       this.forceCacheInto(idefTable, id, version, queryValue);
 

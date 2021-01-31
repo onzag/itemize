@@ -8,7 +8,6 @@
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
-import Knex from "@onzag/knex";
 // @ts-nocheck
 import Confirm from "prompt-confirm";
 
@@ -22,6 +21,7 @@ import { prepareExtensions } from "./extensions";
 import dump from "./dump";
 import loadDump from "./load-dump";
 import { postprocessIdTriggers, prepareIdTrigger } from "./id";
+import { DatabaseConnection } from "../database";
 
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
@@ -48,7 +48,7 @@ export default async function build(version: string, action: "build" | "dump" | 
   ));
 
   // Create the connection string
-  const dbConnectionKnexConfig = {
+  const dbConnectionConfig = {
     host: dbConfig.host,
     port: dbConfig.port,
     user: dbConfig.user,
@@ -56,18 +56,14 @@ export default async function build(version: string, action: "build" | "dump" | 
     database: dbConfig.database,
   };
 
-  if (USING_DOCKER && (dbConnectionKnexConfig.host === "localhost" || dbConnectionKnexConfig.host === "127.0.0.1")) {
-    dbConnectionKnexConfig.host = "pgsql";
+  if (USING_DOCKER && (dbConnectionConfig.host === "localhost" || dbConnectionConfig.host === "127.0.0.1")) {
+    dbConnectionConfig.host = "pgsql";
   }
 
-  console.log(colors.yellow(`attempting database connection at ${dbConnectionKnexConfig.host}...`));
+  console.log(colors.yellow(`attempting database connection at ${dbConnectionConfig.host}...`));
 
   // we only need one client instance
-  const knex = Knex({
-    client: "pg",
-    debug: true,
-    connection: dbConnectionKnexConfig,
-  });
+  const databaseConnection = new DatabaseConnection(dbConnectionConfig);
 
   // parse the data
   let data: any;
@@ -87,9 +83,9 @@ export default async function build(version: string, action: "build" | "dump" | 
   const root = new Root(data);
 
   if (action === "dump") {
-    return dump(version, knex, root);
+    return dump(version, databaseConnection, root);
   } else if (action === "load-dump") {
-    return loadDump(version, knex, root);
+    return loadDump(version, databaseConnection, root);
   }
 
   let isCorrupted = false;
@@ -104,7 +100,7 @@ export default async function build(version: string, action: "build" | "dump" | 
 
   if (!isCorrupted) {
     // let's get the result by progressively building on top of it
-    optimal = getSQLTablesSchemaForRoot(knex, root);
+    optimal = getSQLTablesSchemaForRoot(databaseConnection, root);
 
     // Retrieve the past migration configuration
     // if available

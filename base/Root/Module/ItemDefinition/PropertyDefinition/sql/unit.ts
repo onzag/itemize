@@ -85,21 +85,21 @@ export function unitSQLSearch(arg: ISQLSearchInfo) {
 
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     const exactAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[exactName] as any;
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
     const fromAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[fromName] as any;
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", fromAsUnit.normalizedValue);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", fromAsUnit.normalizedUnit);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", fromAsUnit.normalizedValue, ">=");
     searchedByIt = true;
   }
 
   if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
     const toAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[toName] as any;
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
-    arg.knexBuilder.andWhere(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", toAsUnit.normalizedValue, "<=");
     searchedByIt = true;
   }
 

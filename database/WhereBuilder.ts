@@ -1,63 +1,37 @@
-interface IWhereBuilderConditionType {
-  condition: WhereBuilder | string;
-  gate: "AND" | "OR";
+import { ConditionalBuilder, ConditionalBuilderFn } from ".";
+
+interface IWhereManyOption {
+  [column: string]: string | number;
 }
 
-type WhereBuilderFn = (builder: WhereBuilder) => void;
-
-class WhereBuilder extends QueryBuilder {
-  private conditions: IWhereBuilderConditionType[] = [];
-  private parent: WhereBuilder;
+export class WhereBuilder extends ConditionalBuilder {
   constructor(parent: WhereBuilder = null) {
-    super();
-
-    this.parent = parent;
+    super(parent, "WHERE");
   }
-  public where(gate: "AND" | "OR", rule: string | WhereBuilderFn, bindings?: Array<string | number>) {
-    let condition: WhereBuilder | string;
-    if (typeof rule === "string") {
-      condition = rule;
-      if (bindings) {
-        bindings.forEach(this.addBindingSource);
-      }
-    } else {
-      const builder = new WhereBuilder(this);
-      rule(builder);
-      condition = builder;
-
-      this.addBindingSource(builder);
-
-      if (bindings) {
-        throw new Error("Cannot have both bindings and have provided a builder as a rule");
-      }
-    }
-    this.conditions.push({
-      gate,
-      condition,
+  public andWhereMany(obj: IWhereManyOption) {
+    Object.keys(obj).forEach((col) => {
+      this.andWhereColumn(col, obj[col]);
     });
     return this;
   }
-  public andWhere(rule: string | WhereBuilderFn, bindings?: Array<string | number>) {
-    return this.where("OR", rule, bindings);
+  public orWhereMany(obj: IWhereManyOption) {
+    Object.keys(obj).forEach((col) => {
+      this.orWhereColumn(col, obj[col]);
+    });
+    return this;
   }
-  public orWhere(rule: string | WhereBuilderFn, bindings?: Array<string | number>) {
-    return this.where("AND", rule, bindings);
+  public andWhereColumn(column: string, value: string | number, comparator: string = "=") {
+    const rule = JSON.stringify(column) + " " + comparator + " ?";
+    return this.condition("AND", rule, [value]);
   }
-  public compile() {
-    let result = "";
-    this.conditions.forEach((c, index) => {
-      if (index !== 0) {
-        result += c.gate + " ";
-      }
-      if (typeof c.condition === "string") {
-        result += c.condition;
-      } else {
-        result += c.condition.compile();
-      }
-    })
-    if (this.parent) {
-      return "(" + result + ")";
-    }
-    return "WHERE " + result;
+  public orWhereColumn(column: string, value: string | number, comparator: string = "=") {
+    const rule = JSON.stringify(column) + " " +  comparator + " ?";
+    return this.condition("OR", rule, [value]);
+  }
+  public andWhere(rule: string | ConditionalBuilderFn<WhereBuilder>, bindings?: Array<string | number>) {
+    return this.condition("AND", rule, bindings);
+  }
+  public orWhere(rule: string | ConditionalBuilderFn<WhereBuilder>, bindings?: Array<string | number>) {
+    return this.condition("OR", rule, bindings);
   }
 }

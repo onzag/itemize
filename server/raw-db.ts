@@ -10,13 +10,18 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
-import Knex from "@onzag/knex";
 import { logger } from ".";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import Module from "../base/Root/Module";
+import { UpdateBuilder } from "../database/UpdateBuilder";
+import { DatabaseConnection } from "../database";
+import { SelectBuilder } from "../database/SelectBuilder";
+import { WhereBuilder } from "../database/WhereBuilder";
+import { ISetBuilderManyRule, SetBuilder } from "../database/SetBuilder";
+import { WithBuilder } from "../database/WithBuilder";
 
 /**
  * The required properties that every row should have
@@ -31,18 +36,18 @@ const requiredProperties = ["id", "version", "type", "created_by", "parent_id", 
  */
 export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
-  private knex: Knex;
+  private databaseConnection: DatabaseConnection;
   private root: Root;
 
   /**
    * Builds a new instance of the change informer
    * @param redisPub the redis publish instance
-   * @param knex a connection to the database
+   * @param databaseConnection a connection to the database
    * @param root the root instance
    */
-  constructor(redisPub: ItemizeRedisClient, knex: Knex, root: Root) {
+  constructor(redisPub: ItemizeRedisClient, databaseConnection: DatabaseConnection, root: Root) {
     this.redisPub = redisPub;
-    this.knex = knex;
+    this.databaseConnection = databaseConnection;
     this.root = root;
   }
 
@@ -53,19 +58,26 @@ export class ItemizeRawDB {
    * @returns the transaction time
    */
   private async storeInDeleteRegistry(row: ISQLTableRowValue, moduleName: string) {
-    // simply build the query
-    const insertQueryValue = await this.knex(DELETED_REGISTRY_IDENTIFIER).insert({
+    const insertQuery = this.databaseConnection.insert();
+    insertQuery.table(DELETED_REGISTRY_IDENTIFIER).insert({
       id: row.id,
       version: row.version,
       type: row.type,
       module: moduleName,
       created_by: row.created_by || null,
       parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
-      transaction_time: this.knex.fn.now(),
-    }).returning("transaction_time");
+      transaction_time: [
+        "NOW()",
+        [],
+      ],
+    });
+    insertQuery.returningBuilder.returningColumn("transaction_time");
+
+    // simply build the query
+    const insertQueryValue = await this.databaseConnection.queryFirst(insertQuery);
 
     // returning the transaction time
-    return insertQueryValue[0].transaction_time as string;
+    return insertQueryValue.transaction_time as string;
   }
 
   /**
@@ -398,24 +410,25 @@ export class ItemizeRawDB {
   public getRawDBQueryBuilderFor(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     preventJoin?: boolean,
-  ): Knex.QueryBuilder {
+  ): SelectBuilder {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
+
+    const builder = new SelectBuilder();
     
     if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
       const moduleInQuestion = itemDefinitionOrModuleInstance.getParentModule();
-      return this.knex.table(
-        moduleInQuestion.getQualifiedPathName()
-      ).join(
-        itemDefinitionOrModuleInstance.getQualifiedPathName(),
-        (clause) => {
-          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-        });
+      builder.table(moduleInQuestion.getQualifiedPathName());
+      builder.joinBuilder.join(itemDefinitionOrModuleInstance.getQualifiedPathName(), (ruleBuilder) => {
+        ruleBuilder.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
+        ruleBuilder.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
+      });
     } else {
-      return this.knex.table(itemDefinitionOrModuleInstance.getQualifiedPathName());
+      builder.table(itemDefinitionOrModuleInstance.getQualifiedPathName());
     }
+  
+    return builder;
   }
 
   /**
@@ -430,13 +443,13 @@ export class ItemizeRawDB {
     item: ItemDefinition | string,
     updater: {
       // you only want to use where in here
-      whereCriteriaSelector: (arg: Knex.QueryBuilder) => void;
+      whereCriteriaSelector: (arg: WhereBuilder) => void;
 
-      moduleTableUpdate?: any;
-      itemTableUpdate?: any;
+      moduleTableUpdate?: ISetBuilderManyRule;
+      itemTableUpdate?: ISetBuilderManyRule;
       // you only want to use set in these
-      moduleTableUpdater?: (arg: Knex.QueryBuilder) => void;
-      itemTableUpdater?: (arg: Knex.QueryBuilder) => void;
+      moduleTableUpdater?: (arg: SetBuilder) => void;
+      itemTableUpdater?: (arg: SetBuilder) => void;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -454,68 +467,68 @@ export class ItemizeRawDB {
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
 
+    const withQuery = new WithBuilder();
+  
+    const moduleUpdateQuery = new UpdateBuilder();
+    moduleUpdateQuery.table(moduleTable);
+    // here we will update our last modified
+    moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    if (updater.moduleTableUpdate) {
+      moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
+    }
+    // and join it on id and version match
+    moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+    moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+    // now we pass the where criteria selector for further filtering
+    updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
+    moduleUpdateQuery.fromBuilder.from(selfTable);
+    // returning only the module table information
+    moduleUpdateQuery.returningBuilder.returningAll(moduleTable);
+
+    withQuery.with("MTABLE", moduleUpdateQuery);
+
+    if (updater.itemTableUpdater || updater.itemTableUpdate) {
+      const itemUpdateQuery = new UpdateBuilder();
+      itemUpdateQuery.table(selfTable);
+      // and join it on id and version match
+      itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+      itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+      itemUpdateQuery.fromBuilder.from("MTABLE");
+      // returning only the item table information
+      itemUpdateQuery.returningBuilder.returningAll(selfTable);
+
+      if (updater.itemTableUpdate) {
+        itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
+      }
+      updater.itemTableUpdater && updater.itemTableUpdater(itemUpdateQuery.setBuilder);
+
+      withQuery.with("ITABLE", itemUpdateQuery);
+    } else {
+      const itemSelectQuery = new SelectBuilder();
+      // from both tables
+      itemSelectQuery.tables([selfTable, "MTABLE"]);
+      // where they match the id and version so that it joins
+      itemSelectQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+      itemSelectQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+      // here we would do a simple select of only the properties
+      // of the item definition table
+      itemSelectQuery.selectAll(selfTable);
+
+      withQuery.with("ITABLE", itemSelectQuery);
+    }
+
+    const selectQuery = new SelectBuilder();
+    selectQuery.selectAll().fromBuilder.from("MTABLE");
+    selectQuery.joinBuilder.join("ITABLE", (rule) => {
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
+    });
+
+    withQuery.do(selectQuery);
+
     // we got to get all rows, first we create a pseudo table
     // for our module
-    const allRows = await this.knex.with("MTABLE", (qb) => {
-      // here we will update our last modified
-      const queryBuilder = qb.table(moduleTable).update({
-        ...updater.moduleTableUpdate,
-        last_modified: this.knex.fn.now(),
-      })
-      // and join it on id and version match
-      .whereRaw(
-        "(?? = ?? AND ?? = ??)",
-        ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
-      )
-      // returning only the module table information
-      .returning(this.knex.raw("??.*", [moduleTable]) as any);
-
-      // now we pass the where criteria selector for further filtering
-      updater.whereCriteriaSelector(queryBuilder);
-
-      (queryBuilder as any).updateFrom(selfTable);
-
-      // and the table updater to set the values of the properties manually
-      updater.moduleTableUpdater && updater.moduleTableUpdater(queryBuilder);
-    }).with("ITABLE", (qb) => {
-      // so for the item definition table
-      if (updater.itemTableUpdater || updater.itemTableUpdate) {
-        // if we have an updater we build the query and select from the original
-        // module table
-        const queryBuilder = qb.table(selfTable)
-        // where the id and version match each other
-        .whereRaw(
-          "(?? = ?? AND ?? = ??)",
-          ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
-        )
-        // returning only want belongs to this table
-        .returning(this.knex.raw("??.*", [selfTable]) as any);
-
-        if (updater.itemTableUpdate) {
-          queryBuilder.update(updater.itemTableUpdate);
-        }
-
-        (queryBuilder as any).updateFrom("MTABLE");
-
-        // run the updater
-        updater.itemTableUpdater && updater.itemTableUpdater(queryBuilder);
-      } else {
-
-        // here we would do a simple select of only the properties
-        // of the item definition table
-        qb.select(this.knex.raw("??.*", [selfTable]))
-          // from both tables
-          .from(this.knex.raw("??, ??", [selfTable, "MTABLE"]))
-          // where they match the id and version so that it joins
-          .whereRaw(
-            "(?? = ?? AND ?? = ??)",
-            ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
-          );
-      }
-    }).select("*").from("MTABLE").join("ITABLE", (clause) => {
-      clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-      clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-    });
+    const allRows = await this.databaseConnection.queryRows(withQuery);
 
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
@@ -538,11 +551,11 @@ export class ItemizeRawDB {
     id: string,
     version: string,
     updater: {
-      moduleTableUpdate?: any;
-      itemTableUpdate?: any;
+      moduleTableUpdate?: ISetBuilderManyRule;
+      itemTableUpdate?: ISetBuilderManyRule;
       // you only want to use set in these, not select not anything
-      moduleTableUpdater?: (arg: Knex.QueryBuilder) => void;
-      itemTableUpdater?: (arg: Knex.QueryBuilder) => void;
+      moduleTableUpdater?: (arg: SetBuilder) => void;
+      itemTableUpdater?: (arg: SetBuilder) => void;
     }
   ): Promise<ISQLTableRowValue> {
     if (
@@ -560,45 +573,66 @@ export class ItemizeRawDB {
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
 
-    const sqlModData = {
-      ...updater.moduleTableUpdate,
-      last_modified: this.knex.fn.now(),
-    };
+    const withQuery = new WithBuilder();
+    
+    const moduleUpdateQuery = new UpdateBuilder();
+    moduleUpdateQuery.table(moduleTable);
+    // here we will update our last modified
+    moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    if (updater.moduleTableUpdate) {
+      moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
+    }
+    // and join it on id and version match
+    moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
+    moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
+
+    // returning only the module table information
+    moduleUpdateQuery.returningBuilder.returningAll();
+
+    withQuery.with("MTABLE", moduleUpdateQuery)
+
+    if (updater.itemTableUpdater || updater.itemTableUpdate) {
+      const itemUpdateQuery = new UpdateBuilder();
+      itemUpdateQuery.table(selfTable);
+      // and join it on id and version match
+      itemUpdateQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_ID_FK_NAME, id);
+      itemUpdateQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, version || "");
+      // returning only the item table information
+      itemUpdateQuery.returningBuilder.returningAll();
+
+      if (updater.itemTableUpdate) {
+        itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
+      }
+      updater.itemTableUpdater && updater.itemTableUpdater(itemUpdateQuery.setBuilder);
+
+      withQuery.with("ITABLE", itemUpdateQuery);
+    } else {
+      const itemSelectQuery = new SelectBuilder();
+      // from both tables
+      itemSelectQuery.table(selfTable);
+      // where they match the id and version so that it joins
+      itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_ID_FK_NAME, id);
+      itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, version || "");
+      // here we would do a simple select of only the properties
+      // of the item definition table
+      itemSelectQuery.selectAll();
+
+      withQuery.with("ITABLE", itemSelectQuery);
+    }
+
+    const selectQuery = new SelectBuilder();
+    selectQuery.selectAll().fromBuilder.from("MTABLE");
+    selectQuery.joinBuilder.join("ITABLE", (rule) => {
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
+      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
+    });
+    selectQuery.limit(1);
+
+    withQuery.do(selectQuery);
 
     // this is basically the same as the cache one
     const sqlValue = convertVersionsIntoNullsWhenNecessary(
-      await this.knex.with("MTABLE", (qb) => {
-        const queryBuilder =
-          qb.table(moduleTable).update(sqlModData).where("id", id).andWhere("version", version || "").returning("*");
-        updater.moduleTableUpdater && updater.moduleTableUpdater(queryBuilder);
-      }).with("ITABLE", (qb) => {
-        if (updater.itemTableUpdate || updater.itemTableUpdater) {
-          const queryBuilder = qb.table(selfTable).where(
-            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-            id,
-          ).andWhere(
-            CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-            version || "",
-          ).returning("*");
-
-          if (updater.itemTableUpdate) {
-            queryBuilder.update(updater.itemTableUpdate);
-          }
-
-          updater.itemTableUpdater && updater.itemTableUpdater(queryBuilder);
-        } else {
-          qb.table(selfTable).select("*").where(
-            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-            id,
-          ).andWhere(
-            CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-            version || "",
-          );
-        }
-      }).first("*").from("MTABLE").join("ITABLE", (clause) => {
-        clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-        clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-      }),
+      await this.databaseConnection.queryFirst(withQuery),
     );
 
     await this.informRowsHaveBeenModified([sqlValue], true);
