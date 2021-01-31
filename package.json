@@ -18,7 +18,6 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@material-ui/pickers": "^3.2.10",
-    "@onzag/knex": "^0.95.0-next1",
     "@onzag/react-dom": "^16.14.0-custom.0",
     "@types/autosuggest-highlight": "^3.1.0",
     "@types/bcrypt": "^3.0.0",

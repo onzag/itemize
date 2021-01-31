@@ -15,7 +15,6 @@ import {
 } from "../PropertyDefinition/sql";
 import Include, { IncludeExclusionState } from "../Include";
 import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../../sql";
-import Knex from "@onzag/knex";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
@@ -23,12 +22,11 @@ import StorageProvider from "../../../../../server/services/base/StorageProvider
 /**
  * Provides the table bit that is necessary to store include data
  * for this include when included from the parent definition
- * @param kenx the current knex instance
  * @param itemDefinition the item definition that contains the include (not the referred)
  * @param include the include in question
  * @returns the partial table definition schema for the include, prefixed and with the exclusion state
  */
-export function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: ItemDefinition, include: Include): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForInclude(itemDefinition: ItemDefinition, include: Include): ISQLTableDefinitionType {
   // the exclusion state needs to be stored in the table bit
   // so we basically need to get a prefix for this item definition
   // this is usually INCLUDE_ the include prefix, and the id of the include
@@ -51,7 +49,6 @@ export function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: Item
     resultTableSchema = {
       ...resultTableSchema,
       ...getSQLTableDefinitionForProperty(
-        knex,
         itemDefinition,
         include,
         sinkingProperty,
@@ -66,7 +63,6 @@ export function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: Item
 /**
  * Given a SQL row it converts the value of the data contained
  * within that row into the valid graphql output
- * @param knex the knex instance
  * @param serverData the server data that is currently in use
  * @param include the include in question
  * @param row the row sql data
@@ -76,7 +72,6 @@ export function getSQLTableDefinitionForInclude(knex: Knex, itemDefinition: Item
  * @returns a partial graphql value
  */
 export function convertSQLValueToGQLValueForInclude(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition, 
   include: Include,
@@ -102,7 +97,6 @@ export function convertSQLValueToGQLValueForInclude(
     gqlParentResult = {
       ...gqlParentResult,
       ...convertSQLValueToGQLValueForProperty(
-        knex,
         serverData,
         itemDefinition,
         include,
@@ -123,7 +117,6 @@ export function convertSQLValueToGQLValueForInclude(
 /**
  * Converts a GraphQL value into a SQL row data, it takes apart a complex
  * graphql value and converts it into a serializable sql form
- * @param knex the knex instance
  * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param include the include in question
@@ -141,7 +134,6 @@ export function convertSQLValueToGQLValueForInclude(
  * @returns the partial sql result to be added into the table
  */
 export function convertGQLValueToSQLValueForInclude(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -180,7 +172,6 @@ export function convertGQLValueToSQLValueForInclude(
         // there, the prefix then represents the fact, we want all the added properties
         // to be prefixed with what we are giving, in this case ITEM_wheel_
         const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
-          knex,
           serverData,
           itemDefinition.getParentModule(),
           itemDefinition,
@@ -212,21 +203,17 @@ export function convertGQLValueToSQLValueForInclude(
 
 /**
  * Builds a sql query for an include
- * @param knex the knex instance
  * @param serverData the server data information
  * @param itemDefinition the item definition that contains the include
  * @param include the include in question
  * @param args the args as they come from the search module, specific for this item (not nested)
- * @param knexBuilder the knex query builder
  * @param dictionary the dictionary to use to build the search
  */
 export function buildSQLQueryForInclude(
-  knex: Knex,
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
   args: IGQLArgs,
-  knexBuilder: Knex.QueryBuilder,
   dictionary: string,
 ) {
   // we need all these prefixes
