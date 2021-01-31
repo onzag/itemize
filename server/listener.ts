@@ -5,7 +5,7 @@ import { Server } from "http";
 import Root, { ICustomRoleManager } from "../base/Root";
 import ioMain from "socket.io";
 import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import Module from "../base/Root/Module";
 import {
   CURRENCY_FACTORS_UPDATED_EVENT,

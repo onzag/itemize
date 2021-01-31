@@ -2,7 +2,7 @@ import { IGQLValue, IGQLArgs } from "../../gql-querier";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 
 export enum IOTriggerActions {
   CREATE,

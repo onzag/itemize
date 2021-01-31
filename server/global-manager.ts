@@ -1,4 +1,4 @@
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 
 // based on https://blog.andyet.com/2016/02/23/generating-shortids-in-postgres/

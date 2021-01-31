@@ -189,6 +189,19 @@ It's a simple boolean that specifies whether the current unit is booked however 
 }
 ```
 
+We also add a property about until when the booking takes place
+
+```json
+{
+    "id": "booked_until",
+    "type": "date",
+    "readRoleAccess": ["&OWNER"],
+    "editRoleAccess": [],
+    "nullable": true,
+    "searchable": false
+}
+```
+
 This last one we will use for this and it's special, for once it's a string but the subtype is reference, reference is one of the most powerful subtypes in itemize, given ids are strings, a reference subtype means that 'this is the id of another item'; and with the special properties we define that the module is going to be users, item is going to be a user, and we want to search and display by username; also we are filtering and only enabling users with the role of USER.
 
 Note that references are not checked, and it's possible to put an arbitrary string value in the booked_by value if the permissions are valid.
@@ -298,6 +311,10 @@ properties.unit_type.error.NOT_NULLABLE = you must provide an unit type
 properties.booked_by.label = booked by
 properties.booked_by.placeholder = booked by
 
+properties.booked_until.label = booked until
+properties.booked_until.placeholder = booked until
+properties.booked_until.error.INVALID_VALUE = invalid date
+
 [es]
 
 name = unidad de hospedaje
@@ -353,6 +370,10 @@ properties.unit_type.error.NOT_NULLABLE = debe específicar el tipo de unidad
 
 properties.booked_by.label = reservado por
 properties.booked_by.placeholder = reservado por
+
+properties.booked_until.label = reservado hasta
+properties.booked_until.placeholder = reservado hasta
+properties.booked_until.error.INVALID_VALUE = fecha inválida
 ```
 
 ## Update the database

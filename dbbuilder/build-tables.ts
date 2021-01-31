@@ -8,7 +8,7 @@
 
 import read from "read";
 import colors from "colors/safe";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 
 function fastRead(options: read.Options): Promise<{
   result: string;

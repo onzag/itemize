@@ -1,0 +1,49 @@
+/lib/dialects/postgres/query/pg-querycompiler.js
+
+   update() {
+     const withSQL = this.with();
+     const updateData = this._prepUpdate(this.single.update);
++    const updateFrom =
++      this.single.updateFrom ?
++      ' from ' + this.single.updateFrom.map((f) => this._prepUpdateFrom(f)).join(', ') :
++      '';
+
+.......................
+
+         `update ${this.single.only ? 'only ' : ''}${this.tableName} ` +
+         `set ${updateData.join(', ')}` +
++        updateFrom +
+         (wheres ? ` ${wheres}` : '') +
+
+.........................
+
++  _prepUpdateFrom(value) {
++    return value.alias ?
++      `${this.formatter.wrap(value.tableName)} ${this.formatter.wrap(value.alias)}` :
++      this.formatter.wrap(value.tableName);
++  }
+
+/lib/query/querybuilder.js
+
++  updateFrom(tableName, alias) {
++    const value = {
++      tableName,
++      alias: alias || null,
++    };
++    if (this._single.updateFrom) {
++      this._single.updateFrom.push(value);
++    } else {
++      this._single.updateFrom = [value];
++    }
++    return this;
++  }
+
+/types/index.d.ts
+
+     update<TResult2 = number>(columnName: string, value: Value): QueryBuilder<TRecord, TResult2>;
+ 
++    updateFrom(
++      tableName: string,
++      alias: string,
++    ): QueryBuilder<TRecord, TResult2>;
++

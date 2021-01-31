@@ -6,7 +6,7 @@
  */
 
 import colors from "colors/safe";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import uuidv5 from "uuid/v5";
 
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";

@@ -10,7 +10,7 @@ import path from "path";
 import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { types } from "pg";
 import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";

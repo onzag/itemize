@@ -8,7 +8,7 @@
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
 import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER } from "../../constants";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 
 export interface ISQLTableIndexType {
   /**

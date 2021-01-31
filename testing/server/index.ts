@@ -1,6 +1,6 @@
 import fetchNode from "node-fetch";
 import { Test } from "..";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
 import { RobotsTest } from "./robots";

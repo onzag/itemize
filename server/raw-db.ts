@@ -10,7 +10,7 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { logger } from ".";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
@@ -419,13 +419,119 @@ export class ItemizeRawDB {
   }
 
   /**
+   * Performs a raw db update for many rows
+   * in the database this is a very powerful and quite
+   * advanced method
+   * 
+   * @param item 
+   * @param updater 
+   */
+  public async performBatchRawDBUpdate(
+    item: ItemDefinition | string,
+    updater: {
+      // you only want to use where in here
+      whereCriteriaSelector: (arg: Knex.QueryBuilder) => void;
+
+      moduleTableUpdate?: any;
+      itemTableUpdate?: any;
+      // you only want to use set in these
+      moduleTableUpdater?: (arg: Knex.QueryBuilder) => void;
+      itemTableUpdater?: (arg: Knex.QueryBuilder) => void;
+    },
+  ): Promise<ISQLTableRowValue[]> {
+    if (
+      !updater.moduleTableUpdate &&
+      !updater.itemTableUpdate &&
+      !updater.moduleTableUpdater &&
+      !updater.itemTableUpdater
+    ) {
+      throw new Error("no module update and no item update was specified into the updater");
+    }
+
+    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+    const mod = itemDefinition.getParentModule();
+
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+
+    // we got to get all rows, first we create a pseudo table
+    // for our module
+    const allRows = await this.knex.with("MTABLE", (qb) => {
+      // here we will update our last modified
+      const queryBuilder = qb.table(moduleTable).update({
+        ...updater.moduleTableUpdate,
+        last_modified: this.knex.fn.now(),
+      })
+      // and join it on id and version match
+      .whereRaw(
+        "(?? = ?? AND ?? = ??)",
+        ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
+      )
+      // returning only the module table information
+      .returning(this.knex.raw("??.*", [moduleTable]) as any);
+
+      // now we pass the where criteria selector for further filtering
+      updater.whereCriteriaSelector(queryBuilder);
+
+      (queryBuilder as any).updateFrom(selfTable);
+
+      // and the table updater to set the values of the properties manually
+      updater.moduleTableUpdater && updater.moduleTableUpdater(queryBuilder);
+    }).with("ITABLE", (qb) => {
+      // so for the item definition table
+      if (updater.itemTableUpdater || updater.itemTableUpdate) {
+        // if we have an updater we build the query and select from the original
+        // module table
+        const queryBuilder = qb.table(selfTable)
+        // where the id and version match each other
+        .whereRaw(
+          "(?? = ?? AND ?? = ??)",
+          ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
+        )
+        // returning only want belongs to this table
+        .returning(this.knex.raw("??.*", [selfTable]) as any);
+
+        if (updater.itemTableUpdate) {
+          queryBuilder.update(updater.itemTableUpdate);
+        }
+
+        (queryBuilder as any).updateFrom("MTABLE");
+
+        // run the updater
+        updater.itemTableUpdater && updater.itemTableUpdater(queryBuilder);
+      } else {
+
+        // here we would do a simple select of only the properties
+        // of the item definition table
+        qb.select(this.knex.raw("??.*", [selfTable]))
+          // from both tables
+          .from(this.knex.raw("??, ??", [selfTable, "MTABLE"]))
+          // where they match the id and version so that it joins
+          .whereRaw(
+            "(?? = ?? AND ?? = ??)",
+            ["id", CONNECTOR_SQL_COLUMN_ID_FK_NAME, "version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME],
+          );
+      }
+    }).select("*").from("MTABLE").join("ITABLE", (clause) => {
+      clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+      clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+    });
+
+    const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
+
+    await this.informRowsHaveBeenModified(result, true);
+
+    return result;
+  }
+
+  /**
    * Performs a raw database update, use this method in order to update critical data that could
    * lead to race conditions, otherwise stay by updating through the cache
    *
    * @param item 
    * @param id 
    * @param version 
-   * @param updater 
+   * @param updater
    */
   public async performRawDBUpdate(
     item: ItemDefinition | string,
@@ -434,9 +540,17 @@ export class ItemizeRawDB {
     updater: {
       moduleTableUpdate?: any;
       itemTableUpdate?: any;
+      // you only want to use set in these, not select not anything
+      moduleTableUpdater?: (arg: Knex.QueryBuilder) => void;
+      itemTableUpdater?: (arg: Knex.QueryBuilder) => void;
     }
   ): Promise<ISQLTableRowValue> {
-    if (!updater.moduleTableUpdate && !updater.itemTableUpdate) {
+    if (
+      !updater.moduleTableUpdate &&
+      !updater.itemTableUpdate &&
+      !updater.moduleTableUpdater &&
+      !updater.itemTableUpdater
+    ) {
       throw new Error("no module update and no item update was specified into the updater");
     }
 
@@ -451,34 +565,29 @@ export class ItemizeRawDB {
       last_modified: this.knex.fn.now(),
     };
 
-    const sqlIdefData = updater.itemTableUpdate || {};
-
+    // this is basically the same as the cache one
     const sqlValue = convertVersionsIntoNullsWhenNecessary(
-      await this.knex.transaction(async (transactionKnex) => {
-        // and add them if we have them, note that the module will always have
-        // something to update because the edited_at field is always added when
-        // edition is taking place
-        const updateQueryMod = transactionKnex(moduleTable)
-          .update(sqlModData).where("id", id).andWhere("version", version || "")
-          .returning("*");
-
-        // for the update query of the item definition we have to take several things
-        // into consideration, first we set it as an empty object
-        let updateOrSelectQueryIdef: any = {};
-        // if we have something to update
-        if (Object.keys(sqlIdefData).length) {
-          // we make the update query
-          updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
+      await this.knex.with("MTABLE", (qb) => {
+        const queryBuilder =
+          qb.table(moduleTable).update(sqlModData).where("id", id).andWhere("version", version || "").returning("*");
+        updater.moduleTableUpdater && updater.moduleTableUpdater(queryBuilder);
+      }).with("ITABLE", (qb) => {
+        if (updater.itemTableUpdate || updater.itemTableUpdater) {
+          const queryBuilder = qb.table(selfTable).where(
             CONNECTOR_SQL_COLUMN_ID_FK_NAME,
             id,
           ).andWhere(
             CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
             version || "",
           ).returning("*");
-          // otherwise we check if we are just requesting some fields from the idef
+
+          if (updater.itemTableUpdate) {
+            queryBuilder.update(updater.itemTableUpdate);
+          }
+
+          updater.itemTableUpdater && updater.itemTableUpdater(queryBuilder);
         } else {
-          // and make a simple select query
-          updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
+          qb.table(selfTable).select("*").where(
             CONNECTOR_SQL_COLUMN_ID_FK_NAME,
             id,
           ).andWhere(
@@ -486,16 +595,9 @@ export class ItemizeRawDB {
             version || "",
           );
         }
-        // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
-
-        // now we run both queries
-        const updateQueryValueMod = await updateQueryMod;
-        const updateQueryValueIdef = await updateOrSelectQueryIdef;
-
-        return {
-          ...updateQueryValueMod[0],
-          ...updateQueryValueIdef[0],
-        };
+      }).first("*").from("MTABLE").join("ITABLE", (clause) => {
+        clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+        clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
       }),
     );
 

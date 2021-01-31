@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER
@@ -729,31 +729,19 @@ export class Cache {
     let sqlValue: ISQLTableRowValue;
     try {
       sqlValue = convertVersionsIntoNullsWhenNecessary(
-        await this.knex.transaction(async (transactionKnex) => {
-          // and add them if we have them, note that the module will always have
-          // something to update because the edited_at field is always added when
-          // edition is taking place
-          const updateQueryMod = transactionKnex(moduleTable)
-            .update(sqlModData).where("id", id).andWhere("version", version || "")
-            .returning("*");
-
-          // for the update query of the item definition we have to take several things
-          // into consideration, first we set it as an empty object
-          let updateOrSelectQueryIdef: any = {};
-          // if we have something to update
+        await this.knex.with("MTABLE", (qb) => {
+          qb.table(moduleTable).update(sqlModData).where("id", id).andWhere("version", version || "").returning("*")
+        }).with("ITABLE", (qb) => {
           if (Object.keys(sqlIdefData).length) {
-            // we make the update query
-            updateOrSelectQueryIdef = transactionKnex(selfTable).update(sqlIdefData).where(
+            qb.table(selfTable).update(sqlIdefData).where(
               CONNECTOR_SQL_COLUMN_ID_FK_NAME,
               id,
             ).andWhere(
               CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
               version || "",
             ).returning("*");
-            // otherwise we check if we are just requesting some fields from the idef
           } else {
-            // and make a simple select query
-            updateOrSelectQueryIdef = transactionKnex(selfTable).select("*").where(
+            qb.table(selfTable).select("*").where(
               CONNECTOR_SQL_COLUMN_ID_FK_NAME,
               id,
             ).andWhere(
@@ -761,16 +749,9 @@ export class Cache {
               version || "",
             );
           }
-          // if there's nothing to update, or there is nothing to retrieve, it won't touch the idef table
-
-          // now we run both queries
-          const updateQueryValueMod = await updateQueryMod;
-          const updateQueryValueIdef = await updateOrSelectQueryIdef;
-
-          return {
-            ...updateQueryValueMod[0],
-            ...updateQueryValueIdef[0],
-          };
+        }).first("*").from("MTABLE").join("ITABLE", (clause) => {
+          clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
+          clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
         }),
       );
     } catch (err) {

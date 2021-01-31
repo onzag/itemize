@@ -25,7 +25,7 @@ import location, { IPropertyDefinitionSupportedLocationType } from "./location";
 import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import file, { PropertyDefinitionSupportedFileType } from "./file";
 import ItemDefinition from "../..";

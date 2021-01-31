@@ -8,7 +8,7 @@
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 // @ts-nocheck
 import Confirm from "prompt-confirm";
 

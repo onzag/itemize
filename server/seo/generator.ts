@@ -8,7 +8,7 @@ import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOPara
 import https from "https";
 import { logger } from "../index";
 import { ISitemapJSONType, ISitemapLastQueryType, toXML } from "./sitemaps";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import Root from "../../base/Root";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
 import { escapeStringRegexp } from "../../util";

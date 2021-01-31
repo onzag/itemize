@@ -30,7 +30,7 @@ import {
   buildSQLQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import StorageProvider from "../../../../server/services/base/StorageProvider";
 

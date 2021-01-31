@@ -7,7 +7,7 @@
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 
 import Root from "../base/Root";
 import { IConfigRawJSONDataType, IDumpConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";

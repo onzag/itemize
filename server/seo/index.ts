@@ -4,7 +4,7 @@
  */
 
 import Root from "../../base/Root";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 
 /**
  * Specifies the parameters that are to be given

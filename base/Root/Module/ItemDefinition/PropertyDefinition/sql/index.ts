@@ -11,7 +11,7 @@ import PropertyDefinition from "../../PropertyDefinition";
 import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
   ConsumeStreamsFnType, ISQLTableIndexType } from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";

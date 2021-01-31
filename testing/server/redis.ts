@@ -1,7 +1,7 @@
 import { Test } from "..";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import redis, { RedisClient } from "redis";
 import { SERVER_DATA_IDENTIFIER } from "../../constants";
 import { promisify } from "util";

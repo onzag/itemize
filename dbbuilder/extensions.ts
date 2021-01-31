@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 
 /**

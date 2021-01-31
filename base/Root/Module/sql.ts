@@ -19,7 +19,7 @@ import {
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import StorageProvider from "../../../server/services/base/StorageProvider";
 

@@ -4,7 +4,7 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
 import { IServerSideTokenDataType } from "./basic";
 import equals from "deep-equal";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import Root from "../../base/Root";
 
 export enum CustomRoleGranterEnvironment {

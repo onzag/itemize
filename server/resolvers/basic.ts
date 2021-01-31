@@ -23,7 +23,7 @@ import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { ICustomRoleManager } from "../../base/Root";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport

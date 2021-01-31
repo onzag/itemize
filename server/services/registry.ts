@@ -6,7 +6,7 @@
  */
 
 import { ServiceProvider, ServiceProviderType } from ".";
-import type Knex from "knex";
+import type Knex from "@onzag/knex";
 import { REGISTRY_IDENTIFIER } from "../../constants";
 
 interface IRegistryConfig {

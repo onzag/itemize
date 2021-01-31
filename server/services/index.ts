@@ -1,7 +1,7 @@
 import { IAppDataType, logger } from "..";
 import express from "express";
 import { ITriggerRegistry } from "../resolvers/triggers";
-import Knex from "knex";
+import Knex from "@onzag/knex";
 import { RegistryService } from "./registry";
 import { ItemizeRedisClient } from "../redis";
 import Root from "../../base/Root";

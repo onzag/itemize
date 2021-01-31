@@ -568,7 +568,7 @@ But remember to add the `price` to the properties list that we need to fetch.
 
 ## Creating a service to manage reservations
 
-In this part we will explore services, you might remember at the very start we created the `booked` and `booked_by` property in the unit that are supposed to be internally handled but are not so far, they remain unused; in this section we will take use of them.
+In this part we will explore services, you might remember at the very start we created the `booked`, `booked_by` and `booked_until` property in the unit that are supposed to be internally handled but are not so far, they remain unused; in this section we will take use of them.
 
 We cannot use a trigger to update the value because the trigger only executes during the modification/creation or search, we need to use a service that runs globally and keeps these records updated.
 
@@ -576,7 +576,7 @@ On itemize there are two levels, the global level, which is where your centraliz
 
 When we use triggers we do a local update first and then elevate it to the database, unless we do a raw db upgrade which does it the other way around; however for a service we need to do raw db updates only, so in that sense, what we need is a global service that runs on the global manager level.
 
-Let's first create our new test service, create a file at `server/booking-service.ts` and let's make a new very basic service.
+Let's first create our new test service, create a file at `server/booking-service.ts` and let's make a new very basic service, we are making this one local for demonstration.
 
 ```ts
 import { IAppDataType } from "@onzag/itemize/server";
@@ -584,7 +584,7 @@ import { ServiceProvider, ServiceProviderType } from "@onzag/itemize/server/serv
 
 export default class BookingService extends ServiceProvider<null> {
     static getType() {
-        return ServiceProviderType.GLOBAL;
+        return ServiceProviderType.LOCAL;
     }
 
     /**
@@ -654,7 +654,7 @@ And if you navigate to `http://localhost:8000/rest/service/hello` you should be 
 
 ![Custom Service Endpoint](./images/custom-service-endpoint.png)
 
-
+Now let's modify it and make it global, a global service will not be able to set rest endpoints but will run globally and will be only one.
 
 ### Modifying the unit to be booked once the checkin date comes
 
