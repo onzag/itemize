@@ -71,11 +71,14 @@ export const customUserTriggers: ITriggerRegistry = {
             // now we try to find another user with such email
             let result: ISQLTableRowValue;
             try {
-              result = await arg.appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-                .from(arg.itemDefinition.getQualifiedPathName()).where({
-                  email: newEmail,
-                  e_validated: true,
-                });
+              result = await arg.appData.databaseConnection.queryFirst(
+                `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(arg.itemDefinition.getQualifiedPathName())} ` +
+                `WHERE "email" = $1 AND "e_validated" = $2 LIMIT 1`,
+                [
+                  newEmail as string,
+                  true,
+                ],
+              );
             } catch (err) {
               logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
                 "if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");

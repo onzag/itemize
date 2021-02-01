@@ -106,7 +106,6 @@ export async function editItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       cache: appData.cache,
-      knex: appData.knex,
       preValidation: (content: ISQLTableRowValue) => {
         // if we don't get an user id this means that there's no owner, this is bad input
         if (!content) {
@@ -144,7 +143,6 @@ export async function editItemDefinition(
   // definition, we need to convert that value to GQL value, and for that we use the converter
   // note how we don't pass the requested fields because we want it all
   const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     wholeSqlStoredValue,
@@ -152,7 +150,8 @@ export async function editItemDefinition(
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: currentWholeValueAsGQL,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
@@ -360,7 +359,6 @@ export async function editItemDefinition(
 
   // convert it using the requested fields for that, and ignoring everything else
   const gqlValue = convertSQLValueToGQLValueForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     sqlValue,

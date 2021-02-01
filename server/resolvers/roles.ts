@@ -4,8 +4,9 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
 import { IServerSideTokenDataType } from "./basic";
 import equals from "deep-equal";
-import Knex from "@onzag/knex";
 import Root from "../../base/Root";
+import { DatabaseConnection } from "../../database";
+import { ItemizeRawDB } from "../../server/raw-db";
 
 export enum CustomRoleGranterEnvironment {
   CREATION = "CREATION",
@@ -18,7 +19,8 @@ export enum CustomRoleGranterEnvironment {
 interface ICustomRoleGranterArg {
   tokenData: IServerSideTokenDataType;
   cache: Cache;
-  knex: Knex;
+  databaseConnection: DatabaseConnection;
+  rawDB: ItemizeRawDB;
   item: ItemDefinition;
   module: Module;
   value: IGQLValue;

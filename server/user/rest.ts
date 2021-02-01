@@ -82,11 +82,14 @@ export function userRestServices(appData: IAppDataType) {
     }
 
     try {
-      const result = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-        .from(userTable).where({
-          email: user.email,
-          e_validated: true,
-        });
+      const result = await appData.databaseConnection.queryFirst(
+        `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(userTable)} ` +
+        `WHERE "email" = $1 AND "e_validated" = $2 LIMIT 1`,
+        [
+          user.email,
+          true,
+        ],
+      );
 
       if (result) {
         if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {

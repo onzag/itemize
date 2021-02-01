@@ -1,4 +1,4 @@
-import { QueryBuilder } from ".";
+import { BasicBindingType, QueryBuilder } from ".";
 import { FromBuilder } from "./FromBuilder";
 import { GroupByBuilder } from "./GroupByBuilder";
 import { HavingBuilder } from "./HavingBuilder";
@@ -16,14 +16,11 @@ export class SelectBuilder extends QueryBuilder {
   public havingBuilder: HavingBuilder;
   public orderByBuilder: OrderByBuilder;
 
-  private tableNames: string[];
   private ilimit: number;
   private ioffset: number;
 
   constructor() {
     super();
-
-    this.tableNames = [];
 
     this.fromBuilder = new FromBuilder();
     this.joinBuilder = new JoinBuilder();
@@ -32,19 +29,16 @@ export class SelectBuilder extends QueryBuilder {
     this.havingBuilder = new HavingBuilder();
     this.orderByBuilder = new OrderByBuilder();
 
-    this.addBindingSource(this.fromBuilder);
-    this.addBindingSource(this.joinBuilder);
-    this.addBindingSource(this.whereBuilder);
-    this.addBindingSource(this.groupByBuilder);
-    this.addBindingSource(this.havingBuilder);
-    this.addBindingSource(this.orderByBuilder);
+    this.clearSelect();
   }
   public table(tableName: string) {
-    this.tableNames.push(tableName);
+    this.selectedExpressions.push(JSON.stringify(tableName));
     return this;
   }
   public tables(tableNames: string[]) {
-    this.tableNames = tableNames;
+    tableNames.forEach((t) => {
+      this.selectedExpressions.push(JSON.stringify(t));
+    });
     return this;
   }
   public selectAll(tableName?: string) {
@@ -63,12 +57,31 @@ export class SelectBuilder extends QueryBuilder {
     });
     return this;
   }
-  public selectExpression(expression: string, bindings?: Array<string | number>) {
-    this.selectedExpressions.push(expression);
+  public selectExpression(expression: string, bindings?: BasicBindingType[]) {
+    this.selectedExpressions.unshift(expression);
     
     if (bindings) {
       this.shiftBindingSources(bindings);
     }
+    return this;
+  }
+  public clearSelect() {
+    this.selectedExpressions = [];
+    this.clearBindingSources();
+
+    this.addBindingSource(this.fromBuilder);
+    this.addBindingSource(this.joinBuilder);
+    this.addBindingSource(this.whereBuilder);
+    this.addBindingSource(this.groupByBuilder);
+    this.addBindingSource(this.havingBuilder);
+    this.addBindingSource(this.orderByBuilder);
+
+    return this;
+  }
+  public clear() {
+    this.clearSelect();
+    this.ilimit = null;
+    this.ioffset = null;
     return this;
   }
   public limit(n: number) {
@@ -80,10 +93,10 @@ export class SelectBuilder extends QueryBuilder {
     return this;
   }
   public compile() {
-    if (!this.tableNames.length) {
+    if (!this.selectedExpressions.length) {
       return "";
     }
-    return "SELECT " + this.selectedExpressions.join(", ") + " FROM " + this.tableNames.map((v) => JSON.stringify(v)).join(", ") +
+    return "SELECT " + this.selectedExpressions.join(", ") +
       this.fromBuilder.compile() +
       this.joinBuilder.compile() +
       this.whereBuilder.compile() +

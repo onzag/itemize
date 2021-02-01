@@ -1,9 +1,5 @@
-import { QueryBuilder } from ".";
+import { IManyValueType, QueryBuilder } from ".";
 import { ReturningBuilder } from "./ReturningBuilder";
-
-export interface IValueToInsert {
-  [columnName: string]: number | string | [string, Array<string | number>];
-}
 
 export class InsertBuilder extends QueryBuilder {
   private valuesToInsert: string[] = [];
@@ -23,12 +19,28 @@ export class InsertBuilder extends QueryBuilder {
 
     this.addBindingSource(this.returningBuilder);
   }
+  public clearValues() {
+    this.valuesToInsert = [];
+    this.clearBindingSources();
+
+    this.addBindingSource(this.returningBuilder);
+
+    return this;
+  }
+  public clear() {
+    this.clearValues();
+    this.tableName = null;
+    return this;
+  }
   public table(tableName: string) {
     this.tableName = tableName;
     return this;
   }
-  public insert(...values: IValueToInsert[]) {
+  public insert(...values: IManyValueType[]) {
     const valuesToAdd: string[] = [];
+
+    // we clear because the returning comes last
+    this.clearBindingSources();
 
     const signatures = values.map((v) => {
       const sortedKeys = Object.keys(v).sort();
@@ -49,6 +61,9 @@ export class InsertBuilder extends QueryBuilder {
 
       return sortedKeys.map((k) => JSON.stringify(k)).join(", ");
     });
+
+    // and readd it then
+    this.addBindingSource(this.returningBuilder);
 
     signatures.forEach((signature, i) => {
       const nextSignature = signatures[i + 1];

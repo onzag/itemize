@@ -94,6 +94,7 @@ export interface ISQLStrSearchInfo extends ISQLArgInfo {
 
 export interface ISQLEqualInfo extends ISQLArgInfo {
   value: PropertyDefinitionSupportedType;
+  whereBuilder: WhereBuilder;
   ignoreCase: boolean;
 }
 
@@ -247,7 +248,7 @@ export interface IPropertyDefinitionSupportedType {
    * same for the id, and knex is just the knex instance, not a builder
    * and an optional column name so that it can be used as select as
    */
-  sqlEqual: (arg: ISQLEqualInfo) => any;
+  sqlEqual: (arg: ISQLEqualInfo) => void;
   /**
    * A server side ran cached equal, ran during cache checks very useful for checking
    * against policies during policy checks and other forms of checks

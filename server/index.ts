@@ -10,7 +10,6 @@ import path from "path";
 import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
-import Knex from "@onzag/knex";
 import { types } from "pg";
 import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -24,7 +23,7 @@ import { customUserTriggers } from "./user/triggers";
 
 import winston from "winston";
 import "winston-daily-rotate-file";
-import build from "../dbbuilder";
+// import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/providers/locale-provider";
@@ -51,6 +50,7 @@ import { ItemizeRedisClient, setupRedisClient } from "./redis";
 import { ICustomRoleType } from "./resolvers/roles";
 import { ItemizeRawDB } from "./raw-db";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
+import { DatabaseConnection } from "../database";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -140,7 +140,7 @@ export interface IAppDataType {
   indexProduction: string;
   config: IConfigRawJSONDataType;
   sensitiveConfig: ISensitiveConfigRawJSONDataType;
-  knex: Knex;
+  databaseConnection: DatabaseConnection,
   listener: Listener;
   cache: Cache;
   redis: ItemizeRedisClient;
@@ -293,7 +293,8 @@ export async function initializeServer(
 ) {
   // for build database we just build the database
   if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
-    build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
+    // TODODB repair this
+    // build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
     return;
   }
 
@@ -504,7 +505,7 @@ export async function initializeServer(
     const root = new Root(build);
 
     // Create the connection string
-    const dbConnectionKnexConfig = {
+    const dbConnectionConfig = {
       host: dbConfig.host,
       port: dbConfig.port,
       user: dbConfig.user,
@@ -517,11 +518,12 @@ export async function initializeServer(
     );
 
     // we only need one client instance
-    const knex = Knex({
-      client: "pg",
-      debug: process.env.NODE_ENV !== "production",
-      connection: dbConnectionKnexConfig,
-    });
+    const databaseConnection = new DatabaseConnection(dbConnectionConfig);
+    const rawDB = new ItemizeRawDB(
+      redisPub,
+      databaseConnection,
+      root,
+    )
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
@@ -529,7 +531,7 @@ export async function initializeServer(
       "initializeServer: initializing registry",
     );
     const registry = new RegistryService({
-      knex,
+      databaseConnection,
     }, null, config, sensitiveConfig);
     await registry.initialize();
 
@@ -573,7 +575,7 @@ export async function initializeServer(
 
       const manager: GlobalManager = new GlobalManager(
         root,
-        knex,
+        databaseConnection,
         redisGlobalClient,
         redisPub,
         config,
@@ -644,7 +646,7 @@ export async function initializeServer(
           const seoGenerator = new SEOGenerator(
             seoConfig.seoRules,
             storageClient,
-            knex,
+            rawDB,
             root,
             config.supportedLanguages,
             domain,
@@ -724,7 +726,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, knex, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
+    const cache = new Cache(redisClient, databaseConnection, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );
@@ -741,7 +743,7 @@ export async function initializeServer(
       redisLocalPub,
       root,
       cache,
-      knex,
+      rawDB,
       server,
       custom.customRoles || [],
       sensitiveConfig,
@@ -864,7 +866,7 @@ export async function initializeServer(
       indexProduction: index.replace(/\$MODE/g, "production"),
       config,
       sensitiveConfig,
-      knex,
+      databaseConnection,
       listener,
       redis: redisClient,
       redisGlobal: redisGlobalClient,
@@ -887,11 +889,7 @@ export async function initializeServer(
       customServices,
       registry,
       customRoles: custom.customRoles || [],
-      rawDB: new ItemizeRawDB(
-        redisPub,
-        knex,
-        root,
-      ),
+      rawDB,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };

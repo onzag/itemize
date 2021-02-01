@@ -224,7 +224,8 @@ export class Collector {
       this.appData.customRoles,
       {
         cache: this.appData.cache,
-        knex: this.appData.knex,
+        databaseConnection: this.appData.databaseConnection,
+        rawDB: this.appData.rawDB,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         item: idef,
         module: idef.getParentModule(),
@@ -237,7 +238,6 @@ export class Collector {
         } : null,
         tokenData: this.appliedRule.forUser,
         value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
-          this.appData.knex,
           this.appData.cache.getServerData(),
           idef,
           rowValue,
@@ -259,7 +259,7 @@ export class Collector {
     if (fields) {
       // we build the value for the given role with the given fields
       const value = rowValue === null ? null : filterAndPrepareGQLValue(
-        this.appData.knex, this.appData.cache.getServerData(), rowValue, fields, this.appliedRule.forUser.role, idef,
+        this.appData.cache.getServerData(), rowValue, fields, this.appliedRule.forUser.role, idef,
       );
 
       const valueToReturnToUser = value ? value.toReturnToUser : null;

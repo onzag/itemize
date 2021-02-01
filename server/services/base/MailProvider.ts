@@ -197,20 +197,30 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       try {
         templateValue = this.isInstanceLocal() ?
           await this.localAppData.cache.requestValue(actualItemDefinition, arg.id, arg.version || null) :
-          await this.globalRawDB.getRawDBQueryBuilderFor(actualItemDefinition).first("*").where({
-            id: arg.id,
-            version: arg.version || "",
-          });
+          (
+            await this.globalRawDB.performRawDBSelect(actualItemDefinition, (builder) => {
+              builder.selectAll().limit(1);
+              builder.whereBuilder.andWhereMany({
+                id: arg.id,
+                version: arg.version || "",
+              });
+            })
+          )[0] || null;
 
         // if not found and we have a version, what we assume is a language
         // we fallback to the unversioned
         if (!templateValue && arg.version) {
           templateValue = this.isInstanceLocal() ?
             await this.localAppData.cache.requestValue(actualItemDefinition, arg.id, null) :
-            await this.globalRawDB.getRawDBQueryBuilderFor(actualItemDefinition).first("*").where({
-              id: arg.id,
-              version: "",
-            });
+            (
+              await this.globalRawDB.performRawDBSelect(actualItemDefinition, (builder) => {
+                builder.selectAll().limit(1);
+                builder.whereBuilder.andWhereMany({
+                  id: arg.id,
+                  version: "",
+                });
+              })
+            )[0] || null;
         }
 
         // now we need the property value
@@ -325,7 +335,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       fromEmailHandle: string,
       to: string | IGQLValue | ISQLTableRowValue | Array<string | IGQLValue | ISQLTableRowValue>;
       subject: string;
-      itemDefinition: string | ItemDefinition;
+      itemDefinition: string | ItemDefinition;
       property: string | PropertyDefinition;
       id: string;
       version?: string;
@@ -391,8 +401,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     const encodedSubscribeProperty = encodeURIComponent(arg.subscribeProperty);
     const unsubscribeMailto =
       arg.canUnsubscribe && arg.subscribeProperty ?
-      "mailto:unsubscribe@" + hostname + "?subject=" + encodedSubscribeProperty + "&body=" + encodedSubscribeProperty :
-      null;
+        "mailto:unsubscribe@" + hostname + "?subject=" + encodedSubscribeProperty + "&body=" + encodedSubscribeProperty :
+        null;
 
     // now we need to setup the personalization, if we have any
     // these are going to be the personalization args per user
@@ -412,12 +422,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
             userData as string,
             null,
           ) :
-          await this.globalRawDB.getRawDBQueryBuilderFor(
-            userIdef,
-          ).first("*").where({
-            id: userData as string,
-            version: ""
-          });
+          (
+            await this.globalRawDB.performRawDBSelect(
+              userIdef,
+              (builder) => {
+                builder.selectAll().limit(1);
+                builder.whereBuilder.andWhereMany({
+                  id: userData as any,
+                  version: "",
+                });
+              }
+            )
+          )[0] || null;
       }
 
       // if there's no value, there's no user,

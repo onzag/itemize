@@ -19,8 +19,14 @@ export class GroupByBuilder extends QueryBuilder {
     if (bindings) {
       this.addBindingSources(bindings);
     }
+    return this;
   }
   public compile() {
     return this.expressions.join(", ");
+  }
+  public clear() {
+    this.expressions = [];
+    this.clearBindingSources();
+    return this;
   }
 }

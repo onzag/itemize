@@ -56,34 +56,36 @@ export async function serverSideIndexChecker(
   const isCaseInsensitive = property.isNonCaseSensitiveUnique();
 
   // now the query
-  const query = appData.knex.select(
+  const query = appData.databaseConnection.getSelectBuilder();
+  query.select(
     moduleIDColumn,
     moduleVersionColumn,
-  ).from(qualifiedParentName).where(
-    property.getPropertyDefinitionDescription().sqlEqual({
-      knex: appData.knex,
-      serverData: appData.cache.getServerData(),
-      value,
-      ignoreCase: isCaseInsensitive,
-      id: property.getId(),
-      include,
-      itemDefinition,
-      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
-      property,
-    }),
-  );
+  ).table(qualifiedParentName).limit(1);
+
+  property.getPropertyDefinitionDescription().sqlEqual({
+    serverData: appData.cache.getServerData(),
+    value,
+    ignoreCase: isCaseInsensitive,
+    id: property.getId(),
+    include,
+    itemDefinition,
+    prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+    property,
+    whereBuilder: query.whereBuilder,
+  });
+
 
   // if the id is not null, it might be null to do whole check
   // or an id specified so that we exclude that id in the search
   // because it will match, eg. we check for usernames but our own username
   // would match everyt ime
   if (id !== null) {
-    query.andWhere(moduleIDColumn, "!=", id);
-    query.andWhere(moduleVersionColumn, "!=", version);
+    query.whereBuilder.andWhereColumn(moduleIDColumn, id, "!=");
+    query.whereBuilder.andWhereColumn(moduleVersionColumn, version, "!=");
   }
 
   // run the query
-  const result = await query;
+  const result = await appData.databaseConnection.queryFirst(query);
 
   // return whether we found results
   return !result.length;

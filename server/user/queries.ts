@@ -132,80 +132,88 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         } else {
           // now we prepare the query we use to get the
           // user related to this token or credentials
-          const resultUserQuery = appData.knex.first(
-            "id",
-            "role",
-            "session_id",
-            "blocked_at",
-          ).from(moduleTable).join(userTable, (clause) => {
-            clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-            clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
+          const selectQuery = appData.databaseConnection.getSelectBuilder();
+          selectQuery.select("id", "role", "session_id", "blocked_at");
+          selectQuery.fromBuilder.from(moduleTable);
+          selectQuery.joinBuilder.join(userTable, (clause) => {
+            clause
+              .onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id")
+              .onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
           });
-          // and we apply as required
-          resultUserQuery
-            .where((subQueryBuilder) => {
-              // now for email login to be possible
-              subQueryBuilder
-                .where(userNamePropertyDescription.sqlEqual({
+          selectQuery.limit(1);
+
+          selectQuery.whereBuilder.andWhere((subqueryBuilder) => {
+            subqueryBuilder.orWhere(
+              (internalOrQueryBuilder) => {
+                userNamePropertyDescription.sqlEqual({
                   id: usernameProperty.getId(),
                   prefix: "",
                   ignoreCase: true,
-                  knex: appData.knex,
                   serverData: appData.cache.getServerData(),
                   itemDefinition: userIdef,
                   include: null,
                   value: args.username as string,
                   property: usernameProperty,
-                }))
-                .orWhere((innerSuqueryBuilder) => {
-                  // cannot search by email if these properties are missing
-                  if (!emailProperty || !eValidatedProperty) {
-                    return null;
-                  }
-                  // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
-                  // another invalidated email that other user has and has a chance to login as them
-                  // you might wonder why not avoid them to set the
-                  // email as that user to start with, well this is to avoid a DDOS attack similar to one that was present at github
-                  // where you would set an invalidated email, and that user won't be able to claim its own email
-                  innerSuqueryBuilder
-                    .where(emailPropertyDescription.sqlEqual({
-                      id: emailProperty.getId(),
-                      prefix: "",
-                      ignoreCase: true,
-                      knex: appData.knex,
-                      serverData: appData.cache.getServerData(),
-                      itemDefinition: userIdef,
-                      include: null,
-                      value: args.username as string,
-                      property: usernameProperty,
-                    }))
-                    .andWhere(eValidatedPropertyDescription.sqlEqual({
-                      id: eValidatedProperty.getId(),
-                      prefix: "",
-                      ignoreCase: true,
-                      knex: appData.knex,
-                      serverData: appData.cache.getServerData(),
-                      itemDefinition: userIdef,
-                      include: null,
-                      value: true,
-                      property: eValidatedProperty,
-                    }));
-                });
-            })
-            .andWhere(passwordPropertyDescription.sqlEqual({
+                  whereBuilder: internalOrQueryBuilder,
+                })
+              }
+            );
+
+            // cannot search by email if these properties are missing
+            if (!emailProperty || !eValidatedProperty) {
+              return;
+            }
+
+            // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
+            // another invalidated email that other user has and has a chance to login as them
+            // you might wonder why not avoid them to set the
+            // email as that user to start with, well this is to avoid a DDOS attack similar to one that was present at github
+            // where you would set an invalidated email, and that user won't be able to claim its own email
+            subqueryBuilder.orWhere(
+              (internalOrQueryBuilder) => {
+                internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
+                  userNamePropertyDescription.sqlEqual({
+                    id: usernameProperty.getId(),
+                    prefix: "",
+                    ignoreCase: true,
+                    serverData: appData.cache.getServerData(),
+                    itemDefinition: userIdef,
+                    include: null,
+                    value: args.username as string,
+                    property: usernameProperty,
+                    whereBuilder: internalUsernameWhereBuilder,
+                  });
+                }).andWhere((internalEvalidatedWhereBuilder) => {
+                  eValidatedPropertyDescription.sqlEqual({
+                    id: eValidatedProperty.getId(),
+                    prefix: "",
+                    ignoreCase: true,
+                    serverData: appData.cache.getServerData(),
+                    itemDefinition: userIdef,
+                    include: null,
+                    value: true,
+                    property: eValidatedProperty,
+                    whereBuilder: internalEvalidatedWhereBuilder,
+                  });
+                })
+              }
+            )
+          }).andWhere((internalPasswordWhereBuilder) => {
+            passwordPropertyDescription.sqlEqual({
               id: passwordProperty.getId(),
               prefix: "",
               ignoreCase: true,
-              knex: appData.knex,
               serverData: appData.cache.getServerData(),
               itemDefinition: userIdef,
               include: null,
               value: args.password as string,
               property: passwordProperty,
-            }));
+              whereBuilder: internalPasswordWhereBuilder,
+            })
+          });
 
           try {
-            resultUser = await resultUserQuery || null;
+            resultUser = await appData.databaseConnection.queryFirst(selectQuery) || null;
           } catch (err) {
             logger.error(
               "customUserQueries.token [SERIOUS]: failed to execute sql query in order to retrieve " +
@@ -360,11 +368,14 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         // such
         let userWithThatEmail: ISQLTableRowValue;
         try {
-          userWithThatEmail = await appData.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-            .from(userTable).where({
-              email: resultUser.email,
-              e_validated: true,
-            });
+          userWithThatEmail = await appData.databaseConnection.queryFirst(
+            `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(userTable)} ` +
+            `WHERE "email"=$1 AND "e_validated"=$2 LIMIT 1`,
+            [
+              resultUser.email,
+              true,
+            ],
+          );
         } catch (err) {
           logger.error(
             "customUserQueries.send_validate_email [SERIOUS]: could not perform the SQL query to find out if user with same email but " +
@@ -516,36 +527,40 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         // well this is to avoid a DDOS attack similar to one that was present at github
         // where you would set an invalidated email, and that user won't be able to claim its own email
         let resultUser: ISQLTableRowValue;
-        
+
+        const selectQuery = appData.databaseConnection.getSelectBuilder();
+        selectQuery.select(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "email", "username", "app_language");
+        selectQuery.fromBuilder.from(userTable);
+        selectQuery.limit(1);
+
+        selectQuery.whereBuilder.andWhere((emailWhereBuilder) => {
+          emailPropertyDescription.sqlEqual({
+            id: emailProperty.getId(),
+            prefix: "",
+            ignoreCase: true,
+            whereBuilder: emailWhereBuilder,
+            serverData: appData.cache.getServerData(),
+            itemDefinition: userIdef,
+            include: null,
+            value: args.email,
+            property: eValidatedProperty,
+          })
+        }).andWhere((evalidatedWhereBuilder) => {
+          eValidatedPropertyDescription.sqlEqual({
+            id: eValidatedProperty.getId(),
+            prefix: "",
+            ignoreCase: true,
+            whereBuilder: evalidatedWhereBuilder,
+            serverData: appData.cache.getServerData(),
+            itemDefinition: userIdef,
+            include: null,
+            value: true,
+            property: eValidatedProperty,
+          })
+        });
+
         try {
-          resultUser = await appData.knex.first(
-            CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-            "email",
-            "username",
-            "app_language",
-          ).from(userTable)
-            .where(emailPropertyDescription.sqlEqual({
-              id: emailProperty.getId(),
-              prefix: "",
-              ignoreCase: true,
-              knex: appData.knex,
-              serverData: appData.cache.getServerData(),
-              itemDefinition: userIdef,
-              include: null,
-              value: args.email,
-              property: eValidatedProperty,
-            }))
-            .andWhere(eValidatedPropertyDescription.sqlEqual({
-              id: eValidatedProperty.getId(),
-              prefix: "",
-              ignoreCase: true,
-              knex: appData.knex,
-              serverData: appData.cache.getServerData(),
-              itemDefinition: userIdef,
-              include: null,
-              value: true,
-              property: eValidatedProperty,
-            }));
+          resultUser = await appData.databaseConnection.queryFirst(selectQuery);
         } catch (err) {
           logger.error(
             "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email",
@@ -746,7 +761,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         let resultUser: ISQLTableRowValue;
-        
+
         try {
           resultUser = await appData.cache.requestValue(
             userIdef,

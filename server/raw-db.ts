@@ -17,10 +17,10 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import Module from "../base/Root/Module";
 import { UpdateBuilder } from "../database/UpdateBuilder";
-import { DatabaseConnection } from "../database";
+import { DatabaseConnection, IManyValueType } from "../database";
 import { SelectBuilder } from "../database/SelectBuilder";
 import { WhereBuilder } from "../database/WhereBuilder";
-import { ISetBuilderManyRule, SetBuilder } from "../database/SetBuilder";
+import { SetBuilder } from "../database/SetBuilder";
 import { WithBuilder } from "../database/WithBuilder";
 
 /**
@@ -36,8 +36,9 @@ const requiredProperties = ["id", "version", "type", "created_by", "parent_id", 
  */
 export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
-  private databaseConnection: DatabaseConnection;
   private root: Root;
+
+  public databaseConnection: DatabaseConnection;
 
   /**
    * Builds a new instance of the change informer
@@ -58,7 +59,7 @@ export class ItemizeRawDB {
    * @returns the transaction time
    */
   private async storeInDeleteRegistry(row: ISQLTableRowValue, moduleName: string) {
-    const insertQuery = this.databaseConnection.insert();
+    const insertQuery = this.databaseConnection.getInsertBuilder();
     insertQuery.table(DELETED_REGISTRY_IDENTIFIER).insert({
       id: row.id,
       version: row.version,
@@ -407,10 +408,11 @@ export class ItemizeRawDB {
    * that are in the module table, like id, parents, creators, and prop extensions
    * then you can prevent the join from happening
    */
-  public getRawDBQueryBuilderFor(
+  public async performRawDBSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
+    selecter: (builder: SelectBuilder) => void,
     preventJoin?: boolean,
-  ): SelectBuilder {
+  ): Promise<ISQLTableRowValue[]> {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
@@ -427,8 +429,10 @@ export class ItemizeRawDB {
     } else {
       builder.table(itemDefinitionOrModuleInstance.getQualifiedPathName());
     }
-  
-    return builder;
+ 
+    selecter(builder);
+
+    return await this.databaseConnection.queryRows(builder);
   }
 
   /**
@@ -445,8 +449,8 @@ export class ItemizeRawDB {
       // you only want to use where in here
       whereCriteriaSelector: (arg: WhereBuilder) => void;
 
-      moduleTableUpdate?: ISetBuilderManyRule;
-      itemTableUpdate?: ISetBuilderManyRule;
+      moduleTableUpdate?: IManyValueType;
+      itemTableUpdate?: IManyValueType;
       // you only want to use set in these
       moduleTableUpdater?: (arg: SetBuilder) => void;
       itemTableUpdater?: (arg: SetBuilder) => void;
@@ -551,8 +555,8 @@ export class ItemizeRawDB {
     id: string,
     version: string,
     updater: {
-      moduleTableUpdate?: ISetBuilderManyRule;
-      itemTableUpdate?: ISetBuilderManyRule;
+      moduleTableUpdate?: IManyValueType;
+      itemTableUpdate?: IManyValueType;
       // you only want to use set in these, not select not anything
       moduleTableUpdater?: (arg: SetBuilder) => void;
       itemTableUpdater?: (arg: SetBuilder) => void;

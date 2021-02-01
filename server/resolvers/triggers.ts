@@ -2,7 +2,7 @@ import { IGQLValue, IGQLArgs } from "../../gql-querier";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
-import Knex from "@onzag/knex";
+import { WhereBuilder } from "../../database/WhereBuilder";
 
 export enum IOTriggerActions {
   CREATE,
@@ -83,7 +83,7 @@ export interface ISearchTriggerArgType {
     id: string;
     customData: any;
   };
-  query: Knex.QueryBuilder;
+  whereBuilder: WhereBuilder;
   forbid: (message: string, customCode?: string) => void;
 }
 

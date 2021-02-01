@@ -42,6 +42,10 @@ export class JoinBuilder extends QueryBuilder {
     fn(builder);
     return this;
   }
+  public clear() {
+    this.builders = [];
+    this.clearBindingSources();
+  }
   public compile() {
     if (!this.builders.length) {
       return "";

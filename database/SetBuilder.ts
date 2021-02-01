@@ -1,25 +1,21 @@
-import { QueryBuilder } from ".";
-
-export interface ISetBuilderManyRule {
-  [columnName: string]: string | number | [string, Array<string | number>];
-}
+import { QueryBuilder, IManyValueType, ValueType, BasicBindingType } from ".";
 
 export class SetBuilder extends QueryBuilder {
   private rules: string[] = [];
   constructor() {
     super();
   }
-  public setMany(value: ISetBuilderManyRule) {
+  public setMany(value: IManyValueType) {
     Object.keys(value).forEach((columnName) => {
       const columnValue = value[columnName];
       this.setColumn(columnName, columnValue);
     });
     return this;
   }
-  public setColumn(columnName: string, value: string | number | [string, Array<string | number>]) {
-    return this.setWithTable(null, columnName, value);
+  public setColumn(columnName: string, value: ValueType) {
+    return this.setColumnWithTable(null, columnName, value);
   }
-  public setWithTable(tableName: string, columnName: string, value: string | number | [string, Array<string | number>]) {
+  public setColumnWithTable(tableName: string, columnName: string, value: ValueType) {
     let rule = (tableName ? JSON.stringify(tableName) + "." : "") + JSON.stringify(columnName) + " = ";
     if (Array.isArray(value)) {
       rule += value[0];
@@ -29,7 +25,7 @@ export class SetBuilder extends QueryBuilder {
       return this.set(rule, [value]);
     }
   }
-  public set(rule: string, bindings?: Array<string | number>) {
+  public set(rule: string, bindings?: BasicBindingType[]) {
     this.rules.push(rule);
     this.addBindingSources(bindings);
     return this;
@@ -39,5 +35,9 @@ export class SetBuilder extends QueryBuilder {
       return "";
     }
     return "SET " + this.rules.join(",");
+  }
+  public clear() {
+    this.rules = [];
+    this.clearBindingSources();
   }
 }

@@ -5,7 +5,6 @@ import { Server } from "http";
 import Root, { ICustomRoleManager } from "../base/Root";
 import ioMain from "socket.io";
 import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
-import Knex from "@onzag/knex";
 import Module from "../base/Root/Module";
 import {
   CURRENCY_FACTORS_UPDATED_EVENT,
@@ -67,6 +66,8 @@ import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { DatabaseConnection } from "../database";
+import { ItemizeRawDB } from "./raw-db";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -140,7 +141,7 @@ export class Listener {
   private redisLocalPub: ItemizeRedisClient;
   private buildnumber: string;
   private root: Root;
-  private knex: Knex;
+  private rawDB: ItemizeRawDB;
   private cache: Cache;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private server: Server;
@@ -154,7 +155,7 @@ export class Listener {
     redisLocalPub: ItemizeRedisClient,
     root: Root,
     cache: Cache,
-    knex: Knex,
+    rawDB: ItemizeRawDB,
     server: Server,
     customRoles: ICustomRoleType[],
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
@@ -166,7 +167,7 @@ export class Listener {
     this.buildnumber = buildnumber;
     this.root = root;
     this.cache = cache;
-    this.knex = knex;
+    this.rawDB = rawDB;
     this.sensitiveConfig = sensitiveConfig;
     this.customRoles = customRoles;
 
@@ -528,13 +529,13 @@ export class Listener {
       this.customRoles,
       {
         cache: this.cache,
-        knex: this.knex,
+        databaseConnection: this.rawDB.databaseConnection,
+        rawDB: this.rawDB,
         item: itemDefinition,
         tokenData: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
-          this.knex,
           this.cache.getServerData(),
           itemDefinition,
           value,
@@ -635,7 +636,8 @@ export class Listener {
         this.customRoles,
         {
           cache: this.cache,
-          knex: this.knex,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
@@ -733,7 +735,8 @@ export class Listener {
         this.customRoles,
         {
           cache: this.cache,
-          knex: this.knex,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
@@ -836,7 +839,8 @@ export class Listener {
         this.customRoles,
         {
           cache: this.cache,
-          knex: this.knex,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
@@ -876,31 +880,42 @@ export class Listener {
         return;
       }
 
-      const query = this.knex.select(["id", "version", "type", "last_modified"]);
-      if (request.lastModified) {
-        query.select(this.knex.raw("?? > ? AS ??", ["created_at", request.lastModified, "WAS_CREATED"]));
-      } else {
-        query.select(this.knex.raw("TRUE AS ??", "WAS_CREATED"));
-      }
-      query.from(mod.getQualifiedPathName());
-      if (requiredType) {
-        query.where("type", requiredType);
-      }
+      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "last_modified", ` + (
+          request.lastModified ?
+            `"created_at" > $1 AS "WAS_CREATED"` :
+            `TRUE AS "WAS_CREATED"`
+        ) + ` FROM ${mod.getQualifiedPathName()} WHERE ` + (
+          requiredType ?
+            `"type" = $2 AND ` :
+            ""
+        ) + (
+          request.lastModified ?
+            `"last_modified" > $3 AND ` :
+            ""
+        ) + `"created_by" = $4`,
+        [
+          request.lastModified || null,
+          requiredType || null,
+          request.lastModified || null,
+          request.createdBy,
+        ],
+      )).map(convertVersionsIntoNullsWhenNecessary);
 
-      query.andWhere("created_by", request.createdBy);
-      // the know last record might be null in case of empty searches
-      if (request.lastModified) {
-        query.andWhere("last_modified", ">", request.lastModified);
-      }
-
-      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
-
-      const deletedQuery = this.knex.select(["id", "version", "type", "transaction_time"])
-        .from(DELETED_REGISTRY_IDENTIFIER).where("module", mod.getQualifiedPathName()).andWhere("created_by", request.createdBy);
-      if (requiredType) {
-        deletedQuery.where("type", requiredType);
-      }
-      deletedQuery.andWhere("transaction_time", ">", request.lastModified);
+      const deletedQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time" FROM ${DELETED_REGISTRY_IDENTIFIER} ` +
+        `WHERE "module" = ${mod.getQualifiedPathName()} AND "created_by" = $1 AND "transaction_time" > $2` +
+        (
+          requiredType ?
+            ` AND "type" = $3` :
+            ""
+        ),
+        [
+          request.createdBy,
+          request.lastModified,
+          requiredType,
+        ]
+      );
 
       const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
@@ -1006,7 +1021,8 @@ export class Listener {
         this.customRoles,
         {
           cache: this.cache,
-          knex: this.knex,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
@@ -1051,34 +1067,46 @@ export class Listener {
         return;
       }
 
-      const query = this.knex.select(["id", "version", "type", "last_modified"]).from(mod.getQualifiedPathName());
-      if (request.lastModified) {
-        query.select(this.knex.raw("?? > ? AS ??", ["created_at", request.lastModified, "WAS_CREATED"]));
-      } else {
-        query.select(this.knex.raw("TRUE AS ??", "WAS_CREATED"));
-      }
-      query.from(mod.getQualifiedPathName());
-      if (requiredType) {
-        query.where("type", requiredType);
-      }
-
-      query.andWhere("parent_id", request.parentId);
-      query.andWhere("parent_version", request.parentVersion || "");
-      query.andWhere("parent_type", request.parentType);
-      // the know last record might be null in case of empty searches
-      if (request.lastModified) {
-        query.andWhere("last_modified", ">", request.lastModified);
-      }
-
-      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await query).map(convertVersionsIntoNullsWhenNecessary);
+      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "last_modified", ` + (
+          request.lastModified ?
+            `"created_at" > $1 AS "WAS_CREATED"` :
+            `TRUE AS "WAS_CREATED"`
+        ) + ` FROM ${mod.getQualifiedPathName()} WHERE ` + (
+          requiredType ?
+            `"type" = $2 AND ` :
+            ""
+        ) + (
+          request.lastModified ?
+            `"last_modified" > $3 AND ` :
+            ""
+        ) + `"parent_id" = $4 AND "parent_version" = $5 AND "parent_type" = $6`,
+        [
+          request.lastModified || null,
+          requiredType || null,
+          request.lastModified || null,
+          request.parentId,
+          request.parentVersion || "",
+          request.parentType,
+        ],
+      )).map(convertVersionsIntoNullsWhenNecessary);
 
       const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
-      const deletedQuery = this.knex.select(["id", "version", "type", "transaction_time"])
-        .from(DELETED_REGISTRY_IDENTIFIER).where("module", mod.getQualifiedPathName()).andWhere("parenting_id", parentingId);
-      if (requiredType) {
-        deletedQuery.where("type", requiredType);
-      }
-      deletedQuery.andWhere("transaction_time", ">", request.lastModified);
+
+      const deletedQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time" FROM ${DELETED_REGISTRY_IDENTIFIER} ` +
+        `WHERE "module" = ${mod.getQualifiedPathName()} AND "parenting_id" = $1 AND "transaction_time" > $2` +
+        (
+          requiredType ?
+            ` AND "type" = $3` :
+            ""
+        ),
+        [
+          parentingId,
+          request.lastModified,
+          requiredType,
+        ]
+      );
 
       const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
@@ -1192,13 +1220,13 @@ export class Listener {
       this.customRoles,
       {
         cache: this.cache,
-        knex: this.knex,
+        databaseConnection: this.rawDB.databaseConnection,
+        rawDB: this.rawDB,
         item: itemDefinition,
         tokenData: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
-          this.knex,
           this.cache.getServerData(),
           itemDefinition,
           value,

@@ -130,10 +130,8 @@ export function unitSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
  * @returns a partial row comparison
  */
 export function unitSQLEqual(arg: ISQLEqualInfo) {
-  return {
-    [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: (arg.value as IPropertyDefinitionSupportedUnitType).normalizedUnit,
-    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: (arg.value as IPropertyDefinitionSupportedUnitType).normalizedValue,
-  };
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", (arg.value as IPropertyDefinitionSupportedUnitType).normalizedUnit);
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", (arg.value as IPropertyDefinitionSupportedUnitType).normalizedValue);
 }
 
 /**

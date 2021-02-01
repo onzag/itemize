@@ -1,4 +1,3 @@
-import Knex from "@onzag/knex";
 import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
@@ -19,6 +18,7 @@ import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient } from "./redis";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import MailProvider from "./services/base/MailProvider";
+import { DatabaseConnection, IManyValueType } from "../database";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -34,7 +34,7 @@ const wait = (time: number) => {
 
 export class GlobalManager {
   private root: Root;
-  private knex: Knex;
+  private databaseConnection: DatabaseConnection;
   private globalCache: ItemizeRedisClient;
   private redisPub: ItemizeRedisClient;
   private idefNeedsMantenience: ItemDefinition[];
@@ -54,7 +54,7 @@ export class GlobalManager {
 
   constructor(
     root: Root,
-    knex: Knex,
+    databaseConnection: DatabaseConnection,
     globalCache: ItemizeRedisClient,
     redisPub: ItemizeRedisClient,
     config: IConfigRawJSONDataType,
@@ -64,7 +64,7 @@ export class GlobalManager {
     registry: RegistryService,
   ) {
     this.root = root;
-    this.knex = knex;
+    this.databaseConnection = databaseConnection;
     this.globalCache = globalCache;
     this.redisPub = redisPub;
     this.idefNeedsMantenience = [];
@@ -79,8 +79,8 @@ export class GlobalManager {
 
     this.customServices = {};
 
-    mailProvider.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
-    currencyFactorsProvider.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    mailProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    currencyFactorsProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);
@@ -97,7 +97,7 @@ export class GlobalManager {
   }
   public installGlobalService(service: ServiceProvider<any>) {
     this.customServices[service.getInstanceName()] = service;
-    service.setupGlobalResources(this.knex, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    service.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
   }
   public async initializeServices() {
     if (this.mailProvider) {
@@ -127,7 +127,9 @@ export class GlobalManager {
     const selfTable = userIdef.getQualifiedPathName();
     let primaryAdminUser: any;
     try {
-      primaryAdminUser = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("role", "ADMIN");
+      primaryAdminUser = await this.databaseConnection.queryFirst(
+        `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(selfTable)} WHERE "role"='ADMIN' LIMIT 1`,
+      );
     } catch (err) {
       logger.error(
         "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
@@ -145,7 +147,9 @@ export class GlobalManager {
 
       let currentAdminUserWithSuchUsername: any;
       try {
-        currentAdminUserWithSuchUsername = await this.knex.first(CONNECTOR_SQL_COLUMN_ID_FK_NAME).from(selfTable).where("username", "admin");
+        currentAdminUserWithSuchUsername = await this.databaseConnection.queryFirst(
+          `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(selfTable)} WHERE "username"='admin' LIMIT 1`,
+        );
       } catch (err) {
         logger.error(
           "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
@@ -163,18 +167,29 @@ export class GlobalManager {
 
       const password = uuid.v4().replace(/\-/g, "");
 
-      const sqlModData = {
+      const sqlModData: IManyValueType = {
         type: userIdef.getQualifiedPathName(),
-        last_modified: this.knex.fn.now(),
-        created_at: this.knex.fn.now(),
+        last_modified: [
+          "NOW()",
+          [],
+        ],
+        created_at: [
+          "NOW()",
+          [],
+        ],
         created_by: UNSPECIFIED_OWNER,
         version: "",
         container_id: this.sensitiveConfig.defaultContainerID,
       }
 
-      const sqlIdefData = {
+      const sqlIdefData: IManyValueType = {
         username,
-        password: this.knex.raw("crypt(?, gen_salt('bf',10))", password),
+        password: [
+          "crypt(?, gen_salt('bf',10))",
+          [
+            password,
+          ]
+        ],
         role: "ADMIN",
         app_language: this.config.fallbackLanguage,
         app_country: this.config.fallbackCountryCode,
@@ -192,7 +207,6 @@ export class GlobalManager {
             dictionary: "english",
             id,
             itemDefinition: userIdef,
-            knex: this.knex,
             prefix: "",
             property: p,
             serverData: this.serverData,
@@ -208,19 +222,21 @@ export class GlobalManager {
       });
 
       try {
-        await this.knex.transaction(async (transactionKnex) => {
-          const insertQueryValueMod = await transactionKnex(moduleTable)
-            .insert(sqlModData).returning("*");
+        await this.databaseConnection.startTransaction(async (transactingDatabase) => {
+          const insertQueryMod = transactingDatabase.getInsertBuilder().table(moduleTable);
+          insertQueryMod.insert(sqlModData).returningBuilder.returningAll();
+          const insertQueryValueMod = await transactingDatabase.queryFirst(insertQueryMod);
 
-          sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
-          sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
+          sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod.id;
+          sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod.version;
 
-          const insertQueryIdef = transactionKnex(selfTable).insert(sqlIdefData).returning("*");
-          const insertQueryValueIdef = await insertQueryIdef;
+          const insertQueryIdef = transactingDatabase.getInsertBuilder().table(selfTable);
+          insertQueryIdef.insert(sqlIdefData).returningBuilder.returningAll();
+          const insertQueryValueIdef = await transactingDatabase.queryFirst(insertQueryIdef);
 
           return {
-            ...insertQueryValueMod[0],
-            ...insertQueryValueIdef[0],
+            ...insertQueryValueMod,
+            ...insertQueryValueIdef,
           };
         });
       } catch (err) {
@@ -441,7 +457,6 @@ export class GlobalManager {
     properties.forEach((p) => {
       // and get one if given
       const mantenienceRule = p.pdef.getPropertyDefinitionDescription().sqlMantenience({
-        knex: this.knex,
         serverData: null,
         id: p.pdef.getId(),
         prefix: p.include ? p.include.getPrefixedQualifiedIdentifier() : "",
@@ -469,26 +484,23 @@ export class GlobalManager {
     });
 
     // now we can build the query
-    let query = "UPDATE ?? SET";
+    let query = `UPDATE ${JSON.stringify(tableName)} SET`;
     // and the bindings for that query at the same time
-    let bindings: any[] = [tableName];
+    let bindings: any[] = [];
 
     query += " " + Object.keys(updateRules).map((columnToSet) => {
       // this specifies what column we are setting and how we are setting it as
       const ruleRawStr = updateRules[columnToSet][0];
-      bindings.push(columnToSet);
       bindings = bindings.concat(updateRules[columnToSet][1]);
 
       // and we set it to the value
-      return "?? = " + ruleRawStr;
+      return JSON.stringify(columnToSet) + " = " + ruleRawStr;
     }).join(", ");
 
     if (fromRules.length) {
       query += " FROM "
       query += fromRules.map((rule) => {
-        bindings.push(rule.from);
-        bindings.push(rule.as);
-        return "?? ??"
+        return JSON.stringify(rule.from) + " " + JSON.stringify(rule.as);
       }).join(",");
     }
 
@@ -497,8 +509,8 @@ export class GlobalManager {
     }
 
     if (sinceLimiter) {
-      query += " ?? >= ?";
-      bindings.push("created_at", sinceLimiter);
+      query += ` "created_at" >= ?`;
+      bindings.push(sinceLimiter);
     }
 
     if (andWhereRules.length) {
@@ -528,7 +540,16 @@ export class GlobalManager {
       query += ")"
     }
 
-    await this.knex.raw(query, bindings);
+    const splitted = query.split("?");
+    let pgifiedQuery = "";
+    splitted.forEach((v, index) => {
+      if (index !== 0) {
+        pgifiedQuery += "$" + index;
+      }
+      pgifiedQuery += v;
+    });
+
+    await this.databaseConnection.query(pgifiedQuery, bindings);
 
     // we do not update last_modified in order to avoid useless updates
     // sql mantenience changes now so that it doesn't inform any client or cluster for changes
@@ -566,17 +587,18 @@ export class GlobalManager {
       Object.keys(
         this.serverData[CURRENCY_FACTORS_IDENTIFIER]
       ).forEach(
-        (currencyId) => {
+        (currencyId, index) => {
           if (valuesContainer) {
             valuesContainer += ",";
           }
-          valuesContainer += "(?,?)";
+          const nValue = index * 2;
+          valuesContainer += `($${nValue + 1},$${nValue + 2})`;
           valuesAsArray = valuesAsArray.concat([currencyId, this.serverData[CURRENCY_FACTORS_IDENTIFIER][currencyId]]);
         },
       );
       try {
-        await this.knex.raw(`INSERT INTO ?? ("code", "factor") VALUES ${valuesContainer} ` +
-          `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, [CURRENCY_FACTORS_IDENTIFIER].concat(valuesAsArray as any));
+        await this.databaseConnection.queryFirst(`INSERT INTO ${JSON.stringify(CURRENCY_FACTORS_IDENTIFIER)} ("code", "factor") VALUES ${valuesContainer} ` +
+          `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`, valuesAsArray);
       } catch (err) {
         logger.error(
           "GlobalManager.informNewServerData: [SERIOUS] was unable to update database new currency data",

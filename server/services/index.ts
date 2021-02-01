@@ -1,7 +1,6 @@
 import { IAppDataType, logger } from "..";
 import express from "express";
 import { ITriggerRegistry } from "../resolvers/triggers";
-import Knex from "@onzag/knex";
 import { RegistryService } from "./registry";
 import { ItemizeRedisClient } from "../redis";
 import Root from "../../base/Root";
@@ -9,6 +8,7 @@ import { ItemizeRawDB } from "../raw-db";
 import MailProvider from "./base/MailProvider";
 import { IConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
+import { DatabaseConnection } from "../../database";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -34,7 +34,7 @@ export class ServiceProvider<T> {
   public appConfig: IConfigRawJSONDataType;
   public appSensitiveConfig: ISensitiveConfigRawJSONDataType;
 
-  public globalKnex: Knex;
+  public globalDatabaseConnection: DatabaseConnection;
   public globalRedisPub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
   public globalRawDB: ItemizeRawDB;
@@ -111,7 +111,7 @@ export class ServiceProvider<T> {
   }
 
   public setupGlobalResources(
-    knex: Knex,
+    globalDatabaseConnection: DatabaseConnection,
     globalClient: ItemizeRedisClient,
     globalPub: ItemizeRedisClient,
     globalMailProvider: MailProvider<any>,
@@ -121,11 +121,11 @@ export class ServiceProvider<T> {
     root: Root,
   ) {
     this.globalInstance = true;
-    this.globalKnex = knex;
+    this.globalDatabaseConnection = globalDatabaseConnection;
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;
     this.globalRoot = root;
-    this.globalRawDB = new ItemizeRawDB(globalPub, this.globalKnex, this.globalRoot);
+    this.globalRawDB = new ItemizeRawDB(globalPub, this.globalDatabaseConnection, this.globalRoot);
     this.globalCustomServices = globalCustomServices;
     this.globalMailProvider = globalMailProvider;
   }

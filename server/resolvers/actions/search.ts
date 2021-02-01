@@ -36,6 +36,7 @@ import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
 import { IOTriggerActions } from "../triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
+import { query } from "winston";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -113,7 +114,8 @@ export async function searchModule(
   );
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: null,
     item: null,
     module: mod,
@@ -175,8 +177,9 @@ export async function searchModule(
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const queryModel = appData.knex.table(mod.getQualifiedPathName())
-    .where("blocked_at", null);
+  const queryModel = appData.databaseConnection.getSelectBuilder();
+  queryModel.table(mod.getQualifiedPathName());
+  queryModel.whereBuilder.andWhereColumnNull("blocked_at");
 
   if (created_by) {
     // we need to check for all the possible results we might get
@@ -186,15 +189,15 @@ export async function searchModule(
       // searching by it, indirectly
       await idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
     }));
-    queryModel.andWhere("created_by", created_by);
+    queryModel.whereBuilder.andWhereColumn("created_by", created_by);
   }
 
   if (since) {
-    queryModel.andWhere("created_at", ">=", since);
+    queryModel.whereBuilder.andWhereColumn("created_at", since, ">=");
   }
 
   if (typeof resolverArgs.args.version_filter !== "undefined") {
-    queryModel.andWhere("version", resolverArgs.args.version_filter || "");
+    queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
   }
 
   const pathOfThisModule = mod.getPath().join("/");
@@ -211,18 +214,18 @@ export async function searchModule(
         id: tokenData.id,
         customData: tokenData.customData,
       },
-      query: queryModel,
+      whereBuilder: queryModel.whereBuilder,
       forbid: defaultTriggerForbiddenFunction,
     });
   }
 
   // now we build the sql query for the module
   const addedSearchRaw = buildSQLQueryForModule(
-    appData.knex,
     appData.cache.getServerData(),
     mod,
     resolverArgs.args,
-    queryModel,
+    queryModel.whereBuilder,
+    queryModel.orderByBuilder,
     getDictionary(appData, resolverArgs.args),
     resolverArgs.args.search,
     resolverArgs.args.order_by,
@@ -230,34 +233,37 @@ export async function searchModule(
 
   // if we filter by type
   if (resolverArgs.args.types) {
-    queryModel.andWhere("type", resolverArgs.args.types);
+    queryModel.whereBuilder.andWhere(`"type" = ANY(?)`, [resolverArgs.args.types]);
   }
 
-  const searchQuery = queryModel.clone();
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  searchQuery.select(fieldsToRequest);
+  queryModel.select(...fieldsToRequest);
   addedSearchRaw.forEach((srApplyArgs) => {
-    searchQuery.select(appData.knex.raw(...srApplyArgs));
+    queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
   });
-  searchQuery.limit(limit).offset(offset);
-
-  const countQuery = queryModel.clone().count();
-  countQuery.clearOrder();
+  queryModel.limit(limit).offset(offset);
 
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
-    (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+    (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
-  const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
-  const count = (countResult && countResult[0] && countResult[0].count) || null;
+
+  queryModel.clear();
+  queryModel.selectExpression(`COUNT(*) AS "count"`);
+  queryModel.orderByBuilder.clear();
+
+  const countResult: ISQLTableRowValue = generalFields.count ? (
+    await appData.databaseConnection.queryFirst(queryModel)
+  ) : null;
+  const count = (countResult && countResult.count) || null;
+
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
         baseResult.map(async (r) => {
           const valueToProvide = filterAndPrepareGQLValue(
-            appData.knex,
             appData.cache.getServerData(),
             r,
             requestedFields,
@@ -273,7 +279,6 @@ export async function searchModule(
 
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-              appData.knex,
               appData.cache.getServerData(),
               itemDefinition,
               r,
@@ -447,7 +452,8 @@ export async function searchItemDefinition(
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: null,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
@@ -551,29 +557,30 @@ export async function searchItemDefinition(
   }
 
   // now we build the search query
-  const queryModel = appData.knex.table(selfTable)
-    .join(moduleTable, (clause) => {
-      clause.on("id", "=", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
-      clause.on("version", "=", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
-    }).where("blocked_at", null);
+  const queryModel = appData.databaseConnection.getSelectBuilder();
+  queryModel.table(selfTable).joinBuilder.join(moduleTable, (clause) => {
+    clause.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+    clause.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+  });
+  queryModel.whereBuilder.andWhereColumnNull("blocked_at");
 
   if (created_by) {
-    queryModel.andWhere("created_by", created_by);
+    queryModel.whereBuilder.andWhereColumn("created_by", created_by);
   }
 
   if (since) {
-    queryModel.andWhere("created_at", ">=", since);
+    queryModel.whereBuilder.andWhereColumn("created_at", since, ">=");
   }
 
   if (typeof resolverArgs.args.version_filter !== "undefined") {
-    queryModel.andWhere("version", resolverArgs.args.version_filter || "");
+    queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
   }
 
   if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
-    queryModel
-      .andWhere("parent_id", resolverArgs.args.parent_id)
-      .andWhere("parent_version", resolverArgs.args.parent_version || "")
-      .andWhere("parent_type", resolverArgs.args.parent_type);
+    queryModel.whereBuilder
+      .andWhereColumn("parent_id", resolverArgs.args.parent_id)
+      .andWhereColumn("parent_version", resolverArgs.args.parent_version || "")
+      .andWhereColumn("parent_type", resolverArgs.args.parent_type);
   }
 
   const pathOfThisModule = mod.getPath().join("/");
@@ -592,7 +599,7 @@ export async function searchItemDefinition(
         id: tokenData.id,
         customData: tokenData.customData,
       },
-      query: queryModel,
+      whereBuilder: queryModel.whereBuilder,
       forbid: defaultTriggerForbiddenFunction,
     };
     if (moduleTrigger) {
@@ -607,40 +614,41 @@ export async function searchItemDefinition(
   // that parent query, and adds the andWhere as required
   // into such query
   const addedSearchRaw = buildSQLQueryForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     resolverArgs.args,
-    queryModel,
+    queryModel.whereBuilder,
+    queryModel.orderByBuilder,
     getDictionary(appData, resolverArgs.args),
     resolverArgs.args.search,
     resolverArgs.args.order_by,
   );
 
-  const searchQuery = queryModel.clone();
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  searchQuery.select(fieldsToRequest);
+  queryModel.select(...fieldsToRequest);
   addedSearchRaw.forEach((srApplyArgs) => {
-    searchQuery.select(appData.knex.raw(...srApplyArgs));
+    queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
   });
-  searchQuery.limit(limit).offset(offset);
-  const countQuery = queryModel.clone().count();
-  countQuery.clearOrder();
+  queryModel.limit(limit).offset(offset);
 
   // return using the base result, and only using the id
   const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
-    (await searchQuery).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+    (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
     [];
-  const countResult: ISQLTableRowValue[] = generalFields.count ? (await countQuery) : null;
+
+  queryModel.clear();
+  queryModel.selectExpression(`COUNT(*) AS "count"`);
+  queryModel.orderByBuilder.clear();
+  
+  const countResult: ISQLTableRowValue[] = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
   const count = (countResult && countResult[0] && countResult[0].count) || null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
         baseResult.map(async (r) => {
           const valueToProvide = filterAndPrepareGQLValue(
-            appData.knex,
             appData.cache.getServerData(),
             r,
             requestedFields,
@@ -655,7 +663,6 @@ export async function searchItemDefinition(
 
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-              appData.knex,
               appData.cache.getServerData(),
               itemDefinition,
               r,

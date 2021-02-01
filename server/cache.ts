@@ -29,8 +29,7 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { ItemizeRedisClient } from "./redis";
 import Module from "../base/Root/Module";
-import { IValueToInsert } from "../database/InsertBuilder";
-import { DatabaseConnection } from "../database";
+import { DatabaseConnection, IManyValueType } from "../database";
 import { WithBuilder } from "../database/WithBuilder";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
@@ -349,8 +348,8 @@ export class Cache {
       this.domain,
       dictionary,
     );
-    const sqlModData: IValueToInsert = sqlModDataComposed.value;
-    const sqlIdefData: IValueToInsert = sqlIdefDataComposed.value;
+    const sqlModData: IManyValueType = sqlModDataComposed.value;
+    const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
 
     // this data is added every time when creating
     sqlModData.type = itemDefinition.getQualifiedPathName();
@@ -446,7 +445,7 @@ export class Cache {
           // insert the sql data that we got ready, and return
           // the requested columns in sql, there's always at least 1
           // because we always need the id
-          const insertQuery = transactingDatabase.insert().table(moduleTable);
+          const insertQuery = transactingDatabase.getInsertBuilder().table(moduleTable);
           insertQuery.insert(sqlModData).returningBuilder.returningAll();
 
           const insertQueryValueMod = await transactingDatabase.queryFirst(insertQuery);
@@ -457,7 +456,7 @@ export class Cache {
           sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
 
           // so now we create the insert query
-          const insertQueryIdef = transactingDatabase.insert().table(selfTable);
+          const insertQueryIdef = transactingDatabase.getInsertBuilder().table(selfTable);
           insertQueryIdef.insert(sqlIdefData).returningBuilder.returningAll();
           // so we call the qery
           const insertQueryValueIdef = await transactingDatabase.queryFirst(insertQueryIdef);
@@ -694,8 +693,8 @@ export class Cache {
       dictionary,
       partialUpdateFields,
     );
-    const sqlModData: IValueToInsert = sqlModDataComposed.value;
-    const sqlIdefData: IValueToInsert = sqlIdefDataComposed.value;
+    const sqlModData: IManyValueType = sqlModDataComposed.value;
+    const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
 
     // now we check if we are updating anything at all
     if (
@@ -1199,7 +1198,7 @@ export class Cache {
 
           let trasactionTimes: string[] = []
           if (allVersionsDroppedInternal.length) {
-            const insertQueryBuilder = transactingDatabase.insert();
+            const insertQueryBuilder = transactingDatabase.getInsertBuilder();
             insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
 
             allVersionsDroppedInternal.forEach(async (row) => {
@@ -1273,7 +1272,7 @@ export class Cache {
             ]
           );
 
-          const insertQueryBuilder = transactingDatabase.insert();
+          const insertQueryBuilder = transactingDatabase.getInsertBuilder();
           insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
           insertQueryBuilder.insert({
             id,

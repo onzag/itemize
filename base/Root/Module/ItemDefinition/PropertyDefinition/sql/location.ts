@@ -134,11 +134,12 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
 
     if (arg.isOrderedByIt) {
       return [
-        "ST_Distance(" + JSON.stringify(arg.prefix + arg.id + "_GEO") + ", ST_MakePoint(?,?)::geography) AS ??",
+        "ST_Distance(" + JSON.stringify(arg.prefix + arg.id + "_GEO") +
+        ", ST_MakePoint(?,?)::geography) AS " +
+        JSON.stringify(arg.prefix + arg.id + "_CALC_RADIUS"),
         [
           lng,
           lat,
-          arg.prefix + arg.id + "_CALC_RADIUS",
         ],
       ]
     }
@@ -168,13 +169,10 @@ export function locationSQLOrderBy(arg: ISQLOrderByInfo): [string, string, strin
  */
 export function locationSQLEqual(arg: ISQLEqualInfo) {
   if (arg.value === null) {
-    return {
-      [arg.prefix + arg.id + "_ID"]: null,
-    };
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id + "_ID");
+  } else {
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_ID", (arg.value as IPropertyDefinitionSupportedLocationType).id);
   }
-  return {
-    [arg.prefix + arg.id + "_ID"]: (arg.value as IPropertyDefinitionSupportedLocationType).id,
-  };
 }
 
 /**

@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
+import { ItemizeRawDB } from "../../server/raw-db";
 import Root from "../../base/Root";
-import Knex from "@onzag/knex";
 
 /**
  * Specifies the parameters that are to be given
@@ -110,7 +110,7 @@ export interface ISEORule {
    * and this isn't even good for indexing, but whatever, even this is possible to SEO
    * 
    * In this case you will have to change your extraProperties rule to include the name, and you will have to request
-   * the parent in the parent_id using knex (there's no cache on the global manager) and you should get the container it
+   * the parent in the parent_id using raw db (there's no cache on the global manager) and you should get the container it
    * is in; you might want to use a memory cache while the parametrizer run, the parametrizer can return a promise so
    * it can be async
    * 
@@ -125,7 +125,7 @@ export interface ISEORule {
   parametrize?: (arg: {
     collectedResults: ISEOCollectedResult[];
     root: Root,
-    knex: Knex,
+    rawDB: ItemizeRawDB,
   }) => ISEOParametrizer[] | Promise<ISEOParametrizer[]>
 }
 

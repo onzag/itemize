@@ -95,7 +95,8 @@ export async function addItemDefinition(
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: null,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
@@ -301,7 +302,6 @@ export async function addItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       cache: appData.cache,
-      knex: appData.knex,
       parentModule,
       parentType: resolverArgs.args.parent_type,
       parentId: resolverArgs.args.parent_id,
@@ -463,7 +463,6 @@ export async function addItemDefinition(
   // be full (of nulls) our value is incomplete, so we need to
   // pass the requestedFields anyway
   const gqlValue = convertSQLValueToGQLValueForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     value,

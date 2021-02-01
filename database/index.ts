@@ -1,30 +1,44 @@
 import { Pool, PoolClient, QueryResult } from "pg";
 import { InsertBuilder } from "./InsertBuilder";
+import { SelectBuilder } from "./SelectBuilder";
 import { UpdateBuilder } from "./UpdateBuilder";
+
+export type ValueType = string | number | boolean | [string, Array<string | number>];
+
+export type BasicBindingType = string | number | boolean | Array<BasicBindingType>;
+
+export type ExtendedBindingType = BasicBindingType | QueryBuilder;
+
+export interface IManyValueType {
+  [column: string]: ValueType;
+}
 
 interface IQueryBuilderSQLResult {
   query: string;
-  bindings: Array<string | number>;
+  bindings: BasicBindingType[];
 }
 
 export class QueryBuilder {
-  private bindingSources: Array<QueryBuilder | string | number>;
+  private bindingSources: ExtendedBindingType[] = [];
   constructor() {
   }
-  public addBindingSource(value: QueryBuilder | string | number) {
+  public addBindingSource(value: ExtendedBindingType) {
     this.bindingSources.push(value);
   }
-  public addBindingSources(values: Array<QueryBuilder | string | number>) {
+  public addBindingSources(values: ExtendedBindingType[]) {
     this.bindingSources = this.bindingSources.concat(values);
   }
-  public addBindingSourceAt(index: number, value: QueryBuilder | string | number) {
+  public addBindingSourceAt(index: number, value: ExtendedBindingType) {
     this.bindingSources[index] = value;
   }
-  public shiftBindingSource(value: QueryBuilder | string | number) {
+  public shiftBindingSource(value: ExtendedBindingType) {
     this.bindingSources = [value].concat(this.bindingSources);
   }
-  public shiftBindingSources(values: Array<QueryBuilder | string | number>) {
+  public shiftBindingSources(values: ExtendedBindingType[]) {
     this.bindingSources = values.concat(this.bindingSources);
+  }
+  public clearBindingSources() {
+    this.bindingSources = [];
   }
   public compile() {
     return "";
@@ -52,8 +66,8 @@ export class QueryBuilder {
       bindings,
     };
   }
-  public getBindings() {
-    let allBindings: Array<string | number> = [];
+  public getBindings(): BasicBindingType[] {
+    let allBindings: BasicBindingType[] = [];
     this.bindingSources.forEach((bs) => {
       if (typeof bs === "undefined") {
         return;
@@ -81,20 +95,17 @@ export class ConditionalBuilder extends QueryBuilder {
   private parent: ConditionalBuilder;
   private type: string;
 
-
   constructor(parent: ConditionalBuilder = null, type: string) {
     super();
 
     this.type = type;
     this.parent = parent;
   }
-  public condition(gate: "AND" | "OR", rule: string | ConditionalBuilderFn<any>, bindings?: Array<string | number>) {
+  public condition(gate: "AND" | "OR", rule: string | ConditionalBuilderFn<any>, bindings?: BasicBindingType[]) {
     let condition: ConditionalBuilder | string;
     if (typeof rule === "string") {
       condition = rule;
-      if (bindings) {
-        bindings.forEach(this.addBindingSource);
-      }
+      this.addBindingSources(bindings);
     } else {
       const builder = new ConditionalBuilder(this, this.type);
       rule(builder);
@@ -110,6 +121,11 @@ export class ConditionalBuilder extends QueryBuilder {
       gate,
       condition,
     });
+    return this;
+  }
+  public clear() {
+    this.conditions = [];
+    this.clearBindingSources();
     return this;
   }
   public compile() {
@@ -154,25 +170,25 @@ export class DatabaseConnection {
       min: 1,
     });
   }
-  async query(what: string | QueryBuilder, bindings?: Array<string | number>): Promise<QueryResult> {
+  async query(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<QueryResult> {
     const queryValue = typeof what === "string" ? what : what.compile();
     const queryBindings = typeof what === "string" ? bindings : what.getBindings();
 
     return await (this.pool || this.client).query(queryValue, queryBindings);
   }
-  async queryRows(what: string | QueryBuilder, bindings?: Array<string | number>): Promise<any[]> {
+  async queryRows(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<any[]> {
     return (await this.query(what, bindings)).rows;
   }
-  async queryFirst(what: string | QueryBuilder, bindings?: Array<string | number>): Promise<any> {
+  async queryFirst(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<any> {
     return (await this.query(what, bindings)).rows[0] || null;
   }
-  public update() {
+  public getUpdateBuilder() {
     return new UpdateBuilder();
   }
-  public select() {
-    return new UpdateBuilder();
+  public getSelectBuilder() {
+    return new SelectBuilder();
   }
-  public insert() {
+  public getInsertBuilder() {
     return new InsertBuilder();
   }
   public getPool(): Pool {

@@ -52,6 +52,12 @@ export class OrderByBuilder extends QueryBuilder {
     return this;
   }
 
+  public clear() {
+    this.expressions = [];
+    this.clearBindingSources();
+    return this;
+  }
+
   public compile() {
     if (!this.expressions.length) {
       return "";

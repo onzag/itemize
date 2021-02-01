@@ -66,7 +66,6 @@ export async function getItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       cache: appData.cache,
-      knex: appData.knex,
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no content, we force the entire policy check not to
         // be performed and return null
@@ -90,7 +89,6 @@ export async function getItemDefinition(
   });
 
   const currentWholeValueAsGQL = selectQueryValue ? convertSQLValueToGQLValueForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     selectQueryValue,
@@ -98,7 +96,8 @@ export async function getItemDefinition(
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: currentWholeValueAsGQL,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),
@@ -170,7 +169,6 @@ export async function getItemDefinition(
 
 
   const valueToProvide = filterAndPrepareGQLValue(
-    appData.knex,
     appData.cache.getServerData(),
     selectQueryValue,
     requestedFields,
@@ -340,7 +338,6 @@ export async function getItemDefinitionList(
       }
 
       const valueToProvide = filterAndPrepareGQLValue(
-        appData.knex,
         appData.cache.getServerData(),
         value,
         requestedFields,
@@ -357,14 +354,14 @@ export async function getItemDefinitionList(
         "getItemDefinitionList: checking role access for read",
       );
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-        appData.knex,
         appData.cache.getServerData(),
         itemDefinition,
         value,
       );
       const rolesManager = new CustomRoleManager(appData.customRoles, {
         cache: appData.cache,
-        knex: appData.knex,
+        databaseConnection: appData.databaseConnection,
+        rawDB: appData.rawDB,
         value: currentWholeValueAsGQL,
         item: itemDefinition,
         module: itemDefinition.getParentModule(),
@@ -519,7 +516,6 @@ export async function getModuleList(
       }
 
       const valueToProvide = filterAndPrepareGQLValue(
-        appData.knex,
         appData.cache.getServerData(),
         value,
         requestedFields,
@@ -534,7 +530,6 @@ export async function getModuleList(
       const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-        appData.knex,
         appData.cache.getServerData(),
         itemDefinition,
         value,
@@ -545,7 +540,8 @@ export async function getModuleList(
       );
       const rolesManager = new CustomRoleManager(appData.customRoles, {
         cache: appData.cache,
-        knex: appData.knex,
+        databaseConnection: appData.databaseConnection,
+        rawDB: appData.rawDB,
         value: currentWholeValueAsGQL,
         item: itemDefinition,
         module: itemDefinition.getParentModule(),

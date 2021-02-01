@@ -8,7 +8,6 @@ import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOPara
 import https from "https";
 import { logger } from "../index";
 import { ISitemapJSONType, ISitemapLastQueryType, toXML } from "./sitemaps";
-import Knex from "@onzag/knex";
 import Root from "../../base/Root";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
 import { escapeStringRegexp } from "../../util";
@@ -17,6 +16,8 @@ import { Readable } from "stream";
 import equals from "deep-equal";
 import StorageProvider from "../services/base/StorageProvider";
 import { convertVersionsIntoNullsWhenNecessary } from "../version-null-value";
+import { ItemizeRawDB } from "../../server/raw-db";
+import { SelectBuilder } from "../../database/SelectBuilder";
 
 /**
  * Whether seo is disabled
@@ -64,7 +65,7 @@ interface ISEOPreResult {
  */
 export class SEOGenerator {
   private root: Root;
-  private knex: Knex;
+  private rawDB: ItemizeRawDB;
   private storageClient: StorageProvider<any>;
   private rules: ISEORuleSet;
   private supportedLanguages: string[];
@@ -79,7 +80,7 @@ export class SEOGenerator {
    * Buillds a new seo generator
    * @param rules the seo rules
    * @param storageClient the storageClient with the XML files
-   * @param knex the knex instance
+   * @param rawDB the raw db instance
    * @param root the root for definitions
    * @param prefix the prefix for the openstack container
    * @param supportedLanguages the supporte languages
@@ -89,14 +90,14 @@ export class SEOGenerator {
   constructor(
     rules: ISEORuleSet,
     storageClient: StorageProvider<any>,
-    knex: Knex,
+    rawDB: ItemizeRawDB,
     root: Root,
     supportedLanguages: string[],
     hostname: string,
     pingGoogle: boolean,
   ) {
     this.storageClient = storageClient;
-    this.knex = knex;
+    this.rawDB = rawDB;
     this.root = root;
     this.rules = rules;
     this.supportedLanguages = supportedLanguages;
@@ -477,7 +478,7 @@ export class SEOGenerator {
           const cachedKey = collectionPoint.module + "." + (collectionPoint.item || "") + "." + (querySince || "");
 
           // so this will be our query
-          let query: Knex.QueryBuilder;
+          let query: SelectBuilder;
 
           // and we will make the query if there's no cached result for it
           if (!this.seoCache[cachedKey]) {
@@ -495,31 +496,35 @@ export class SEOGenerator {
             const idef = splittedIdef && mod.getItemDefinitionFor(splittedIdef);
 
             const whatToSelect = ["id", "version", "created_at"].concat(collectionPoint.extraProperties || []);
-            query = this.knex.select(whatToSelect);
+
+            query = this.rawDB.databaseConnection.getSelectBuilder();
+            query.select(...whatToSelect);
             if (idef) {
-              query.from(idef.getQualifiedPathName()).join(mod.getQualifiedPathName(), (clause) => {
-                clause.on("id", "=", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
-                clause.on("version", "=", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
-              })
+              query.fromBuilder.from(idef.getQualifiedPathName());
+              query.joinBuilder.join(mod.getQualifiedPathName(), (clause) => {
+                clause.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+                clause.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+              });
             } else {
-              query.from(mod.getQualifiedPathName());
+              query.fromBuilder.from(mod.getQualifiedPathName());
             }
 
             if (querySince) {
-              query.where("created_at", ">", querySince);
+              query.whereBuilder.andWhereColumn("created_at", querySince, ">");
             }
 
             if (!collectionPoint.collectAllVersions) {
-              query.where("version", "");
+              query.whereBuilder.andWhereColumn("version", "");
             }
 
-            query.where("blocked_at", null).orderBy("created_at", "desc");
+            query.whereBuilder.andWhereColumnNull("blocked_at");
+            query.orderByBuilder.orderBy("created_at", "DESC", "LAST");
           }
 
           // otherwise we set by our cache or well, execute the query
           const collected: ISEOCollectedData[] =
             this.seoCache[cachedKey] ||
-            await query as ISEOCollectedData[];
+            await this.rawDB.databaseConnection.queryRows(query) as ISEOCollectedData[];
 
           // fix the null values
           collected.forEach((c) => convertVersionsIntoNullsWhenNecessary(c));
@@ -545,7 +550,7 @@ export class SEOGenerator {
       const parameters = await parametrize({
         collectedResults,
         root: this.root,
-        knex: this.knex,
+        rawDB: this.rawDB,
       });
 
       // now we fetch our urls

@@ -73,7 +73,6 @@ export async function deleteItemDefinition(
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: null,
       cache: appData.cache,
-      knex: appData.knex,
       // this functions runs before the policy has been checked
       // and we do it for being efficient, because we can run
       // both of these checks with a single SQL query, and the policy
@@ -124,7 +123,6 @@ export async function deleteItemDefinition(
   );
 
   const currentWholeValueAsGQL: IGQLValue = convertSQLValueToGQLValueForItemDefinition(
-    appData.knex,
     appData.cache.getServerData(),
     itemDefinition,
     wholeSqlStoredValue,
@@ -132,7 +130,8 @@ export async function deleteItemDefinition(
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
-    knex: appData.knex,
+    databaseConnection: appData.databaseConnection,
+    rawDB: appData.rawDB,
     value: currentWholeValueAsGQL,
     item: itemDefinition,
     module: itemDefinition.getParentModule(),

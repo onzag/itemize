@@ -173,17 +173,23 @@ export function currencySQLMantenience(arg: ISQLArgInfo): ISQLMantenienceType {
     // so we are setting normalized value column
     columnToSet: normalizedValueId,
     // we are setting it to, the value column multiplied by the meta row, factor column 
-    setColumnToRaw: ["??*??.??", [valueId, asConversionRule, "factor"]],
+    setColumnToRaw: [`${JSON.stringify(valueId)}*${JSON.stringify(asConversionRule)}."factor"`, []],
     // from our currency factors table
     from: CURRENCY_FACTORS_IDENTIFIER,
     // the table row that matches will be matched as the conversion rule id we have just created
     fromAs: asConversionRule,
     // and this row will be updated only if the value is not null, and also the currency
     // factors table, code, matches our current currency id
-    whereRaw: ["?? is not NULL AND ??.?? = ??", [valueId, asConversionRule, "code", currencyId]],
+    whereRaw: [
+      `${JSON.stringify(valueId)} is not NULL AND ${JSON.stringify(asConversionRule)}."code" = ${JSON.stringify(currencyId)}`,
+      [],
+    ],
     // we only update if the result of all this creates a change that is larger than 0.1 from the original
     // this will avoid updating too much unnecesarily, basically 1 cent of difference
-    updateConditionRaw: ["??*??.?? > 0.1", [valueId, asConversionRule, "factor"]],
+    updateConditionRaw: [
+      `${JSON.stringify(valueId)}*${JSON.stringify(asConversionRule)}."factor" > 0.1`,
+      [],
+    ],
   }
 }
 
@@ -193,10 +199,8 @@ export function currencySQLMantenience(arg: ISQLArgInfo): ISQLMantenienceType {
  * @returns a partial row match
  */
 export function currencySQLEqual(arg: ISQLEqualInfo) {
-  return {
-    [arg.prefix + arg.id + "_CURRENCY"]: (arg.value as IPropertyDefinitionSupportedCurrencyType).currency,
-    [arg.prefix + arg.id + "_VALUE"]: (arg.value as IPropertyDefinitionSupportedCurrencyType).value,
-  };
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_CURRENCY", (arg.value as IPropertyDefinitionSupportedCurrencyType).currency);
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_VALUE", (arg.value as IPropertyDefinitionSupportedCurrencyType).value);
 }
 
 /**

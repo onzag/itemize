@@ -41,6 +41,12 @@ export class UpdateBuilder extends QueryBuilder {
     this.isOnly = true;
     return this;
   }
+  public clear() {
+    this.tableName = null;
+    this.tableAlias = null;
+    this.isOnly = false;
+    return this;
+  }
   public compile() {
     if (!this.tableName) {
       return null;

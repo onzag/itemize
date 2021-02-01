@@ -23,7 +23,6 @@ import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
-import Knex from "@onzag/knex";
 import { ICustomRoleManager } from "../../base/Root";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
@@ -645,7 +644,6 @@ export interface IFilteredAndPreparedValueType {
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
 export function filterAndPrepareGQLValue(
-  knex: Knex,
   serverData: any,
   value: ISQLTableRowValue,
   requestedFields: IGQLRequestFields,
@@ -658,7 +656,6 @@ export function filterAndPrepareGQLValue(
     // we convert the value we were provided, of course, we only need
     // to process what was requested
     valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
-      knex,
       serverData,
       parentModuleOrIdef,
       value,
@@ -667,7 +664,6 @@ export function filterAndPrepareGQLValue(
   } else {
     // same for modules
     valueOfTheItem = convertSQLValueToGQLValueForModule(
-      knex,
       serverData,
       parentModuleOrIdef,
       value,
@@ -966,7 +962,6 @@ export async function runPolicyCheck(
     gqlArgValue: IGQLValue,
     gqlFlattenedRequestedFiels: any,
     cache: Cache,
-    knex: Knex,
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
     parentModule?: string,
     parentType?: string,
@@ -1187,7 +1182,6 @@ export async function runPolicyCheck(
           prefix: "",
           row: policyType === "parent" ? parentSelectQueryValue : selectQueryValue,
           property,
-          knex: arg.knex,
           serverData: arg.cache.getServerData(),
           itemDefinition: arg.itemDefinition,
         });

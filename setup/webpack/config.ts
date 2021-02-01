@@ -123,10 +123,10 @@ module.exports = {
         use: "null-loader"
       },
 
-      // knex is for database usage so it should not
+      // pg is for database usage so it should not
       // be bundled
       {
-        test: /knex/,
+        test: /pg/,
         use: "null-loader"
       },
 
@@ -158,6 +158,10 @@ module.exports = {
       // SQL handling files are unecessary as well
       {
         test: /itemize\\/[a-zA-Z0-9_\\/]+\\/sql\\.ts/,
+        use: "null-loader"
+      },
+      {
+        test: /itemize\\/database\\/*\\.ts/,
         use: "null-loader"
       },
       {

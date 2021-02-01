@@ -163,9 +163,8 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
 export function standardSQLEqualFn(arg: ISQLEqualInfo) {
   if (arg.ignoreCase && typeof arg.value === "string") {
     return [
-      "LOWER(??) = ?",
+      "LOWER(" + JSON.stringify(arg.prefix + arg.id) + ") = ?",
       [
-        arg.prefix + arg.id,
         arg.value.toLowerCase(),
       ],
     ]; 

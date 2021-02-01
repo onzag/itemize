@@ -14,11 +14,11 @@ import bcyrpt from "bcrypt";
  */
 export function passwordSQLIn(arg: ISQLInInfo) {
   if (arg.value === null) {
-    return  {
+    return {
       [arg.prefix + arg.id]: null,
     };
   }
-  return  {
+  return {
     [arg.prefix + arg.id]: ["crypt(?, gen_salt('bf',10))", [arg.value as string]],
   };
 }
@@ -29,13 +29,12 @@ export function passwordSQLIn(arg: ISQLInInfo) {
  * @returns a knex raw execution query
  */
 export function passwordSQLEqual(arg: ISQLEqualInfo) {
-  const columnName = JSON.stringify(arg.prefix + arg.id);
-  return [
-    columnName + " = crypt(?, " + columnName + ")",
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, [
+    "crypt(?, " + JSON.stringify(arg.prefix + arg.id) + ")",
     [
       arg.value as string,
-    ],
-  ];
+    ]
+  ]);
 }
 
 /**
@@ -48,7 +47,7 @@ export function passwordSQLSSEqual(arg: ISQLSSCacheEqualInfo) {
   if (arg.value === null) {
     // like this from the row itself
     return arg.row[arg.prefix + arg.id] === null;
-  // if the row itself is null
+    // if the row itself is null
   } else if (!arg.row[arg.prefix + arg.id]) {
     // it's false 
     return false;

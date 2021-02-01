@@ -37,4 +37,9 @@ export class ReturningBuilder extends QueryBuilder {
     }
     return "RETURNING " + this.expression + (this.expressionAlias ? " AS " + JSON.stringify(this.expressionAlias) : "");
   }
+  public clear() {
+    this.expression = null;
+    this.expressionAlias = null;
+    this.clearBindingSources();
+  }
 }
