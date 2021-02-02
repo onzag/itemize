@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * Provides a builder for a FROM statments in SQL

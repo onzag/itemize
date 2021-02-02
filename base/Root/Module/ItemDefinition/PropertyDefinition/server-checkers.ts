@@ -93,5 +93,6 @@ export async function serverSideIndexChecker(
   const result = await appData.databaseConnection.queryFirst(query);
 
   // return whether we found results
-  return !result.length;
+  // no result means valid index
+  return !result;
 }

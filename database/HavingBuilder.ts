@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { ConditionalBuilder, ConditionalBuilderFn } from ".";
+import { ConditionalBuilder, ConditionalBuilderFn } from "./base";
 
 /**
  * The having builder that allows to create HAVING statments

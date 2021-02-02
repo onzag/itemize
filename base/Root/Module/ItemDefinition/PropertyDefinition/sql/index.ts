@@ -5,11 +5,15 @@
  * @packageDocumentation
  */
 
-import { PropertyDefinitionSupportedType, ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
-  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo } from "../types";
+import {
+  PropertyDefinitionSupportedType, ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
+  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo
+} from "../types";
 import PropertyDefinition from "../../PropertyDefinition";
-import { ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
-  ConsumeStreamsFnType, ISQLTableIndexType } from "../../../../sql";
+import {
+  ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
+  ConsumeStreamsFnType, ISQLTableIndexType
+} from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import ItemDefinition from "../..";
 import Include from "../../Include";
@@ -162,17 +166,19 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
  */
 export function standardSQLEqualFn(arg: ISQLEqualInfo) {
   if (arg.ignoreCase && typeof arg.value === "string") {
-    return [
+    arg.whereBuilder.andWhere(
       "LOWER(" + JSON.stringify(arg.prefix + arg.id) + ") = ?",
       [
         arg.value.toLowerCase(),
       ],
-    ]; 
+    );
+    return;
   }
 
-  return {
-    [arg.prefix + arg.id]: arg.value,
-  };
+  arg.whereBuilder.andWhereColumn(
+    arg.prefix + arg.id,
+    arg.value as string,
+  );
 }
 
 /**

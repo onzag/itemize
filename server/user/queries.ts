@@ -172,7 +172,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             subqueryBuilder.orWhere(
               (internalOrQueryBuilder) => {
                 internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
-                  userNamePropertyDescription.sqlEqual({
+                  emailPropertyDescription.sqlEqual({
                     id: usernameProperty.getId(),
                     prefix: "",
                     ignoreCase: true,

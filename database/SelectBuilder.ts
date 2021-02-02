@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { BasicBindingType, QueryBuilder } from ".";
+import { BasicBindingType, QueryBuilder } from "./base";
 import { FromBuilder } from "./FromBuilder";
 import { GroupByBuilder } from "./GroupByBuilder";
 import { HavingBuilder } from "./HavingBuilder";

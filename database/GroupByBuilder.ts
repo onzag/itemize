@@ -3,13 +3,13 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * Provides the group by builders that allows to create GROUP BY sql statments
  */
 export class GroupByBuilder extends QueryBuilder {
-  private expressions: string[];
+  private expressions: string[] = [];
   constructor() {
     super();
   }

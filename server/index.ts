@@ -56,7 +56,12 @@ import { DatabaseConnection } from "../database";
 let serviceCustom: IServiceCustomizationType = {};
 try {
   const itemizeConfig = require(path.join(path.resolve("."), "itemize.config"));
-  serviceCustom = itemizeConfig.services;
+  if (itemizeConfig.services) {
+    serviceCustom = require(path.resolve(itemizeConfig.services));
+    if ((serviceCustom as any).default) {
+      serviceCustom = (serviceCustom as any).default;
+    }
+  }
 } catch {
 }
 

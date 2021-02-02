@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * Represents a rule to order by

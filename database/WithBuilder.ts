@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * This is each one of the queries we are doing with the with
@@ -26,7 +26,7 @@ export class WithBuilder extends QueryBuilder {
   /**
    * These are all the WITH ... queries we are doing
    */
-  private withs: IWithRules[];
+  private withs: IWithRules[] = [];
   /**
    * And this is the query itself we are executing with WITH ... DO ...
    */

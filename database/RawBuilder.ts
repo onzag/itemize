@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * This is the raw builder for raw queries, it's not very useful

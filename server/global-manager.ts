@@ -18,7 +18,8 @@ import { RegistryService } from "./services/registry";
 import { ItemizeRedisClient } from "./redis";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import MailProvider from "./services/base/MailProvider";
-import { DatabaseConnection, IManyValueType } from "../database";
+import { DatabaseConnection } from "../database";
+import { IManyValueType } from "../database/base";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -79,8 +80,10 @@ export class GlobalManager {
 
     this.customServices = {};
 
-    mailProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
-    currencyFactorsProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    mailProvider &&
+      mailProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
+    currencyFactorsProvider &&
+      currencyFactorsProvider.setupGlobalResources(this.databaseConnection, this.globalCache, this.redisPub, this.mailProvider, this.customServices, this.root);
 
     this.processIdef = this.processIdef.bind(this);
     this.processModule = this.processModule.bind(this);

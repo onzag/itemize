@@ -14,7 +14,7 @@ import { DatabaseConnection } from "../../database";
 
 const NODE_ENV = process.env.NODE_ENV;
 
-// TODO FIX
+// TODODB FIX
 
 export interface IUserInfoAndTokensForTesting {
   testUser: any;

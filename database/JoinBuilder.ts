@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder, ConditionalBuilder, ConditionalBuilderFn } from ".";
+import { QueryBuilder, ConditionalBuilder, ConditionalBuilderFn } from "./base";
 
 /**
  * Represents the join rule basically the real LEFT JOIN, RIGHT  JOIN, INNER JOIN and whatnot
@@ -72,7 +72,7 @@ export class JoinBuilder extends QueryBuilder {
   /**
    * These are the list of all the builders that represents the join rules
    */
-  private builders: JoinRuleBuilder[];
+  private builders: JoinRuleBuilder[] = [];
 
   /**
    * Builds a new join builder
@@ -88,7 +88,7 @@ export class JoinBuilder extends QueryBuilder {
    * @returns the new builder
    */
   private joinBase(type: "JOIN" | "LEFT JOIN" | "RIGHT JOIN" | "FULL JOIN", tableName: string) {
-    const conditionalBuilder = new JoinRuleBuilder(null, type + " " + JSON.stringify(tableName));
+    const conditionalBuilder = new JoinRuleBuilder(null, type + " " + JSON.stringify(tableName) + " ON");
     this.builders.push(conditionalBuilder);
     this.addBindingSource(conditionalBuilder);
     return conditionalBuilder;

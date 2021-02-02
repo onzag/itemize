@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 import { FromBuilder } from "./FromBuilder";
 import { ReturningBuilder } from "./ReturningBuilder";
 import { SetBuilder } from "./SetBuilder";

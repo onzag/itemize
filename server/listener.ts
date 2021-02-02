@@ -66,7 +66,6 @@ import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
-import { DatabaseConnection } from "../database";
 import { ItemizeRawDB } from "./raw-db";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport

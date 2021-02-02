@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from ".";
+import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from "./base";
 
 /**
  * The where query builder allows to create WHERE statments

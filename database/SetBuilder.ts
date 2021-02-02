@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder, IManyValueType, ValueType, BasicBindingType } from ".";
+import { QueryBuilder, IManyValueType, ValueType, BasicBindingType } from "./base";
 
 /**
  * The set builder that allows to create SET statments

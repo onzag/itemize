@@ -29,7 +29,8 @@ import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { ItemizeRedisClient } from "./redis";
 import Module from "../base/Root/Module";
-import { DatabaseConnection, IManyValueType } from "../database";
+import { DatabaseConnection } from "../database";
+import { IManyValueType } from "../database/base";
 import { WithBuilder } from "../database/WithBuilder";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
@@ -1425,8 +1426,9 @@ export class Cache {
         // let's remember versions as null do not exist in the database, instead it uses
         // the invalid empty string "" value
         await this.databaseConnection.queryFirst(
-          `SELECT * FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" $2 JOIN ${JSON.stringify(idefTable)} ` +
+          `SELECT * FROM ${JSON.stringify(moduleTable)} JOIN ${JSON.stringify(idefTable)} ` +
           `ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version" ` +
+          `WHERE "id" = $1 AND "version" = $2 ` +
           `LIMIT 1`,
           [
             id,

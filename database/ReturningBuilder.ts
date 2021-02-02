@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { QueryBuilder } from ".";
+import { QueryBuilder } from "./base";
 
 /**
  * The returning builder that allows to create RETURNING statments
@@ -12,7 +12,7 @@ export class ReturningBuilder extends QueryBuilder {
   /**
    * the expressions that we are returning
    */
-  private expressions: string[];
+  private expressions: string[] = [];
 
   /**
    * Builds a new SQL RETURNING statment

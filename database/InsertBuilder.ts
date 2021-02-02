@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { IManyValueType, QueryBuilder } from ".";
+import { IManyValueType, QueryBuilder } from "./base";
 import { ReturningBuilder } from "./ReturningBuilder";
 
 /**
