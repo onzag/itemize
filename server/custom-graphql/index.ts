@@ -59,7 +59,7 @@ export interface ICustomTokenGQLQueryDefinition {
    */
   resolve: (
     /**
-     * This is the app data that allows access to both the cache, root and knex
+     * This is the app data that allows access to both the cache, root and database connection
      * as well as to any service
      */
     appData: IAppDataType,

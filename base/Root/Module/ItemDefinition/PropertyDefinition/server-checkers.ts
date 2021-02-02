@@ -15,7 +15,7 @@ import { IAppDataType } from "../../../../../server";
 
 /**
  * The server side index checker checks for unique indexes within properties
- * @param knex the Knex instance
+ * @param appData the app data object
  * @param itemDefinition item definition
  * @param include the include where the property resides (or null)
  * @param property the property in question
@@ -57,11 +57,16 @@ export async function serverSideIndexChecker(
 
   // now the query
   const query = appData.databaseConnection.getSelectBuilder();
+  // we select both the id and the version based on what
+  // we are selecting in the given table and limit to 1 answer
   query.select(
     moduleIDColumn,
     moduleVersionColumn,
-  ).table(qualifiedParentName).limit(1);
+  ).limit(1).fromBuilder.from(qualifiedParentName);
 
+  // now we can pass its where clause to the sql equal
+  // function of the property giving the value we want to
+  // use
   property.getPropertyDefinitionDescription().sqlEqual({
     serverData: appData.cache.getServerData(),
     value,
@@ -80,11 +85,11 @@ export async function serverSideIndexChecker(
   // because it will match, eg. we check for usernames but our own username
   // would match everyt ime
   if (id !== null) {
-    query.whereBuilder.andWhereColumn(moduleIDColumn, id, "!=");
-    query.whereBuilder.andWhereColumn(moduleVersionColumn, version, "!=");
+    query.whereBuilder.andWhereColumn(moduleIDColumn, "!=", id);
+    query.whereBuilder.andWhereColumn(moduleVersionColumn, "!=", version);
   }
 
-  // run the query
+  // run the query getting only the first row
   const result = await appData.databaseConnection.queryFirst(query);
 
   // return whether we found results

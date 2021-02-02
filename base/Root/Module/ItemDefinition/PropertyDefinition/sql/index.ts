@@ -142,12 +142,12 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[fromName] as any, ">=");
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, ">=", arg.args[fromName] as any);
     searchedByIt = true;
   }
 
   if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
-    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[toName] as any, "<=");
+    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, "<=", arg.args[toName] as any);
     searchedByIt = true;
   }
 

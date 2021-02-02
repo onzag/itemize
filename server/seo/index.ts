@@ -104,7 +104,7 @@ export interface ISEORule {
    * 
    * (arg) => (arg.collectedResults[0].collected.map(r) => ({params: {sid: r.id, id: r.parent_id}}));
    * 
-   * this will correctly parametrize and replace every id with every other, notice that you have access to knex
+   * this will correctly parametrize and replace every id with every other, notice that you have access to raw db
    * and the root in these, this should enable you to create complex parametrizers eg. suppose you are using the
    * /group/:name/subgroup/:name instead in the urls (however this is not recommended unless your names are static)
    * and this isn't even good for indexing, but whatever, even this is possible to SEO

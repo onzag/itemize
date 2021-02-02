@@ -592,7 +592,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     const userHandle = data.from.split("@")[0];
     if (userHandle === "unsubscribe") {
       // TODO do the unsubscribe via the cache
-      // we have the email, we will need knex in order
+      // we have the email, we will need raw db in order
       // to find the user it belongs to and then
       // we can request an update
     } else if (this.storageIdef) {

@@ -105,9 +105,9 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     // so we do
     arg.whereBuilder.andWhere((clause) => {
       clause
-        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", normalized, ">=").orWhere((subclause) => {
+        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized).orWhere((subclause) => {
         subclause
-          .andWhereColumn(arg.prefix + arg.id + "_VALUE", fromArg.value, ">=")
+          .andWhereColumn(arg.prefix + arg.id + "_VALUE", ">=", fromArg.value)
           .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
       })
     });
@@ -121,9 +121,9 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     const normalized = factor ? factor * toArg.value : null;
     arg.whereBuilder.andWhere((clause) => {
       clause
-        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", normalized, "<=").orWhere((subclause) => {
+        .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized).orWhere((subclause) => {
         subclause
-          .andWhereColumn(arg.prefix + arg.id + "_VALUE", toArg.value, "<=")
+          .andWhereColumn(arg.prefix + arg.id + "_VALUE", "<=", toArg.value)
           .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
       })
     });

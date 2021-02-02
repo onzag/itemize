@@ -26,7 +26,7 @@ export function passwordSQLIn(arg: ISQLInInfo) {
 /**
  * Provides the equality function as run in the database
  * @param arg the sql equal arg info
- * @returns a knex raw execution query
+ * @returns a raw value
  */
 export function passwordSQLEqual(arg: ISQLEqualInfo) {
   arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, [

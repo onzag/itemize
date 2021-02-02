@@ -225,7 +225,7 @@ export function buildSQLQueryForInclude(
 
   // if the expected exclusion state is to be excluded
   if (expectedExclusionState === IncludeExclusionState.EXCLUDED) {
-    // we tell knex that is to be the case
+    // we tell the connection that is to be the case
     whereBuilder.andWhereColumn(exclusionStateQualifiedId, IncludeExclusionState.EXCLUDED);
   } else {
     // otherwise if we are expecting something else like ANY and INCLUDED

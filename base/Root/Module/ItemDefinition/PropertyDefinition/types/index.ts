@@ -183,7 +183,7 @@ export interface IPropertyDefinitionSupportedType {
    */
   gqlAddFileToFields?: boolean;
   /**
-   * sql definition, either a string for knex supported types
+   * sql definition
    * or a function where the id is the id is a property id
    * this represents how tables are populated and data is stored
    * a simple type simply saves the id, say it's a number, so
@@ -195,7 +195,7 @@ export interface IPropertyDefinitionSupportedType {
   /**
    * specifies how data is stored, by default it just sets the row value
    * to whatever is given, however if you have a complex value you should
-   * set this, the raw function is the raw knex function, that allows to build raw queries,
+   * set this, that allows to build raw queries,
    * by default if not set this function just sets {property_id: value}
    */
   sqlIn: (arg: ISQLInInfo) => ISQLTableRowValue;
@@ -220,9 +220,6 @@ export interface IPropertyDefinitionSupportedType {
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it
-   * note that the whereBuilder can be null in this case, because of technical limitations
-   * with knex as it only executes subqueries within the subquery and we need to know
-   * the select query beforehand
    * return a boolean on whether it searched by it or it didn't
    */
   sqlStrSearch: (arg: ISQLStrSearchInfo) => boolean | [string, any[]];
@@ -245,8 +242,6 @@ export interface IPropertyDefinitionSupportedType {
   /**
    * Represents a check for equality of a property against another
    * same with the sql prefix as the search
-   * same for the id, and knex is just the knex instance, not a builder
-   * and an optional column name so that it can be used as select as
    */
   sqlEqual: (arg: ISQLEqualInfo) => void;
   /**

@@ -421,13 +421,13 @@ export class ItemizeRawDB {
     
     if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
       const moduleInQuestion = itemDefinitionOrModuleInstance.getParentModule();
-      builder.table(moduleInQuestion.getQualifiedPathName());
+      builder.fromBuilder.from(moduleInQuestion.getQualifiedPathName());
       builder.joinBuilder.join(itemDefinitionOrModuleInstance.getQualifiedPathName(), (ruleBuilder) => {
         ruleBuilder.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
         ruleBuilder.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
       });
     } else {
-      builder.table(itemDefinitionOrModuleInstance.getQualifiedPathName());
+      builder.fromBuilder.from(itemDefinitionOrModuleInstance.getQualifiedPathName());
     }
  
     selecter(builder);
@@ -510,7 +510,7 @@ export class ItemizeRawDB {
     } else {
       const itemSelectQuery = new SelectBuilder();
       // from both tables
-      itemSelectQuery.tables([selfTable, "MTABLE"]);
+      itemSelectQuery.fromBuilder.from(selfTable, "MTABLE");
       // where they match the id and version so that it joins
       itemSelectQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
       itemSelectQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
@@ -613,7 +613,7 @@ export class ItemizeRawDB {
     } else {
       const itemSelectQuery = new SelectBuilder();
       // from both tables
-      itemSelectQuery.table(selfTable);
+      itemSelectQuery.fromBuilder.from(selfTable);
       // where they match the id and version so that it joins
       itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_ID_FK_NAME, id);
       itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, version || "");

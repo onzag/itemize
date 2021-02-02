@@ -115,7 +115,7 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
     typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
   ) {
-    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_GEO", null, "IS NOT");
+    arg.whereBuilder.andWhereColumnNotNull(arg.prefix + arg.id + "_GEO");
 
     const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
     const lng = argAsLocation.lng || 0;

@@ -47,24 +47,20 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
  * @returns a boolean on whether it was searched by it
  */
 export function stringSQLStrSearch(arg: ISQLStrSearchInfo) {
-  // this is due to knex shenanigans, we need to check it
-  // it's a limitation
-  if (arg.whereBuilder) {
-    // so we check it
-    if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
-      arg.whereBuilder.andWhereColumn(
-        arg.prefix + arg.id,
-        arg.search,
-      );
-    } else {
-      arg.whereBuilder.andWhere(
-        JSON.stringify(arg.prefix + arg.id) + " ILIKE ? ESCAPE ?",
-        [
-          "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
-          "\\",
-        ],
-      );
-    }
+  // so we check it
+  if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
+    arg.whereBuilder.andWhereColumn(
+      arg.prefix + arg.id,
+      arg.search,
+    );
+  } else {
+    arg.whereBuilder.andWhere(
+      JSON.stringify(arg.prefix + arg.id) + " ILIKE ? ESCAPE ?",
+      [
+        "%" + arg.search.replace(/\%/g, "\\%").replace(/\_/g, "\\_") + "%",
+        "\\",
+      ],
+    );
   }
 
   return true;

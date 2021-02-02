@@ -510,7 +510,7 @@ export class SEOGenerator {
             }
 
             if (querySince) {
-              query.whereBuilder.andWhereColumn("created_at", querySince, ">");
+              query.whereBuilder.andWhereColumn("created_at", ">", querySince);
             }
 
             if (!collectionPoint.collectAllVersions) {

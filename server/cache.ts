@@ -328,8 +328,7 @@ export class Cache {
     const containerExists = containerId && this.storageClients[containerId];
 
     // now we extract the SQL information for both item definition table
-    // and the module table, this value is database ready, and hence needs
-    // knex and the dictionary to convert fields that need it
+    // and the module table, this value is database ready
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
       this.serverData,
       itemDefinition,
@@ -420,11 +419,7 @@ export class Cache {
 
     CAN_LOG_DEBUG && logger.debug(
       "Cache.requestCreation: finalizing SQL data with module data",
-      {
-        ...sqlModData,
-        created_at: "[this.knex.fn.now()]",
-        last_modified: "[this.knex.fn.now()]",
-      },
+      sqlModData,
     );
 
     CAN_LOG_DEBUG && logger.debug(
@@ -765,7 +760,8 @@ export class Cache {
       withQuery.with("ITABLE", itemUpdateQuery);
     } else {
       const itemSelectQuery = new SelectBuilder();
-      itemSelectQuery.table(selfTable).selectAll().whereBuilder.andWhereColumn(
+      itemSelectQuery.fromBuilder.from(selfTable);
+      itemSelectQuery.selectAll().whereBuilder.andWhereColumn(
         CONNECTOR_SQL_COLUMN_ID_FK_NAME,
         id,
       ).andWhereColumn(
@@ -777,7 +773,8 @@ export class Cache {
     }
 
     const selectQuery = new SelectBuilder();
-    selectQuery.table("MTABLE").selectAll().limit(1).joinBuilder.join("ITABLE", (rule) => {
+    selectQuery.fromBuilder.from("MTABLE");
+    selectQuery.selectAll().limit(1).joinBuilder.join("ITABLE", (rule) => {
       rule.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
       rule.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
     });

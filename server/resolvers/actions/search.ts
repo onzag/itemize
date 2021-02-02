@@ -178,7 +178,7 @@ export async function searchModule(
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
   const queryModel = appData.databaseConnection.getSelectBuilder();
-  queryModel.table(mod.getQualifiedPathName());
+  queryModel.fromBuilder.from(mod.getQualifiedPathName());
   queryModel.whereBuilder.andWhereColumnNull("blocked_at");
 
   if (created_by) {
@@ -193,7 +193,7 @@ export async function searchModule(
   }
 
   if (since) {
-    queryModel.whereBuilder.andWhereColumn("created_at", since, ">=");
+    queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
   }
 
   if (typeof resolverArgs.args.version_filter !== "undefined") {
@@ -558,7 +558,8 @@ export async function searchItemDefinition(
 
   // now we build the search query
   const queryModel = appData.databaseConnection.getSelectBuilder();
-  queryModel.table(selfTable).joinBuilder.join(moduleTable, (clause) => {
+  queryModel.fromBuilder.from(selfTable);
+  queryModel.joinBuilder.join(moduleTable, (clause) => {
     clause.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
     clause.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
   });
@@ -569,7 +570,7 @@ export async function searchItemDefinition(
   }
 
   if (since) {
-    queryModel.whereBuilder.andWhereColumn("created_at", since, ">=");
+    queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
   }
 
   if (typeof resolverArgs.args.version_filter !== "undefined") {
