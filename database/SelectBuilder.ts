@@ -132,7 +132,11 @@ export class SelectBuilder extends QueryBuilder {
    * @returns itself
    */
   public limit(n: number) {
-    this.ilimit = n;
+    if (typeof n !== "number") {
+      this.ilimit = null;
+    } else {
+      this.ilimit = n;
+    }
     return this;
   }
 
@@ -142,7 +146,11 @@ export class SelectBuilder extends QueryBuilder {
    * @returns itself
    */
   public offset(n: number) {
-    this.ioffset = n;
+    if (typeof n !== "number") {
+      this.ioffset = null;
+    } else {
+      this.ioffset = n;
+    }
     return this;
   }
 

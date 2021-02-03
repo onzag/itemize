@@ -36,7 +36,6 @@ import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
 import { IOTriggerActions } from "../triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
-import { query } from "winston";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -257,7 +256,7 @@ export async function searchModule(
   const countResult: ISQLTableRowValue = generalFields.count ? (
     await appData.databaseConnection.queryFirst(queryModel)
   ) : null;
-  const count = (countResult && countResult.count) || null;
+  const count = countResult ? countResult.count : null;
 
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
@@ -643,8 +642,8 @@ export async function searchItemDefinition(
   queryModel.selectExpression(`COUNT(*) AS "count"`);
   queryModel.orderByBuilder.clear();
   
-  const countResult: ISQLTableRowValue[] = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
-  const count = (countResult && countResult[0] && countResult[0].count) || null;
+  const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
+  const count = countResult ? countResult.count : null;
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(

@@ -8,7 +8,7 @@
  * needs to be assigned a value, we support string, number, booleans
  * and raw values represented by an array and its bindings
  */
-export type ValueType = string | number | boolean | [string, Array<string | number>];
+export type ValueType = string | number | boolean | [string, Array<string | number>];
 
 /**
  * Represents a binding type, that binds to $1, $2, $3 etc... in the query itself
@@ -21,7 +21,7 @@ export type BasicBindingType = string | number | boolean | Array<BasicBindingTyp
  * plus the query builder itself that can act as a compounded binding element
  * [binding, binding, binding, [binding, binding, binding]...]
  */
-export type ExtendedBindingType = BasicBindingType | QueryBuilder;
+export type ExtendedBindingType = BasicBindingType | QueryBuilder;
 
 /**
  * Represents a way to specify many values to many columns or elements
@@ -197,11 +197,15 @@ export interface IConditionalBuilderConditionType {
    * The condition itself can be a subcondition
    * or an expression itself
    */
-  condition: ConditionalBuilder | string;
+  condition: ConditionalBuilder | QueryBuilder | string;
   /**
    * The gate that is going to use
    */
   gate: "AND" | "OR";
+  /**
+   * An optional prefix that comes after the and rule
+   */
+  prefix: string;
 }
 
 /**
@@ -253,8 +257,10 @@ export class ConditionalBuilder extends QueryBuilder {
     return this.conditions.some((c) => {
       if (typeof c.condition === "string") {
         return true;
-      } else {
+      } else if (c.condition instanceof ConditionalBuilder) {
         return c.condition.hasRulesAssigned();
+      } else {
+        return true;
       }
     });
   }
@@ -274,19 +280,25 @@ export class ConditionalBuilder extends QueryBuilder {
   /**
    * Makes a new condition based on an expression or a subrule function
    * @param gate the gate to use
+   * @param prefix an optional prefix to the rule, if none, make it null
    * @param rule either the expression itself or a subcondition
    * @param bindings the bindings for the expression, will not be used if using a subcondition
    * @returns itself
    */
-  public condition(gate: "AND" | "OR", rule: string | ConditionalBuilderFn<any>, bindings?: BasicBindingType[]) {
+  public condition(
+    gate: "AND" | "OR",
+    prefix: string,
+    rule: string | QueryBuilder | ConditionalBuilderFn<any>,
+    bindings?: BasicBindingType[],
+  ) {
     // first we build the condition that we are going to use
-    let condition: ConditionalBuilder | string;
+    let condition: QueryBuilder | ConditionalBuilder | string;
     // if the rule is a string, as in an expression
     if (typeof rule === "string") {
       // it's simple, we just add it
       condition = rule;
       this.addBindingSources(bindings);
-    } else {
+    } else if (!(rule instanceof QueryBuilder)) {
       // otherwise we make a new builder itself
       const builder = this.subcondition();
       // now we call the rule with that builder
@@ -307,11 +319,21 @@ export class ConditionalBuilder extends QueryBuilder {
       if (bindings) {
         throw new Error("Cannot have both bindings and have provided a builder as a rule");
       }
+    } else {
+      condition = rule;
+      this.addBindingSource(condition);
+
+      // and we reject the bindings
+      if (bindings) {
+        throw new Error("Cannot have both bindings and have provided a builder as a rule");
+      }
     }
+
     // now we can push the condition
     this.conditions.push({
       gate,
       condition,
+      prefix,
     });
 
     // return this
@@ -346,12 +368,21 @@ export class ConditionalBuilder extends QueryBuilder {
         result += " " + c.gate + " ";
       }
 
+      if (c.prefix) {
+        result += c.prefix + " ";
+      }
+
       // a expression just gets added
       if (typeof c.condition === "string") {
         result += c.condition;
       } else {
-        // otherwise compile
-        result += c.condition.compile();
+        if (c.condition instanceof ConditionalBuilder) {
+          // otherwise compile
+          result += c.condition.compile();
+        } else {
+          // otherwise compile as a subquery that is embedded
+          result += "(" + c.condition.compile() + ")";
+        }
       }
     });
 

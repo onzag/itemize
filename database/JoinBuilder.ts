@@ -25,7 +25,7 @@ export class JoinRuleBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public on(rule: string | ConditionalBuilderFn<JoinRuleBuilder>, bindings?: Array<string | number>) {
-    return this.condition("AND", rule, bindings);
+    return this.condition("AND", null, rule, bindings);
   }
 
   /**
@@ -35,7 +35,7 @@ export class JoinRuleBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public orOn(rule: string | ConditionalBuilderFn<JoinRuleBuilder>, bindings?: Array<string | number>) {
-    return this.condition("OR", rule, bindings);
+    return this.condition("OR", null, rule, bindings);
   }
 
   /**
@@ -45,7 +45,7 @@ export class JoinRuleBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public onColumnEquals(columnA: string, columnB: string) {
-    return this.condition("AND", JSON.stringify(columnA) + " = " + JSON.stringify(columnB));
+    return this.condition("AND", null, JSON.stringify(columnA) + " = " + JSON.stringify(columnB));
   }
 
   /**
@@ -55,7 +55,7 @@ export class JoinRuleBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public orOnColumnEquals(columnA: string, columnB: string) {
-    return this.condition("OR", JSON.stringify(columnA) + " = " + JSON.stringify(columnB));
+    return this.condition("OR", null, JSON.stringify(columnA) + " = " + JSON.stringify(columnB));
   }
 }
 

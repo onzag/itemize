@@ -42,6 +42,11 @@ export class DatabaseConnection {
   private client: PoolClient;
 
   /**
+   * Suppresses console logging
+   */
+  private suppressLogs: boolean;
+
+  /**
    * Constructs a new database connection
    * @param info the connection information
    * @param client for child database connections used in transactions the client that is in use
@@ -56,6 +61,13 @@ export class DatabaseConnection {
       max: 5,
       min: 1,
     });
+  }
+
+  /**
+   * Suppresses console logging
+   */
+  public suppressLogging() {
+    this.suppressLogs = true;
   }
 
   /**
@@ -83,7 +95,7 @@ export class DatabaseConnection {
       });
 
       if (holes !== queryBindings.length) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
           console.log(
             {
               sql: queryValue,
@@ -95,7 +107,7 @@ export class DatabaseConnection {
       }
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
       console.log(
         {
           sql: queryValue,
@@ -182,6 +194,9 @@ export class DatabaseConnection {
 
     // now we build a treansacting client as a new database connection
     const transactingClient = new DatabaseConnection(null, client, this.pool);
+    if (this.suppressLogs) {
+      transactingClient.suppressLogging();
+    }
 
     // now we can try this
     try {

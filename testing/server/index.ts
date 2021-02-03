@@ -4,8 +4,8 @@ import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
 import { RobotsTest } from "./robots";
 import { GraphqlTest } from "./graphql";
-// import { DatabaseTest } from "./database";
-// import { RedisTest } from "./redis";
+import { DatabaseTest } from "./database";
+import { RedisTest } from "./redis";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
 import { jwtSign } from "../../server/token";
 import { TokenTest } from "./token";
@@ -13,8 +13,6 @@ import { convertVersionsIntoNullsWhenNecessary } from "../../server/version-null
 import { DatabaseConnection } from "../../database";
 
 const NODE_ENV = process.env.NODE_ENV;
-
-// TODODB FIX
 
 export interface IUserInfoAndTokensForTesting {
   testUser: any;
@@ -48,96 +46,95 @@ export class ServerTest extends Test {
   public async before() {
     this.fullHost = (this.https ? "https://" : "http://") + this.host + (this.port ? ":" + this.port : "");
 
-    if (NODE_ENV !== "production") {
-      const dbConnectionConfig = {
-        host: this.testingInfo.dbConfig.host,
-        port: this.testingInfo.dbConfig.port,
-        user: this.testingInfo.dbConfig.user,
-        password: this.testingInfo.dbConfig.password,
-        database: this.testingInfo.dbConfig.database,
-      };
+    const dbConnectionConfig = {
+      host: this.testingInfo.dbConfig.host,
+      port: this.testingInfo.dbConfig.port,
+      user: this.testingInfo.dbConfig.user,
+      password: this.testingInfo.dbConfig.password,
+      database: this.testingInfo.dbConfig.database,
+    };
 
-      this.databaseConnection = new DatabaseConnection(dbConnectionConfig);
-    }
+    this.databaseConnection = new DatabaseConnection(dbConnectionConfig);
+    this.databaseConnection.suppressLogging();
 
     const userMod = this.testingInfo.root.getModuleFor(["users"]);
     const userIdef = userMod.getItemDefinitionFor(["user"]);
 
     // This will normally pick the admin user
     // but who knows it can happen otherwise
-    // const testUser = convertVersionsIntoNullsWhenNecessary(
-    //   await this.knex.first("*")
-    //     .from(userMod.getQualifiedPathName())
-    //     .join(userIdef.getQualifiedPathName(), (clause) => {
-    //       clause.on(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "=", "id");
-    //       clause.on(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "=", "version");
-    //     }).orderBy("id")
-    // );
+    const testUser = convertVersionsIntoNullsWhenNecessary(
+      await this.databaseConnection.queryFirst(
+        `SELECT * FROM ${JSON.stringify(userMod.getTableName())} JOIN ${JSON.stringify(userIdef.getTableName())} ` +
+        `ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ` +
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version" WHERE "role" = 'ADMIN' ` + 
+        `ORDER BY "created_at" ASC LIMIT 1`
+      ),
+    );
 
-    // const testToken = await jwtSign(
-    //   {
-    //     id: testUser.id,
-    //     role: testUser.role,
-    //     sessionId: testUser.session_id || 0,
-    //   },
-    //   this.testingInfo.sensitiveConfig.jwtKey,
-    // );
+    const testToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: testUser.role,
+        sessionId: testUser.session_id || 0,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
 
-    // const malformedTestToken = await jwtSign(
-    //   {
-    //     id: 1,
-    //     role: testUser.role,
-    //     sessionId: (testUser.session_id || 0).toString(),
-    //   },
-    //   this.testingInfo.sensitiveConfig.jwtKey,
-    // );
+    const malformedTestToken = await jwtSign(
+      {
+        id: 1,
+        role: testUser.role,
+        sessionId: (testUser.session_id || 0).toString(),
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
 
-    // const invalidSessionIdTestToken = await jwtSign(
-    //   {
-    //     id: testUser.id,
-    //     role: testUser.role,
-    //     sessionId: (testUser.session_id || 0) + 1,
-    //   },
-    //   this.testingInfo.sensitiveConfig.jwtKey,
-    // );
+    const invalidSessionIdTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: testUser.role,
+        sessionId: (testUser.session_id || 0) + 1,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
 
-    // const allRoles = this.testingInfo.config.roles;
-    // const rolesWithoutSelf = allRoles.filter((r) => r !== testUser.role);
-    // const invalidRoleTestToken = await jwtSign(
-    //   {
-    //     id: testUser.id,
-    //     role: rolesWithoutSelf[0] || "MADE_UP_ROLE",
-    //     sessionId: testUser.session_id || 0,
-    //   },
-    //   this.testingInfo.sensitiveConfig.jwtKey,
-    // );
+    const allRoles = this.testingInfo.config.roles;
+    const rolesWithoutSelf = allRoles.filter((r) => r !== testUser.role);
+    const invalidRoleTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: rolesWithoutSelf[0] || "MADE_UP_ROLE",
+        sessionId: testUser.session_id || 0,
+      },
+      this.testingInfo.sensitiveConfig.jwtKey,
+    );
 
-    // const invalidSignatureTestToken = await jwtSign(
-    //   {
-    //     id: testUser.id,
-    //     role: rolesWithoutSelf[0],
-    //     sessionId: testUser.session_id || 0,
-    //   },
-    //   "123456",
-    // );
+    const invalidSignatureTestToken = await jwtSign(
+      {
+        id: testUser.id,
+        role: rolesWithoutSelf[0],
+        sessionId: testUser.session_id || 0,
+      },
+      "123456",
+    );
 
-    // const garbageMadeUpToken = "THIS_IS_NOT_A_REAL_TOKEN";
+    const garbageMadeUpToken = "THIS_IS_NOT_A_REAL_TOKEN";
 
-    // this.info("Test user chosen: " + testUser.username);
+    this.info("Test user chosen: " + testUser.username);
 
-    // this.testingUserInfo = {
-    //   testUser,
-    //   testToken,
-    //   malformedTestToken,
-    //   invalidSessionIdTestToken,
-    //   invalidRoleTestToken,
-    //   invalidSignatureTestToken,
-    //   garbageMadeUpToken,
-    // }
+    this.testingUserInfo = {
+      testUser,
+      testToken,
+      malformedTestToken,
+      invalidSessionIdTestToken,
+      invalidRoleTestToken,
+      invalidSignatureTestToken,
+      garbageMadeUpToken,
+    }
 
-    // if (testUser.role !== "ADMIN") {
-    //   this.warn("For some reason the test user is not an admin user but " + testUser.role);
-    // }
+    if (testUser.role !== "ADMIN") {
+      this.warn("For some reason the test user is not an admin user but " + testUser.role);
+    }
   }
   public describe() {
     if (this.testingInfo.sensitiveConfig.localContainer) {
@@ -162,16 +159,18 @@ export class ServerTest extends Test {
       }
     ).quitOnFail();
 
-    // this.it(
-    //   "Should have at least one user",
-    //   async () => {
-    //     const userMod = this.testingInfo.root.getModuleFor(["users"]);
-    //     const oneUser = await this.knex.first("id").from(userMod.getQualifiedPathName());
-    //     if (!oneUser) {
-    //       assert.fail("Could not even get a single user");
-    //     }
-    //   }
-    // ).quitOnFail();
+    this.it(
+      "Should have at least one user",
+      async () => {
+        const userMod = this.testingInfo.root.getModuleFor(["users"]);
+        const oneUser = await this.databaseConnection.queryFirst(
+          `SELECT "id" FROM ${JSON.stringify(userMod.getTableName())} LIMIT 1`
+        );
+        if (!oneUser) {
+          assert.fail("Could not even get a single user");
+        }
+      }
+    ).quitOnFail();
 
     this.it(
       "Should be able to fetch a SSR disabled instance when using noredirect",
@@ -284,20 +283,14 @@ export class ServerTest extends Test {
       new RobotsTest(this.https, this.host, this.port, this.fullHost, this.testingInfo),
     );
 
-    // this.define(
-    //   "Database test",
-    //   new DatabaseTest(this.knex, this.testingInfo),
-    // );
+    this.define(
+      "Database test",
+      new DatabaseTest(this.databaseConnection, this.testingInfo),
+    );
 
-    // this.define(
-    //   "Redis test",
-    //   new RedisTest(this.knex, this.testingInfo, this.testingUserInfo, this.fullHost),
-    // );
-  }
-
-  public after() {
-    if (NODE_ENV !== "production") {
-      // this.databaseConnection.destroy();
-    }
+    this.define(
+      "Redis test",
+      new RedisTest(this.databaseConnection, this.testingInfo, this.testingUserInfo, this.fullHost),
+    );
   }
 }

@@ -35,7 +35,7 @@ export class HavingBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public andHaving(rule: string | ConditionalBuilderFn<HavingBuilder>, bindings?: Array<string | number>) {
-    return this.condition("AND", rule, bindings);
+    return this.condition("AND", null, rule, bindings);
   }
 
   /**
@@ -45,6 +45,6 @@ export class HavingBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public orHaving(rule: string | ConditionalBuilderFn<HavingBuilder>, bindings?: Array<string | number>) {
-    return this.condition("OR", rule, bindings);
+    return this.condition("OR", null, rule, bindings);
   }
 }

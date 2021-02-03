@@ -4,6 +4,7 @@
  */
 
 import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from "./base";
+import { SelectBuilder } from "./SelectBuilder";
 
 /**
  * The where query builder allows to create WHERE statments
@@ -25,6 +26,54 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public subcondition() {
     return new WhereBuilder(this);
+  }
+
+  /**
+   * Specifies a condition for an EXISTS rule
+   * @param arg a function that provides a select builder
+   * @returns itself
+   */
+  public andWhereExists(arg: ConditionalBuilderFn<SelectBuilder>) {
+    const builder = new SelectBuilder();
+    arg(builder);
+
+    return this.condition("AND", "EXISTS", builder);
+  }
+
+  /**
+   * Specifies a condition for an EXISTS rule
+   * @param arg a function that provides a select builder
+   * @returns itself
+   */
+  public andWhereNotExists(arg: ConditionalBuilderFn<SelectBuilder>) {
+    const builder = new SelectBuilder();
+    arg(builder);
+
+    return this.condition("AND", "NOT EXISTS", builder);
+  }
+
+  /**
+   * Specifies a condition for an EXISTS rule
+   * @param arg a function that provides a select builder
+   * @returns itself
+   */
+  public orWhereExists(arg: ConditionalBuilderFn<SelectBuilder>) {
+    const builder = new SelectBuilder();
+    arg(builder);
+
+    return this.condition("OR", "EXISTS", builder);
+  }
+
+  /**
+   * Specifies a condition for an EXISTS rule
+   * @param arg a function that provides a select builder
+   * @returns itself
+   */
+  public orWhereNotExists(arg: ConditionalBuilderFn<SelectBuilder>) {
+    const builder = new SelectBuilder();
+    arg(builder);
+
+    return this.condition("OR", "NOT EXISTS", builder);
   }
 
   /**
@@ -63,7 +112,7 @@ export class WhereBuilder extends ConditionalBuilder {
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
     if (Array.isArray(value)) {
       const rule = JSON.stringify(column) + " " + comparator + " " + value[0];
-      return this.condition("AND", rule, value[1]);
+      return this.condition("AND", null, rule, value[1]);
     } else {
       if (value === null && comparator === "=") {
         return this.andWhereColumnNull(column);
@@ -71,7 +120,7 @@ export class WhereBuilder extends ConditionalBuilder {
         return this.andWhereColumnNotNull(column);
       }
       const rule = JSON.stringify(column) + " " + comparator + " ?";
-      return this.condition("AND", rule, [value]);
+      return this.condition("AND", null, rule, [value]);
     }
   }
 
@@ -87,7 +136,7 @@ export class WhereBuilder extends ConditionalBuilder {
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
     if (Array.isArray(value)) {
       const rule = JSON.stringify(column) + " " + comparator + " " + value[0];
-      return this.condition("OR", rule, value[1]);
+      return this.condition("OR", null, rule, value[1]);
     } else {
       if (value === null && comparator === "=") {
         return this.orWhereColumnNull(column);
@@ -95,7 +144,7 @@ export class WhereBuilder extends ConditionalBuilder {
         return this.orWhereColumnNotNull(column);
       }
       const rule = JSON.stringify(column) + " " + comparator + " ?";
-      return this.condition("OR", rule, [value]);
+      return this.condition("OR", null, rule, [value]);
     }
   }
 
@@ -106,7 +155,7 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public andWhereColumnNull(column: string) {
     const rule = JSON.stringify(column) + " IS NULL";
-    return this.condition("AND", rule);
+    return this.condition("AND", null, rule);
   }
 
   /**
@@ -116,7 +165,7 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public andWhereColumnNotNull(column: string) {
     const rule = JSON.stringify(column) + " IS NOT NULL";
-    return this.condition("AND", rule);
+    return this.condition("AND", null, rule);
   }
 
   /**
@@ -126,7 +175,7 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public orWhereColumnNull(column: string) {
     const rule = JSON.stringify(column) + " IS NULL";
-    return this.condition("OR", rule);
+    return this.condition("OR", null, rule);
   }
 
   /**
@@ -136,7 +185,7 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public orWhereColumnNotNull(column: string) {
     const rule = JSON.stringify(column) + " IS NOT NULL";
-    return this.condition("OR", rule);
+    return this.condition("OR", null, rule);
   }
 
   /**
@@ -146,7 +195,7 @@ export class WhereBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public andWhere(rule: string | ConditionalBuilderFn<WhereBuilder>, bindings?: Array<string | number>) {
-    return this.condition("AND", rule, bindings);
+    return this.condition("AND", null, rule, bindings);
   }
 
   /**
@@ -156,6 +205,6 @@ export class WhereBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public orWhere(rule: string | ConditionalBuilderFn<WhereBuilder>, bindings?: Array<string | number>) {
-    return this.condition("OR", rule, bindings);
+    return this.condition("OR", null, rule, bindings);
   }
 }

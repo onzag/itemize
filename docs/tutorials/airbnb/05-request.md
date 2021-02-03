@@ -1002,7 +1002,7 @@ await arg.appData.rawDB.performRawDBUpdate(
             // but we are just going to leave it like this
             // a count itself would be better for consistency
             // but this is just for a tutorial
-            pending_requests_count: arg.appData.knex.raw("?? + 1", "pending_requests_count"),
+            pending_requests_count: [`"pending_requests_count" + 1`, []],
         }
     }
 );
@@ -1012,7 +1012,7 @@ await arg.appData.rawDB.performRawDBUpdate(
     targetUser.version,
     {
         itemTableUpdate: {
-            pending_requests_count: arg.appData.knex.raw("?? + 1", "pending_requests_count"),
+            pending_requests_count: [`"pending_requests_count" + 1`, []],
         }
     }
 );
@@ -1020,7 +1020,7 @@ await arg.appData.rawDB.performRawDBUpdate(
 
 This is however a demonstration of the capacity of itemize to modify raw rows in place, we could do a simple update via the cache, which is usually one of the best ways to update, however, we want to be paranoid, and think of race conditions, so we want the update to occur at database level and get the result of the update back.
 
-Using rawDB instead of knex, ensures that our changes get published into all the caches, knex is the raw connection itself and won't inform for changes.
+Using rawDB instead of database connection, ensures that our changes get published into all the caches.
 
 Now we have added the trigger that increases the counter once a new request has been created, but now we want a trigger that decreases once a request has been answered.
 
@@ -1039,9 +1039,9 @@ if (
         "hosting/unit",
         arg.newValue.parent_id as string,
         arg.newValue.parent_version as string,
-            {
-                itemTableUpdate: {
-                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+        {
+            itemTableUpdate: {
+                pending_requests_count: [`"pending_requests_count" - 1`, []],
             }
         }
     );
@@ -1053,7 +1053,7 @@ if (
         null,
         {
             itemTableUpdate: {
-                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+                pending_requests_count: [`"pending_requests_count" - 1`, []],
             }
         }
     );
@@ -1580,31 +1580,30 @@ For this we will go back to our trigger and this time we will need to access the
 if (arg.action === IOTriggerActions.CREATE) {
     const checkIn: string = arg.requestedUpdate.check_in as string;
     const checkOut: string = arg.requestedUpdate.check_out as string;
-    // The CONNECTOR_SQL_COLUMN_ID_FK_NAME is basically the id, remember that item definition
-    // data has its own table and module as well, but we want to be cheap and not do a join
-    // so we will use this reference to the foreign key of the id because we are cheap
-    const oneOverlappingRequest = await arg.appData.rawDB.getRawDBQueryBuilderFor(
+    const overlappingRequests = await arg.appData.rawDB.performRawDBSelect(
         "hosting/request",
-    )
-    .first("id")
-    // and we are going to search for an overlap between check in and check out
-    .where("status", "APPROVED")
-    .andWhere((clause) => {
-        clause.where((subclause) => {
-            subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
-        }).orWhere((subclause) => {
-            subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
-        }).orWhere((subclause) => {
-            subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<=", checkOut);
-        });
-    })
-    .andWhere("parent_id", arg.requestedUpdate.parent_id as string);
+        (selecter) => {
+            selecter.select("id").limit(1);
+            // and we are going to search for an overlap between check in and check out
+            selecter.whereBuilder.andWhereColumn("status", "APPROVED");
+            selecter.whereBuilder.andWhere((clause) => {
+                clause.orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", "<=", checkIn).andWhereColumn("check_out", ">", checkIn);
+                }).orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", "<", checkOut).andWhereColumn("check_out", ">=", checkOut);
+                }).orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", ">=", checkIn).andWhereColumn("check_out", "<=", checkOut);
+                });
+            });
+            selecter.whereBuilder.andWhereColumn("parent_id", arg.requestedUpdate.parent_id as string);
+        }
+    );
 
-    if (oneOverlappingRequest) {
+    if (overlappingRequests.length) {
         // we put the id in the error message, the user doesn't see forbidden messages anyway
         // but it's good for debugging
         arg.forbid(
-            "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
+            "This request is overlapping with an approved request " + overlappingRequests[0].id,
             "OVERLAPPING_REQUEST",
         );
     }
@@ -1641,25 +1640,29 @@ if (
 ) {
     const checkIn: string = arg.originalValue.check_in as string;
     const checkOut: string = arg.originalValue.check_out as string;
-    const oneOverlappingRequest = await arg.appData.rawDB.getRawDBQueryBuilderFor(
-        "hosting/request",
-    )
-    .first("id")
-    .where("status", "APPROVED")
-    .andWhere((clause) => {
-        clause.where((subclause) => {
-            subclause.where("check_in", "<=", checkIn).andWhere("check_out", ">", checkIn);
-        }).orWhere((subclause) => {
-            subclause.where("check_in", "<", checkOut).andWhere("check_out", ">=", checkOut);
-        }).orWhere((subclause) => {
-            subclause.where("check_in", ">=", checkIn).andWhere("check_out", "<=", checkOut);
-        });
-    })
-    .andWhere("parent_id", arg.originalValue.parent_id as string);
 
-    if (oneOverlappingRequest) {
+    const overlappingRequests = await arg.appData.rawDB.performRawDBSelect(
+        "hosting/request",
+        (selecter) => {
+            selecter.select("id").limit(1);
+            // and we are going to search for an overlap between check in and check out
+            selecter.whereBuilder.andWhereColumn("status", "APPROVED");
+            selecter.whereBuilder.andWhere((clause) => {
+                clause.orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", "<=", checkIn).andWhereColumn("check_out", ">", checkIn);
+                }).orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", "<", checkOut).andWhereColumn("check_out", ">=", checkOut);
+                }).orWhere((subclause) => {
+                    subclause.andWhereColumn("check_in", ">=", checkIn).andWhereColumn("check_out", "<=", checkOut);
+                });
+            });
+            selecter.whereBuilder.andWhereColumn("parent_id", arg.originalValue.parent_id as string);
+        }
+    );
+
+    if (overlappingRequests.length) {
         arg.forbid(
-            "This request is overlapping with an approved request " + oneOverlappingRequest[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
+            "This request is overlapping with an approved request " + overlappingRequests[0].id,
             "OVERLAPPING_REQUEST",
         );
     }
@@ -1885,7 +1888,7 @@ if (
         arg.newValue.parent_version as string,
         {
             itemTableUpdate: {
-                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+                pending_requests_count: [`"pending_requests_count" - 1`, []],
             }
         }
     );
@@ -1897,7 +1900,7 @@ if (
         null,
         {
             itemTableUpdate: {
-                pending_requests_count: arg.appData.knex.raw("?? - 1", "pending_requests_count"),
+                pending_requests_count: [`"pending_requests_count" - 1`, []],
             }
         }
     );
