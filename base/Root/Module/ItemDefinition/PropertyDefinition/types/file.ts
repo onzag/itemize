@@ -48,7 +48,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
       type: "string",
     },
   ],
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("text"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT"),
   sqlIn: stardardSQLInWithJSONStringifyFn,
   sqlOut: standardSQLOutWithJSONParseFn,
   sqlSearch: () => {

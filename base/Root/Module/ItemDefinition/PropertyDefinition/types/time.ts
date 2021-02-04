@@ -45,7 +45,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("time"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("TIME"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

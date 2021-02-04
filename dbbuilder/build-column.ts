@@ -1,57 +1,40 @@
-// /**
-//  * This file contains the functions that are used in order to setup
-//  * columns in the database schema to be built
-//  *
-//  * @packageDocumentation
-//  */
+/**
+ * This file contains the functions that are used in order to setup
+ * columns in the database schema to be built
+ *
+ * @packageDocumentation
+ */
 
-// import { ISQLColumnDefinitionType } from "../base/Root/sql";
+import { CreateTableBuilder } from "../database/CreateTableBuilder";
+import { AlterTableBuilder } from "../database/AlterTableBuilder";
+import { ISQLColumnDefinitionType } from "../base/Root/sql";
 
-// const typesForceSpecific = [
-//   "timestamp",
-//   "date",
-//   "serial",
-// ];
+/**
+ * Builds a type for the knex table
+ * @param columnName the column name we want to create
+ * @param columnData the column data from migrations
+ * @param tableBuilder the table creator
+ * @param alterAction the action to perform if an alter table was given as the table builder
+ */
+export function buildColumn(
+  columnName: string,
+  columnData: ISQLColumnDefinitionType,
+  tableBuilder: CreateTableBuilder | AlterTableBuilder,
+  action?: "ADD COLUMN" | "DROP COLUMN" | "ALTER COLUMN",
+) {
+  // we need to use the special type that represents the id type
+  const actualType = columnData.type === "ID" ? "TEXT" : columnData.type;
 
-// /**
-//  * Builds a type for the knex table
-//  * @param columnName the column name we want to create
-//  * @param columnData the column data from migrations
-//  * @param table the table creator
-//  * @returns a knex column builder
-//  */
-// export function buildColumn(
-//   columnName: string,
-//   columnData: ISQLColumnDefinitionType,
-//   tableBuilder: Knex.CreateTableBuilder,
-// ): Knex.ColumnBuilder {
-//   // we need to use the special type that represents the id type
-//   const actualType = columnData.type === "id" ? "string" : columnData.type;
+  const columnInfo = {
+    name: columnName,
+    type: actualType,
+    notNull: columnData.notNull,
+    defaultTo: columnData.defaultTo,
+  };
 
-//   // now we need to execute, if there's no function in the table
-//   // creator or if it's marked as necessary to use a specific function
-//   const tableColumnExec: Knex.ColumnBuilder =
-//     !tableBuilder[actualType] || typesForceSpecific.includes(actualType) ?
-//     // we use a specific function
-//     tableBuilder.specificType(columnName, actualType) :
-//     // otherwise we use the actual type
-//     tableBuilder[actualType](columnName);
-
-//   // if it's not null
-//   if (columnData.notNull) {
-//     // we mark it as so
-//     tableColumnExec.notNullable();
-//   }
-
-//   // if it has a default value
-//   if (
-//     typeof columnData.defaultTo !== "undefined" &&
-//     columnData.defaultTo !== null
-//   ) {
-//     // make the default
-//     tableColumnExec.defaultTo(columnData.defaultTo);
-//   }
-
-//   // return the same column builder execution
-//   return tableColumnExec;
-// }
+  if (tableBuilder instanceof CreateTableBuilder) {
+    tableBuilder.addColumn(columnInfo);
+  } else {
+    tableBuilder.affectColumn(action, columnInfo);
+  }
+}

@@ -36,7 +36,7 @@ export class UpdateBuilder extends QueryBuilder {
     super();
 
     this.tableName = null;
-    this.alias = null;
+    this.tableAlias = null;
     this.setBuilder = new SetBuilder();
     this.fromBuilder = new FromBuilder();
     this.whereBuilder = new WhereBuilder();

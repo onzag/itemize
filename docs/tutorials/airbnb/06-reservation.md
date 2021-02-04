@@ -211,24 +211,28 @@ However nothing really happens, we still get all the properties even those that 
         "hosting/unit": async (arg) => {
             const request: ItemDefinition = arg.appData.root.registry["hosting/request"] as ItemDefinition;
             if (arg.args.planned_check_in && arg.args.planned_check_out) {
-                arg.query.whereNotExists((subquery) => {
-                    subquery.select("*").from(request.getTableName())
-                        .where({
-                            status: "APPROVED",
-                        })
-                        .andWhere((subclause: any) => {
-                            subclause.where("check_in", "<=", arg.args.planned_check_in).andWhere("check_out", ">", arg.args.planned_check_in);
-                        })
-                        .orWhere((subclause: any) => {
-                            subclause.where("check_in", "<", arg.args.planned_check_out).andWhere("check_out", ">=", arg.args.planned_check_out);
-                        })
-                        .orWhere((subclause: any) => {
-                            subclause.where("check_in", ">=", arg.args.planned_check_in).andWhere("check_out", "<=", arg.args.planned_check_out);
+                arg.whereBuilder.andWhereNotExists((subquery) => {
+                    subquery.selectAll();
+                    subquery.fromBuilder.from(request.getTableName());
+                    subquery.whereBuilder.andWhereColumn("status", "APPROVED");
+                    subquery.whereBuilder.andWhere((subclause) => {
+                        subclause.orWhere((internalClause) => {
+                            internalClause.andWhereColumn("check_in", "<=", arg.args.planned_check_in as string);
+                            internalClause.andWhereColumn("check_out", ">", arg.args.planned_check_in as string);
                         });
+                        subclause.orWhere((internalClause) => {
+                            internalClause.andWhereColumn("check_in", "<", arg.args.planned_check_out as string);
+                            internalClause.andWhereColumn("check_out", ">=", arg.args.planned_check_out as string);
+                        });
+                        subclause.orWhere((internalClause) => {
+                            internalClause.andWhereColumn("check_in", ">=", arg.args.planned_check_in as string);
+                            internalClause.andWhereColumn("check_out", "<=", arg.args.planned_check_out as string);
+                        });
+                    });
                 });
             }
         },
-    },
+    }
 }
 ```
 

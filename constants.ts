@@ -722,7 +722,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
   addedIndexes: string[],
 ) => ({
   id: {
-    type: "id",
+    type: "ID",
     notNull: true,
     index: {
       id: "PRIMARY_KEY",
@@ -731,7 +731,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     },
   },
   version: {
-    type: "string",
+    type: "TEXT",
     notNull: true,
     // make it default to the invalid version value empty string
     // this means null only for versions, this trick is done because
@@ -744,11 +744,11 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     },
   },
   type: {
-    type: "string",
+    type: "TEXT",
     notNull: true,
   },
   parent_id: {
-    type: "string",
+    type: "TEXT",
     index: combinedIndexes.includes("parent_id") ? {
       id: COMBINED_INDEX,
       type: "btree",
@@ -760,7 +760,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       },
   },
   parent_version: {
-    type: "string",
+    type: "TEXT",
     index: combinedIndexes.includes("parent_version") ? {
       id: COMBINED_INDEX,
       type: "btree",
@@ -772,7 +772,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       },
   },
   parent_type: {
-    type: "string",
+    type: "TEXT",
     index: combinedIndexes.includes("parent_type") ? {
       id: COMBINED_INDEX,
       type: "btree",
@@ -784,11 +784,11 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       },
   },
   container_id: {
-    type: "string",
+    type: "TEXT",
     notNull: true,
   },
   created_at: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
     notNull: true,
     index: (combinedIndexes.includes("created_at") || addedIndexes.includes("created_at")) ? {
       id: combinedIndexes.includes("created_at") ? COMBINED_INDEX : CREATED_AT_INDEX,
@@ -797,7 +797,7 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     } : null,
   },
   created_by: {
-    type: "string",
+    type: "TEXT",
     notNull: true,
     index: combinedIndexes.includes("created_by") ? {
       id: COMBINED_INDEX,
@@ -810,37 +810,37 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       },
   },
   edited_at: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
   },
   edited_by: {
-    type: "string",
+    type: "TEXT",
   },
   reviewed_at: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
   },
   reviewed_by: {
-    type: "string",
+    type: "TEXT",
   },
   last_modified: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
   },
   blocked_at: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
   },
   blocked_until: {
-    type: "datetime",
+    type: "TIMESTAMPTZ",
   },
   blocked_by: {
-    type: "string",
+    type: "TEXT",
   },
   blocked_reason: {
-    type: "text",
+    type: "TEXT",
   },
   flagged_by: {
-    type: "text[]",
+    type: "TEXT[]",
   },
   flagged_reasons: {
-    type: "text[]",
+    type: "TEXT[]",
   },
 });
 

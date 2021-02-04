@@ -73,7 +73,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   // a string is a string
   json: "string",
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("text", null, (subtype: string, sqlPrefix: string, id: string) => {
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", null, (subtype: string, sqlPrefix: string, id: string) => {
     if (subtype) {
       return {
         type: "btree",

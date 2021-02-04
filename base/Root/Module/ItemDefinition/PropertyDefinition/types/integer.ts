@@ -43,7 +43,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // an integer is represented as a number
   json: "number",
   gql: GraphQLInt,
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("integer"),
+  sql: getStandardSQLFnFor && getStandardSQLFnFor("INTEGER"),
   sqlIn: stardardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,

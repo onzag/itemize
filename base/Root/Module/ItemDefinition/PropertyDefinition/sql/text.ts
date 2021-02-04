@@ -16,13 +16,13 @@ import { DOMWindow, DOMPurify } from "../../../../../../util";
 export function textSQL(arg: ISQLArgInfo) {
   return {
     [arg.prefix + arg.id]: {
-      type: "text",
+      type: "TEXT",
     },
     [arg.prefix + arg.id + "_DICTIONARY"]: {
-      type: "regconfig",
+      type: "REGCONFIG",
     },
     [arg.prefix + arg.id + "_VECTOR"]: {
-      type: "tsvector",
+      type: "TSVECTOR",
       index: {
         type: "gin",
         id: "FTS_" + arg.prefix + arg.id,

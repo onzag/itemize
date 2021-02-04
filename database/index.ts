@@ -7,7 +7,9 @@
  */
 
 import { Pool, PoolClient, QueryResult } from "pg";
+import { AlterTableBuilder } from "./AlterTableBuilder";
 import type { QueryBuilder, BasicBindingType } from "./base";
+import { CreateTableBuilder } from "./CreateTableBuilder";
 import { InsertBuilder } from "./InsertBuilder";
 import { SelectBuilder } from "./SelectBuilder";
 import { UpdateBuilder } from "./UpdateBuilder";
@@ -164,6 +166,22 @@ export class DatabaseConnection {
    */
   public getInsertBuilder() {
     return new InsertBuilder();
+  }
+
+  /**
+   * Provides a single create table builder
+   * @returns a new create table builder
+   */
+  public getCreateTableBuilder() {
+    return new CreateTableBuilder();
+  }
+
+  /**
+   * Provides a single alter table builder
+   * @returns a new alter table builder
+   */
+  public getAlterTableBuilder() {
+    return new AlterTableBuilder();
   }
 
   /**

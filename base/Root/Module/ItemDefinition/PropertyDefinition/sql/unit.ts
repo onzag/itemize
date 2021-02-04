@@ -17,16 +17,16 @@ import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces
 export function unitSQL(arg: ISQLArgInfo) {
   return {
     [arg.prefix + arg.id + "_VALUE"]: {
-      type: "float",
+      type: "REAL",
     },
     [arg.prefix + arg.id + "_UNIT"]: {
-      type: "text",
+      type: "TEXT",
     },
     [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
-      type: "float",
+      type: "REAL",
     },
     [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
-      type: "text",
+      type: "TEXT",
     },
   };
 }

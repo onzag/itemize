@@ -18,9 +18,9 @@ import { IGQLArgs } from "../../../../../../gql-querier";
 export function currencySQL(arg: ISQLArgInfo) {
   // there are 3 fields, value, currency and normalized value
   return {
-    [arg.prefix + arg.id + "_VALUE"]: {type: "float"},
-    [arg.prefix + arg.id + "_CURRENCY"]: {type: "text"},
-    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {type: "float"},
+    [arg.prefix + arg.id + "_VALUE"]: {type: "NUMERIC"},
+    [arg.prefix + arg.id + "_CURRENCY"]: {type: "TEXT"},
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {type: "NUMERIC"},
   };
 }
 

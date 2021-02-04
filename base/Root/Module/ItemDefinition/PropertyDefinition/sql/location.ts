@@ -32,23 +32,23 @@ export function locationSQL(arg: ISQLArgInfo) {
     // this contains the id, which is an unique id generated
     // based on the lng and lat of the position
     [arg.prefix + arg.id + "_ID"]: {
-      type: "text",
+      type: "TEXT",
     },
     // this is the latitude
     [arg.prefix + arg.id + "_LAT"]: {
-      type: "float",
+      type: "REAL",
     },
     // the longitude
     [arg.prefix + arg.id + "_LNG"]: {
-      type: "float",
+      type: "REAL",
     },
     // the text information
     [arg.prefix + arg.id + "_TXT"]: {
-      type: "text",
+      type: "TEXT",
     },
     // and the alternative text information
     [arg.prefix + arg.id + "_ATXT"]: {
-      type: "text",
+      type: "TEXT",
     },
   };
 }
