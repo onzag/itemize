@@ -23,7 +23,7 @@ import { customUserTriggers } from "./user/triggers";
 
 import winston from "winston";
 import "winston-daily-rotate-file";
-// import build from "../dbbuilder";
+import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/providers/locale-provider";
@@ -298,8 +298,7 @@ export async function initializeServer(
 ) {
   // for build database we just build the database
   if (INSTANCE_MODE === "BUILD_DATABASE" || INSTANCE_MODE === "LOAD_DATABASE_DUMP") {
-    // TODODB repair this
-    // build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
+    build(NODE_ENV, INSTANCE_MODE === "BUILD_DATABASE" ? "build" : "load-dump");
     return;
   }
 

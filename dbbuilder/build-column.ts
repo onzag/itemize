@@ -10,7 +10,7 @@ import { AlterTableBuilder } from "../database/AlterTableBuilder";
 import { ISQLColumnDefinitionType } from "../base/Root/sql";
 
 /**
- * Builds a type for the knex table
+ * Builds a type for the table
  * @param columnName the column name we want to create
  * @param columnData the column data from migrations
  * @param tableBuilder the table creator

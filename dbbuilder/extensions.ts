@@ -10,7 +10,7 @@ import { ISQLSchemaDefinitionType } from "../base/Root/sql";
 
 /**
  * Builds all the extensions as they are required to be processed
- * @param knex the knex instance
+ * @param databaseConnection the database instance
  * @param newDatabaseSchema the new database schema as requested
  */
 export async function prepareExtensions(

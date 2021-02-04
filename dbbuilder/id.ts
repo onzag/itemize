@@ -41,7 +41,7 @@ $$ language 'plpgsql'
 
 /**
  * Prepares the id trigger as it is required
- * @param knex the knex instance
+ * @param databaseConnection the database instance
  */
 export async function prepareIdTrigger(
   databaseConnection: DatabaseConnection,

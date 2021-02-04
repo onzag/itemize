@@ -35,7 +35,7 @@ export const MAX_PG_FK_SIZE = 60;
 
 /**
  * Builds all the foreign keys
- * @param knex the knex instance
+ * @param databaseConnection the database instance
  * @param currentDatabaseSchema the current database schema
  * @param newDatabaseSchema the new database schema as requested
  * @returns the resulting database schema and the new current

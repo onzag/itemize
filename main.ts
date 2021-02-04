@@ -9,8 +9,7 @@ import setup from "./setup";
 import { start, stop } from "./dev-environment";
 import colors from "colors";
 import buildData from "./builder";
-// TODODB
-//import buildDatabase from "./dbbuilder";
+import buildDatabase from "./dbbuilder";
 import getDeployable from "./getdeployable";
 
 // the action we are asked to execute is the thrird argument 0 is node, 1 is itemize
@@ -62,9 +61,7 @@ const actionRegistry: {
     needsArgs: 0,
   },
   "build-database": {
-    // fn: buildDatabase,
-    // TODODB
-    fn: null,
+    fn: buildDatabase,
     description: "Builds the database (warning you must run build-data before this) " +
     "pass the argument development or production in order to specify which config to use " +
     "if using a development environment, remember to run start-development-environment",

@@ -142,9 +142,9 @@ export interface IDumpSpecificIdefInfoType {
   /**
    * The item definition path inside the module
    * if it's a boolean dump all of the items
-   * if it's an array with number, or number string, dump the specific id, id,version combo
+   * if it's an array with string, or string string, dump the specific id, id,version combo
    */
-  [idefPath: string]: boolean | Array<number | [number, string]>
+  [idefPath: string]: boolean | Array<string | [string, string]>
 }
 
 /**
@@ -154,10 +154,10 @@ export interface IDumpSpecificModInfoType {
   /**
    * The module path as module/submodule
    * if it's a boolean dump all
-   * if it's an array with number, or number string, dump the specific id, version combo
+   * if it's an array with string, or string string, dump the specific id, version combo
    * otherwise dump only specific item definition types
    */
-  [modPath: string]: boolean | Array<number | [number, string]> | IDumpSpecificIdefInfoType;
+  [modPath: string]: boolean | Array<string | [string, string]> | IDumpSpecificIdefInfoType;
 }
 
 /**
