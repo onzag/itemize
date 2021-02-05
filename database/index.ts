@@ -49,6 +49,11 @@ export class DatabaseConnection {
   private suppressLogs: boolean;
 
   /**
+   * Forces the logging even if env is not development
+   */
+  private forceLogs: boolean;
+
+  /**
    * Constructs a new database connection
    * @param info the connection information
    * @param client for child database connections used in transactions the client that is in use
@@ -70,6 +75,14 @@ export class DatabaseConnection {
    */
   public suppressLogging() {
     this.suppressLogs = true;
+  }
+
+  /**
+   * Forces console logging even if env is not
+   * development
+   */
+  public forceLogging() {
+    this.forceLogs = true;
   }
 
   /**
@@ -97,7 +110,7 @@ export class DatabaseConnection {
       });
 
       if (holes !== queryBindings.length) {
-        if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
+        if ((process.env.NODE_ENV === "development" || this.forceLogs) && !this.suppressLogs) {
           console.log(
             {
               sql: queryValue,
@@ -109,7 +122,7 @@ export class DatabaseConnection {
       }
     }
 
-    if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
+    if ((process.env.NODE_ENV === "development" || this.forceLogs) && !this.suppressLogs) {
       console.log(
         {
           sql: queryValue,
@@ -121,7 +134,7 @@ export class DatabaseConnection {
     // we execute either from the client first or the pool later 
     const response = await (this.client || this.pool).query(queryValue, queryBindings);
 
-    if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
+    if ((process.env.NODE_ENV === "development" || this.forceLogs) && !this.suppressLogs) {
       console.log(
         {
           commandExecuted: response.command,
@@ -225,6 +238,9 @@ export class DatabaseConnection {
     const transactingClient = new DatabaseConnection(null, client, this.pool);
     if (this.suppressLogs) {
       transactingClient.suppressLogging();
+    }
+    if (this.forceLogs) {
+      transactingClient.forceLogging();
     }
 
     // now we can try this

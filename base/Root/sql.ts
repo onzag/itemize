@@ -129,7 +129,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
   let resultSchema: ISQLSchemaDefinitionType = {
     [CURRENCY_FACTORS_IDENTIFIER]: {
       code: {
-        type: "text",
+        type: "TEXT",
         index: {
           id: "code_index",
           type: "primary",
@@ -137,7 +137,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
       factor: {
-        type: "float"
+        type: "DECIMAL"
       }
     },
     [DELETED_REGISTRY_IDENTIFIER]: {
@@ -151,23 +151,23 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
       id: {
-        type: "string",
+        type: "TEXT",
         notNull: true,
       },
       version: {
-        type: "string",
+        type: "TEXT",
         notNull: true,
       },
       module: {
-        type: "string",
+        type: "TEXT",
         notNull: true
       },
       type: {
-        type: "string",
+        type: "TEXT",
         notNull: true
       },
       created_by: {
-        type: "string",
+        type: "TEXT",
         index: {
           id: CREATED_BY_INDEX,
           level: 0,
@@ -175,7 +175,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         }
       },
       parenting_id: {
-        type: "text",
+        type: "TEXT",
         index: {
           id: PARENT_INDEX,
           level: 0,
@@ -183,12 +183,12 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         }
       },
       transaction_time: {
-        type: "datetime",
+        type: "TIMESTAMPTZ",
       },
     },
     [REGISTRY_IDENTIFIER]: {
       id: {
-        type: "serial",
+        type: "SERIAL",
         notNull: true,
         index: {
           id: "PRIMARY_KEY",
@@ -197,7 +197,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
       pkey: {
-        type: "text",
+        type: "TEXT",
         notNull: true,
         index: {
           id: "UNIQUE_REGISTRY_COMBINATION",
@@ -206,7 +206,7 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
       skey: {
-        type: "text",
+        type: "TEXT",
         notNull: true,
         index: {
           id: "UNIQUE_REGISTRY_COMBINATION",
@@ -215,14 +215,14 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         },
       },
       value: {
-        type: "text",
+        type: "TEXT",
       },
       created_at: {
-        type: "datetime",
+        type: "TIMESTAMPTZ",
         notNull: true,
       },
       last_modified: {
-        type: "datetime",
+        type: "TIMESTAMPTZ",
         notNull: true,
       },
     },

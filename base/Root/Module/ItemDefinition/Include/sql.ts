@@ -40,7 +40,7 @@ export function getSQLTableDefinitionForInclude(itemDefinition: ItemDefinition, 
   // ITEM_wheel_ + _EXCLUSION_STATE
   let resultTableSchema: ISQLTableDefinitionType = {
     [prefix + EXCLUSION_STATE_SUFFIX]: {
-      type: "string",
+      type: "TEXT",
       notNull: true,
     },
   };

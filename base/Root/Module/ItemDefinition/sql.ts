@@ -49,7 +49,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
   const tableToConnect = itemDefinition.getParentModule().getQualifiedPathName();
   const resultTableSchema: ISQLTableDefinitionType = {
     [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: {
-      type: "string",
+      type: "TEXT",
       notNull: true,
       foreignKey: {
         id: "ITEM_TO_MODULE_CONNECTION",
@@ -61,7 +61,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
       },
     },
     [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: {
-      type: "string",
+      type: "TEXT",
       notNull: true,
       foreignKey: {
         id: "ITEM_TO_MODULE_CONNECTION",

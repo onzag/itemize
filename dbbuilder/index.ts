@@ -64,6 +64,7 @@ export default async function build(version: string, action: "build" | "dump" | 
 
   // we only need one client instance
   const databaseConnection = new DatabaseConnection(dbConnectionConfig);
+  databaseConnection.forceLogging();
 
   // parse the data
   let data: any;

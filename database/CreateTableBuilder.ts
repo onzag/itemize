@@ -29,7 +29,7 @@ export class CreateTableBuilder extends QueryBuilder {
    */
   private tableName: string;
   private createIfNotExists: boolean;
-  private columns: ICreateTableColumnDataWithExpressionAsDefault[];
+  private columns: ICreateTableColumnDataWithExpressionAsDefault[] = [];
 
   /**
    * Builds a new create table query builder
