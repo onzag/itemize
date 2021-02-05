@@ -1,3 +1,5 @@
+[Prev](./05-request.md)
+
 # Reservations
 
 In this section we will improve the flow that we need to take in order to make a reservation, as well as manage the reservations automatically; we will explore search triggers and internal management functions that can be used in order to handle our reservations.
@@ -662,4 +664,154 @@ Now let's modify it and make it global, a global service will not be able to set
 
 ### Modifying the unit to be booked once the checkin date comes
 
+```ts
+import { ISQLTableRowValue } from "@onzag/itemize/base/Root/sql";
+import { ServiceProvider, ServiceProviderType } from "@onzag/itemize/server/services";
+
+export default class BookingService extends ServiceProvider<null> {
+    static getType() {
+        return ServiceProviderType.GLOBAL;
+    }
+    public getRunCycleTime() {
+        // run will run every hour
+        return 3600000;
+    }
+    public async run() {
+        // we are going to pick all approved requests that exist within the requests
+        // within the check in and out date
+        const allActiveRequests: ISQLTableRowValue[] = await this.globalRawDB.performRawDBSelect(
+            "hosting/request",
+            (selecter) => {
+                selecter.select("created_by", "parent_id", "check_out");
+                selecter.whereBuilder
+                    .andWhereColumn("status", "APPROVED")
+                    .andWhereColumn("check_in", "<=", ["CURRENT_DATE", []])
+                    .andWhereColumn("check_out", ">", ["CURRENT_DATE", []]);
+            }
+        );
+
+        // and then we are going to update the units with that data
+        for (const activeRequest of allActiveRequests) {
+            // we will use performBatchRawDBUpdate rather than a single row update
+            // because we will be updating 0 or 1 row, so we have a different criteria
+            // than just id and version
+            await this.globalRawDB.performBatchRawDBUpdate(
+                "hosting/unit",
+                {
+                    whereCriteriaSelector: (qb) => {
+                        qb.andWhereColumn("id", activeRequest.parent_id).andWhereColumn("version", "").andWhereColumn("booked", false);
+                    },
+                    itemTableUpdate: {
+                        booked: true,
+                        booked_by: activeRequest.created_by,
+                        booked_until: activeRequest.check_out,
+                    }
+                }
+            );
+        }
+    }
+}
+```
+
 ### Releasing the unit automatically
+
+However we still have a problem units are not released once the date of checkout comes, so for such we will need to add this piece of code right before all the other execution.
+
+```ts
+// we are going to remove the booked, booked by and booked until
+// when the booking is done
+await this.globalRawDB.performBatchRawDBUpdate(
+    "hosting/unit",
+    {
+        whereCriteriaSelector: (qb) => {
+            qb.andWhereColumn("booked_until", "<=", ["CURRENT_DATE", []]);
+        },
+        itemTableUpdate: {
+            booked: false,
+            booked_by: null,
+            booked_until: null,
+        }
+    }
+);
+```
+
+This allows the reservation to be released automatically.
+
+Note how this is a global service that runs once and it's not instantiated, which means it shouldn't conflict with any other nor duplicate, there's only one of it, if this service was local, then it would run per extended instance, which while would work just fine puts unecessary pressure on the database as it would mean executing the same command many times.
+
+You might now see the SQL execution when you rebuild the server with `npm run install` and run it.
+
+### Displaying reservation data
+
+Now we have this data that is populated, let's just display it for that we will simply add the new information into `ViewHosting` component at `hosting/index.tsx`
+
+We will add the following properties to the `ItemProvider`
+
+```tsx
+<ItemProvider
+    itemDefinition="unit"
+    forId={idToView}
+    properties={[
+        "title",
+        "image",
+        "unit_type",
+        "booked",
+        "booked_until",
+        "booked_by",
+    ]}
+>
+...
+</ItemProvider>
+```
+
+And now we will add this element inside:
+
+```tsx
+<Reader id="booked">
+    {(booked: boolean) => {
+        if (!booked) {
+            return null;
+        }
+
+        return (
+            <Typography variant="body1" color="textSecondary">
+                <I18nRead
+                    id="booked"
+                    args={[
+                        <View id="booked_by" />,
+                        <View id="booked_until" />
+                    ]}
+                />
+            </Typography>
+        );
+    }}
+</Reader>
+```
+
+Note how we are now using i18n information for something named `booked` which currently does not exist and needs to be added to `unit.properties` as a custom property.
+
+```properties
+custom.booked = this unit is booked by {0} until {1}
+```
+
+And in Spanish
+
+```properties
+custom.booked = esta unidad está actualmente reservada por {0} hasta {1}
+```
+
+The result should look like:
+
+![Unit Booked Message](./images/unit-booked-message.png)
+
+## What you achieved
+
+ 1. Completed creating a fully functional prototype website that is airbnb like.
+ 2. Created a service that directly handles the database and streams such updates to the client.
+ 3. Created a filtering mechanism that allows to fine tune searches.
+
+So we are now ready for making some considerations to what it takes to produce a proper MVP and exit the prototype phase.
+
+## Next
+
+[Next](./07-redesign.md)

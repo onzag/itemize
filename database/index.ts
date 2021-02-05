@@ -119,7 +119,18 @@ export class DatabaseConnection {
     }
 
     // we execute either from the client first or the pool later 
-    return await (this.client || this.pool).query(queryValue, queryBindings);
+    const response = await (this.client || this.pool).query(queryValue, queryBindings);
+
+    if (process.env.NODE_ENV === "development" && !this.suppressLogs) {
+      console.log(
+        {
+          commandExecuted: response.command,
+          returnedRowCount: response.rowCount,
+        }
+      );
+    }
+
+    return response;
   }
 
   /**
