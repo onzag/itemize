@@ -25,6 +25,10 @@ export function buildColumn(
   // we need to use the special type that represents the id type
   const actualType = columnData.type === "ID" ? "TEXT" : columnData.type;
 
+  if (columnData.type === "ID" && columnName !== "id") {
+    throw new Error("Cannot make a column type ID and it not be named id");
+  }
+
   const columnInfo = {
     name: columnName,
     type: actualType,

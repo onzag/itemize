@@ -246,19 +246,19 @@ export class DatabaseConnection {
     // now we can try this
     try {
       // let's begin the transaction
-      await this.client.query("BEGIN");
+      await client.query("BEGIN");
       // now we can call the transacting client in the function and get the result
       result = await arg(transactingClient);
       // then release such client
       client.release();
     } catch (err) {
       // any fail and we rollback
-      await this.client.query("ROLLBACK");
+      await client.query("ROLLBACK");
       throw err;
     }
 
     // now we can commit
-    await this.client.query("COMMIT");
+    await client.query("COMMIT");
 
     // and return the result we had given in the start
     return result;

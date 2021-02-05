@@ -63,7 +63,7 @@ export async function postprocessIdTriggers(
     const tableSchema = currentDatabaseSchema[tableName];
     const isIdTable = Object.keys(tableSchema).some((columnName) => {
       const columnSchema = tableSchema[columnName];
-      return columnSchema.type === "id" && columnName === "id";
+      return columnSchema.type === "ID" && columnName === "id";
     });
     if (isIdTable) {
       gatheredIdTriggeredTables.push(tableName);
