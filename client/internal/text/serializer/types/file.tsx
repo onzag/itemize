@@ -93,7 +93,7 @@ export function registerFile(registry: ISerializationRegistryType) {
       extension: fileExtensionNode.textContent,
       size: fileSizeNode.textContent,
       src: node.dataset.src,
-      children: [STANDARD_TEXT_NODE],
+      children: [STANDARD_TEXT_NODE()],
     };
   }
 

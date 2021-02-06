@@ -46,7 +46,7 @@ export function registerParagraph(registry: ISerializationRegistryType) {
       ...base,
       type: "paragraph",
       containment: "block",
-      children: children.length ? children : [STANDARD_TEXT_NODE],
+      children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
     // return it

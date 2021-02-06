@@ -356,7 +356,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
         {
           type: "paragraph",
           containment: "block",
-          children: [STANDARD_TEXT_NODE]
+          children: [STANDARD_TEXT_NODE()]
         }
       ] :
       finalChildren,

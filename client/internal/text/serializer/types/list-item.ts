@@ -47,7 +47,7 @@ export function registerListItem(registry: ISerializationRegistryType) {
       ...base,
       type: "list-item",
       containment: "block",
-      children: children.length ? children : [STANDARD_TEXT_NODE],
+      children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
     // and return it

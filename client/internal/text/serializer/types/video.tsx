@@ -81,7 +81,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
       src: iframe.dataset.videoSrc,
       origin: iframe.dataset.videoOrigin as any,
       children: [
-        STANDARD_TEXT_NODE,
+        STANDARD_TEXT_NODE(),
       ]
     };
   }

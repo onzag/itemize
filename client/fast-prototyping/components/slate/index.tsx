@@ -1237,6 +1237,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // as it uses a namespaced uuid that will give the same value for the same string
         if (!state.internalValue || newInternalValue.id !== state.internalValue.id) {
 
+          console.log("Changing from ", state.internalValue, "to", newInternalValue);
+
           // then we do the same and set the new internal value
           // and clear all the anchors
           return {
@@ -1316,6 +1318,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertBreak = this.insertBreak.bind(this);
     this.insertSuperblockBreak = this.insertSuperblockBreak.bind(this);
     this.deleteBackward = this.deleteBackward.bind(this);
+    this.deleteForward = this.deleteForward.bind(this);
 
     // and so we override
     this.editor.isInline = this.isInline as any;
@@ -1323,6 +1326,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor.normalizeNode = this.normalizeNode;
     this.editor.insertBreak = this.insertBreak;
     this.editor.deleteBackward = this.deleteBackward;
+    // this.editor.deleteForward = this.deleteForward;
 
     // other functions and heler utilities
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
@@ -1406,7 +1410,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       if (node.children.length === 0) {
         // we insert a paragraph
         Transforms.insertNodes(this.editor,
-          { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE] },
+          { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE()] },
           { at: path.concat(0) }
         );
       }
@@ -1559,7 +1563,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // then we add a basic text node
           Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE,
+            STANDARD_TEXT_NODE(),
             { at: path.concat(0) }
           );
         }
@@ -1589,7 +1593,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // equally we add a simple text node
           Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE,
+            STANDARD_TEXT_NODE(),
             { at: path.concat(0) }
           );
         }
@@ -1617,7 +1621,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we add an empty paragraph
           Transforms.insertNodes(this.editor,
-            { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE] },
+            { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE()] },
             { at: path.concat(0) }
           );
         }
@@ -1652,7 +1656,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we need to add an emtpy list item node
           Transforms.insertNodes(this.editor,
-            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE] },
+            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE()] },
             { at: path.concat(0) }
           );
         }
@@ -1779,6 +1783,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     } else {
       // otherwise we do a simple split node
       Transforms.splitNodes(this.editor, { always: true })
+    }
+  }
+
+  /**
+   * Override function to perform a forward delete
+   * backwards event
+   * @param unit the unit we are dealing with
+   */
+  public deleteForward(unit: "character" | "word" | "line" | "block") {
+    // first we pick the current selection
+    const { selection } = this.editor
+
+    if (selection && Range.isCollapsed(selection)) {
+      Transforms.delete(this.editor, { unit })
     }
   }
 

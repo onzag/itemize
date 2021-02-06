@@ -15,11 +15,13 @@ import { IReactifyArg, ISerializationRegistryType } from "..";
  * Represents a standard text node as it should be given
  * for a void text node
  */
-export const STANDARD_TEXT_NODE = {
-  bold: false,
-  italic: false,
-  underline: false,
-  text: "",
+export const STANDARD_TEXT_NODE = () => {
+  return {
+    bold: false,
+    italic: false,
+    underline: false,
+    text: "",
+  }
 };
 
 /**
@@ -82,7 +84,7 @@ export function registerText(registry: ISerializationRegistryType) {
       // then simply standard text node
       // this can happen with a node that has no children
       // but we are always expected to have one
-      return STANDARD_TEXT_NODE;
+      return STANDARD_TEXT_NODE();
     }
 
     // now we can start picking this appart
@@ -91,21 +93,21 @@ export function registerText(registry: ISerializationRegistryType) {
     // if it's strong or B
     if (nodeAsHTMLElement.tagName === "STRONG" || nodeAsHTMLElement.tagName === "B") {
       // we need to get its text value, if any
-      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
+      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       // it's bold
       textValue.bold = true;
       return textValue;
-    // we do the same we did before for I
+      // we do the same we did before for I
     } else if (nodeAsHTMLElement.tagName === "I") {
-      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
+      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       textValue.italic = true;
       return textValue;
-    // Underline
+      // Underline
     } else if (nodeAsHTMLElement.tagName === "U") {
-      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE;
+      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       textValue.underline = true;
       return textValue;
-    // and span
+      // and span
     }
 
     // now if it's a text node and it's not an HTML element
@@ -235,7 +237,7 @@ export function registerText(registry: ISerializationRegistryType) {
     // itself, the reactification does it in a single level
     // because text editor would like it so
     return (
-      <span {...newCustomProps}/>
+      <span {...newCustomProps} />
     );
   }
 

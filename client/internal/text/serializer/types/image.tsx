@@ -160,7 +160,7 @@ export function registerImage(registry: ISerializationRegistryType) {
       width: parseInt(img.dataset.srcWidth) || null,
       height: parseInt(img.dataset.srcHeight) || null,
       standalone: node.tagName === "IMG",
-      children: [STANDARD_TEXT_NODE]
+      children: [STANDARD_TEXT_NODE()]
     };
   }
 

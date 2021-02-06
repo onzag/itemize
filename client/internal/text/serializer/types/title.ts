@@ -48,7 +48,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
       type: "title",
       containment: "block",
       subtype: node.tagName.toLowerCase() as any,
-      children: children.length ? children : [STANDARD_TEXT_NODE],
+      children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
     // return it

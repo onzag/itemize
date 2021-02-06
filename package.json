@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.139",
+  "version": "0.0.140",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
@@ -44,7 +44,7 @@
     "@types/read": "0.0.28",
     "@types/redis": "^2.8.18",
     "@types/sharp": "^0.23.1",
-    "@types/slate": "^0.47.7",
+    "@types/slate": "^0.47.8",
     "@types/slate-react": "^0.22.9",
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.32",

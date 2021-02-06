@@ -80,7 +80,7 @@ export function registerLink(registry: ISerializationRegistryType) {
       containment: "inline",
       href,
       thref,
-      children: children.length ? children : [STANDARD_TEXT_NODE],
+      children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
     // and return such

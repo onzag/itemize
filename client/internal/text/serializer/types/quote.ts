@@ -61,7 +61,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
       type: "quote",
       containment: "block",
       children: children.length ? children : [
-        STANDARD_TEXT_NODE,
+        STANDARD_TEXT_NODE(),
       ],
     }
 
