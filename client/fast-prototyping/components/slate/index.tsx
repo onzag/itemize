@@ -13,8 +13,10 @@ import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeaf
 import { withHistory, HistoryEditor } from "slate-history";
 
 import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain } from "../../../internal/text/serializer";
-import { CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
-  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString } from "../../../internal/text";
+import {
+  CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
+  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString
+} from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
@@ -33,7 +35,7 @@ import { IInline } from "../../../internal/text/serializer/types/inline";
 /**
  * Combine both interfaces
  */
-interface ItemizeEditor extends ReactEditor, HistoryEditor {};
+interface ItemizeEditor extends ReactEditor, HistoryEditor { };
 
 /**
  * The template argument is used in a template context in order
@@ -55,7 +57,7 @@ interface ItemizeEditor extends ReactEditor, HistoryEditor {};
  * we do not know the values of these only at render time, but then we know
  * these are available arguments
  */
-interface ITemplateArg {
+export interface ITemplateArg {
   /**
    * The type of the template argument, such are
    * 1. text: basic text type, implies a string value
@@ -68,6 +70,7 @@ interface ITemplateArg {
    * the ui-handler full potential
    */
   type: "text" | "link" | "html" | "function" | "ui-handler";
+
   /**
    * The label to be used to specify this value, it should be given
    * in the given language that wants to be shown as, the actual string
@@ -89,6 +92,14 @@ interface ITemplateArg {
    * A react node can also be given to pass the i18n component
    */
   label: string | React.ReactNode;
+
+  /**
+   * an optional html content that can be used to render when it
+   * matches this ui handler signature, when a string is given
+   * it will modify the inner html, otherwise it will be used as
+   * a react component
+   */
+  htmlDisplay?: string | React.ReactNode;
 
   /**
    * A handler component to use during the edition of a component
@@ -185,6 +196,17 @@ export interface ITemplateArgsContext {
   properties: {
     [name: string]: ITemplateArg | ITemplateArgsContext;
   };
+}
+
+/**
+ * Same as the usual context but with extra props that give root superpowers
+ */
+export interface ITemplateArgsRootContext extends ITemplateArgsContext {
+  /**
+   * Allows to specify a wrapper to wrap based on the root context, usually
+   * to give providers down the line
+   */
+  wrapper?: (n: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -924,7 +946,7 @@ interface ISlateEditorProps {
    * rendererArgs property it might be passed there, as this is a rendering
    * element
    */
-  rootContext: ITemplateArgsContext;
+  rootContext: ITemplateArgsRootContext;
   /**
    * The root i18n, renderers have a way to receive the root i18n data
    * based on the property definition they are using
@@ -1576,7 +1598,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // superblocks can only have blocks as children
         // as well as other superblocks, they are made
         // to be containers for the most part
-      } else if (nodeAsRichElement.containment === "superblock") {
+      } else if (nodeAsRichElement.containment === "superblock" && !nodeAsRichElement.html) {
         // we get the node
         const newNode = Node.get(this.editor, path);
 
@@ -1654,7 +1676,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public isVoid(element: RichElement) {
     // all ui handled elements are void
-    if (element.uiHandler) {
+    if (element.uiHandler || element.html || element.textContent) {
       return true;
     }
 
@@ -1925,17 +1947,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const nextAnchor = [...currentSuperBlockElementAnchor];
       nextAnchor[currentSuperBlockElementAnchor.length - 1]++;
 
-      // and we insert a clone based on the block itself
-      // with no text
-      Transforms.insertNodes(this.editor, {
-        ...this.state.currentBlockElement,
-        children: [
-          {
-            ...this.state.currentText,
-            text: "",
-          }
-        ]
-      }, { at: nextAnchor });
+      if (this.state.currentSuperBlockElement === this.state.currentBlockElement) {
+        // in cases where the block is also the super block, these odd types
+        // that exist due to templating reasons
+        Transforms.insertNodes(this.editor, {
+          type: "paragraph",
+          containment: "block",
+          children: [
+            {
+              ...this.state.currentText,
+              text: "",
+            }
+          ]
+        }, { at: nextAnchor });
+      } else {
+        // and we insert a clone based on the block itself
+        // with no text
+        Transforms.insertNodes(this.editor, {
+          ...this.state.currentBlockElement,
+          children: [
+            {
+              ...this.state.currentText,
+              text: "",
+            }
+          ]
+        }, { at: nextAnchor });
+      }
 
       // and we want to focus on such text
       const nextAnchorText = nextAnchor.concat([0]);
@@ -2279,6 +2316,43 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Provides the context a given node is sitting in
+   * @param n the node in question
+   */
+  public findContextBasedOnNode(n: Node): ITemplateArgsContext {
+    const pathOfNode = ReactEditor.findPath(this.editor, n);
+    let currentContext = this.props.rootContext;
+    let currentElement: RichElement = this.editor as any;
+    pathOfNode.forEach((n: number) => {
+      // avoid further processing if we have hit a dead end
+      if (currentContext === null) {
+        return;
+      }
+      // we will treat them all as rich element, even if the last
+      // is text
+      currentElement = currentElement.children[n] as RichElement;
+
+      // now we need to fetch the context we are in
+      if (currentContext && currentElement.context) {
+        currentContext = currentContext.properties[currentElement.context] as ITemplateArgsContext || null;
+        if (currentContext.type !== "context" || currentContext.loopable) {
+          currentContext = null;
+        }
+      }
+
+      // also in the foreach context
+      if (currentContext && currentElement.forEach) {
+        currentContext = currentContext.properties[currentElement.forEach] as ITemplateArgsContext || null;
+        if (currentContext.type !== "context" || !currentContext.loopable) {
+          currentContext = null;
+        }
+      }
+    });
+
+    return currentContext;
+  }
+
+  /**
    * the render element function to be used in slate editor
    * @param props the properties that slate provides to render the component
    */
@@ -2299,6 +2373,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // if we have one
     if (uiHandler) {
+      const handlerContext = this.findContextBasedOnNode(element as any);
 
       // we extract the arguments for the ui handler that are in the rich element
       const uiHandlerArgs = (element as any as RichElement).uiHandlerArgs;
@@ -2306,7 +2381,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we try to get the ui handler from the context itself
       // either the root or the one in the property itself
       const propertiesFromContext =
-        this.state.currentContext.properties[uiHandler] ||
+        handlerContext.properties[uiHandler] ||
         this.props.rootContext.properties[uiHandler];
 
       // if we don't find a UI handler
@@ -2338,12 +2413,42 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       // now we can use the handler component that is given via the ui handler
       return (
-        <HandlerComponent
-          {...uiHandlerArgs}
-          {...handlerExtraArgs}
-          {...extraInfoArgs}
-        />
+        <div {...attributes}>
+          <HandlerComponent
+            {...uiHandlerArgs}
+            {...handlerExtraArgs}
+            {...extraInfoArgs}
+          />
+          <div style={{ display: "none" }}>{children}</div>
+        </div>
       );
+    }
+
+    const customProps: any = { ...attributes, children };
+
+    const html = (element as any as RichElement).html;
+    if (html) {
+      const htmlContext = this.findContextBasedOnNode(element as any);
+      const propertiesFromContext: any = htmlContext.properties[html];
+
+      if (propertiesFromContext && typeof propertiesFromContext.htmlDisplay !== "undefined") {
+        const toDisplay = propertiesFromContext.htmlDisplay;
+        if (typeof toDisplay === "string") {
+          customProps.children = (
+            <>
+              <div dangerouslySetInnerHTML={{ __html: toDisplay }} />
+              <div style={{ display: "none" }}>{children}</div>
+            </>
+          );
+        } else {
+          customProps.children = (
+            <>
+              {toDisplay}
+              <div style={{ display: "none" }}>{children}</div>
+            </>
+          );
+        }
+      }
     }
 
     // and now we call the reactification
@@ -2352,7 +2457,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       selected: isSelected,
       element: element as any,
       asTemplate: false,
-      customProps: { ...attributes, children },
+      customProps,
     }) as any;
   }
 
@@ -2619,17 +2724,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       text: label,
     }
 
-    // and now we build a paragraph node to put the text there
-    const blockNode: IParagraph = {
-      children: [textNode],
-      containment: "block",
-      type: "paragraph",
-    };
-
     // and a container to make it be the inner html
     // container
     const superBlock: IContainer = {
-      children: [blockNode],
+      children: [textNode],
       containment: "superblock",
       containerType: null,
       type: "container",
@@ -2945,7 +3043,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
       );
 
-    // otherwise we want to wrap into a quote
+      // otherwise we want to wrap into a quote
     } else {
       // so we do
       Transforms.wrapNodes(
@@ -3151,7 +3249,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             );
           }
 
-        // now if have link information to be used to create a link
+          // now if have link information to be used to create a link
         } else if (!noLink) {
           // we do so by wrapping
           Transforms.wrapNodes(
@@ -3167,7 +3265,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           );
         }
 
-      // otherwise if we are not collapsed
+        // otherwise if we are not collapsed
       } else {
         // if we are within a link
         if (
@@ -3518,7 +3616,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.insertSuperblockBreak();
     } else if (e.key === "z" && e.ctrlKey && !e.shiftKey) {
       this.editor.undo();
-    } else if ((e.key === "y" && e.ctrlKey) || (e.key === "z" && e.ctrlKey && e.shiftKey)) {
+    } else if ((e.key === "y" && e.ctrlKey) || (e.key === "z" && e.ctrlKey && e.shiftKey)) {
       this.editor.redo();
     }
   }
@@ -3692,6 +3790,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {children}
         </Wrapper>
       );
+    }
+
+    // wrapping based on the root context
+    if (this.props.rootContext && this.props.rootContext.wrapper) {
+      children = this.props.rootContext.wrapper(children);
     }
 
     // now we can return

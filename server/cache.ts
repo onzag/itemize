@@ -448,8 +448,8 @@ export class Cache {
 
           // so with that in mind, we add the foreign key column value
           // for combining both and keeping them joined togeher
-          sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod[0].id;
-          sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod[0].version;
+          sqlIdefData[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod.id;
+          sqlIdefData[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod.version;
 
           // so now we create the insert query
           const insertQueryIdef = transactingDatabase.getInsertBuilder().table(selfTable);

@@ -378,8 +378,17 @@ export function reactifyElementBase(
   if (arg.asTemplate && base.html) {
     // we remove the children if we have them
     delete finalProps.children;
-    // and define the dangerously set inner html
-    finalProps.dangerouslySetInnerHTML = currentTemplateArgs && currentTemplateArgs[base.html];
+
+    const value = currentTemplateArgs && currentTemplateArgs[base.html];
+    if (value) {
+      if (typeof value === "string") {
+        // and define the dangerously set inner html
+        finalProps.dangerouslySetInnerHTML = {__html: value};
+      } else {
+        // define it as a react component
+        finalProps.children = value;
+      }
+    }
   } else if (arg.asTemplate && base.textContent) {
     // we remove the children if we have them
     delete finalProps.children;

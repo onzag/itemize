@@ -115,7 +115,7 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
    */
   public onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
     // set the new value
-    const newValue = e.target.value.trim() || null;
+    const newValue = e.target.value || null;
     // set the state
     this.setState({
       value: newValue || "",
