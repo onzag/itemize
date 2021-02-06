@@ -1237,8 +1237,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // as it uses a namespaced uuid that will give the same value for the same string
         if (!state.internalValue || newInternalValue.id !== state.internalValue.id) {
 
-          console.log("Changing from ", state.internalValue, "to", newInternalValue);
-
           // then we do the same and set the new internal value
           // and clear all the anchors
           return {
@@ -2380,11 +2378,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we check if we are in a selected elelement
     // because the component is immutable, we can do this
-    const isSelected = (
+    let isSelected = (
       (element as any) === this.state.currentBlockElement ||
       (element as any) === this.state.currentElement ||
       (element as any) === this.state.currentSuperBlockElement
     );
+
+    if (this.state.currentElement !== this.state.currentSelectedNode) {
+      isSelected = (element as any) === this.state.currentSelectedNode;
+    }
 
     // let's check for a ui handler
     const uiHandler = (element as any as RichElement).uiHandler;
@@ -2399,8 +2401,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we try to get the ui handler from the context itself
       // either the root or the one in the property itself
       const propertiesFromContext =
-        handlerContext.properties[uiHandler] ||
-        this.props.rootContext.properties[uiHandler];
+        (handlerContext && handlerContext.properties && handlerContext.properties)[uiHandler] ||
+        (this.props.rootContext && this.props.rootContext.properties[uiHandler]);
 
       // if we don't find a UI handler
       // let's put a message about it
@@ -2432,12 +2434,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // now we can use the handler component that is given via the ui handler
       return (
         <div {...attributes}>
-          <HandlerComponent
-            {...uiHandlerArgs}
-            {...handlerExtraArgs}
-            {...extraInfoArgs}
-          />
-          <div style={{ display: "none" }}>{children}</div>
+          <div contentEditable={false}>
+            <HandlerComponent
+              {...uiHandlerArgs}
+              {...handlerExtraArgs}
+              {...extraInfoArgs}
+            />
+          </div>
+          {children}
         </div>
       );
     }
@@ -2447,26 +2451,48 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const html = (element as any as RichElement).html;
     if (html) {
       const htmlContext = this.findContextBasedOnNode(element as any);
-      const propertiesFromContext: any = htmlContext.properties[html];
+      const propertiesFromContext: any = htmlContext && htmlContext.properties && htmlContext.properties[html];
 
       if (propertiesFromContext && typeof propertiesFromContext.htmlDisplay !== "undefined") {
         const toDisplay = propertiesFromContext.htmlDisplay;
         if (typeof toDisplay === "string") {
           customProps.children = (
             <>
-              <div dangerouslySetInnerHTML={{ __html: toDisplay }} />
-              <div style={{ display: "none" }}>{children}</div>
+              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} />
+              {children}
             </>
           );
         } else {
           customProps.children = (
             <>
-              {toDisplay}
-              <div style={{ display: "none" }}>{children}</div>
+              <div contentEditable={false}>
+                {toDisplay}
+              </div>
+              {children}
             </>
           );
         }
+      } else {
+        customProps.children = (
+          <>
+            {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+            {children}
+          </>
+        );
       }
+    }
+
+    const text = (element as any as RichElement).textContent;
+    if (text) {
+      const textContext = this.findContextBasedOnNode(element as any);
+      const propertiesFromContext: any = textContext && textContext.properties && textContext.properties[html];
+
+      customProps.children = (
+        <>
+          {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+          {children}
+        </>
+      );
     }
 
     // and now we call the reactification
@@ -2558,15 +2584,21 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public selectPath(p: Path) {
     // first we need to find the actual node that is referred to that path
-    let finalNode: any = this.state.internalValue;
+    const newInternalValue = {...this.state.internalValue};
+    newInternalValue.children = [...newInternalValue.children];
+    let finalNode: any = newInternalValue;
     p.forEach((v) => {
-      finalNode = finalNode.children[v];
+      const newFinalNode = {...finalNode.children[v]};
+      newFinalNode.children = [...newFinalNode.children];
+      finalNode.children[v] = newFinalNode;
+      finalNode = newFinalNode;
     });
 
     // now we can update the state
     this.setState({
       currentSelectedNodeAnchor: p,
       currentSelectedNode: finalNode,
+      internalValue: newInternalValue,
     });
   }
 

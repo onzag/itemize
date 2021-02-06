@@ -3,6 +3,7 @@ $quote-background-color: rgba(0, 0, 0, 0.09);
 $quote-highlight-color: #26a69a;
 $quote-text-color: #455a64;
 $template-item-color: #1a237e;
+$template-item-highlight-color: #880e4f;
 $general-highlight-color: #0d47a1;
 $superblock-highlight-color: #33691e;
 
@@ -29,6 +30,11 @@ $superblock-highlight-color: #33691e;
   .template {
     border: solid 1px $template-item-color;
     border-style: dashed;
+
+    &.selected {
+      border: solid 1px $template-item-highlight-color;
+      border-style: dashed;
+    }
   }
 
   .ql-editor {
@@ -37,6 +43,10 @@ $superblock-highlight-color: #33691e;
 
   p, li, blockquote, strong {
     text-align: justify;
+  }
+
+  p:empty::before {
+    content: '\00a0';
   }
 
   ul {
