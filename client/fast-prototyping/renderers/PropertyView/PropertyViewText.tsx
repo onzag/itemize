@@ -346,7 +346,9 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   }
   public render() {
     const deserializedValue = deserialize(this.props.children);
-    return renderTemplateDynamically(deserializedValue, this.props.templateArgs);
+    return <div className="rich-text">
+      {renderTemplateDynamically(deserializedValue, this.props.templateArgs)}
+    </div>;
   }
 }
 
@@ -370,11 +372,13 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
 
   if (props.isRichText) {
     if (props.args.makeTemplate) {
-      return (
+      const value = (
         <TemplatedPropertyViewRichTextRenderer templateArgs={props.args.templateArgs}>
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );
+      const templateContextWrapper = props.args.templateContextWrapper;
+      return templateContextWrapper ? templateContextWrapper(value) : value;
     } else {
       return (
         <PropertyViewRichTextViewer>

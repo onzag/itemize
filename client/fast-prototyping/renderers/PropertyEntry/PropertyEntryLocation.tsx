@@ -395,7 +395,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
    * react autosuggest manually decides when it needs to load suggestions
    * @param arg the value it wants to load
    */
-  public onSuggestionsFetchRequested(arg: {value: string}) {
+  public onSuggestionsFetchRequested(arg: { value: string }) {
     // and this is where we use search query change that loads suggestions
     this.props.onSearchQueryChange(arg.value);
   }
@@ -451,23 +451,23 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
 
     // now we can build these props
     let appliedInputProps: any = {
-      endAdornment: (
+      endAdornment: !this.props.args.disableMapAndSearch ? (
         <InputAdornment position="end">
           <IconButton
             tabIndex={-1}
             disabled={this.props.disabled}
-            classes={{root: this.props.classes.iconButton}}
+            classes={{ root: this.props.classes.iconButton }}
             onClick={onClickFn}
           >
             {iconSearch}
           </IconButton>
         </InputAdornment>
-      ),
+      ) : null,
     };
 
     // and add the text field props from the autosuggest
     if (textFieldProps) {
-      const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
+      const { inputRef = () => { return; }, ref, ...other } = textFieldProps;
       appliedTextFieldProps = other;
       appliedInputProps = {
         ...appliedInputProps,
@@ -497,7 +497,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
     // maps that are only available in the client side
     // the onViewportChange handler function is fairly compatible
     // with react-leaftlet
-    const map = this.state.readyToMap ? (
+    const map = this.state.readyToMap && !this.props.args.disableMapAndSearch ? (
       <CMap
         viewport={viewport}
         onViewportChanged={this.props.onViewportChange}
@@ -529,42 +529,48 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
       <div className={this.props.classes.container}>
         {
           this.props.description && descriptionAsAlert ?
-          <Alert severity="info" className={this.props.classes.description}>
-            {this.props.description}
-          </Alert> :
-          null
+            <Alert severity="info" className={this.props.classes.description}>
+              {this.props.description}
+            </Alert> :
+            null
         }
         {
           this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={this.props.classes.description}>
-            {this.props.description}
-          </Typography> :
-          null
-        }
-        <div className={this.props.classes.locationAlternativeTextHeader}>
-          {
-            icon ? <IconButton
-              tabIndex={-1}
-              className={this.props.classes.icon}
-              onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
-          }
-          {
-            this.props.currentValue && this.props.currentValue.atxt ||
-            (
-              <span className={this.props.classes.locationPlaceholder}>
-                {capitalize(this.props.placeholder)}
-              </span>
-            )
-          }
-          {
-            this.props.resultOutOfLabel ?
-            <i className={this.props.classes.resultListLabel}>{this.props.resultOutOfLabel}</i> :
+            <Typography variant="caption" className={this.props.classes.description}>
+              {this.props.description}
+            </Typography> :
             null
-          }
-        </div>
-        <div className={this.props.classes.locationMapContainer}>
-          {map}
-        </div>
+        }
+        {!this.props.args.disableMapAndSearch ?
+          <div className={this.props.classes.locationAlternativeTextHeader}>
+            {
+              icon ? <IconButton
+                tabIndex={-1}
+                className={this.props.classes.icon}
+                onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
+            }
+            {
+              this.props.currentValue && this.props.currentValue.atxt ||
+              (
+                <span className={this.props.classes.locationPlaceholder}>
+                  {capitalize(this.props.placeholder)}
+                </span>
+              )
+            }
+            {
+              this.props.resultOutOfLabel ?
+                <i className={this.props.classes.resultListLabel}>{this.props.resultOutOfLabel}</i> :
+                null
+            }
+          </div> : null
+        }
+        {
+          !this.props.args.disableMapAndSearch ?
+            <div className={this.props.classes.locationMapContainer}>
+              {map}
+            </div> :
+            null
+        }
         <TextField
           fullWidth={true}
           type="text"
@@ -597,8 +603,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
           {this.props.currentInvalidReason}
           {
             !this.props.currentInvalidReason && this.props.activeSearchResults && this.props.activeSearchResults.length === 0 ?
-            this.props.noResultsLabel :
-            null
+              this.props.noResultsLabel :
+              null
           }
         </div>
       </div>
@@ -666,10 +672,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
                   {part.text}
                 </span>
               ) : (
-                <strong key={index} style={{ fontWeight: 300 }}>
-                  {part.text}
-                </strong>
-              ),
+                  <strong key={index} style={{ fontWeight: 300 }}>
+                    {part.text}
+                  </strong>
+                ),
             )}
           </div>
           <div className={this.props.classes.autosuggestMenuItemSubText}>

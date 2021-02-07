@@ -318,7 +318,7 @@ export function reactifyElementBase(
 
     // if we have it, we use it
     if (Handler) {
-      return (<Handler {...base.uiHandlerArgs} />);
+      return (<Handler {...base.uiHandlerArgs} key={arg.key}/>);
     } else {
       return null;
     }
@@ -331,7 +331,7 @@ export function reactifyElementBase(
   };
 
   // if we have a key, we use it
-  if (arg.key !== "undefined") {
+  if (typeof arg.key !== "undefined") {
     finalProps.key = arg.key;
   }
 

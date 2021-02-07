@@ -206,6 +206,7 @@ export function registerText(registry: ISerializationRegistryType) {
     // the new custom props
     const newCustomProps = {
       ...arg.customProps,
+      key: arg.key,
     };
 
     // we change the style as required
@@ -229,7 +230,7 @@ export function registerText(registry: ISerializationRegistryType) {
     }
 
     // now we add the text if we haven't specified custom children
-    if (!arg.customProps.children) {
+    if (!newCustomProps.children) {
       newCustomProps.children = arg.element.text;
     }
 

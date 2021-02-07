@@ -1324,7 +1324,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor.normalizeNode = this.normalizeNode;
     this.editor.insertBreak = this.insertBreak;
     this.editor.deleteBackward = this.deleteBackward;
-    // this.editor.deleteForward = this.deleteForward;
+    this.editor.deleteForward = this.deleteForward;
 
     // other functions and heler utilities
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
@@ -1794,7 +1794,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const { selection } = this.editor
 
     if (selection && Range.isCollapsed(selection)) {
-      Transforms.delete(this.editor, { unit })
+      Transforms.delete(this.editor, { unit });
     }
   }
 
@@ -1850,9 +1850,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.delete(this.editor, { unit, reverse: true });
       this.ignoreCurrentLocationToRemoveEmpty = false;
       // otherwise
-    } else {
-      // do a normal delete
-      Transforms.delete(this.editor, { unit, reverse: true });
     }
   }
 
