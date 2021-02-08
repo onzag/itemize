@@ -25,7 +25,6 @@ import { IVideo } from "../../../internal/text/serializer/types/video";
 import { mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import { IContainer } from "../../../internal/text/serializer/types/container";
-import { IParagraph } from "../../../internal/text/serializer/types/paragraph";
 import { IFile } from "../../../internal/text/serializer/types/file";
 import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
@@ -1370,6 +1369,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.releaseBlur = this.releaseBlur.bind(this);
   }
 
+  public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
+    // during the update the selected node that was previous might remain selected
+    // because the internal value didn't change state
+    if (this.state.currentSelectedNode !== prevState.currentSelectedNode && prevState.currentSelectedNode) {
+      // so we have to find it
+      const pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedNode as any);
+      // and if there's a match
+      if (pathOfPreviousSelectedNode) {
+        // we are going to invalidate its state
+        const newInternalValue = {...this.state.internalValue};
+        newInternalValue.children = [...newInternalValue.children];
+        let finalNode: any = newInternalValue;
+        pathOfPreviousSelectedNode.forEach((v) => {
+          const newFinalNode = { ...finalNode.children[v] };
+          newFinalNode.children = [...newFinalNode.children];
+          finalNode.children[v] = newFinalNode;
+          finalNode = newFinalNode;
+        });
+
+        this.setState({
+          internalValue: newInternalValue,
+        });
+      }
+    }
+  }
+
   /**
    * Checks whether two nodes are mergable
    * @param n1 the first node
@@ -2472,7 +2497,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       } else {
         customProps.children = (
           <>
-            {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+            {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
             {children}
           </>
         );
@@ -2486,7 +2511,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       customProps.children = (
         <>
-          {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+          {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
           {children}
         </>
       );
@@ -2581,11 +2606,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public selectPath(p: Path) {
     // first we need to find the actual node that is referred to that path
-    const newInternalValue = {...this.state.internalValue};
+    const newInternalValue = { ...this.state.internalValue };
     newInternalValue.children = [...newInternalValue.children];
     let finalNode: any = newInternalValue;
     p.forEach((v) => {
-      const newFinalNode = {...finalNode.children[v]};
+      const newFinalNode = { ...finalNode.children[v] };
       newFinalNode.children = [...newFinalNode.children];
       finalNode.children[v] = newFinalNode;
       finalNode = newFinalNode;
