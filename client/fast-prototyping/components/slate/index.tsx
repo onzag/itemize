@@ -30,7 +30,6 @@ import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import { ICustom } from "../../../internal/text/serializer/types/custom";
 import { IInline } from "../../../internal/text/serializer/types/inline";
-
 /**
  * Combine both interfaces
  */
@@ -1369,27 +1368,105 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.releaseBlur = this.releaseBlur.bind(this);
   }
 
+  public moveSelected(dir: -1 | 1) {
+    if (!this.state.currentSelectedNode) {
+      return;
+    }
+
+    // TODO
+    // const pathOfPrev = [...this.state.currentSelectedNodeAnchor];
+
+    // while (pathOfPrev.length) {
+    //   pathOfPrev[pathOfPrev.length - 1] += dir;
+    //   if (pathOfPrev[pathOfPrev.length - 1] <= 0 || !Node.has(this.editor, pathOfPrev)) {
+    //     pathOfPrev.pop();
+    //   }
+
+    //   let nodeInQuestion: any = Node.get(this.editor, pathOfPrev);
+    //   while (nodeInQuestion.children && nodeInQuestion.children.length) {
+    //     const index = nodeInQuestion.children.length - 1;
+    //     nodeInQuestion = nodeInQuestion.children[index];
+    //     pathOfPrev.push(index);
+    //   }
+    // }
+
+    // if (!pathOfPrev.length) {
+    //   return;
+    // }
+
+
+  }
+
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
     // during the update the selected node that was previous might remain selected
     // because the internal value didn't change state
-    if (this.state.currentSelectedNode !== prevState.currentSelectedNode && prevState.currentSelectedNode) {
-      // so we have to find it
+    if (prevState.currentSelectedNode && !equals(this.state.currentSelectedNodeAnchor, prevState.currentSelectedNodeAnchor)) {
+      // so we have to find it in the current
       const pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedNode as any);
       // and if there's a match
       if (pathOfPreviousSelectedNode) {
         // we are going to invalidate its state
         const newInternalValue = {...this.state.internalValue};
         newInternalValue.children = [...newInternalValue.children];
+
+        let finalSelectedNode: any = this.state.currentSelectedNode;
+        let finalCurrentBlock: any = this.state.currentBlockElement;
+        let finalCurrentElement: any = this.state.currentElement;
+        let finalCurrentSuperBlock: any = this.state.currentSuperBlockElement;
+
         let finalNode: any = newInternalValue;
+        let notFound = false;
         pathOfPreviousSelectedNode.forEach((v) => {
-          const newFinalNode = { ...finalNode.children[v] };
+          // sometimes it's just not there
+          if (notFound || !finalNode.children[v]) {
+            notFound = true;
+            return;
+          }
+
+          // now we grab the node
+          const nodeInPath = finalNode.children[v];
+          // when changing from say selecting a child from selecting a parent
+          // the parent node will not be equal anymore to the current selected node
+          // because they have indeed changed so we need to keep it consistent
+          // and update the parent for that we got to know if this node
+          // we will be changing is the selected
+          const isCurrentlySelectedNode = finalSelectedNode === nodeInPath;
+          const isCurrentlyCurrentBlock = finalCurrentBlock === nodeInPath;
+          const isCurrentlyCurrentElement = finalCurrentElement === nodeInPath;
+          const isCurrentlyCurrentSuperBlock = finalCurrentSuperBlock === nodeInPath;
+
+          // now we do the basics of copying
+          const newFinalNode = { ...nodeInPath };
           newFinalNode.children = [...newFinalNode.children];
           finalNode.children[v] = newFinalNode;
           finalNode = newFinalNode;
+
+          // and if it was the selected
+          if (isCurrentlySelectedNode) {
+            // got to update it
+            finalSelectedNode = newFinalNode;
+          }
+          if (isCurrentlyCurrentBlock) {
+            finalCurrentBlock = newFinalNode;
+          }
+          if (isCurrentlyCurrentElement) {
+            finalCurrentElement = newFinalNode;
+          }
+          if (isCurrentlyCurrentSuperBlock) {
+            finalCurrentSuperBlock = newFinalNode;
+          }
         });
+
+        if (notFound) {
+          return;
+        }
 
         this.setState({
           internalValue: newInternalValue,
+          currentSelectedNode: finalSelectedNode,
+          currentBlockElement: finalCurrentBlock,
+          currentElement: finalCurrentElement,
+          currentSuperBlockElement: finalCurrentSuperBlock,
         });
       }
     }
