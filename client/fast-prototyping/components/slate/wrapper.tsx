@@ -57,6 +57,13 @@ const style = createStyles({
   },
   treeChildrenBox: {
     padding: "0 0 0 0.5rem",
+    borderLeft: "solid 1px #ccc",
+  },
+  treeDataBox: {
+    width: "100%",
+    position: "relative",
+    maxHeight: "200px",
+    overflowY: "auto",
   },
   separator: {
     margin: "1rem 0",

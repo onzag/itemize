@@ -24,7 +24,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // we grab this from local storage, this won't affect SSR because the drawer won't
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
-  const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
+  const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
 
   // update the given location
   const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {
@@ -32,29 +32,24 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     setLocation(value);
   }, []);
 
-  // now we want to make a component that shows the path of the given currently selected
-  // node, if any, this is basically what shows [container] [templated paragraph] etc...
-  let treeData: React.ReactNode = null;
-
   // but for that to be set we need to have something selected
   // in the rich text editor state
-  if (props.state.currentSelectedTextNodeAnchor) {
-    treeData = <Tree
-      currentRichElement={{
-        children: props.state.currentValue
-      } as any}
-      currentSelectedNode={props.state.currentSelectedNode as any}
-      currentSelectedNodePath={props.state.currentSelectedNodeAnchor}
-      currentPath={[]}
-      i18nRichInfo={props.i18nRichInfo}
-      buttonClassName={props.classes.wrapperButton}
-      childrenBoxClassName={props.classes.treeChildrenBox}
-      onSelectPath={props.helpers.selectPath}
-    />
-  }
+  const treeData = <Tree
+    currentRichElement={{
+      children: props.state.currentValue
+    } as any}
+    currentSelectedNode={props.state.currentSelectedNode as any}
+    currentSelectedNodePath={props.state.currentSelectedNodeAnchor}
+    currentPath={[]}
+    i18nRichInfo={props.i18nRichInfo}
+    buttonClassName={props.classes.wrapperButton}
+    childrenBoxClassName={props.classes.treeChildrenBox}
+    onSelectPath={props.helpers.selectPath}
+  />
 
   // now we need to build the settings
   let settingsForNode: React.ReactNode = null;
+  let titleForNode: React.ReactNode = null;
 
   // and that's done based on the selected node
   if (props.state.currentSelectedNode) {
@@ -86,14 +81,19 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
         break;
     }
 
+    titleForNode = (
+      <>
+        <Typography className={props.classes.elementTitle} variant="h6">{selectedNodeInfo.name}</Typography>
+        <Divider className={props.classes.separator} />
+      </>
+    );
+
     // and now we can build these settings
     // basically here we are building the divider and then
     // adding the panel, where the tabs allow us to switch
     // from each panel
     settingsForNode = (
       <>
-        <Divider className={props.classes.separator} />
-        <Typography className={props.classes.elementTitle} variant="h6">{selectedNodeInfo.name}</Typography>
         {
           !selectedNodeInfo.isText ?
             (
@@ -156,7 +156,10 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // now we return
   return (
     <>
-      {treeData}
+      {titleForNode}
+      <div className={props.classes.treeDataBox}>
+        {treeData}
+      </div>
       {settingsForNode}
     </>
   );

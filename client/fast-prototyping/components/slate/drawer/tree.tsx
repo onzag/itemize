@@ -6,6 +6,7 @@ import React from "react";
 import {
   Button
 } from "../../../mui-core";
+import ReactDOM from "react-dom";
 
 /**
  * The interactive actions that exist that mark
@@ -123,7 +124,101 @@ interface ITreeProps {
   onSelectPath: (p: Path) => void;
 }
 
-export class Tree extends React.PureComponent<ITreeProps> {
+interface ITreeState {
+  dragging: boolean;
+  x: number;
+  y: number;
+  initialX: number;
+  initialY: number;
+}
+
+export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
+  private bodyDiv: HTMLDivElement;
+  private lastEffectTime: number;
+  constructor(props: ITreeProps) {
+    super(props);
+
+    this.state = {
+      dragging: false,
+      x: null,
+      y: null,
+      initialX: null,
+      initialY: null,
+    };
+
+    this.startDragMouse = this.startDragMouse.bind(this);
+    this.startDragTouch = this.startDragTouch.bind(this);
+    this.moveDragMouse = this.moveDragMouse.bind(this);
+    this.moveDragTouch = this.moveDragTouch.bind(this);
+    this.endDragMouse = this.endDragMouse.bind(this);
+    this.endDragTouch = this.endDragTouch.bind(this);
+  }
+  public startDragMouse(e: React.MouseEvent) {
+    document.body.addEventListener("mousemove", this.moveDragMouse);
+    document.body.addEventListener("mouseup", this.endDragMouse);
+    this.startDrag(e.clientX, e.clientY);
+  }
+  public startDragTouch(e: React.TouchEvent) {
+
+  }
+  public startDrag(x: number, y: number) {
+    this.lastEffectTime = (new Date()).getTime();
+    this.bodyDiv = document.createElement("div");
+    document.body.appendChild(this.bodyDiv);
+
+    this.setState({
+      dragging: true,
+      x,
+      y,
+      initialX: x,
+      initialY: y,
+    });
+  }
+  public moveDragMouse(e: MouseEvent) {
+    this.moveDrag(e.clientX, e.clientY);
+  }
+  public moveDragTouch(e: TouchEvent) {
+
+  }
+  public moveDrag(x: number, y: number) {
+    if (!this.state.dragging) {
+      return;
+    }
+
+    this.setState({
+      x,
+      y,
+    });
+  }
+  public endDragMouse(e: MouseEvent) {
+    document.body.removeEventListener("mousemove", this.moveDragMouse);
+    document.body.removeEventListener("mouseup", this.endDragMouse);
+    this.endDrag();
+  }
+  public endDragTouch(e: TouchEvent) {
+
+  }
+  public endDrag() {
+    if (!this.state.dragging) {
+      return;
+    }
+
+    const endTime = (new Date()).getTime();
+    if (endTime - this.lastEffectTime <= 300) {
+      this.props.onSelectPath(this.props.currentPath);
+    }
+
+    this.setState({
+      dragging: false,
+      x: null,
+      y: null,
+      initialX: null,
+      initialY: null,
+    }, () => {
+      document.body.removeChild(this.bodyDiv);
+      this.bodyDiv = null;
+    });
+  }
   public render() {
     // and now let's find what we will choose
     let currentRichElement = this.props.currentRichElement;
@@ -142,28 +237,44 @@ export class Tree extends React.PureComponent<ITreeProps> {
 
     // now if we are selected we must make it clear
     const isSelected = currentRichElement === this.props.currentSelectedNode;
-    const isSemiSelected = !isSelected && Path.isDescendant(this.props.currentSelectedNodePath, this.props.currentPath);
+    const isSemiSelected = !isSelected && this.props.currentSelectedNodePath &&
+      Path.isDescendant(this.props.currentSelectedNodePath, this.props.currentPath);
     const info = currentRichElement.type ? getInfoOf(currentRichElement, this.props.i18nRichInfo) : null;
 
     if (!info) {
       return childTree;
     }
 
-    return (
+    const internals = (
       <>
         <Button
           size="small"
           variant={isSelected ? "contained" : (isSemiSelected ? "outlined" : "text")}
           color={info.isTemplate ? "secondary" : "primary"}
           className={this.props.buttonClassName}
-          onClick={this.props.onSelectPath.bind(null, this.props.currentPath)}
+          onMouseDown={this.startDragMouse}
+          onTouchStart={this.startDragTouch}
         >
           {info.name}
         </Button>
         {childTree ? <div className={this.props.childrenBoxClassName}>
-           {childTree}
+          {childTree}
         </div> : null}
       </>
+    );
+
+    const shouldShowDrag = this.state.dragging && (
+      Math.abs(this.state.x - this.state.initialX) >= 2.5 ||
+      Math.abs(this.state.y - this.state.initialY) >= 2.5
+    );
+
+    return (
+      shouldShowDrag ? ReactDOM.createPortal(
+        <div style={{ position: "fixed", left: this.state.x, top: this.state.y }}>
+          {internals}
+        </div>,
+        this.bodyDiv,
+      ) : internals
     );
   }
 }

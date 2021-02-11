@@ -779,13 +779,6 @@ export interface ISlateEditorStateType {
   currentSelectedNode: RichElement | IText;
 
   /**
-   * The text node that is selected that is being worked with
-   * this is normally automatically selected to be the current
-   * text
-   */
-  currentSelectedTextNode: IText;
-
-  /**
    * The current templating context, as it is
    * based on the root context, this is a subcontext
    * from that base context
@@ -822,11 +815,6 @@ export interface ISlateEditorStateType {
    * Selected anchor
    */
   currentSelectedNodeAnchor: Path;
-
-  /**
-   * The anchor of the current selected text node
-   */
-  currentSelectedTextNodeAnchor: Path;
 }
 
 /**
@@ -1078,14 +1066,6 @@ interface ISlateEditorState {
    */
   currentSelectedNodeContext: ITemplateArgsContext;
   /**
-   * The selected node
-   */
-  currentSelectedTextNode: IText;
-  /**
-   * The selected node
-   */
-  currentSelectedTextNodeAnchor: Path;
-  /**
    * all containers that exist within the definitions
    * for the css classes
    * 
@@ -1217,8 +1197,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentText: null,
             currentSelectedNode: null,
             currentSelectedNodeContext: null,
-            currentSelectedTextNode: null,
-            currentSelectedTextNodeAnchor: null,
           };
         }
 
@@ -1251,8 +1229,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentText: null,
             currentSelectedNode: null,
             currentSelectedNodeContext: null,
-            currentSelectedTextNode: null,
-            currentSelectedTextNodeAnchor: null,
           };
         }
       }
@@ -1292,8 +1268,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentText: null,
       currentSelectedNode: null,
       currentSelectedNodeContext: null,
-      currentSelectedTextNode: null,
-      currentSelectedTextNodeAnchor: null,
 
       // ensure SSR compatibility
       // since we cannot read the CSS file on the server side
@@ -1406,7 +1380,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and if there's a match
       if (pathOfPreviousSelectedNode) {
         // we are going to invalidate its state
-        const newInternalValue = {...this.state.internalValue};
+        const newInternalValue = { ...this.state.internalValue };
         newInternalValue.children = [...newInternalValue.children];
 
         let finalSelectedNode: any = this.state.currentSelectedNode;
@@ -1418,7 +1392,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         let notFound = false;
         pathOfPreviousSelectedNode.forEach((v) => {
           // sometimes it's just not there
-          if (notFound || !finalNode.children[v]) {
+          if (notFound || !finalNode.children[v]) {
             notFound = true;
             return;
           }
@@ -2111,10 +2085,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * that are currently selected (or it will override with the defaults)
    * @param anchor the anchor that is currently deemed to be selected at
    * @param value the value that we are working with, if not provided it will take it from the state
-   * @param currentSelectedNodeAnchorAndTextAnchor the selected node anchor, and text anchor if not provided
+   * @param currentGivenSelectedNodeAnchor the selected node anchor, and text anchor if not provided
    * it will use the default values based on the logic of the calculated anchors
    */
-  public calculateAnchorsAndContext(anchor: Path, value?: Node[], currentSelectedNodeAnchorAndTextAnchor?: [Path, Path]) {
+  public calculateAnchorsAndContext(anchor: Path, value?: Node[], currentGivenSelectedNodeAnchor?: Path) {
     // first we set up all the basics to their null value
     let currentContext: ITemplateArgsContext = null;
     let currentElement: RichElement = null;
@@ -2189,20 +2163,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now for our selection, by default it's all null
     let currentSelectedNodeAnchor: Path = null;
     let currentSelectedNode: RichElement | IText = null;
-    let currentSelectedTextNode: IText = null;
-    let currentSelectedTextNodeAnchor: Path = null;
     let currentSelectedNodeContext: ITemplateArgsContext = null;
 
     // if we don't have a selected anchor and origin
     // we have purposely set then we should
     // default to the currently selected values, if any
-    if (!currentSelectedNodeAnchorAndTextAnchor) {
+    if (!currentGivenSelectedNodeAnchor) {
       // so the selected anchor will be the element anchor
       currentSelectedNodeAnchor = currentElementAnchor;
-      // the origin will be made on the text
-      currentSelectedTextNode = currentText;
-      // the origin anchor will be the text anchor
-      currentSelectedTextNodeAnchor = anchor;
       // the selected node is the element just like the anchor
       currentSelectedNode = currentElement;
       // and the context is our current context
@@ -2211,52 +2179,45 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // otherwise here, we are going to pick and trust
       // the values we are given, the anchors
       // are the these values
-      currentSelectedNodeAnchor = currentSelectedNodeAnchorAndTextAnchor[0];
-      currentSelectedTextNodeAnchor = currentSelectedNodeAnchorAndTextAnchor[1];
+      currentSelectedNodeAnchor = currentGivenSelectedNodeAnchor;
 
       // now we need to prepare and find the text origin, and context
       // as well as the selected element
-      currentSelectedTextNode = value ? {
+      currentSelectedNode = value ? {
         children: value,
       } as any : this.state.internalValue;
       currentSelectedNodeContext = this.props.rootContext || null;
 
       // so we loop in the origin anchor
-      currentSelectedTextNodeAnchor.forEach((n: number, index: number) => {
+      currentGivenSelectedNodeAnchor.forEach((n: number, index: number) => {
         // and update the node origin
-        currentSelectedTextNode = (currentSelectedTextNode as any).children[n];
+        currentSelectedNode = (currentSelectedNode as any).children[n];
 
-        // if it's our last value from the selected anchor, which should
-        // be contained in the origin
-        if (index === currentSelectedNodeAnchor.length - 1) {
-          // then that's our node
-          currentSelectedNode = currentSelectedTextNode;
+        // we need to fetch the context we are in for the currentSelectedNodeContext
+        // which might differ
+        if (currentSelectedNodeContext && (currentSelectedNode as any).context) {
+          // so we pick it from the origin value we are using to loop in
+          currentSelectedNodeContext =
+            currentSelectedNodeContext.properties[(currentSelectedNode as any).context] as ITemplateArgsContext || null;
+
+          // and then we recheck these
+          if (currentSelectedNodeContext.type !== "context" || currentSelectedNodeContext.loopable) {
+            currentSelectedNodeContext = null;
+          }
         }
 
-        // if we are still within the selected anchor
-        if (index < currentSelectedNodeAnchor.length) {
-          // we need to fetch the context we are in for the currentSelectedNodeContext
-          // which might differ
-          if (currentSelectedNodeContext && (currentSelectedTextNode as any).context) {
-            // so we pick it from the origin value we are using to loop in
-            currentSelectedNodeContext =
-              currentSelectedNodeContext.properties[(currentSelectedTextNode as any).context] as ITemplateArgsContext || null;
-
-            // and then we recheck these
-            if (currentSelectedNodeContext.type !== "context" || currentSelectedNodeContext.loopable) {
-              currentSelectedNodeContext = null;
-            }
-          }
-
-          // also in the foreach context
-          if (currentSelectedNodeContext && (currentSelectedTextNode as any).forEach) {
-            currentSelectedNodeContext = currentSelectedNodeContext.properties[(currentSelectedTextNode as any).forEach] as ITemplateArgsContext || null;
-            if (currentSelectedNodeContext.type !== "context" || !currentSelectedNodeContext.loopable) {
-              currentSelectedNodeContext = null;
-            }
+        // also in the foreach context
+        if (currentSelectedNodeContext && (currentSelectedNode as any).forEach) {
+          currentSelectedNodeContext = currentSelectedNodeContext.properties[(currentSelectedNode as any).forEach] as ITemplateArgsContext || null;
+          if (currentSelectedNodeContext.type !== "context" || !currentSelectedNodeContext.loopable) {
+            currentSelectedNodeContext = null;
           }
         }
       });
+    }
+
+    if (Text.isText(currentSelectedNode)) {
+      debugger;
     }
 
     // now we can return
@@ -2273,8 +2234,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentText,
       currentSelectedNode,
       currentSelectedNodeContext,
-      currentSelectedTextNode,
-      currentSelectedTextNodeAnchor,
     }
   }
 
@@ -2320,10 +2279,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // remains even after the selection only if
       // we have not just deleted that node
       this.state.currentSelectedNodeAnchor &&
-        !this.lastChangeWasSelectedDelete ? [
-          this.state.currentSelectedNodeAnchor,
-          this.state.currentSelectedTextNodeAnchor,
-        ] : null,
+        !this.lastChangeWasSelectedDelete ? this.state.currentSelectedNodeAnchor : null,
     );
     this.setState({
       focused: false,
@@ -3908,8 +3864,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
         currentSelectedNode: this.state.currentSelectedNode,
-        currentSelectedTextNode: this.state.currentSelectedTextNode,
-        currentSelectedTextNodeAnchor: this.state.currentSelectedTextNodeAnchor,
         isRichText: this.props.isRichText,
         currentValue: this.state.internalValue.children as any,
         textAnchor: this.state.currentAnchor,
