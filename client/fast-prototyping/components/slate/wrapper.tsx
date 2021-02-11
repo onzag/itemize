@@ -55,6 +55,9 @@ const style = createStyles({
     fontSize: "0.5rem",
     padding: "0.1rem 0.5rem 0.2rem 0.5rem",
   },
+  treeChildrenBox: {
+    padding: "0 0 0 0.5rem",
+  },
   separator: {
     margin: "1rem 0",
   },

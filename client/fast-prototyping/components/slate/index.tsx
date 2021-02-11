@@ -2477,15 +2477,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we check if we are in a selected elelement
     // because the component is immutable, we can do this
-    let isSelected = (
-      (element as any) === this.state.currentBlockElement ||
-      (element as any) === this.state.currentElement ||
-      (element as any) === this.state.currentSuperBlockElement
+    const isSelected = (
+      (element as any) === this.state.currentSelectedNode
     );
-
-    if (this.state.currentElement !== this.state.currentSelectedNode) {
-      isSelected = (element as any) === this.state.currentSelectedNode;
-    }
 
     // let's check for a ui handler
     const uiHandler = (element as any as RichElement).uiHandler;
