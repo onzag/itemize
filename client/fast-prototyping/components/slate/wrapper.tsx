@@ -65,6 +65,17 @@ const style = createStyles({
     maxHeight: "200px",
     overflowY: "auto",
   },
+  dropPositionEnabled: {
+    height: "0.5rem",
+    border: "dashed 1px #ccc",
+    "&:hover": {
+      border: "dashed 1px green",
+    },
+  },
+  dropPositionDisabled: {
+    height: "0.5rem",
+    border: "solid 1px invisible",
+  },
   separator: {
     margin: "1rem 0",
   },
@@ -83,6 +94,7 @@ const style = createStyles({
     fontWeight: 700,
     color: "#444",
     fontSize: "1rem",
+    height: "1rem",
   },
   editorDrawer: {
     width: 0,

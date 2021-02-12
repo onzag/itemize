@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Divider, Typography, Tab, Tabs, BorderStyleIcon, TouchAppIcon, WebIcon, Paper, SettingsIcon
 } from "../../../mui-core";
@@ -16,6 +16,68 @@ import { ActionsOptions } from "./actions";
 import { TemplatingOptions } from "./templating";
 import { getInfoOf, Tree } from "./tree";
 
+class ScrollSlowly {
+  private speed: number;
+  private element: HTMLElement;
+  private curScrollTop: number;
+  constructor(speed: number, element: HTMLElement) {
+    this.speed = speed;
+    this.element = element;
+    this.curScrollTop = element.scrollTop;
+
+    this.run = this.run.bind(this);
+    this.stop = this.stop.bind(this);
+    this.change = this.change.bind(this);
+
+    this.run();
+  }
+  public run() {
+    if (this.speed === 0) {
+      return;
+    }
+
+    const currentPos = this.element.scrollTop;
+    if (this.speed < 0 && currentPos === 0) {
+      return;
+    } else if (this.speed > 0 && this.element.scrollHeight === this.element.offsetHeight + currentPos) {
+      return;
+    }
+
+    const realSpeed = this.speed / 60;
+    const nextPos = this.curScrollTop + realSpeed;
+
+    console.log("scroll by", nextPos, realSpeed);
+    this.curScrollTop = nextPos;
+    this.element.scrollTop = nextPos;
+
+    window.requestAnimationFrame(this.run);
+  }
+  public stop() {
+    this.speed = 0;
+  }
+  public change(speed: number) {
+    this.speed = speed;
+  }
+}
+
+let currentScrollSlowlyElement: ScrollSlowly;
+
+function scrollSlowly(speed: number, element: HTMLElement) {
+  if (speed === 0) {
+    if (currentScrollSlowlyElement) {
+      currentScrollSlowlyElement.stop();
+      currentScrollSlowlyElement = null;
+    }
+    return;
+  }
+
+  if (currentScrollSlowlyElement) {
+    currentScrollSlowlyElement.change(speed);
+  } else {
+    currentScrollSlowlyElement = new ScrollSlowly(speed, element);
+  }
+}
+
 /**
  * This is the wrapper drawer itself
  * @param props it takes the entire wrapper props with the styles
@@ -25,12 +87,42 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
   const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
+  const [dragScroll, setDragScroll] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>();
 
   // update the given location
   const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {
     localStorage.setItem("SLATE_DRAWER_LAST_LOCATION", value);
     setLocation(value);
   }, []);
+
+  const setScrollPositionCallback = useCallback((e: MouseEvent | TouchEvent) => {
+    if (dragScroll) {
+      const boundingRect = scrollRef.current.getBoundingClientRect();
+      const cursorPositionY = (e instanceof MouseEvent) ? e.clientY : e.targetTouches[0].clientY;
+      if (boundingRect.top > cursorPositionY) {
+        const scrollTopIntensity = cursorPositionY - boundingRect.top;
+        scrollSlowly(scrollTopIntensity, scrollRef.current);
+      } else if (boundingRect.bottom < cursorPositionY) {
+        const scrollBottomIntensity = cursorPositionY - boundingRect.bottom;
+        scrollSlowly(scrollBottomIntensity, scrollRef.current);
+      } else {
+        scrollSlowly(0, scrollRef.current);
+      }
+    } else {
+      scrollSlowly(0, scrollRef.current);
+    }
+  }, [dragScroll, scrollRef]);
+
+  useEffect(() => {
+    document.addEventListener("mousemove", setScrollPositionCallback);
+    document.addEventListener("touchmove", setScrollPositionCallback);
+
+    return () => {
+      document.removeEventListener("mousemove", setScrollPositionCallback);
+      document.removeEventListener("touchmove", setScrollPositionCallback);
+    }
+  })
 
   // but for that to be set we need to have something selected
   // in the rich text editor state
@@ -40,16 +132,21 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     } as any}
     currentSelectedNode={props.state.currentSelectedNode as any}
     currentSelectedNodePath={props.state.currentSelectedNodeAnchor}
+    dropPositionDisabledClassName={props.classes.dropPositionDisabled}
+    dropPositionEnabledClassName={props.classes.dropPositionEnabled}
+    currentIsLastInPath={true}
     currentPath={[]}
     i18nRichInfo={props.i18nRichInfo}
     buttonClassName={props.classes.wrapperButton}
     childrenBoxClassName={props.classes.treeChildrenBox}
     onSelectPath={props.helpers.selectPath}
+    onBeginDrop={setDragScroll.bind(null, true)}
+    onEndDrop={setDragScroll.bind(null, false)}
   />
 
   // now we need to build the settings
   let settingsForNode: React.ReactNode = null;
-  let titleForNode: React.ReactNode = null;
+  let titleForNode: string = null;
 
   // and that's done based on the selected node
   if (props.state.currentSelectedNode) {
@@ -81,12 +178,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
         break;
     }
 
-    titleForNode = (
-      <>
-        <Typography className={props.classes.elementTitle} variant="h6">{selectedNodeInfo.name}</Typography>
-        <Divider className={props.classes.separator} />
-      </>
-    );
+    titleForNode = selectedNodeInfo.name;
 
     // and now we can build these settings
     // basically here we are building the divider and then
@@ -156,8 +248,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // now we return
   return (
     <>
-      {titleForNode}
-      <div className={props.classes.treeDataBox}>
+      <Typography className={props.classes.elementTitle} variant="h6">{titleForNode}</Typography>
+      <Divider className={props.classes.separator} />
+      <div className={props.classes.treeDataBox} ref={scrollRef}>
         {treeData}
       </div>
       {settingsForNode}

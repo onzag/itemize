@@ -7,6 +7,7 @@ import {
   Button
 } from "../../../mui-core";
 import ReactDOM from "react-dom";
+import { toJSON } from "yaml/util";
 
 /**
  * The interactive actions that exist that mark
@@ -118,33 +119,48 @@ interface ITreeProps {
   currentSelectedNodePath: Path;
   currentRichElement: RichElement;
   currentPath: Path;
+  currentIsLastInPath: boolean;
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
   buttonClassName: string;
+  dropPositionEnabledClassName: string;
+  dropPositionDisabledClassName: string;
   childrenBoxClassName: string;
   onSelectPath: (p: Path) => void;
+  parentDropping?: boolean;
+  onBeginDrop?: () => void;
+  onEndDrop?: () => void;
 }
 
 interface ITreeState {
+  dropping: boolean;
   dragging: boolean;
+  showDrag: boolean;
   x: number;
   y: number;
   initialX: number;
   initialY: number;
+  calculatedHoleHeight: number;
 }
 
 export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
   private bodyDiv: HTMLDivElement;
   private lastEffectTime: number;
+  private internalsRef: React.RefObject<HTMLDivElement>;
   constructor(props: ITreeProps) {
     super(props);
 
     this.state = {
+      dropping: false,
       dragging: false,
+      showDrag: false,
       x: null,
       y: null,
       initialX: null,
       initialY: null,
+      calculatedHoleHeight: null,
     };
+
+    this.internalsRef = React.createRef();
 
     this.startDragMouse = this.startDragMouse.bind(this);
     this.startDragTouch = this.startDragTouch.bind(this);
@@ -152,6 +168,39 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     this.moveDragTouch = this.moveDragTouch.bind(this);
     this.endDragMouse = this.endDragMouse.bind(this);
     this.endDragTouch = this.endDragTouch.bind(this);
+    this.startDropping = this.startDropping.bind(this);
+    this.endDropping = this.endDropping.bind(this);
+  }
+  public componentDidUpdate(prevProps: ITreeProps, prevState: ITreeState) {
+    if (this.state.dragging && !this.state.showDrag) {
+      const shouldShowDrag = this.state.dragging && (
+        Math.abs(this.state.x - this.state.initialX) >= 2.5 ||
+        Math.abs(this.state.y - this.state.initialY) >= 2.5
+      );
+      if (shouldShowDrag) {
+        this.setState({
+          showDrag: true,
+        });
+      }
+    }
+
+    if (prevState.showDrag && !this.state.showDrag) {
+      this.props.onEndDrop && this.props.onEndDrop();
+    } else if (this.state.showDrag && !prevState.showDrag) {
+      this.props.onBeginDrop && this.props.onBeginDrop();
+    }
+  }
+  public startDropping() {
+    this.setState({
+      dropping: true,
+    });
+    this.props.onBeginDrop && this.props.onBeginDrop();
+  }
+  public endDropping() {
+    this.setState({
+      dropping: false,
+    });
+    this.props.onEndDrop && this.props.onEndDrop();
   }
   public startDragMouse(e: React.MouseEvent) {
     document.body.addEventListener("mousemove", this.moveDragMouse);
@@ -159,7 +208,9 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     this.startDrag(e.clientX, e.clientY);
   }
   public startDragTouch(e: React.TouchEvent) {
-
+    document.body.addEventListener("touchmove", this.moveDragTouch);
+    document.body.addEventListener("touchend", this.endDragTouch);
+    this.startDrag(e.targetTouches[0].clientX, e.targetTouches[0].clientY);
   }
   public startDrag(x: number, y: number) {
     this.lastEffectTime = (new Date()).getTime();
@@ -168,17 +219,19 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
 
     this.setState({
       dragging: true,
+      showDrag: false,
       x,
       y,
       initialX: x,
       initialY: y,
+      calculatedHoleHeight: this.internalsRef.current.offsetHeight,
     });
   }
   public moveDragMouse(e: MouseEvent) {
     this.moveDrag(e.clientX, e.clientY);
   }
   public moveDragTouch(e: TouchEvent) {
-
+    this.moveDrag(e.targetTouches[0].clientX, e.targetTouches[0].clientY);
   }
   public moveDrag(x: number, y: number) {
     if (!this.state.dragging) {
@@ -196,7 +249,9 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     this.endDrag();
   }
   public endDragTouch(e: TouchEvent) {
-
+    document.body.removeEventListener("touchmove", this.moveDragTouch);
+    document.body.removeEventListener("touchend", this.endDragTouch);
+    this.endDrag();
   }
   public endDrag() {
     if (!this.state.dragging) {
@@ -210,6 +265,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
 
     this.setState({
       dragging: false,
+      showDrag: false,
       x: null,
       y: null,
       initialX: null,
@@ -223,14 +279,20 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     // and now let's find what we will choose
     let currentRichElement = this.props.currentRichElement;
 
+    const shouldShowDrop = !this.state.showDrag && (this.props.parentDropping || this.state.dropping);
+
     let childTree: React.ReactNode = null;
     if (currentRichElement.children && currentRichElement.children.length) {
       childTree = (currentRichElement.children as any).map((c: RichElement, index: number) => (
         c.type ? <Tree
           {...this.props}
           currentPath={[...this.props.currentPath, index]}
+          currentIsLastInPath={index === currentRichElement.children.length - 1}
           currentRichElement={c}
           key={index}
+          parentDropping={shouldShowDrop}
+          onBeginDrop={this.startDropping}
+          onEndDrop={this.endDropping}
         /> : null
       ));
     }
@@ -245,8 +307,34 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
       return childTree;
     }
 
+    const prevSpacer =
+      shouldShowDrop ?
+        (
+          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(this.props.currentPath)}/>
+        ) :
+        (
+          <div className={this.props.dropPositionDisabledClassName} />
+        );
+
+    const nextPath: Path = null;
+    if (this.props.currentIsLastInPath && shouldShowDrop) {
+      const nextPath = [...this.props.currentPath];
+      nextPath[nextPath.length - 1]++;
+    }
+
+    const nextSpacer = this.props.currentIsLastInPath ? (
+      shouldShowDrop ?
+        (
+          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(nextPath)}/>
+        ) :
+        (
+          <div className={this.props.dropPositionDisabledClassName} />
+        )
+    ) : null;
+
     const internals = (
-      <>
+      <div ref={this.internalsRef}>
+        {prevSpacer}
         <Button
           size="small"
           variant={isSelected ? "contained" : (isSemiSelected ? "outlined" : "text")}
@@ -260,21 +348,22 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
         {childTree ? <div className={this.props.childrenBoxClassName}>
           {childTree}
         </div> : null}
-      </>
-    );
-
-    const shouldShowDrag = this.state.dragging && (
-      Math.abs(this.state.x - this.state.initialX) >= 2.5 ||
-      Math.abs(this.state.y - this.state.initialY) >= 2.5
+        {nextSpacer}
+      </div>
     );
 
     return (
-      shouldShowDrag ? ReactDOM.createPortal(
-        <div style={{ position: "fixed", left: this.state.x, top: this.state.y }}>
-          {internals}
-        </div>,
-        this.bodyDiv,
-      ) : internals
+      this.state.showDrag ? <>
+        {
+          ReactDOM.createPortal(
+            <div style={{ position: "fixed", left: this.state.x + 1, top: this.state.y + 1, zIndex: 1000 }}>
+              {internals}
+            </div>,
+            this.bodyDiv,
+          )
+        }
+        <div style={{ height: this.state.calculatedHoleHeight }} />
+      </> : internals
     );
   }
 }
