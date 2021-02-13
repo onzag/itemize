@@ -2672,12 +2672,36 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         selectedNode = Node.get(this.editor, oldPosition);
       }
 
+      // due to a bug in the way the nodes are moved actually
+      // it has to be done this way so first we need to find
+      // if we are just sorting, sorting in the same level
+      const toCropped = [...to];
+      const toLast = toCropped.pop();
+
+      const fromCropped = [...from];
+      const fromLast = fromCropped.pop();
+
+      // this will work as where we are actually moving to
+      const actualTo = [...to];
+
+      // if we are at the same level, and we are moving under our from
+      if (Path.equals(fromCropped, toCropped) && toLast > fromLast) {
+        // then we substract one
+        actualTo[actualTo.length - 1]--;
+      }
+
+      // the reason we do that is because for some weird messed up reason slate
+      // is going to move things at the same level one position further because
+      // we are taking one element away (it does that) and then it moves it to the wrong
+      // place one further because then it is not there anymore, weirdly this doesn't
+      // happen when there are many levels involved
+
       // and we can move it now
       Transforms.moveNodes(
         this.editor,
         {
           at: from,
-          to,
+          to: actualTo,
         }
       );
 
