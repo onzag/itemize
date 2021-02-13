@@ -502,6 +502,11 @@ export interface IHelperFunctions {
   selectPath: (path: Path) => void;
 
   /**
+   * Switches a path from one place to another
+   */
+  movePaths: (from: Path, to: Path) => void;
+
+  /**
    * Deletes the node at the selected path
    */
   deleteSelectedNode: () => void;
@@ -1310,6 +1315,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.selectPath = this.selectPath.bind(this);
+    this.movePaths = this.movePaths.bind(this);
     this.focus = this.focus.bind(this);
     this.insertImage = this.insertImage.bind(this);
     this.insertVideo = this.insertVideo.bind(this);
@@ -2652,6 +2658,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Allows to move between two paths as it moves elements to one place to another
+   * @param p the path to select
+   */
+  public movePaths(from: Path, to: Path) {
+    Transforms.moveNodes(
+      this.editor,
+      {
+        at: from,
+        to,
+      }
+    );
+  }
+
+  /**
    * Deletes the selected node that has been selected, either the current default
    * or one that has been manually selected using selectPath
    */
@@ -3748,6 +3768,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       HistoryEditor,
 
       selectPath: this.selectPath,
+      movePaths: this.movePaths,
 
       deleteSelectedNode: this.deleteSelectedNode,
 

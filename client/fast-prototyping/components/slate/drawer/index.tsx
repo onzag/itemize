@@ -46,7 +46,6 @@ class ScrollSlowly {
     const realSpeed = this.speed / 60;
     const nextPos = this.curScrollTop + realSpeed;
 
-    console.log("scroll by", nextPos, realSpeed);
     this.curScrollTop = nextPos;
     this.element.scrollTop = nextPos;
 
@@ -130,6 +129,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     currentRichElement={{
       children: props.state.currentValue
     } as any}
+    parentRichElement={null}
     currentSelectedNode={props.state.currentSelectedNode as any}
     currentSelectedNodePath={props.state.currentSelectedNodeAnchor}
     dropPositionDisabledClassName={props.classes.dropPositionDisabled}
@@ -140,8 +140,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     buttonClassName={props.classes.wrapperButton}
     childrenBoxClassName={props.classes.treeChildrenBox}
     onSelectPath={props.helpers.selectPath}
-    onBeginDrop={setDragScroll.bind(null, true)}
-    onEndDrop={setDragScroll.bind(null, false)}
+    onBeginDrag={setDragScroll.bind(null, true)}
+    onEndDrag={setDragScroll.bind(null, false)}
+    moveFromTo={props.helpers.movePaths}
   />
 
   // now we need to build the settings

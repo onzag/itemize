@@ -54,6 +54,8 @@ const style = createStyles({
   wrapperButton: {
     fontSize: "0.5rem",
     padding: "0.1rem 0.5rem 0.2rem 0.5rem",
+    borderLeft: "solid 2px #ccc",
+    borderRadius: 0,
   },
   treeChildrenBox: {
     padding: "0 0 0 0.5rem",

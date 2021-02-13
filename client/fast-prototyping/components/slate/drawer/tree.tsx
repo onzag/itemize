@@ -114,10 +114,43 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
   }
 }
 
+function canAcceptAsChildren(expectedParent: RichElement, expectedChild: RichElement) {
+  const expectedParentContainment = expectedParent ? (expectedParent.containment || "superblock") : "superblock";
+
+  if (expectedParentContainment === "superblock") {
+    return true;
+  }
+
+  if (
+    expectedParentContainment === "inline" ||
+    expectedParentContainment.startsWith("void") ||
+    expectedParent.html ||
+    expectedParent.textContent
+  ) {
+    return false;
+  }
+
+  if (expectedParentContainment === "block") {
+    return expectedChild.containment === "inline" || expectedChild.containment === "void-inline";
+  }
+
+  if (expectedParentContainment === "list-superblock") {
+    return expectedChild.containment === "block";
+  }
+
+  return false;
+}
+
+interface IDraggingElementInfo {
+  path: Path;
+  element: RichElement;
+}
+
 interface ITreeProps {
   currentSelectedNode: RichElement;
   currentSelectedNodePath: Path;
   currentRichElement: RichElement;
+  parentRichElement: RichElement;
   currentPath: Path;
   currentIsLastInPath: boolean;
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
@@ -126,13 +159,14 @@ interface ITreeProps {
   dropPositionDisabledClassName: string;
   childrenBoxClassName: string;
   onSelectPath: (p: Path) => void;
-  parentDropping?: boolean;
-  onBeginDrop?: () => void;
-  onEndDrop?: () => void;
+  parentDraggingAt?: IDraggingElementInfo;
+  onBeginDrag?: (element: RichElement, at: Path) => void;
+  onEndDrag?: () => void;
+  moveFromTo: (from: Path, to: Path) => void;
 }
 
 interface ITreeState {
-  dropping: boolean;
+  draggingAt: IDraggingElementInfo;
   dragging: boolean;
   showDrag: boolean;
   x: number;
@@ -150,7 +184,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     super(props);
 
     this.state = {
-      dropping: false,
+      draggingAt: null,
       dragging: false,
       showDrag: false,
       x: null,
@@ -168,8 +202,8 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     this.moveDragTouch = this.moveDragTouch.bind(this);
     this.endDragMouse = this.endDragMouse.bind(this);
     this.endDragTouch = this.endDragTouch.bind(this);
-    this.startDropping = this.startDropping.bind(this);
-    this.endDropping = this.endDropping.bind(this);
+    this.onTreeElementBeginsDrag = this.onTreeElementBeginsDrag.bind(this);
+    this.onTreeElementEndsDrag = this.onTreeElementEndsDrag.bind(this);
   }
   public componentDidUpdate(prevProps: ITreeProps, prevState: ITreeState) {
     if (this.state.dragging && !this.state.showDrag) {
@@ -185,22 +219,25 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     }
 
     if (prevState.showDrag && !this.state.showDrag) {
-      this.props.onEndDrop && this.props.onEndDrop();
+      this.props.onEndDrag && this.props.onEndDrag();
     } else if (this.state.showDrag && !prevState.showDrag) {
-      this.props.onBeginDrop && this.props.onBeginDrop();
+      this.props.onBeginDrag && this.props.onBeginDrag(this.props.currentRichElement, this.props.currentPath);
     }
   }
-  public startDropping() {
+  public onTreeElementBeginsDrag(element: RichElement, at: Path) {
     this.setState({
-      dropping: true,
+      draggingAt: {
+        element,
+        path: at,
+      },
     });
-    this.props.onBeginDrop && this.props.onBeginDrop();
+    this.props.onBeginDrag && this.props.onBeginDrag(element, at);
   }
-  public endDropping() {
+  public onTreeElementEndsDrag() {
     this.setState({
-      dropping: false,
+      draggingAt: null,
     });
-    this.props.onEndDrop && this.props.onEndDrop();
+    this.props.onEndDrag && this.props.onEndDrag();
   }
   public startDragMouse(e: React.MouseEvent) {
     document.body.addEventListener("mousemove", this.moveDragMouse);
@@ -263,6 +300,13 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
       this.props.onSelectPath(this.props.currentPath);
     }
 
+    const element = document.elementFromPoint(this.state.x, this.state.y) as HTMLDivElement;
+    const pathSource = element.dataset && element.dataset.path;
+    if (pathSource) {
+      const givenPath = JSON.parse(pathSource);
+      this.props.moveFromTo(this.props.currentPath, givenPath);
+    }
+
     this.setState({
       dragging: false,
       showDrag: false,
@@ -279,22 +323,38 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     // and now let's find what we will choose
     let currentRichElement = this.props.currentRichElement;
 
-    const shouldShowDrop = !this.state.showDrag && (this.props.parentDropping || this.state.dropping);
+    const draggingAt = this.props.parentDraggingAt || this.state.draggingAt;
+    const shouldShowDrop = !this.state.showDrag && draggingAt;
 
     let childTree: React.ReactNode = null;
-    if (currentRichElement.children && currentRichElement.children.length) {
-      childTree = (currentRichElement.children as any).map((c: RichElement, index: number) => (
-        c.type ? <Tree
+    const accessibleChildren = currentRichElement.children && currentRichElement.children.filter((c) => !!(c as any).type);
+    if (accessibleChildren && accessibleChildren.length) {
+      childTree = (accessibleChildren as any).map((c: RichElement, index: number) => (
+        <Tree
           {...this.props}
           currentPath={[...this.props.currentPath, index]}
           currentIsLastInPath={index === currentRichElement.children.length - 1}
           currentRichElement={c}
+          parentRichElement={this.props.currentRichElement}
           key={index}
-          parentDropping={shouldShowDrop}
-          onBeginDrop={this.startDropping}
-          onEndDrop={this.endDropping}
-        /> : null
+          parentDraggingAt={draggingAt}
+          onBeginDrag={this.onTreeElementBeginsDrag}
+          onEndDrag={this.onTreeElementEndsDrag}
+        />
       ));
+    } else if (!currentRichElement.textContent && !currentRichElement.html) {
+      let childPath: Path = null;
+      if (shouldShowDrop) {
+        childPath = [...this.props.currentPath, 0];
+      }
+
+      childTree = shouldShowDrop && canAcceptAsChildren(this.props.currentRichElement, draggingAt.element) ?
+        (
+          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(childPath)} />
+        ) :
+        (
+          <div className={this.props.dropPositionDisabledClassName} />
+        );
     }
 
     // now if we are selected we must make it clear
@@ -307,25 +367,33 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
       return childTree;
     }
 
+    let shouldShowSiblingDrops = shouldShowDrop && canAcceptAsChildren(this.props.parentRichElement, draggingAt.element);
+
+    let prevPath: Path = null;
+    if (shouldShowSiblingDrops) {
+      prevPath = [...this.props.currentPath];
+      prevPath[prevPath.length - 1]--;
+    }
+
     const prevSpacer =
-      shouldShowDrop ?
+      shouldShowSiblingDrops && !Path.equals(prevPath, draggingAt.path) ?
         (
-          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(this.props.currentPath)}/>
+          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(this.props.currentPath)} />
         ) :
         (
           <div className={this.props.dropPositionDisabledClassName} />
         );
 
-    const nextPath: Path = null;
-    if (this.props.currentIsLastInPath && shouldShowDrop) {
-      const nextPath = [...this.props.currentPath];
+    let nextPath: Path = null;
+    if (this.props.currentIsLastInPath && shouldShowSiblingDrops) {
+      nextPath = [...this.props.currentPath];
       nextPath[nextPath.length - 1]++;
     }
 
     const nextSpacer = this.props.currentIsLastInPath ? (
-      shouldShowDrop ?
+      shouldShowSiblingDrops && !Path.equals(nextPath, draggingAt.path) ?
         (
-          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(nextPath)}/>
+          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(nextPath)} />
         ) :
         (
           <div className={this.props.dropPositionDisabledClassName} />
@@ -345,9 +413,9 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
         >
           {info.name}
         </Button>
-        {childTree ? <div className={this.props.childrenBoxClassName}>
+        <div className={this.props.childrenBoxClassName}>
           {childTree}
-        </div> : null}
+        </div>
         {nextSpacer}
       </div>
     );
