@@ -2222,10 +2222,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       });
     }
 
-    if (Text.isText(currentSelectedNode)) {
-      debugger;
-    }
-
     // now we can return
     return {
       currentAnchor: anchor,
@@ -2662,13 +2658,60 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param p the path to select
    */
   public movePaths(from: Path, to: Path) {
-    Transforms.moveNodes(
-      this.editor,
-      {
-        at: from,
-        to,
+    // first we pick the old selected position from what we have now
+    // it might be null
+    const oldPosition = this.state.currentSelectedNodeAnchor;
+
+    // this is what actually performs the moving
+    const performMove = () => {
+      // now we need to get our selected node because
+      // removing the current selected might have affected
+      // its value
+      let selectedNode: Node;
+      if (oldPosition) {
+        selectedNode = Node.get(this.editor, oldPosition);
       }
-    );
+
+      // and we can move it now
+      Transforms.moveNodes(
+        this.editor,
+        {
+          at: from,
+          to,
+        }
+      );
+
+      // now if we had that old position as well
+      if (oldPosition) {
+        // another weird timeout
+        setTimeout(() => {
+          // and now we need to find out the path to select
+          const newAnchor = ReactEditor.findPath(this.editor, selectedNode);
+          // and we can now select it
+          if (newAnchor) {
+            this.selectPath(newAnchor);
+          }
+        }, 0);
+      }
+    }
+
+    // if we have an old position
+    // we need to clear it because moving the selected
+    // node might cause issues during normalization and
+    // getting the contexts and anchors
+    if (oldPosition) {
+      this.setState({
+        currentSelectedNode: null,
+        currentSelectedNodeAnchor: null,
+        currentSelectedNodeContext: null,
+      }, () => {
+        // slate loves this and I don't know why
+        // it won't work without the timeout
+        setTimeout(performMove, 0);
+      });
+    } else {
+      performMove();
+    }
   }
 
   /**
