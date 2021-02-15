@@ -319,7 +319,6 @@ export interface IImage extends IElementBase {
   srcSet: string;
   /**
    * sizes of the image
-   * sizes is a property that is removed
    */
   sizes: string;
   /**

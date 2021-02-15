@@ -68,6 +68,7 @@ export interface IPropertyEntryI18nRichTextInfo {
 
   name: string;
   alt: string;
+  sizes: string;
   container: string;
   inline: string;
   text: string;
@@ -767,7 +768,8 @@ export default class PropertyEntryText
         formatMore: i18nInLanguage.format_more,
 
         name: i18nInLanguage.rich_name,
-        alt: i18nInLanguage.alt,
+        alt: i18nInLanguage.rich_alt,
+        sizes: i18nInLanguage.rich_sizes,
         container: i18nInLanguage.rich_container,
         inline: i18nInLanguage.rich_inline,
         text: i18nInLanguage.rich_text,

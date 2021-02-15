@@ -311,6 +311,7 @@ export function postprocess(
       const alt = (node as HTMLImageElement).alt || "";
       const srcHeight = node.dataset.srcHeight;
       const srcWidth = node.dataset.srcWidth;
+      const sizes = (node as HTMLImageElement).sizes || "70vw";
 
       node.removeAttribute("loading");
 
@@ -337,7 +338,7 @@ export function postprocess(
         // src
         node.setAttribute("src", absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg");
         // sizes
-        node.setAttribute("sizes", "70vw");
+        node.setAttribute("sizes", sizes);
         // data-src-width
         node.dataset.srcWidth = srcWidth;
         // data-src-id

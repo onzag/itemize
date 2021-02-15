@@ -166,11 +166,9 @@ Going to our header we will find we have 7 html template bits to use, and if we 
 
 ![Template Header Making](./images/template-header-making.png)
 
-Now if we go to our actual frontpage, we will find that it doesn't look quite right.
+Now if we go to our actual frontpage, we will find that it doesn't look quite right, the contents are missing and it just looks off overall.
 
-![CatBnB Header Attempt](./images/catbnb-header-attempt.png)
-
-This is rightly because we have just told our edit renderer how to edit this fragment, but when we are using it we are rendering it as it is; as raw plain html, rather than instantiating it as a template.
+This is rightly because we have just told our edit renderer how to render this fragment using the available information, but when we are using it we are rendering it as it is; as raw plain html, rather than instantiating it as a template.
 
 Let's remake our `frontpage/index.tsx` as a primarily fragment based mechanism based on our header and body.
 
@@ -276,4 +274,10 @@ export function Frontpage() {
 }
 ```
 
-Now we can remove both `hero.tsx` and `search.tsx` as we don't need them any further, let's try to then make it look nice, this simple design shall suffice.
+Now we can remove both `hero.tsx` and `search.tsx` as we don't need them any further, if you check now your frontpage the view should have changed to the more appropiate look of:
+
+![Catbnb New Frontpage](./images/catbnb-new-frontpage.png)
+
+Which is more like what we are aiming for, now let's try to go further and make it look nice; as you might realize these fragments support images so it is totally possible to add a new image to them and style them in the rich text editor itself.
+
+Now let's say this is not enough at all, and we need to give our designer some resources and classes to work with.

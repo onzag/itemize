@@ -377,6 +377,7 @@ export const LOCALE_I18N = [
   // extra rich element information
   "rich_name",
   "rich_alt",
+  "rich_sizes",
   "rich_container",
   "rich_inline",
   "rich_text",

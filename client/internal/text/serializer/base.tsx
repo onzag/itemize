@@ -182,7 +182,7 @@ export function serializeElementBase(
   // now we go over each one of the properties of the base
   Object.keys(base).forEach((k) => {
     // and check for a translation
-    if (translations[k]) {
+    if (translations[k] && typeof base[k] !== "undefined" && base[k] !== null) {
       // set it if there's such
       elementComponent.setAttribute(translations[k], base[k]);
     }

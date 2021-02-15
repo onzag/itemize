@@ -281,6 +281,10 @@ interface IGeneralImageOptionsState {
    */
   altValue: string;
   /**
+   * The sizes value that is used for image scale loading
+   */
+  sizes: string;
+  /**
    * The anchor that the image is selected for as we follow the same
    * pattern as the other editor
    */
@@ -299,6 +303,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
    * we can just wait some milliseconds
    */
   private altUpdateTimeout: NodeJS.Timer;
+  private sizesUpdateTimeout: NodeJS.Timer;
 
   /**
    * We need the derived function in order to be able to update the value of the
@@ -314,6 +319,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     if (
       (
         (selectedNode.alt || "") !== state.altValue ||
+        (selectedNode.sizes || "") !== state.sizes ||
         selectedNode.standalone !== state.standalone
       ) &&
       !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
@@ -321,6 +327,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
       return {
         altValue: selectedNode.alt || "",
         standalone: selectedNode.standalone,
+        sizes: selectedNode.sizes || "",
         valueForAnchor: props.state.currentSelectedNodeAnchor,
       }
     }
@@ -340,6 +347,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.state = {
       altValue: selectedNode.alt || "",
       standalone: selectedNode.standalone,
+      sizes: selectedNode.sizes || "",
       valueForAnchor: props.state.currentSelectedNodeAnchor,
     }
 
@@ -361,6 +369,18 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   }
 
   /**
+   * Performs the actually update of the sizes based on the
+   * state and when the timer has finally ellapsed
+   */
+  public actuallyUpdateSizes() {
+    // here we use the arbitrary partial value set function
+    // to update the node at the given anchor
+    this.props.helpers.set({
+      sizes: this.state.sizes,
+    }, this.props.state.currentSelectedNodeAnchor);
+  }
+
+  /**
    * Performs the state update of the alt into the state
    * and delays the execution of the update in the node
    * in order to avoid doing a tree update of the rich text
@@ -377,6 +397,25 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     clearTimeout(this.altUpdateTimeout);
     // and then we create a new timeout in 300 ms
     this.altUpdateTimeout = setTimeout(this.actuallyUpdateAlt, 300);
+  }
+
+  /**
+   * Performs the state update of the alt into the state
+   * and delays the execution of the update in the node
+   * in order to avoid doing a tree update of the rich text
+   * on every key stroke
+   * @param e the change event in the input
+   */
+  public updateSizes(e: React.ChangeEvent<HTMLInputElement>) {
+    // update the state
+    this.setState({
+      sizes: e.target.value,
+    });
+
+    // now we clear a possibly existant previous timeout
+    clearTimeout(this.sizesUpdateTimeout);
+    // and then we create a new timeout in 300 ms
+    this.sizesUpdateTimeout = setTimeout(this.actuallyUpdateSizes, 300);
   }
 
   /**
@@ -408,6 +447,14 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
           placeholder={this.props.i18nRichInfo.alt}
           variant="filled"
           onChange={this.updateAlt}
+          fullWidth={true}
+        />
+        <TextField
+          value={this.state.sizes}
+          label={this.props.i18nRichInfo.sizes}
+          placeholder={this.props.i18nRichInfo.sizes}
+          variant="filled"
+          onChange={this.updateSizes}
           fullWidth={true}
         />
         <FormControlLabel

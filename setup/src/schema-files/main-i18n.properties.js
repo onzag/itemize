@@ -45,6 +45,7 @@ format_more = more options
 
 rich_name = name
 rich_alt = alt
+rich_sizes = sizes
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -210,6 +211,7 @@ format_more = lisää
 
 rich_name = nimi
 rich_alt = alt
+rich_sizes = sizes
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -375,6 +377,7 @@ format_more = more options
 
 rich_name = name
 rich_alt = alt
+rich_sizes = sizes
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -540,6 +543,7 @@ format_more = more options
 
 rich_name = name
 rich_alt = alt
+rich_sizes = sizes
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -705,6 +709,7 @@ format_more = más opciones
 
 rich_name = nombre
 rich_alt = alt
+rich_sizes = sizes
 rich_container = contenedor
 rich_inline = inline
 rich_text = texto
@@ -870,6 +875,7 @@ format_more = more options
 
 rich_name = name
 rich_alt = alt
+rich_sizes = sizes
 rich_container = container
 rich_inline = inline
 rich_text = text
