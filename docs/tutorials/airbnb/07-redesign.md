@@ -280,4 +280,28 @@ Now we can remove both `hero.tsx` and `search.tsx` as we don't need them any fur
 
 Which is more like what we are aiming for, now let's try to go further and make it look nice; as you might realize these fragments support images so it is totally possible to add a new image to them and style them in the rich text editor itself.
 
-Now let's say this is not enough at all, and we need to give our designer some resources and classes to work with.
+We can keep working and polishing the frontpage and the body in the text editor and make it look such as:
+
+![Catbnb Frontpage Redesign First](./images/catbnb-frontpage-redesign-first.png)
+
+We are going to drop more designing since it's out of the scope of this tutorial to design, but feel free to play with the rich text editor further and figure out its potential to design almost anything.
+
+However there are limitations, for example there is no support for defining media queries since the styles of these components are set as inline, and we need to give our designer some resources and classes to work with, for example some responsive classes for usage with responsive design, since the text-specs do not support these.
+
+Let's add some classes that our designer can take advantage of, let's go to the file that we have in our source code named `rich-extensions.scss` which is part of an imported styles that is included in our codebase and let's add the following extensions, note that they all must be prefixed with `rich-text--`.
+
+```scss
+.rich-text--hidden-mobile {
+    @media only screen and (max-width: 500px) {
+        display: none;
+    }
+}
+
+.rich-text--hidden-desktop {
+    @media only screen and (min-width: 501px) {
+        display: none;
+    }
+}
+```
+
+In reality these classes should be more specific on what they want to achieve, but it's a start, after you have added and rebuilt they should be accessible, and you should be able to use them.

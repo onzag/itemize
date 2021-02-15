@@ -271,9 +271,14 @@ let ALL_IS_LOADED: boolean = false;
  * @param stylesheet the stylesheet to calculate
  * @ignore
  */
-function calculateStylesheet(stylesheet: CSSStyleSheet) {
+function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
   // so first we split within the rules
   Array.from(stylesheet.cssRules).forEach((r) => {
+    if (r instanceof CSSMediaRule || (r as any).cssRules) {
+      calculateStylesheet(r as CSSMediaRule);
+      return;
+    }
+
     // and now we need the selector part that selects, and split it so we have
     // something like [".trusted", ".rich-text--something"]
     // selectorText is supported in chromium based browsers but not all, so we have a more expensive
@@ -2805,7 +2810,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         ],
         height: data.height,
         width: data.width,
-        sizes: null,
+        sizes: "70vw",
         src: data.result.url,
         srcId: data.result.id,
         srcSet: null,

@@ -239,7 +239,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
               </>
             ) : null
         }
-        <Paper>
+        <Paper className={props.classes.drawerSettingsForNodePaper}>
           {infoPanel}
         </Paper>
       </>

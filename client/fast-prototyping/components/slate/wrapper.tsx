@@ -64,8 +64,9 @@ const style = createStyles({
   treeDataBox: {
     width: "100%",
     position: "relative",
-    maxHeight: "200px",
+    maxHeight: "360px",
     overflowY: "auto",
+    flex: "1 0 auto",
   },
   dropPositionEnabled: {
     height: "0.5rem",
@@ -97,6 +98,7 @@ const style = createStyles({
     color: "#444",
     fontSize: "1rem",
     height: "1rem",
+    flex: "0 0 1rem",
   },
   editorDrawer: {
     width: 0,
@@ -104,7 +106,7 @@ const style = createStyles({
     transition: "width 0.5s ease-in-out, height 0.5s ease-in-out",
     "&.open": {
       width: "300px",
-      height: "500px",
+      height: "800px",
     },
     overflow: "hidden",
     position: "relative",
@@ -124,6 +126,12 @@ const style = createStyles({
     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
     backgroundColor: "#f5f5f5",
     padding: "1rem",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  },
+  drawerSettingsForNodePaper: {
+    flex: "0 1 auto",
     overflowY: "auto",
   },
   editor: (props: ISlateEditorWrapperBaseProps) => {
