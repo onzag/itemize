@@ -429,7 +429,7 @@ In order to make a for loop for the given template you would have to do the foll
 
 Because this also represents a context update of the template, the children of this for loop now have the new context and have no access to the animals variable anymore, but rather conform a new context.
 
-### Complete UI Handler
+### Complete UI Handler (Deprecated Description)
 
 Text in templating mode can provide a whole custom ui handler for the given component, a whole complete UI handler allows for full modification and control over a given node and it's given by `data-ui-handler` where the value is one of the values given by the templating object
 

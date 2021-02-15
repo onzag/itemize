@@ -49,7 +49,7 @@ export function registerFile(registry: ISerializationRegistryType) {
     // filename
     const name = DOMWindow.document.createElement("span");
     name.className = "file-name";
-    name.textContent = file.name;
+    name.textContent = file.fileName;
     parentContainer.appendChild(name);
 
     // and file size
@@ -89,7 +89,7 @@ export function registerFile(registry: ISerializationRegistryType) {
       containment: "void-inline",
       type: "file",
       srcId: node.dataset.srcId,
-      name: fileNameNode.textContent,
+      fileName: fileNameNode.textContent,
       extension: fileExtensionNode.textContent,
       size: fileSizeNode.textContent,
       src: node.dataset.src,
@@ -125,7 +125,7 @@ export function registerFile(registry: ISerializationRegistryType) {
             <span className="file-icon">
               <span className="file-extension" spellCheck={false}>{arg.element.extension}</span>
             </span>
-            <span className="file-name" spellCheck={false}>{arg.element.name}</span>
+            <span className="file-name" spellCheck={false}>{arg.element.fileName}</span>
             <span className="file-size" spellCheck={false}>{arg.element.size}</span>
             {children}
           </span>
@@ -159,7 +159,7 @@ export interface IFile extends IElementBase {
   /**
    * file name
    */
-  name: string;
+  fileName: string;
   /**
    * file size
    */

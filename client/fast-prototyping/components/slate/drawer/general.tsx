@@ -22,7 +22,8 @@ import {
 import { IContainer } from "../../../../internal/text/serializer/types/container";
 import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
-import { Path } from "slate";
+import { Path, Text } from "slate";
+import type { RichElement } from "../../../../internal/text/serializer";
 
 /**
  * The state of the general option selector for the given item
@@ -403,8 +404,8 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
       <div className={this.props.classes.box}>
         <TextField
           value={this.state.altValue}
-          label="alt"
-          placeholder="alt"
+          label={this.props.i18nRichInfo.alt}
+          placeholder={this.props.i18nRichInfo.alt}
           variant="filled"
           onChange={this.updateAlt}
           fullWidth={true}
@@ -412,6 +413,127 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
         <FormControlLabel
           control={<Switch checked={this.state.standalone} onChange={this.updateStandalone} />}
           label={this.props.i18nRichInfo.standalone}
+        />
+      </div>
+    );
+  }
+}
+
+/**
+ * The general image option uses a different state
+ * because it has 2 properties that is has to track of
+ */
+interface IGeneralElementOptionsState {
+  /**
+   * The name that is being used
+   */
+  name: string;
+  /**
+   * The anchor that the image is selected for as we follow the same
+   * pattern as the other editor
+   */
+  valueForAnchor: Path;
+}
+
+/**
+ * Provides options that are shared in common with all the elements
+ */
+class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralElementOptionsState> {
+  /**
+   * We build a timer for updating the name, because the name is text and not a selector
+   * updating the name on each keystroke can be overkill, since we have a state anyway
+   * we can just wait some milliseconds
+   */
+  private nameUpdateTimeout: NodeJS.Timer;
+
+  /**
+   * We need the derived function in order to be able to update the value of the
+   * selector in case, this is the more efficient way in these cases where things
+   * are slightly out of sync
+   */
+  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralElementOptionsState) {
+
+    // for that we check if the value is not the same as the one in the state, which happens
+    // whenever changing, but in order to actually change it we only do so if it's a different
+    // element anchor we are at
+    const selectedNode: IImage = props.state.currentSelectedNode as any;
+    if (
+      (
+        (selectedNode.givenName || "") !== state.name
+      ) &&
+      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+    ) {
+      return {
+        name: selectedNode.givenName || "",
+        valueForAnchor: props.state.currentSelectedNodeAnchor,
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * This is the constructor for the image form options
+   * @param props the entire wrapper props that are passed here
+   */
+  constructor(props: MaterialUISlateWrapperWithStyles) {
+    super(props);
+
+    const selectedNode: RichElement = props.state.currentSelectedNode as any;
+
+    this.state = {
+      name: selectedNode.givenName || "",
+      valueForAnchor: props.state.currentSelectedNodeAnchor,
+    }
+
+    this.updateName = this.updateName.bind(this);
+    this.actuallyUpdateName = this.actuallyUpdateName.bind(this);
+  }
+
+  /**
+   * Performs the actually update of the alt based on the
+   * state and when the timer has finally ellapsed
+   */
+  public actuallyUpdateName() {
+    // here we use the arbitrary partial value set function
+    // to update the node at the given anchor
+    this.props.helpers.set({
+      givenName: this.state.name,
+    }, this.props.state.currentSelectedNodeAnchor);
+  }
+
+  /**
+   * Performs the state update of the name into the state
+   * and delays the execution of the update in the node
+   * in order to avoid doing a tree update of the rich text
+   * on every key stroke
+   * @param e the change event in the input
+   */
+  public updateName(e: React.ChangeEvent<HTMLInputElement>) {
+    // update the state
+    this.setState({
+      name: e.target.value,
+    });
+
+    // now we clear a possibly existant previous timeout
+    clearTimeout(this.nameUpdateTimeout);
+    // and then we create a new timeout in 300 ms
+    this.nameUpdateTimeout = setTimeout(this.actuallyUpdateName, 300);
+  }
+
+  /**
+   * The render function
+   */
+  public render() {
+    return (
+      <div className={this.props.classes.box}>
+        <TextField
+          value={this.state.name}
+          label={this.props.i18nRichInfo.name}
+          placeholder={this.props.i18nRichInfo.name}
+          variant="filled"
+          onChange={this.updateName}
+          fullWidth={true}
         />
       </div>
     );
@@ -444,6 +566,11 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   // and return
   return (
     <>
+      {
+        Text.isText((props.state.currentSelectedNode as any)) ?
+        null :
+        <GeneralElementOptions {...props}/>
+      }
       {specificNodeOptions}
       <IconButton onClick={props.helpers.deleteSelectedNode}>
         <DeleteIcon />

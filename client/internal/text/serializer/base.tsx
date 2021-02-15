@@ -106,6 +106,7 @@ export interface IAttrs {
  * @ignore
  */
 const translations = {
+  givenName: "data-name",
   html: "data-html",
   textContent: "data-text",
   style: "style",
@@ -514,6 +515,10 @@ export function deserializeElementBase(node: HTMLElement): IElementBase {
  * that it might have regardless
  */
 export interface IElementBase {
+  /**
+   * An optional name, just used to be displayed in the tree
+   */
+  givenName?: string;
   /**
    * This is the standard style that translates to the style tag
    * following the text specifications only some properties are allowed

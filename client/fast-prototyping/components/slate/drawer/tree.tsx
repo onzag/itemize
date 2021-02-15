@@ -95,15 +95,17 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
 
   // now let's build the name label for the given language
-  let nameLabel: string = node.type ? (i18nData[node.type] || node.type) : i18nData.text;
-  if (isBasicStyled || isTemplateStyled) {
-    nameLabel = localeReplacer(i18nData.styled, nameLabel);
-  }
-  if (isInteractive) {
-    nameLabel = localeReplacer(i18nData.interactive, nameLabel);
-  }
-  if (isTemplate) {
-    nameLabel = localeReplacer(i18nData.template, nameLabel);
+  let nameLabel: string = node.givenName ? node.givenName : (node.type ? (i18nData[node.type] || node.type) : i18nData.text);
+  if (!node.givenName) {
+    if (isBasicStyled || isTemplateStyled) {
+      nameLabel = localeReplacer(i18nData.styled, nameLabel);
+    }
+    if (isInteractive) {
+      nameLabel = localeReplacer(i18nData.interactive, nameLabel);
+    }
+    if (isTemplate) {
+      nameLabel = localeReplacer(i18nData.template, nameLabel);
+    }
   }
 
   // and we can return the information now

@@ -1348,41 +1348,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.releaseBlur = this.releaseBlur.bind(this);
   }
 
-  public moveSelected(dir: -1 | 1) {
-    if (!this.state.currentSelectedNode) {
-      return;
-    }
-
-    // TODO
-    // const pathOfPrev = [...this.state.currentSelectedNodeAnchor];
-
-    // while (pathOfPrev.length) {
-    //   pathOfPrev[pathOfPrev.length - 1] += dir;
-    //   if (pathOfPrev[pathOfPrev.length - 1] <= 0 || !Node.has(this.editor, pathOfPrev)) {
-    //     pathOfPrev.pop();
-    //   }
-
-    //   let nodeInQuestion: any = Node.get(this.editor, pathOfPrev);
-    //   while (nodeInQuestion.children && nodeInQuestion.children.length) {
-    //     const index = nodeInQuestion.children.length - 1;
-    //     nodeInQuestion = nodeInQuestion.children[index];
-    //     pathOfPrev.push(index);
-    //   }
-    // }
-
-    // if (!pathOfPrev.length) {
-    //   return;
-    // }
-
-
-  }
-
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
     // during the update the selected node that was previous might remain selected
     // because the internal value didn't change state
     if (prevState.currentSelectedNode && !equals(this.state.currentSelectedNodeAnchor, prevState.currentSelectedNodeAnchor)) {
       // so we have to find it in the current
-      const pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedNode as any);
+      let pathOfPreviousSelectedNode: Path;
+      try {
+        pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedNode as any);
+      } catch {
+        // it failed for whatever reason
+      }
       // and if there's a match
       if (pathOfPreviousSelectedNode) {
         // we are going to invalidate its state
@@ -1850,6 +1826,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we are dealing with and copy all its properties
       Transforms.insertNodes(this.editor, {
         ...this.state.currentBlockElement,
+        givenName: null,
         // but certainly not its current text properties
         // that we might be at, as we don't want to copy nor the
         // text, nor the template text values
@@ -3064,7 +3041,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           }
         ],
         extension: mimeTypeToExtension(file.type),
-        name: data.result.name,
+        fileName: data.result.name,
+        givenName: data.result.name,
         size: prettyBytes(data.result.size),
         src: data.result.url,
         srcId: data.result.id,
@@ -3111,6 +3089,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we use the current block element here in case we don't find it
       // the type is on top for case of emergency
       ...currentBlockElement,
+      givenName: null,
       children: [
         {
           bold: false,
@@ -3125,6 +3104,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now we can make the container
     const containerNode: IContainer = {
       type: "container",
+      givenName: type || null,
       containment: "superblock",
       children: [],
       containerType: type || null,
@@ -3172,6 +3152,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we use the current block element here in case we don't find it
       // the type is on top for case of emergency
       ...currentBlockElement,
+      givenName: null,
       children: [
         {
           bold: false,
@@ -3189,6 +3170,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containment: "superblock",
       children: [],
       customType: type,
+      givenName: type,
     };
 
     // and wrap the thing
@@ -3613,6 +3595,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: type || null,
       uiHandler: value,
       uiHandlerArgs: args,
+      givenName: type || null,
     };
 
     // and insert the thing

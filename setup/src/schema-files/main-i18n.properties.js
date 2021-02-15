@@ -43,6 +43,8 @@ format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
+rich_name = name
+rich_alt = alt
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -206,6 +208,8 @@ format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = lisää
 
+rich_name = nimi
+rich_alt = alt
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -369,6 +373,8 @@ format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
+rich_name = name
+rich_alt = alt
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -532,6 +538,8 @@ format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
+rich_name = name
+rich_alt = alt
 rich_container = container
 rich_inline = inline
 rich_text = text
@@ -695,6 +703,8 @@ format_add_template_html = insertar HTML de plantilla
 format_delete_element = eliminar elemento
 format_more = más opciones
 
+rich_name = nombre
+rich_alt = alt
 rich_container = contenedor
 rich_inline = inline
 rich_text = texto
@@ -858,6 +868,8 @@ format_add_template_html = add template HTML
 format_delete_element = delete element
 format_more = more options
 
+rich_name = name
+rich_alt = alt
 rich_container = container
 rich_inline = inline
 rich_text = text
