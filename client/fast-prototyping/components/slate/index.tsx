@@ -993,6 +993,11 @@ interface ISlateEditorProps {
    */
   onCheckFileExists: (fileId: string) => boolean;
   /**
+   * Function that should be specified to retrieve data uris from blob urls given
+   * a file id
+   */
+  onRetrieveDataURI: (fileId: string) => string;
+  /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
    */
@@ -1380,16 +1385,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * This function runs and prepares the tree that is to be inserted into the
    * pasted content
    * @param data the data transfer of the clipboard
+   * @param blobs an object that contains the blob transfer object
    * @param element the element we are currently processing
    */
-  public async findAndInsertFilesFromDataTransfer(data: DataTransfer, element: RichElement): Promise<RichElement> {
+  public async findAndInsertFilesFromDataTransfer(data: DataTransfer, blobs: any, element: RichElement): Promise<RichElement> {
     // by default the new element is itself
     let newElement = element;
 
     // however we might have these types we need to process
     if (newElement.type === "image" || newElement.type === "file") {
-      const urlToReadFrom = newElement.src;
       const idSpecified = newElement.srcId;
+      const urlToReadFrom = blobs[idSpecified] ? blobs[idSpecified] : newElement.src;
 
       if (this.props.onCheckFileExists(idSpecified)) {
         // File belongs to this editor, nothing to do
@@ -1452,7 +1458,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // we need to process those too
     if (newElement && newElement.children) {
       newElement.children = (
-        await Promise.all((newElement.children as any).map(this.findAndInsertFilesFromDataTransfer.bind(this, data)))
+        await Promise.all((newElement.children as any).map(this.findAndInsertFilesFromDataTransfer.bind(this, data, blobs)))
       ).filter(e => !!e) as any;
     }
 
@@ -1465,15 +1471,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public async insertData(data: DataTransfer) {
     // we grab the fragment data for slate
-    const fragment = data.getData('application/x-slate-fragment')
+    const fragment = data.getData('application/x-slate-fragment');
 
     // if we have it
     if (fragment) {
+      // let's get the blobs
+      const blobs = JSON.parse(data.getData('application/x-slate-blobs') || "{}");
       // then we decode and parse
       const decoded = decodeURIComponent(window.atob(fragment));
       // note how we filter in case bits fail to load (aka images and files)
       const parsed = (
-        await Promise.all(JSON.parse(decoded).map(this.findAndInsertFilesFromDataTransfer.bind(this, data))) as Node[]
+        await Promise.all(JSON.parse(decoded).map(this.findAndInsertFilesFromDataTransfer.bind(this, data, blobs))) as Node[]
       ).filter(e => !!e) as any;
       // now we can insert that fragment once we are done
       this.editor.insertFragment(parsed);
@@ -1489,7 +1497,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param data the data transfer
    * @param element the rich element we have just copied
    */
-  public findAndAppendFilesToDataTransfer(data: DataTransfer, element: RichElement) {
+  public findAndAppendFilesToDataTransfer(data: DataTransfer, element: RichElement): Promise<any> {
+    const gatheredFiles: any = {};
+
     // we want to spot images and files
     if (element.type === "image" || element.type === "file") {
       // get the url
@@ -1501,14 +1511,22 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // then we should think about copying it right into the data transfer
       // since blobs are temporary
       if (isBlob) {
-        // TODO
+        const urlData = this.props.onRetrieveDataURI(element.srcId);
+        if (urlData) {
+          gatheredFiles[element.srcId] = urlData;
+        }
       }
     }
 
     // now we run per each children
     if (element.children) {
-      element.children.forEach(this.findAndAppendFilesToDataTransfer.bind(this, data));
+      const gatheredFilesArr = (element.children as any).map(this.findAndAppendFilesToDataTransfer.bind(this, data));
+      gatheredFilesArr.forEach((gatheredFilesPerChildren: any) => {
+        Object.assign(gatheredFiles, gatheredFilesPerChildren);
+      });
     }
+
+    return gatheredFiles;
   }
 
   /**
@@ -1523,7 +1541,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const fragment64 = data.getData("application/x-slate-fragment");
     if (fragment64) {
       const copyDataTree: RichElement[] = JSON.parse(decodeURIComponent(atob(fragment64)));
-      copyDataTree.forEach(this.findAndAppendFilesToDataTransfer.bind(this, data));
+
+      const gatheredFiles: any = {};
+      const gatheredFilesArr = copyDataTree.map(this.findAndAppendFilesToDataTransfer.bind(this, data));
+      gatheredFilesArr.forEach((gatheredFilesPerChildren) => {
+        Object.assign(gatheredFiles, gatheredFilesPerChildren);
+      });
+
+      data.setData("application/x-slate-blobs", JSON.stringify(gatheredFiles));
     }
   }
 

@@ -221,6 +221,15 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * @returns the single file
    */
   onRetrieveFile: (fileId: string) => IPropertyDefinitionSupportedSingleFilesType;
+
+  /**
+   * Given a blob URL that doesn't have a remote server located storage
+   * provides a data URI for the file, this is used for copying; as you will
+   * need DATA URIs for blob urls
+   * @param fileId the file id
+   * @returns a data uri or null
+   */
+  onRetrieveDataURI: (fileId: string) => string;
 }
 
 /**
@@ -266,6 +275,13 @@ export default class PropertyEntryText
     [id: string]: IPropertyDefinitionSupportedSingleFilesType;
   }
 
+  /**
+   * Contains a list of active data uris for the blob elements
+   */
+  private activeDataURIs: {
+    [id: string]: string;
+  }
+
   constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
     super(props);
 
@@ -275,11 +291,13 @@ export default class PropertyEntryText
     }
 
     this.internalFileCache = {};
+    this.activeDataURIs = {};
 
     this.onInsertFile = this.onInsertFile.bind(this);
     this.onInsertFileFromURL = this.onInsertFileFromURL.bind(this);
     this.onCheckFileExists = this.onCheckFileExists.bind(this);
     this.onRetrieveFile = this.onRetrieveFile.bind(this);
+    this.onRetrieveDataURI = this.onRetrieveDataURI.bind(this);
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
     this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
@@ -306,6 +324,8 @@ export default class PropertyEntryText
         URL.revokeObjectURL(this.internalFileCache[k].url);
       }
     });
+
+    this.activeDataURIs = {};
   }
 
   /**
@@ -351,8 +371,29 @@ export default class PropertyEntryText
 
       // if we have one, we will loop and store such files
       if (currentValue) {
+        const processedDataURIS: string[] = [];
         currentValue.forEach((v) => {
           this.internalFileCache[v.id] = v;
+
+          if (v.url.startsWith("blob:")) {
+            processedDataURIS.push(v.id);
+            
+            if (!this.activeDataURIs[v.id]) {
+              (async () => {
+                if (v.src) {
+                  this.activeDataURIs[v.id] = await this.readBlobAsDataUrl(v.src as any);
+                } else {
+                  this.activeDataURIs[v.id] = await this.readUrlAsDataUrl(v.url);
+                }
+              })();
+            }
+          }
+        });
+
+        Object.keys(this.activeDataURIs).forEach((fileId) => {
+          if (!processedDataURIS.includes(fileId)) {
+            delete this.activeDataURIs[fileId];
+          }
         });
       }
     }
@@ -458,7 +499,18 @@ export default class PropertyEntryText
       const newValue: PropertyDefinitionSupportedFilesType = currentValue !== null ?
         [...currentValue] : [];
 
-      newValue.push(this.internalFileCache[fileId]);
+      const fileCacheValue = this.internalFileCache[fileId];
+      newValue.push(fileCacheValue);
+
+      if (!this.activeDataURIs[fileId]) {
+        (async () => {
+          if (fileCacheValue.url.startsWith("blob:")) {
+            this.activeDataURIs[fileId] = fileCacheValue.src ?
+              await this.readBlobAsDataUrl(fileCacheValue.src as any) :
+              await this.readUrlAsDataUrl(fileCacheValue.url);
+          }
+        })();
+      }
 
       relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
       this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
@@ -475,6 +527,8 @@ export default class PropertyEntryText
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
     const currentValue =
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    delete this.activeDataURIs[fileId];
 
     // delete files but we don't get rid off them from the cache
     if (currentValue && currentValue.find(v => v.id === fileId)) {
@@ -494,6 +548,10 @@ export default class PropertyEntryText
       this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
     return currentValue && currentValue.find((v) => v.id === fileId);
+  }
+
+  public onRetrieveDataURI(fileId: string) {
+    return this.activeDataURIs[fileId] || null;
   }
 
   /**
@@ -522,8 +580,42 @@ export default class PropertyEntryText
       return null;
     }
 
+    let overrideURL: string;
+    if (!url.startsWith("blob:")) {
+      overrideURL = url;
+    }
+
     // there, it will work
-    return this.onInsertFile(blob, isExpectingImage);
+    // now this is a funny thing since the data uri might
+    // be a remote URL as well, depends on what we used to load
+    // from
+    return this.onInsertFile(blob, isExpectingImage, overrideURL);
+  }
+
+  public async readBlobAsDataUrl(blob: Blob): Promise<string> {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+
+    return new Promise<string>((resolve) => {
+      reader.onabort = () => {
+        resolve(null);
+      }
+      reader.onerror = () => {
+        resolve(null);
+      }
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      }
+    });
+  }
+
+  public async readUrlAsDataUrl(url: string): Promise<string> {
+    try {
+      const blob = await (await fetch(url)).blob();
+      return this.readBlobAsDataUrl(blob);
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -534,6 +626,7 @@ export default class PropertyEntryText
   public async onInsertFile(
     file: File,
     isExpectingImage?: boolean,
+    overrideDataURI?: string,
   ): Promise<IInsertedFileInformationType> {
     // So now if we are expecting image we check against images
     if (isExpectingImage && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
@@ -636,6 +729,10 @@ export default class PropertyEntryText
 
     // add this to the cache
     this.internalFileCache[id] = addedFile;
+    // we don't await for this, if it fails, it fails
+    (async () => {
+      this.activeDataURIs[id] = overrideDataURI || (await this.readBlobAsDataUrl(file));
+    })();
 
     // and now we can set the value for the cached media property
     this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
@@ -924,6 +1021,7 @@ export default class PropertyEntryText
       onInsertFileFromURL: this.onInsertFileFromURL,
       onCheckFileExists: this.onCheckFileExists,
       onRetrieveFile: this.onRetrieveFile,
+      onRetrieveDataURI: this.onRetrieveDataURI,
 
       enableUserSetErrors: this.enableUserSetErrors,
     };
