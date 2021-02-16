@@ -95,9 +95,9 @@ export interface IGQLFile {
    */
   metadata: string,
   /**
-   * A source, either a File or a read stream
+   * A source, either a File, Blob or a read stream
    */
-  src?: File | Promise<any>;
+  src?: File | Blob | Promise<any>;
 }
 
 /**
@@ -401,6 +401,7 @@ export class GQLQuery {
     // we are checking for a src which means it's a file
     if (
       (typeof File !== "undefined" && arg.src instanceof File) ||
+      (typeof Blob !== "undefined" && arg.src instanceof Blob) ||
       (Stream && arg.src instanceof Stream.Readable)
     ) {
       // let's build the unprocessed file

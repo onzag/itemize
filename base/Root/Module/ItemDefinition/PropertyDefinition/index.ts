@@ -566,6 +566,11 @@ export default class PropertyDefinition {
               (
                 typeof File !== "undefined" &&
                 v.src instanceof File
+              ) ||
+              // or check that the source is a blob
+              (
+                typeof Blob !== "undefined" &&
+                v.src instanceof Blob
               )
             );
         })) {
@@ -600,6 +605,9 @@ export default class PropertyDefinition {
           !(valueAsIGQLFile.src as Promise<any>).then && (
             typeof File === "undefined" ||
             !(valueAsIGQLFile.src instanceof File)
+          ) && (
+            typeof Blob === "undefined" ||
+            !(valueAsIGQLFile.src instanceof Blob)
           )
         )
       ) {

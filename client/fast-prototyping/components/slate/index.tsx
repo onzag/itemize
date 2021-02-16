@@ -982,6 +982,17 @@ interface ISlateEditorProps {
    */
   onInsertFile: (file: File, isExpectingImage?: boolean) => Promise<IInsertedFileInformationType>;
   /**
+   * Function that usually comes from the handler and is provided via the renderer
+   * directly to this in order to handle file insertions into the media property
+   * this function is given by the handler in this way to the renderer
+   */
+  onInsertFileFromURL: (url: string, name: string, isExpectingImage?: boolean) => Promise<IInsertedFileInformationType>;
+  /**
+   * Function that should be specified to inform whether a file is included
+   * in the current internal information
+   */
+  onCheckFileExists: (fileId: string) => boolean;
+  /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
    */
@@ -1167,6 +1178,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   private lastChangeWasSelectedDelete: boolean = false;
 
+  private originalSetFragmentData: any;
+  private originalInsertData: any;
+
   /**
    * The standard derived state function is used in order to set the state in an effective way
    * it is used because the behaviour of this editor is rather complex
@@ -1299,6 +1313,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertSuperblockBreak = this.insertSuperblockBreak.bind(this);
     this.deleteBackward = this.deleteBackward.bind(this);
     this.deleteForward = this.deleteForward.bind(this);
+    this.setFragmentData = this.setFragmentData.bind(this);
+    this.findAndAppendFilesToDataTransfer = this.findAndAppendFilesToDataTransfer.bind(this);
+    this.insertData = this.insertData.bind(this);
+    this.findAndInsertFilesFromDataTransfer = this.findAndInsertFilesFromDataTransfer.bind(this);
+
+    this.originalSetFragmentData = this.editor.setFragmentData;
+    this.originalInsertData = this.editor.insertData;
 
     // and so we override
     this.editor.isInline = this.isInline as any;
@@ -1307,6 +1328,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor.insertBreak = this.insertBreak;
     this.editor.deleteBackward = this.deleteBackward;
     this.editor.deleteForward = this.deleteForward;
+    this.editor.setFragmentData = this.setFragmentData;
+    this.editor.insertData = this.insertData;
 
     // other functions and heler utilities
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
@@ -1351,6 +1374,157 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     this.blockBlur = this.blockBlur.bind(this);
     this.releaseBlur = this.releaseBlur.bind(this);
+  }
+
+  /**
+   * This function runs and prepares the tree that is to be inserted into the
+   * pasted content
+   * @param data the data transfer of the clipboard
+   * @param element the element we are currently processing
+   */
+  public async findAndInsertFilesFromDataTransfer(data: DataTransfer, element: RichElement): Promise<RichElement> {
+    // by default the new element is itself
+    let newElement = element;
+
+    // however we might have these types we need to process
+    if (newElement.type === "image" || newElement.type === "file") {
+      const urlToReadFrom = newElement.src;
+      const idSpecified = newElement.srcId;
+
+      if (this.props.onCheckFileExists(idSpecified)) {
+        // File belongs to this editor, nothing to do
+      } else {
+        // File belongs to a different editor, cloning the content
+
+        const infoFromInsert = await this.props.onInsertFileFromURL(
+          urlToReadFrom,
+          (newElement as any).fileName || (newElement as any).alt || idSpecified,
+          newElement.type === "image",
+        );
+
+        if (infoFromInsert) {
+          if (newElement.type === "image") {
+            const imageNode: IImage = {
+              ...newElement,
+              type: "image",
+              containment: "void-block",
+              children: [
+                {
+                  bold: false,
+                  italic: false,
+                  text: "",
+                  underline: false,
+                }
+              ],
+              height: infoFromInsert.height,
+              width: infoFromInsert.width,
+              src: infoFromInsert.result.url,
+              srcId: infoFromInsert.result.id,
+              srcSet: null,
+            };
+            newElement = imageNode;
+          } else {
+            const fileNode: IFile = {
+              ...newElement,
+              type: "file",
+              containment: "void-inline",
+              children: [
+                {
+                  bold: false,
+                  italic: false,
+                  text: "",
+                  underline: false,
+                }
+              ],
+              size: prettyBytes(infoFromInsert.result.size),
+              src: infoFromInsert.result.url,
+              srcId: infoFromInsert.result.id,
+            };
+            newElement = fileNode;
+          }
+        } else {
+          newElement = null;
+        }
+      }
+    }
+
+    // if we still have the element and it has children
+    // we need to process those too
+    if (newElement && newElement.children) {
+      newElement.children = (
+        await Promise.all((newElement.children as any).map(this.findAndInsertFilesFromDataTransfer.bind(this, data)))
+      ).filter(e => !!e) as any;
+    }
+
+    return newElement;
+  }
+
+  /**
+   * This function runs when we are inserting using the slate clipboard
+   * @param data the data transfer
+   */
+  public async insertData(data: DataTransfer) {
+    // we grab the fragment data for slate
+    const fragment = data.getData('application/x-slate-fragment')
+
+    // if we have it
+    if (fragment) {
+      // then we decode and parse
+      const decoded = decodeURIComponent(window.atob(fragment));
+      // note how we filter in case bits fail to load (aka images and files)
+      const parsed = (
+        await Promise.all(JSON.parse(decoded).map(this.findAndInsertFilesFromDataTransfer.bind(this, data))) as Node[]
+      ).filter(e => !!e) as any;
+      // now we can insert that fragment once we are done
+      this.editor.insertFragment(parsed);
+      return;
+    }
+
+    // otherwise run the original
+    this.originalInsertData(data);
+  }
+
+  /**
+   * Runs per each rich element that has just been copied to the clipboard
+   * @param data the data transfer
+   * @param element the rich element we have just copied
+   */
+  public findAndAppendFilesToDataTransfer(data: DataTransfer, element: RichElement) {
+    // we want to spot images and files
+    if (element.type === "image" || element.type === "file") {
+      // get the url
+      const urlToReadFrom = element.src;
+
+      // if it's a blob
+      const isBlob = urlToReadFrom.startsWith("blob:");
+
+      // then we should think about copying it right into the data transfer
+      // since blobs are temporary
+      if (isBlob) {
+        // TODO
+      }
+    }
+
+    // now we run per each children
+    if (element.children) {
+      element.children.forEach(this.findAndAppendFilesToDataTransfer.bind(this, data));
+    }
+  }
+
+  /**
+   * This function runs when we are preparing the slate clipboard
+   * @param data the data transfer
+   */
+  public setFragmentData(data: DataTransfer) {
+    // we run the original function to prepare the clipboard
+    this.originalSetFragmentData(data);
+
+    // need to find the files that are included in the copy
+    const fragment64 = data.getData("application/x-slate-fragment");
+    if (fragment64) {
+      const copyDataTree: RichElement[] = JSON.parse(decodeURIComponent(atob(fragment64)));
+      copyDataTree.forEach(this.findAndAppendFilesToDataTransfer.bind(this, data));
+    }
   }
 
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {

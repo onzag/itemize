@@ -193,6 +193,34 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    */
   onInsertFile: (file: File, isExpectingImage?: boolean) =>
     Promise<IInsertedFileInformationType>;
+
+  /**
+   * Insert a file, based on an url, this is very useful when doing
+   * pastes where we need to retrieve the information based on an url
+   * @param url the url we need to fetch data from
+   * @param name the name of the file to give it
+   * @param isExpectingImage whether the file should be an image
+   * of the types we are expecting
+   * @returns a promise with information about the file, note
+   * that even if you are not expecting just an image but
+   * you pass an image you will get image information
+   */
+  onInsertFileFromURL: (url: string, name: string, isExpectingImage?: boolean) =>
+    Promise<IInsertedFileInformationType>;
+
+  /**
+   * Specifies whether the file id exists within the current context
+   * @param fileId the file id
+   * @returns a boolean
+   */
+  onCheckFileExists: (fileId: string) => boolean;
+
+  /**
+   * Given an id returns the given file
+   * @param fileId the file id
+   * @returns the single file
+   */
+  onRetrieveFile: (fileId: string) => IPropertyDefinitionSupportedSingleFilesType;
 }
 
 /**
@@ -249,6 +277,9 @@ export default class PropertyEntryText
     this.internalFileCache = {};
 
     this.onInsertFile = this.onInsertFile.bind(this);
+    this.onInsertFileFromURL = this.onInsertFileFromURL.bind(this);
+    this.onCheckFileExists = this.onCheckFileExists.bind(this);
+    this.onRetrieveFile = this.onRetrieveFile.bind(this);
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
     this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
@@ -452,6 +483,47 @@ export default class PropertyEntryText
       relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue.length === 0 ? null : newValue, null);
       this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
     }
+  }
+
+  public onCheckFileExists(fileId: string) {
+    return this.onRetrieveFile(fileId) !== null;
+  }
+
+  public onRetrieveFile(fileId: string) {
+    const currentValue =
+      this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+
+    return currentValue && currentValue.find((v) => v.id === fileId);
+  }
+
+  /**
+   * Inserts an image but instead of using a file as a source it uses
+   * an url, note that this will read and append the file from there
+   * @param url 
+   * @param name
+   * @param isExpectingImage 
+   */
+  public async onInsertFileFromURL(
+    url: string,
+    name: string,
+    isExpectingImage?: boolean,
+  ): Promise<IInsertedFileInformationType> {
+    let blob: any;
+    try {
+      const fileData = await fetch(url);
+      blob = await fileData.blob();
+
+      // we are going to use a trick, we could use the File constructor
+      // but there were a lot of complains regarding the constructor on stackoverflow
+      // while as a matter of fact the src allows for blobs so
+      blob.name = name;
+    } catch (err) {
+      // failed to fetch
+      return null;
+    }
+
+    // there, it will work
+    return this.onInsertFile(blob, isExpectingImage);
   }
 
   /**
@@ -849,6 +921,9 @@ export default class PropertyEntryText
       onRestore: supportsMedia ? this.onRestoreHijacked : this.props.onRestore,
 
       onInsertFile: this.onInsertFile,
+      onInsertFileFromURL: this.onInsertFileFromURL,
+      onCheckFileExists: this.onCheckFileExists,
+      onRetrieveFile: this.onRetrieveFile,
 
       enableUserSetErrors: this.enableUserSetErrors,
     };

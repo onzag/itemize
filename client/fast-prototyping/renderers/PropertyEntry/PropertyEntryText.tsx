@@ -218,6 +218,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         internalValue={this.props.currentInternalValue}
         onChange={this.props.onChange}
         onInsertFile={this.props.onInsertFile}
+        onInsertFileFromURL={this.props.onInsertFileFromURL}
+        onCheckFileExists={this.props.onCheckFileExists}
         isRichText={this.props.isRichText}
         onFocus={this.onFocus}
         onBlur={this.onBlur}
