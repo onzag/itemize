@@ -94,6 +94,7 @@ export class VideoDialog extends React.PureComponent<IVideoDialogProps, IVideoDi
     this.acceptVideo = this.acceptVideo.bind(this);
     this.updateVideoURL = this.updateVideoURL.bind(this);
     this.closeDialog = this.closeDialog.bind(this);
+    this.onOpening = this.onOpening.bind(this);
   }
 
   /**
@@ -148,6 +149,14 @@ export class VideoDialog extends React.PureComponent<IVideoDialogProps, IVideoDi
       videoURL: "",
       videoInvalid: false,
     });
+
+    setTimeout(() => {
+      delete document.body.dataset.unblur;
+    }, 100);
+  }
+
+  public onOpening() {
+    document.body.dataset.unblur = "true";
   }
 
   /**
@@ -160,6 +169,7 @@ export class VideoDialog extends React.PureComponent<IVideoDialogProps, IVideoDi
         open={this.props.videoDialogOpen}
         onClose={this.closeDialog}
         onOpen={this.focusVideoTextField}
+        onOpening={this.onOpening}
         title={this.props.i18nLoadVideoTitle}
         buttons={
           <Button onClick={this.acceptVideo}>

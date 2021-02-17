@@ -143,6 +143,8 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
       label: null,
       options: templateHTMLPropertiesToUse,
     });
+
+    document.body.dataset.unblur = "true";
   }
 
   /**
@@ -192,6 +194,10 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
   public closeDialog() {
     // call the function in the props
     this.props.closeTemplateElementDialog();
+
+    setTimeout(() => {
+      delete document.body.dataset.unblur;
+    }, 100);
 
     // clear the state
     this.setState({

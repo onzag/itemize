@@ -39,6 +39,21 @@ interface IFileLoadErrorDialogProps {
  * for when the file failed to load
  */
 export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialogProps> {
+  constructor(props: IFileLoadErrorDialogProps) {
+    super(props);
+
+    this.onClose = this.onClose.bind(this);
+    this.onOpening = this.onOpening.bind(this);
+  }
+  public onClose() {
+    this.props.dismissCurrentLoadError();
+    setTimeout(() => {
+      delete document.body.dataset.unblur;
+    }, 100);
+  }
+  public onOpening() {
+    document.body.dataset.unblur = "true";
+  }
   /**
    * The render function
    */
@@ -47,7 +62,8 @@ export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialo
       <Dialog
         fullScreen={false}
         open={!!this.props.currentLoadError}
-        onClose={this.props.dismissCurrentLoadError}
+        onClose={this.onClose}
+        onOpening={this.onOpening}
         title={capitalize(this.props.i18nGenericError)}
         buttons={
           <Button onClick={this.props.dismissCurrentLoadError}>

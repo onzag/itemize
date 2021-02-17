@@ -226,6 +226,8 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       linkTValue: selectedContextValue,
       linkTemplateOptions: linkPropertiesToUse,
     });
+
+    document.body.dataset.unblur = "true";
   }
 
   /**
@@ -283,6 +285,10 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       linkInvalid: false,
       linkTemplateOptions: [],
     });
+
+    setTimeout(() => {
+      delete document.body.dataset.unblur;
+    }, 100);
   }
 
   /**
@@ -302,6 +308,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
             {this.props.i18nSetLinkSubmit}
           </Button>
         }
+        className="__unblur"
       >
         <div>
           <TextField

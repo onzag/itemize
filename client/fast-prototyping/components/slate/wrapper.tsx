@@ -18,7 +18,7 @@ import {
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
   TextFieldsIcon, CodeIcon, Badge,
 } from "../../mui-core";
-import { Range, Text } from "slate";
+import { Path, Range, Text } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
 import { WrapperDrawer } from "./drawer";
 import { FileLoadErrorDialog } from "./dialogs/file";
@@ -377,7 +377,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
       <IconButton
         tabIndex={-1}
         title={props.i18nRichInfo.formatAddTemplateHTML}
-        disabled={!props.state.currentSelectedElement}
+        disabled={!props.featureSupport.canInsertContainer}
         onMouseDown={props.helpers.blockBlur}
         onClick={props.requestTemplateHTML}
         onMouseUp={props.helpers.releaseBlur}
@@ -663,6 +663,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * selection range, but that is lost when losing focus, so we need to remember it
    */
   private originalSelectionArea: Range;
+  /**
+   * If instead of having a selection area we had a selection path as a selected element
+   * because we were workign in the range
+   */
+  private originalSelectionPath: Path;
 
   /**
    * this is used to ensure a refocus after the native dialogs for file and for image that
@@ -812,7 +817,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we add the focus listener for the refocus when the dialog closes
     document.body.addEventListener("focus", this.onFileEventedReFocus, { capture: true });
     // get the original selection area
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // trigger a click
     this.inputImageRef.current.click();
   }
@@ -825,7 +831,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we add the focus listener for the refocus when the dialog closes
     document.body.addEventListener("focus", this.onFileEventedReFocus, { capture: true });
     // get the original selection area
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // trigger a click
     this.inputFileRef.current.click();
   }
@@ -851,7 +858,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * mainly used by dialogs once they haave closed
    */
   public refocus() {
-    this.props.helpers.focusAt(this.originalSelectionArea);
+    if (this.originalSelectionArea) {
+      this.props.helpers.focusAt(this.originalSelectionArea);
+    } else if (this.originalSelectionPath) {
+      this.props.helpers.selectPath(this.originalSelectionPath);
+    }
   }
 
   /**
@@ -875,7 +886,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   public requestVideo() {
     // save the selection area before losing focus
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // set the state to open the dialog
     this.setState({
       videoDialogOpen: true,
@@ -888,7 +900,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   public requestTemplateText() {
     // save the selection area before losing focus
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // set the state to open the dialog
     this.setState({
       templateTextDialogOpen: true,
@@ -901,7 +914,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   public requestTemplateHTML() {
     // save the selection area before losing focus
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // set the state to open the dialog
     this.setState({
       templateHTMLDialogOpen: true,
@@ -914,13 +928,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   public requestLink() {
     // save the selection area before losing focus
-    this.originalSelectionArea = this.props.helpers.editor.selection;
+    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
+    this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // now we open the dialog and we also save
     // the current element because we might be opening
     // in order to modify the current link
     this.setState({
       linkDialogOpen: true,
-      elementThatWasCurrentBeforeLosingFocus: this.props.state.currentElement,
+      elementThatWasCurrentBeforeLosingFocus: this.props.state.currentSelectedElement,
     });
   }
 
@@ -994,7 +1009,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we need to pass the original selection area to tell the helper
     // where we are about to insert that video, in which range
     // this will cause a refocus there
-    return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea);
+    return this.props.helpers.insertVideo(videoURL, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1007,7 +1022,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we need to pass the original selection area to tell the helper
     // where we are about to insert that link, in which range
     // this will cause a refocus there
-    return this.props.helpers.toggleLink(linkURL, linkTValue, this.originalSelectionArea);
+    return this.props.helpers.toggleLink(linkURL, linkTValue, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1020,7 +1035,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we need to pass the original selection area to tell the helper
     // where we are about to insert that template text, in which range
     // this will cause a refocus there
-    this.props.helpers.insertTemplateText(label, value, this.originalSelectionArea);
+    this.props.helpers.insertTemplateText(label, value, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1033,7 +1048,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // we need to pass the original selection area to tell the helper
     // where we are about to insert that template html, in which range
     // this will cause a refocus there
-    this.props.helpers.insertTemplateHTML(label, value, this.originalSelectionArea);
+    this.props.helpers.insertTemplateHTML(label, value, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1053,7 +1068,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const file = e.target.files[0];
     e.target.value = "";
     // and insert it
-    this.props.helpers.insertImage(file, false, this.originalSelectionArea);
+    this.props.helpers.insertImage(file, false, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1073,7 +1088,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const file = e.target.files[0];
     e.target.value = "";
     // and insert it
-    this.props.helpers.insertFile(file, this.originalSelectionArea);
+    this.props.helpers.insertFile(file, this.originalSelectionArea || this.originalSelectionPath);
   }
 
   /**
@@ -1218,6 +1233,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           </div>
           <div
             data-unblur="true"
+            onClick={this.props.helpers.softBlur}
             className={
               this.props.classes.editorDrawer +
               (this.state.drawerOpen ? " open" : "") +

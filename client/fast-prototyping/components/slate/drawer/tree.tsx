@@ -330,9 +330,11 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
 
     let childTree: React.ReactNode = null;
     const accessibleChildren = currentRichElement.children && currentRichElement.children.filter((c) => !!(c as any).type);
-    if (accessibleChildren && accessibleChildren.length) {
-      childTree = (accessibleChildren as any).map((c: RichElement, index: number) => (
-        <Tree
+    if (accessibleChildren && accessibleChildren.length && currentRichElement.containment !== "inline") {
+      // we cannot use the accessible children because then the index would be absolutely wrong
+      // and the path would be wrong
+      childTree = (currentRichElement.children as any).map((c: RichElement, index: number) => (
+        (c as any).type ? <Tree
           {...this.props}
           currentPath={[...this.props.currentPath, index]}
           currentIsLastInPath={index === currentRichElement.children.length - 1}
@@ -342,7 +344,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
           parentDraggingAt={draggingAt}
           onBeginDrag={this.onTreeElementBeginsDrag}
           onEndDrag={this.onTreeElementEndsDrag}
-        />
+        /> : null
       ));
     } else if (!currentRichElement.textContent && !currentRichElement.html) {
       let childPath: Path = null;
