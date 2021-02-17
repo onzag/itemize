@@ -713,6 +713,10 @@ export interface IHelperFunctions {
    * not using this function should not have any effect
    */
   releaseBlur: () => void;
+  /**
+   * Performs a hard blur, and even the selected paths are lost
+   */
+  hardBlur: () => void;
 }
 
 /**
@@ -786,7 +790,12 @@ export interface ISlateEditorStateType {
    * by default if a text node represents a template node
    * then it will be selected instead
    */
-  currentSelectedNode: RichElement | IText;
+  currentSelectedElement: RichElement;
+
+  /**
+   * Based on the current selected element or the current text
+   */
+  currentSelectedText: IText;
 
   /**
    * The current templating context, as it is
@@ -824,7 +833,7 @@ export interface ISlateEditorStateType {
   /**
    * Selected anchor
    */
-  currentSelectedNodeAnchor: Path;
+  currentSelectedElementAnchor: Path;
 }
 
 /**
@@ -1060,7 +1069,7 @@ interface ISlateEditorState {
   /**
    * The selected anchor path
    */
-  currentSelectedNodeAnchor: Path;
+  currentSelectedElementAnchor: Path;
   /**
    * Related to the anchor, specifies the current context
    * that is being worked with, can be null, if context is null
@@ -1086,11 +1095,15 @@ interface ISlateEditorState {
   /**
    * The selected node 
    */
-  currentSelectedNode: RichElement | IText;
+  currentSelectedElement: RichElement;
+  /**
+   * The selected text
+   */
+  currentSelectedText: IText;
   /**
    * The selected node context
    */
-  currentSelectedNodeContext: ITemplateArgsContext;
+  currentSelectedElementContext: ITemplateArgsContext;
   /**
    * all containers that exist within the definitions
    * for the css classes
@@ -1217,15 +1230,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentAnchor: null,
             currentElementAnchor: null,
             currentBlockElementAnchor: null,
-            currentSelectedNodeAnchor: null,
+            currentSelectedElementAnchor: null,
             currentContext: props.rootContext || null,
             currentElement: null,
             currentBlockElement: null,
             currentSuperBlockElement: null,
             currentSuperBlockElementAnchor: null,
             currentText: null,
-            currentSelectedNode: null,
-            currentSelectedNodeContext: null,
+            currentSelectedElement: null,
+            currentSelectedElementContext: null,
           };
         }
 
@@ -1249,15 +1262,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentAnchor: null,
             currentElementAnchor: null,
             currentBlockElementAnchor: null,
-            currentSelectedNodeAnchor: null,
+            currentSelectedElementAnchor: null,
             currentContext: props.rootContext || null,
             currentElement: null,
             currentBlockElement: null,
             currentSuperBlockElement: null,
             currentSuperBlockElementAnchor: null,
             currentText: null,
-            currentSelectedNode: null,
-            currentSelectedNodeContext: null,
+            currentSelectedElement: null,
+            currentSelectedElementContext: null,
           };
         }
       }
@@ -1289,14 +1302,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentElementAnchor: null,
       currentBlockElementAnchor: null,
       currentSuperBlockElementAnchor: null,
-      currentSelectedNodeAnchor: null,
+      currentSelectedElementAnchor: null,
       currentContext: this.props.rootContext || null,
       currentElement: null,
       currentBlockElement: null,
       currentSuperBlockElement: null,
       currentText: null,
-      currentSelectedNode: null,
-      currentSelectedNodeContext: null,
+      currentSelectedText: null,
+      currentSelectedElement: null,
+      currentSelectedElementContext: null,
 
       // ensure SSR compatibility
       // since we cannot read the CSS file on the server side
@@ -1379,6 +1393,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     this.blockBlur = this.blockBlur.bind(this);
     this.releaseBlur = this.releaseBlur.bind(this);
+    this.hardBlur = this.hardBlur.bind(this);
   }
 
   /**
@@ -1404,7 +1419,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         const infoFromInsert = await this.props.onInsertFileFromURL(
           urlToReadFrom,
-          (newElement as any).fileName || (newElement as any).alt || idSpecified,
+          (newElement as any).fileName || (newElement as any).alt || idSpecified,
           newElement.type === "image",
         );
 
@@ -1476,7 +1491,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // if we have it
     if (fragment) {
       // let's get the blobs
-      const blobs = JSON.parse(data.getData('application/x-slate-blobs') || "{}");
+      const blobs = JSON.parse(data.getData('application/x-slate-blobs') || "{}");
       // then we decode and parse
       const decoded = decodeURIComponent(window.atob(fragment));
       // note how we filter in case bits fail to load (aka images and files)
@@ -1555,11 +1570,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
     // during the update the selected node that was previous might remain selected
     // because the internal value didn't change state
-    if (prevState.currentSelectedNode && !equals(this.state.currentSelectedNodeAnchor, prevState.currentSelectedNodeAnchor)) {
+    if (prevState.currentSelectedElement && !equals(this.state.currentSelectedElementAnchor, prevState.currentSelectedElementAnchor)) {
       // so we have to find it in the current
       let pathOfPreviousSelectedNode: Path;
       try {
-        pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedNode as any);
+        pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedElement as any);
       } catch {
         // it failed for whatever reason
       }
@@ -1569,7 +1584,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const newInternalValue = { ...this.state.internalValue };
         newInternalValue.children = [...newInternalValue.children];
 
-        let finalSelectedNode: any = this.state.currentSelectedNode;
+        let finalSelectedNode: any = this.state.currentSelectedElement;
         let finalCurrentBlock: any = this.state.currentBlockElement;
         let finalCurrentElement: any = this.state.currentElement;
         let finalCurrentSuperBlock: any = this.state.currentSuperBlockElement;
@@ -1585,6 +1600,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
           // now we grab the node
           const nodeInPath = finalNode.children[v];
+
+          // same as it's not there
+          if (Text.isText(nodeInPath)) {
+            return;
+          }
+
           // when changing from say selecting a child from selecting a parent
           // the parent node will not be equal anymore to the current selected node
           // because they have indeed changed so we need to keep it consistent
@@ -1623,7 +1644,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         this.setState({
           internalValue: newInternalValue,
-          currentSelectedNode: finalSelectedNode,
+          currentSelectedElement: finalSelectedNode,
           currentBlockElement: finalCurrentBlock,
           currentElement: finalCurrentElement,
           currentSuperBlockElement: finalCurrentSuperBlock,
@@ -2348,59 +2369,76 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // now for our selection, by default it's all null
-    let currentSelectedNodeAnchor: Path = null;
-    let currentSelectedNode: RichElement | IText = null;
-    let currentSelectedNodeContext: ITemplateArgsContext = null;
+    let currentSelectedElementAnchor: Path = null;
+    let currentSelectedElement: RichElement = null;
+    let currentSelectedText: IText = null;
+    let currentSelectedElementContext: ITemplateArgsContext = null;
 
     // if we don't have a selected anchor and origin
     // we have purposely set then we should
     // default to the currently selected values, if any
     if (!currentGivenSelectedNodeAnchor) {
       // so the selected anchor will be the element anchor
-      currentSelectedNodeAnchor = currentElementAnchor;
+      currentSelectedElementAnchor = currentElementAnchor;
       // the selected node is the element just like the anchor
-      currentSelectedNode = currentElement;
+      currentSelectedElement = currentElement;
+      currentSelectedText = currentText;
       // and the context is our current context
-      currentSelectedNodeContext = currentContext;
+      currentSelectedElementContext = currentContext;
     } else {
       // otherwise here, we are going to pick and trust
       // the values we are given, the anchors
       // are the these values
-      currentSelectedNodeAnchor = currentGivenSelectedNodeAnchor;
+      currentSelectedElementAnchor = currentGivenSelectedNodeAnchor;
 
       // now we need to prepare and find the text origin, and context
       // as well as the selected element
-      currentSelectedNode = value ? {
+      currentSelectedElement = value ? {
         children: value,
       } as any : this.state.internalValue;
-      currentSelectedNodeContext = this.props.rootContext || null;
+      currentSelectedElementContext = this.props.rootContext || null;
 
       // so we loop in the origin anchor
       currentGivenSelectedNodeAnchor.forEach((n: number, index: number) => {
         // and update the node origin
-        currentSelectedNode = (currentSelectedNode as any).children[n];
+        currentSelectedElement = (currentSelectedElement as any).children[n];
 
-        // we need to fetch the context we are in for the currentSelectedNodeContext
+        // we need to fetch the context we are in for the currentSelectedElementContext
         // which might differ
-        if (currentSelectedNodeContext && (currentSelectedNode as any).context) {
+        if (currentSelectedElementContext && (currentSelectedElement as any).context) {
           // so we pick it from the origin value we are using to loop in
-          currentSelectedNodeContext =
-            currentSelectedNodeContext.properties[(currentSelectedNode as any).context] as ITemplateArgsContext || null;
+          currentSelectedElementContext =
+            currentSelectedElementContext.properties[(currentSelectedElement as any).context] as ITemplateArgsContext || null;
 
           // and then we recheck these
-          if (currentSelectedNodeContext.type !== "context" || currentSelectedNodeContext.loopable) {
-            currentSelectedNodeContext = null;
+          if (currentSelectedElementContext.type !== "context" || currentSelectedElementContext.loopable) {
+            currentSelectedElementContext = null;
           }
         }
 
         // also in the foreach context
-        if (currentSelectedNodeContext && (currentSelectedNode as any).forEach) {
-          currentSelectedNodeContext = currentSelectedNodeContext.properties[(currentSelectedNode as any).forEach] as ITemplateArgsContext || null;
-          if (currentSelectedNodeContext.type !== "context" || !currentSelectedNodeContext.loopable) {
-            currentSelectedNodeContext = null;
+        if (currentSelectedElementContext && (currentSelectedElement as any).forEach) {
+          currentSelectedElementContext = currentSelectedElementContext.properties[(currentSelectedElement as any).forEach] as ITemplateArgsContext || null;
+          if (currentSelectedElementContext.type !== "context" || !currentSelectedElementContext.loopable) {
+            currentSelectedElementContext = null;
           }
         }
       });
+
+      // if we have a selected element let's find the text
+      // that refers to it
+      if (currentSelectedElement) {
+        // let's loop inside this element until we find a text node
+        let childrenLoop = currentSelectedElement;
+        // and of course, we are going to short circuit voids too
+        while (childrenLoop && !Text.isText(childrenLoop) && !this.editor.isVoid(childrenLoop as any)) {
+          childrenLoop = currentSelectedElement.children[0] as any;
+        }
+        // so if we end with a text that's our node
+        if (Text.isText(childrenLoop)) {
+          currentSelectedText = childrenLoop as any;
+        }
+      }
     }
 
     // now we can return
@@ -2408,15 +2446,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentAnchor: anchor,
       currentElementAnchor,
       currentBlockElementAnchor,
-      currentSelectedNodeAnchor,
+      currentSelectedElementAnchor,
       currentContext,
       currentElement,
       currentBlockElement,
       currentSuperBlockElement,
       currentSuperBlockElementAnchor,
       currentText,
-      currentSelectedNode,
-      currentSelectedNodeContext,
+      currentSelectedElement,
+      currentSelectedText,
+      currentSelectedElementContext,
     }
   }
 
@@ -2445,7 +2484,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Triggers on an on change whent he field is blurred
    * @param value the value that we are working with
    */
-  public onBlurredChange(value: Node[]) {
+  public onBlurredChange(value?: Node[]) {
     // if we are considered as focused
     if (this.state.focused) {
       // well not anymore
@@ -2461,8 +2500,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and we pass the selected node anchor as it
       // remains even after the selection only if
       // we have not just deleted that node
-      this.state.currentSelectedNodeAnchor &&
-        !this.lastChangeWasSelectedDelete ? this.state.currentSelectedNodeAnchor : null,
+      this.state.currentSelectedElementAnchor &&
+        !this.lastChangeWasSelectedDelete ? this.state.currentSelectedElementAnchor : null,
     );
     this.setState({
       focused: false,
@@ -2497,7 +2536,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.rootContext !== this.props.rootContext ||
       nextProps.rootI18n !== this.props.rootI18n ||
       nextState.currentAnchor !== this.state.currentAnchor ||
-      nextState.currentSelectedNodeAnchor !== this.state.currentSelectedNodeAnchor ||
+      nextState.currentSelectedElementAnchor !== this.state.currentSelectedElementAnchor ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
@@ -2617,7 +2656,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now we check if we are in a selected elelement
     // because the component is immutable, we can do this
     const isSelected = (
-      (element as any) === this.state.currentSelectedNode
+      (element as any) === this.state.currentSelectedElement
     );
 
     // let's check for a ui handler
@@ -2810,6 +2849,19 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Performs a hard blur event and the paths are cleared out
+   */
+  public hardBlur() {
+    this.setState({
+      currentSelectedElementAnchor: null,
+      currentSelectedElement: null,
+      currentSelectedText: null,
+    });
+
+    this.onBlurredChange();
+  }
+
+  /**
    * given a node path, that should represent either an element or a text node
    * this allows such a path to be selected and be marked into the selection
    * @param p the path to select
@@ -2826,11 +2878,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       finalNode = newFinalNode;
     });
 
+    let currentSelectedText: IText = null;
+    // if we have a selected element let's find the text
+    // that refers to it
+    if (finalNode) {
+      // let's loop inside this element until we find a text node
+      let childrenLoop = finalNode;
+      // and of course, we are going to short circuit voids too
+      while (childrenLoop && !Text.isText(childrenLoop) && !this.editor.isVoid(childrenLoop as any)) {
+        childrenLoop = childrenLoop.children[0] as any;
+      }
+      // so if we end with a text that's our node
+      if (Text.isText(childrenLoop)) {
+        currentSelectedText = childrenLoop as any;
+      }
+    }
+
     // now we can update the state
     this.setState({
-      currentSelectedNodeAnchor: p,
-      currentSelectedNode: finalNode,
+      currentSelectedElementAnchor: p,
+      currentSelectedElement: finalNode,
       internalValue: newInternalValue,
+      currentSelectedText,
     });
   }
 
@@ -2841,7 +2910,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public movePaths(from: Path, to: Path) {
     // first we pick the old selected position from what we have now
     // it might be null
-    const oldPosition = this.state.currentSelectedNodeAnchor;
+    const oldPosition = this.state.currentSelectedElementAnchor;
 
     // this is what actually performs the moving
     const performMove = () => {
@@ -2906,9 +2975,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // getting the contexts and anchors
     if (oldPosition) {
       this.setState({
-        currentSelectedNode: null,
-        currentSelectedNodeAnchor: null,
-        currentSelectedNodeContext: null,
+        currentSelectedElement: null,
+        currentSelectedElementAnchor: null,
+        currentSelectedElementContext: null,
       }, () => {
         // slate loves this and I don't know why
         // it won't work without the timeout
@@ -2932,7 +3001,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // so we delete which will call onchange and normalization
     Transforms.delete(this.editor, {
-      at: this.state.currentSelectedNodeAnchor,
+      at: this.state.currentSelectedElementAnchor,
     });
 
     // and now we can refocus
@@ -3799,7 +3868,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: type || null,
       uiHandler: value,
       uiHandlerArgs: args,
-      givenName: type || null,
+      givenName: type || null,
     };
 
     // and insert the thing
@@ -4056,6 +4125,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       blockBlur: this.blockBlur,
       releaseBlur: this.releaseBlur,
+      hardBlur: this.hardBlur,
     }
 
     return helpers;
@@ -4084,23 +4154,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       availableCustoms: availableCustoms,
       availableRichClasses,
 
-      canInsertContainer: this.state.currentBlockElement && this.props.features.supportsContainers,
-      canInsertCustom: this.state.currentBlockElement && this.props.features.supportsCustom && !!availableCustoms.length,
-      canInsertFile: this.state.currentBlockElement && this.props.features.supportsFiles,
-      canInsertImage: this.state.currentBlockElement && this.props.features.supportsImages,
-      canInsertLink: this.state.currentBlockElement && this.props.features.supportsLinks,
-      canInsertList: this.state.currentBlockElement && this.props.features.supportsLists,
-      canInsertQuote: this.state.currentBlockElement && this.props.features.supportsQuote,
-      canInsertRichClass: this.state.currentBlockElement && this.props.features.supportsRichClasses && !!availableRichClasses.length,
-      canInsertTitle: this.state.currentText && this.props.features.supportsTitle,
-      canInsertVideo: this.state.currentBlockElement && this.props.features.supportsVideos,
-      canSetActionFunction: this.state.currentBlockElement && this.props.features.supportsTemplating,
-      canSetActiveStyle: this.state.currentBlockElement && this.props.features.supportsTemplating,
-      canSetDynamicHref: this.state.currentBlockElement && this.props.features.supportsTemplating,
-      canSetHoverStyle: this.state.currentBlockElement && this.props.features.supportsTemplating,
-      canSetLoop: this.state.currentBlockElement && this.props.features.supportsTemplating,
-      canSetStyle: this.state.currentBlockElement && this.props.features.supportsCustomStyles,
-      canSetUIHandler: this.state.currentBlockElement && this.props.features.supportsTemplating,
+      canInsertContainer: this.state.currentSelectedElement && this.props.features.supportsContainers,
+      canInsertCustom: this.state.currentSelectedElement && this.props.features.supportsCustom && !!availableCustoms.length,
+      canInsertFile: this.state.currentSelectedElement && this.props.features.supportsFiles,
+      canInsertImage: this.state.currentSelectedElement && this.props.features.supportsImages,
+      canInsertLink: this.state.currentSelectedElement && this.props.features.supportsLinks,
+      canInsertList: this.state.currentSelectedElement && this.props.features.supportsLists,
+      canInsertQuote: this.state.currentSelectedElement && this.props.features.supportsQuote,
+      canInsertRichClass: this.state.currentSelectedElement && this.props.features.supportsRichClasses && !!availableRichClasses.length,
+      canInsertTitle: this.state.currentSelectedText && this.props.features.supportsTitle,
+      canInsertVideo: this.state.currentSelectedElement && this.props.features.supportsVideos,
+      canSetActionFunction: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetActiveStyle: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetDynamicHref: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetHoverStyle: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetLoop: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles,
+      canSetUIHandler: this.state.currentSelectedElement && this.props.features.supportsTemplating,
     };
 
     return newFeatureSupport;
@@ -4138,14 +4208,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSuperBlockElement: this.state.currentSuperBlockElement,
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
-        currentSelectedNode: this.state.currentSelectedNode,
+        currentSelectedElement: this.state.currentSelectedElement,
         isRichText: this.props.isRichText,
         currentValue: this.state.internalValue.children as any,
         textAnchor: this.state.currentAnchor,
         currentBlockElementAnchor: this.state.currentBlockElementAnchor,
         currentElementAnchor: this.state.currentElementAnchor,
         currentSuperBlockElementAnchor: this.state.currentSuperBlockElementAnchor,
-        currentSelectedNodeAnchor: this.state.currentSelectedNodeAnchor,
+        currentSelectedElementAnchor: this.state.currentSelectedElementAnchor,
+        currentSelectedText: this.state.currentSelectedText,
       }
 
       // and we feed the thing in the wrapper as the new children

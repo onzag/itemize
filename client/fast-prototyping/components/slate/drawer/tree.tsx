@@ -149,8 +149,8 @@ interface IDraggingElementInfo {
 }
 
 interface ITreeProps {
-  currentSelectedNode: RichElement;
-  currentSelectedNodePath: Path;
+  currentSelectedElement: RichElement;
+  currentSelectedElementPath: Path;
   currentRichElement: RichElement;
   parentRichElement: RichElement;
   currentPath: Path;
@@ -360,9 +360,9 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     }
 
     // now if we are selected we must make it clear
-    const isSelected = currentRichElement === this.props.currentSelectedNode;
-    const isSemiSelected = !isSelected && this.props.currentSelectedNodePath &&
-      Path.isDescendant(this.props.currentSelectedNodePath, this.props.currentPath);
+    const isSelected = currentRichElement === this.props.currentSelectedElement;
+    const isSemiSelected = !isSelected && this.props.currentSelectedElementPath &&
+      Path.isDescendant(this.props.currentSelectedElementPath, this.props.currentPath);
     const info = currentRichElement.type ? getInfoOf(currentRichElement, this.props.i18nRichInfo) : null;
 
     if (!info) {

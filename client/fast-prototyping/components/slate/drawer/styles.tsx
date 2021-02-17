@@ -181,17 +181,17 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
   static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IClassesOptionSelectorState) {
     // we do it this way because this component eats the entire wrapper props so we need to pick it right
     // from the current selected node
-    const selectedNode: RichElement = props.state.currentSelectedNode as any;
+    const selectedNode: RichElement = props.state.currentSelectedElement as any;
 
     // and we use both equals and path equals to determine a change
     // and avoid the sync issue
     if (
       !equals(selectedNode.richClassList || [], state.value) &&
-      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.richClassList || [],
-        valueForAnchor: props.state.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
 
@@ -206,10 +206,10 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     super(props);
 
     // setup the initial state
-    const selectedNode: RichElement = props.state.currentSelectedNode as any;
+    const selectedNode: RichElement = props.state.currentSelectedElement as any;
     this.state = {
       value: selectedNode.richClassList || [],
-      valueForAnchor: props.state.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedElementAnchor,
     };
 
     this.onRichClassListChange = this.onRichClassListChange.bind(this);
@@ -226,7 +226,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     // now we can update the state
     this.setState({
       value: newValue,
-      valueForAnchor: this.props.state.currentSelectedNodeAnchor,
+      valueForAnchor: this.props.state.currentSelectedElementAnchor,
     });
 
     // if we have nothing, the new value is null
@@ -236,7 +236,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     }
 
     // so we set such
-    this.props.helpers.setRichClasses(newValue, this.props.state.currentSelectedNodeAnchor);
+    this.props.helpers.setRichClasses(newValue, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -284,7 +284,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
  * options of the wrapper itself
  */
 export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
-  const currentNode = props.state.currentSelectedNode as RichElement;
+  const currentNode = props.state.currentSelectedElement as RichElement;
   return (
     <div className={props.classes.box}>
       {
@@ -294,7 +294,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles ?
           <SingleStyle
-            anchor={props.state.currentSelectedNodeAnchor}
+            anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setStyle}
             name={props.i18nRichInfo.style}
             styleValue={currentNode.style}
@@ -304,7 +304,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles && props.featureSupport.supportsTemplating ?
           <SingleStyle
-            anchor={props.state.currentSelectedNodeAnchor}
+            anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setHoverStyle}
             name={props.i18nRichInfo.styleHover}
             styleValue={currentNode.styleHover}
@@ -314,7 +314,7 @@ export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
       {
         props.featureSupport.supportsCustomStyles && props.featureSupport.supportsTemplating ?
           <SingleStyle
-            anchor={props.state.currentSelectedNodeAnchor}
+            anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setActiveStyle}
             name={props.i18nRichInfo.styleActive}
             styleValue={currentNode.styleActive}

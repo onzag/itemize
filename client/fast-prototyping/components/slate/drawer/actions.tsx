@@ -221,7 +221,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
  */
 export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
   // get the current node that we have currently selected
-  const currentNode = props.state.currentSelectedNode as RichElement;
+  const currentNode = props.state.currentSelectedElement as RichElement;
 
   // and now let's build all the options that we have for that we need to check our current context, if we have one
   const allOptions = props.state.currentContext ? Object.keys(props.state.currentContext.properties).map((p) => {
@@ -250,7 +250,7 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
             name={v}
             actionValue={currentNode[v] || null}
             options={allOptions}
-            anchor={props.state.currentSelectedNodeAnchor}
+            anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setAction}
           />
         ))

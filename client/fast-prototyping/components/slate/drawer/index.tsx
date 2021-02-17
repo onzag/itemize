@@ -130,8 +130,8 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
       children: props.state.currentValue
     } as any}
     parentRichElement={null}
-    currentSelectedNode={props.state.currentSelectedNode as any}
-    currentSelectedNodePath={props.state.currentSelectedNodeAnchor}
+    currentSelectedElement={props.state.currentSelectedElement as any}
+    currentSelectedElementPath={props.state.currentSelectedElementAnchor}
     dropPositionDisabledClassName={props.classes.dropPositionDisabled}
     dropPositionEnabledClassName={props.classes.dropPositionEnabled}
     currentIsLastInPath={true}
@@ -150,9 +150,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   let titleForNode: string = null;
 
   // and that's done based on the selected node
-  if (props.state.currentSelectedNode) {
+  if (props.state.currentSelectedElement) {
     // for that we get the info of the selected node
-    const selectedNodeInfo = getInfoOf(props.state.currentSelectedNode, props.i18nRichInfo);
+    const selectedNodeInfo = getInfoOf(props.state.currentSelectedElement, props.i18nRichInfo);
 
     // and we need to see in which location we are
     let actualLocation = location;

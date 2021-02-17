@@ -196,7 +196,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
  */
 export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
   // we need to pick these to make the option list
-  const currentNode = props.state.currentSelectedNode as RichElement;
+  const currentNode = props.state.currentSelectedElement as RichElement;
   const allEachContexts: ISingleTemplatingElementOption[] = [];
   const allContexts: ISingleTemplatingElementOption[] = [];
 
@@ -233,7 +233,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.each}
         value={currentNode.forEach || null}
         options={allEachContexts}
-        anchor={props.state.currentSelectedNodeAnchor}
+        anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setForEach}
       />
       <SingleTemplatingElement
@@ -241,7 +241,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         i18nName={props.i18nRichInfo.context}
         value={currentNode.context || null}
         options={allContexts}
-        anchor={props.state.currentSelectedNodeAnchor}
+        anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setContext}
       />
     </div>

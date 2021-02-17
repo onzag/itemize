@@ -61,14 +61,14 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    const selectedNode: IContainer = props.state.currentSelectedNode as any;
+    const selectedNode: IContainer = props.state.currentSelectedElement as any;
     if (
       (selectedNode.containerType || "") !== state.value &&
-      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.containerType || "",
-        valueForAnchor: props.state.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
 
@@ -82,11 +82,11 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: IContainer = props.state.currentSelectedNode as any;
+    const selectedNode: IContainer = props.state.currentSelectedElement as any;
 
     this.state = {
       value: selectedNode.containerType || "",
-      valueForAnchor: props.state.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedElementAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -109,7 +109,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     // anchor
     this.props.helpers.set({
       containerType: newValue,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -174,14 +174,14 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    const selectedNode: ITitle = props.state.currentSelectedNode as any;
+    const selectedNode: ITitle = props.state.currentSelectedElement as any;
     if (
       (selectedNode.subtype || "") !== state.value &&
-      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {
         value: selectedNode.subtype || "",
-        valueForAnchor: props.state.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
 
@@ -195,11 +195,11 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: ITitle = props.state.currentSelectedNode as any;
+    const selectedNode: ITitle = props.state.currentSelectedElement as any;
 
     this.state = {
       value: selectedNode.subtype || "",
-      valueForAnchor: props.state.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedElementAnchor,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -222,7 +222,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // anchor
     this.props.helpers.set({
       subtype: newValue,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -315,20 +315,20 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    const selectedNode: IImage = props.state.currentSelectedNode as any;
+    const selectedNode: IImage = props.state.currentSelectedElement as any;
     if (
       (
         (selectedNode.alt || "") !== state.altValue ||
         (selectedNode.sizes || "") !== state.sizes ||
         selectedNode.standalone !== state.standalone
       ) &&
-      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {
         altValue: selectedNode.alt || "",
         standalone: selectedNode.standalone,
         sizes: selectedNode.sizes || "",
-        valueForAnchor: props.state.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
 
@@ -342,13 +342,13 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: IImage = props.state.currentSelectedNode as any;
+    const selectedNode: IImage = props.state.currentSelectedElement as any;
 
     this.state = {
       altValue: selectedNode.alt || "",
       standalone: selectedNode.standalone,
       sizes: selectedNode.sizes || "",
-      valueForAnchor: props.state.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedElementAnchor,
     }
 
     this.updateAlt = this.updateAlt.bind(this);
@@ -365,7 +365,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // to update the node at the given anchor
     this.props.helpers.set({
       alt: this.state.altValue,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -377,7 +377,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // to update the node at the given anchor
     this.props.helpers.set({
       sizes: this.state.sizes,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -432,7 +432,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // use the partial value setter to set the value of standalone at the given node
     this.props.helpers.set({
       standalone: e.target.checked,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -503,16 +503,16 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    const selectedNode: IImage = props.state.currentSelectedNode as any;
+    const selectedNode: IImage = props.state.currentSelectedElement as any;
     if (
       (
         (selectedNode.givenName || "") !== state.name
       ) &&
-      !Path.equals(props.state.currentSelectedNodeAnchor, state.valueForAnchor)
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {
         name: selectedNode.givenName || "",
-        valueForAnchor: props.state.currentSelectedNodeAnchor,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
 
@@ -526,11 +526,11 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
   constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: RichElement = props.state.currentSelectedNode as any;
+    const selectedNode: RichElement = props.state.currentSelectedElement as any;
 
     this.state = {
       name: selectedNode.givenName || "",
-      valueForAnchor: props.state.currentSelectedNodeAnchor,
+      valueForAnchor: props.state.currentSelectedElementAnchor,
     }
 
     this.updateName = this.updateName.bind(this);
@@ -546,7 +546,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
     // to update the node at the given anchor
     this.props.helpers.set({
       givenName: this.state.name,
-    }, this.props.state.currentSelectedNodeAnchor);
+    }, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -598,7 +598,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   let specificNodeOptions: React.ReactNode = null;
 
   // so we got to get in the type
-  switch ((props.state.currentSelectedNode as any).type) {
+  switch ((props.state.currentSelectedElement as any).type) {
     case "container":
       specificNodeOptions = <GeneralContainerOptions {...props} />
       break;
@@ -614,7 +614,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   return (
     <>
       {
-        Text.isText((props.state.currentSelectedNode as any)) ?
+        Text.isText((props.state.currentSelectedElement as any)) ?
         null :
         <GeneralElementOptions {...props}/>
       }
