@@ -1504,7 +1504,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         await Promise.all(JSON.parse(decoded).map(this.findAndInsertFilesFromDataTransfer.bind(this, data, blobs))) as Node[]
       ).filter(e => !!e) as any;
       // now we can insert that fragment once we are done
-      this.editor.insertFragment(parsed);
+      const parsedIsStandard = parsed.every((n: RichElement) => n.containment !== "superblock" && n.containment !== "list-superblock");
+      if (parsedIsStandard) {
+        Transforms.insertFragment(this.editor, parsed);
+      } else if (this.state.currentBlockElementAnchor) {
+        const pathForNext = [...this.state.currentBlockElementAnchor];
+        pathForNext[pathForNext.length - 1]++;
+        Transforms.insertNodes(this.editor, parsed, {at: pathForNext});
+      }
       return;
     }
 
