@@ -7,7 +7,6 @@ import {
   Button
 } from "../../../mui-core";
 import ReactDOM from "react-dom";
-import { toJSON } from "yaml/util";
 
 /**
  * The interactive actions that exist that mark
@@ -165,6 +164,7 @@ interface ITreeProps {
   onBeginDrag?: (element: RichElement, at: Path) => void;
   onEndDrag?: () => void;
   moveFromTo: (from: Path, to: Path) => void;
+  scrollableAreaRef: React.MutableRefObject<HTMLDivElement>;
 }
 
 interface ITreeState {
@@ -182,6 +182,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
   private bodyDiv: HTMLDivElement;
   private lastEffectTime: number;
   private internalsRef: React.RefObject<HTMLDivElement>;
+  private buttonRef: React.RefObject<HTMLButtonElement>;
   constructor(props: ITreeProps) {
     super(props);
 
@@ -197,6 +198,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     };
 
     this.internalsRef = React.createRef();
+    this.buttonRef = React.createRef();
 
     this.startDragMouse = this.startDragMouse.bind(this);
     this.startDragTouch = this.startDragTouch.bind(this);
@@ -224,6 +226,24 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
       this.props.onEndDrag && this.props.onEndDrag();
     } else if (this.state.showDrag && !prevState.showDrag) {
       this.props.onBeginDrag && this.props.onBeginDrag(this.props.currentRichElement, this.props.currentPath);
+    }
+
+    const isSelected = this.props.currentRichElement === this.props.currentSelectedElement;
+    if (isSelected) {
+      const refObject = this.buttonRef.current;
+      const scrollRefObject = this.props.scrollableAreaRef.current;
+
+      const offsetTop = refObject.offsetTop;
+      const offsetBottom = offsetTop + refObject.offsetHeight;
+
+      const scrollStartsAt = scrollRefObject.scrollTop;
+      const scrollsEndsAt = scrollStartsAt + scrollRefObject.offsetHeight;
+
+      const isWithinLimits = scrollStartsAt <= offsetTop && offsetBottom <= scrollsEndsAt;
+
+      if (!isWithinLimits) {
+        scrollRefObject.scrollTop = offsetTop;
+      }
     }
   }
   public onTreeElementBeginsDrag(element: RichElement, at: Path) {
@@ -323,7 +343,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
   }
   public render() {
     // and now let's find what we will choose
-    let currentRichElement = this.props.currentRichElement;
+    const currentRichElement = this.props.currentRichElement;
 
     const draggingAt = this.props.parentDraggingAt || this.state.draggingAt;
     const shouldShowDrop = !this.state.showDrag && draggingAt;
@@ -414,6 +434,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
           className={this.props.buttonClassName}
           onMouseDown={this.startDragMouse}
           onTouchStart={this.startDragTouch}
+          ref={this.buttonRef}
         >
           {info.name}
         </Button>

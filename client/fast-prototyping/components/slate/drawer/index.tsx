@@ -143,6 +143,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     onBeginDrag={setDragScroll.bind(null, true)}
     onEndDrag={setDragScroll.bind(null, false)}
     moveFromTo={props.helpers.movePaths}
+    scrollableAreaRef={scrollRef}
   />
 
   // now we need to build the settings
