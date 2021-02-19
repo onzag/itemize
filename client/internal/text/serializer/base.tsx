@@ -639,6 +639,7 @@ export function deserializeElementBase(node: HTMLElement): IElementBase {
   // now for the ui handler if we got one
   // from our translation that added into the result
   if (result.uiHandler && node.dataset) {
+    result.uiHandlerArgs = {};
     // we got to extract every dataset property
     // as an attribute for the ui handler
     Object.keys(node.dataset).forEach((datasetKey) => {
