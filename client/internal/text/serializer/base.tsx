@@ -12,6 +12,62 @@ import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
 import { IText } from "./types/text";
 import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";
 
+export interface IUIHandlerEvents {
+  onClick?: any;
+  onBlur?: any;
+  onFocus?: any;
+  onInput?: any;
+  onKeyDown?: any;
+  onKeyPress?: any;
+  onKeyUp?: any;
+  onMouseDown?: any;
+  onMouseEnter?: any;
+  onMouseLeave?: any;
+  onMouseMove?: any;
+  onMouseOver?: any;
+  onMouseWheel?: any;
+  onTouchStart?: any;
+  onTouchMove?: any;
+  onTouchEnd?: any;
+  onTouchCancel?: any;
+  onWheel?: any;
+}
+
+/**
+ * Basic properties included in the basic view ui handler
+ */
+export interface IUIHandlerProps {
+  /**
+   * Represents the arguments that are retrieved
+   * by the handler itself, the args are provided in slate
+   * mode or not
+   */
+  args: {
+    [key: string]: any;
+  };
+  /**
+   * The element that the ui handler belongs to
+   */
+  element: RichElement;
+  /**
+   * The children inside the ui handler
+   * please ensure to use them specially if in slate mode
+   */
+  children: React.ReactNode;
+  /**
+   * An optional class name
+   */
+  className?: string;
+  /**
+   * The style object
+   */
+  style?: React.CSSProperties;
+  /**
+   * contains events that should be added to the element
+   */
+  events: IUIHandlerEvents;
+}
+
 /**
  * Converts a style property string into a camel case based one
  * this is basically to convert things like text-align into textAlign
@@ -94,6 +150,29 @@ export function convertStyleStringToReactObject(str: string) {
 };
 
 /**
+ * Retrieves all the element actions for a react target
+ * @param base the base
+ */
+export function retrieveElementActionsForReact(base: IElementBase, context: any): IUIHandlerEvents {
+  if (!context) {
+    return {};
+  }
+
+  const actions: IUIHandlerEvents = {};
+  Object.keys(eventReactifyTranslations).forEach((key) => {
+    const value = base[key];
+    if (value) {
+      const contextValue = context[value];
+      if (contextValue) {
+        const translation = eventReactifyTranslations[key];
+        actions[translation] = contextValue;
+      }
+    }
+  });
+  return actions;
+}
+
+/**
  * An interface to refer to attributes
  * of a given element that is used during serialization
  */
@@ -135,6 +214,32 @@ const translations = {
   touchend: "data-on-touchend",
   touchcancel: "data-on-touchcancel",
   wheel: "data-on-wheel",
+}
+
+/**
+ * @ignore
+ */
+const eventReactifyTranslations = {
+  click: "onClick",
+  blur: "onBlur",
+  focus: "onFocus",
+  input: "onInput",
+  keydown: "onKeyDown",
+  keypress: "onKeyPress",
+  keyup: "onKeyUp",
+  mousedown: "onMouseDown",
+  mouseenter: "onMouseEnter",
+  mouseleave: "onMouseLeave",
+  mousemove: "onMouseMove",
+  mouseover: "onMouseOver",
+  mouseout: "onMouseOut",
+  mouseup: "onMouseUp",
+  mousewheel: "onMouseWheel",
+  touchstart: "onTouchStart",
+  touchmove: "onTouchMove",
+  touchend: "onTouchEnd",
+  touchcancel: "onTouchCancel",
+  wheel: "onWheel",
 }
 
 /**
@@ -317,11 +422,46 @@ export function reactifyElementBase(
       currentTemplateRootArgs && currentTemplateRootArgs[base.uiHandler]
     );
 
+    const handlerChildren = children.map((c, index: number) => {
+      // we use these options and we add the key
+      // in there
+      const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
+        asTemplate: arg.asTemplate,
+        active: arg.active,
+        selected: arg.selected,
+        element: c,
+        templateArgs: currentTemplateArgs,
+        templateRootArgs: currentTemplateRootArgs,
+        key: index,
+      };
+
+      // and then we call the reactify
+      if ((c as IText).text) {
+        return registry.REACTIFY.text(specificChildTemplateOptions);
+      } else if (registry.SERIALIZE[(c as RichElement).type]) {
+        return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
+      }
+
+      // ohteriwse null
+      return null;
+    });
+
     // if we have it, we use it
     if (Handler) {
-      return (<Handler {...base.uiHandlerArgs} key={arg.key}/>);
-    } else {
-      return null;
+      let className: string = null;
+      base.richClassList && base.richClassList.forEach((c) => {
+        className = (className || "") + " rich-text--" + c;
+      });
+      const style = convertStyleStringToReactObject(base.style);
+      return (<Handler
+        args={base.uiHandlerArgs}
+        key={arg.key}
+        children={handlerChildren}
+        element={arg.element}
+        className={className}
+        style={style}
+        events={retrieveElementActionsForReact(base, currentTemplateArgs)}
+      />);
     }
   }
 
@@ -329,6 +469,7 @@ export function reactifyElementBase(
   // given all of the before failed
   const finalProps = {
     ...arg.customProps,
+    ...retrieveElementActionsForReact(base, currentTemplateArgs),
   };
 
   // if we have a key, we use it

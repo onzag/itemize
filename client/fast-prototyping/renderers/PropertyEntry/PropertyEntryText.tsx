@@ -238,6 +238,9 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             i18nRichInfo: this.props.i18nRichInfo,
           }
         }
+        toolbarExtras={
+          this.props.args.toolbarExtras
+        }
       />
 
     // we return the component, note how we set the thing to focused

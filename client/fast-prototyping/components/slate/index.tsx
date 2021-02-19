@@ -20,7 +20,7 @@ import {
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import { copyElementBase } from "../../../internal/text/serializer/base";
+import { convertStyleStringToReactObject, copyElementBase, IUIHandlerProps } from "../../../internal/text/serializer/base";
 import { IVideo } from "../../../internal/text/serializer/types/video";
 import { mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
@@ -34,6 +34,30 @@ import { IInline } from "../../../internal/text/serializer/types/inline";
  * Combine both interfaces
  */
 interface ItemizeEditor extends ReactEditor, HistoryEditor { };
+
+/**
+ * The ui handler props that an ui handler takes
+ */
+export interface ISlateTemplateUIHandlerProps extends IUIHandlerProps {
+  /**
+   * Whether it is currently into an slate instance
+   */
+  isSlate: boolean;
+  /**
+   * The attributes that slate provides
+   */
+  attributes: any;
+  /**
+   * The helpers that might be provided if the handler
+   * requests extra info
+   */
+  helpers?: IHelperFunctions;
+  /**
+   * The selected state that might be provided if the handler
+   * requests extra info
+   */
+  selected?: boolean;
+}
 
 /**
  * The template argument is used in a template context in order
@@ -103,7 +127,7 @@ export interface ITemplateArg {
    * A handler component to use during the edition of a component
    * that matches this ui handler signature
    */
-  handler?: React.ComponentType;
+  handler?: React.ComponentType<ISlateTemplateUIHandlerProps>;
   /**
    * Extra arguments to pass to the handler component itself
    * every instance of this given handler will be passed the same
@@ -119,6 +143,29 @@ export interface ITemplateArg {
    * "helpers" for the rich text helpers
    */
   handlerPassSlateInfo?: boolean;
+  /**
+   * Makes the ui handler in question be void so it doesn't
+   * have children and it's managed all within itself
+   */
+  handlerIsVoid?: boolean;
+}
+
+/**
+ * Refers to toolbar prescence elements that are added
+ */
+export interface IToolbarPrescenseElement {
+  /**
+   * Given icon to use in the toolbar
+   */
+  icon: React.ReactNode;
+  /**
+   * A title to use
+   */
+  title?: string;
+  /**
+   * The element to be added
+   */
+  element: RichElement;
 }
 
 /**
@@ -449,6 +496,11 @@ export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions
    * normally true if templating is true
    */
   canSetLoop: boolean;
+  /**
+   * Able to insert any custom element from
+   * custom toolbar
+   */
+  canInsertAnyElement: boolean;
 
   /**
    * The classes that are available by the rich text
@@ -593,6 +645,13 @@ export interface IHelperFunctions {
   insertUIHandledContainer: (type: string, value: string, args: { [key: string]: string }, at?: Range | Path) => void;
 
   /**
+   * Inserts an element at the given position
+   * @param element the element to insert
+   * @param at optional range to insert at
+   */
+  insertElement: (element: RichElement, at?: Range | Path) => void;
+
+  /**
    * Makes a quote out of the current element
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
@@ -680,6 +739,10 @@ export interface IHelperFunctions {
    * for indirect usage
    */
   setUIHandler: (key: string, args: { [key: string]: string }, anchor: Path) => void;
+  /**
+   * Allows to set UI handler args in the ui handler
+   */
+  setUIHandlerArg: (key: string, value: string, anchor: Path) => void;
   /**
    * Sets the for-each loop key
    * this function does not refocus and it's silent and meant
@@ -887,6 +950,11 @@ export interface ISlateEditorWrapperBaseProps {
    * as the currentLoadError
    */
   dismissCurrentLoadError: () => void;
+  /**
+   * Function that should be specified to assign extra toolbar elements
+   * to be used either by ui handled components and whatnot
+   */
+  toolbarExtras?: IToolbarPrescenseElement[];
 }
 
 /**
@@ -1010,6 +1078,11 @@ interface ISlateEditorProps {
    * a file id
    */
   onRetrieveDataURI: (fileId: string) => string;
+  /**
+   * Function that should be specified to assign extra toolbar elements
+   * to be used either by ui handled components and whatnot
+   */
+  toolbarExtras?: IToolbarPrescenseElement[];
   /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
@@ -1343,6 +1416,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.findAndAppendFilesToDataTransfer = this.findAndAppendFilesToDataTransfer.bind(this);
     this.insertData = this.insertData.bind(this);
     this.findAndInsertFilesFromDataTransfer = this.findAndInsertFilesFromDataTransfer.bind(this);
+    this.isVoid = this.isVoid.bind(this);
 
     this.originalSetFragmentData = this.editor.setFragmentData;
     this.originalInsertData = this.editor.insertData;
@@ -1394,6 +1468,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggleUnderline = this.formatToggleUnderline.bind(this);
     this.setAction = this.setAction.bind(this);
     this.insertUIHandledContainer = this.insertUIHandledContainer.bind(this);
+    this.insertElement = this.insertElement.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchorsAndContext = this.calculateAnchorsAndContext.bind(this);
@@ -1513,7 +1588,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       } else if (this.state.currentBlockElementAnchor) {
         const pathForNext = [...this.state.currentBlockElementAnchor];
         pathForNext[pathForNext.length - 1]++;
-        Transforms.insertNodes(this.editor, parsed, {at: pathForNext});
+        Transforms.insertNodes(this.editor, parsed, { at: pathForNext });
       }
       return;
     }
@@ -1998,14 +2073,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a boolean on whether it represents a void element
    */
   public isVoid(element: RichElement) {
-    // all ui handled elements are void
-    if (element.uiHandler || element.html || element.textContent) {
+    // void-block are for example videos, and void-inline are for example files
+    if (element.html || element.textContent || element.containment === "void-block" || element.containment === "void-inline") {
       return true;
     }
 
-    // otherwise it depends on the containment
-    // void-block are for example videos, and void-inline are for example files
-    return element.containment === "void-block" || element.containment === "void-inline";
+    if (element.uiHandler) {
+      try {
+        const context = this.findContextBasedOnNode(element as any);
+        if (context) {
+          const uiHandler = context.properties[element.uiHandler];
+          if (uiHandler && uiHandler.type === "ui-handler") {
+            return !!uiHandler.handlerIsVoid;
+          }
+        }
+      } catch {
+      }
+
+      const rootContext = this.props.rootContext;
+      if (rootContext) {
+        const uiHandler = rootContext.properties[element.uiHandler];
+        if (uiHandler && uiHandler.type === "ui-handler") {
+          return !!uiHandler.handlerIsVoid;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -2721,43 +2815,47 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // if we don't find a UI handler
       // let's put a message about it
       if (
-        !propertiesFromContext ||
-        propertiesFromContext.type !== "ui-handler" ||
-        !propertiesFromContext.handler
+        propertiesFromContext &&
+        propertiesFromContext.type === "ui-handler" &&
+        propertiesFromContext.handler
       ) {
+        // now we can get the component, extra args and whatnot
+        const HandlerComponent = propertiesFromContext.handler;
+        const handlerExtraArgs = propertiesFromContext.handlerExtraArgs;
+        const passExtraInfo = propertiesFromContext.handlerPassSlateInfo;
+
+        // the extra info that should be passed if necessary
+        const extraInfo = passExtraInfo ?
+          {
+            helpers: this.getHelpers(),
+            selected: isSelected,
+          } : {};
+
+        let className: string = null;
+        (element as any as RichElement).richClassList && (element as any as RichElement).richClassList.forEach((c) => {
+          className = (className || "") + " rich-text--" + c;
+        });
+        const style = convertStyleStringToReactObject((element as any as RichElement).style);
+
+        // now we can use the handler component that is given via the ui handler
         return (
-          <div>
-            <span>{`UI Handled [${uiHandler}]`}</span>
-            <span>You are missing the given UI Handler as such it can't be rendered</span>
-          </div>
+          <HandlerComponent
+            args={{
+              ...uiHandlerArgs,
+              ...handlerExtraArgs,
+            } as any}
+            isSlate={true}
+            attributes={attributes}
+            element={element as any}
+            style={style}
+            className={className}
+            events={null}
+            {...extraInfo}
+          >
+            {children}
+          </HandlerComponent>
         );
       }
-
-      // now we can get the component, extra args and whatnot
-      const HandlerComponent = propertiesFromContext.handler;
-      const handlerExtraArgs = propertiesFromContext.handlerExtraArgs;
-      const passExtraInfo = propertiesFromContext.handlerPassSlateInfo;
-
-      // the extra info that should be passed if necessary
-      const extraInfoArgs = passExtraInfo ?
-        {
-          helpers: this.getHelpers(),
-          selected: isSelected,
-        } : {};
-
-      // now we can use the handler component that is given via the ui handler
-      return (
-        <div {...attributes}>
-          <div contentEditable={false}>
-            <HandlerComponent
-              {...uiHandlerArgs}
-              {...handlerExtraArgs}
-              {...extraInfoArgs}
-            />
-          </div>
-          {children}
-        </div>
-      );
     }
 
     const customProps: any = { ...attributes, children };
@@ -3472,7 +3570,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: type || null,
     };
 
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
 
     // and wrap the thing
     if (pathAt && !this.state.currentElement) {
@@ -3534,7 +3632,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       customType: type,
     };
 
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
 
     // and wrap the thing
     if (pathAt && !this.state.currentElement) {
@@ -4085,6 +4183,71 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Sets ui handler args to a given element
+   * @param key the ui handler arg key
+   * @param value the ui handler arg value
+   * @param anchor the anchor in question
+   */
+  public setUIHandlerArg(key: string, value: string, anchor: Path) {
+    const nodeAtPath = Node.get(this.editor, anchor);
+    let newValue: any = {
+      ...(nodeAtPath as any as RichElement).uiHandlerArgs,
+      [key]: value,
+    };
+
+    if (value === null || value === undefined) {
+      delete newValue[key];
+    }
+    Transforms.setNodes(this.editor, {
+      uiHandlerArgs: newValue,
+    }, { at: anchor });
+  }
+
+  /**
+   * Inserts an element at a given position
+   * @param element the element 
+   * @param at an optional position to do it at
+   */
+  public async insertElement(element: RichElement, at?: Range | Path) {
+    // if we are provided a range
+    if (at) {
+      // we focus at it
+      await this.focusAt(at);
+    }
+
+    // and insert the thing
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+
+    const nodeToInsert = { ...element };
+    nodeToInsert.children = [
+      STANDARD_TEXT_NODE(),
+    ];
+
+    // and wrap the thing
+    if (pathAt && !this.state.currentElement) {
+      const nodeAtPath = Node.get(this.editor, pathAt);
+      let newPath: Path;
+
+      if (nodeAtPath.containment === "superblock") {
+        newPath = [...pathAt, 0];
+      } else {
+        newPath = [...pathAt];
+        newPath[newPath.length - 1]++;
+      }
+      Transforms.insertNodes(this.editor, nodeToInsert as any, { at: newPath });
+    } else {
+      this.editor.insertNode(nodeToInsert as any);
+    }
+
+    if (this.state.currentText) {
+      // now we need to refocus
+      ReactEditor.focus(this.editor);
+    } else {
+      ReactEditor.blur(this.editor);
+    }
+  }
+
+  /**
    * Will insert a container at the given location and assign it an UI handler
    * @param type the container type
    * @param value the value for the ui handler that should be taken out of the context
@@ -4109,15 +4272,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       givenName: type || null,
     };
 
-    // and insert the thing
-    if (Path.isPath(at)) {
-      const newPath = [...at, 0];
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+
+    // and wrap the thing
+    if (pathAt && !this.state.currentElement) {
+      const nodeAtPath = Node.get(this.editor, pathAt);
+      let newPath: Path;
+
+      if (nodeAtPath.containment === "superblock") {
+        newPath = [...pathAt, 0];
+      } else {
+        newPath = [...pathAt];
+        newPath[newPath.length - 1]++;
+      }
       Transforms.insertNodes(this.editor, containerNode as any, { at: newPath });
     } else {
       this.editor.insertNode(containerNode as any);
     }
 
-    // then refocus
     if (this.state.currentText) {
       // now we need to refocus
       ReactEditor.focus(this.editor);
@@ -4430,7 +4602,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setRichClasses: this.setRichClasses,
       setAction: this.setAction,
       setUIHandler: this.setUIHandler,
+      setUIHandlerArg: this.setUIHandlerArg,
       insertUIHandledContainer: this.insertUIHandledContainer,
+      insertElement: this.insertElement,
 
       blockBlur: this.blockBlur,
       releaseBlur: this.releaseBlur,
@@ -4486,6 +4660,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       canSetLoop: this.state.currentSelectedElement && this.props.features.supportsTemplating,
       canSetStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles,
       canSetUIHandler: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canInsertAnyElement: hasSelectionAndNonInlineNorVoid,
     };
 
     return newFeatureSupport;
@@ -4544,6 +4719,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+          toolbarExtras={this.props.toolbarExtras}
         >
           {children}
         </Wrapper>

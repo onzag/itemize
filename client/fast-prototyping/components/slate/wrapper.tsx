@@ -25,7 +25,6 @@ import { FileLoadErrorDialog } from "./dialogs/file";
 import { LinkDialog } from "./dialogs/link";
 import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
-import { IText } from "../../../internal/text/serializer/types/text";
 
 /**
  * Defining a bunch of styles for the wrapper
@@ -293,6 +292,7 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
  * @param props the entire rich text editor toolbar props with all the added functions
  */
 function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
+  // issues with the badge and SSR
   const [isReady, makeReady] = useState(false);
   useEffect(() => {
     makeReady(true);
@@ -387,6 +387,23 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
     </Badge>
   }
 
+  let toolbarExtras: React.ReactNode[] = null;
+  if (props.toolbarExtras && props.toolbarExtras.length) {
+    toolbarExtras = props.toolbarExtras.map((x, index) => (
+      <IconButton
+        key={index}
+        tabIndex={-1}
+        title={x.title}
+        disabled={!props.featureSupport.canInsertAnyElement}
+        onMouseDown={props.helpers.blockBlur}
+        onMouseUp={props.helpers.releaseBlur}
+        onClick={props.helpers.insertElement.bind(null, x.element, null)}
+      >
+        {x.icon}
+      </IconButton>
+    ));
+  }
+
   let currentSuperBlockElement = props.state.currentSuperBlockElement;
   if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
     currentSuperBlockElement = props.state.currentSelectedElement;
@@ -478,7 +495,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatListNumberedLabel}
               color={
                 currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-                currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
+                  currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "numbered", null)}
@@ -496,7 +513,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
               title={props.i18nRichInfo.formatListBulletedLabel}
               color={
                 currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-                currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
+                  currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
               }
               disabled={!props.featureSupport.canInsertList}
               onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
@@ -555,7 +572,10 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
             null
         }
         {
-          props.featureSupport.supportsContainers ?
+          props.featureSupport.supportsContainers ||
+            toolbarExtras ||
+            templateTextBaseComponent ||
+            templateHTMLBaseComponent ?
             <Divider orientation="vertical" className={props.classes.divider} /> :
             null
         }
@@ -575,6 +595,7 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         }
         {templateTextBaseComponent}
         {templateHTMLBaseComponent}
+        {toolbarExtras}
         <div className={props.classes.moreOptionsSpacer} />
         {
           props.shouldHaveDrawer() ?

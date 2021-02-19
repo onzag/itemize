@@ -305,3 +305,9 @@ Let's add some classes that our designer can take advantage of, let's go to the 
 ```
 
 In reality these classes should be more specific on what they want to achieve, but it's a start, after you have added and rebuilt they should be accessible, and you should be able to use them.
+
+![Accessible Options Rich Text](./images/accessible-options-rich-text.png)
+
+And they should indeed react and be responsive to the width of the screen.
+
+However we now need a button to perform the search functionality, our inputs are nice and all, and we could indeed specify a component for the search, however we do actually want to go a new screen instead of remaining here in the frontpage to our search specific page.
