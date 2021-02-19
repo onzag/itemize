@@ -1202,6 +1202,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
   private originalSetFragmentData: any;
   private originalInsertData: any;
+  private isUnmounted: boolean;
 
   /**
    * The standard derived state function is used in order to set the state in an effective way
@@ -1323,6 +1324,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allCustom: [],
       allRichClasses: [],
     }
+
+    this.isUnmounted = false;
 
     // now we build the slate editor
     const rawEditor = createEditor();
@@ -2603,6 +2606,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param v the value to set
    */
   public setValue(v: any) {
+    if (this.isUnmounted) {
+      return;
+    }
+
     // build a new document
     const newRootDocument: IRootLevelDocument = {
       id: uuid.v4(),
@@ -2837,6 +2844,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param newValue the new value of the children of the document
    */
   public onChange(newValue: Node[]) {
+    if (this.isUnmounted) {
+      return;
+    }
 
     // first we clear the timeout of the blur
     // this is used during the blur blocking so now
@@ -4364,6 +4374,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allCustom: ALL_CUSTOM,
       allRichClasses: ALL_RICH_CLASSES,
     });
+  }
+
+  /**
+   * Sometimes slate leaves a selection behind we need to unselect if such
+   * is the case
+   */
+  public componentWillUnmount() {
+    // we need to set this to prevent the set value
+    // from being called on an unmounted component
+    this.isUnmounted = true;
+    ReactEditor.deselect(this.editor);
   }
 
   /**
