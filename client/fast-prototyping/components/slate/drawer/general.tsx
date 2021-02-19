@@ -112,6 +112,14 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     }, this.props.state.currentSelectedElementAnchor);
   }
 
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
   /**
    * The render function
    */
@@ -139,6 +147,8 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
                 placeholder={this.props.i18nRichInfo.type}
               />
             }
+            onOpen={this.unblur}
+            onClose={this.resetBlur}
           >
             <MenuItem value="">
               <em>{" "}</em>
@@ -225,6 +235,14 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     }, this.props.state.currentSelectedElementAnchor);
   }
 
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
   /**
    * The render function
    */
@@ -252,6 +270,8 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
                 placeholder={this.props.i18nRichInfo.type}
               />
             }
+            onOpen={this.unblur}
+            onClose={this.resetBlur}
           >
             <MenuItem value="h1">h1</MenuItem>
             <MenuItem value="h2">h2</MenuItem>

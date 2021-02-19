@@ -167,6 +167,14 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     this.props.onChange(this.props.name, newValue, this.props.anchor);
   }
 
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
   /**
    * The render function for the component
    */
@@ -194,6 +202,8 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
                 placeholder={this.props.name}
               />
             }
+            onOpen={this.unblur}
+            onClose={this.resetBlur}
           >
             <MenuItem value="">
               <em>{" "}</em>

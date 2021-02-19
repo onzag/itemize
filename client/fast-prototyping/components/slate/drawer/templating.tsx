@@ -140,6 +140,14 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
     this.props.onChange(newValue, this.props.anchor);
   }
 
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
   /**
    * The render function
    */
@@ -168,6 +176,8 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
                 placeholder={this.props.i18nName}
               />
             }
+            onOpen={this.unblur}
+            onClose={this.resetBlur}
           >
             <MenuItem value="">
               <em>{" "}</em>

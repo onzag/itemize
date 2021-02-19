@@ -239,6 +239,14 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     this.props.helpers.setRichClasses(newValue, this.props.state.currentSelectedElementAnchor);
   }
 
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
   /**
    * The render function that creates the multiselect
    */
@@ -262,7 +270,8 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
               ))}
             </div>
           )}
-          variant="filled"
+          onOpen={this.unblur}
+          onClose={this.resetBlur}
         >
           {
             this.props.featureSupport.availableRichClasses.map((element) => (

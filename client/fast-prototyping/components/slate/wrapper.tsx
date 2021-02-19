@@ -758,11 +758,13 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       });
     }
 
-    document.body.addEventListener("click", this.selectiveHardBlur);
+    document.body.addEventListener("mousedown", this.selectiveHardBlur);
+    document.body.addEventListener("touchstart", this.selectiveHardBlur);
   }
 
   public componentWillUnmount() {
-    document.body.removeEventListener("click", this.selectiveHardBlur);
+    document.body.removeEventListener("mousedown", this.selectiveHardBlur);
+    document.body.removeEventListener("touchstart", this.selectiveHardBlur);
   }
 
   public selectiveHardBlur(e: MouseEvent) {
