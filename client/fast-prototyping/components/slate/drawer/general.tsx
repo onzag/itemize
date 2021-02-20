@@ -24,6 +24,7 @@ import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
 import { Path, Text } from "slate";
 import type { RichElement } from "../../../../internal/text/serializer";
+import { IDrawerUIHandlerElementConfigCustomProps } from "..";
 
 /**
  * The state of the general option selector for the given item
@@ -347,7 +348,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
       return {
         altValue: selectedNode.alt || "",
         standalone: selectedNode.standalone,
-        sizes: selectedNode.sizes || "",
+        sizes: selectedNode.sizes || "",
         valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
@@ -367,7 +368,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.state = {
       altValue: selectedNode.alt || "",
       standalone: selectedNode.standalone,
-      sizes: selectedNode.sizes || "",
+      sizes: selectedNode.sizes || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
     }
 
@@ -482,6 +483,177 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
           label={this.props.i18nRichInfo.standalone}
         />
       </div>
+    );
+  }
+}
+
+interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles {
+  arg: string;
+  label: string;
+  placeholder: string;
+  isSelect: boolean;
+  isCustom: boolean;
+  CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
+  options?: Array<{ label: string, value: string }>;
+}
+
+class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOptionProps, IGeneralOptionsState> {
+  static getDerivedStateFromProps(props: IGeneralUIHandlerOptionProps, state: IGeneralOptionsState) {
+    const selectedNode: RichElement = props.state.currentSelectedElement as any;
+    if (
+      ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") !== state.value &&
+      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+    ) {
+      return {
+        value: (selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "",
+        valueForAnchor: props.state.currentSelectedElementAnchor,
+      }
+    }
+
+    return null;
+  }
+
+  private inputUpdateTimeout: NodeJS.Timer;
+
+  /**
+   * This is the constructor for the title type options
+   * @param props the entire wrapper props that are passed here
+   */
+  public constructor(props: IGeneralUIHandlerOptionProps) {
+    super(props);
+
+    const selectedNode: RichElement = props.state.currentSelectedElement as any;
+
+    this.state = {
+      value: (selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "",
+      valueForAnchor: props.state.currentSelectedElementAnchor,
+    }
+
+    this.onUpdateBySelect = this.onUpdateBySelect.bind(this);
+    this.updateByInput = this.updateByInput.bind(this);
+    this.actuallyUpdate = this.actuallyUpdate.bind(this);
+    this.onDelayedUpdate = this.onDelayedUpdate.bind(this);
+    this.onImmediateUpdate = this.onImmediateUpdate.bind(this);
+  }
+
+  public onDelayedUpdate(v: string) {
+    // update the state
+    this.setState({
+      value: v || "",
+    });
+
+    // now we clear a possibly existant previous timeout
+    clearTimeout(this.inputUpdateTimeout);
+    // and then we create a new timeout in 300 ms
+    this.inputUpdateTimeout = setTimeout(this.actuallyUpdate, 300);
+  }
+
+  public onImmediateUpdate(v: string) {
+    this.setState({
+      value: v || "",
+    });
+
+    // we use the helper set for the title subtype
+    // which does an arbitrary partial value update at the selected
+    // anchor
+    this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state.currentSelectedElementAnchor);
+  }
+
+  /**
+   * This triggers on update of the change of the select field
+   * in question that allows to change the container type
+   * @param e the event coming from the select
+   */
+  public onUpdateBySelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.value;
+    this.onImmediateUpdate(newValue);
+  }
+
+  /**
+   * Performs the state update of the alt into the state
+   * and delays the execution of the update in the node
+   * in order to avoid doing a tree update of the rich text
+   * on every key stroke
+   * @param e the change event in the input
+   */
+  public updateByInput(e: React.ChangeEvent<HTMLInputElement>) {
+    this.onDelayedUpdate(e.target.value);
+  }
+
+  /**
+   * Performs the actually update of the alt based on the
+   * state and when the timer has finally ellapsed
+   */
+  public actuallyUpdate() {
+    this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state.currentSelectedElementAnchor);
+  }
+
+  public unblur() {
+    document.body.dataset.unblur = "true";
+  }
+
+  public resetBlur() {
+    delete document.body.dataset.unblur;
+  }
+
+  /**
+   * The render function
+   */
+  public render() {
+    if (this.props.isCustom) {
+      const CustomComponent = this.props.CustomComponent;
+      return (
+        <CustomComponent
+          value={this.state.value}
+          onChange={this.onImmediateUpdate}
+          onDelayedChange={this.onDelayedUpdate}
+        />
+      );
+    }
+
+    if (!this.props.isSelect) {
+      return (
+        <TextField
+          value={this.state.value}
+          label={this.props.label}
+          placeholder={this.props.placeholder}
+          variant="filled"
+          onChange={this.updateByInput}
+          fullWidth={true}
+        />
+      );
+    }
+
+    return (
+      <FormControl
+        variant="filled"
+        fullWidth={true}
+      >
+        <InputLabel
+          htmlFor={"slate-drawer-uihandled-" + this.props.arg + "-selector"}
+          shrink={true}
+        >
+          {this.props.label}
+        </InputLabel>
+        <Select
+          value={this.state.value}
+          displayEmpty={true}
+          onChange={this.onUpdateBySelect}
+          variant="filled"
+          input={
+            <FilledInput
+              id={"slate-drawer-uihandled-" + this.props.arg + "-selector"}
+              placeholder={this.props.placeholder}
+            />
+          }
+          onOpen={this.unblur}
+          onClose={this.resetBlur}
+        >
+          {this.props.options.map((o) => (
+            <MenuItem value={o.value || ""} key={o.value || ""}>{o.label}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     );
   }
 }
@@ -618,16 +790,38 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   let specificNodeOptions: React.ReactNode = null;
 
   // so we got to get in the type
-  switch ((props.state.currentSelectedElement as any).type) {
-    case "container":
-      specificNodeOptions = <GeneralContainerOptions {...props} />
-      break;
-    case "title":
-      specificNodeOptions = <GeneralTitleOptions {...props} />
-      break;
-    case "image":
-      specificNodeOptions = <GeneralImageOptions {...props} />
-      break;
+  if (!props.state.currentSelectedElement.uiHandler) {
+    switch ((props.state.currentSelectedElement as any).type) {
+      case "container":
+        specificNodeOptions = <GeneralContainerOptions {...props} />
+        break;
+      case "title":
+        specificNodeOptions = <GeneralTitleOptions {...props} />
+        break;
+      case "image":
+        specificNodeOptions = <GeneralImageOptions {...props} />
+        break;
+    }
+  } else {
+    const extrasApplied = props.drawerUIHandlerExtras && props.drawerUIHandlerExtras
+      .filter((x) => x.uiHandler === props.state.currentSelectedElement.uiHandler);
+    if (extrasApplied && extrasApplied.length) {
+      specificNodeOptions = <div className={props.classes.box}>
+        {extrasApplied.map((x) => (
+          <GeneralUIHandlerOption
+            {...props}
+            arg={x.arg}
+            label={(x.input as any).label}
+            placeholder={(x.input as any).placeholder}
+            isSelect={x.input.type === "select"}
+            isCustom={x.input.type === "custom"}
+            CustomComponent={x.input.type === "custom" && x.input.component}
+            options={x.input.type === "select" && x.input.options}
+            key={x.arg}
+          />
+        ))}
+      </div>
+    }
   }
 
   // and return
@@ -635,8 +829,8 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
     <>
       {
         Text.isText((props.state.currentSelectedElement as any)) ?
-        null :
-        <GeneralElementOptions {...props}/>
+          null :
+          <GeneralElementOptions {...props} />
       }
       {specificNodeOptions}
       <IconButton onClick={props.helpers.deleteSelectedNode}>

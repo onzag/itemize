@@ -241,6 +241,9 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         toolbarExtras={
           this.props.args.toolbarExtras
         }
+        drawerUIHandlerExtras={
+          this.props.args.drawerUIHandlerExtras
+        }
       />
 
     // we return the component, note how we set the thing to focused

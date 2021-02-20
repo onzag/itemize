@@ -169,6 +169,58 @@ export interface IToolbarPrescenseElement {
 }
 
 /**
+ * Specifies a input configuration for the ui handler argument
+ * of type select
+ */
+export interface IDrawerUIHandlerElementConfigSelect {
+  type: "select",
+  label: string;
+  placeholder: string;
+  options: Array<{value: string, label: string}>;
+}
+
+/**
+ * Specifies an input configuration for the ui handler argument
+ * of type input
+ */
+export interface IDrawerUIHandlerElementConfigInput {
+  type: "input";
+  label: string;
+  placeholder: string;
+}
+
+export interface IDrawerUIHandlerElementConfigCustomProps {
+  value: string;
+  onChange: (value: string) => void;
+  onDelayedChange: (value: string) => void;
+}
+
+export interface IDrawerUIHandlerElementConfigCustom {
+  type: "custom";
+  component: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
+}
+
+/**
+ * Specifies a configurator to be added to the UI handled element
+ * that is created to be chosen in the drawer
+ */
+export interface IDrawerUIHandlerConfiguratorElement {
+  /**
+   * The ui handler in question
+   */
+  uiHandler: string;
+  /**
+   * The relevant argument of the ui handler
+   */
+  arg: string;
+  /**
+   * The way for the input to be specified
+   */
+  input: IDrawerUIHandlerElementConfigSelect | IDrawerUIHandlerElementConfigInput | IDrawerUIHandlerElementConfigCustom;
+}
+
+
+/**
  * Represents the available args in the context, a context is a compound
  * of arguments that represent an object shape, that will be used to create
  * a template and render such
@@ -955,6 +1007,10 @@ export interface ISlateEditorWrapperBaseProps {
    * to be used either by ui handled components and whatnot
    */
   toolbarExtras?: IToolbarPrescenseElement[];
+  /**
+   * Drawer extras for the ui handled types
+   */
+  drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
 }
 
 /**
@@ -1083,6 +1139,11 @@ interface ISlateEditorProps {
    * to be used either by ui handled components and whatnot
    */
   toolbarExtras?: IToolbarPrescenseElement[];
+  /**
+   * Allows to specify extras for the ui handler element types
+   * for being provided configuration within the general settings
+   */
+  drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
   /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
@@ -4720,6 +4781,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
           toolbarExtras={this.props.toolbarExtras}
+          drawerUIHandlerExtras={this.props.drawerUIHandlerExtras}
         >
           {children}
         </Wrapper>
