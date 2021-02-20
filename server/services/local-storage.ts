@@ -6,18 +6,22 @@ import StorageProvider from "./base/StorageProvider";
 
 async function copyDir(src: string, dest: string) {
   try {
-    await fsAsync.mkdir(dest);
-  } catch {
-    // Do nothing directory already exists
-  }
-  const files = await fsAsync.readdir(src);
-  for (let file of files) {
-    const current = await fsAsync.stat(path.join(src, file));
-    if (current.isDirectory()) {
-      await copyDir(path.join(src, file), path.join(dest, file));
-    } else {
-      await fsAsync.copyFile(path.join(src, file), path.join(dest, file));
+    const files = await fsAsync.readdir(src);
+    for (let file of files) {
+      const current = await fsAsync.stat(path.join(src, file));
+      if (current.isDirectory()) {
+        await copyDir(path.join(src, file), path.join(dest, file));
+      } else if (current.isFile()) {
+        try {
+          await fsAsync.mkdir(dest, { recursive: true });
+        } catch {
+          // Do nothing directory already exists
+        }
+        await fsAsync.copyFile(path.join(src, file), path.join(dest, file));
+      }
     }
+  } catch {
+    // DO nothing, can't access directory, must not even exist
   }
 };
 

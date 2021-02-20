@@ -210,10 +210,14 @@ async function dumpAllFromModuleRecursive(
  * @param client the cloud client
  */
 async function copyDataAt(domain: string, qualifiedPathName: string, idVersionHandle: string, client: StorageProvider<any>) {
-  await client.dumpFolder(
-    domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
-    path.join("dump", qualifiedPathName, idVersionHandle),
-  );
+  try {
+    await client.dumpFolder(
+      domain + "/" + qualifiedPathName + "/" + idVersionHandle + "/",
+      path.join("dump", qualifiedPathName, idVersionHandle),
+    );
+  } catch (err) {
+    console.log(colors.red(err.message));
+  }
 }
 
 /**

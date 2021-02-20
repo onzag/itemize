@@ -193,7 +193,7 @@ export default async function loadDump(configVersion: string, databaseConnection
       // and now we try to see if the row already exists
       const result: ISQLTableRowValue = await databaseConnection.queryFirst(
         `SELECT "type", "created_by", "created_at", "edited_by", "container_id" FROM ${JSON.stringify(mod.getQualifiedPathName())} ` +
-        `WHERE "id" = $1 AND "version = $2 LIMIT 1`,
+        `WHERE "id" = $1 AND "version" = $2 LIMIT 1`,
         [
           id,
           version,
@@ -215,7 +215,7 @@ export default async function loadDump(configVersion: string, databaseConnection
         const obtainedType = result.type;
         const differs = obtainedType !== row.type;
         let needsRecreation: boolean = false;
-        
+
         // is not the same as our own type, this is dangerous, but it might just be
         // a simple case that the type has changed, this will however lead to an
         // orphaned child on the item definition table
@@ -307,14 +307,18 @@ export default async function loadDump(configVersion: string, databaseConnection
               // otherwise as standard we update
               delete idefRows[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
               delete idefRows[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME];
-              const updateQuery = transactingDatabase.getUpdateBuilder();
-              updateQuery.table(idef.getTableName());
-              updateQuery.whereBuilder.andWhereMany({
-                [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: id,
-                [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: version,
-              });
-              updateQuery.setBuilder.setMany(idefRows);
-              await transactingDatabase.query(updateQuery);
+
+              if (Object.keys(idefRows).length !== 0) {
+                const updateQuery = transactingDatabase.getUpdateBuilder();
+                updateQuery.table(idef.getTableName());
+                updateQuery.whereBuilder.andWhereMany({
+                  [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: id,
+                  [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: version,
+                });
+                console.log(idefRows);
+                updateQuery.setBuilder.setMany(idefRows);
+                await transactingDatabase.query(updateQuery);
+              }
             }
           });
 
