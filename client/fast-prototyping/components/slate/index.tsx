@@ -2244,6 +2244,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we are dealing with and copy all its properties
       Transforms.insertNodes(this.editor, {
         ...this.state.currentBlockElement,
+        uiHandler: null,
+        uiHandlerArgs: null,
         givenName: null,
         // but certainly not its current text properties
         // that we might be at, as we don't want to copy nor the
