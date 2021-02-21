@@ -315,7 +315,6 @@ export default async function loadDump(configVersion: string, databaseConnection
                   [CONNECTOR_SQL_COLUMN_ID_FK_NAME]: id,
                   [CONNECTOR_SQL_COLUMN_VERSION_FK_NAME]: version,
                 });
-                console.log(idefRows);
                 updateQuery.setBuilder.setMany(idefRows);
                 await transactingDatabase.query(updateQuery);
               }
