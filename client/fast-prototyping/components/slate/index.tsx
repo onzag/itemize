@@ -924,6 +924,28 @@ export interface ISlateEditorStateType {
   currentContext: ITemplateArgsContext;
 
   /**
+   * root context
+   */
+  currentRootContext: ITemplateArgsRootContext;
+
+  /**
+   * The current selected element templating context
+   */
+  currentSelectedElementContext: ITemplateArgsContext
+
+  /**
+   * The current selected element context where the each options
+   * are
+   */
+  currentSelectedElementEachSelectContext: ITemplateArgsContext;
+
+  /**
+   * The current selected element context where the context options
+   * are
+   */
+  currentSelectedElementContextSelectContext: ITemplateArgsContext;
+
+  /**
    * The current value from the document that is used
    * in the slate rich text editor
    */
@@ -1243,6 +1265,16 @@ interface ISlateEditorState {
    */
   currentSelectedElementContext: ITemplateArgsContext;
   /**
+   * The current selected element context where the each options
+   * are
+   */
+  currentSelectedElementEachSelectContext: ITemplateArgsContext;
+  /**
+   * The current selected element context where the context options
+   * are
+   */
+  currentSelectedElementContextSelectContext: ITemplateArgsContext;
+  /**
    * all containers that exist within the definitions
    * for the css classes
    * 
@@ -1450,6 +1482,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedText: null,
       currentSelectedElement: null,
       currentSelectedElementContext: null,
+      currentSelectedElementContextSelectContext: null,
+      currentSelectedElementEachSelectContext: null,
 
       // ensure SSR compatibility
       // since we cannot read the CSS file on the server side
@@ -2502,11 +2536,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentSuperBlockElementAnchor: Path = null;
     let currentText: IText = null;
 
+    let expectedSelectedElementEachContext: ITemplateArgsContext = null;
+    let expectedSelectedElementContextContext: ITemplateArgsContext = null;
+
     // now we do need to setup the anchor if we have an anchor
     // in that case we need to populate these fields
     if (anchor) {
       // right now we setup everything at root
       currentContext = this.props.rootContext || null;
+      expectedSelectedElementEachContext = currentContext;
+      expectedSelectedElementContextContext = currentContext;
+
       // the current element
       currentElement = value ? {
         children: value,
@@ -2527,6 +2567,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // that must be our text
           currentText = currentElement.children[n] as IText;
         } else {
+          const isElementLast = anchor.length - 2 === index;
+
           // otherwise it's an element
           currentElement = currentElement.children[n] as RichElement;
 
@@ -2548,6 +2590,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             if (currentContext.type !== "context" || currentContext.loopable) {
               currentContext = null;
             }
+            if (!isElementLast) {
+              expectedSelectedElementEachContext = currentContext;
+              expectedSelectedElementContextContext = currentContext;
+            } else {
+              expectedSelectedElementEachContext = currentContext;
+            }
           }
 
           // also in the foreach context
@@ -2555,6 +2603,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentContext = currentContext.properties[currentElement.forEach] as ITemplateArgsContext || null;
             if (currentContext.type !== "context" || !currentContext.loopable) {
               currentContext = null;
+            }
+            if (!isElementLast) {
+              expectedSelectedElementEachContext = currentContext;
+              expectedSelectedElementContextContext = currentContext;
             }
           }
         }
@@ -2567,8 +2619,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentSelectedElementAnchor: Path = null;
     let currentSelectedElement: RichElement = null;
     let currentSelectedText: IText = null;
-    let currentSelectedTextAnchor: Path = null;
     let currentSelectedElementContext: ITemplateArgsContext = null;
+    let currentSelectedElementEachSelectContext: ITemplateArgsContext = null;
+    let currentSelectedElementContextSelectContext: ITemplateArgsContext = null;
 
     // if we don't have a selected anchor and origin
     // we have purposely set then we should
@@ -2581,6 +2634,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedText = currentText;
       // and the context is our current context
       currentSelectedElementContext = currentContext;
+      currentSelectedElementEachSelectContext = expectedSelectedElementEachContext;
+      currentSelectedElementContextSelectContext = expectedSelectedElementContextContext;
     } else {
       // otherwise here, we are going to pick and trust
       // the values we are given, the anchors
@@ -2593,9 +2648,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         children: value,
       } as any : this.state.internalValue;
       currentSelectedElementContext = this.props.rootContext || null;
+      currentSelectedElementEachSelectContext = currentSelectedElementContext;
+      currentSelectedElementContextSelectContext = currentSelectedElementContext;
 
       // so we loop in the origin anchor
       currentGivenSelectedNodeAnchor.forEach((n: number, index: number) => {
+        const isLast = index === currentGivenSelectedNodeAnchor.length - 1;
+
         // and update the node origin
         currentSelectedElement = (currentSelectedElement as any).children[n];
 
@@ -2610,6 +2669,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           if (currentSelectedElementContext.type !== "context" || currentSelectedElementContext.loopable) {
             currentSelectedElementContext = null;
           }
+
+          if (!isLast) {
+            currentSelectedElementEachSelectContext = currentSelectedElementContext;
+            currentSelectedElementContextSelectContext = currentSelectedElementContext;
+          } else {
+            currentSelectedElementEachSelectContext = currentSelectedElementContext;
+          }
         }
 
         // also in the foreach context
@@ -2617,6 +2683,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           currentSelectedElementContext = currentSelectedElementContext.properties[(currentSelectedElement as any).forEach] as ITemplateArgsContext || null;
           if (currentSelectedElementContext.type !== "context" || !currentSelectedElementContext.loopable) {
             currentSelectedElementContext = null;
+          }
+
+          if (!isLast) {
+            currentSelectedElementEachSelectContext = currentSelectedElementContext;
+            currentSelectedElementContextSelectContext = currentSelectedElementContext;
           }
         }
       });
@@ -2652,6 +2723,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedElement,
       currentSelectedText,
       currentSelectedElementContext,
+      currentSelectedElementEachSelectContext,
+      currentSelectedElementContextSelectContext,
     }
   }
 
@@ -3195,6 +3268,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSelectedElement: null,
         currentSelectedElementAnchor: null,
         currentSelectedElementContext: null,
+        currentSelectedElementEachSelectContext: null,
+        currentSelectedElementContextSelectContext: null,
       }, () => {
         // slate loves this and I don't know why
         // it won't work without the timeout
@@ -4770,6 +4845,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSuperBlockElementAnchor: this.state.currentSuperBlockElementAnchor,
         currentSelectedElementAnchor: this.state.currentSelectedElementAnchor,
         currentSelectedText: this.state.currentSelectedText,
+        currentRootContext: this.props.rootContext || null,
+        currentSelectedElementContext: this.state.currentSelectedElementContext,
+        currentSelectedElementEachSelectContext: this.state.currentSelectedElementEachSelectContext,
+        currentSelectedElementContextSelectContext: this.state.currentSelectedElementContextSelectContext,
       }
 
       // and we feed the thing in the wrapper as the new children

@@ -197,6 +197,10 @@ const style = createStyles({
     color: "#aaa",
     paddingBottom: "1rem",
   },
+  optionPrimary: {
+    fontWeight: 700,
+    color: "#1b5e20",
+  },
 });
 
 /**
@@ -308,9 +312,28 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
   let templateHTMLAmount = 0;
   let templateLinkAmount = 0;
 
-  if (props.featureSupport.supportsTemplating && props.state.currentContext) {
-    Object.keys(props.state.currentContext.properties).forEach((key) => {
-      const property = props.state.currentContext.properties[key];
+  if (props.featureSupport.supportsTemplating && props.state.currentSelectedElementContext) {
+    Object.keys(props.state.currentSelectedElementContext.properties).forEach((key) => {
+      const property = props.state.currentSelectedElementContext.properties[key];
+
+      // but they must be the given element type
+      if (property.type === "text") {
+        templateTextAmount++;
+      } else if (property.type === "html") {
+        templateHTMLAmount++;
+      } else if (property.type === "link") {
+        templateLinkAmount++;
+      }
+    });
+  }
+
+  if (
+    props.featureSupport.supportsTemplating &&
+    props.state.currentRootContext &&
+    props.state.currentRootContext !== props.state.currentSelectedElementContext
+  ) {
+    Object.keys(props.state.currentRootContext.properties).forEach((key) => {
+      const property = props.state.currentRootContext.properties[key];
 
       // but they must be the given element type
       if (property.type === "text") {
@@ -1193,12 +1216,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nSetLinkTemplatedPlaceholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
         i18nSetLinkTemplatedUnspecified={this.props.i18nRichInfo.setLink.templatedUnspecified}
         i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
-        currentContext={this.props.state.currentContext}
+        currentContext={this.props.state.currentSelectedElementContext}
+        currentRootContext={this.props.state.currentRootContext}
         linkDialogOpen={this.state.linkDialogOpen}
         selectedElement={this.state.elementThatWasCurrentBeforeLosingFocus}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
         templateBoxClassName={this.props.classes.linkTemplateOptionsBox}
         templateTextClassName={this.props.classes.linkTemplateOptionsText}
+        optionPrimaryClassName={this.props.classes.optionPrimary}
       />
     ) : null;
 
@@ -1209,12 +1234,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         insertTemplateElement={this.insertTemplateText}
         closeTemplateElementDialog={this.closeDialogTemplateText}
         templateElementDialogOpen={this.state.templateTextDialogOpen}
-        currentContext={this.props.state.currentContext}
+        currentContext={this.props.state.currentSelectedElementContext}
+        currentRootContext={this.props.state.currentRootContext}
         i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateText.label}
         i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateText.submit}
         i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateText.title}
         elementType="text"
+        optionPrimaryClassName={this.props.classes.optionPrimary}
       />
     ) : null;
 
@@ -1225,12 +1252,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         insertTemplateElement={this.insertTemplateHTML}
         closeTemplateElementDialog={this.closeDialogTemplateHTML}
         templateElementDialogOpen={this.state.templateHTMLDialogOpen}
-        currentContext={this.props.state.currentContext}
+        currentContext={this.props.state.currentSelectedElementContext}
+        currentRootContext={this.props.state.currentRootContext}
         i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateHTML.label}
         i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateHTML.placeholder}
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateHTML.submit}
         i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateHTML.title}
         elementType="html"
+        optionPrimaryClassName={this.props.classes.optionPrimary}
       />
     ) : null;
 

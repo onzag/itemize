@@ -565,11 +565,12 @@ export const NULL_DOCUMENT = deserialize(null);
 function processTemplateNodeInitialization(
   node: HTMLElement,
   templateArgsContext: any,
+  templateArgsRootcontext: any,
 ) {
   // has a text handler
   const textKey = node.dataset.text;
   if (textKey) {
-    const text: string = templateArgsContext[textKey];
+    const text: string = templateArgsContext[textKey] || templateArgsRootcontext[textKey];
     if (typeof text !== "string") {
       // we do not log because this will hit the server side
     } else {
@@ -580,7 +581,7 @@ function processTemplateNodeInitialization(
   // set the thref key
   const threfKey = node.dataset.href;
   if (threfKey) {
-    const thref: string = templateArgsContext[threfKey];
+    const thref: string = templateArgsContext[threfKey] || templateArgsRootcontext[threfKey];
     if (typeof thref !== "string") {
       // we do not log because this will hit the server side
     } else {
@@ -591,7 +592,7 @@ function processTemplateNodeInitialization(
   // has a HTML handler
   const htmlKey = node.dataset.html;
   if (htmlKey) {
-    const html: string = node[htmlKey];
+    const html: string = templateArgsContext[htmlKey] || templateArgsRootcontext[htmlKey];
 
     if (typeof html !== "string") {
       // we do not log because this will hit the server side
@@ -611,6 +612,7 @@ function processTemplateNodeInitialization(
 function processTemplateInitialization(
   node: HTMLElement,
   templateArgsContext: any,
+  templateArgsRootContext: any,
 ) {
   // first we check if we have child nodes to loop
   node.hasChildNodes() && node.childNodes.forEach((childNode) => {
@@ -620,10 +622,6 @@ function processTemplateInitialization(
     // so the args we are working with, this is going to be
     // the context we will be working with
     let templateArgsNewContext = templateArgsContext;
-
-    // and whether we should leave the children of this
-    // node unhandled
-    let leaveNodeChildrenUnhandled: boolean = false;
 
     // cheap cheesy way to check if we are working with a HTML Element
     // that has a dataset in it, no need for fancy checks since we are only interested
@@ -639,8 +637,6 @@ function processTemplateInitialization(
       // so now we got to see if we have a for loop
       const forEachKey = childNodeASHTMLElement.dataset.forEach;
       if (forEachKey) {
-        // we will unhandle then
-        leaveNodeChildrenUnhandled = true;
         // and this is what we are looping for
         const forArgument = templateArgsNewContext[forEachKey];
         // we grab the next sibling so that we can properly repeat
@@ -662,6 +658,7 @@ function processTemplateInitialization(
           processTemplateNodeInitialization(
             clone,
             forEachContext,
+            templateArgsRootContext,
           );
 
           // if we don't expect children to be unhandled
@@ -670,6 +667,7 @@ function processTemplateInitialization(
             processTemplateInitialization(
               clone,
               forEachContext,
+              templateArgsRootContext,
             );
           }
         });
@@ -681,6 +679,7 @@ function processTemplateInitialization(
         processTemplateNodeInitialization(
           childNodeASHTMLElement,
           templateArgsNewContext,
+          templateArgsRootContext,
         );
       }
     }
@@ -692,6 +691,7 @@ function processTemplateInitialization(
       processTemplateInitialization(
         childNodeASHTMLElement,
         templateArgsNewContext,
+        templateArgsRootContext,
       );
     }
   });
@@ -727,6 +727,7 @@ export function renderTemplate(
 
   processTemplateInitialization(
     cheapdiv,
+    args,
     args,
   );
 

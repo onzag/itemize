@@ -107,6 +107,11 @@ export function registerLink(registry: ISerializationRegistryType) {
       newCustomProps.title = arg.element.thref;
     }
 
+    if (arg.asTemplate && arg.element.thref && arg.active) {
+      const href = arg.templateArgs[arg.element.thref] || arg.templateRootArgs[arg.element.thref];
+      (newCustomProps as any).href = href;
+    }
+
     // now we can do a call to the reactify
     return reactifyElementBase(
       registry,

@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { ITemplateArgsContext } from "..";
+import { ITemplateArgsContext, ITemplateArgsRootContext } from "..";
 import {
   Button, FilledInput, FormControl, InputLabel, MenuItem, Select,
 } from "../../../mui-core";
@@ -32,6 +32,10 @@ interface ITemplateElementDialogProps {
    */
   currentContext: ITemplateArgsContext;
   /**
+   * The current root context
+   */
+  currentRootContext: ITemplateArgsRootContext;
+  /**
    * Whether the dialog should be open
    */
   templateElementDialogOpen: boolean;
@@ -56,6 +60,10 @@ interface ITemplateElementDialogProps {
    * are the only supported
    */
   elementType: "text" | "html";
+  /**
+   * Class name for primary options
+   */
+  optionPrimaryClassName: string;
 }
 
 /**
@@ -65,6 +73,7 @@ interface ITemplateElementDialogProps {
 interface ITemplateElementOption {
   value: string;
   label: string | React.ReactNode;
+  primary: boolean;
 };
 
 /**
@@ -134,8 +143,28 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
       templateHTMLPropertiesToUse.push({
         value: key,
         label: property.label || key,
+        primary: this.props.currentContext !== this.props.currentRootContext,
       });
     });
+
+    if (this.props.currentContext !== this.props.currentRootContext) {
+      Object.keys(this.props.currentRootContext.properties).forEach((key) => {
+        const property = this.props.currentRootContext.properties[key];
+  
+        // but they must be the given element type
+        if (property.type !== this.props.elementType) {
+          // otherwise continue;
+          return;
+        }
+  
+        // now we can add the option to our option list
+        templateHTMLPropertiesToUse.push({
+          value: key,
+          label: property.label || key,
+          primary: false,
+        });
+      });
+    }
 
     // and set the state
     this.setState({
@@ -254,6 +283,7 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
                       key={vv.value}
                       value={vv.value}
                       id={"slate-template-element-for-" + encodeURIComponent(vv.value)}
+                      className={vv.primary ? this.props.optionPrimaryClassName : null}
                     >
                       {
                         vv.label

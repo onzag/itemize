@@ -211,12 +211,12 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
   const allContexts: ISingleTemplatingElementOption[] = [];
 
   // if we have a context, otherwise without context there are no options
-  if (props.state.currentContext) {
+  if (props.state.currentSelectedElementContextSelectContext) {
     // we build the key list
-    Object.keys(props.state.currentContext.properties).forEach((p) => {
-      const value = props.state.currentContext.properties[p];
+    Object.keys(props.state.currentSelectedElementContextSelectContext.properties).forEach((p) => {
+      const value = props.state.currentSelectedElementContextSelectContext.properties[p];
       // it needs to be a context type
-      if (value.type !== "context") {
+      if (value.type !== "context" || value.loopable) {
         return null;
       }
 
@@ -226,13 +226,48 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         label: value.label,
       };
 
-      // and decide where it goes
-      if (value.loopable) {
-        allEachContexts.push(option);
-      } else {
-        allContexts.push(option);
-      }
+      allContexts.push(option);
     });
+  }
+
+  // if we have a context, otherwise without context there are no options
+  if (props.state.currentSelectedElementEachSelectContext) {
+    // we build the key list
+    Object.keys(props.state.currentSelectedElementEachSelectContext.properties).forEach((p) => {
+      const value = props.state.currentSelectedElementEachSelectContext.properties[p];
+      // it needs to be a context type
+      if (value.type !== "context" || !value.loopable) {
+        return null;
+      }
+
+      // now we can build the option
+      const option = {
+        value: p,
+        label: value.label,
+      };
+
+      allEachContexts.push(option);
+    });
+  }
+
+  if (currentNode.forEach) {
+    const eachFound = allEachContexts.find((v) => v.value === currentNode.forEach);
+    if (!eachFound) {
+      allEachContexts.push({
+        value: currentNode.forEach,
+        label: currentNode.forEach,
+      });
+    }
+  }
+
+  if (currentNode.context) {
+    const contextFound = allContexts.find((v) => v.value === currentNode.context);
+    if (!contextFound) {
+      allContexts.push({
+        value: currentNode.context,
+        label: currentNode.context,
+      });
+    }
   }
 
   // and return the thing

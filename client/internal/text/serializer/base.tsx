@@ -521,7 +521,11 @@ export function reactifyElementBase(
     // we remove the children if we have them
     delete finalProps.children;
 
-    const value = currentTemplateArgs && currentTemplateArgs[base.html];
+    const value = (
+      currentTemplateArgs && currentTemplateArgs[base.html]
+    ) || (
+      currentTemplateRootArgs && currentTemplateRootArgs[base.html]
+    );
     if (value) {
       if (typeof value === "string") {
         // and define the dangerously set inner html
@@ -530,12 +534,25 @@ export function reactifyElementBase(
         // define it as a react component
         finalProps.children = value;
       }
+    } else {
+      finalProps.children = null;
     }
   } else if (arg.asTemplate && base.textContent) {
     // we remove the children if we have them
     delete finalProps.children;
     // and define the text content
-    finalProps.children = currentTemplateArgs && currentTemplateArgs[base.textContent];
+    const value = (
+      currentTemplateArgs && currentTemplateArgs[base.textContent]
+    ) || (
+      currentTemplateRootArgs && currentTemplateRootArgs[base.textContent]
+    );
+
+    if (typeof value === "string") {
+      finalProps.children = value;
+    } else {
+      finalProps.children = null;
+    }
+  
   } else if (!finalProps.children && children) {
     // otherwise if no children have been defined in the given
     // custom properties, then we are going to instantiate

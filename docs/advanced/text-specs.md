@@ -330,6 +330,14 @@ Similar security policies apply from the style tag.
 
 If style templating isn't enough as it's honestly very limiting you should definetely use a rich extension via the class attribute
 
+### Provide a name
+
+Elements can be given names, these can be useful for displaying and analyzing the data tree.
+
+```html
+<span data-name="some name"></span>
+```
+
 ### Event handling
 
 It's totally possible to pass events to these templates to functions can be called externally, the supported events are:
@@ -429,56 +437,40 @@ In order to make a for loop for the given template you would have to do the foll
 
 Because this also represents a context update of the template, the children of this for loop now have the new context and have no access to the animals variable anymore, but rather conform a new context.
 
-### Complete UI Handler (Deprecated Description)
+### Complete UI Handler
 
 Text in templating mode can provide a whole custom ui handler for the given component, a whole complete UI handler allows for full modification and control over a given node and it's given by `data-ui-handler` where the value is one of the values given by the templating object
 
-You can pass args to the ui handler by using `data-[name]` in order to pass those arguments as props, technically all the data attributes get passed as props to the handler
+Note tha UI handlers are only supported during dynamic renders and not quite avaliable in standard rendering, unlike the html form which would be able to render a string.
+
+You can pass args to the ui handler by using `data-[name]` in order to pass those arguments as props, technically all the data attributes get passed as props to the handler so be careful about not using attributes that are stored as data as well, such as `data-name`, `data-on-[event]`, `data-src`, and such....
 
 ```html
-<div data-ui-handler="myRepeatHandler" data-amount="10"><span>repeat</span></div>
+<div data-ui-handler="myCustomButtonHandler" data-color="red"><p>content</p></div>
 ```
 
-UI handlers are complex and in the template object are expected to take the form of an UI handler such as
+UI handlers are complex and in the template object and are expected to take the following shape
 
-```typescript
-// we are defining a handler called my repeat handler
-// which will repeat its children a given amount of times
-const myRepeatHandler: ICustomUITemplateHandler = {
-  /**
-   * The initialization function gets called at the start
-   * of the ui handler taking place
-   * 
-   * Yes UI handlers can have access to the rootArgs, where
-   * templateArgs are the current context args
-   */
-  initialize(bareNode, DOMWindow, templateArgs, rootArgs) {
-    // the bare node is the node before anything has happened to it
-    // so we fetch the data from it and do the repeat
-    const amountToRepeat = parseInt(bareNode.dataset.amount) || 2;
-    const childrenToRepeat = bareNode.childNodes[0];
-    bareNode.removeChild(childrenToRepeat);
-    for (let i = 0; i < amountToRepeat; i++) {
-      bareNode.appendChild(childrenToRepeat.cloneNode(true));
-    }
-
-    // now we return our new custom node, in this case it is the
-    // same bare node, but with our children repeated
-    return bareNode;
-  },
-  load(customNode, DOMWindow, templateArgs, rootArgs) {
-    // when we load
-    customNode.addEventListener("click", () => {
-      alert(localeReplacer(rootArgs["i18nItWasRepeated"], parseInt(bareNode.dataset.amount) || 2));
-    });
-  },
-  unload(customNode, DOMWindow, templateArgs, rootArgs) {
-    alert(rootArgs["i18nUnloading"])
-  }
+```tsx
+// we are defining a handler called my custom button handler
+function myCustomButtonHandler(props: IUIHandlerProps) {
+  return (
+    <button
+      className={props.className}
+      style={
+        props.args.color ?
+        props.style :
+        {...props.style, color: props.args.color, border: "solid 1px " + props.args.color}
+      }
+      {...props.events}
+    >
+      {props.children}
+    </button>
+  );
 }
 ```
 
-Note that UI handlers are handled by the renderer, so if you are writting your own custom renderer you will have to support this functionality if you want to fully support itemize text specifications, the fast prototying view renderer supports templating already
+Note that UI handlers are handled by the renderer, and they might follow different rules and allow for extra attributes, for example the fast prototyping slate based entry renderer allows for the extension of these handlers for one that is editable, but this is the standard form for viewing.
 
 ## Custom Components
 

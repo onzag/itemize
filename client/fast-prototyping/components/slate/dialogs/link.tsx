@@ -8,7 +8,7 @@ import {
   Button, TextField, FilledInput, FormControl, InputLabel, MenuItem, Select,
 } from "../../../mui-core";
 import { Dialog } from "../../dialog";
-import { ITemplateArgsContext } from "..";
+import { ITemplateArgsContext, ITemplateArgsRootContext } from "..";
 import { RichElement } from "../../../../internal/text/serializer";
 
 /**
@@ -36,6 +36,10 @@ interface ILinkDialogProps {
    * The current context the dialog was opened
    */
   currentContext: ITemplateArgsContext;
+  /**
+   * The root context
+   */
+  currentRootContext: ITemplateArgsRootContext;
   /**
    * The selected element that was chosen, before opening
    * the dialog, it might be or not present, it is used
@@ -97,6 +101,10 @@ interface ILinkDialogProps {
    * The text class name
    */
   templateTextClassName: string;
+  /**
+   * Class name for primary options
+   */
+  optionPrimaryClassName: string;
 }
 
 /**
@@ -106,6 +114,7 @@ interface ILinkDialogProps {
 interface ILinkDialogTemplateOption {
   value: string;
   label: string | React.ReactNode;
+  primary: boolean;
 };
 
 /**
@@ -197,8 +206,28 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       linkPropertiesToUse.push({
         value: key,
         label: property.label || key,
+        primary: this.props.currentContext !== this.props.currentRootContext,
       });
     });
+
+    if (this.props.currentRootContext !== this.props.currentContext) {
+      Object.keys(this.props.currentRootContext.properties).forEach((key) => {
+        // grab each property and check the type of it
+        const property = this.props.currentRootContext.properties[key];
+        // if it's not a link
+        if (property.type !== "link") {
+          // continue
+          return;
+        }
+  
+        // otherwise we have a property we can use
+        linkPropertiesToUse.push({
+          value: key,
+          label: property.label || key,
+          primary: false,
+        });
+      });
+    }
 
     // now if we have a selected element
     // that is also a link
@@ -213,6 +242,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
         linkPropertiesToUse.push({
           value: this.props.selectedElement.thref,
           label: this.props.selectedElement.thref,
+          primary: false,
         });
       }
 
@@ -356,7 +386,11 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
                       // render the valid values that we display and choose
                       this.state.linkTemplateOptions.map((vv) => {
                         // the i18n value from the i18n data
-                        return <MenuItem key={vv.value} value={vv.value}>{
+                        return <MenuItem
+                          key={vv.value}
+                          value={vv.value}
+                          className={vv.primary ? this.props.optionPrimaryClassName : null}
+                        >{
                           vv.label
                         }</MenuItem>;
                       })
