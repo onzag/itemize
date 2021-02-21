@@ -567,6 +567,15 @@ function processTemplateNodeInitialization(
   templateArgsContext: any,
   templateArgsRootcontext: any,
 ) {
+  const ifKey = node.dataset.if;
+  if (ifKey) {
+    const ifValue = templateArgsContext[ifKey];
+    if (!ifValue) {
+      node.parentElement.removeChild(node);
+      return;
+    }
+  }
+
   // has a text handler
   const textKey = node.dataset.text;
   if (textKey) {
@@ -637,43 +646,50 @@ function processTemplateInitialization(
       // so now we got to see if we have a for loop
       const forEachKey = childNodeASHTMLElement.dataset.forEach;
       if (forEachKey) {
-        // and this is what we are looping for
-        const forArgument = templateArgsNewContext[forEachKey];
-        // we grab the next sibling so that we can properly repeat
-        const nextSibling = childNodeASHTMLElement.nextSibling;
+        const ifKey = childNodeASHTMLElement.dataset.if;
+        const ifValue = ifKey && templateArgsNewContext[ifKey];
 
-        // so we loop
-        forArgument.forEach((forEachContext: any, index: number) => {
-          // now we make a clone of what we are looping for
-          const clone = childNodeASHTMLElement.cloneNode(true) as HTMLElement;
-          // if we have a next sibling
-          if (nextSibling) {
-            // we insert before it
-            childNodeASHTMLElement.parentElement.insertBefore(clone, nextSibling);
-          } else {
-            childNodeASHTMLElement.parentElement.appendChild(clone);
-          }
+        if (ifKey && !ifValue) {
+          node.parentElement.removeChild(node);
+        } else {
+          // and this is what we are looping for
+          const forArgument = templateArgsNewContext[forEachKey];
+          // we grab the next sibling so that we can properly repeat
+          const nextSibling = childNodeASHTMLElement.nextSibling;
 
-          // and now we call for the initialization of this node itself
-          processTemplateNodeInitialization(
-            clone,
-            forEachContext,
-            templateArgsRootContext,
-          );
+          // so we loop
+          forArgument.forEach((forEachContext: any, index: number) => {
+            // now we make a clone of what we are looping for
+            const clone = childNodeASHTMLElement.cloneNode(true) as HTMLElement;
+            // if we have a next sibling
+            if (nextSibling) {
+              // we insert before it
+              childNodeASHTMLElement.parentElement.insertBefore(clone, nextSibling);
+            } else {
+              childNodeASHTMLElement.parentElement.appendChild(clone);
+            }
 
-          // if we don't expect children to be unhandled
-          if (clone.hasChildNodes()) {
-            // we handle them per clone result
-            processTemplateInitialization(
+            // and now we call for the initialization of this node itself
+            processTemplateNodeInitialization(
               clone,
               forEachContext,
               templateArgsRootContext,
             );
-          }
-        });
 
-        // now we can remove the original
-        childNodeASHTMLElement.parentElement.removeChild(childNodeASHTMLElement);
+            // if we don't expect children to be unhandled
+            if (clone.hasChildNodes()) {
+              // we handle them per clone result
+              processTemplateInitialization(
+                clone,
+                forEachContext,
+                templateArgsRootContext,
+              );
+            }
+          });
+
+          // now we can remove the original
+          childNodeASHTMLElement.parentElement.removeChild(childNodeASHTMLElement);
+        }
       } else {
         // otherwise if we have no for loop, we just process the node itself
         processTemplateNodeInitialization(

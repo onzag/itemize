@@ -56,6 +56,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatSetClassLabel: string;
   formatSetEventHandlers: string;
   formatSetContext: string;
+  formatSetRenderCondition: string;
   formatMakeLoop: string;
   formatSetUIHandlerLabel: string;
   formatSetUIHandlerArgLabel: string;
@@ -95,6 +96,7 @@ export interface IPropertyEntryI18nRichTextInfo {
   actions: string;
   each: string;
   context: string;
+  renderCondition: string;
   uiHandler: string;
   type: string;
   standalone: string;
@@ -925,6 +927,7 @@ export default class PropertyEntryText
         formatSetClassLabel: i18nInLanguage.format_set_class,
         formatSetEventHandlers: i18nInLanguage.format_set_event_handlers,
         formatSetContext: i18nInLanguage.format_set_context,
+        formatSetRenderCondition: i18nInLanguage.format_set_render_condition,
         formatSetHoverStyleLabel: i18nInLanguage.format_set_hover_style,
         formatSetStyleLabel: i18nInLanguage.format_set_style,
         formatSetUIHandlerArgLabel: i18nInLanguage.format_set_ui_handler_arg,
@@ -965,6 +968,7 @@ export default class PropertyEntryText
         actions: i18nInLanguage.rich_actions,
         each: i18nInLanguage.rich_each,
         context: i18nInLanguage.rich_context,
+        renderCondition: i18nInLanguage.rich_render_condition,
         uiHandler: i18nInLanguage.rich_ui_handler,
         type: i18nInLanguage.rich_type,
         standalone: i18nInLanguage.rich_standalone,

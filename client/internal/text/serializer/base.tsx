@@ -186,6 +186,7 @@ export interface IAttrs {
  */
 const translations = {
   givenName: "data-name",
+  ifCondition: "data-if",
   html: "data-html",
   textContent: "data-text",
   style: "style",
@@ -374,6 +375,13 @@ export function reactifyElementBase(
       // hopefully it'll be an array
       if (Array.isArray(loopElement)) {
 
+        if (base.ifCondition) {
+          const value = currentTemplateArgs[base.ifCondition];
+          if (!value) {
+            return null;
+          }
+        }
+
         // so now we loop and return a fragment
         return (
           <React.Fragment key={arg.key}>
@@ -409,6 +417,13 @@ export function reactifyElementBase(
     }
   }
 
+  if (arg.asTemplate && base.ifCondition) {
+    const value = currentTemplateArgs && currentTemplateArgs[base.ifCondition];
+    if (!value) {
+      return null;
+    }
+  }
+
   // now we do this if we have UI handlers
   // for the given element and we are working out
   // as a template
@@ -418,9 +433,9 @@ export function reactifyElementBase(
     // or the root context
     const Handler: any = (
       currentTemplateArgs && currentTemplateArgs[base.uiHandler]
-    ) || (
-      currentTemplateRootArgs && currentTemplateRootArgs[base.uiHandler]
-    );
+    ) || (
+        currentTemplateRootArgs && currentTemplateRootArgs[base.uiHandler]
+      );
 
     const handlerChildren = children.map((c, index: number) => {
       // we use these options and we add the key
@@ -524,12 +539,12 @@ export function reactifyElementBase(
     const value = (
       currentTemplateArgs && currentTemplateArgs[base.html]
     ) || (
-      currentTemplateRootArgs && currentTemplateRootArgs[base.html]
-    );
+        currentTemplateRootArgs && currentTemplateRootArgs[base.html]
+      );
     if (value) {
       if (typeof value === "string") {
         // and define the dangerously set inner html
-        finalProps.dangerouslySetInnerHTML = {__html: value};
+        finalProps.dangerouslySetInnerHTML = { __html: value };
       } else {
         // define it as a react component
         finalProps.children = value;
@@ -544,15 +559,15 @@ export function reactifyElementBase(
     const value = (
       currentTemplateArgs && currentTemplateArgs[base.textContent]
     ) || (
-      currentTemplateRootArgs && currentTemplateRootArgs[base.textContent]
-    );
+        currentTemplateRootArgs && currentTemplateRootArgs[base.textContent]
+      );
 
     if (typeof value === "string") {
       finalProps.children = value;
     } else {
       finalProps.children = null;
     }
-  
+
   } else if (!finalProps.children && children) {
     // otherwise if no children have been defined in the given
     // custom properties, then we are going to instantiate
@@ -703,6 +718,11 @@ export interface IElementBase {
   richClassList?: string[];
 
   // TEMPLATING PROPERTIES
+  /**
+   * For templating
+   * and if condition for conditional rendering
+   */
+  ifCondition?: string;
   /**
    * For templating
    * Represents replacement html content for the inner HTML

@@ -209,6 +209,7 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
   const currentNode = props.state.currentSelectedElement as RichElement;
   const allEachContexts: ISingleTemplatingElementOption[] = [];
   const allContexts: ISingleTemplatingElementOption[] = [];
+  const allIfConditions: ISingleTemplatingElementOption[] = [];
 
   // if we have a context, otherwise without context there are no options
   if (props.state.currentSelectedElementContextSelectContext) {
@@ -236,7 +237,9 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
     Object.keys(props.state.currentSelectedElementEachSelectContext.properties).forEach((p) => {
       const value = props.state.currentSelectedElementEachSelectContext.properties[p];
       // it needs to be a context type
-      if (value.type !== "context" || !value.loopable) {
+      const isValidForBoolean = value.type === "boolean";
+      const isValidForLoop = value.type === "context" && value.loopable;
+      if (!isValidForBoolean && !isValidForLoop) {
         return null;
       }
 
@@ -246,7 +249,11 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         label: value.label,
       };
 
-      allEachContexts.push(option);
+      if (isValidForBoolean) {
+        allIfConditions.push(option);
+      } else {
+        allEachContexts.push(option);
+      }
     });
   }
 
@@ -270,17 +277,19 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
     }
   }
 
+  if (currentNode.ifCondition) {
+    const ifConditionFound = allIfConditions.find((v) => v.value === currentNode.ifCondition);
+    if (!ifConditionFound) {
+      allEachContexts.push({
+        value: currentNode.ifCondition,
+        label: currentNode.ifCondition,
+      });
+    }
+  }
+
   // and return the thing
   return (
     <div className={props.classes.box}>
-      <SingleTemplatingElement
-        name="each"
-        i18nName={props.i18nRichInfo.each}
-        value={currentNode.forEach || null}
-        options={allEachContexts}
-        anchor={props.state.currentSelectedElementAnchor}
-        onChange={props.helpers.setForEach}
-      />
       <SingleTemplatingElement
         name="context"
         i18nName={props.i18nRichInfo.context}
@@ -288,6 +297,22 @@ export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
         options={allContexts}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setContext}
+      />
+      <SingleTemplatingElement
+        name="if"
+        i18nName={props.i18nRichInfo.renderCondition}
+        value={currentNode.ifCondition || null}
+        options={allIfConditions}
+        anchor={props.state.currentSelectedElementAnchor}
+        onChange={props.helpers.setIfCondition}
+      />
+      <SingleTemplatingElement
+        name="each"
+        i18nName={props.i18nRichInfo.each}
+        value={currentNode.forEach || null}
+        options={allEachContexts}
+        anchor={props.state.currentSelectedElementAnchor}
+        onChange={props.helpers.setForEach}
       />
     </div>
   );

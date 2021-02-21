@@ -91,7 +91,7 @@ export interface ITemplateArg {
    * "handler", "handlerExtraArgs" and "handlerPassSlateInfo" to unlock
    * the ui-handler full potential
    */
-  type: "text" | "link" | "html" | "function" | "ui-handler";
+  type: "text" | "link" | "html" | "function" | "ui-handler" | "boolean";
 
   /**
    * The label to be used to specify this value, it should be given
@@ -785,6 +785,12 @@ export interface IHelperFunctions {
    * for indirect usage
    */
   setContext: (key: string, anchor: Path) => void;
+  /**
+   * Sets the if render condition
+   * this function does not refocus and it's silent and meant
+   * for indirect usage
+   */
+  setIfCondition: (key: string, anchor: Path) => void;
   /**
    * Sets an UI handler in the given anchor with the given args
    * this function does not refocus and it's silent and meant
@@ -1557,6 +1563,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.setActiveStyle = this.setActiveStyle.bind(this);
     this.setRichClasses = this.setRichClasses.bind(this);
     this.setContext = this.setContext.bind(this);
+    this.setIfCondition = this.setIfCondition.bind(this);
     this.setForEach = this.setForEach.bind(this);
     this.formatToggleBold = this.formatToggleBold.bind(this);
     this.formatToggleItalic = this.formatToggleItalic.bind(this);
@@ -4448,6 +4455,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   };
 
   /**
+   * Sets the context key
+   * @param value the value for the new if condition key
+   * @param anchor the anchor where to set the context key at
+   */
+  public setIfCondition(value: string, anchor: Path) {
+    Transforms.setNodes(this.editor, {
+      ifCondition: value,
+    }, { at: anchor });
+  };
+
+
+  /**
   * Sets the for-each loop key
   * @param value the value for the new context key
   * @param anchor the anchor where to set the context key at
@@ -4733,6 +4752,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       toggleTitle: this.toggleTitle,
       setActiveStyle: this.setActiveStyle,
       setContext: this.setContext,
+      setIfCondition: this.setIfCondition,
       setForEach: this.setForEach,
       setHoverStyle: this.setHoverStyle,
       setStyle: this.setStyle,
