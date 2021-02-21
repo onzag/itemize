@@ -180,7 +180,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
             onClose={this.resetBlur}
           >
             <MenuItem value="">
-              <em>{" "}</em>
+              <em>{" - "}</em>
             </MenuItem>
             {
               // render the valid values that we display and choose
