@@ -394,6 +394,7 @@ export const LOCALE_I18N = [
   "rich_video",
   "rich_styled_component",
   "rich_template_component",
+  "rich_interactive_component",
   "rich_style",
   "rich_style_active",
   "rich_style_hover",

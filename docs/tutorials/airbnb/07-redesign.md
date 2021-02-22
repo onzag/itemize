@@ -311,3 +311,222 @@ In reality these classes should be more specific on what they want to achieve, b
 And they should indeed react and be responsive to the width of the screen.
 
 However we now need a button to perform the search functionality, our inputs are nice and all, and we could indeed specify a component for the search, however we do actually want to go a new screen instead of remaining here in the frontpage to our search specific page.
+
+## UI handlers
+
+You might however notice that we are lacking a button to perform the search, and while it is possible to create the button by hand, using for example a paragraph, and make it look like a nice button, it might not be exactly what we want; and our UI/UX designer might be unhappy because the button option they are given is missing accessibility, and they still want a button, and well, we are using material ui so why aren't we having a button that looks like it as well.
+
+This is where UI handlers come into play they are defined in text specs to provide templating features that go beyond the usual form, these allow for creation of dynamic content such as math formulas, custom component, and whatever other custom elements you fancy, UI handler are considered templating features since the element is not displayed as it is, but rather templatized with the content of the UI handler, even if you think they are the content itself, so the text content must support templating in order to support UI Handling.
+
+Luckily our fragments are already templates, so we just need to define an ui handler, so let's create a file in `components/ui-handlers.tsx` and add a new ui handler there.
+
+```tsx
+import { IDrawerUIHandlerConfiguratorElement, ISlateTemplateUIHandlerProps, IToolbarPrescenseElement } from "@onzag/itemize/client/fast-prototyping/components/slate";
+import { Button, ExtensionIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import React from "react";
+
+/**
+ * This is the button ui handler itself
+ * @param props the props are based on ISlateTemplateUIHandlerProps which extends
+ * the IUIHandlerProps which allows you to create an edit mode for the button so this same
+ * component can be used for both display mode and edit mode, you can technically use different
+ * components for display and edit, and it's up to the editor what extra props to pass, the slate
+ * edit ui handler manager was built so that it keeps compatibility with the text serializer
+ */
+export const button = (props: ISlateTemplateUIHandlerProps) => {
+    // as you can see we just render a button
+    return (
+        <Button
+            // these come from the arguments our template handler supports
+            variant={props.args.type}
+            color={props.args.color}
+            // these come from the rich classes
+            className={props.className}
+            // we need to change the style if we are in slate to use a cursor text
+            // note how we extend props.style this is because these are the styles given
+            // by the configuration of the inline style, there is also styleActive and styleHover
+            // but we are ignoring them
+            style={props.isSlate ? { ...props.style, cursor: "text" } : props.style}
+            // we need to change the touch ripple props if we are in slate because
+            // we are inside a content editable then
+            TouchRippleProps={props.isSlate ? {
+                contentEditable: false,
+                style: {
+                    userSelect: "none",
+                }
+            } : null}
+            // the events are what events have been added to the component
+            // in the standard functions given in the context, so data-on-click
+            // becomes onClick and provides a function and so on
+            {...props.events}
+            // these are attributes from slate given by the renderer if we
+            // are in such mode
+            {...props.attributes}
+        >
+            {props.children}
+        </Button>
+    );
+}
+
+/**
+ * This is very specific to our fast prototyping editor, unlike our handler
+ * which is compatible with our text serializer, it represents a button in the toolbar
+ * that inserts a node, in our case, we want to add a button, and we are basing
+ * ourselves off a paragraph for that, since that's the behaviour we want, if you need
+ * to support children, it could be, for example, a container
+ */
+export const buttonToolbarPrescence: IToolbarPrescenseElement = {
+    element: {
+        type: "paragraph",
+        containment: "block",
+        children: [],
+        uiHandler: "button",
+        uiHandlerArgs: {
+            type: "contained",
+            color: "primary",
+        },
+    },
+    icon: <ExtensionIcon />,
+}
+
+/**
+ * These are also very specific to the fast prototyping editor, and represents
+ * extra options to add to the general configuration drawer for the element, so if you
+ * remember the uiHandler args we have two, type and color, this allows the drawer to modify
+ * these args, if you use other editor other than the fast prototyping this might differ, however
+ * we encourage other editors to still support these basic options
+ */
+export const buttonOptions: IDrawerUIHandlerConfiguratorElement[] = [
+    {
+        uiHandler: "button",
+        arg: "type",
+        input: {
+            type: "select",
+            label: "button type",
+            placeholder: "button type",
+            options: [
+                {
+                    label: "contained",
+                    value: "contained",
+                },
+                {
+                    label: "text",
+                    value: "text",
+                },
+                {
+                    label: "outlined",
+                    value: "outlined",
+                }
+            ],
+        }
+    },
+    {
+        uiHandler: "button",
+        arg: "color",
+        input: {
+            type: "select",
+            label: "button color",
+            placeholder: "button color",
+            options: [
+                {
+                    label: "primary",
+                    value: "primary",
+                },
+                {
+                    label: "secondary",
+                    value: "secondary",
+                }
+            ],
+        }
+    }
+];
+```
+
+We have now defined our UI handler, which represents a button, as well as a button in the toolbar to insert such button and options to change how they are going to look and behave; as you can see this UI hanlder can be anything, including a math formula, and they can be even edited inline, rather than using the drawer, as that is what the `ISlateTemplateUIHandlerProps` provides and allows, and it's possible to hide the technical drawer so to only have inline editing.
+
+Anyway we have just defined the UI handler but we need to add it to our rich text, just like text, functions, html, booleans, and so on, ui handlers are just like any other, they are a property in the context, so we need to define in both places, in our `fragment.tsx` at `frontpageProperties` we need to add it.
+
+```tsx
+{
+    button: {
+        label: "Button",
+        type: "ui-handler",
+        handler: button,
+    }
+}
+```
+
+As well as in `frontpage/index.tsx` as a template arg in `templateArgs`:
+
+```tsx
+const templateArgs = {
+    check_in_date_entry: <Entry id="planned_check_in" />,
+    check_out_date_entry: <Entry id="planned_check_out" />,
+    location_entry: <Entry id="address" searchVariant="location" rendererArgs={{disableMapAndSearch: true}}/>,
+    search_radius_entry: <Entry id="address" searchVariant="radius" />,
+    unit_type_entry: <Entry id="unit_type" searchVariant="search" />,
+    min_price_entry: <Entry id="price" searchVariant="from" />,
+    max_price_entry: <Entry id="price" searchVariant="to" />,
+    button,
+}
+```
+
+And if we compile this it will work just fine, with the exception that we cannot add the UI handler at all, nor see any special configuration, and for that we need to give renderer specific options to our fast prototyping, that's our `buttonToolbarPrescence` and `buttonOptions` they need to be passed as rendererArgs in our cms, so at `cms/fragment.tsx`
+
+```tsx
+<Entry
+    id="content"
+    rendererArgs={{
+        context: FRAGMENTS[fragmentId] || null,
+        toolbarExtras: [
+            buttonToolbarPrescence,
+        ],
+        drawerUIHandlerExtras: [
+            ...buttonOptions,
+        ],
+    }}
+/>
+```
+
+With that we are passing the information about a button that will insert a standard empty button from our toolbar.
+
+![Rich Navbar New Button](./images/rich-navbar-new-button.png)
+
+And that button is fully editable once you insert it.
+
+![Button UI Handler Hero](./images/button-ui-handler-hero.png)
+
+And if you check the general options you can see that you are provided with modification options as you had just defined them.
+
+![Button UI Handler Options](./images/button-ui-handler-options.png)
+
+Note that is possible to provide labels using the `I18nRead` component so that you can keep internationalization.
+
+## Actions
+
+However now what we want to do is give an action such as the UI/UX designer is able to trigger an event once that button is clicked (or any other element), what we want to happen is to go to the search page, so we will create a function that takes us to the search page.
+
+In our `fragment.tsx` we don't need to define much, this is a function we have available in a templating environment, so we define it.
+
+```tsx
+{
+    go_to_search_page: {
+        label: "Go To Search Page",
+        type: "function",
+    },
+}
+```
+
+And now it should be available to set in our CMS.
+
+![Rich Text Actions](./images/rich-text-actions.png)
+
+
+
+## Loops
+
+Now we need to display the search results, and for such a mechanism we should use a loop, one of the features of the templating mechanism of itemize is the capability to create loops, however they as well need to be defined.
+
+## Language Support
+
+We have so far done everything in english, yet we haven't specified a locale, this is because we have using the "fallback" locale each time off these fragments, they try to load a versioned item but don't find it, so they go to the fallback, however, we have a multilingual website, so let's now make the spanish version of our header, which can be completely different!... press `ctrl + A` and copy all the text in our header and change the language with the button at the top left.

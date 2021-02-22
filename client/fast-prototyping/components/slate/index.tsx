@@ -160,8 +160,11 @@ export interface IToolbarPrescenseElement {
   icon: React.ReactNode;
   /**
    * A title to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
    */
-  title?: string;
+  title?: string | React.ReactNode;
   /**
    * The element to be added
    */
@@ -174,9 +177,16 @@ export interface IToolbarPrescenseElement {
  */
 export interface IDrawerUIHandlerElementConfigSelect {
   type: "select",
-  label: string;
-  placeholder: string;
-  options: Array<{value: string, label: string}>;
+  label: string | React.ReactNode;
+
+  /**
+   * A placeholder to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
+   */
+  placeholder: string | React.ReactNode;
+  options: Array<{value: string, label: string | React.ReactNode}>;
 }
 
 /**
@@ -185,8 +195,15 @@ export interface IDrawerUIHandlerElementConfigSelect {
  */
 export interface IDrawerUIHandlerElementConfigInput {
   type: "input";
-  label: string;
-  placeholder: string;
+  label: string | React.ReactNode;
+
+  /**
+   * A placeholder to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
+   */
+  placeholder: string | React.ReactNode;
 }
 
 export interface IDrawerUIHandlerElementConfigCustomProps {
@@ -1039,6 +1056,10 @@ export interface ISlateEditorWrapperBaseProps {
    * Drawer extras for the ui handled types
    */
   drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
+  /**
+   * Whether to hide the drawer
+   */
+  hideDrawer?: boolean;
 }
 
 /**
@@ -1172,6 +1193,10 @@ interface ISlateEditorProps {
    * for being provided configuration within the general settings
    */
   drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
+  /**
+   * Whether to hide the drawer
+   */
+  hideDrawer?: boolean;
   /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
@@ -2979,6 +3004,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           className = (className || "") + " rich-text--" + c;
         });
         const style = convertStyleStringToReactObject((element as any as RichElement).style);
+        const styleActive = convertStyleStringToReactObject((element as any as RichElement).styleActive);
+        const styleHover = convertStyleStringToReactObject((element as any as RichElement).styleHover);
 
         // now we can use the handler component that is given via the ui handler
         return (
@@ -2991,6 +3018,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             attributes={attributes}
             element={element as any}
             style={style}
+            styleActive={styleActive}
+            styleHover={styleHover}
             className={className}
             events={null}
             {...extraInfo}
@@ -4812,9 +4841,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       canInsertTitle: hasSelectionAndNonInlineNorVoid && this.props.features.supportsTitle,
       canInsertVideo: hasSelectionAndNonInlineNorVoid && this.props.features.supportsVideos,
       canSetActionFunction: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canSetActiveStyle: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canSetDynamicHref: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canSetHoverStyle: this.state.currentSelectedElement && this.props.features.supportsTemplating,
+      canSetActiveStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles && this.props.features.supportsTemplating,
+      canSetDynamicHref: this.state.currentSelectedElement && this.props.features.supportsLinks && this.props.features.supportsTemplating,
+      canSetHoverStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles && this.props.features.supportsTemplating,
       canSetLoop: this.state.currentSelectedElement && this.props.features.supportsTemplating,
       canSetStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles,
       canSetUIHandler: this.state.currentSelectedElement && this.props.features.supportsTemplating,
@@ -4883,6 +4912,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
           toolbarExtras={this.props.toolbarExtras}
           drawerUIHandlerExtras={this.props.drawerUIHandlerExtras}
+          hideDrawer={this.props.hideDrawer}
         >
           {children}
         </Wrapper>

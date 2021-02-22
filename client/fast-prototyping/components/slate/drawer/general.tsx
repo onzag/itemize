@@ -489,12 +489,12 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
 interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles {
   arg: string;
-  label: string;
-  placeholder: string;
+  label: string | React.ReactNode;
+  placeholder: string | React.ReactNode;
   isSelect: boolean;
   isCustom: boolean;
   CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
-  options?: Array<{ label: string, value: string }>;
+  options?: Array<{ label: string | React.ReactNode, value: string }>;
 }
 
 class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOptionProps, IGeneralOptionsState> {
@@ -612,19 +612,35 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     }
 
     if (!this.props.isSelect) {
-      return (
-        <TextField
-          value={this.state.value}
-          label={this.props.label}
-          placeholder={this.props.placeholder}
-          variant="filled"
-          onChange={this.updateByInput}
-          fullWidth={true}
-        />
-      );
+      const textFieldProps = {
+        value: this.state.value,
+        label: this.props.label,
+        variant: "filled" as "filled",
+        onChange: this.updateByInput,
+        fullWidth: true,
+      }
+      if (typeof this.props.placeholder === "string") {
+        return (
+          <TextField
+            {...textFieldProps}
+            placeholder={this.props.placeholder}
+          />
+        );
+      } else {
+        const element: React.ReactElement = this.props.placeholder as any;
+        const elementCloned = React.cloneElement(element, {
+          children: (i18nPlaceholder: string) => (
+            <TextField
+              {...textFieldProps}
+              placeholder={i18nPlaceholder}
+            />
+          )
+        });
+        return elementCloned;
+      }
     }
 
-    return (
+    const elemCreator = (placeholder: string) => (
       <FormControl
         variant="filled"
         fullWidth={true}
@@ -643,7 +659,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
           input={
             <FilledInput
               id={"slate-drawer-uihandled-" + this.props.arg + "-selector"}
-              placeholder={this.props.placeholder}
+              placeholder={placeholder}
             />
           }
           onOpen={this.unblur}
@@ -655,6 +671,16 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
         </Select>
       </FormControl>
     );
+
+    if (typeof this.props.placeholder === "string") {
+      return elemCreator(this.props.placeholder);
+    } else {
+      const element: React.ReactElement = this.props.placeholder as any;
+      const elementCloned = React.cloneElement(element, {
+        children: elemCreator,
+      });
+      return elementCloned;
+    }
   }
 }
 

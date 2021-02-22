@@ -412,19 +412,40 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
 
   let toolbarExtras: React.ReactNode[] = null;
   if (props.toolbarExtras && props.toolbarExtras.length) {
-    toolbarExtras = props.toolbarExtras.map((x, index) => (
-      <IconButton
-        key={index}
-        tabIndex={-1}
-        title={x.title}
-        disabled={!props.featureSupport.canInsertAnyElement}
-        onMouseDown={props.helpers.blockBlur}
-        onMouseUp={props.helpers.releaseBlur}
-        onClick={props.helpers.insertElement.bind(null, x.element, null)}
-      >
-        {x.icon}
-      </IconButton>
-    ));
+    toolbarExtras = props.toolbarExtras.map((x, index) => {
+      const basicProps = {
+        key: index,
+        tabIndex: -1,
+        disabled: !props.featureSupport.canInsertAnyElement,
+        onMouseDown: props.helpers.blockBlur,
+        onMouseUp: props.helpers.releaseBlur,
+        onClick: props.helpers.insertElement.bind(null, x.element, null),
+      }
+      if (typeof x.title === "string" || !x.title) {
+        return (
+          <IconButton
+            {...basicProps}
+            title={x.title as string}
+          >
+            {x.icon}
+          </IconButton>
+        );
+      } else {
+        const element: React.ReactElement = x.title as any;
+        const elementCloned = React.cloneElement(element, {
+          children: (i18nTitle: string) => (
+            <IconButton
+              {...basicProps}
+              title={i18nTitle}
+            >
+              {x.icon}
+            </IconButton>
+          )
+        });
+
+        return elementCloned;
+      }
+    });
   }
 
   let currentSuperBlockElement = props.state.currentSuperBlockElement;
@@ -841,7 +862,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   public shouldHaveDrawer() {
     // basically not rich text
-    if (!this.props.featureSupport) {
+    if (!this.props.featureSupport || this.props.hideDrawer) {
       return false;
     }
     // a drawer is only necessary if we support all of these

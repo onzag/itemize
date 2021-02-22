@@ -63,6 +63,14 @@ export interface IUIHandlerProps {
    */
   style?: React.CSSProperties;
   /**
+   * The style active object
+   */
+  styleActive?: React.CSSProperties;
+  /**
+   * The style hover object
+   */
+  styleHover?: React.CSSProperties;
+  /**
    * contains events that should be added to the element
    */
   events: IUIHandlerEvents;
@@ -468,6 +476,8 @@ export function reactifyElementBase(
         className = (className || "") + " rich-text--" + c;
       });
       const style = convertStyleStringToReactObject(base.style);
+      const styleActive = convertStyleStringToReactObject(base.styleActive);
+      const styleHover = convertStyleStringToReactObject(base.styleHover);
       return (<Handler
         args={base.uiHandlerArgs}
         key={arg.key}
@@ -475,6 +485,8 @@ export function reactifyElementBase(
         element={arg.element}
         className={className}
         style={style}
+        styleActive={styleActive}
+        styleHover={styleHover}
         events={retrieveElementActionsForReact(base, currentTemplateArgs)}
       />);
     }
