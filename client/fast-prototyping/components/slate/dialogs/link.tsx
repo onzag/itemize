@@ -214,6 +214,11 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       Object.keys(this.props.currentRootContext.properties).forEach((key) => {
         // grab each property and check the type of it
         const property = this.props.currentRootContext.properties[key];
+
+        if ((property as any).nonRootInheritable) {
+          return;
+        }
+
         // if it's not a link
         if (property.type !== "link") {
           // continue

@@ -150,7 +150,11 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
     if (this.props.currentContext !== this.props.currentRootContext) {
       Object.keys(this.props.currentRootContext.properties).forEach((key) => {
         const property = this.props.currentRootContext.properties[key];
-  
+ 
+        if ((property as any).nonRootInheritable) {
+          return;
+        }
+        
         // but they must be the given element type
         if (property.type !== this.props.elementType) {
           // otherwise continue;

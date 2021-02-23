@@ -116,6 +116,13 @@ export interface ITemplateArg {
   label: string | React.ReactNode;
 
   /**
+   * A flag that specifies that when placed in the root the property
+   * should not really be accessible, mainly used for display purposes
+   * TODO implement
+   */
+  nonRootInheritable?: boolean;
+
+  /**
    * an optional html content that can be used to render when it
    * matches this html signature, when a string is given
    * it will modify the inner html, otherwise it will be used as
@@ -314,6 +321,11 @@ export interface ITemplateArgsContext {
    * If the context is an array or iterable, then mark it as such
    */
   loopable?: boolean;
+  /**
+   * Emulate render the element a couple of times in order to give the effect
+   * of many views
+   */
+  loopEmulation?: number;
   /**
    * The properties that the context contains
    */
@@ -2839,7 +2851,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextState.currentSelectedElementAnchor !== this.state.currentSelectedElementAnchor ||
       nextState.currentSelectedElementContext !== this.state.currentSelectedElementContext ||
       nextState.currentContext !== this.state.currentContext ||
+      nextState.currentSelectedElementEachSelectContext !== this.state.currentSelectedElementEachSelectContext ||
+      nextState.currentSelectedElementContextSelectContext !== this.state.currentSelectedElementContextSelectContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
+      nextProps.drawerUIHandlerExtras !== this.props.drawerUIHandlerExtras ||
+      nextProps.toolbarExtras !== this.props.toolbarExtras ||
+      nextProps.hideDrawer !== this.props.hideDrawer ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses) ||
@@ -2988,9 +3005,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       // and now we try to get the ui handler from the context itself
       // either the root or the one in the property itself
-      const propertiesFromContext =
-        (handlerContext && handlerContext.properties && handlerContext.properties)[uiHandler] ||
-        (this.props.rootContext && this.props.rootContext.properties[uiHandler]);
+      let propertiesFromContext: ITemplateArg =
+        (handlerContext && handlerContext.properties && handlerContext.properties)[uiHandler] as ITemplateArg;
+
+      if (!propertiesFromContext) {
+        propertiesFromContext = (this.props.rootContext && this.props.rootContext.properties[uiHandler]) as ITemplateArg;
+        if (propertiesFromContext.nonRootInheritable) {
+          propertiesFromContext = null;
+        }
+      }
 
       // if we don't find a UI handler
       // let's put a message about it
@@ -3052,7 +3075,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const html = (element as any as RichElement).html;
     if (html) {
       const htmlContext = this.findContextBasedOnNode(element as any);
-      const propertiesFromContext: any = htmlContext && htmlContext.properties && htmlContext.properties[html];
+      let propertiesFromContext: ITemplateArg = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArg;
+      if (!propertiesFromContext) {
+        propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArg;
+        if (propertiesFromContext.nonRootInheritable) {
+          propertiesFromContext = null;
+        }
+      }
 
       if (propertiesFromContext && typeof propertiesFromContext.htmlDisplay !== "undefined") {
         const toDisplay = propertiesFromContext.htmlDisplay;
@@ -3086,7 +3115,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const text = (element as any as RichElement).textContent;
     if (text) {
       const textContext = this.findContextBasedOnNode(element as any);
-      const propertiesFromContext: any = textContext && textContext.properties && textContext.properties[text];
+      let propertiesFromContext: ITemplateArg = textContext &&
+        textContext.properties &&
+        textContext.properties[text] as ITemplateArg;
+      if (!propertiesFromContext) {
+        propertiesFromContext = this.props.rootContext &&
+          this.props.rootContext.properties &&
+          this.props.rootContext.properties[text] as ITemplateArg;
+        if (propertiesFromContext.nonRootInheritable) {
+          propertiesFromContext = null;
+        }
+      }
 
       customProps.children = (
         <>
@@ -3097,7 +3136,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // and now we call the reactification
-    const toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
+    let toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
       active: false,
       selected: isSelected,
       element: element as any,
@@ -3106,6 +3145,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }) as any;
 
     const contextSwichContext = this.findContextBasedOnNode(element as any, true);
+
+    if (
+      contextSwichContext &&
+      contextSwichContext.loopable &&
+      contextSwichContext.loopEmulation &&
+      contextSwichContext.loopEmulation >= 1
+    ) {
+      const arr: React.ReactNode[] = [];
+      for (let i = 0; i < contextSwichContext.loopEmulation; i++) {
+        arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>)
+      }
+      toReturn = arr;
+    };
+
     if (contextSwichContext && contextSwichContext.wrapper) {
       return contextSwichContext.wrapper(toReturn);
     } else {

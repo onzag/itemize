@@ -334,6 +334,9 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
   ) {
     Object.keys(props.state.currentRootContext.properties).forEach((key) => {
       const property = props.state.currentRootContext.properties[key];
+      if ((property as any).nonRootInheritable) {
+        return;
+      }
 
       // but they must be the given element type
       if (property.type === "text") {

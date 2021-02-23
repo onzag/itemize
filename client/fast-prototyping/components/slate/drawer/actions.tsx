@@ -44,6 +44,7 @@ const EVENTS = [
 interface ISingleActionOption {
   value: string;
   label: string | React.ReactNode;
+  primary: boolean;
 }
 
 /**
@@ -87,6 +88,10 @@ interface ISingleActionProps {
    * The class name for the box that wraps it all
    */
   boxClassName?: string;
+  /**
+   * The class name for a primary option
+   */
+  optionPrimaryClassName?: string;
 }
 
 /**
@@ -212,7 +217,11 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
               // render the valid values that we display and choose
               this.props.options.map((vv) => {
                 // the i18n value from the i18n data
-                return <MenuItem key={vv.value} value={vv.value}>{
+                return <MenuItem
+                  key={vv.value}
+                  value={vv.value}
+                  className={vv.primary ? this.props.optionPrimaryClassName : null}
+                >{
                   vv.label
                 }</MenuItem>;
               })
@@ -234,9 +243,9 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
   const currentNode = props.state.currentSelectedElement as RichElement;
 
   // and now let's build all the options that we have for that we need to check our current context, if we have one
-  const allOptions = props.state.currentContext ? Object.keys(props.state.currentContext.properties).map((p) => {
+  let allOptions = props.state.currentSelectedElementContext ? Object.keys(props.state.currentSelectedElementContext.properties).map((p) => {
     // get the value of each property in the context properties
-    const value = props.state.currentContext.properties[p];
+    const value = props.state.currentSelectedElementContext.properties[p];
 
     // and it needs to be a function to pass
     if (value.type !== "function") {
@@ -247,8 +256,32 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
     return {
       value: p,
       label: value.label,
+      primary: props.state.currentRootContext !== props.state.currentSelectedElementContext,
     }
   }).filter((v) => !!v) : [];
+
+  if (props.state.currentRootContext !== props.state.currentSelectedElementContext) {
+    allOptions = allOptions.concat(Object.keys(props.state.currentRootContext.properties).map((p) => {
+      // get the value of each property in the context properties
+      const value = props.state.currentRootContext.properties[p];
+
+      if ((value as any).nonRootInheritable) {
+        return null;
+      }
+  
+      // and it needs to be a function to pass
+      if (value.type !== "function") {
+        return null;
+      }
+  
+      // now we can return it and give it the label it holds
+      return {
+        value: p,
+        label: value.label,
+        primary: false,
+      }
+    }).filter((v) => !!v));
+  }
 
   // now we can return the whole box
   return (
@@ -260,6 +293,7 @@ export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
             name={v}
             actionValue={currentNode[v] || null}
             options={allOptions}
+            optionPrimaryClassName={props.classes.optionPrimary}
             anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setAction}
           />
