@@ -2837,6 +2837,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.rootI18n !== this.props.rootI18n ||
       nextState.currentAnchor !== this.state.currentAnchor ||
       nextState.currentSelectedElementAnchor !== this.state.currentSelectedElementAnchor ||
+      nextState.currentSelectedElementContext !== this.state.currentSelectedElementContext ||
+      nextState.currentContext !== this.state.currentContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
