@@ -117,11 +117,17 @@ export interface ITemplateArg {
 
   /**
    * an optional html content that can be used to render when it
-   * matches this ui handler signature, when a string is given
+   * matches this html signature, when a string is given
    * it will modify the inner html, otherwise it will be used as
    * a react component
    */
   htmlDisplay?: string | React.ReactNode;
+
+  /**
+   * An optional text content that can be used to render when it matches
+   * the text content signature
+   */
+  textDisplay?: string;
 
   /**
    * A handler component to use during the edition of a component
@@ -186,7 +192,7 @@ export interface IDrawerUIHandlerElementConfigSelect {
    * eg. the i18nRead element
    */
   placeholder: string | React.ReactNode;
-  options: Array<{value: string, label: string | React.ReactNode}>;
+  options: Array<{ value: string, label: string | React.ReactNode }>;
 }
 
 /**
@@ -206,7 +212,7 @@ export interface IDrawerUIHandlerElementConfigInput {
   placeholder: string | React.ReactNode;
 }
 
-export interface IDrawerUIHandlerElementConfigCustomProps {
+export interface IDrawerUIHandlerElementConfigCustomProps {
   value: string;
   onChange: (value: string) => void;
   onDelayedChange: (value: string) => void;
@@ -294,6 +300,10 @@ export interface ITemplateArgsContext {
    */
   type: "context";
   /**
+   * Allows to specify a wrapper to wrap based on the context
+   */
+  wrapper?: (n: React.ReactNode) => React.ReactNode;
+  /**
    * A human readable label for this given context value
    * it should be in the given language
    * 
@@ -310,17 +320,6 @@ export interface ITemplateArgsContext {
   properties: {
     [name: string]: ITemplateArg | ITemplateArgsContext;
   };
-}
-
-/**
- * Same as the usual context but with extra props that give root superpowers
- */
-export interface ITemplateArgsRootContext extends ITemplateArgsContext {
-  /**
-   * Allows to specify a wrapper to wrap based on the root context, usually
-   * to give providers down the line
-   */
-  wrapper?: (n: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -949,7 +948,7 @@ export interface ISlateEditorStateType {
   /**
    * root context
    */
-  currentRootContext: ITemplateArgsRootContext;
+  currentRootContext: ITemplateArgsContext;
 
   /**
    * The current selected element templating context
@@ -1128,7 +1127,7 @@ interface ISlateEditorProps {
    * rendererArgs property it might be passed there, as this is a rendering
    * element
    */
-  rootContext: ITemplateArgsRootContext;
+  rootContext: ITemplateArgsContext;
   /**
    * The root i18n, renderers have a way to receive the root i18n data
    * based on the property definition they are using
@@ -2916,11 +2915,22 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Provides the context a given node is sitting in
    * @param n the node in question
+   * @param onlySwichingContext provides the context only if it was set
+   * by the given node otherwise it will return null
    */
-  public findContextBasedOnNode(n: Node): ITemplateArgsContext {
+  public findContextBasedOnNode(n: Node, onlySwichingContext?: boolean): ITemplateArgsContext {
+    if (onlySwichingContext) {
+      // it's not switching the context so it returns null
+      const nodeAsRichElement: RichElement = n as any;
+      if (!nodeAsRichElement.context && !nodeAsRichElement.forEach) {
+        return null;
+      }
+    }
+
     const pathOfNode = ReactEditor.findPath(this.editor, n);
     let currentContext = this.props.rootContext;
     let currentElement: RichElement = this.editor as any;
+
     pathOfNode.forEach((n: number) => {
       // avoid further processing if we have hit a dead end
       if (currentContext === null) {
@@ -3008,25 +3018,30 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const styleHover = convertStyleStringToReactObject((element as any as RichElement).styleHover);
 
         // now we can use the handler component that is given via the ui handler
-        return (
-          <HandlerComponent
-            args={{
-              ...uiHandlerArgs,
-              ...handlerExtraArgs,
-            } as any}
-            isSlate={true}
-            attributes={attributes}
-            element={element as any}
-            style={style}
-            styleActive={styleActive}
-            styleHover={styleHover}
-            className={className}
-            events={null}
-            {...extraInfo}
-          >
-            {children}
-          </HandlerComponent>
-        );
+        const toReturn = <HandlerComponent
+          args={{
+            ...uiHandlerArgs,
+            ...handlerExtraArgs,
+          } as any}
+          isSlate={true}
+          attributes={attributes}
+          element={element as any}
+          style={style}
+          styleActive={styleActive}
+          styleHover={styleHover}
+          className={className}
+          events={null}
+          {...extraInfo}
+        >
+          {children}
+        </HandlerComponent>;
+
+        const contextSwichContext = this.findContextBasedOnNode(element as any, true);
+        if (contextSwichContext && contextSwichContext.wrapper) {
+          return contextSwichContext.wrapper(toReturn);
+        } else {
+          return toReturn;
+        }
       }
     }
 
@@ -3069,24 +3084,31 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const text = (element as any as RichElement).textContent;
     if (text) {
       const textContext = this.findContextBasedOnNode(element as any);
-      const propertiesFromContext: any = textContext && textContext.properties && textContext.properties[html];
+      const propertiesFromContext: any = textContext && textContext.properties && textContext.properties[text];
 
       customProps.children = (
         <>
-          {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+          {(propertiesFromContext && (propertiesFromContext.textDisplay || propertiesFromContext.label)) || (element as any).children[0].text}
           {children}
         </>
       );
     }
 
     // and now we call the reactification
-    return SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
+    const toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
       active: false,
       selected: isSelected,
       element: element as any,
       asTemplate: false,
       customProps,
     }) as any;
+
+    const contextSwichContext = this.findContextBasedOnNode(element as any, true);
+    if (contextSwichContext && contextSwichContext.wrapper) {
+      return contextSwichContext.wrapper(toReturn);
+    } else {
+      return toReturn;
+    }
   }
 
   /**

@@ -11,6 +11,7 @@ import { DOMWindow } from "../../../../util";
 import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
 import { IText } from "./types/text";
 import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";
+import { MutatingTemplateArgs, TemplateArgs } from "./template-args";
 
 export interface IUIHandlerEvents {
   onClick?: any;
@@ -370,57 +371,74 @@ export function reactifyElementBase(
   if (arg.asTemplate && !arg.templateIgnoreContextualChanges) {
     // first we need to find the context
     if (currentTemplateArgs && base.context) {
-      // and change it accordingly
-      currentTemplateArgs = currentTemplateArgs[base.context] || null;
+      // and change it accordingly, this change should be
+      currentTemplateArgs = currentTemplateArgs.properties[base.context] || null;
+      if (!(currentTemplateArgs instanceof TemplateArgs) || !(currentTemplateArgs instanceof MutatingTemplateArgs)) {
+        throw new Error("When changing to context " + base.context + " could not find an actual template args context");
+      }
     }
 
     // then we got to use the foreach context if we have one
     if (base.forEach) {
-
-      // and such we find what we are supposed to loop for
-      const loopElement = currentTemplateArgs && currentTemplateArgs[base.forEach];
-
-      // hopefully it'll be an array
-      if (Array.isArray(loopElement)) {
-
+      const renderEachBasedOnContext = (resolvedContext: TemplateArgs): React.ReactNode => {
         if (base.ifCondition) {
-          const value = currentTemplateArgs[base.ifCondition];
+          const value = resolvedContext.properties[base.ifCondition];
           if (!value) {
             return null;
           }
         }
-
-        // so now we loop and return a fragment
-        return (
-          <React.Fragment key={arg.key}>
-            {loopElement.map((loopContext, index) => {
-              // note how we re-reactify the current element
-              // but telling it to ignore contextual changes
-              // because we have already done them here
-              return reactifyElementBase(
-                registry,
-                Tag,
-                baseClass,
-                children,
-                wrapChildren,
-                {
-                  active: arg.active,
-                  selected: arg.selected,
-                  element: base as RichElement,
-                  asTemplate: true,
-                  customProps: arg.customProps,
-                  key: index,
-                  templateArgs: loopContext,
-                  templateRootArgs: currentTemplateRootArgs,
-                  templateIgnoreContextualChanges: true,
+  
+        // and such we find what we are supposed to loop for
+        const loopElementBase = resolvedContext && resolvedContext.properties[base.forEach];
+  
+        const childrenRenderFn = (eachElementContext: TemplateArgs, key?: string | number): React.ReactNode => {
+          return reactifyElementBase(
+            registry,
+            Tag,
+            baseClass,
+            children,
+            wrapChildren,
+            {
+              active: arg.active,
+              selected: arg.selected,
+              element: base as RichElement,
+              asTemplate: true,
+              customProps: arg.customProps,
+              key: key,
+              templateArgs: eachElementContext,
+              templateRootArgs: currentTemplateRootArgs,
+              templateIgnoreContextualChanges: true,
+            }
+          );
+        }
+  
+        // hopefully it'll be an array
+        if (Array.isArray(loopElementBase)) {
+          return (
+            <React.Fragment key={arg.key}>
+              {loopElementBase.map((loopContext, index) => {
+                if (!(loopContext instanceof TemplateArgs)) {
+                  throw new Error("Could not find a proper context value for item in index " + index + " at " + base.forEach);
                 }
-              );
-            })}
-          </React.Fragment>
-        );
+                // note how we re-reactify the current element
+                // but telling it to ignore contextual changes
+                // because we have already done them here
+                return childrenRenderFn(loopContext, index);
+              })}
+            </React.Fragment>
+          );
+        } else if (loopElementBase instanceof MutatingTemplateArgs) {
+          return loopElementBase.mutatingWrapper(childrenRenderFn);
+        } else {
+          // it's not an iterable, we can't render a thing
+          return null;
+        }
+      }
+
+      if (currentTemplateArgs instanceof MutatingTemplateArgs) {
+        return currentTemplateArgs.mutatingWrapper(renderEachBasedOnContext);
       } else {
-        // it's not an iterable, we can't render a thing
-        return null;
+        return renderEachBasedOnContext(currentTemplateArgs);
       }
     }
   }
@@ -478,6 +496,7 @@ export function reactifyElementBase(
       const style = convertStyleStringToReactObject(base.style);
       const styleActive = convertStyleStringToReactObject(base.styleActive);
       const styleHover = convertStyleStringToReactObject(base.styleHover);
+
       return (<Handler
         args={base.uiHandlerArgs}
         key={arg.key}
@@ -585,29 +604,47 @@ export function reactifyElementBase(
     // custom properties, then we are going to instantiate
     // based on the children we are requested to render
     // by the base element
-    finalProps.children = children.map((c, index: number) => {
-      // we use these options and we add the key
-      // in there
-      const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
-        asTemplate: arg.asTemplate,
-        active: arg.active,
-        selected: arg.selected,
-        element: c,
-        templateArgs: currentTemplateArgs,
-        templateRootArgs: currentTemplateRootArgs,
-        key: index,
-      };
+    const childrenBase = (
+      <>
+        {
+          children.map((c, index: number) => {
+            // we use these options and we add the key
+            // in there
+            const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
+              asTemplate: arg.asTemplate,
+              active: arg.active,
+              selected: arg.selected,
+              element: c,
+              templateArgs: currentTemplateArgs,
+              templateRootArgs: currentTemplateRootArgs,
+              key: index,
+            };
 
-      // and then we call the reactify
-      if ((c as IText).text) {
-        return registry.REACTIFY.text(specificChildTemplateOptions);
-      } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
-      }
+            // and then we call the reactify
+            if ((c as IText).text) {
+              return registry.REACTIFY.text(specificChildTemplateOptions);
+            } else if (registry.SERIALIZE[(c as RichElement).type]) {
+              return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
+            }
 
-      // ohteriwse null
-      return null;
-    });
+            // ohteriwse null
+            return null;
+          })
+        }
+      </>
+    );
+
+    // a change of context has happened so we might as well
+    // check for a wrapper for the given context
+    if (
+      (base.context || base.forEach) &&
+      currentTemplateArgs &&
+      currentTemplateArgs.wrapper
+    ) {
+      finalProps.children = currentTemplateArgs.wrapper(childrenBase);
+    } else {
+      finalProps.children = childrenBase;
+    }
   }
 
   // if we have a function to wrap children

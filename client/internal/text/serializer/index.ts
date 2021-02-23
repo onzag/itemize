@@ -21,6 +21,7 @@ import { IVideo, registerVideo } from "./types/video";
 import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
 import { IInline, registerInline } from "./types/inline";
+import { TemplateArgs } from "./template-args";
 import uuidv5 from "uuid/v5";
 
 /**
@@ -35,6 +36,8 @@ type DeserializationFn = (n: Node) => RichElement | IText;
 interface IDeserializeRegistryType {
   [attr: string]: DeserializationFn;
 }
+
+
 
 /**
  * The argument that is passed to the reactify function that allows to convert
@@ -69,13 +72,13 @@ export interface IReactifyArg<T> {
   /**
    * The template arguments to be used that represent the current context
    */
-  templateArgs?: any;
+  templateArgs?: TemplateArgs;
   /**
    * These represent the root args, you can leave it unpassed if you passed template args
    * as they are equivalent, however the root level can be used to extract ui handler logic
    * as such they are overwritten when matching  the tree
    */
-  templateRootArgs?: any;
+  templateRootArgs?: TemplateArgs;
   /**
    * Ignore contextual changes that change the template arg, these are forEach and context
    * attributes of a base context

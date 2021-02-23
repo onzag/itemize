@@ -13,6 +13,7 @@ import React from "react";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
 import { deserialize, renderTemplateDynamically } from "../../../internal/text";
+import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
 
 /**
  * The current intersection observer
@@ -325,7 +326,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
 }
 
 interface ITemplatedPropertyViewRichTextRendererProps extends IPropertyViewRichTextViewerProps {
-  templateArgs: any;
+  templateArgs: TemplateArgs;
 }
 
 /**
@@ -373,7 +374,9 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   if (props.isRichText) {
     if (props.args.makeTemplate) {
       const value = (
-        <TemplatedPropertyViewRichTextRenderer templateArgs={props.args.templateArgs}>
+        <TemplatedPropertyViewRichTextRenderer
+          templateArgs={props.args.templateArgs}
+        >
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );

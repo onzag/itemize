@@ -8,7 +8,7 @@ import {
   Button, TextField, FilledInput, FormControl, InputLabel, MenuItem, Select,
 } from "../../../mui-core";
 import { Dialog } from "../../dialog";
-import { ITemplateArgsContext, ITemplateArgsRootContext } from "..";
+import { ITemplateArgsContext } from "..";
 import { RichElement } from "../../../../internal/text/serializer";
 
 /**
@@ -39,7 +39,7 @@ interface ILinkDialogProps {
   /**
    * The root context
    */
-  currentRootContext: ITemplateArgsRootContext;
+  currentRootContext: ITemplateArgsContext;
   /**
    * The selected element that was chosen, before opening
    * the dialog, it might be or not present, it is used

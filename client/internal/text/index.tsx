@@ -9,6 +9,7 @@ import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement, SERIALIZATION_REGISTRY } from "./serializer";
 import { IText } from "./serializer/types/text";
 import { DOMWindow } from "../../../util";
+import { TemplateArgs } from "./serializer/template-args";
 
 /**
  * Sanitazation standard configuraton
@@ -640,7 +641,7 @@ function processTemplateInitialization(
       // update the context for children
       const contextKey = childNodeASHTMLElement.dataset.context;
       if (contextKey) {
-        templateArgsNewContext = templateArgsContext[contextKey];
+        templateArgsNewContext = templateArgsNewContext[contextKey];
       }
 
       // so now we got to see if we have a for loop
@@ -767,13 +768,13 @@ export function renderTemplate(
  */
 export function renderTemplateDynamically(
   document: IRootLevelDocument,
-  args: any,
+  args: TemplateArgs,
 ) {
   if (document === NULL_DOCUMENT) {
     return null;
   }
 
-  return (
+  const toReturn = (
     <>
       {
         document.children.map((c, index) => {
@@ -789,4 +790,10 @@ export function renderTemplateDynamically(
       }
     </>
   );
+
+  if (args && args.wrapper) {
+    return args.wrapper(toReturn);
+  }
+
+  return toReturn;
 }

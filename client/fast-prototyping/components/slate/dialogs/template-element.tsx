@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { ITemplateArgsContext, ITemplateArgsRootContext } from "..";
+import { ITemplateArgsContext } from "..";
 import {
   Button, FilledInput, FormControl, InputLabel, MenuItem, Select,
 } from "../../../mui-core";
@@ -34,7 +34,7 @@ interface ITemplateElementDialogProps {
   /**
    * The current root context
    */
-  currentRootContext: ITemplateArgsRootContext;
+  currentRootContext: ITemplateArgsContext;
   /**
    * Whether the dialog should be open
    */
