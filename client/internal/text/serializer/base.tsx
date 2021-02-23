@@ -162,7 +162,7 @@ export function convertStyleStringToReactObject(str: string) {
  * Retrieves all the element actions for a react target
  * @param base the base
  */
-export function retrieveElementActionsForReact(base: IElementBase, context: any): IUIHandlerEvents {
+export function retrieveElementActionsForReact(base: IElementBase, context: TemplateArgs): IUIHandlerEvents {
   if (!context) {
     return {};
   }
@@ -171,7 +171,7 @@ export function retrieveElementActionsForReact(base: IElementBase, context: any)
   Object.keys(eventReactifyTranslations).forEach((key) => {
     const value = base[key];
     if (value) {
-      const contextValue = context[value];
+      const contextValue = context.properties[value];
       if (contextValue) {
         const translation = eventReactifyTranslations[key];
         actions[translation] = contextValue;
@@ -359,21 +359,24 @@ export function reactifyElementBase(
   children: Array<RichElement | IText>,
   wrapChildren: (node: React.ReactNode) => React.ReactNode,
   arg: IReactifyArg<RichElement | IText>,
-) {
+): React.ReactNode {
   // so first we take the element that we are supposed to reactify
   const base: IElementBase = arg.element as IElementBase;
 
   // let's create these in the meantime
-  let currentTemplateArgs = arg.templateArgs;
+  let currentTemplateArgs: TemplateArgs = arg.templateArgs;
   let currentTemplateRootArgs = arg.templateRootArgs || arg.templateArgs;
 
   // if we have a template and we are rendering as template
   if (arg.asTemplate && !arg.templateIgnoreContextualChanges) {
+
+    let newTemplateArgs: TemplateArgs | MutatingTemplateArgs = currentTemplateArgs;
+
     // first we need to find the context
-    if (currentTemplateArgs && base.context) {
+    if (newTemplateArgs && base.context) {
       // and change it accordingly, this change should be
-      currentTemplateArgs = currentTemplateArgs.properties[base.context] || null;
-      if (!(currentTemplateArgs instanceof TemplateArgs) || !(currentTemplateArgs instanceof MutatingTemplateArgs)) {
+      newTemplateArgs = (newTemplateArgs.properties[base.context] || null) as any;
+      if (!(newTemplateArgs instanceof TemplateArgs) || !(newTemplateArgs instanceof MutatingTemplateArgs)) {
         throw new Error("When changing to context " + base.context + " could not find an actual template args context");
       }
     }
@@ -416,7 +419,7 @@ export function reactifyElementBase(
         if (Array.isArray(loopElementBase)) {
           return (
             <React.Fragment key={arg.key}>
-              {loopElementBase.map((loopContext, index) => {
+              {(loopElementBase as TemplateArgs[]).map((loopContext, index) => {
                 if (!(loopContext instanceof TemplateArgs)) {
                   throw new Error("Could not find a proper context value for item in index " + index + " at " + base.forEach);
                 }
@@ -435,16 +438,39 @@ export function reactifyElementBase(
         }
       }
 
-      if (currentTemplateArgs instanceof MutatingTemplateArgs) {
-        return currentTemplateArgs.mutatingWrapper(renderEachBasedOnContext);
+      if (newTemplateArgs instanceof MutatingTemplateArgs) {
+        return newTemplateArgs.mutatingWrapper(renderEachBasedOnContext);
       } else {
-        return renderEachBasedOnContext(currentTemplateArgs);
+        return renderEachBasedOnContext(newTemplateArgs);
       }
+    } else if (newTemplateArgs instanceof MutatingTemplateArgs) {
+      return newTemplateArgs.mutatingWrapper((newContext: TemplateArgs) => {
+        return reactifyElementBase(
+          registry,
+          Tag,
+          baseClass,
+          children,
+          wrapChildren,
+          {
+            active: arg.active,
+            selected: arg.selected,
+            element: base as RichElement,
+            asTemplate: true,
+            customProps: arg.customProps,
+            key: arg.key,
+            templateArgs: newContext,
+            templateRootArgs: currentTemplateRootArgs,
+            templateIgnoreContextualChanges: true,
+          }
+        );
+      })
+    } else {
+      currentTemplateArgs = newTemplateArgs;
     }
   }
 
   if (arg.asTemplate && base.ifCondition) {
-    const value = currentTemplateArgs && currentTemplateArgs[base.ifCondition];
+    const value = currentTemplateArgs && currentTemplateArgs.properties[base.ifCondition];
     if (!value) {
       return null;
     }
@@ -458,9 +484,9 @@ export function reactifyElementBase(
     // and we find the given handler, either from the current context
     // or the root context
     const Handler: any = (
-      currentTemplateArgs && currentTemplateArgs[base.uiHandler]
+      currentTemplateArgs && currentTemplateArgs.properties[base.uiHandler]
     ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs[base.uiHandler]
+        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler]
       );
 
     const handlerChildren = children.map((c, index: number) => {
@@ -568,9 +594,9 @@ export function reactifyElementBase(
     delete finalProps.children;
 
     const value = (
-      currentTemplateArgs && currentTemplateArgs[base.html]
+      currentTemplateArgs && currentTemplateArgs.properties[base.html]
     ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs[base.html]
+        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.html]
       );
     if (value) {
       if (typeof value === "string") {
@@ -588,9 +614,9 @@ export function reactifyElementBase(
     delete finalProps.children;
     // and define the text content
     const value = (
-      currentTemplateArgs && currentTemplateArgs[base.textContent]
+      currentTemplateArgs && currentTemplateArgs.properties[base.textContent]
     ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs[base.textContent]
+        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.textContent]
       );
 
     if (typeof value === "string") {

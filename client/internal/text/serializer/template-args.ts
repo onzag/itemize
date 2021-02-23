@@ -1,8 +1,28 @@
+import { IUIHandlerProps } from "./base";
+
 /**
  * Interface to define context wrappers during a dynamic render
  */
 export interface ITemplateArgsProperties {
-  [name: string]: TemplateArgs | MutatingTemplateArgs | any;
+  [name: string]:
+    // internal context
+    TemplateArgs |
+    // mutating context or array
+    MutatingTemplateArgs |
+    // standard array of context
+    Array<TemplateArgs> |
+    // a component for data-html
+    React.ReactNode |
+    // an ui handler
+    React.ComponentType<IUIHandlerProps> |
+    // a action function
+    Function |
+    // for text content and whatnot
+    string |
+    // for ifs
+    boolean |
+    // eh?
+    number;
 }
 
 /**

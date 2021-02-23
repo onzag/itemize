@@ -373,15 +373,13 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
 
   if (props.isRichText) {
     if (props.args.makeTemplate) {
-      const value = (
+      return (
         <TemplatedPropertyViewRichTextRenderer
           templateArgs={props.args.templateArgs}
         >
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );
-      const templateContextWrapper = props.args.templateContextWrapper;
-      return templateContextWrapper ? templateContextWrapper(value) : value;
     } else {
       return (
         <PropertyViewRichTextViewer>
