@@ -309,7 +309,7 @@ export interface ITemplateArgsContext {
   /**
    * Allows to specify a wrapper to wrap based on the context
    */
-  wrapper?: (n: React.ReactNode) => React.ReactNode;
+  wrapper?: (n: React.ReactNode, emulatedIndex?: number) => React.ReactNode;
   /**
    * A human readable label for this given context value
    * it should be in the given language
@@ -3043,7 +3043,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const styleHover = convertStyleStringToReactObject((element as any as RichElement).styleHover);
 
         // now we can use the handler component that is given via the ui handler
-        const toReturn = <HandlerComponent
+        let toReturn: React.ReactNode = <HandlerComponent
           args={{
             ...uiHandlerArgs,
             ...handlerExtraArgs,
@@ -3062,11 +3062,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         </HandlerComponent>;
 
         const contextSwichContext = this.findContextBasedOnNode(element as any, true);
-        if (contextSwichContext && contextSwichContext.wrapper) {
-          return contextSwichContext.wrapper(toReturn);
-        } else {
-          return toReturn;
+
+        if (
+          contextSwichContext &&
+          contextSwichContext.loopable &&
+          contextSwichContext.loopEmulation &&
+          contextSwichContext.loopEmulation >= 1
+        ) {
+          const arr: React.ReactNode[] = [];
+          for (let i = 0; i < contextSwichContext.loopEmulation; i++) {
+            if (contextSwichContext.wrapper) {
+              arr.push(<React.Fragment key={i}>{contextSwichContext.wrapper(toReturn, i)}</React.Fragment>);
+            } else {
+              arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+            }
+          }
+          toReturn = arr;
+        } else if (contextSwichContext && contextSwichContext.wrapper) {
+          toReturn = contextSwichContext.wrapper(toReturn);
         }
+
+        return toReturn;
       }
     }
 
@@ -3154,16 +3170,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     ) {
       const arr: React.ReactNode[] = [];
       for (let i = 0; i < contextSwichContext.loopEmulation; i++) {
-        arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>)
+        if (contextSwichContext.wrapper) {
+          arr.push(<React.Fragment key={i}>{contextSwichContext.wrapper(toReturn, i)}</React.Fragment>);
+        } else {
+          arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+        }
       }
       toReturn = arr;
-    };
-
-    if (contextSwichContext && contextSwichContext.wrapper) {
-      return contextSwichContext.wrapper(toReturn);
-    } else {
-      return toReturn;
+    } else if (contextSwichContext && contextSwichContext.wrapper) {
+      toReturn = contextSwichContext.wrapper(toReturn);
     }
+
+    return toReturn;
   }
 
   /**

@@ -12,6 +12,11 @@ import { IGQLFile } from "./gql-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
 import Include from "./base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
+import type { IPropertyDefinitionSupportedCurrencyType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
+import type { IPropertyDefinitionSupportedUnitType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
+import { IPropertyDefinitionSupportedLocationType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
+import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
+import convert from "convert-units";
 
 export const Moment = MomentDef;
 export const JSDOM = JSDOMDef;
@@ -38,7 +43,7 @@ export function delayedExecutionFn(fn: any, id: string, ms: number): TimedExecut
     if (TIMED_FN_WAIT_LIST[id]) {
       clearTimeout(TIMED_FN_WAIT_LIST[id]);
     }
-  
+
     TIMED_FN_WAIT_LIST[id] = setTimeout(() => {
       delete TIMED_FN_WAIT_LIST[id];
       fn();
@@ -357,8 +362,8 @@ export function fileURLAbsoluter(
       prefix +
       (
         property.isExtension() ?
-        itemDefinition.getParentModule().getQualifiedPathName() :
-        itemDefinition.getQualifiedPathName()
+          itemDefinition.getParentModule().getQualifiedPathName() :
+          itemDefinition.getQualifiedPathName()
       ) + "/" +
       id + "." + (version || "") + "/" +
       (include ? include.getId() + "/" : "") +
@@ -403,8 +408,133 @@ export function fileArrayURLAbsoluter(
   }
   return files.map(
     (file) =>
-    fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable)
+      fileURLAbsoluter(domain, containerHostnamePrefixes, file, itemDefinition, id, version, containerId, include, property, cacheable)
   );
+}
+
+/**
+ * Creates a currency value to use with prefills and setters
+ * @param value the currency numeric value
+ * @param currency the currency itself
+ */
+export function createCurrencyValue(value: number, currency: string): IPropertyDefinitionSupportedCurrencyType {
+  return {
+    value,
+    currency,
+  };
+}
+
+/**
+ * Creates a date value to be used with prefills and setters
+ * @param value 
+ */
+export function createDateValue(value: Date | string) {
+  return Moment(value).format(DATE_FORMAT);
+}
+
+/**
+ * Creates a datetime value to be used with prefills and setters
+ * @param value 
+ */
+export function createDateTimeValue(value: Date | string) {
+  return Moment(value).format(DATETIME_FORMAT);
+}
+
+/**
+ * Creates a time value to be used with prefills and setters
+ * @param value 
+ */
+export function createTimeValue(value: Date | string) {
+  return Moment(value).format(TIME_FORMAT);
+}
+
+/**
+ * Creates an unit value to be used with prefills and setters
+ * @param value 
+ * @param unit 
+ * @param normalizedUnit 
+ */
+export function createUnitValue(value: number, unit: string, normalizedUnit: string): IPropertyDefinitionSupportedUnitType {
+  return {
+    value,
+    unit,
+    normalizedValue: convert(value)
+      .from(unit as any).to(normalizedUnit as any),
+    normalizedUnit,
+  };
+}
+
+/**
+ * Creates an location value to be used with prefills and setters
+ * @param txt 
+ * @param atxt 
+ * @param lat 
+ * @param lng 
+ * @param id non necessary if not planning to submit
+ */
+export function createLocationValue(txt: string, atxt: string, lat?: number, lng?: number, id?: string): IPropertyDefinitionSupportedLocationType {
+  return {
+    atxt,
+    txt,
+    lat: lat || 0,
+    lng: lng || 0,
+    id: id || "CUSTOM-" + (lat || 0) + "." + (lng || 0),
+  };
+}
+
+/**
+ * A fake file value that you should not submit as it's an invalid value
+ * you can use this to setup a placeholder of sorts
+ * @param id 
+ * @param name 
+ * @param url 
+ */
+export function createFakeFileValue(id: string, name: string, url: string): PropertyDefinitionSupportedFileType {
+  return {
+    id,
+    metadata: null,
+    name,
+    size: null,
+    type: null,
+    url,
+  }
+}
+
+/**
+ * Creates a real image value to prefill with that can be used to generate
+ * values that can be submitted
+ * @param id 
+ * @param file 
+ * @param objectURL 
+ * @param imageMetadataGeneratorInfo 
+ */
+export function createRealFileValue(
+  id: string,
+  file: File,
+  objectURL: string,
+  imageMetadataGeneratorInfo?: {
+    property: PropertyDefinition;
+    width: number;
+    height: number;
+  }
+): PropertyDefinitionSupportedFileType {
+  const value: PropertyDefinitionSupportedFileType = {
+    name: file.name,
+    type: file.type,
+    id,
+    url: objectURL,
+    size: file.size,
+    src: file,
+    metadata: null,
+  };
+
+  if (imageMetadataGeneratorInfo) {
+    const dimensions: string = imageMetadataGeneratorInfo.property.getSpecialProperty("dimensions") || "";
+    const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+    value.metadata = imageMetadataGeneratorInfo.width + "x" + imageMetadataGeneratorInfo.height + ";" + dimensionNames.join(",");
+  }
+
+  return value;
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
