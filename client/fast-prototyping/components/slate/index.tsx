@@ -3270,7 +3270,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     });
     Transforms.deselect(this.editor);
     ReactEditor.blur(this.editor);
-    this.onBlurredChange();
   }
 
   /**
@@ -3279,7 +3278,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public softBlur() {
     ReactEditor.blur(this.editor);
     Transforms.deselect(this.editor);
-    this.onBlurredChange();
   }
 
   /**

@@ -547,6 +547,354 @@ We should now define a new fragment regarding this new page, which will be simil
 
 Now we need to display the search results, and for such a mechanism we should use a loop, one of the features of the templating mechanism of itemize is the capability to create loops, however they as well need to be defined.
 
+In order to create our looping mechanism let's first define the templating mechanism, we will be doing a lot of changes because we want to have all these template args that we first defined to let's refactor our `fragment.tsx` file to be organized the following way:
+
+```tsx
+import React from "react";
+
+import { ItemProvider } from "@onzag/itemize/client/providers/item";
+import Entry from "@onzag/itemize/client/components/property/Entry";
+import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
+import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
+
+import {
+    Paper, createStyles, withStyles, WithStyles,
+    Container, Box, List, ListItem, ListItemText,
+    ExtensionIcon, ListItemIcon,
+} from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
+import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
+import { ITemplateArgsContext, ITemplateArg } from "@onzag/itemize/client/fast-prototyping/components/slate";
+import Route from "@onzag/itemize/client/components/navigation/Route";
+import Link from "@onzag/itemize/client/components/navigation/Link";
+import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
+import { ModuleProvider } from "@onzag/itemize/client/providers/module";
+import { button, buttonOptions, buttonToolbarPrescence } from "../../components/ui-handlers";
+import View from "@onzag/itemize/client/components/property/View";
+import { createCurrencyValue, createFakeFileValue, createLocationValue } from "@onzag/itemize/util";
+
+/**
+ * This is going to be the search wrapper that wraps
+ * our search based fragments
+ * @param children 
+ */
+function searchWrapper(children: React.ReactNode) {
+    return (
+        <ModuleProvider module="hosting">
+            <ItemProvider
+                itemDefinition="unit"
+                searchCounterpart={true}
+                properties={[
+                    "address",
+                    "unit_type",
+                    "planned_check_in",
+                    "planned_check_out",
+                    "price",
+                ]}
+            >
+                {children}
+            </ItemProvider>
+        </ModuleProvider>
+    );
+}
+
+/**
+ * These are the basic properties that we will have everywhere
+ * in our fragments
+ */
+const basicFieldsProperties: { [key: string]: ITemplateArg } = {
+    check_in_date_entry: {
+        label: "Check in date Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="planned_check_in" />),
+        nonRootInheritable: true,
+    },
+    check_out_date_entry: {
+        label: "Check out date Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="planned_check_out" />),
+        nonRootInheritable: true,
+    },
+    location_entry: {
+        label: "Location Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="address" searchVariant="location" rendererArgs={{ disableMapAndSearch: true }} />),
+        nonRootInheritable: true,
+    },
+    search_radius_entry: {
+        label: "Search Radius Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="address" searchVariant="radius" />),
+        nonRootInheritable: true,
+    },
+    unit_type_entry: {
+        label: "Unit Type Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="unit_type" searchVariant="search" />),
+        nonRootInheritable: true,
+    },
+    min_price_entry: {
+        label: "Min Price Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="price" searchVariant="from" />),
+        nonRootInheritable: true,
+    },
+    max_price_entry: {
+        label: "Max Price Entry",
+        type: "html",
+        htmlDisplay: (<Entry id="price" searchVariant="to" />),
+        nonRootInheritable: true,
+    },
+    button: {
+        label: "Button",
+        type: "ui-handler",
+        handler: button,
+    },
+};
+
+/**
+ * This is the frontpage only specific notice how this one
+ * has the go to search page function in it
+ */
+const frontpageProperties: { [key: string]: ITemplateArg } = {
+    ...basicFieldsProperties,
+    go_to_search_page: {
+        label: "Go To Search Page",
+        type: "function",
+    },
+};
+
+/**
+ * Now these are for the one where we are searching for a place to reserve
+ */
+const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsContext } = {
+    ...basicFieldsProperties,
+    /**
+     * We add the function for the button or whatever to perform the search
+     * to actually do such search
+     */
+    perform_search: {
+        label: "Perform Search",
+        type: "function",
+    },
+
+    /**
+     * And then define this loop for the search results the search results exist within a context
+     * that is loopable
+     */
+    search_results: {
+        type: "context",
+        label: "Search Results",
+
+        // we make it loopable and emulate 3 items
+        loopable: true,
+        loopEmulation: 3,
+
+        /**
+         * We want to wrap everything that is inside this context and because
+         * we are loop wrapping we have index emulation
+         * @param n this is basically the node we are wrapping
+         * @param emulatedIndex and this is the index we are emulating, we have 3, so [0, 1, 2] will be our indexes
+         */
+        wrapper: (n, emulatedIndex) => (
+            // we are going to change the context of our item provider
+            <ItemProvider
+                itemDefinition="unit"
+                // using a version in order to ensure they hold different states
+                forVersion={"rich-test-" + emulatedIndex}
+                // we need to use these properties
+                properties={[
+                    "title",
+                    "image",
+                    "address",
+                    "unit_type",
+                    "price",
+                ]}
+                cleanOnDismount={true}
+                // and we are going to set using emulated values
+                // this means that these items will have such values which will allow
+                // for variety
+                setters={[
+                    {
+                        id: "address",
+                        value: createLocationValue("Sample Address " + emulatedIndex, "Sample Address Specification " + emulatedIndex),
+                    },
+                    {
+                        id: "title",
+                        value: ["Sample Title", "Another Title", "Yet another Title"][emulatedIndex],
+                    },
+                    {
+                        id: "image",
+                        // note how we are using this strange url as the source of our file
+                        // we will have to create and put such file as a resource
+                        value: createFakeFileValue("SAMPLE_FILE", "Sample image " + emulatedIndex, "/rest/resource/image/sample.jpg", "image/jpeg"),
+                    },
+                    {
+                        id: "unit_type",
+                        value: ["room", "apartment", "house"][emulatedIndex],
+                    },
+                    {
+                        id: "price",
+                        value: createCurrencyValue(100 * (emulatedIndex + 1), ["EUR", "USD", "CHF"][emulatedIndex]),
+                    }
+                ]}
+            >
+                {n}
+            </ItemProvider>
+        ),
+
+        // now we can set these properties here
+        // this is what we are using for searching
+        properties: {
+            address: {
+                label: "Address",
+                type: "html",
+                htmlDisplay: (<View id="address" rendererArgs={{ hideMap: true }} />),
+            },
+            title: {
+                label: "Title",
+                type: "html",
+                htmlDisplay: (<View id="title" />),
+            },
+            unit_type: {
+                label: "Unit Type",
+                type: "html",
+                htmlDisplay: (<View id="unit_type" />),
+            },
+            unit_price: {
+                label: "Price Of Unit",
+                type: "html",
+                htmlDisplay: (<View id="price" />),
+            },
+            image: {
+                label: "Image Of Unit",
+                type: "html",
+                htmlDisplay: (<View id="image" />),
+            }
+        }
+    }
+};
+
+/**
+ * The most important bit that defines what fragments are available to modify
+ * from within the CMS, these use custom keys; and you might add as many of
+ * them as you like, they are defined by template args since every fragment
+ * is allowed to be a template and can be rendered as such (even if it doesn't have to)
+ * in cms/index.propext.json you can find out the content property and what it
+ * supports
+ */
+const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
+    /**
+     * In this example you can see the header, the header uses a custom ID
+     * and is loaded in the frontpage by passing it as ID for the fragment
+     * item definition
+     * 
+     * This defines the context, now we are using hardcoded contexts in here
+     * that don't support for multilingual design, because of the labels
+     * we are giving in, which are in english
+     * 
+     * Labels can however also be i18n element types, as react nodes are allowed
+     * so that enables multilingual functionality if required, for the purpose
+     * of this basic CMS simple strings are used
+     */
+    "HEADER": {
+        type: "context",
+        label: "Header",
+        wrapper: searchWrapper,
+        properties: frontpageProperties,
+    },
+    "BODY": {
+        type: "context",
+        label: "Body",
+        wrapper: searchWrapper,
+        properties: frontpageProperties,
+    },
+    "RESERVE_SEARCH": {
+        type: "context",
+        label: "Reservation Search Page",
+        wrapper: searchWrapper,
+        properties: reserveSearchProperties,
+    },
+    "ACCOUNT_VALIDATION_EMAIL": {
+        type: "context",
+        label: "Account Validation Email",
+        properties: {
+            validate_account_link: {
+                type: "link",
+                label: "Validation Link",
+            },
+            username: {
+                type: "text",
+                label: "Username",
+            },
+        },
+    },
+    "ACCOUNT_RECOVERY_EMAIL": {
+        type: "context",
+        label: "Account Recovery Email",
+        properties: {
+            forgot_password_link: {
+                type: "link",
+                label: "Recovery Link",
+            },
+            username: {
+                type: "text",
+                label: "Username",
+            },
+        },
+    },
+    "NOTIFICATION_EMAIL": {
+        type: "context",
+        label: "Request notification email",
+        properties: {
+            request_notification_requester: {
+                type: "text",
+                label: "Requester",
+            },
+            request_notification_check_in: {
+                type: "text",
+                label: "Check in time",
+            },
+            request_notification_check_out: {
+                type: "text",
+                label: "Check out time",
+            },
+        },
+    },
+    "APPROVAL_EMAIL": {
+        type: "context",
+        label: "Request approval email",
+        properties: {
+            request_notification_host: {
+                type: "text",
+                label: "Host",
+            },
+        },
+    },
+    "DENIAL_EMAIL": {
+        type: "context",
+        label: "Request denial email",
+        properties: {
+            request_notification_host: {
+                type: "text",
+                label: "Host",
+            },
+        },
+    },
+}
+const ALL_FRAGMENTS = Object.keys(FRAGMENTS);
+```
+
+This is what the refactor is like without including anything that was under the `ALL_FRAGMENTS` last line, we have now introduced a brand new fragment into the elements named `RESERVE_SEARCH` which represents our search result page, which we haven't defined yet, but we should, but first, let's try to define a new raw resource for our fake file.
+
+This is extremely simple and easy to do, create a folder inside the `resources` folder in your root directory for your project at `resources/image` and create a file named `sample.jpg` after running `npm run build-data` your resource should have been processed and be accessible at `localhost:8000/rest/resource/image/sample.jpg`.
+
+With this now ready let's start hacking a reserve search page view, the plan is to make a box in the center, 
+
 ## Language Support
 
 We have so far done everything in english, yet we haven't specified a locale, this is because we have using the "fallback" locale each time off these fragments, they try to load a versioned item but don't find it, so they go to the fallback, however, we have a multilingual website, so let's now make the spanish version of our header, which can be completely different!... press `ctrl + A` and copy all the text in our header and change the language with the button at the top left.
+
+## Fragment loader and the escape form
+
+You still are not happy how things are done, the CMS seems clunky to access things over there, well you can use

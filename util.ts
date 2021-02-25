@@ -488,14 +488,16 @@ export function createLocationValue(txt: string, atxt: string, lat?: number, lng
  * @param id 
  * @param name 
  * @param url 
+ * @param size
+ * @param type
  */
-export function createFakeFileValue(id: string, name: string, url: string): PropertyDefinitionSupportedFileType {
+export function createFakeFileValue(id: string, name: string, url: string, type?: string, size?: number): PropertyDefinitionSupportedFileType {
   return {
     id,
-    metadata: null,
+    metadata: "FAKE_FILE",
     name,
-    size: null,
-    type: null,
+    size: typeof size === "number" ? size : null,
+    type: type || null,
     url,
   }
 }

@@ -31,6 +31,7 @@ export function imageSrcSetRetriever(
   // file that we can get a srcset of
   if (
     fileData &&
+    fileData.metadata !== "FAKE_FILE" &&
     fileData.url.indexOf("blob:") !== 0 &&
     fileData.type.indexOf("image/svg") !== 0
   ) {

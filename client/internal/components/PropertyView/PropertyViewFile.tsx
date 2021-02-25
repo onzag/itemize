@@ -44,6 +44,11 @@ export default class PropertyViewFile
   extends React.Component<
   IPropertyViewHandlerProps<IPropertyViewFileRendererProps>
 > {
+  constructor(props: IPropertyViewHandlerProps<IPropertyViewFileRendererProps>) {
+    super(props);
+
+    this.openFile = this.openFile.bind(this);
+  }
   public shouldComponentUpdate(
     nextProps: IPropertyViewHandlerProps<IPropertyViewFileRendererProps>,
   ) {
@@ -77,7 +82,8 @@ export default class PropertyViewFile
 
     if (
       currentValue &&
-      currentValue.url.indexOf("blob:") !== 0
+      currentValue.url.indexOf("blob:") !== 0 &&
+      currentValue.metadata !== "FAKE_FILE"
     ) {
       const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
       currentValue = fileURLAbsoluter(
@@ -94,8 +100,8 @@ export default class PropertyViewFile
       );
     }
 
-    const prettySize = currentValue && prettyBytes(currentValue.size);
-    const extension = currentValue && mimeTypeToExtension(currentValue.type);
+    const prettySize = currentValue && (typeof currentValue.size === "number" ? prettyBytes(currentValue.size) : null);
+    const extension = currentValue && (currentValue.type ? mimeTypeToExtension(currentValue.type) : currentValue.type);
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property) : null;
 
     const RendererElement = this.props.renderer;

@@ -18,7 +18,7 @@ import {
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
   TextFieldsIcon, CodeIcon, Badge,
 } from "../../mui-core";
-import { Path, Range, Text } from "slate";
+import { Path, Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
 import { WrapperDrawer } from "./drawer";
 import { FileLoadErrorDialog } from "./dialogs/file";
