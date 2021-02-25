@@ -3010,7 +3010,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       if (!propertiesFromContext) {
         propertiesFromContext = (this.props.rootContext && this.props.rootContext.properties[uiHandler]) as ITemplateArg;
-        if (propertiesFromContext.nonRootInheritable) {
+        if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
       }
@@ -3094,7 +3094,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       let propertiesFromContext: ITemplateArg = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArg;
       if (!propertiesFromContext) {
         propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArg;
-        if (propertiesFromContext.nonRootInheritable) {
+        if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
       }
@@ -3138,7 +3138,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         propertiesFromContext = this.props.rootContext &&
           this.props.rootContext.properties &&
           this.props.rootContext.properties[text] as ITemplateArg;
-        if (propertiesFromContext.nonRootInheritable) {
+        if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
       }
@@ -3315,6 +3315,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we can update the state
     this.setState({
+      ...this.calculateAnchorsAndContext(this.state.currentSelectedElementAnchor, newInternalValue.children as any, p),
+
       currentSelectedElementAnchor: p,
       currentSelectedElement: finalNode,
       internalValue: newInternalValue,
@@ -3566,6 +3568,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containment: "inline",
       type: "inline",
       textContent: value,
+      givenName: label,
     };
 
     // and insert right there
@@ -3610,6 +3613,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: null,
       type: "container",
       html: value,
+      givenName: label,
     }
 
     // now we can insert that node
