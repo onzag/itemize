@@ -677,6 +677,7 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
     perform_search: {
         label: "Perform Search",
         type: "function",
+        nonRootInheritable: true,
     },
 
     /**
@@ -770,8 +771,12 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
             image: {
                 label: "Image Of Unit",
                 type: "html",
-                htmlDisplay: (<View id="image" rendererArgs={{imageClassName: "element-view"}}/>),
-            }
+                htmlDisplay: (<View id="image" rendererArgs={{imageClassName: "element-view", disableImageLinking: true}}/>),
+            },
+            go_to_view_listing: {
+                label: "Go to View Listing Page",
+                type: "function",
+            },
         }
     }
 };

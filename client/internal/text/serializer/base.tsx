@@ -211,10 +211,11 @@ export function recurseAndConsumeMutatingActions(
 export function retrieveElementActionsForReact(
   base: IElementBase,
   context: TemplateArgs,
+  rootContext: TemplateArgs,
   children: (args: IUIHandlerEvents) => React.ReactNode,
 ): React.ReactNode {
   // no context no args
-  if (!context) {
+  if (!context && !rootContext) {
     return children({});
   }
 
@@ -224,7 +225,7 @@ export function retrieveElementActionsForReact(
   Object.keys(eventReactifyTranslations).forEach((key) => {
     const value = base[key];
     if (value) {
-      const contextValue = context.properties[value];
+      const contextValue = (context && context.properties[value]) || (rootContext && rootContext.properties[value]);
       if (contextValue) {
         const translation = eventReactifyTranslations[key];
         if (contextValue instanceof MutatingFunctionArg) {
@@ -598,7 +599,7 @@ export function reactifyElementBase(
       return (
         <React.Fragment key={arg.key}>
           {
-            retrieveElementActionsForReact(base, currentTemplateArgs, (events) => (
+            retrieveElementActionsForReact(base, currentTemplateArgs, currentTemplateRootArgs, (events) => (
               <Handler
                 args={base.uiHandlerArgs}
                 children={handlerChildren}
@@ -755,7 +756,7 @@ export function reactifyElementBase(
   return (
     <React.Fragment key={arg.key}>
       {
-        retrieveElementActionsForReact(base, currentTemplateArgs, (events) => {
+        retrieveElementActionsForReact(base, currentTemplateArgs, currentTemplateRootArgs, (events) => {
           // if we have these templating options
           if (base.styleActive || base.styleHover) {
             // then we fetch them
