@@ -193,6 +193,12 @@ export interface IPropertyDefinitionSupportedType {
    */
   sql: (arg: ISQLArgInfo) => ISQLTableDefinitionType;
   /**
+   * On a simple search what fields should be selected that are
+   * the minimum necessary to perform a selection, this is used
+   * for traditional search mainly
+   */
+  sqlSelect: (arg: ISQLArgInfo) => string[];
+  /**
    * specifies how data is stored, by default it just sets the row value
    * to whatever is given, however if you have a complex value you should
    * set this, that allows to build raw queries,

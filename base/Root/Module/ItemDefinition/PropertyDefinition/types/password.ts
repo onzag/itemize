@@ -6,7 +6,7 @@
 
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn, getStandardSQLFnFor } from "../sql";
+import { standardSQLOutFn, getStandardSQLFnFor, standardSQLSelect } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_STRING_LENGTH, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { passwordSQLIn, passwordSQLEqual, passwordSQLSSEqual, passwordSQLSearch } from "../sql/password";
@@ -23,6 +23,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   gql: GraphQLString,
   nullableDefault: "",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", "pgcrypto"),
+  sqlSelect: standardSQLSelect,
   sqlIn: passwordSQLIn,
   sqlOut: standardSQLOutFn,
   sqlSearch: passwordSQLSearch,

@@ -8,7 +8,7 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn, standardSQLEqualFn } from "../sql";
+import { standardSQLOutFn, standardSQLEqualFn, standardSQLSelect } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
@@ -120,6 +120,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     },
   ],
   sql: textSQL,
+  sqlSelect: standardSQLSelect,
   sqlIn: textSQLIn,
   sqlOut: standardSQLOutFn,
   sqlSearch: textSQLSearch,

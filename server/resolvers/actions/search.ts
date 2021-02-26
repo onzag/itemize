@@ -25,6 +25,7 @@ import {
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
   ENDPOINT_ERRORS,
+  EXCLUSION_STATE_SUFFIX,
 } from "../../../constants";
 import { buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
@@ -138,14 +139,14 @@ export async function searchModule(
     true,
   );
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
+  let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
     checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
 
-    fieldsToRequest = Object.keys(requestedFields);
+    const fieldsToRequestRawValue = Object.keys(requestedFields);
 
     const requestedFieldsInMod = {};
     Object.keys(requestedFields || {}).forEach((arg) => {
@@ -155,14 +156,9 @@ export async function searchModule(
     });
     CAN_LOG_DEBUG && logger.debug(
       "searchModule: Extracted requested fields from module",
-      fieldsToRequest,
+      fieldsToRequestRawValue,
     );
-    if (!fieldsToRequest.includes("last_modified")) {
-      fieldsToRequest.push("last_modified");
-    }
-    if (!fieldsToRequest.includes("blocked_at")) {
-      fieldsToRequest.push("blocked_at");
-    }
+
     await mod.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
       tokenData.role,
@@ -172,6 +168,30 @@ export async function searchModule(
       rolesManager,
       true,
     );
+
+    sqlFieldsToRequest = [];
+    fieldsToRequestRawValue.forEach((v) => {
+      const propDef = mod.hasPropExtensionFor(v) && mod.getPropExtensionFor(v);
+      if (!propDef) {
+        sqlFieldsToRequest.push(v);
+      } else {
+        const sqlSelectFields = propDef.getPropertyDefinitionDescription().sqlSelect({
+          id: v,
+          itemDefinition: null,
+          prefix: "",
+          property: propDef,
+          serverData: appData.cache.getServerData(),
+        });
+        sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
+      }
+    });
+
+    if (!sqlFieldsToRequest.includes("last_modified")) {
+      sqlFieldsToRequest.push("last_modified");
+    }
+    if (!sqlFieldsToRequest.includes("blocked_at")) {
+      sqlFieldsToRequest.push("blocked_at");
+    }
   }
 
   // now we build the search query, the search query only matches an id
@@ -238,7 +258,7 @@ export async function searchModule(
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  queryModel.select(...fieldsToRequest);
+  queryModel.select(...sqlFieldsToRequest);
   addedSearchRaw.forEach((srApplyArgs) => {
     queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
   });
@@ -513,14 +533,14 @@ export async function searchItemDefinition(
   const moduleTable = mod.getQualifiedPathName();
   const selfTable = itemDefinition.getQualifiedPathName();
 
-  let fieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
+  let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
     checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
 
-    fieldsToRequest = Object.keys(requestedFields);
+    const fieldsToRequestRawValue = Object.keys(requestedFields);
     const requestedFieldsInIdef = {};
     Object.keys(requestedFields || {}).forEach((arg) => {
       if (
@@ -532,16 +552,67 @@ export async function searchItemDefinition(
     });
     CAN_LOG_DEBUG && logger.debug(
       "searchItemDefinition: Extracted requested fields from module",
-      fieldsToRequest,
+      fieldsToRequestRawValue,
     );
-    if (!fieldsToRequest.includes("last_modified")) {
-      fieldsToRequest.push("last_modified");
+
+    sqlFieldsToRequest = [];
+    fieldsToRequestRawValue.forEach((v) => {
+      if (v.startsWith(INCLUDE_PREFIX)) {
+        const actualName = v.replace(INCLUDE_PREFIX, "");
+        const include = itemDefinition.hasIncludeFor(actualName) && itemDefinition.getIncludeFor(actualName);
+
+        // will filter out exclusion state from getting here cheaply
+        if (include) {
+          const includeProperties = requestedFields[v];
+
+          const includePrefix = include.getPrefixedQualifiedIdentifier();
+          const includeExclusionState = includePrefix + EXCLUSION_STATE_SUFFIX;
+
+          if (!sqlFieldsToRequest.includes(includeExclusionState)) {
+            sqlFieldsToRequest.push(includeExclusionState);
+          }
+
+          Object.keys(includeProperties).forEach((v2) => {
+            const propDef = include.getSinkingPropertyFor(v2);
+            const sqlSelectFields = propDef.getPropertyDefinitionDescription().sqlSelect({
+              id: v2,
+              itemDefinition,
+              prefix: includePrefix,
+              property: propDef,
+              serverData: appData.cache.getServerData(),
+              include,
+            });
+            sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
+          });
+        } else {
+          sqlFieldsToRequest.push(v);
+        }
+      } else {
+        // will filter out special properties
+        const propDef = itemDefinition.hasPropertyDefinitionFor(v, true) && itemDefinition.getPropertyDefinitionFor(v, true);
+        if (!propDef) {
+          sqlFieldsToRequest.push(v);
+        } else {
+          const sqlSelectFields = propDef.getPropertyDefinitionDescription().sqlSelect({
+            id: v,
+            itemDefinition,
+            prefix: "",
+            property: propDef,
+            serverData: appData.cache.getServerData(),
+          });
+          sqlFieldsToRequest = sqlFieldsToRequest.concat(...sqlSelectFields);
+        }
+      }
+    });
+
+    if (!sqlFieldsToRequest.includes("last_modified")) {
+      sqlFieldsToRequest.push("last_modified");
     }
     // we need these to get the DATA properly populated
     // as the filterAndPrepareGQLValue will use of those
     // to know if the value is blocked to return to user
-    if (!fieldsToRequest.includes("blocked_at")) {
-      fieldsToRequest.push("blocked_at");
+    if (!sqlFieldsToRequest.includes("blocked_at")) {
+      sqlFieldsToRequest.push("blocked_at");
     }
 
     await itemDefinition.checkRoleAccessFor(
@@ -627,7 +698,7 @@ export async function searchItemDefinition(
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  queryModel.select(...fieldsToRequest);
+  queryModel.select(...sqlFieldsToRequest);
   addedSearchRaw.forEach((srApplyArgs) => {
     queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
   });
@@ -641,7 +712,7 @@ export async function searchItemDefinition(
   queryModel.clear();
   queryModel.selectExpression(`COUNT(*) AS "count"`);
   queryModel.orderByBuilder.clear();
-  
+
   const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
   const count = countResult ? countResult.count : null;
   if (traditional) {

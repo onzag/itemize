@@ -7,12 +7,13 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLBoolean } from "graphql";
 import {
-  stardardSQLInFn,
+  standardSQLInFn,
   standardSQLOutFn,
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
+  standardSQLSelect,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn,
@@ -34,7 +35,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   json: "boolean",
   gql: GraphQLBoolean,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("BOOLEAN"),
-  sqlIn: stardardSQLInFn,
+  sqlSelect: standardSQLSelect,
+  sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlStrSearch: null,

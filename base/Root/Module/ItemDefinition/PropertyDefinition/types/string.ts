@@ -7,11 +7,12 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
 import {
-  stardardSQLInFn,
+  standardSQLInFn,
   standardSQLOutFn,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
+  standardSQLSelect,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -83,7 +84,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
     return null;
   }),
-  sqlIn: stardardSQLInFn,
+  sqlSelect: standardSQLSelect,
+  sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: stringSQLSearch,
   sqlEqual: standardSQLEqualFn,

@@ -71,12 +71,25 @@ export function standardSQLOrderBy(arg: ISQLOrderByInfo) {
 }
 
 /**
+ * The standard sql select function that is used to select the minimum necessary
+ * for a selection in a traditional search
+ * @param arg the in arg
+ * @returns the rows to select
+ */
+export function standardSQLSelect(arg: ISQLArgInfo): string[] {
+  // as simple as this
+  return [
+    arg.prefix + arg.id,
+  ];
+}
+
+/**
  * The standard sql in function that specifies how a property inputs its value
  * into a table
  * @param arg the in arg
  * @returns the partial row value
  */
-export function stardardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
+export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
   // as simple as this
   return {
     [arg.prefix + arg.id]: arg.value,

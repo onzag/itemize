@@ -25,6 +25,18 @@ export function currencySQL(arg: ISQLArgInfo) {
 }
 
 /**
+ * The selection for the currency in searches
+ * does not need the normalized value
+ * @param arg 
+ */
+export function currencySQLSelect(arg: ISQLArgInfo) {
+  return [
+    arg.prefix + arg.id + "_VALUE",
+    arg.prefix + arg.id + "_CURRENCY",
+  ]
+}
+
+/**
  * The sql in function for the currency
  * @param arg the sql in info argument
  * @returns a partial row

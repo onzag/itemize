@@ -54,6 +54,20 @@ export function locationSQL(arg: ISQLArgInfo) {
 }
 
 /**
+ * provides the SQL select form for the location type
+ * @param arg the arg info
+ */
+export function locationSQLSelect(arg: ISQLArgInfo) {
+  return [
+    arg.prefix + arg.id + "_LAT",
+    arg.prefix + arg.id + "_LNG",
+    arg.prefix + arg.id + "_TXT",
+    arg.prefix + arg.id + "_ATXT",
+    arg.prefix + arg.id + "_ID",
+  ];
+}
+
+/**
  * Provides the functionality for sql in of data into
  * the row
  * @param arg the sql in arg info

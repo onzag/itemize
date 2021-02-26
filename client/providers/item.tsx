@@ -32,6 +32,8 @@ import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
 
@@ -2355,6 +2357,14 @@ export class ActualItemProvider extends
     withId: boolean,
     withSearchResults: boolean,
   ): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults {
+
+    if (isDevelopment) {
+      console.warn(
+        "Action refused due to invalid partial/total state at",
+        this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null,  this.props.forVersion || null),
+      );
+    }
+
     const emulatedError: EndpointErrorType = {
       message: "Submit refused due to invalid information in form fields",
       code: ENDPOINT_ERRORS.INVALID_DATA_SUBMIT_REFUSED,

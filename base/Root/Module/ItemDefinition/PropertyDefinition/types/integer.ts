@@ -7,13 +7,14 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLInt } from "graphql";
 import {
-  stardardSQLInFn,
+  standardSQLInFn,
   standardSQLOutFn,
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLOrderBy,
+  standardSQLSelect,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -44,7 +45,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   json: "number",
   gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("INTEGER"),
-  sqlIn: stardardSQLInFn,
+  sqlSelect: standardSQLSelect,
+  sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,

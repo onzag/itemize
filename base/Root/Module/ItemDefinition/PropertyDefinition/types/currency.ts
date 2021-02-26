@@ -22,7 +22,7 @@ import {
   MIN_SUPPORTED_REAL,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy, currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual } from "../sql/currency";
+import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy, currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual, currencySQLSelect } from "../sql/currency";
 
 /**
  * The currency definition is described by an object
@@ -52,6 +52,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // from the sql file to save space as they are not
   // used in the client side
   sql: currencySQL,
+  sqlSelect: currencySQLSelect,
   sqlIn: currencySQLIn,
   sqlOut: currencySQLOut,
   sqlSearch: currencySQLSearch,

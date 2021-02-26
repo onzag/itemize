@@ -11,7 +11,7 @@ import { DOMWindow } from "../../../../util";
 import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
 import { IText } from "./types/text";
 import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";
-import { MutatingTemplateArgs, TemplateArgs } from "./template-args";
+import { MutatingFunctionArg, MutatingTemplateArgs, TemplateArgs } from "./template-args";
 
 export interface IUIHandlerEvents {
   onClick?: any;
@@ -159,26 +159,90 @@ export function convertStyleStringToReactObject(str: string) {
 };
 
 /**
- * Retrieves all the element actions for a react target
- * @param base the base
+ * Sets the contexts for the mutating actions that reside on top
+ * of a component to give value to a function
+ * @param basicActions the basic actions that already got a defined value
+ * @param mutatingActions the mutating actions that need a value from the context
+ * @param children the children that will be fed all those values
  */
-export function retrieveElementActionsForReact(base: IElementBase, context: TemplateArgs): IUIHandlerEvents {
-  if (!context) {
-    return {};
+export function recurseAndConsumeMutatingActions(
+  basicActions: IUIHandlerEvents,
+  mutatingActions: IUIHandlerEvents,
+  children: (args: IUIHandlerEvents) => React.ReactNode
+): React.ReactNode {
+  // first we need all the mutating action keys
+  const mutatingActionsKeys = Object.keys(mutatingActions);
+
+  // none, well then we are done
+  if (mutatingActionsKeys.length === 0) {
+    return children(basicActions);
   }
 
-  const actions: IUIHandlerEvents = {};
+  // now we pick one
+  const keyToPick = mutatingActionsKeys[0];
+  const value = mutatingActions[keyToPick] as MutatingFunctionArg;
+
+  // and we can use the mutating wrapper to retrieve the function
+  return value.mutatingFunctionWrapper((fn) => {
+    // and set it as the basic value
+    const newBasicActions = {
+      ...basicActions,
+      [keyToPick]: fn,
+    };
+    // and remove it from the mutating
+    const newMutatingActions = {
+      ...mutatingActions,
+    };
+    delete newMutatingActions[keyToPick];
+
+    // and we can keep going
+    return recurseAndConsumeMutatingActions(newBasicActions, newMutatingActions, children);
+  });
+}
+
+/**
+ * Provides all the actions that are specified for a given node
+ * including those that are meant to be mutating
+ * @param base the base element that is to be fed properties
+ * @param context the context where we need to find the values of such
+ * @param children this is the node itself where the args are fed to this way it allows
+ * to set contexts and wrappers on top of it
+ */
+export function retrieveElementActionsForReact(
+  base: IElementBase,
+  context: TemplateArgs,
+  children: (args: IUIHandlerEvents) => React.ReactNode,
+): React.ReactNode {
+  // no context no args
+  if (!context) {
+    return children({});
+  }
+
+  // now we need all the basic and mutating actions
+  const basicActions: IUIHandlerEvents = {};
+  const mutatingActions: IUIHandlerEvents = {};
   Object.keys(eventReactifyTranslations).forEach((key) => {
     const value = base[key];
     if (value) {
       const contextValue = context.properties[value];
       if (contextValue) {
         const translation = eventReactifyTranslations[key];
-        actions[translation] = contextValue;
+        if (contextValue instanceof MutatingFunctionArg) {
+          mutatingActions[translation] = contextValue;
+        } else {
+          basicActions[translation] = contextValue;
+        }
       }
     }
   });
-  return actions;
+
+  // no mutating actions we can return right away
+  if (Object.keys(mutatingActions).length === 0) {
+    return children(basicActions);
+  }
+
+  // otherwise we need to setup all those contexts
+  return recurseAndConsumeMutatingActions(basicActions, mutatingActions, children);
 }
 
 /**
@@ -390,10 +454,10 @@ export function reactifyElementBase(
             return null;
           }
         }
-  
+
         // and such we find what we are supposed to loop for
         const loopElementBase = resolvedContext && resolvedContext.properties[base.forEach];
-  
+
         const childrenRenderFn = (eachElementContext: TemplateArgs, key?: string | number): React.ReactNode => {
           return reactifyElementBase(
             registry,
@@ -414,7 +478,7 @@ export function reactifyElementBase(
             }
           );
         }
-  
+
         // hopefully it'll be an array
         if (Array.isArray(loopElementBase)) {
           return (
@@ -431,7 +495,11 @@ export function reactifyElementBase(
             </React.Fragment>
           );
         } else if (loopElementBase instanceof MutatingTemplateArgs) {
-          return loopElementBase.mutatingWrapper(childrenRenderFn);
+          return (
+            <React.Fragment key={arg.key}>
+              {loopElementBase.mutatingWrapper(childrenRenderFn)}
+            </React.Fragment>
+          );
         } else {
           // it's not an iterable, we can't render a thing
           return null;
@@ -439,7 +507,11 @@ export function reactifyElementBase(
       }
 
       if (newTemplateArgs instanceof MutatingTemplateArgs) {
-        return newTemplateArgs.mutatingWrapper(renderEachBasedOnContext);
+        return (
+          <React.Fragment key={arg.key}>
+            {newTemplateArgs.mutatingWrapper(renderEachBasedOnContext)}
+          </React.Fragment>
+        );
       } else {
         return renderEachBasedOnContext(newTemplateArgs);
       }
@@ -523,17 +595,24 @@ export function reactifyElementBase(
       const styleActive = convertStyleStringToReactObject(base.styleActive);
       const styleHover = convertStyleStringToReactObject(base.styleHover);
 
-      return (<Handler
-        args={base.uiHandlerArgs}
-        key={arg.key}
-        children={handlerChildren}
-        element={arg.element}
-        className={className}
-        style={style}
-        styleActive={styleActive}
-        styleHover={styleHover}
-        events={retrieveElementActionsForReact(base, currentTemplateArgs)}
-      />);
+      return (
+        <React.Fragment key={arg.key}>
+          {
+            retrieveElementActionsForReact(base, currentTemplateArgs, (events) => (
+              <Handler
+                args={base.uiHandlerArgs}
+                children={handlerChildren}
+                element={arg.element}
+                className={className}
+                style={style}
+                styleActive={styleActive}
+                styleHover={styleHover}
+                events={events}
+              />
+            ))
+          }
+        </React.Fragment>
+      );
     }
   }
 
@@ -541,13 +620,7 @@ export function reactifyElementBase(
   // given all of the before failed
   const finalProps = {
     ...arg.customProps,
-    ...retrieveElementActionsForReact(base, currentTemplateArgs),
   };
-
-  // if we have a key, we use it
-  if (typeof arg.key !== "undefined") {
-    finalProps.key = arg.key;
-  }
 
   // define the class for active and inactive
   if (!arg.active) {
@@ -679,29 +752,38 @@ export function reactifyElementBase(
     finalProps.children = wrapChildren(finalProps.children);
   }
 
-  // if we have these templating options
-  if (base.styleActive || base.styleHover) {
-    // then we fetch them
-    const styleActive = convertStyleStringToReactObject(base.styleActive);
-    const styleHover = convertStyleStringToReactObject(base.styleHover);
-
-    // due to a bug in typescript I have to do it this way
-    const propsForThis: any = {
-      ...finalProps,
-      Tag,
-      styleActive,
-      styleHover,
-    };
-
-    // and now we return with the dynamic component
-    return (
-      <ReactifiedElementWithHoverAndActive {...propsForThis} />
-    )
-  }
-
-  // otherwise we return based on the simple tag
   return (
-    <Tag {...finalProps} />
+    <React.Fragment key={arg.key}>
+      {
+        retrieveElementActionsForReact(base, currentTemplateArgs, (events) => {
+          // if we have these templating options
+          if (base.styleActive || base.styleHover) {
+            // then we fetch them
+            const styleActive = convertStyleStringToReactObject(base.styleActive);
+            const styleHover = convertStyleStringToReactObject(base.styleHover);
+
+            // due to a bug in typescript I have to do it this way
+            const propsForThis: any = {
+              ...finalProps,
+              ...events,
+              Tag,
+              styleActive,
+              styleHover,
+            };
+
+            // and now we return with the dynamic component
+            return (
+              <ReactifiedElementWithHoverAndActive {...propsForThis} />
+            );
+          }
+
+          // otherwise we return based on the simple tag
+          return (
+            <Tag {...finalProps} {...events} />
+          );
+        })
+      }
+    </React.Fragment>
   );
 }
 

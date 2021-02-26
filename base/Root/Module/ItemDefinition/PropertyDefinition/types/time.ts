@@ -7,13 +7,14 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLString } from "graphql";
 import {
-  stardardSQLInFn,
+  standardSQLInFn,
   standardSQLOutFn,
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLOrderBy,
+  standardSQLSelect,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -46,7 +47,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TIME"),
-  sqlIn: stardardSQLInFn,
+  sqlSelect: standardSQLSelect,
+  sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,

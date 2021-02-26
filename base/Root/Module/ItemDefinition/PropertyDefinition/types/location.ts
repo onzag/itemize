@@ -11,7 +11,7 @@ import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedUnitType } from "./unit";
-import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual, locationSQLBtreeIndexable } from "../sql/location";
+import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual, locationSQLBtreeIndexable, locationSQLSelect } from "../sql/location";
 
 /**
  * The haversine formula extracted from stackoverflow
@@ -84,6 +84,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
     },
   },
   sql: locationSQL,
+  sqlSelect: locationSQLSelect,
   sqlIn: locationSQLIn,
   sqlOut: locationSQLOut,
   sqlSearch: locationSQLSearch,

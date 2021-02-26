@@ -7,13 +7,14 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { GraphQLInt } from "graphql";
 import {
-  stardardSQLInFn,
+  standardSQLInFn,
   standardSQLOutFn,
   standardSQLSearchFnExactAndRange,
   standardSQLEqualFn,
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLOrderBy,
+  standardSQLSelect,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -45,7 +46,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // years can be set as a number
   json: "number",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("SMALLINT"),
-  sqlIn: stardardSQLInFn,
+  sqlSelect: standardSQLSelect,
+  sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   sqlEqual: standardSQLEqualFn,

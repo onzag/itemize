@@ -9,6 +9,8 @@ export interface ITemplateArgsProperties {
     TemplateArgs |
     // mutating context or array
     MutatingTemplateArgs |
+    // mutating function value
+    MutatingFunctionArg |
     // standard array of context
     Array<TemplateArgs> |
     // a component for data-html
@@ -109,5 +111,17 @@ export class MutatingTemplateArgs {
   public mutatingWrapper: TemplateArgMutatingWrapperFn;
   constructor(mutatingWrapper: TemplateArgMutatingWrapperFn) {
     this.mutatingWrapper = mutatingWrapper;
+  }
+}
+
+export type TemplateArgFunctionalWrapperFn = (children: (fn: Function) => React.ReactNode) => React.ReactNode;
+
+/**
+ * Allows to specify a context mutating function into the serializer during a dynamic render
+ */
+export class MutatingFunctionArg {
+  public mutatingFunctionWrapper: TemplateArgFunctionalWrapperFn;
+  constructor(mutatingFunctionWrapper: TemplateArgFunctionalWrapperFn) {
+    this.mutatingFunctionWrapper = mutatingFunctionWrapper;
   }
 }

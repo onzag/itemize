@@ -32,6 +32,19 @@ export function unitSQL(arg: ISQLArgInfo) {
 }
 
 /**
+ * the selection function for unit based elements
+ * @param arg the arg
+ */
+export function unitSQLSelect(arg: ISQLArgInfo) {
+  return [
+    arg.prefix + arg.id + "_VALUE",
+    arg.prefix + arg.id + "_UNIT",
+    arg.prefix + arg.id + "_NORMALIZED_VALUE",
+    arg.prefix + arg.id + "_NORMALIZED_UNIT",
+  ];
+}
+
+/**
  * Specifies how units are to be sql in
  * @param arg the sql in arg info
  * @returns a partial row value
