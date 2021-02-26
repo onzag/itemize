@@ -9,7 +9,8 @@
 import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";
 import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "../..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
-import { IText } from "./text";
+import { STANDARD_PARAGRAPH } from "./paragraph";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the container in the given
@@ -67,6 +68,12 @@ export function registerContainer(registry: ISerializationRegistryType) {
       containment: "superblock",
       containerType,
       children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null),
+    }
+
+    if (!container.children.length) {
+      container.children = [
+        STANDARD_PARAGRAPH(),
+      ];
     }
 
     // return it

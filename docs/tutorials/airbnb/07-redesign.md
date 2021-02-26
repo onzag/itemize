@@ -919,11 +919,212 @@ This is what we can achieve with the rich text editor, you are free to make your
 
 ## Define the page view
 
-So far so good we have defined what the search page should look like, but it is nowhere to be displayed.
+So far so good we have defined what the search page should look like, but it is nowhere to be displayed, so what we need to do now is to define a page for it to be visible, we already have a `reserve/index.tsx` page that we would rather reuse, so let's add this code in there where we define a template rendering method for the template that we defined previously where real data would be used with real methods.
+
+```tsx
+/**
+ * These are our search arguments
+ */
+const searchArgs = {
+    limit: 50,
+    offset: 0,
+    requestedProperties: [
+        "address",
+        "title",
+        "unit_type",
+        "price",
+        "image",
+    ],
+    searchByProperties: [
+        "address",
+        "unit_type",
+        "planned_check_in",
+        "planned_check_out",
+        "price",
+    ],
+    traditional: true,
+    storeResultsInNavigation: "search-results",
+};
+
+/**
+ * This is the wrapper that will wrap the entire template mechanism
+ * all our template html will be under this
+ */
+const templateContextWrapper = (children: React.ReactNode) => {
+    return (
+        <ModuleProvider module="hosting">
+            <ItemProvider
+                itemDefinition="unit"
+                searchCounterpart={true}
+                properties={[
+                    "address",
+                    "unit_type",
+                    "planned_check_in",
+                    "planned_check_out",
+                    "price",
+                ]}
+                setters={[
+                    {
+                        id: "address",
+                        searchVariant: "radius",
+                        value: createUnitValue(50, "km", "km"),
+                    }
+                ]}
+
+                // we will automatically search when hitting this page
+                // but only the first time
+                automaticSearch={searchArgs}
+                automaticSearchIsOnlyInitial={true}
+                loadSearchFromNavigation="search-results"
+            >
+                {children}
+            </ItemProvider>
+        </ModuleProvider>
+    );
+}
+
+/**
+ * These are the template args for our search result, a single
+ * one, each one of them in the loop, yes they are all the same
+ * because they are contextual, so they don't need to be recalculated in the context
+ */
+const searchResultTemplateArgs = new TemplateArgs({
+    address: <View id="address" rendererArgs={{ hideMap: true }} />,
+    title: <View id="title" />,
+    unit_type: <View id="unit_type" />,
+    unit_price: <View id="price" />,
+    image: <View id="image" rendererArgs={{ imageClassName: "element-view", disableImageLinking: true }} />,
+
+    // this is an uncommon way to handle a function but also possible
+    // instead of passing a function we pass null and handle it ourselves as a link
+    // component
+    go_to_view_listing: new MutatingFunctionArg((children) => {
+        // we can even handle events differently if we fancy
+        // we are not even passing a function we just wrap the component
+        // in a link
+        return (
+            <Reader id="id">
+                {(id: string) => (
+                    <Link to={`/reserve/${id}`}>
+                        {children(null)}
+                    </Link>
+                )}
+            </Reader>
+        );
+    })
+});
+
+/**
+ * These are our root template args for the search where we define our entries
+ * that were specified by the designer and how they are assigned as html content
+ */
+const templateArgs = new TemplateArgs({
+    check_in_date_entry: <Entry id="planned_check_in" />,
+    check_out_date_entry: <Entry id="planned_check_out" />,
+    location_entry: <Entry id="address" searchVariant="location" rendererArgs={{ disableMapAndSearch: true }} />,
+    search_radius_entry: <Entry id="address" searchVariant="radius" />,
+    unit_type_entry: <Entry id="unit_type" searchVariant="search" />,
+    min_price_entry: <Entry id="price" searchVariant="from" />,
+    max_price_entry: <Entry id="price" searchVariant="to" />,
+    // this is our good old ui handler
+    button,
+
+    // and this is special this is the perform search function, now as you know
+    // we need to use the SearchActioner in order to trigger a search within a
+    // item context, so we create a mutating function arg where we can grab
+    // this context and pass the function to the children they will recognize that
+    // the function is about that
+    perform_search: new MutatingFunctionArg((children) => {
+        return (
+            <SearchActioner>
+                {(actioner) => {
+                    const fn = () => actioner.search(searchArgs);
+                    return children(fn);
+                }}
+            </SearchActioner>
+        );
+    }),
+
+    // now the search results are also dynamic and they vary and we retrieve
+    // them from our search loader, so they are mutating as well, this is a loopable
+    // element if you remember, but for what template args consists
+    // there's no dinstintion, you must simply return an array and call the children
+    // as many times as they are required with the new context that they are in
+    search_results: new MutatingTemplateArgs((children) => {
+        return (
+            <SearchLoader
+                currentPage={0}
+                pageSize={50}
+                cleanOnDismount={true}
+            >
+                {(loader) => {
+                    return loader.searchRecords.map((r) => (
+                        <ItemProvider {...r.providerProps}>
+                            {children(searchResultTemplateArgs)}
+                        </ItemProvider>
+                    ));
+                }}
+            </SearchLoader>
+        );
+    })
+}).wrappedBy(templateContextWrapper);
+
+export function ReserveHostingSearch() {
+    return (
+        <>
+            <I18nRead id="app_name" capitalize={true}>
+                {(i18nAppName: string) => {
+                    return (
+                        <TitleSetter>
+                            {i18nAppName}
+                        </TitleSetter>
+                    );
+                }}
+            </I18nRead>
+            <div className="trusted">
+                <ModuleProvider module="cms">
+                    <AppLanguageRetriever>
+                        {(languageData) => (
+                            <ItemProvider
+                                itemDefinition="fragment"
+                                forId="RESERVE_SEARCH"
+                                forVersion={languageData.currentLanguage.code}
+                                loadUnversionedFallback={true}
+                                longTermCaching={true}
+                                properties={
+                                    [
+                                        "content",
+                                        "attachments",
+                                    ]
+                                }
+                                static="NO_LISTENING"
+                            >
+                                <View id="content" rendererArgs={{ makeTemplate: true, templateArgs }} />
+                            </ItemProvider>
+                        )}
+                    </AppLanguageRetriever>
+                </ModuleProvider>
+            </div>
+        </>
+    );
+}
+```
+
+As you can notice we have a lot of `Mutating` in the args, because these args are not quite static and represent many contextual values and they need to be injected in the template, which is something most templating engines don't allow to do; and it can be rather tricky to understand how it goes, because but basically we are putting these contexts in between our rendering.
+
+Now if we go to the page we will have no issues whatsoever performing a search using this mechanism, it works:
+
+![Catbnb Reserve Search Works](./images/catbnb-reserve-search-works.png)
 
 ## Language Support
 
 We have so far done everything in english, yet we haven't specified a locale, this is because we have using the "fallback" locale each time off these fragments, they try to load a versioned item but don't find it, so they go to the fallback, however, we have a multilingual website, so let's now make the spanish version of our header, which can be completely different!... press `ctrl + A` and copy all the text in our header and change the language with the button at the top left.
+
+You might realize that we have also no english version of our header, but a "default" version which happens to be in english but it doesn't have to, it is not recommended that you use the default version here, the default version is meant to be a fallback when everything fails, and it is actually more expensive and slower to use the fallback version as itemize has to lookup first for the expected localized version, usually what you want to hand to the designer as a base filled with fallbacks in the language you speak that might not be the best so they can make the legitivate localized versions, granted our header took a lot of work, but that was only as a demonstration.
+
+Let's make now a spanish version of our header, just for testing, you need to choose the language in the cms, `ctrl + A` to copy it.
+
+![Fragment Language Picker](./images/fragment-language-picker.png)
 
 ## Fragment loader and the escape form
 

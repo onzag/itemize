@@ -11,6 +11,14 @@ import { IFile } from "./file";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
+export function STANDARD_PARAGRAPH(): IParagraph {
+  return {
+    type: "paragraph",
+    containment: "block",
+    children: [STANDARD_TEXT_NODE()],
+  };
+};
+
 /**
  * The function that registers and adds the paragraph element in the given
  * registry

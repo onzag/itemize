@@ -10,6 +10,7 @@
 import { deserializeElement, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IListItem } from "./list-item";
+import { STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the list element in the given
@@ -59,6 +60,18 @@ export function registerList(registry: ISerializationRegistryType) {
       listType: node.tagName === "OL" ? "numbered" : "bulleted",
       children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as IListItem[],
     }
+
+    if (!list.children.length) {
+      list.children = [
+        {
+          type: "list-item",
+          containment: "block",
+          children: [
+            STANDARD_TEXT_NODE(),
+          ],
+        },
+      ];
+    };
 
     // return such
     return list;
