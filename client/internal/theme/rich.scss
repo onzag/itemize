@@ -27,14 +27,16 @@ $superblock-highlight-color: #33691e;
     }
   }
 
-  .template {
-    border: solid 1px $template-item-color;
-    border-style: dashed;
+  .template:hover {
+    box-shadow: 0 0 0 1px $template-item-color;
 
     &.selected {
-      border: solid 1px $template-item-highlight-color;
-      border-style: dashed;
+      box-shadow: 0 0 0 1px $template-item-highlight-color;
     }
+  }
+
+  .container, .custom {
+    position: relative;
   }
 
   .ql-editor {

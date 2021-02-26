@@ -386,6 +386,7 @@ export const buttonToolbarPrescence: IToolbarPrescenseElement = {
             type: "contained",
             color: "primary",
         },
+        givenName: "button",
     },
     icon: <ExtensionIcon />,
 }
@@ -769,7 +770,7 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
             image: {
                 label: "Image Of Unit",
                 type: "html",
-                htmlDisplay: (<View id="image" />),
+                htmlDisplay: (<View id="image" rendererArgs={{imageClassName: "element-view"}}/>),
             }
         }
     }
@@ -889,7 +890,31 @@ This is what the refactor is like without including anything that was under the 
 
 This is extremely simple and easy to do, create a folder inside the `resources` folder in your root directory for your project at `resources/image` and create a file named `sample.jpg` after running `npm run build-data` your resource should have been processed and be accessible at `localhost:8000/rest/resource/image/sample.jpg`.
 
-With this now ready let's start hacking a reserve search page view, the plan is to make a box in the center, 
+Another thing you want to do is to create a file named `base.scss` to define the element named `element-view` that we just added for the html content information, remember that the designer is defining inner HTML by using the html fragments and has no real direct access to what is rendered inside there (unlike UI Handlers that allow full blown access), and an img tag inside there cannot really be handled so our `base.scss` should define it as:
+
+```scss
+.element-view {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    min-height: 1rem;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+}
+```
+
+And now import that file as `import ./base.scss` in your `client/index.tsx` file, this will allow the parent container that defines the inner html to define the shape of the image without this losing dimensions.
+
+With this now ready let's start hacking a reserve search page view, the plan is to make a box in the center, and use a loop to display the elements that we have defined, create a button with the action that performs the search.
+
+![Long Design](./images/long-design.png)
+
+This is what we can achieve with the rich text editor, you are free to make your own design, and save it.
+
+## Define the page view
+
+So far so good we have defined what the search page should look like, but it is nowhere to be displayed.
 
 ## Language Support
 
