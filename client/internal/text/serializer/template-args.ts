@@ -114,7 +114,7 @@ export class MutatingTemplateArgs {
   }
 }
 
-export type TemplateArgFunctionalWrapperFn = (children: (fn: Function) => React.ReactNode) => React.ReactNode;
+export type TemplateArgFunctionalWrapperFn = (children: (fn: Function) => React.ReactNode, fnKey: string) => React.ReactNode;
 
 /**
  * Allows to specify a context mutating function into the serializer during a dynamic render

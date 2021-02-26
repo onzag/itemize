@@ -197,7 +197,7 @@ export function recurseAndConsumeMutatingActions(
 
     // and we can keep going
     return recurseAndConsumeMutatingActions(newBasicActions, newMutatingActions, children);
-  });
+  }, keyToPick);
 }
 
 /**
