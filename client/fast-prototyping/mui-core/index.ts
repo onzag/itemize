@@ -142,6 +142,7 @@ import IconVisibility from "@material-ui/icons/Visibility";
 import GpsFixedIcon from '@material-ui/icons/GpsFixed';
 import EditIcon from '@material-ui/icons/Edit';
 import CropSquareIcon from '@material-ui/icons/CropSquare';
+import SaveIcon from '@material-ui/icons/Save';
 
 export {
   Grid,
@@ -281,4 +282,5 @@ export {
   SettingsIcon,
   TextFieldsIcon,
   ExtensionIcon,
+  SaveIcon,
 }

@@ -247,7 +247,14 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         hideDrawer={
           this.props.args.hideDrawer
         }
+        disjointedMode={
+          this.props.args.disjointedMode
+        }
       />
+
+    if (this.props.args.disjointedMode) {
+      return editor;
+    }
 
     // we return the component, note how we set the thing to focused
     return (

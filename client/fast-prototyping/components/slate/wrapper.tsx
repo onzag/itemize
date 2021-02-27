@@ -16,7 +16,7 @@ import {
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
   FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
   FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
-  TextFieldsIcon, CodeIcon, Badge,
+  TextFieldsIcon, CodeIcon, Badge, Theme,
 } from "../../mui-core";
 import { Path, Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -25,11 +25,12 @@ import { FileLoadErrorDialog } from "./dialogs/file";
 import { LinkDialog } from "./dialogs/link";
 import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
+import ReactDOM from "react-dom";
 
 /**
  * Defining a bunch of styles for the wrapper
  */
-const style = createStyles({
+const style = (theme: Theme) => createStyles({
   selectionInput: {
     width: "100%",
   },
@@ -111,14 +112,32 @@ const style = createStyles({
     overflow: "hidden",
     position: "relative",
     flex: "none",
+    display: "flex",
+    flexDirection: "column",
+  },
+  editorDrawerAppbarSpacer: theme.mixins.toolbar,
+  editorDrawerFixed: {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 0,
+    zIndex: 1,
+    transition: "width 0.5s ease-in-out",
+    "&.open": {
+      width: "300px",
+    },
+    overflow: "hidden",
+    position: "fixed",
+    flex: "none",
+    display: "flex",
+    flexDirection: "column",
   },
   editorDrawerNoAnimate: {
     transition: "none",
   },
   editorDrawerBody: {
+    flex: "1 1 auto",
     width: "300px",
-    height: "100%",
-    position: "absolute",
     top: 0,
     left: 0,
     borderLeft: "1px solid rgba(0, 0, 0, 0.12)",
@@ -181,6 +200,8 @@ const style = createStyles({
   },
   appbar: {
     zIndex: 1,
+  },
+  appbarFixed: {
   },
   moreOptionsSpacer: {
     flex: "1 1 auto",
@@ -458,8 +479,16 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
 
   // now we can create the component itself
   // there is not much to say on how this all works
-  return (
-    <AppBar position="relative" variant="outlined" color="default" className={props.classes.appbar} data-unblur="true">
+  const toReturn = (
+    <AppBar
+      position={props.disjointedMode ? "fixed" : "relative"}
+      variant="outlined"
+      color="default"
+      className={
+        props.disjointedMode ? props.classes.appbarFixed : props.classes.appbar
+      }
+      data-unblur="true"
+    >
       <Toolbar className={props.classes.toolbar}>
         <IconButton
           tabIndex={-1}
@@ -659,6 +688,14 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
       </Toolbar>
     </AppBar>
   );
+
+  if (props.disjointedMode && isReady) {
+    return ReactDOM.createPortal(toReturn, document.body);
+  } else if (props.disjointedMode) {
+    return null;
+  } else {
+    return toReturn;
+  }
 }
 
 /**
@@ -1287,39 +1324,50 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     ) : null;
 
+    const toolbar = (
+      <RichTextEditorToolbar
+        {...this.props}
+        requestImage={this.requestImage}
+        requestFile={this.requestFile}
+        requestVideo={this.requestVideo}
+        shouldHaveDrawer={this.shouldHaveDrawer}
+        drawerOpen={this.state.drawerOpen}
+        toggleDrawer={this.toggleDrawer}
+        requestLink={this.requestLink}
+        insertContainer={this.insertContainer}
+        requestTemplateText={this.requestTemplateText}
+        requestTemplateHTML={this.requestTemplateHTML}
+      />
+    );
+
+    if (this.props.disjointedMode) {
+      return (
+        <>
+          {toolbar}
+          <div className="rich-text">
+            {this.props.children}
+          </div>
+          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} />
+          {fileLoadErrorDialog}
+          {videoDialog}
+          {linkDialog}
+          {templateTextDialog}
+          {templateHTMLDialog}
+          {imageInput}
+          {fileInput}
+        </>
+      );
+    }
+
     // now we build the rich text editor itself
     return (
       <>
-        <RichTextEditorToolbar
-          {...this.props}
-          requestImage={this.requestImage}
-          requestFile={this.requestFile}
-          requestVideo={this.requestVideo}
-          shouldHaveDrawer={this.shouldHaveDrawer}
-          drawerOpen={this.state.drawerOpen}
-          toggleDrawer={this.toggleDrawer}
-          requestLink={this.requestLink}
-          insertContainer={this.insertContainer}
-          requestTemplateText={this.requestTemplateText}
-          requestTemplateHTML={this.requestTemplateHTML}
-        />
+        {toolbar}
         <div className={this.props.classes.editorContainer}>
           <div className={"rich-text " + this.props.classes.editor + (this.props.state.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
-          <div
-            data-unblur="true"
-            onClick={this.props.helpers.softBlur}
-            className={
-              this.props.classes.editorDrawer +
-              (this.state.drawerOpen ? " open" : "") +
-              (this.state.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
-            }
-          >
-            <div className={this.props.classes.editorDrawerBody}>
-              {this.state.drawerOpen ? <WrapperDrawer {...this.props} /> : null}
-            </div>
-          </div>
+          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} />
         </div>
         {fileLoadErrorDialog}
         {videoDialog}
@@ -1330,6 +1378,45 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         {fileInput}
       </>
     );
+  }
+}
+
+interface WrapperContainerProps extends MaterialUISlateWrapperWithStyles {
+  drawerOpen: boolean;
+  noAnimate: boolean;
+}
+
+function WrapperContainer(props: WrapperContainerProps) {
+  const [isReady, makeReady] = useState(false);
+  useEffect(() => {
+    makeReady(true);
+  }, []);
+
+  const toReturn = (
+    <div
+      data-unblur="true"
+      onClick={props.helpers.softBlur}
+      className={
+        (props.disjointedMode ? props.classes.editorDrawerFixed : props.classes.editorDrawer) +
+        (props.drawerOpen ? " open" : "") +
+        (props.noAnimate ? " " + props.classes.editorDrawerNoAnimate : "")
+      }
+    >
+      {props.disjointedMode ? <div className={props.classes.editorDrawerAppbarSpacer}/> : null}
+      <div className={props.classes.editorDrawerBody}>
+        {props.drawerOpen ? <WrapperDrawer {...props} /> : null}
+      </div>
+    </div>
+  );
+
+  if (props.disjointedMode) {
+    if (isReady) {
+      return ReactDOM.createPortal(toReturn, document.body);
+    } else {
+      return null;
+    }
+  } else {
+    return toReturn;
   }
 }
 

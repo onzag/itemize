@@ -1071,6 +1071,10 @@ export interface ISlateEditorWrapperBaseProps {
    * Whether to hide the drawer
    */
   hideDrawer?: boolean;
+  /**
+   * The disjointed mode
+   */
+  disjointedMode?: boolean;
 }
 
 /**
@@ -1208,6 +1212,12 @@ interface ISlateEditorProps {
    * Whether to hide the drawer
    */
   hideDrawer?: boolean;
+  /**
+   * A mode where the drawer and the toolbar are separated and fixed
+   * from the rich text output, which allows to be more like a WYSIWYG editor
+   * with responsive screen functionality and such
+   */
+  disjointedMode?: boolean;
   /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
@@ -2857,6 +2867,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.drawerUIHandlerExtras !== this.props.drawerUIHandlerExtras ||
       nextProps.toolbarExtras !== this.props.toolbarExtras ||
       nextProps.hideDrawer !== this.props.hideDrawer ||
+      nextProps.disjointedMode !== this.props.disjointedMode ||
       !equals(this.state.allContainers, nextState.allContainers) ||
       !equals(this.state.allCustom, nextState.allCustom) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses) ||
@@ -2924,9 +2935,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we are going to wait a little bit more
       this.updateTimeout = setTimeout(() => {
         // to tell it that it should sync
-        this.setState({
-          synced: true,
-        });
+        if (!this.isUnmounted) {
+          this.setState({
+            synced: true,
+          });
+        }
       }, 30);
     }, 300);
   }
@@ -3104,14 +3117,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if (typeof toDisplay === "string") {
           customProps.children = (
             <>
-              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} />
+              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} style={{display: "contents"}}/>
               {children}
             </>
           );
         } else {
           customProps.children = (
             <>
-              <div contentEditable={false}>
+              <div contentEditable={false} style={{display: "contents"}}>
                 {toDisplay}
               </div>
               {children}
@@ -5010,6 +5023,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           toolbarExtras={this.props.toolbarExtras}
           drawerUIHandlerExtras={this.props.drawerUIHandlerExtras}
           hideDrawer={this.props.hideDrawer}
+          disjointedMode={this.props.disjointedMode}
         >
           {children}
         </Wrapper>

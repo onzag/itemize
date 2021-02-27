@@ -47,7 +47,13 @@ $superblock-highlight-color: #33691e;
     text-align: justify;
   }
 
-  p:empty::before {
+  p:empty::before,
+  h1:empty::before,
+  h2:empty::before,
+  h3:empty::before,
+  h4:empty::before,
+  h5:empty::before,
+  h6:empty::before {
     content: '\00a0';
   }
 

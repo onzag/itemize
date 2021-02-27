@@ -1126,6 +1126,20 @@ Let's make now a spanish version of our header, just for testing, you need to ch
 
 ![Fragment Language Picker](./images/fragment-language-picker.png)
 
+After doing that and copying and pasting our old header we can then modify it as such:
+
+![Catbnb Header Spanish](./images/catbnb-header-spanish.png)
+
+And then save such, note however how the fields inside the header remain being in english, that's because those fields are linked to the language the application is currently set to view, and that's english.
+
+![Catbnb Footer Localization](./images/catbnb-footer-localization.png)
+
+Once we switch that language it should indeed display the correct info in the right language, do that and you will notice how the fields switch to spanish, without affecting the template; now go to the header in spanish at `http://localhost:8000/es/` which will not redirect you if you had changed the language to spanish.
+
+![Catbnb Frontpage Spanish](./images/catbnb-frontpage-spanish.png)
+
+And as you can see it looks as we expect it to look like, note that we are not constrained to just changing the text, we can change anything we want regarding that template, it can look completely different, you could change the background image, the orientation of the fields, etc... but for the purpose of this tutorial we can just keep it simple.
+
 ## Fragment loader and the escape form
 
-You still are not happy how things are done, the CMS seems clunky to access things over there, well you can use
+You still are not happy how things are done, the CMS seems clunky to access things over there, well you can use a fast prototyping element that is the fragment loader, such component exists mainly for utility and it is a very simple mechanism that you could implement yourself.

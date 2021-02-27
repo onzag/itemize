@@ -189,6 +189,14 @@ export function registerImage(registry: ISerializationRegistryType) {
         // from the new property
         delete newCustomProps.children;
 
+        if (newCustomProps.style && !newCustomProps.style.display) {
+          newCustomProps.style.display = "contents";
+        } else if (!newCustomProps.style) {
+          newCustomProps.style = {
+            display: "contents",
+          };
+        }
+
         // and instead wrap everything into a div
         // that will take these custom properties
         // and put the children at the bottom
