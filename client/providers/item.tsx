@@ -23,7 +23,7 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import CacheWorkerInstance from "../internal/workers/cache";
 import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
-import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride, IPropertyOverride } from "../internal/gql-client-util";
+import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride, IPropertyOverride, reprocessFileArgumentForAdd } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
@@ -256,7 +256,7 @@ export interface IActionCleanOptions {
 export interface IActionSubmitOptions extends IActionCleanOptions {
   properties: string[];
   differingOnly?: boolean;
-  includes?: {[include: string]: string[]};
+  includes?: { [include: string]: string[] };
   policies?: PolicyPathType[];
   beforeSubmit?: () => boolean | Promise<boolean>;
   parentedBy?: {
@@ -290,14 +290,14 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   /**
    * The requested includes (EXPERIMENTAL)
    */
-  requestedIncludes?: {[include: string]: string[]};
+  requestedIncludes?: { [include: string]: string[] };
   /**
    * The properties to be used to search with
    * you have access to three other special properties
    * that only exist within search mode "search", "created_by" and "since"
    */
   searchByProperties: string[];
-  searchByIncludes?: {[include: string]: string[]};
+  searchByIncludes?: { [include: string]: string[] };
   orderBy?: IOrderByRuleType;
   /**
    * By whom it was created, note that this option takes priority
@@ -325,7 +325,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
 
 export interface IPokeElementsType {
   properties: string[];
-  includes: {[include: string]: string[]};
+  includes: { [include: string]: string[] };
   policies: PolicyPathType[];
 }
 
@@ -399,7 +399,7 @@ export interface IItemContextType {
   // to the search function
   searchFields: any;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: {[include: string]: string[]};
+  searchRequestedIncludes: { [include: string]: string[] };
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -596,7 +596,7 @@ export interface IItemProviderProps {
   /**
    * only includes the items specified in the list in the state
    */
-  includes?: {[include: string]: string[]};
+  includes?: { [include: string]: string[] };
   /**
    * excludes the policies from being part of the state
    */
@@ -701,7 +701,7 @@ interface IActualItemProviderSearchState {
   searchParent: [string, string, string];
   searchShouldCache: boolean;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: {[include: string]: string[]};
+  searchRequestedIncludes: { [include: string]: string[] };
   searchFields: any;
 };
 
@@ -1988,7 +1988,7 @@ export class ActualItemProvider extends
     // so once everything has been completed this function actually runs per instance
     if (value.error) {
       // if we got an error we basically have no value
-      this.setState({
+      !this.isUnmounted && this.setState({
         // set the load error and all the logical states, we are not loading
         // anymore
         loadError: value.error,
@@ -2001,7 +2001,7 @@ export class ActualItemProvider extends
       // otherwise if there's no value, it means the item is not found
     } else if (!value.value) {
       // we mark it as so, it is not found
-      this.setState({
+      !this.isUnmounted && this.setState({
         loadError: null,
         notFound: true,
         isBlocked: false,
@@ -2011,7 +2011,7 @@ export class ActualItemProvider extends
       });
     } else if (value.value) {
       // otherwise if we have a value, we check all these options
-      this.setState({
+      !this.isUnmounted && this.setState({
         loadError: null,
         notFound: false,
         isBlocked: !!value.value.blocked_at,
@@ -2243,7 +2243,7 @@ export class ActualItemProvider extends
   public checkItemStateValidity(
     options: {
       properties: string[],
-      includes?: {[include: string]: string[]},
+      includes?: { [include: string]: string[] },
       policies?: PolicyPathType[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
     },
@@ -2361,7 +2361,7 @@ export class ActualItemProvider extends
     if (isDevelopment) {
       console.warn(
         "Action refused due to invalid partial/total state at",
-        this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null,  this.props.forVersion || null),
+        this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null),
       );
     }
 
@@ -2735,6 +2735,7 @@ export class ActualItemProvider extends
     const {
       requestFields,
       argumentsForQuery,
+      argumentsFoundFilePaths,
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
@@ -2780,45 +2781,29 @@ export class ActualItemProvider extends
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
-    if (options.action ? options.action === "edit" : (submitForId && !this.state.notFound)) {
-      if (!this.state.notFound) {
-        const totalValues = await runEditQueryFor({
-          args: argumentsForQuery,
-          fields: requestFields,
-          itemDefinition: this.props.itemDefinitionInstance,
-          token: this.props.tokenData.token,
-          language: this.props.localeData.language,
-          id: submitForId || null,
-          version: submitForVersion || null,
-          listenerUUID: this.props.remoteListener.getUUID(),
-          cacheStore: this.props.longTermCaching,
-          waitAndMerge: options.waitAndMerge,
-        });
 
-        value = totalValues.value;
-        error = totalValues.error;
-        getQueryFields = totalValues.getQueryFields;
-      } else {
-        if (!this.isUnmounted) {
-          this.setState({
-            submitError: {
-              message: "Edit refused due to item not found",
-              code: "NOT_FOUND",
-            },
-            submitting: false,
-            submitted: false,
-          });
-        }
-        return {
-          id: null,
-          version: null,
-          error: {
-            message: "Edit refused due to item not found",
-            code: "NOT_FOUND",
-          },
-        };
-      }
+    // if we are in edit as we have specified an action that is meant to be edit
+    // or if we have a submit for id that is also our current item id and it is indeed found which means that we are sure
+    // there's a value for it and it is loaded so we can be guaranteed this is meant to be an edit
+    if (options.action ? options.action === "edit" : (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)) {
+      const totalValues = await runEditQueryFor({
+        args: argumentsForQuery,
+        fields: requestFields,
+        itemDefinition: this.props.itemDefinitionInstance,
+        token: this.props.tokenData.token,
+        language: this.props.localeData.language,
+        id: submitForId || null,
+        version: submitForVersion || null,
+        listenerUUID: this.props.remoteListener.getUUID(),
+        cacheStore: this.props.longTermCaching,
+        waitAndMerge: options.waitAndMerge,
+      });
+
+      value = totalValues.value;
+      error = totalValues.error;
+      getQueryFields = totalValues.getQueryFields;
     } else {
+      // otherwise it is an add query
       let containerId: string
       Object.keys(this.props.config.containersRegionMappers).forEach((mapper) => {
         if (mapper.split(";").includes(this.props.localeData.country)) {
@@ -2828,6 +2813,56 @@ export class ActualItemProvider extends
       if (!containerId) {
         containerId = this.props.config.containersRegionMappers["*"];
       }
+
+      // if we are submitting to add to a different element to our own
+      // basically copying what we have in this item definition into
+      // another of another kind, either new with undefined id or
+      // a different version, we need to ensure all the files
+      // are going to be there nicely and copied
+      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        this.props.forId || null,
+        this.props.forVersion || null,
+      );
+      const originalContainerIdOfContent = appliedValue.rawValue.container_id as string;
+
+      // so if we have an applied value we have stored content about
+      if (originalContainerIdOfContent) {
+        // now we can start refetching all those values to get them
+        // back as files
+        await Promise.all(
+          // so we map in those file paths we found
+          argumentsFoundFilePaths.map(async (path: [string, string] | [string]) => {
+            // these are for the ones with includes
+            if (path.length === 2) {
+              // we get the include
+              const include = this.props.itemDefinitionInstance.getIncludeFor(path[0].replace(INCLUDE_PREFIX, ""));
+              // and reprocess the value
+              argumentsForQuery[path[0]][path[1]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]][path[1]], {
+                config: this.props.config,
+                containerId: originalContainerIdOfContent,
+                forId: this.props.forId || null,
+                forVersion: this.props.forVersion || null,
+                include,
+                itemDefinition: this.props.itemDefinitionInstance,
+                property: include.getSinkingPropertyFor(path[1]),
+              });
+            } else {
+              // and for standard raw properties
+              argumentsForQuery[path[0]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]], {
+                config: this.props.config,
+                containerId: originalContainerIdOfContent,
+                forId: this.props.forId || null,
+                forVersion: this.props.forVersion || null,
+                include: null,
+                itemDefinition: this.props.itemDefinitionInstance,
+                property: this.props.itemDefinitionInstance.getPropertyDefinitionFor(path[0], true),
+              });
+            }
+          })
+        );
+      }
+
+      // now we can call the add query after all the files have been processed
       const totalValues = await runAddQueryFor({
         args: argumentsForQuery,
         fields: requestFields,
@@ -2883,9 +2918,9 @@ export class ActualItemProvider extends
       if (!triggeredAnUpdate) {
         this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
 
-      // clean will props may have triggered the change listeners, but if there's a difference
-      // between what we have cleaned and applied we want to trigger these listeners again for the
-      // received value
+        // clean will props may have triggered the change listeners, but if there's a difference
+        // between what we have cleaned and applied we want to trigger these listeners again for the
+        // received value
       } else if (this.props.forId !== recievedId && (this.props.forVersion || null) !== (receivedVersion || null)) {
         this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
       }
@@ -2906,6 +2941,10 @@ export class ActualItemProvider extends
    * @returns the search id that it managed to collect
    */
   public loadSearch(): string {
+    if (this.isUnmounted) {
+      return;
+    }
+
     const searchId = (
       this.props.location.state &&
       this.props.location.state[this.props.loadSearchFromNavigation] &&
@@ -3135,7 +3174,7 @@ export class ActualItemProvider extends
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
       createdBy: options.createdBy || null,
-      since: options.since || null,
+      since: options.since || null,
       orderBy: options.orderBy || {
         created_at: {
           priority: 0,

@@ -13,6 +13,8 @@ import UserDataRetriever from "../../components/user/UserDataRetriever";
 import SubmitActioner from "../../components/item/SubmitActioner";
 import Snackbar from "../components/snackbar";
 import ReactDOM from "react-dom";
+import IdVersionRetriever from "../../components/item/IdVersionRetriever";
+import { IActionSubmitOptions } from "../../providers/item";
 
 /**
  * The item definition loader styles
@@ -44,10 +46,11 @@ const fragmentLoaderStyles = createStyles({
  */
 interface FragmentLoaderProps extends WithStyles<typeof fragmentLoaderStyles> {
   roles: string[];
+  version: string;
   fullWidth?: boolean;
-  fragmentVersion?: string;
   fragmentPropertyId?: string;
   fragmentAttachmentPropertyId?: string;
+  onBeforeSubmit?: (action: "add" | "edit", options: IActionSubmitOptions) => IActionSubmitOptions;
   viewRendererArgs?: any;
   entryRendererArgs?: any;
   buttonPosition?: "topRight" | "bottomRight" | "topLeft" | "bottomLeft",
@@ -79,36 +82,56 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
   } else {
     buttonsToUse = ReactDOM.createPortal(
       <div className={props.classes.buttonApproveRejectGroup}>
-        <SubmitActioner>
-          {(actioner) => {
-            const submitAction = async () => {
-              const effect = await actioner.submit({
-                properties: [
-                  props.fragmentPropertyId || "content",
-                  props.fragmentAttachmentPropertyId || "attachments",
-                ],
-              });
+        <IdVersionRetriever>
+          {(idVersion) => (
+            <SubmitActioner>
+              {(actioner) => {
+                const submitAction = async () => {
+                  // this means that it loaded an unversioned fallback so we need to add
+                  // otherwise edit
+                  const action = !idVersion.version ? "add" : "edit";
 
-              if (!effect.error) {
-                setEditMode(false);
-              }
-            }
-            return (
-              <>
-                <IconButton onClick={submitAction} color="primary">
-                  <SaveIcon />
-                </IconButton>
-                <Snackbar
-                  id="fragment-edit-error"
-                  severity="error"
-                  i18nDisplay={actioner.submitError}
-                  open={!!actioner.submitError}
-                  onClose={actioner.dismissError}
-                />
-              </>
-            );
-          }}
-        </SubmitActioner>
+                  let options: IActionSubmitOptions = {
+                    action,
+                    properties: [
+                      props.fragmentPropertyId || "content",
+                      props.fragmentAttachmentPropertyId || "attachments",
+                    ],
+                    submitForId: idVersion.id,
+                    submitForVersion: props.version,
+                  };
+
+                  if (props.onBeforeSubmit) {
+                    const newOptions = props.onBeforeSubmit(action, options);
+                    if (newOptions) {
+                      options = newOptions;
+                    }
+                  }
+
+                  const effect = await actioner.submit(options);
+
+                  if (!effect.error) {
+                    setEditMode(false);
+                  }
+                }
+                return (
+                  <>
+                    <IconButton onClick={submitAction} color="primary">
+                      <SaveIcon />
+                    </IconButton>
+                    <Snackbar
+                      id="fragment-edit-error"
+                      severity="error"
+                      i18nDisplay={actioner.submitError}
+                      open={!!actioner.submitError}
+                      onClose={actioner.dismissError}
+                    />
+                  </>
+                );
+              }}
+            </SubmitActioner>
+          )}
+        </IdVersionRetriever>
         <IconButton onClick={setEditMode.bind(null, false)} color="secondary">
           <CloseIcon />
         </IconButton>

@@ -24,13 +24,16 @@ import {
   UNSPECIFIED_OWNER,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
-import { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
+import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { fileURLAbsoluter } from "../../util";
+import { IConfigRawJSONDataType } from "../../config";
+import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 export interface IPropertyOverride {
   id: string;
@@ -90,6 +93,10 @@ export function getFieldsAndArgs(
   let requestFields: any = {
     DATA: {},
   };
+
+  // paths for the found file fileds during the action in the arguments
+  // that are to be passed
+  let argumentsFoundFilePaths: any = [];
 
   // the reason for this some of these values are meant to be applied, when a value is applied
   // in an item definition it will erase anything in it, as merging won't work when timestamps,
@@ -168,9 +175,10 @@ export function getFieldsAndArgs(
         const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
         const currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id === pId);
         const currentValue = currentOverride ? currentOverride.value : pd.getCurrentValue(options.forId || null, options.forVersion || null);
+        const pdDescr = pd.getPropertyDefinitionDescription();
         if (options.differingPropertiesOnlyForArgs) {
           const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
-          const isEqual = pd.getPropertyDefinitionDescription().localEqual({
+          const isEqual = pdDescr.localEqual({
             itemDefinition: options.itemDefinitionInstance,
             property: pd,
             include: null,
@@ -184,6 +192,10 @@ export function getFieldsAndArgs(
           }
         }
         argumentsForQuery[pd.getId()] = currentValue;
+
+        if (pdDescr.gqlAddFileToFields) {
+          argumentsFoundFilePaths.push([pd.getId()]);
+        }
       });
     }
     if (options.includesForArgs) {
@@ -230,9 +242,10 @@ export function getFieldsAndArgs(
           const currentPropertyOverride = currentOverride && currentOverride.overrides && currentOverride.overrides.find((o) => o.id === sp.getId());
           const currentValue = currentPropertyOverride ? currentPropertyOverride.value : sp.getCurrentValue(
             options.forId || null, options.forVersion || null);
+          const spDescr = sp.getPropertyDefinitionDescription();
           if (options.differingIncludesOnlyForArgs) {
             const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
-            const isEqual = sp.getPropertyDefinitionDescription().localEqual({
+            const isEqual = spDescr.localEqual({
               itemDefinition: options.itemDefinitionInstance,
               property: sp,
               include,
@@ -245,7 +258,12 @@ export function getFieldsAndArgs(
               return;
             }
           }
+
           argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
+
+          if (spDescr.gqlAddFileToFields) {
+            argumentsFoundFilePaths.push([qualifiedId, sp.getId()]);
+          }
         });
 
         if (Object.keys(argumentsForQuery[qualifiedId]).length === 0) {
@@ -264,7 +282,74 @@ export function getFieldsAndArgs(
 
   options.itemDefinitionInstance.getPropertiesForPolicy
 
-  return { requestFields, argumentsForQuery };
+  return { requestFields, argumentsForQuery, argumentsFoundFilePaths };
+}
+
+/**
+ * When creating a brand new item using the add action but somehow
+ * we are using files and values from another item and submitting that
+ * into the new ones, the new files will not have a source because they belong
+ * to the old file, this will allow us to ensure that everything has a source
+ * regarding these files
+ * 
+ * @param files the file in question either an array or a file itself
+ * @param options options for restoring the source
+ */
+export async function reprocessFileArgumentForAdd(
+  files: IGQLFile | IGQLFile[],
+  options: {
+    config: IConfigRawJSONDataType;
+    itemDefinition: ItemDefinition;
+    include: Include;
+    property: PropertyDefinition;
+    forId: string;
+    forVersion: string;
+    containerId: string;
+  }
+): Promise<IGQLFile | IGQLFile[]> {
+  // for array we recurse as an array
+  if (Array.isArray(files)) {
+    return await Promise.all((files as any).map((f: any) => reprocessFileArgumentForAdd(f, options)));
+  }
+
+  // if we have a source, it's good as it is
+  if (files.src) {
+    return files;
+  }
+
+  // otherwise we have to recover such a source
+  const domain = process.env.NODE_ENV === "production" ? options.config.productionHostname : options.config.developmentHostname;
+  const absolutedFile = fileURLAbsoluter(
+    domain,
+    options.config.containersHostnamePrefixes,
+    files,
+    options.itemDefinition,
+    options.forId,
+    options.forVersion,
+    options.containerId,
+    options.include,
+    options.property,
+    false,
+  );
+
+  // and for that we get the absolute url of the file
+  const url = absolutedFile.url;
+
+  // and fetch it
+  const fileData = await fetch(url);
+  const blob = await fileData.blob();
+
+  // we are going to use a trick, we could use the File constructor
+  // but there were a lot of complains regarding the constructor on stackoverflow
+  // while as a matter of fact the src allows for blobs so
+  (blob as any).name = files.name;
+
+  // now we have returned the source of the file
+  // so it is ready to be added
+  return {
+    ...files,
+    src: blob,
+  };
 }
 
 /**
