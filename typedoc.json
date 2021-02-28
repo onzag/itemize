@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["./base/Root/index.ts"],
+  "out": "docs/api"
+}

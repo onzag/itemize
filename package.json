@@ -8,7 +8,8 @@
   "main": "index",
   "types": "nodejs/index",
   "scripts": {
-    "install": "tsc && node ./sass-json-handler.js"
+    "install": "tsc && node ./sass-json-handler.js",
+    "docs": "typedoc --plugin typedoc-plugin-markdown"
   },
   "author": "Onza Systems - Edward Gonzalez",
   "license": "AGPL3",
@@ -115,6 +116,8 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "typedoc": "^0.20.28",
+    "typedoc-plugin-markdown": "^3.6.0"
   }
 }
