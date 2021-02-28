@@ -60,9 +60,51 @@ And none of this caching will affect the realtime nature of itemize, as the appl
 
 However we have just cached a single element with a specific id, what about searches, searches are a bit more complicated to cache and honestly only recommended when you really need it, in order to cache searches you need to specify a cache policy at the time you perform a search, currently there are three, `none` which is the default, `by-parent` and `by-owner`.
 
-A `by-parent` cache search policy will cache a search by the parent item, it will download all the items that have a specific parent, and you really need to have access to them, it will put them into indexeddb and it will search from there, as you might imagine caching searches isn't meant for very large lists.
+A `by-parent` cache search policy will cache a search by the parent item, it will download all the items that have a specific parent, and we really need to have access to them, it will put them into indexeddb and it will search from there, as you might imagine caching searches isn't meant for very large lists.
 
 A `by-owner` cache search policy will cache a search by the user that owns such items, doing the same mechanism as by parent.
+
+In the case of our list of units, we want to use a by owner because we are the owner of the items, the list of our units is in a different page from our current at the `UnitList` component, our automatic search should now have a `cachePolicy: "by-owner"` in it.
+
+Now again using `npm run build` and expecting our application to complain we refresh, and go to `http://localhost:8000/en/hosting/` to see our unit list.
+
+It all seems to work the same way, but it's anything but that, searches are now done against the cache, rather than against postgreSQL in the server side, and postgreSQL is more powerful on what it can do, so in the client side some functionality might behave differently right now, it is a trade off.
+
+If you check your application cache, your search should be now on the cache.
+
+![IndexedDB Cache Search](./images/indexeddb-cache-search.png)
+
+Caching a search is heavy work as all the possible results must be cached as well, now one good thing about caching searches is that only the results remain having to keep themselves updated, which means that once they donwnload incremental updates and patches get sent by the server side rather than having to download all over.
+
+So now if we do indeed kill the server and refresh without the server on, we get the same issue as before with the images, and we need to apply the same solution.
+
+![Catbnb Cached Search](./images/catbnb-cached-search.png)
+
+```tsx
+<View
+    id="image"
+    rendererArgs={
+        {
+            // we do not want to link images with with <a> tags like
+            // the active renderer does by default
+            disableImageLinking: true,
+            // we want the image size to load by 30 viewport width
+            // this is used to choose what image resolution to load
+            // so they load faster, we want tiny images
+            imageSizes: "30vw",
+            imageClassName: props.classes.image,
+        }
+    }
+    // we turn on cache files
+    cacheFiles={true}
+/>
+```
+
+However same as before we want to ensure that this data is destroyed when we log out, we don't want a malicious agent accessing this data from the cache after the user logged out, the search parameters also allow for such mechanism.
+
+So we add `markForDestructionOnLogout: true` to where we just added our cache policy.
+
+We will see a similar effect now at `localStorage.SEARCH_DESTRUCTION_MARKERS` 
 
 ## Some considerations
 

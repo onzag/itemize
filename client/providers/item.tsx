@@ -13,6 +13,8 @@ import {
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
   INCLUDE_PREFIX,
+  MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION,
+  SEARCH_DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -319,6 +321,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   };
   cachePolicy?: "by-owner" | "by-parent" | "none";
   listenPolicy?: "by-owner" | "by-parent" | "none";
+  markForDestructionOnLogout?: boolean;
   traditional?: boolean;
   limit: number;
   offset: number;
@@ -1083,6 +1086,30 @@ export class ActualItemProvider extends
       if (changed) {
         localStorage.setItem(DESTRUCTION_MARKERS_LOCATION, JSON.stringify((window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION]));
       }
+    }
+  }
+  public markSearchForDestruction(type: "by-parent" | "by-owner", qualifiedName: string, arg: string | [string, string, string]) {
+    (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] =
+      (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] ||
+      JSON.parse(localStorage.getItem(SEARCH_DESTRUCTION_MARKERS_LOCATION) || "{}");
+    let changed = false;
+    if (!(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]) {
+      (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName] = [
+        [type, arg],
+      ];
+      changed = true;
+    } else {
+      if (
+        !(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
+        .find((m: [string, string | [string, string, string]]) => m[0] === type && equals(m[1], arg))
+      ) {
+        changed = true;
+        (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([type, arg]);
+      }
+    }
+
+    if (changed) {
+      localStorage.setItem(SEARCH_DESTRUCTION_MARKERS_LOCATION, JSON.stringify((window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION]));
     }
   }
   public installSetters(props: IActualItemProviderProps = this.props) {
@@ -2843,7 +2870,7 @@ export class ActualItemProvider extends
               argumentsForQuery[path[0]][path[1]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]][path[1]], {
                 config: this.props.config,
                 containerId: originalContainerIdOfContent,
-                forId: this.props.forId || null,
+                forId: this.props.forId || null,
                 forVersion: this.props.forVersion || null,
                 include,
                 itemDefinition: this.props.itemDefinitionInstance,
@@ -2854,7 +2881,7 @@ export class ActualItemProvider extends
               argumentsForQuery[path[0]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]], {
                 config: this.props.config,
                 containerId: originalContainerIdOfContent,
-                forId: this.props.forId || null,
+                forId: this.props.forId || null,
                 forVersion: this.props.forVersion || null,
                 include: null,
                 itemDefinition: this.props.itemDefinitionInstance,
@@ -3072,6 +3099,10 @@ export class ActualItemProvider extends
         options.parentedBy.id,
         options.parentedBy.version || null,
       ];
+
+      if (options.markForDestructionOnLogout) {
+        this.markSearchForDestruction("by-parent", this.props.itemDefinitionInstance.getQualifiedPathName(), searchParent);
+      }
     }
 
     if (options.cachePolicy === "by-owner") {
@@ -3082,6 +3113,10 @@ export class ActualItemProvider extends
         // value, and we are now redoing the search, and we might have a search listener
         // registered already for this search if that is the case
         this.removePossibleSearchListeners();
+      }
+
+      if (options.markForDestructionOnLogout) {
+        this.markSearchForDestruction("by-owner", this.props.itemDefinitionInstance.getQualifiedPathName(), options.createdBy);
       }
     } else if (options.cachePolicy === "by-parent") {
       // we basically do the exact same here, same logic

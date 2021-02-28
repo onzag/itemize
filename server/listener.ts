@@ -884,7 +884,7 @@ export class Listener {
           request.lastModified ?
             `"created_at" > $1 AS "WAS_CREATED"` :
             `TRUE AS "WAS_CREATED"`
-        ) + ` FROM ${mod.getQualifiedPathName()} WHERE ` + (
+        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
           requiredType ?
             `"type" = $2 AND ` :
             ""
@@ -902,14 +902,15 @@ export class Listener {
       )).map(convertVersionsIntoNullsWhenNecessary);
 
       const deletedQuery = this.rawDB.databaseConnection.queryRows(
-        `SELECT "id", "version", "type", "transaction_time" FROM ${DELETED_REGISTRY_IDENTIFIER} ` +
-        `WHERE "module" = ${mod.getQualifiedPathName()} AND "created_by" = $1 AND "transaction_time" > $2` +
+        `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "module" = $1 AND "created_by" = $2 AND "transaction_time" > $3` +
         (
           requiredType ?
-            ` AND "type" = $3` :
+            ` AND "type" = $4` :
             ""
         ),
         [
+          mod.getQualifiedPathName(),
           request.createdBy,
           request.lastModified,
           requiredType,
@@ -1071,7 +1072,7 @@ export class Listener {
           request.lastModified ?
             `"created_at" > $1 AS "WAS_CREATED"` :
             `TRUE AS "WAS_CREATED"`
-        ) + ` FROM ${mod.getQualifiedPathName()} WHERE ` + (
+        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
           requiredType ?
             `"type" = $2 AND ` :
             ""
@@ -1093,14 +1094,15 @@ export class Listener {
       const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
 
       const deletedQuery = this.rawDB.databaseConnection.queryRows(
-        `SELECT "id", "version", "type", "transaction_time" FROM ${DELETED_REGISTRY_IDENTIFIER} ` +
-        `WHERE "module" = ${mod.getQualifiedPathName()} AND "parenting_id" = $1 AND "transaction_time" > $2` +
+        `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "module" = $1 AND "parenting_id" = $2 AND "transaction_time" > $3` +
         (
           requiredType ?
-            ` AND "type" = $3` :
+            ` AND "type" = $4` :
             ""
         ),
         [
+          mod.getQualifiedPathName(),
           parentingId,
           request.lastModified,
           requiredType,

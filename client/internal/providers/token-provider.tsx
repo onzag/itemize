@@ -7,7 +7,7 @@ import React from "react";
 import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from "./locale-provider";
-import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET } from "../../../constants";
+import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_SEARCH } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 import { ISSRContextType, SSRContext } from "./ssr-provider";
@@ -98,7 +98,7 @@ export interface ITokenContextType extends IActualTokenProviderState {
    * is used in the initial login
    * @returns a promise with the id, role and a possible error
    */
-  login: (username: string, password: string, token: string) => Promise<{id: string, role: string, error: EndpointErrorType}>;
+  login: (username: string, password: string, token: string) => Promise<{ id: string, role: string, error: EndpointErrorType }>;
   /**
    * logout function, for the logoutAll functionality check the LogActioner as it's a complex function
    * the token provider only manages simple functionality about the current app state
@@ -126,7 +126,7 @@ export function TokenProvider(props: ITokenProviderProps) {
   return (
     <SSRContext.Consumer>
       {(ssrContext) => (
-        <ActualTokenProvider ssrContext={ssrContext} {...props}/>
+        <ActualTokenProvider ssrContext={ssrContext} {...props} />
       )}
     </SSRContext.Consumer>
   )
@@ -159,7 +159,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     // but if we are in the ssr 
     if (props.ssrContext) {
       // then we can set the token from it
-      initialState.token = props.ssrContext.user.token || null;
+      initialState.token = props.ssrContext.user.token || null;
       // and if it specifies the IN_COOKIE for the token
       // which means read from the cookie, for security reasons
       if (initialState.token === "IN_COOKIE") {
@@ -174,7 +174,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       initialState.role = props.ssrContext.user.role || GUEST_METAROLE;
       initialState.isReady = true;
     }
-    
+
     // set the initial state
     this.state = initialState;
 
@@ -202,8 +202,8 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       // we call the login functionality
       this.login(null, null, storedToken, true);
 
-    // otherwise with no stored token
-    // aka no user logged in
+      // otherwise with no stored token
+      // aka no user logged in
     } else {
       // since the guest is our default, we just make ourselves ready
       const newState: IActualTokenProviderState = {
@@ -240,7 +240,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     password: string,
     token: string,
     doNotShowLoginError?: boolean,
-  ): Promise<{id: string, role: string, error: EndpointErrorType}> {
+  ): Promise<{ id: string, role: string, error: EndpointErrorType }> {
 
     // if we are already logging in
     if (this.state.isLoggingIn) {
@@ -266,7 +266,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
           fields: {
             id: {},
             role: {},
-            token: {},
+            token: {},
           },
         },
       ),
@@ -474,10 +474,10 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     // gathering the destruction markers
     const destructionMarkers =
-        // if we have memcached them, pick those
-        (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
-        // otherwise get them from local storage
-        JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
+      // if we have memcached them, pick those
+      (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
+      // otherwise get them from local storage
+      JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
     // clean them from the memory cache to match local storage
     (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] = {};
     // as we delete from local storage as well
@@ -494,6 +494,30 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         );
       });
     });
+
+    // gathering the search destruction markers
+    const searchDestructionMarkers =
+      // if we have memcached them, pick those
+      (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] ||
+      // otherwise get them from local storage
+      JSON.parse(localStorage.getItem(SEARCH_DESTRUCTION_MARKERS_LOCATION) || "{}");
+  
+    // clean them from the memory cache to match local storage
+    (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] = {};
+    // as we delete from local storage as well
+    localStorage.removeItem(SEARCH_DESTRUCTION_MARKERS_LOCATION);
+
+    // now we loop over the destruction markers
+    Object.keys(searchDestructionMarkers).forEach((qualifiedPathName: string) => {
+      searchDestructionMarkers[qualifiedPathName].forEach((marker: [string, string | [string, string, string]]) => {
+        // and delete everything within it
+        CacheWorkerInstance.instance.deleteCachedSearch(
+          PREFIX_SEARCH + qualifiedPathName,
+          marker[0] as any,
+          marker[1],
+        );
+      });
+    });
   }
 
   /**
@@ -506,7 +530,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     }
 
     this.cleanAndDestroyLoggedData();
-    
+
     // now we update the state
     this.setState({
       id: null,

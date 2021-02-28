@@ -12,8 +12,10 @@ import "regenerator-runtime/runtime";
 import { expose } from "comlink";
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
-import { IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
-  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue } from "../../../../gql-querier";
+import {
+  IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
+  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue
+} from "../../../../gql-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
@@ -388,6 +390,64 @@ export default class CacheWorker {
   }
 
   /**
+   * Deletes a cached search and all the referent values that are related to it
+   * @param queryName the query name for that cached search
+   * @param type the type of the search
+   * @param arg either the owner or the parent
+   */
+  public async deleteCachedSearch(
+    queryName: string,
+    type: "by-parent" | "by-owner",
+    arg: string | [string, string, string],
+  ) {
+    // so we wait for the setup, just in case
+    await this.waitForSetupPromise;
+
+    // if we don't have it
+    if (!this.db) {
+      // what gives, we return
+      return false;
+    }
+
+    // we get the key name where we are supposed to be
+    let storeKeyName = queryName + "." + type.replace("-", "_") + ".";
+    if (!Array.isArray(arg)) {
+      storeKeyName += (arg || "");
+    } else {
+      storeKeyName += arg[0] + "." + arg[1] + "." + (arg[2] || "");
+    }
+
+    try {
+      // get the current value
+      const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+
+      if (!currentValue) {
+        return false;
+      }
+
+      // and now we loop on all the records and delete them
+      // as well
+      await Promise.all(
+        currentValue.value.map((record) => {
+          return this.deleteCachedValue(
+            PREFIX_GET + record.type,
+            record.id,
+            record.version,
+          );
+        })
+      );
+
+      // and now we can delete the search itself
+      await this.db.delete(QUERIES_TABLE_NAME, storeKeyName);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Merges a cached value of an item definition with another if possible
    * it will perform a total override if the last_modified value do not match
    * as it doesn't know what else has changed, it can only truly merge
@@ -425,7 +485,7 @@ export default class CacheWorker {
         const currentValueTime = new NanoSecondComposedDate(currentValue.value.last_modified as string);
         shouldMerge = partialValueTime.greaterThan(currentValueTime)
       }
-      
+
       if (shouldMerge) {
         return await this.setCachedValue(
           queryName,
@@ -499,7 +559,7 @@ export default class CacheWorker {
         // match like that
         const fields = idbValue.fields;
 
-        if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
+        if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
           if (requestedFields) {
             console.log("RETURNING FROM CACHE", queryName, id, version, requestedFields, idbValue);
           }
@@ -543,7 +603,7 @@ export default class CacheWorker {
     cachePolicy: "by-owner" | "by-parent",
   ): Promise<boolean> {
     await this.waitForSetupPromise;
-  
+
     // so we fetch our db like usual
     if (!this.db) {
       return false;
@@ -551,9 +611,9 @@ export default class CacheWorker {
 
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
-      storeKeyName += (createdByIfKnown || "");
+      storeKeyName += (createdByIfKnown || "");
     } else {
-      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown|| "");
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
 
     try {
@@ -796,7 +856,7 @@ export default class CacheWorker {
               dataMightBeStale,
               lastModified,
             };
-          } catch (err) {
+          } catch (err) {
             // It comes here if it finds data corruption during the search and it should
             // be handled accordingly by the refetcher which is under all this
             // after the next catch
@@ -915,7 +975,7 @@ export default class CacheWorker {
       );
 
       // return the value, whatever it is, null, error, etc..
-      return {gqlValue, batch};
+      return { gqlValue, batch };
     }));
 
     // we will assume one error, whatever we pick at last, to be
@@ -950,43 +1010,43 @@ export default class CacheWorker {
         // and so we will do
         await Promise.all(
           (resultingValue.data[getListQueryName].results as IGQLValue[]).map(async (value, index) => {
-          const originalBatchRequest = originalBatch[index];
-          let suceedStoring: boolean;
-          if (value === null) {
-            // if the item was deleted, somehow, like it's so unlikely but
-            // still possible, say run a search search fails somehow, and then
-            // later when executed the item is gone
-            suceedStoring = await this.setCachedValue(
-              PREFIX_GET + originalBatchRequest.type,
-              originalBatchRequest.id,
-              originalBatchRequest.version,
-              null,
-              null
-            );
-          } else {
-            // otherwise we do push the value and merge the cache
-            // notice how we consider this an actual resulting value, whereas
-            // we would not even use the deleted as a search result
-            suceedStoring = await this.mergeCachedValue(
-              PREFIX_GET + originalBatchRequest.type,
-              originalBatchRequest.id,
-              originalBatchRequest.version,
-              value,
-              getListRequestedFields,
-            );
-          }
+            const originalBatchRequest = originalBatch[index];
+            let suceedStoring: boolean;
+            if (value === null) {
+              // if the item was deleted, somehow, like it's so unlikely but
+              // still possible, say run a search search fails somehow, and then
+              // later when executed the item is gone
+              suceedStoring = await this.setCachedValue(
+                PREFIX_GET + originalBatchRequest.type,
+                originalBatchRequest.id,
+                originalBatchRequest.version,
+                null,
+                null
+              );
+            } else {
+              // otherwise we do push the value and merge the cache
+              // notice how we consider this an actual resulting value, whereas
+              // we would not even use the deleted as a search result
+              suceedStoring = await this.mergeCachedValue(
+                PREFIX_GET + originalBatchRequest.type,
+                originalBatchRequest.id,
+                originalBatchRequest.version,
+                value,
+                getListRequestedFields,
+              );
+            }
 
-          // if it didn't succeed strong the value
-          // from the cache then we consider the whole combo
-          // failed, even it's just one
-          if (!suceedStoring) {
-            somethingFailed = true;
-            error = {
-              code: ENDPOINT_ERRORS.UNSPECIFIED,
-              message: "Failed to store the cached value",
-            };
-          }
-        }));
+            // if it didn't succeed strong the value
+            // from the cache then we consider the whole combo
+            // failed, even it's just one
+            if (!suceedStoring) {
+              somethingFailed = true;
+              error = {
+                code: ENDPOINT_ERRORS.UNSPECIFIED,
+                message: "Failed to store the cached value",
+              };
+            }
+          }));
       }
     }));
 
@@ -1035,7 +1095,7 @@ export default class CacheWorker {
         dataMightBeStale,
         lastModified,
       };
-    } else {
+    } else {
       // otherwise it must have been some sort
       // of connection failure (or database error)
       // we return an unspecified error if we hit an error
