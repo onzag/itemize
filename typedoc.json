@@ -1,4 +1,5 @@
 {
-  "entryPoints": ["./base/Root/index.ts"],
+  "entryPoints": ["./"],
+  "exclude": ["./nodejs", "./node_modules", "./types"],
   "out": "docs/api"
 }
