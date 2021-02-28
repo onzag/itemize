@@ -20,6 +20,8 @@ SEO actually requires some modification in your server side, Itemize likes to do
 
 ## Dumping the content
 
+You might realize that our fragments are right now in the database and once you want to deploy this application they will not come in our environment, they exist in our development environment alone and nowhere else.
+
 ## Docker
 
 Itemize by default creates a docker build of the project you are working on by creating a so called "deployable"

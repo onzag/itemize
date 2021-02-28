@@ -144,7 +144,7 @@ export interface IDumpSpecificIdefInfoType {
    * if it's a boolean dump all of the items
    * if it's an array with string, or string string, dump the specific id, id,version combo
    */
-  [idefPath: string]: boolean | Array<string | [string, string]>
+  [idefPath: string]: boolean | "all" | "only-unversioned" | Array<string | [string, string]>
 }
 
 /**
@@ -157,7 +157,7 @@ export interface IDumpSpecificModInfoType {
    * if it's an array with string, or string string, dump the specific id, version combo
    * otherwise dump only specific item definition types
    */
-  [modPath: string]: boolean | Array<string | [string, string]> | IDumpSpecificIdefInfoType;
+  [modPath: string]: boolean | "all" | "only-unversioned" | Array<string | [string, string]> | IDumpSpecificIdefInfoType;
 }
 
 /**

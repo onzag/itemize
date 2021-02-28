@@ -35,13 +35,16 @@ const fsAsync = fs.promises;
  * @param databaseConnection the database instance
  * @param root the root instance
  * @param idef the item definition in question
- * @param specifics how it is to be dumped, optional, will dump all if not provided
+ * @param options how it is to be dumped, optional, will dump all if not provided
  */
 async function dumpFromIdef(
   databaseConnection: DatabaseConnection,
   root: Root,
   idef: ItemDefinition,
-  specifics?: Array<string | [string, string]>,
+  options: {
+    specifics?: Array<string | [string, string]>,
+    onlyUnversioned?: boolean,
+  } = {},
 ): Promise<ISQLTableRowValue[]> {
   console.log("dumping: " + colors.green(idef.getQualifiedPathName()));
 
@@ -49,12 +52,16 @@ async function dumpFromIdef(
   const idefTable = idef.getQualifiedPathName();
   const mod = idef.getParentModule();
 
-  const baseQuery =
+  let baseQuery =
     `SELECT * FROM ${JSON.stringify(mod.getQualifiedPathName())} JOIN ${JSON.stringify(idefTable)} ON ` +
     `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version"`;
 
+  if (options.onlyUnversioned && !options.specifics) {
+    baseQuery += ` WHERE "version" = ''`;
+  }
+
   // if no specifics have been given
-  if (!specifics) {
+  if (!options.specifics) {
     // dump everything, joins included
     const result: ISQLTableRowValue[] = await databaseConnection.queryRows(baseQuery);
 
@@ -64,7 +71,7 @@ async function dumpFromIdef(
     // otherwise we are only dumping certain of these
     let final: ISQLTableRowValue[] = [];
     // so we loop
-    for (const specific of specifics) {
+    for (const specific of options.specifics) {
       // and query each of them
       let query = baseQuery;
       let bindings: string[];
@@ -76,7 +83,7 @@ async function dumpFromIdef(
       if (isVersioned) {
         bindings = [
           specific[0],
-          specific[1],
+          specific[1] || "",
         ];
         query += ` WHERE "id" = $1 AND "version" = $2`;
       } else {
@@ -97,18 +104,22 @@ async function dumpFromIdef(
  * @param databaseConnection the database instance
  * @param root the root instance
  * @param idef the item definition in question
+ * @param options some options
  */
 async function dumpAllFromIdefRecursive(
   databaseConnection: DatabaseConnection,
   root: Root,
   idef: ItemDefinition,
+  options: {
+    onlyUnversioned?: boolean,
+  } = {}
 ): Promise<ISQLTableRowValue[]> {
   // very simple we use the dump from idef function without specifics
-  let final = await dumpFromIdef(databaseConnection, root, idef);
+  let final = await dumpFromIdef(databaseConnection, root, idef, options);
   // and get into all the children
   for (const cIdef of idef.getChildDefinitions()) {
     // and dump those too
-    final = final.concat(await dumpAllFromIdefRecursive(databaseConnection, root, cIdef));
+    final = final.concat(await dumpAllFromIdefRecursive(databaseConnection, root, cIdef, options));
   }
   // return that
   return final;
@@ -119,13 +130,16 @@ async function dumpAllFromIdefRecursive(
  * @param databaseConnection the database instance
  * @param root the root instance
  * @param mod the module in question
- * @param specifics an optional parameter to specify what it is to be dumped
+ * @param options an optional parameter to specify options for dumping
  */
 async function dumpFromModule(
   databaseConnection: DatabaseConnection,
   root: Root,
   mod: Module,
-  specifics?: Array<string | [string, string]>,
+  options: {
+    specifics?: Array<string | [string, string]>,
+    onlyUnversioned?: boolean,
+  } = {},
 ): Promise<ISQLTableRowValue[]> {
   // inform the developer
   console.log("dumping: " + colors.green(mod.getQualifiedPathName()));
@@ -134,15 +148,17 @@ async function dumpFromModule(
   let final: ISQLTableRowValue[] = [];
 
   // we are giving no specifics
-  if (!specifics) {
+  if (!options.specifics) {
     // as such we got to basically copy everything into the children item
     // definitions as everything is extending that module, so we got to copy it
     for (const idef of mod.getAllChildItemDefinitions()) {
-      final = final.concat(await dumpAllFromIdefRecursive(databaseConnection, root, idef));
+      final = final.concat(await dumpAllFromIdefRecursive(databaseConnection, root, idef, {
+        onlyUnversioned: options.onlyUnversioned,
+      }));
     }
   } else {
     // otherwise we are going over what specifics we are going to copy
-    for (const specific of specifics) {
+    for (const specific of options.specifics) {
       // we need to know the type for that, so we fetch it
       let query = `SELECT "type" FROM ${JSON.stringify(mod.getTableName())}`;
       let bindings: string[];
@@ -152,7 +168,7 @@ async function dumpFromModule(
       if (isVersioned) {
         bindings = [
           specific[0],
-          specific[1],
+          specific[1] || "",
         ];
         query += ` WHERE "id" = $1 AND "version" = $2`;
       } else {
@@ -168,7 +184,9 @@ async function dumpFromModule(
       for (const result of partialResult) {
         // and we dump from the item definition itself
         const idef = root.registry[result.type] as ItemDefinition;
-        final = final.concat(await dumpFromIdef(databaseConnection, root, idef, [specific]));
+        final = final.concat(await dumpFromIdef(databaseConnection, root, idef, {
+          specifics: [specific],
+        }));
       }
     }
   }
@@ -301,13 +319,20 @@ export default async function dump(version: string, databaseConnection: Database
       // and now let's see what value was given
       const value = dumpConfig.save[key];
       // if the value is a simple true
-      if (value === true) {
+      if (value === true || value === "all") {
         // we dump all for that module
         final = final.concat(await dumpFromModule(databaseConnection, root, mod));
+      } else if (value === "only-unversioned") {
+        // we dump all for that module
+        final = final.concat(await dumpFromModule(databaseConnection, root, mod, {
+          onlyUnversioned: true,
+        }));
       } else if (Array.isArray(value)) {
         // otherwise for arrays, we are being specific on what we are dumping
         // we pass that as the specific
-        final = final.concat(await dumpFromModule(databaseConnection, root, mod, value));
+        final = final.concat(await dumpFromModule(databaseConnection, root, mod, {
+          specifics: value,
+        }));
       } else if (value !== false) {
         // otherwise we likely have a custom configuration of specific
         // item definitions we are deploying to the dump folder
@@ -318,12 +343,18 @@ export default async function dump(version: string, databaseConnection: Database
           const idefValue = dumpConfig.save[key][idefKey];
 
           // if it's a simple true
-          if (idefValue === true) {
+          if (idefValue === true || idefValue === "all") {
             // we do the same and just dump the idef content
             final = final.concat(await dumpFromIdef(databaseConnection, root, idef));
+          } else if (idefValue === "only-unversioned") {
+            final = final.concat(await dumpFromIdef(databaseConnection, root, idef, {
+              onlyUnversioned: true,
+            }));
           } else if (Array.isArray(idefValue)) {
             // otherwise the parameters must be a specifics list
-            final = final.concat(await dumpFromIdef(databaseConnection, root, idef, idefValue));
+            final = final.concat(await dumpFromIdef(databaseConnection, root, idef, {
+              specifics: idefValue,
+            }));
           }
         }
       }

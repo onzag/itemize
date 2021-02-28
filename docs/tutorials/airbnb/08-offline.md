@@ -104,10 +104,21 @@ However same as before we want to ensure that this data is destroyed when we log
 
 So we add `markForDestructionOnLogout: true` to where we just added our cache policy.
 
-We will see a similar effect now at `localStorage.SEARCH_DESTRUCTION_MARKERS` 
+We will see a similar effect now at `localStorage.SEARCH_DESTRUCTION_MARKERS` where our search will be marked for destruction, and our search has right now been offline enabled and secured.
 
 ## Some considerations
 
 Yes our application is still not very well optimized for being used offline, things still fail to load and we need a refresh and revisit, there are many components and way you can deal with this, you can check if the app is offline with the `OfflineStatusRetriever` and show a different behaviour, and produce reloading icons when some non-cached item failed to load due to lack of connectivity.
 
-Again this is too extensive to be covered by this tutorial alone.
+Again this is too extensive to be covered by this tutorial alone, you should check the API for further offline optimizations.
+
+## What you achieved
+
+ 1. Enabled offline support on single handpicked elements
+ 2. Enabled offline support for searches.
+ 3. Offline support was kept realtime.
+ 4. Usage of service workers to cache images.
+
+## Next
+
+[Next](./09-deployment.md)
