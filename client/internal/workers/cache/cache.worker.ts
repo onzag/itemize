@@ -237,8 +237,6 @@ export default class CacheWorker {
           if (this.blockedCallback) {
             this.blockedCallback(false);
           }
-
-          this.waitForSetupPromiseResolve();
         },
         blocked: () => {
           console.log("BLOCKED");
