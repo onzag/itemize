@@ -37,6 +37,9 @@ const isDevelopment = process.env.NODE_ENV === "development";
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
 
+// TODO cache policy search destruction markers
+// destruct a whole search and its children on logout
+
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {

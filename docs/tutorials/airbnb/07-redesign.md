@@ -1140,6 +1140,100 @@ Once we switch that language it should indeed display the correct info in the ri
 
 And as you can see it looks as we expect it to look like, note that we are not constrained to just changing the text, we can change anything we want regarding that template, it can look completely different, you could change the background image, the orientation of the fields, etc... but for the purpose of this tutorial we can just keep it simple.
 
-## Fragment loader and the escape form
+## Fragment loader
 
-You still are not happy how things are done, the CMS seems clunky to access things over there, well you can use a fast prototyping element that is the fragment loader, such component exists mainly for utility and it is a very simple mechanism that you could implement yourself.
+You still are not happy how things are done, the CMS seems clunky to access things over there, and you don't get the full picture of what you are trying to modify it all seems a bit off regarding what the final look is going to be.
+
+Well we can use a fast prototyping element that is the fragment loader, such component exists mainly for utility and it is a very simple mechanism based on the standard components, the fragment loader allows you to modify elements of your design as they would look, they are based on both the entry and the view renderer.
+
+In order to use the fragment loader we need to set it up both as it would view and be editable, since we have already our configuration at the `fragment.tsx` file we can just import them.
+
+In the `fragment.tsx` file we should export our `FRAGMENT` constant.
+
+```tsx
+export const FRAGMENTS = {
+```
+
+And now we can start configuring our fragment loaded header at `frontpage/index.tsx` we need to do the import for:
+
+```tsx
+import { FragmentLoader } from "@onzag/itemize/client/fast-prototyping/components/fragment-loader";
+```
+
+And now we can use the fragment loader in the place of our `View` component.
+
+```tsx
+<FragmentLoader
+    // only these roles can edit
+    roles={["ADMIN"]}
+    // the version that we are aiming to deal with right now
+    // this allows the fragment loader to realize if it's dealing with
+    // a fallback and add the fragment rather than editing
+    // if that's the case
+    version={languageData.currentLanguage.code}
+    // these are the view args we used in our view same ones
+    viewRendererArgs={{ makeTemplate: true, templateArgs }}
+    entryRendererArgs={{
+        // these are the renderer args that we use in our CMS
+        // the same ones
+        context: FRAGMENTS.HEADER,
+        toolbarExtras: [
+            buttonToolbarPrescence,
+        ],
+        drawerUIHandlerExtras: [
+            ...buttonOptions,
+        ],
+        // the disjointed mode so that the toolbars and wrappers are fixed
+        // rather than the standard mode where it flows with the page
+        disjointedMode: true,
+    }}
+    onBeforeSubmit={(action, options) => {
+        // this means that the fragment loader is adding
+        // because it did not find a right matching version
+        // and is actually using a fallback
+        if (action === "add") {
+            // we got to remember that the title is require
+            // in our kind of fragments
+            // this is why we need to modify the options
+            options.properties.push("title");
+            // and we just set an override to it
+            options.propertyOverrides = [
+                {
+                    id: "title",
+                    value: "HEADER (" + languageData.currentLanguage.code + ")",
+                }
+            ];
+        }
+
+        return null;
+    }}
+/>
+```
+
+Now if we go to our frontpage, and we are logged in as admins, we will see the following screen that slightly differs from what an average user would see.
+
+![Catbnb Fragment Loader](./images/catbnb-fragment-loader.png)
+
+And we can indeed press that small icon and we would be presented with an editable form that looks exactly as it would look.
+
+![Catbnb Fragment Loader As Entry](./images/catbnb-fragment-loader-as-entry.png)
+
+And just like the normal editor our drawer is accessible
+
+![Catbnb Fragment Loader As Entry With Drawer](./images/catbnb-fragment-loader-as-entry-with-drawer.png)
+
+Pressing the small save button at the bottom will indeed save our edits and they will be comitted into the page, this includes adding the missing version if it doesn't exist, with the title that we have specified.
+
+You can now use the same mechanism for issuing a fragment loader for eg. our search page.
+
+## What you achieved
+
+ 1. Allowed a designer to modify the page via a CMS and create templates.
+ 2. Allowed these templates to modify the page in a WYSIWYG fashion.
+ 3. Created non-WYSIWYG templates for loops with example data.
+
+This tutorial would turn too long if we remained redesigning every screen and setting fragments from them all, so we are going to drop it here, and continue towards the final phases, which is setting offline functionality and deploying the application to a live server.
+
+## Next
+
+[Next](./08-offline.md)
