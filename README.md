@@ -8,7 +8,7 @@ The aim of itemize is to be a library that can produce and deliver results fast,
 
 # **WARNING** Alpha
 
-This library is in alpha, it is an experimental library that defies some of the most common development pattern and currently it's incomplete, documentation isn't done and might be misleading, and while everything that is described in this document is currently functional as described there might be bugs and issues, undocumented, untested features, the library will be considered mature once it hits version 1.0 which might take until 2021
+This library is in alpha, it is an experimental library that defies some of the most common development patterns and currently documentation isn't complete and further testing is required.
 
 ## When to use Itemize
 
