@@ -27,7 +27,7 @@
 
 • **capital**: *string*
 
-Defined in: [imported-resources/index.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L26)
+Defined in: [imported-resources/index.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L26)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **code**: *string*
 
-Defined in: [imported-resources/index.ts:33](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L33)
+Defined in: [imported-resources/index.ts:33](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L33)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **continent**: *string*
 
-Defined in: [imported-resources/index.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L25)
+Defined in: [imported-resources/index.ts:25](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L25)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **currency**: *string*
 
-Defined in: [imported-resources/index.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L27)
+Defined in: [imported-resources/index.ts:27](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L27)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 • **emoji**: *string*
 
-Defined in: [imported-resources/index.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L29)
+Defined in: [imported-resources/index.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L29)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 • **emojiU**: *string*
 
-Defined in: [imported-resources/index.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L30)
+Defined in: [imported-resources/index.ts:30](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L30)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 • **languages**: *string*[]
 
-Defined in: [imported-resources/index.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L28)
+Defined in: [imported-resources/index.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L28)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 • **latitude**: *number*
 
-Defined in: [imported-resources/index.ts:32](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L32)
+Defined in: [imported-resources/index.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L32)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 • **longitude**: *number*
 
-Defined in: [imported-resources/index.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L31)
+Defined in: [imported-resources/index.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L31)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [imported-resources/index.ts:22](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L22)
+Defined in: [imported-resources/index.ts:22](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L22)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 • **native**: *string*
 
-Defined in: [imported-resources/index.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L23)
+Defined in: [imported-resources/index.ts:23](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L23)
 
 ___
 
@@ -115,4 +115,4 @@ ___
 
 • **phone**: *string*
 
-Defined in: [imported-resources/index.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L24)
+Defined in: [imported-resources/index.ts:24](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L24)

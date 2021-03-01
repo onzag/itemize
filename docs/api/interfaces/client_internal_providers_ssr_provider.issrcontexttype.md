@@ -28,7 +28,7 @@ there's no SSR context then it should fetch
 
 #### Type declaration:
 
-Defined in: [client/internal/providers/ssr-provider.tsx:54](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L54)
+Defined in: [client/internal/providers/ssr-provider.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L54)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 Collected queries
 
-Defined in: [client/internal/providers/ssr-provider.tsx:60](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L60)
+Defined in: [client/internal/providers/ssr-provider.tsx:60](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L60)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Collected resources map
 
-Defined in: [client/internal/providers/ssr-provider.tsx:64](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L64)
+Defined in: [client/internal/providers/ssr-provider.tsx:64](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L64)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 The title of the page, will be the same as the document.title in the client side
 but the server has no access to the dom, so to keep things consistent it's here
 
-Defined in: [client/internal/providers/ssr-provider.tsx:90](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L90)
+Defined in: [client/internal/providers/ssr-provider.tsx:90](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L90)
 
 ___
 
@@ -77,4 +77,4 @@ Name | Type | Description |
 `role` | *string* | Role of the user   |
 `token` | *string* | Token of the user, now due to security considerations and since this is equal to the cookie, the cookie value IN_COOKIE will be used in the client side, different for what is used in the server side, however the output should be equal anyway, as anyone who consumes this should read the cookie value   |
 
-Defined in: [client/internal/providers/ssr-provider.tsx:68](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L68)
+Defined in: [client/internal/providers/ssr-provider.tsx:68](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L68)

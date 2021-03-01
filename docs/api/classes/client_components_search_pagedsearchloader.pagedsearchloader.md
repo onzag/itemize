@@ -64,7 +64,7 @@ Name | Type |
 
 **Returns:** [*PagedSearchLoader*](client_components_search_pagedsearchloader.pagedsearchloader.md)
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:58](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L58)
+Defined in: [client/components/search/PagedSearchLoader.tsx:58](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L58)
 
 ## Properties
 
@@ -443,7 +443,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:67](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L67)
+Defined in: [client/components/search/PagedSearchLoader.tsx:67](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L67)
 
 ___
 
@@ -460,7 +460,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:85](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L85)
+Defined in: [client/components/search/PagedSearchLoader.tsx:85](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L85)
 
 ___
 
@@ -478,7 +478,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:76](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L76)
+Defined in: [client/components/search/PagedSearchLoader.tsx:76](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L76)
 
 ___
 
@@ -497,7 +497,7 @@ Name | Type |
 
 **Returns:** *number*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L95)
+Defined in: [client/components/search/PagedSearchLoader.tsx:95](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L95)
 
 ___
 
@@ -507,7 +507,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:111](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L111)
+Defined in: [client/components/search/PagedSearchLoader.tsx:111](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L111)
 
 ___
 
@@ -546,4 +546,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:91](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L91)
+Defined in: [client/components/search/PagedSearchLoader.tsx:91](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/PagedSearchLoader.tsx#L91)

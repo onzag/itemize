@@ -52,7 +52,7 @@ Name | Type | Description |
 
 **Returns:** *boolean*
 
-Defined in: [server/resolvers/basic.ts:197](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L197)
+Defined in: [server/resolvers/basic.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L197)
 
 ___
 
@@ -72,7 +72,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:452](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L452)
+Defined in: [server/resolvers/basic.ts:452](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L452)
 
 ___
 
@@ -93,7 +93,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:404](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L404)
+Defined in: [server/resolvers/basic.ts:404](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L404)
 
 ___
 
@@ -110,7 +110,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:252](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L252)
+Defined in: [server/resolvers/basic.ts:252](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L252)
 
 ___
 
@@ -127,7 +127,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:418](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L418)
+Defined in: [server/resolvers/basic.ts:418](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L418)
 
 ___
 
@@ -147,7 +147,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:878](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L878)
+Defined in: [server/resolvers/basic.ts:878](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L878)
 
 ___
 
@@ -168,7 +168,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L483)
+Defined in: [server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L483)
 
 ___
 
@@ -185,7 +185,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:601](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L601)
+Defined in: [server/resolvers/basic.ts:601](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L601)
 
 ___
 
@@ -202,7 +202,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L47)
+Defined in: [server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L47)
 
 ___
 
@@ -219,7 +219,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:58](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L58)
+Defined in: [server/resolvers/basic.ts:58](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L58)
 
 ___
 
@@ -229,7 +229,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:54](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L54)
+Defined in: [server/resolvers/basic.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L54)
 
 ___
 
@@ -255,7 +255,7 @@ Name | Type | Description |
 
 **Returns:** [*IFilteredAndPreparedValueType*](../interfaces/server_resolvers_basic.ifilteredandpreparedvaluetype.md)
 
-Defined in: [server/resolvers/basic.ts:646](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L646)
+Defined in: [server/resolvers/basic.ts:646](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L646)
 
 ___
 
@@ -275,7 +275,7 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [server/resolvers/basic.ts:515](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L515)
+Defined in: [server/resolvers/basic.ts:515](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L515)
 
 ___
 
@@ -291,7 +291,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [server/resolvers/basic.ts:237](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L237)
+Defined in: [server/resolvers/basic.ts:237](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L237)
 
 ___
 
@@ -323,7 +323,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
 
-Defined in: [server/resolvers/basic.ts:955](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L955)
+Defined in: [server/resolvers/basic.ts:955](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L955)
 
 ___
 
@@ -350,7 +350,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:728](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L728)
+Defined in: [server/resolvers/basic.ts:728](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L728)
 
 ___
 
@@ -371,7 +371,7 @@ Name | Type | Description |
 
 **Returns:** [[*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md)]
 
-Defined in: [server/resolvers/basic.ts:909](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L909)
+Defined in: [server/resolvers/basic.ts:909](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L909)
 
 ___
 
@@ -391,7 +391,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:529](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L529)
+Defined in: [server/resolvers/basic.ts:529](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L529)
 
 ___
 
@@ -417,7 +417,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:126](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L126)
+Defined in: [server/resolvers/basic.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L126)
 
 ___
 
@@ -437,7 +437,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IServerSideTokenDataType*](../interfaces/server_resolvers_basic.iserversidetokendatatype.md)\>
 
-Defined in: [server/resolvers/basic.ts:74](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L74)
+Defined in: [server/resolvers/basic.ts:74](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L74)
 
 ___
 
@@ -457,4 +457,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:552](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L552)
+Defined in: [server/resolvers/basic.ts:552](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/basic.ts#L552)

@@ -60,7 +60,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry_propertyentryboolean.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:44](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L44)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:44](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L44)
 
 ## Properties
 
@@ -391,7 +391,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:91](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L91)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:91](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L91)
 
 ___
 
@@ -445,7 +445,7 @@ might be bad if null is a non default value, and we want to restore to false
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:61](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L61)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:61](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L61)
 
 ___
 
@@ -455,7 +455,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:96](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L96)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:96](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L96)
 
 ___
 
@@ -495,4 +495,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:72](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L72)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:72](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L72)

@@ -29,4 +29,4 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [builder/manifest.ts:20](https://github.com/onzag/itemize/blob/3efa2a4a/builder/manifest.ts#L20)
+Defined in: [builder/manifest.ts:20](https://github.com/onzag/itemize/blob/0e9b128c/builder/manifest.ts#L20)

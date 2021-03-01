@@ -68,7 +68,7 @@ Name | Type | Description |
 
 **Returns:** [*LinkDialog*](client_fast_prototyping_components_slate_dialogs_link.linkdialog.md)
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:152](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L152)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:152](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L152)
 
 ## Properties
 
@@ -129,7 +129,7 @@ ___
 
 We grab a ref for the text field in order to focus
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:152](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L152)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:152](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L152)
 
 ___
 
@@ -260,7 +260,7 @@ to accept the link we have given
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:272](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L272)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:272](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L272)
 
 ___
 
@@ -273,7 +273,7 @@ to be closed
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:312](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L312)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:312](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L312)
 
 ___
 
@@ -438,7 +438,7 @@ to focus the text field
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:182](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L182)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:182](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L182)
 
 ___
 
@@ -490,7 +490,7 @@ Triggers when the dialog is opening
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:189](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L189)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:189](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L189)
 
 ___
 
@@ -502,7 +502,7 @@ Render function
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:332](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L332)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:332](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L332)
 
 ___
 
@@ -571,7 +571,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:302](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L302)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:302](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L302)
 
 ___
 
@@ -589,4 +589,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:291](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/link.tsx#L291)
+Defined in: [client/fast-prototyping/components/slate/dialogs/link.tsx:291](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/dialogs/link.tsx#L291)

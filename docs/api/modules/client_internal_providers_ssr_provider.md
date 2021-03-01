@@ -29,7 +29,7 @@ The ssr provider file
 
 The ssr context passes the context value all the way to all the components
 
-Defined in: [client/internal/providers/ssr-provider.tsx:96](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L96)
+Defined in: [client/internal/providers/ssr-provider.tsx:96](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L96)
 
 ## Functions
 
@@ -53,4 +53,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/ssr-provider.tsx#L117)
+Defined in: [client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L117)

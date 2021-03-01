@@ -42,7 +42,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [base/Root/sql.ts:111](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/sql.ts#L111)
+Defined in: [base/Root/sql.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/sql.ts#L111)
 
 ## Functions
 
@@ -64,4 +64,4 @@ Name | Type | Description |
 
 a total database schema
 
-Defined in: [base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/sql.ts#L128)
+Defined in: [base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/sql.ts#L128)

@@ -55,7 +55,7 @@ Builds a new insert query
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/InsertBuilder.ts:43](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L43)
+Defined in: [database/InsertBuilder.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L43)
 
 ## Properties
 
@@ -70,7 +70,7 @@ this is the columns list
 
 as a string itself
 
-Defined in: [database/InsertBuilder.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L29)
+Defined in: [database/InsertBuilder.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L29)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 What to do on conflict
 
-Defined in: [database/InsertBuilder.ts:43](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L43)
+Defined in: [database/InsertBuilder.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L43)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 The returning builder to specify the returning condition
 
-Defined in: [database/InsertBuilder.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L34)
+Defined in: [database/InsertBuilder.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L34)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 The table name we try to insert at
 
-Defined in: [database/InsertBuilder.ts:39](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L39)
+Defined in: [database/InsertBuilder.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L39)
 
 ___
 
@@ -114,7 +114,7 @@ into a string form, for example
 
 "?, ?, ?, NOW()" etc...
 
-Defined in: [database/InsertBuilder.ts:20](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L20)
+Defined in: [database/InsertBuilder.ts:20](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L20)
 
 ## Methods
 
@@ -134,7 +134,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L69)
 
 ___
 
@@ -154,7 +154,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L77)
 
 ___
 
@@ -169,7 +169,7 @@ this function does not affect the builders
 
 itself
 
-Defined in: [database/InsertBuilder.ts:76](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L76)
+Defined in: [database/InsertBuilder.ts:76](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L76)
 
 ___
 
@@ -183,7 +183,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L102)
 
 ___
 
@@ -197,7 +197,7 @@ Clears the values to insert and the values alone
 
 itself
 
-Defined in: [database/InsertBuilder.ts:62](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L62)
+Defined in: [database/InsertBuilder.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L62)
 
 ___
 
@@ -213,7 +213,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/InsertBuilder.ts:180](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L180)
+Defined in: [database/InsertBuilder.ts:180](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L180)
 
 ___
 
@@ -230,7 +230,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L165)
 
 ___
 
@@ -250,7 +250,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/InsertBuilder.ts:97](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L97)
+Defined in: [database/InsertBuilder.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L97)
 
 ___
 
@@ -270,7 +270,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/InsertBuilder.ts:171](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L171)
+Defined in: [database/InsertBuilder.ts:171](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L171)
 
 ___
 
@@ -284,7 +284,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L109)
 
 ___
 
@@ -305,7 +305,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L86)
 
 ___
 
@@ -326,7 +326,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L95)
 
 ___
 
@@ -346,7 +346,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/InsertBuilder.ts:87](https://github.com/onzag/itemize/blob/3efa2a4a/database/InsertBuilder.ts#L87)
+Defined in: [database/InsertBuilder.ts:87](https://github.com/onzag/itemize/blob/0e9b128c/database/InsertBuilder.ts#L87)
 
 ___
 
@@ -362,4 +362,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L126)

@@ -27,7 +27,7 @@ integer, year and number are truly supported for this
 Supported renderer args:
 - descriptionAsAlert: displays the description if exists as alert rather than the standard
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:253](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L253)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:253](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L253)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 The styles for the select
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:41](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L41)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:41](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L41)

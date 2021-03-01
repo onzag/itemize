@@ -36,4 +36,4 @@ Name | Type | Description |
 
 that same json with evaled fields replaced
 
-Defined in: [builder/evaler.ts:20](https://github.com/onzag/itemize/blob/3efa2a4a/builder/evaler.ts#L20)
+Defined in: [builder/evaler.ts:20](https://github.com/onzag/itemize/blob/0e9b128c/builder/evaler.ts#L20)

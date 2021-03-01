@@ -14,4 +14,4 @@
 
 • `Const` **customUserTriggers**: [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)
 
-Defined in: [server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/3efa2a4a/server/user/triggers.ts#L7)
+Defined in: [server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/0e9b128c/server/user/triggers.ts#L7)

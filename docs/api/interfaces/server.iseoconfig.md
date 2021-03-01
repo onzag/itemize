@@ -16,4 +16,4 @@
 
 • **seoRules**: [*ISEORuleSet*](server_seo.iseoruleset.md)
 
-Defined in: [server/index.ts:135](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L135)
+Defined in: [server/index.ts:135](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L135)

@@ -53,7 +53,7 @@ Builds a new join builder
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L75)
+Defined in: [database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L75)
 
 ## Properties
 
@@ -63,7 +63,7 @@ Defined in: [database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/3
 
 These are the list of all the builders that represents the join rules
 
-Defined in: [database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L75)
+Defined in: [database/JoinBuilder.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L75)
 
 ## Methods
 
@@ -83,7 +83,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L69)
 
 ___
 
@@ -103,7 +103,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L77)
 
 ___
 
@@ -117,7 +117,7 @@ Clears all the joining rules from the builder
 
 itself
 
-Defined in: [database/JoinBuilder.ts:149](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L149)
+Defined in: [database/JoinBuilder.ts:149](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L149)
 
 ___
 
@@ -131,7 +131,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L102)
 
 ___
 
@@ -147,7 +147,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/JoinBuilder.ts:159](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L159)
+Defined in: [database/JoinBuilder.ts:159](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L159)
 
 ___
 
@@ -168,7 +168,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/JoinBuilder.ts:139](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L139)
+Defined in: [database/JoinBuilder.ts:139](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L139)
 
 ___
 
@@ -185,7 +185,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L165)
 
 ___
 
@@ -206,7 +206,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/JoinBuilder.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L103)
+Defined in: [database/JoinBuilder.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L103)
 
 ___
 
@@ -227,7 +227,7 @@ Name | Type | Description |
 
 the new builder
 
-Defined in: [database/JoinBuilder.ts:90](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L90)
+Defined in: [database/JoinBuilder.ts:90](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L90)
 
 ___
 
@@ -248,7 +248,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/JoinBuilder.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L115)
+Defined in: [database/JoinBuilder.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L115)
 
 ___
 
@@ -262,7 +262,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L109)
 
 ___
 
@@ -283,7 +283,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/JoinBuilder.ts:127](https://github.com/onzag/itemize/blob/3efa2a4a/database/JoinBuilder.ts#L127)
+Defined in: [database/JoinBuilder.ts:127](https://github.com/onzag/itemize/blob/0e9b128c/database/JoinBuilder.ts#L127)
 
 ___
 
@@ -304,7 +304,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L86)
 
 ___
 
@@ -325,7 +325,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L95)
 
 ___
 
@@ -341,4 +341,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L126)

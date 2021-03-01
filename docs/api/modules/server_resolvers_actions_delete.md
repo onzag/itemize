@@ -25,7 +25,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/actions/delete.ts#L29)
+Defined in: [server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/actions/delete.ts#L29)
 
 ___
 
@@ -41,4 +41,4 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/delete.ts:286](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/actions/delete.ts#L286)
+Defined in: [server/resolvers/actions/delete.ts:286](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/actions/delete.ts#L286)

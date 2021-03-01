@@ -38,7 +38,7 @@ The renderer args
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[args](client_internal_components_propertyview.ipropertyviewrendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L19)
 
 ___
 
@@ -50,7 +50,7 @@ The current value to be displayed
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[currentValue](client_internal_components_propertyview.ipropertyviewrendererprops.md#currentvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 The extension of that file
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L36)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:36](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L36)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 If it's a supported image, the source set
 that is attached to that image
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L28)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:28](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L28)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 whether the file is a supported image
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:23](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L23)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:23](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L23)
 
 ___
 
@@ -97,9 +97,9 @@ open the current file
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L40)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L40)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L40)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L40)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 The size of the file in a human readable form
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:32](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L32)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:32](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewFile.tsx#L32)
 
 ___
 
@@ -121,4 +121,4 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[rtl](client_internal_components_propertyview.ipropertyviewrendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L15)

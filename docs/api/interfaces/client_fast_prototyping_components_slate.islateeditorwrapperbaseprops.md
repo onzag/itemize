@@ -44,7 +44,7 @@ rich text editor itself as it comes from slate
 and it should be rendered
 where it is expected to be used
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1047](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1047)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1047](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1047)
 
 ___
 
@@ -58,7 +58,7 @@ as it's just passed right here as well to the wrapper
 this is used via the PropertyEntryText as it does
 indeed provide this as a prop for the render
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1055](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1055)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1055](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1055)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 The disjointed mode
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1077](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1077)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1077](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1077)
 
 ___
 
@@ -85,9 +85,9 @@ as the currentLoadError
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1060)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1060)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1060)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1060)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 Drawer extras for the ui handled types
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1069](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1069)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1069](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1069)
 
 ___
 
@@ -109,7 +109,7 @@ This is a list of extended features that are available
 to the editor, and the wrapper can render buttons
 and whatnot from it
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1035](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1035)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1035](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1035)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 These are helper functions that are used to insert elements
 and modify nodes
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1040](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1040)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1040](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1040)
 
 ___
 
@@ -130,7 +130,7 @@ ___
 
 Whether to hide the drawer
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1073](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1073)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1073](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1073)
 
 ___
 
@@ -142,7 +142,7 @@ This is the slate editor current state
 that is passed to the wrapper in order
 so it can get state information
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1029](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1029)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1029](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1029)
 
 ___
 
@@ -153,4 +153,4 @@ ___
 Function that should be specified to assign extra toolbar elements
 to be used either by ui handled components and whatnot
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1065](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L1065)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1065](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1065)

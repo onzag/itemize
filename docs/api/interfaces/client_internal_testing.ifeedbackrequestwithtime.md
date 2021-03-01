@@ -27,7 +27,7 @@
 
 Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[id](base_remote_protocol.ifeedbackrequest.md#id)
 
-Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L267)
+Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L267)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[itemDefinition](base_remote_protocol.ifeedbackrequest.md#itemdefinition)
 
-Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L266)
+Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L266)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L63)
+Defined in: [client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L63)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[version](base_remote_protocol.ifeedbackrequest.md#version)
 
-Defined in: [base/remote-protocol.ts:268](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L268)
+Defined in: [base/remote-protocol.ts:268](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L268)

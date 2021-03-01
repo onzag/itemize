@@ -26,4 +26,4 @@ Shows a loading circle on top of a component to show that such is loading
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/util.tsx:74](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/util.tsx#L74)
+Defined in: [client/fast-prototyping/components/util.tsx:74](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/util.tsx#L74)

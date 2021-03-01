@@ -23,7 +23,7 @@ Represents the basic text type for the slate editor support
 
 Whether the text is in bold
 
-Defined in: [client/internal/text/serializer/types/text.tsx:265](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/text.tsx#L265)
+Defined in: [client/internal/text/serializer/types/text.tsx:265](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/types/text.tsx#L265)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 Whether the text is in italic
 
-Defined in: [client/internal/text/serializer/types/text.tsx:269](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/text.tsx#L269)
+Defined in: [client/internal/text/serializer/types/text.tsx:269](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/types/text.tsx#L269)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 Represents the text content
 
-Defined in: [client/internal/text/serializer/types/text.tsx:261](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/text.tsx#L261)
+Defined in: [client/internal/text/serializer/types/text.tsx:261](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/types/text.tsx#L261)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 Whether the text is underline
 
-Defined in: [client/internal/text/serializer/types/text.tsx:273](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/text.tsx#L273)
+Defined in: [client/internal/text/serializer/types/text.tsx:273](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/types/text.tsx#L273)

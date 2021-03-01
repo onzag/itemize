@@ -34,7 +34,7 @@ Name | Type | Description |
 
 a boolean on whether it matches
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:73](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L73)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:73](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L73)
 
 ___
 
@@ -55,4 +55,4 @@ Name | Type | Description |
 
 a boolean on whether it matches
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L21)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/local-search.ts#L21)

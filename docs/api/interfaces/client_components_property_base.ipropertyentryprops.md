@@ -49,7 +49,7 @@ Name |
 
 An alternative description
 
-Defined in: [client/components/property/base.tsx:86](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L86)
+Defined in: [client/components/property/base.tsx:86](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L86)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 An alternative label
 
-Defined in: [client/components/property/base.tsx:90](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L90)
+Defined in: [client/components/property/base.tsx:90](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L90)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 An alternative placeholder
 
-Defined in: [client/components/property/base.tsx:94](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L94)
+Defined in: [client/components/property/base.tsx:94](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L94)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 Focus on mount
 
-Defined in: [client/components/property/base.tsx:103](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L103)
+Defined in: [client/components/property/base.tsx:103](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L103)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 whether to cache files when running the url absoluter
 
-Defined in: [client/components/property/base.tsx:118](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L118)
+Defined in: [client/components/property/base.tsx:118](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L118)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 Whether to hide the description that is hidden in language data
 
-Defined in: [client/components/property/base.tsx:82](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L82)
+Defined in: [client/components/property/base.tsx:82](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L82)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 An icon to display alognside
 
-Defined in: [client/components/property/base.tsx:78](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L78)
+Defined in: [client/components/property/base.tsx:78](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L78)
 
 ___
 
@@ -122,7 +122,7 @@ provider
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[id](client_components_property_base.ipropertybasewithrendererprops.md#id)
 
-Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L31)
+Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L31)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 Whether to ignore the errors
 that are given
 
-Defined in: [client/components/property/base.tsx:99](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L99)
+Defined in: [client/components/property/base.tsx:99](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L99)
 
 ___
 
@@ -157,9 +157,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/property/base.tsx:70](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L70)
+Defined in: [client/components/property/base.tsx:70](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L70)
 
-Defined in: [client/components/property/base.tsx:70](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L70)
+Defined in: [client/components/property/base.tsx:70](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L70)
 
 ___
 
@@ -171,7 +171,7 @@ the policy name, should be provided with a policy type
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[policyName](client_components_property_base.ipropertybasewithrendererprops.md#policyname)
 
-Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L44)
+Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L44)
 
 ___
 
@@ -183,7 +183,7 @@ the policy type, should be provided with a policy name
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[policyType](client_components_property_base.ipropertybasewithrendererprops.md#policytype)
 
-Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L40)
+Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L40)
 
 ___
 
@@ -193,7 +193,7 @@ ___
 
 The value to prefill with on mount
 
-Defined in: [client/components/property/base.tsx:107](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L107)
+Defined in: [client/components/property/base.tsx:107](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L107)
 
 ___
 
@@ -206,7 +206,7 @@ the reference filtering set options
 
 #### Type declaration:
 
-Defined in: [client/components/property/base.tsx:112](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L112)
+Defined in: [client/components/property/base.tsx:112](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L112)
 
 ___
 
@@ -218,7 +218,7 @@ the renderer in charge of rendering the output
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[renderer](client_components_property_base.ipropertybasewithrendererprops.md#renderer)
 
-Defined in: [client/components/property/base.tsx:54](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L54)
+Defined in: [client/components/property/base.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L54)
 
 ___
 
@@ -230,7 +230,7 @@ Extra renderer args
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[rendererArgs](client_components_property_base.ipropertybasewithrendererprops.md#rendererargs)
 
-Defined in: [client/components/property/base.tsx:58](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L58)
+Defined in: [client/components/property/base.tsx:58](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L58)
 
 ___
 
@@ -243,7 +243,7 @@ only truly available in search mode
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[searchVariant](client_components_property_base.ipropertybasewithrendererprops.md#searchvariant)
 
-Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L36)
+Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L36)
 
 ___
 
@@ -253,4 +253,4 @@ ___
 
 make it seem as invalid, allows displaying an entry property as invalid
 
-Defined in: [client/components/property/base.tsx:74](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L74)
+Defined in: [client/components/property/base.tsx:74](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L74)

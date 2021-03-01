@@ -48,7 +48,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:556](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L556)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:556](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L556)
 
 ___
 
@@ -74,7 +74,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:507](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L507)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:507](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L507)
 
 ___
 
@@ -100,7 +100,7 @@ Name | Type | Description |
 
 **Returns:** *boolean* \| [*string*, *any*[]]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:416](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L416)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:416](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L416)
 
 ___
 
@@ -127,7 +127,7 @@ Name | Type | Description |
 
 **Returns:** *boolean* \| [*string*, *any*[]]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:453](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L453)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:453](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L453)
 
 ___
 
@@ -158,7 +158,7 @@ Name | Type | Description |
 a composed value with a partial row value and the consume streams functionality
 included in it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:318](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L318)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:318](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L318)
 
 ___
 
@@ -183,7 +183,7 @@ Name | Type | Description |
 
 the graphql value for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:243](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L243)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:243](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L243)
 
 ___
 
@@ -206,7 +206,7 @@ Name | Type | Description |
 
 the partial sql table definition for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:214](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L214)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:214](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L214)
 
 ___
 
@@ -229,7 +229,7 @@ Name | Type | Default value | Description |
 
 a function that returns the partial table definition object with the given type
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L36)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L36)
 
 ___
 
@@ -249,7 +249,7 @@ Name | Type | Description |
 
 an array of the columns to index
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:202](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L202)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:202](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L202)
 
 ___
 
@@ -270,7 +270,7 @@ Name | Type | Description |
 a valid args to use in the where expression or an object
 for where many
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:180](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L180)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:180](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L180)
 
 ___
 
@@ -291,7 +291,7 @@ Name | Type | Description |
 
 the partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:92](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L92)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L92)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type | Description |
 
 an array of string with the order by
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L69)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L69)
 
 ___
 
@@ -333,7 +333,7 @@ Name | Type | Description |
 
 the property value out
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L123)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L123)
 
 ___
 
@@ -354,7 +354,7 @@ Name | Type | Description |
 
 the supported type json parsed
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
 
 ___
 
@@ -374,7 +374,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:150](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L150)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:150](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L150)
 
 ___
 
@@ -395,7 +395,7 @@ Name | Type | Description |
 
 the rows to select
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L79)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L79)
 
 ___
 
@@ -416,4 +416,4 @@ Name | Type | Description |
 
 the partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L105)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L105)

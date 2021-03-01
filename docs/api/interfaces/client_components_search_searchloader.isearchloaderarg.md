@@ -40,7 +40,7 @@ and retrieve as search results; this is due to technical limitations
 and security policies, anyway no person really goes further than page 4
 better them to refine the search
 
-Defined in: [client/components/search/SearchLoader.tsx:107](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L107)
+Defined in: [client/components/search/SearchLoader.tsx:107](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L107)
 
 ___
 
@@ -56,9 +56,9 @@ dismiss the errors
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L124)
+Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L124)
 
-Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L124)
+Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L124)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 An error that occured during the get list execution to fetch
 the search results of a given page
 
-Defined in: [client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L120)
+Defined in: [client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L120)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 whether there's a next page from the current selected
 
-Defined in: [client/components/search/SearchLoader.tsx:111](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L111)
+Defined in: [client/components/search/SearchLoader.tsx:111](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L111)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 Whether there's a previous page from the current selected
 
-Defined in: [client/components/search/SearchLoader.tsx:115](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L115)
+Defined in: [client/components/search/SearchLoader.tsx:115](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L115)
 
 ___
 
@@ -104,7 +104,7 @@ once the isSearching variable is set to false, all the applied values
 for the given page are ensured to be there, this is also true for
 traditional search
 
-Defined in: [client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L83)
+Defined in: [client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L83)
 
 ___
 
@@ -117,7 +117,7 @@ this not being a pagination based mechanism, still
 the search results are loaded in chunks or pages; note that
 the page count is only has to do with the accessible count of matches
 
-Defined in: [client/components/search/SearchLoader.tsx:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L95)
+Defined in: [client/components/search/SearchLoader.tsx:95](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L95)
 
 ___
 
@@ -134,9 +134,9 @@ say you got an error, you can ask for a refresh
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L129)
+Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L129)
 
-Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L129)
+Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L129)
 
 ___
 
@@ -147,7 +147,7 @@ ___
 The search id is an unique identifier for this
 search and this search only
 
-Defined in: [client/components/search/SearchLoader.tsx:74](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L74)
+Defined in: [client/components/search/SearchLoader.tsx:74](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L74)
 
 ___
 
@@ -158,7 +158,7 @@ ___
 the search records are records that allow to be requested
 as well as organized, partial information of a search result
 
-Defined in: [client/components/search/SearchLoader.tsx:88](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L88)
+Defined in: [client/components/search/SearchLoader.tsx:88](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L88)
 
 ___
 
@@ -169,4 +169,4 @@ ___
 The total count, the number of items that matched this search
 in the server side
 
-Defined in: [client/components/search/SearchLoader.tsx:100](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L100)
+Defined in: [client/components/search/SearchLoader.tsx:100](https://github.com/onzag/itemize/blob/0e9b128c/client/components/search/SearchLoader.tsx#L100)

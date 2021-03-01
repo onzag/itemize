@@ -21,7 +21,7 @@
 
 By default only the base version is collected, if you wish you can collect all the versions
 
-Defined in: [server/seo/index.ts:44](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L44)
+Defined in: [server/seo/index.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L44)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • `Optional` **extraProperties**: *string*[]
 
-Defined in: [server/seo/index.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L40)
+Defined in: [server/seo/index.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L40)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • `Optional` **item**: *string*
 
-Defined in: [server/seo/index.ts:39](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L39)
+Defined in: [server/seo/index.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L39)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **module**: *string*
 
-Defined in: [server/seo/index.ts:38](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L38)
+Defined in: [server/seo/index.ts:38](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L38)

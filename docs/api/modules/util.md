@@ -52,7 +52,7 @@ Contains general utility functions to be used within the itemize app
 
 • `Const` **DOMPurify**: DOMPurifyI
 
-Defined in: [util.ts:543](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L543)
+Defined in: [util.ts:543](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L543)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • `Const` **DOMWindow**: Window & *typeof* globalThis \| DOMWindow
 
-Defined in: [util.ts:542](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L542)
+Defined in: [util.ts:542](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L542)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 • `Const` **JSDOM**: *typeof* JSDOM
 
-Defined in: [util.ts:22](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L22)
+Defined in: [util.ts:22](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L22)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • `Const` **Moment**: *typeof* moment
 
-Defined in: [util.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L21)
+Defined in: [util.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L21)
 
 ## Functions
 
@@ -94,7 +94,7 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [util.ts:58](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L58)
+Defined in: [util.ts:58](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L58)
 
 ___
 
@@ -113,7 +113,7 @@ Name | Type | Description |
 
 **Returns:** *boolean*
 
-Defined in: [util.ts:190](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L190)
+Defined in: [util.ts:190](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L190)
 
 ___
 
@@ -132,7 +132,7 @@ Name | Type | Description |
 
 **Returns:** [*IPropertyDefinitionSupportedCurrencyType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_currency.ipropertydefinitionsupportedcurrencytype.md)
 
-Defined in: [util.ts:420](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L420)
+Defined in: [util.ts:420](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L420)
 
 ___
 
@@ -150,7 +150,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:439](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L439)
+Defined in: [util.ts:439](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L439)
 
 ___
 
@@ -168,7 +168,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:431](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L431)
+Defined in: [util.ts:431](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L431)
 
 ___
 
@@ -191,7 +191,7 @@ Name | Type |
 
 **Returns:** [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
 
-Defined in: [util.ts:494](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L494)
+Defined in: [util.ts:494](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L494)
 
 ___
 
@@ -213,7 +213,7 @@ Name | Type | Description |
 
 **Returns:** [*IPropertyDefinitionSupportedLocationType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_location.ipropertydefinitionsupportedlocationtype.md)
 
-Defined in: [util.ts:475](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L475)
+Defined in: [util.ts:475](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L475)
 
 ___
 
@@ -238,7 +238,7 @@ Name | Type |
 
 **Returns:** [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
 
-Defined in: [util.ts:513](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L513)
+Defined in: [util.ts:513](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L513)
 
 ___
 
@@ -256,7 +256,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:447](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L447)
+Defined in: [util.ts:447](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L447)
 
 ___
 
@@ -276,7 +276,7 @@ Name | Type |
 
 **Returns:** [*IPropertyDefinitionSupportedUnitType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_unit.ipropertydefinitionsupportedunittype.md)
 
-Defined in: [util.ts:457](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L457)
+Defined in: [util.ts:457](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L457)
 
 ___
 
@@ -299,7 +299,7 @@ Name | Type | Description |
 
 a function without parameters
 
-Defined in: [util.ts:41](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L41)
+Defined in: [util.ts:41](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L41)
 
 ___
 
@@ -319,7 +319,7 @@ Name | Type | Description |
 
 a string that is regex ready
 
-Defined in: [util.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L103)
+Defined in: [util.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L103)
 
 ___
 
@@ -348,7 +348,7 @@ Name | Type | Description |
 
 a new array of files
 
-Defined in: [util.ts:392](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L392)
+Defined in: [util.ts:392](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L392)
 
 ___
 
@@ -377,7 +377,7 @@ Name | Type | Description |
 
 a new IGQLFile but absolute
 
-Defined in: [util.ts:318](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L318)
+Defined in: [util.ts:318](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L318)
 
 ___
 
@@ -394,7 +394,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:275](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L275)
+Defined in: [util.ts:275](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L275)
 
 ___
 
@@ -411,7 +411,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:285](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L285)
+Defined in: [util.ts:285](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L285)
 
 ___
 
@@ -428,7 +428,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:280](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L280)
+Defined in: [util.ts:280](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L280)
 
 ___
 
@@ -444,7 +444,7 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [util.ts:265](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L265)
+Defined in: [util.ts:265](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L265)
 
 ___
 
@@ -460,7 +460,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:271](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L271)
+Defined in: [util.ts:271](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L271)
 
 ___
 
@@ -476,7 +476,7 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [util.ts:259](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L259)
+Defined in: [util.ts:259](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L259)
 
 ___
 
@@ -488,7 +488,7 @@ Provides now
 
 **Returns:** *string*
 
-Defined in: [util.ts:83](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L83)
+Defined in: [util.ts:83](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L83)
 
 ___
 
@@ -500,7 +500,7 @@ Provides time
 
 **Returns:** *string*
 
-Defined in: [util.ts:90](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L90)
+Defined in: [util.ts:90](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L90)
 
 ___
 
@@ -512,7 +512,7 @@ Provides today
 
 **Returns:** *string*
 
-Defined in: [util.ts:76](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L76)
+Defined in: [util.ts:76](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L76)
 
 ___
 
@@ -535,7 +535,7 @@ Name | Type | Description |
 
 a string
 
-Defined in: [util.ts:216](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L216)
+Defined in: [util.ts:216](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L216)
 
 ___
 
@@ -559,7 +559,7 @@ Name | Type | Description |
 
 a an array
 
-Defined in: [util.ts:236](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L236)
+Defined in: [util.ts:236](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L236)
 
 ___
 
@@ -579,7 +579,7 @@ Name | Type | Description |
 
 an extension or txt if it doesn't know
 
-Defined in: [util.ts:200](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L200)
+Defined in: [util.ts:200](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L200)
 
 ___
 
@@ -595,7 +595,7 @@ Name | Type |
 
 **Returns:** Moment
 
-Defined in: [util.ts:290](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L290)
+Defined in: [util.ts:290](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L290)
 
 ___
 
@@ -611,7 +611,7 @@ Name | Type |
 
 **Returns:** Moment
 
-Defined in: [util.ts:298](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L298)
+Defined in: [util.ts:298](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L298)
 
 ___
 
@@ -627,7 +627,7 @@ Name | Type |
 
 **Returns:** Moment
 
-Defined in: [util.ts:294](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L294)
+Defined in: [util.ts:294](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L294)
 
 ___
 
@@ -644,4 +644,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [util.ts:178](https://github.com/onzag/itemize/blob/3efa2a4a/util.ts#L178)
+Defined in: [util.ts:178](https://github.com/onzag/itemize/blob/0e9b128c/util.ts#L178)

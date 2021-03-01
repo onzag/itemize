@@ -28,4 +28,4 @@ throw new EndpointError({
 
 The standard reply exists because graphql needs something for success
 
-Defined in: [server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/server/custom-graphql/graphql-standard-reply-object.ts#L21)
+Defined in: [server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/graphql-standard-reply-object.ts#L21)

@@ -43,7 +43,7 @@ Name | Type |
 
 Inherited from: [GQLRaw](gql_querier.gqlraw.md)
 
-Defined in: [gql-querier.ts:497](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L497)
+Defined in: [gql-querier.ts:497](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L497)
 
 ## Properties
 
@@ -53,7 +53,7 @@ Defined in: [gql-querier.ts:497](https://github.com/onzag/itemize/blob/3efa2a4a/
 
 Overrides: [GQLRaw](gql_querier.gqlraw.md).[__type__](gql_querier.gqlraw.md#__type__)
 
-Defined in: [gql-querier.ts:514](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L514)
+Defined in: [gql-querier.ts:514](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L514)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 Inherited from: [GQLRaw](gql_querier.gqlraw.md).[value](gql_querier.gqlraw.md#value)
 
-Defined in: [gql-querier.ts:495](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L495)
+Defined in: [gql-querier.ts:495](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L495)
 
 ## Methods
 
@@ -80,4 +80,4 @@ Name | Type |
 
 Inherited from: [GQLRaw](gql_querier.gqlraw.md)
 
-Defined in: [gql-querier.ts:501](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L501)
+Defined in: [gql-querier.ts:501](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L501)

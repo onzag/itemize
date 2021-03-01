@@ -39,7 +39,7 @@ The include callout warning represents the renderer that is used
 when an include is missing, and the item is marked as callout, aka
 marked as incomplete
 
-Defined in: [client/providers/renderer.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L36)
+Defined in: [client/providers/renderer.tsx:36](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L36)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 The property entry boolean renderer, non-special
 
-Defined in: [client/providers/renderer.tsx:76](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L76)
+Defined in: [client/providers/renderer.tsx:76](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L76)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 The datetime renderer, a mainly standard renderer that expects a date in
 the given format
 
-Defined in: [client/providers/renderer.tsx:115](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L115)
+Defined in: [client/providers/renderer.tsx:115](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L115)
 
 ___
 
@@ -78,7 +78,7 @@ When creating a entry field renderer use onChangeByTextualValue and currentTextu
 instead of currentValue and onChange, these will handle internals for you using
 its own handler logic
 
-Defined in: [client/providers/renderer.tsx:49](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L49)
+Defined in: [client/providers/renderer.tsx:49](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L49)
 
 ___
 
@@ -90,7 +90,7 @@ The file renderer is used only for files, as simple as that
 
 Do not use the onChange function to update, use onSetFile instead
 
-Defined in: [client/providers/renderer.tsx:72](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L72)
+Defined in: [client/providers/renderer.tsx:72](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L72)
 
 ___
 
@@ -104,7 +104,7 @@ onChangeBySuggestion and onChangeBySearchResult functionality that you should
 use, otherwise you might render as normal; suggestions come from the server
 using the default service as it is programmed in the server side
 
-Defined in: [client/providers/renderer.tsx:84](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L84)
+Defined in: [client/providers/renderer.tsx:84](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L84)
 
 ___
 
@@ -126,7 +126,7 @@ changing the field used the onChangeSearch so you get options you can select,
 you can use currentValue to check if anything is currently selected, should be a number
 larger than 0
 
-Defined in: [client/providers/renderer.tsx:66](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L66)
+Defined in: [client/providers/renderer.tsx:66](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L66)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 The select renderer is used when the type has valid values, regardless of the type
 it is, supports both texual and numerical types, otherwise works as standard
 
-Defined in: [client/providers/renderer.tsx:89](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L89)
+Defined in: [client/providers/renderer.tsx:89](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L89)
 
 ___
 
@@ -164,7 +164,7 @@ of choice does not support HTML you might want to pass whatever it's using, note
 that the internal value is NOT GUARANTEED, so you must be able to recreate from just
 HTML in the render function of your renderer
 
-Defined in: [client/providers/renderer.tsx:110](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L110)
+Defined in: [client/providers/renderer.tsx:110](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L110)
 
 ___
 
@@ -175,7 +175,7 @@ ___
 The boolean renderer used to render, well, booleans; since booleans are either
 true or false, we expect a diverging rendering
 
-Defined in: [client/providers/renderer.tsx:121](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L121)
+Defined in: [client/providers/renderer.tsx:121](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L121)
 
 ___
 
@@ -188,7 +188,7 @@ can be different from standard, say for showing the price of goods
 you might want to show the value in another currency, so having support
 for conversions is relevant
 
-Defined in: [client/providers/renderer.tsx:154](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L154)
+Defined in: [client/providers/renderer.tsx:154](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L154)
 
 ___
 
@@ -198,7 +198,7 @@ ___
 
 The date time renderer
 
-Defined in: [client/providers/renderer.tsx:136](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L136)
+Defined in: [client/providers/renderer.tsx:136](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L136)
 
 ___
 
@@ -210,7 +210,7 @@ Allows to view files, it shouldn't be hard to implement a viewer for this
 you might want to use the file standard for it, this one is also
 used for files
 
-Defined in: [client/providers/renderer.tsx:142](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L142)
+Defined in: [client/providers/renderer.tsx:142](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L142)
 
 ___
 
@@ -221,7 +221,7 @@ ___
 Allows to view location, very useful and similar to the entry but simpler,
 this renderer can be used as a realtime location renderer
 
-Defined in: [client/providers/renderer.tsx:147](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L147)
+Defined in: [client/providers/renderer.tsx:147](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L147)
 
 ___
 
@@ -233,7 +233,7 @@ The simple renderer is one of the most dynamic types, similar to field, it only 
 renders properties that are not part of a property definition, which means
 these values can be null
 
-Defined in: [client/providers/renderer.tsx:127](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L127)
+Defined in: [client/providers/renderer.tsx:127](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L127)
 
 ___
 
@@ -244,4 +244,4 @@ ___
 One of the most complex view renderers for viewing the text type which
 on html rich text mode can be complex
 
-Defined in: [client/providers/renderer.tsx:132](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/renderer.tsx#L132)
+Defined in: [client/providers/renderer.tsx:132](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/renderer.tsx#L132)

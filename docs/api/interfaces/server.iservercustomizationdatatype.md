@@ -34,9 +34,9 @@ Name | Type |
 
 **Returns:** [*IGQLQueryFieldsDefinitionType*](base_root_gql.igqlqueryfieldsdefinitiontype.md)
 
-Defined in: [server/index.ts:197](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L197)
+Defined in: [server/index.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L197)
 
-Defined in: [server/index.ts:197](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L197)
+Defined in: [server/index.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L197)
 
 ___
 
@@ -56,9 +56,9 @@ Name | Type |
 
 **Returns:** [*IGQLQueryFieldsDefinitionType*](base_root_gql.igqlqueryfieldsdefinitiontype.md)
 
-Defined in: [server/index.ts:195](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L195)
+Defined in: [server/index.ts:195](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L195)
 
-Defined in: [server/index.ts:195](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L195)
+Defined in: [server/index.ts:195](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L195)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • `Optional` **customRoles**: [*ICustomRoleType*](server_resolvers_roles.icustomroletype.md)[]
 
-Defined in: [server/index.ts:201](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L201)
+Defined in: [server/index.ts:201](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L201)
 
 ___
 
@@ -86,9 +86,9 @@ Name | Type |
 
 **Returns:** *Router*
 
-Defined in: [server/index.ts:199](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L199)
+Defined in: [server/index.ts:199](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L199)
 
-Defined in: [server/index.ts:199](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L199)
+Defined in: [server/index.ts:199](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L199)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 • `Optional` **customRouterEndpoint**: *string*
 
-Defined in: [server/index.ts:198](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L198)
+Defined in: [server/index.ts:198](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L198)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 • `Optional` **customTokenGQLQueries**: [*ICustomTokensType*](server_custom_graphql.icustomtokenstype.md)
 
-Defined in: [server/index.ts:196](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L196)
+Defined in: [server/index.ts:196](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L196)
 
 ___
 
@@ -112,4 +112,4 @@ ___
 
 • `Optional` **customTriggers**: [*ITriggerRegistry*](server_resolvers_triggers.itriggerregistry.md)
 
-Defined in: [server/index.ts:200](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L200)
+Defined in: [server/index.ts:200](https://github.com/onzag/itemize/blob/0e9b128c/server/index.ts#L200)

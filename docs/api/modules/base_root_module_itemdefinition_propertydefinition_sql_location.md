@@ -36,7 +36,7 @@ Name | Type | Description |
 
 a partial row definition
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L19)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L19)
 
 ___
 
@@ -48,7 +48,7 @@ Provides the btree indexable functionality
 
 **Returns:** *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:207](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L207)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:207](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L207)
 
 ___
 
@@ -68,7 +68,7 @@ Name | Type | Description |
 
 a partial row match
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:184](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L184)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:184](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L184)
 
 ___
 
@@ -89,7 +89,7 @@ Name | Type | Description |
 
 a partial row
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:76](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L76)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:76](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L76)
 
 ___
 
@@ -109,7 +109,7 @@ Name | Type | Description |
 
 the order by rule string array
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:172](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L172)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:172](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L172)
 
 ___
 
@@ -130,7 +130,7 @@ Name | Type | Description |
 
 a property definition supported location type, or null
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L105)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L105)
 
 ___
 
@@ -150,7 +150,7 @@ Name | Type | Description |
 
 a boolean
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:197](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L197)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L197)
 
 ___
 
@@ -170,7 +170,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it, or an order by rule (also when it was searched by it)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:124](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L124)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:124](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L124)
 
 ___
 
@@ -188,4 +188,4 @@ Name | Type | Description |
 
 **Returns:** *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:60](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L60)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:60](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L60)

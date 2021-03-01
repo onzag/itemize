@@ -51,7 +51,7 @@ Constructs a new cache worker
 
 **Returns:** [*default*](client_internal_workers_cache_cache_worker.default.md)
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:176](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L176)
+Defined in: [client/internal/workers/cache/cache.worker.ts:176](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L176)
 
 ## Properties
 
@@ -73,9 +73,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:160](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L160)
+Defined in: [client/internal/workers/cache/cache.worker.ts:160](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L160)
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:160](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L160)
+Defined in: [client/internal/workers/cache/cache.worker.ts:160](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L160)
 
 ___
 
@@ -87,7 +87,7 @@ Represents the indexed db database, as a promise
 as the db might be loading even before it is requested
 to perform any action
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:136](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L136)
+Defined in: [client/internal/workers/cache/cache.worker.ts:136](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L136)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 Whether currently the cache is blocked from
 releasing
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:155](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L155)
+Defined in: [client/internal/workers/cache/cache.worker.ts:155](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L155)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 Whether the promise has been resolved as a boolean
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:176](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L176)
+Defined in: [client/internal/workers/cache/cache.worker.ts:176](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L176)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 The comlink proxied root class
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:149](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L149)
+Defined in: [client/internal/workers/cache/cache.worker.ts:149](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L149)
 
 ___
 
@@ -132,7 +132,7 @@ the database but it's only necessary to do it once
 however many instances might call the same function
 when they need the cache, so it simply ignores next calls
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:144](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L144)
+Defined in: [client/internal/workers/cache/cache.worker.ts:144](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L144)
 
 ___
 
@@ -144,7 +144,7 @@ A promise that is resolved once the indexed db
 has been setup, this doesn't say whether it was succesful
 or it failed
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:167](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L167)
+Defined in: [client/internal/workers/cache/cache.worker.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L167)
 
 ___
 
@@ -161,9 +161,9 @@ been set
 
 **Returns:** *void*
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:172](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L172)
+Defined in: [client/internal/workers/cache/cache.worker.ts:172](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L172)
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:172](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L172)
+Defined in: [client/internal/workers/cache/cache.worker.ts:172](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L172)
 
 ## Methods
 
@@ -183,7 +183,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:396](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L396)
+Defined in: [client/internal/workers/cache/cache.worker.ts:396](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L396)
 
 ___
 
@@ -205,7 +205,7 @@ Name | Type | Description |
 
 a boolean whether we succeed or not
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:360](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L360)
+Defined in: [client/internal/workers/cache/cache.worker.ts:360](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L360)
 
 ___
 
@@ -228,7 +228,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ICacheMatchType*](../interfaces/client_internal_workers_cache_cache_worker.icachematchtype.md)\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:530](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L530)
+Defined in: [client/internal/workers/cache/cache.worker.ts:530](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L530)
 
 ___
 
@@ -253,7 +253,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:459](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L459)
+Defined in: [client/internal/workers/cache/cache.worker.ts:459](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L459)
 
 ___
 
@@ -269,7 +269,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:1120](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L1120)
+Defined in: [client/internal/workers/cache/cache.worker.ts:1120](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L1120)
 
 ___
 
@@ -295,7 +295,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ICachedSearchResult*](../interfaces/client_internal_workers_cache_cache_worker.icachedsearchresult.md)\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:712](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L712)
+Defined in: [client/internal/workers/cache/cache.worker.ts:712](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L712)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:1124](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L1124)
+Defined in: [client/internal/workers/cache/cache.worker.ts:1124](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L1124)
 
 ___
 
@@ -336,7 +336,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:314](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L314)
+Defined in: [client/internal/workers/cache/cache.worker.ts:314](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L314)
 
 ___
 
@@ -354,7 +354,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:205](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L205)
+Defined in: [client/internal/workers/cache/cache.worker.ts:205](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L205)
 
 ___
 
@@ -382,4 +382,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:591](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L591)
+Defined in: [client/internal/workers/cache/cache.worker.ts:591](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L591)

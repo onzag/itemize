@@ -34,4 +34,4 @@ Name | Type | Description |
 
 **Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
 
-Defined in: [server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/server/custom-graphql/index.ts#L103)
+Defined in: [server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L103)

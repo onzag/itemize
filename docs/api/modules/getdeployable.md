@@ -29,4 +29,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [getdeployable/index.ts:38](https://github.com/onzag/itemize/blob/3efa2a4a/getdeployable/index.ts#L38)
+Defined in: [getdeployable/index.ts:38](https://github.com/onzag/itemize/blob/0e9b128c/getdeployable/index.ts#L38)

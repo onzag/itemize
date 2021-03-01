@@ -45,7 +45,7 @@
 
 Ƭ **PolicyPathType**: [*string*, *string*, *string*]
 
-Defined in: [client/providers/item.tsx:144](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L144)
+Defined in: [client/providers/item.tsx:144](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L144)
 
 ## Variables
 
@@ -53,7 +53,7 @@ Defined in: [client/providers/item.tsx:144](https://github.com/onzag/itemize/blo
 
 • `Const` **ItemContext**: *Context*<[*IItemContextType*](../interfaces/client_providers_item.iitemcontexttype.md)\>
 
-Defined in: [client/providers/item.tsx:498](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L498)
+Defined in: [client/providers/item.tsx:498](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L498)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 • `Const` **SearchItemValueContext**: *Context*<[*ISearchItemValueContextType*](../interfaces/client_providers_item.isearchitemvaluecontexttype.md)\>
 
-Defined in: [client/providers/item.tsx:499](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L499)
+Defined in: [client/providers/item.tsx:499](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L499)
 
 ## Functions
 
@@ -77,7 +77,7 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/providers/item.tsx:3648](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L3648)
+Defined in: [client/providers/item.tsx:3648](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L3648)
 
 ___
 
@@ -93,7 +93,7 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/providers/item.tsx:3789](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L3789)
+Defined in: [client/providers/item.tsx:3789](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L3789)
 
 ___
 
@@ -110,4 +110,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/providers/item.tsx:3819](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L3819)
+Defined in: [client/providers/item.tsx:3819](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L3819)

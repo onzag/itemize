@@ -19,7 +19,7 @@ this is the rule once compiled, notice that it's not raw json anymore
 
 • **if**: [*default*](../classes/base_root_module_itemdefinition_conditionalruleset.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:258](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L258)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:258](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L258)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **value**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:257](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L257)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:257](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L257)

@@ -31,4 +31,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/View.tsx#L20)
+Defined in: [client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/View.tsx#L20)

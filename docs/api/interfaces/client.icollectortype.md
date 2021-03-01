@@ -45,9 +45,9 @@ Name | Type |
 `id` | *string* |
 `node` | ReactNode |
 
-Defined in: [client/index.tsx:151](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L151)
+Defined in: [client/index.tsx:151](https://github.com/onzag/itemize/blob/0e9b128c/client/index.tsx#L151)
 
-Defined in: [client/index.tsx:151](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L151)
+Defined in: [client/index.tsx:151](https://github.com/onzag/itemize/blob/0e9b128c/client/index.tsx#L151)
 
 ___
 
@@ -71,6 +71,6 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/index.tsx:159](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L159)
+Defined in: [client/index.tsx:159](https://github.com/onzag/itemize/blob/0e9b128c/client/index.tsx#L159)
 
-Defined in: [client/index.tsx:159](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L159)
+Defined in: [client/index.tsx:159](https://github.com/onzag/itemize/blob/0e9b128c/client/index.tsx#L159)

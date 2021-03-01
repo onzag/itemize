@@ -24,7 +24,7 @@ but rather it's processed again
 
 These are the args that the graphql query needs to take
 
-Defined in: [server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/3efa2a4a/server/custom-graphql/index.ts#L80)
+Defined in: [server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L80)
 
 ___
 
@@ -51,6 +51,6 @@ Name | Type |
 
 **Returns:** [*IReferredTokenStructure*](server_custom_graphql.ireferredtokenstructure.md) \| *Promise*<[*IReferredTokenStructure*](server_custom_graphql.ireferredtokenstructure.md)\>
 
-Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/3efa2a4a/server/custom-graphql/index.ts#L60)
+Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L60)
 
-Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/3efa2a4a/server/custom-graphql/index.ts#L60)
+Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L60)

@@ -44,7 +44,7 @@ and this is the raw untreated json for an item
 
 • `Optional` **canBeParentedBy**: [*IItemDefinitionParentingRawJSONDataType*](base_root_module_itemdefinition.iitemdefinitionparentingrawjsondatatype.md)[]
 
-Defined in: [builder/index.ts:110](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L110)
+Defined in: [builder/index.ts:110](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L110)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • `Optional` **canCreateInBehalf**: *boolean*
 
-Defined in: [builder/index.ts:112](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L112)
+Defined in: [builder/index.ts:112](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L112)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • `Optional` **canCreateInBehalfRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:113](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L113)
+Defined in: [builder/index.ts:113](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L113)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 • `Optional` **canCreateInBehalfTargetRoles**: *string*[]
 
-Defined in: [builder/index.ts:114](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L114)
+Defined in: [builder/index.ts:114](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L114)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • `Optional` **children**: *string*[]
 
-Defined in: [builder/index.ts:101](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L101)
+Defined in: [builder/index.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L101)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • `Optional` **createRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:104](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L104)
+Defined in: [builder/index.ts:104](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L104)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • `Optional` **customIdRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:111](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L111)
+Defined in: [builder/index.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L111)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • `Optional` **deleteRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:106](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L106)
+Defined in: [builder/index.ts:106](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L106)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 • `Optional` **editRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L105)
+Defined in: [builder/index.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L105)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 • `Optional` **enableVersioning**: *boolean*
 
-Defined in: [builder/index.ts:121](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L121)
+Defined in: [builder/index.ts:121](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L121)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 • `Optional` **imports**: *string*[]
 
-Defined in: [builder/index.ts:100](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L100)
+Defined in: [builder/index.ts:100](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L100)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 
 • `Optional` **includes**: [*IIncludeRawJSONDataType*](base_root_module_itemdefinition_include.iincluderawjsondatatype.md)[]
 
-Defined in: [builder/index.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L102)
+Defined in: [builder/index.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L102)
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 • `Optional` **mustBeParented**: *boolean*
 
-Defined in: [builder/index.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L115)
+Defined in: [builder/index.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L115)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 • `Optional` **ownerIsObjectId**: *boolean*
 
-Defined in: [builder/index.ts:117](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L117)
+Defined in: [builder/index.ts:117](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L117)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 • `Optional` **ownerReadRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:118](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L118)
+Defined in: [builder/index.ts:118](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L118)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 • `Optional` **parentingRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:109](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L109)
+Defined in: [builder/index.ts:109](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L109)
 
 ___
 
@@ -172,7 +172,7 @@ ___
 
 • `Optional` **policies**: [*IPoliciesRawJSONDataType*](base_root_module_itemdefinition.ipoliciesrawjsondatatype.md)
 
-Defined in: [builder/index.ts:116](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L116)
+Defined in: [builder/index.ts:116](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L116)
 
 ___
 
@@ -180,7 +180,7 @@ ___
 
 • `Optional` **properties**: [*IPropertyDefinitionRawJSONDataType*](base_root_module_itemdefinition_propertydefinition.ipropertydefinitionrawjsondatatype.md)[]
 
-Defined in: [builder/index.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L103)
+Defined in: [builder/index.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L103)
 
 ___
 
@@ -188,7 +188,7 @@ ___
 
 • `Optional` **readRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:108](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L108)
+Defined in: [builder/index.ts:108](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L108)
 
 ___
 
@@ -196,7 +196,7 @@ ___
 
 • `Optional` **requestLimiters**: [*IRequestLimitersType*](base_root.irequestlimiterstype.md)
 
-Defined in: [builder/index.ts:125](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L125)
+Defined in: [builder/index.ts:125](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L125)
 
 ___
 
@@ -204,7 +204,7 @@ ___
 
 • `Optional` **searchRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:107](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L107)
+Defined in: [builder/index.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L107)
 
 ___
 
@@ -212,7 +212,7 @@ ___
 
 • `Optional` **searchable**: *boolean*
 
-Defined in: [builder/index.ts:119](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L119)
+Defined in: [builder/index.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L119)
 
 ___
 
@@ -220,7 +220,7 @@ ___
 
 • **type**: *item*
 
-Defined in: [builder/index.ts:99](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L99)
+Defined in: [builder/index.ts:99](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L99)
 
 ___
 
@@ -228,7 +228,7 @@ ___
 
 • `Optional` **versionIsCountry**: *boolean*
 
-Defined in: [builder/index.ts:124](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L124)
+Defined in: [builder/index.ts:124](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L124)
 
 ___
 
@@ -236,7 +236,7 @@ ___
 
 • `Optional` **versionIsLanguage**: *boolean*
 
-Defined in: [builder/index.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L123)
+Defined in: [builder/index.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L123)
 
 ___
 
@@ -244,7 +244,7 @@ ___
 
 • `Optional` **versionIsLanguageAndCountry**: *boolean*
 
-Defined in: [builder/index.ts:122](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L122)
+Defined in: [builder/index.ts:122](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L122)
 
 ___
 
@@ -252,4 +252,4 @@ ___
 
 • `Optional` **versioningRoleAccess**: *string*[]
 
-Defined in: [builder/index.ts:120](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L120)
+Defined in: [builder/index.ts:120](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L120)

@@ -27,7 +27,7 @@ path name and the slot id
 
 • **id**: *string*
 
-Defined in: [base/remote-protocol.ts:198](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L198)
+Defined in: [base/remote-protocol.ts:198](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L198)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **itemDefinition**: *string*
 
-Defined in: [base/remote-protocol.ts:197](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L197)
+Defined in: [base/remote-protocol.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L197)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **version**: *string*
 
-Defined in: [base/remote-protocol.ts:199](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L199)
+Defined in: [base/remote-protocol.ts:199](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L199)

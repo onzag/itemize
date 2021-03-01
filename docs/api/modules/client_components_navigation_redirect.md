@@ -30,4 +30,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/navigation/Redirect.tsx:17](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/Redirect.tsx#L17)
+Defined in: [client/components/navigation/Redirect.tsx:17](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/Redirect.tsx#L17)

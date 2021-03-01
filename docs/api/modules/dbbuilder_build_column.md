@@ -30,4 +30,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [dbbuilder/build-column.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/build-column.ts#L19)
+Defined in: [dbbuilder/build-column.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-column.ts#L19)

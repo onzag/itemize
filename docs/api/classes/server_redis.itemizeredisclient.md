@@ -49,7 +49,7 @@ Name | Type | Description |
 
 **Returns:** [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L28)
+Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L28)
 
 ## Properties
 
@@ -69,9 +69,9 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/redis.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L25)
+Defined in: [server/redis.ts:25](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L25)
 
-Defined in: [server/redis.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L25)
+Defined in: [server/redis.ts:25](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L25)
 
 ___
 
@@ -91,9 +91,9 @@ Name | Type |
 
 **Returns:** *Promise*<number\>
 
-Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L28)
+Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L28)
 
-Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L28)
+Defined in: [server/redis.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L28)
 
 ___
 
@@ -114,9 +114,9 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/redis.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L27)
+Defined in: [server/redis.ts:27](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L27)
 
-Defined in: [server/redis.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L27)
+Defined in: [server/redis.ts:27](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L27)
 
 ___
 
@@ -130,9 +130,9 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/redis.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L26)
+Defined in: [server/redis.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L26)
 
-Defined in: [server/redis.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L26)
+Defined in: [server/redis.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L26)
 
 ___
 
@@ -152,9 +152,9 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [server/redis.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L23)
+Defined in: [server/redis.ts:23](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L23)
 
-Defined in: [server/redis.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L23)
+Defined in: [server/redis.ts:23](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L23)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 • `Private` **isReconnecting**: *boolean*= false
 
-Defined in: [server/redis.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L19)
+Defined in: [server/redis.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L19)
 
 ___
 
@@ -170,7 +170,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [server/redis.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L21)
+Defined in: [server/redis.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L21)
 
 ___
 
@@ -178,7 +178,7 @@ ___
 
 • **redisClient**: *RedisClient*
 
-Defined in: [server/redis.ts:22](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L22)
+Defined in: [server/redis.ts:22](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L22)
 
 ___
 
@@ -199,9 +199,9 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/redis.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L24)
+Defined in: [server/redis.ts:24](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L24)
 
-Defined in: [server/redis.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L24)
+Defined in: [server/redis.ts:24](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L24)
 
 ## Methods
 
@@ -219,7 +219,7 @@ Name | Type | Description |
 
 **Returns:** (...`args`: *any*[]) => *Promise*<any\>
 
-Defined in: [server/redis.ts:124](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L124)
+Defined in: [server/redis.ts:124](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L124)
 
 ___
 
@@ -240,4 +240,4 @@ Name | Type | Description |
 the client itself, once it has been done and the connect function has ran, considering itself ready
 to take on connections
 
-Defined in: [server/redis.ts:56](https://github.com/onzag/itemize/blob/3efa2a4a/server/redis.ts#L56)
+Defined in: [server/redis.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/server/redis.ts#L56)

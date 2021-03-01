@@ -51,9 +51,9 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/providers/locale-provider.tsx:35](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L35)
+Defined in: [client/internal/providers/locale-provider.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L35)
 
-Defined in: [client/internal/providers/locale-provider.tsx:35](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L35)
+Defined in: [client/internal/providers/locale-provider.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L35)
 
 ___
 
@@ -80,9 +80,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/providers/locale-provider.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L28)
+Defined in: [client/internal/providers/locale-provider.tsx:28](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L28)
 
-Defined in: [client/internal/providers/locale-provider.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L28)
+Defined in: [client/internal/providers/locale-provider.tsx:28](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L28)
 
 ___
 
@@ -112,9 +112,9 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/providers/locale-provider.tsx:22](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L22)
+Defined in: [client/internal/providers/locale-provider.tsx:22](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L22)
 
-Defined in: [client/internal/providers/locale-provider.tsx:22](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L22)
+Defined in: [client/internal/providers/locale-provider.tsx:22](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L22)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 The current country code
 
-Defined in: [client/internal/providers/locale-provider.tsx:57](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L57)
+Defined in: [client/internal/providers/locale-provider.tsx:57](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L57)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 The current currency code
 
-Defined in: [client/internal/providers/locale-provider.tsx:47](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L47)
+Defined in: [client/internal/providers/locale-provider.tsx:47](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L47)
 
 ___
 
@@ -146,7 +146,7 @@ The current currency factors
 
 #### Type declaration:
 
-Defined in: [client/internal/providers/locale-provider.tsx:51](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L51)
+Defined in: [client/internal/providers/locale-provider.tsx:51](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L51)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 The root i18n data
 
-Defined in: [client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L70)
+Defined in: [client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L70)
 
 ___
 
@@ -166,7 +166,7 @@ ___
 
 The language locales available, and their given direction
 
-Defined in: [client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L66)
+Defined in: [client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L66)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 The current language code
 
-Defined in: [client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L39)
+Defined in: [client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L39)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 Whether this current language is rtl
 
-Defined in: [client/internal/providers/locale-provider.tsx:43](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L43)
+Defined in: [client/internal/providers/locale-provider.tsx:43](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L43)
 
 ___
 
@@ -197,4 +197,4 @@ ___
 Whether this is currently updating, on practise only happens
 with updating the language as it has to be refetched
 
-Defined in: [client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/locale-provider.tsx#L62)
+Defined in: [client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/locale-provider.tsx#L62)

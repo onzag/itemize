@@ -40,7 +40,7 @@ Name | Type | Description |
 
 **Returns:** [*string*, *any*[]][]
 
-Defined in: [base/Root/Module/sql.ts:302](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/sql.ts#L302)
+Defined in: [base/Root/Module/sql.ts:302](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/sql.ts#L302)
 
 ___
 
@@ -68,7 +68,7 @@ Name | Type | Description |
 
 the composed row value with the consume streams function
 
-Defined in: [base/Root/Module/sql.ts:195](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/sql.ts#L195)
+Defined in: [base/Root/Module/sql.ts:195](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/sql.ts#L195)
 
 ___
 
@@ -94,7 +94,7 @@ Name | Type | Description |
 
 a graphql value
 
-Defined in: [base/Root/Module/sql.ts:259](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/sql.ts#L259)
+Defined in: [base/Root/Module/sql.ts:259](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/sql.ts#L259)
 
 ___
 
@@ -115,7 +115,7 @@ Name | Type | Description |
 
 a whole table schema for the module table
 
-Defined in: [base/Root/Module/sql.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/sql.ts#L34)
+Defined in: [base/Root/Module/sql.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/sql.ts#L34)
 
 ___
 
@@ -137,4 +137,4 @@ Name | Type | Description |
 
 a partial database schema for the module itself, all the child modules, and the item definition
 
-Defined in: [base/Root/Module/sql.ts:156](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/sql.ts#L156)
+Defined in: [base/Root/Module/sql.ts:156](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/sql.ts#L156)

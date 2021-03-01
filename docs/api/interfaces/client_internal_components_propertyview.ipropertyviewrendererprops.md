@@ -54,7 +54,7 @@ The renderer args
 
 Inherited from: [IRendererProps](client_internal_renderer.irendererprops.md).[args](client_internal_renderer.irendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L19)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 The current value to be displayed
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -76,4 +76,4 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IRendererProps](client_internal_renderer.irendererprops.md).[rtl](client_internal_renderer.irendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L15)

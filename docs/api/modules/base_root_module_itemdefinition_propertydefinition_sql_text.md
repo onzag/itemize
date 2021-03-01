@@ -33,7 +33,7 @@ Name | Type | Description |
 
 a partial row definition
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:16](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L16)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:16](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L16)
 
 ___
 
@@ -45,7 +45,7 @@ Provides the btree indexable function for text type
 
 **Returns:** *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:173](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L173)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:173](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L173)
 
 ___
 
@@ -65,7 +65,7 @@ Name | Type | Description |
 
 a partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L40)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L40)
 
 ___
 
@@ -85,7 +85,7 @@ Name | Type | Description |
 
 the order by rule string array (or null) if not possible to order
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:159](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L159)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:159](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L159)
 
 ___
 
@@ -105,7 +105,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it, and a complementary column order by in case it needs it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:94](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L94)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:94](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L94)
 
 ___
 
@@ -125,4 +125,4 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it, and a complementary column order by in case it needs it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:129](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L129)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:129](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L129)

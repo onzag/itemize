@@ -40,7 +40,7 @@ Name |
 
 whether to cache files when running the url absoluter
 
-Defined in: [client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L168)
+Defined in: [client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L168)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 Whether to capitalize
 
-Defined in: [client/components/property/base.tsx:158](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L158)
+Defined in: [client/components/property/base.tsx:158](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L158)
 
 ___
 
@@ -63,7 +63,7 @@ provider
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[id](client_components_property_base.ipropertybasewithrendererprops.md#id)
 
-Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L31)
+Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L31)
 
 ___
 
@@ -75,7 +75,7 @@ the policy name, should be provided with a policy type
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[policyName](client_components_property_base.ipropertybasewithrendererprops.md#policyname)
 
-Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L44)
+Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L44)
 
 ___
 
@@ -87,7 +87,7 @@ the policy type, should be provided with a policy name
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[policyType](client_components_property_base.ipropertybasewithrendererprops.md#policytype)
 
-Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L40)
+Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L40)
 
 ___
 
@@ -99,7 +99,7 @@ the renderer in charge of rendering the output
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[renderer](client_components_property_base.ipropertybasewithrendererprops.md#renderer)
 
-Defined in: [client/components/property/base.tsx:54](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L54)
+Defined in: [client/components/property/base.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L54)
 
 ___
 
@@ -111,7 +111,7 @@ Extra renderer args
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[rendererArgs](client_components_property_base.ipropertybasewithrendererprops.md#rendererargs)
 
-Defined in: [client/components/property/base.tsx:58](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L58)
+Defined in: [client/components/property/base.tsx:58](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L58)
 
 ___
 
@@ -124,7 +124,7 @@ only truly available in search mode
 
 Inherited from: [IPropertyBaseWithRendererProps](client_components_property_base.ipropertybasewithrendererprops.md).[searchVariant](client_components_property_base.ipropertybasewithrendererprops.md#searchvariant)
 
-Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L36)
+Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L36)
 
 ___
 
@@ -136,4 +136,4 @@ whether to use the applied value rather than the
 actual current value the applied value is synced
 with the server
 
-Defined in: [client/components/property/base.tsx:164](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/property/base.tsx#L164)
+Defined in: [client/components/property/base.tsx:164](https://github.com/onzag/itemize/blob/0e9b128c/client/components/property/base.tsx#L164)

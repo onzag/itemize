@@ -22,7 +22,7 @@ Contains the text type description
 
 The text is described by a string
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L29)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L29)
 
 ## Variables
 
@@ -32,4 +32,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:29
 
 The type describes how the text type behaves in the app, this includes rich text
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L34)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/text.ts#L34)

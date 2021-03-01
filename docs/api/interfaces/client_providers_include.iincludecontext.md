@@ -17,7 +17,7 @@
 
 • **include**: [*default*](../classes/base_root_module_itemdefinition_include.default.md)
 
-Defined in: [client/providers/include.tsx:7](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/include.tsx#L7)
+Defined in: [client/providers/include.tsx:7](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/include.tsx#L7)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **state**: [*IIncludeState*](base_root_module_itemdefinition_include.iincludestate.md)
 
-Defined in: [client/providers/include.tsx:8](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/include.tsx#L8)
+Defined in: [client/providers/include.tsx:8](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/include.tsx#L8)

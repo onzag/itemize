@@ -23,7 +23,7 @@ Information about the file that has just been inserted
 
 height of the file, only available if it's an image
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:32](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L32)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:32](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L32)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 whether it is an image
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L36)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:36](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L36)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 The file itself
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:24](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L24)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:24](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L24)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 width of the file, only available if it's an image
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L28)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:28](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L28)

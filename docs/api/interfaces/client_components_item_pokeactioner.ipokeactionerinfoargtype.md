@@ -42,9 +42,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L63)
+Defined in: [client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L63)
 
-Defined in: [client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L63)
+Defined in: [client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L63)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 The elements to be poked, this is basically the same as
 the property
 
-Defined in: [client/components/item/PokeActioner.tsx:47](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L47)
+Defined in: [client/components/item/PokeActioner.tsx:47](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L47)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 Whether one of the includes in the elements to poke
 is currently invalid
 
-Defined in: [client/components/item/PokeActioner.tsx:32](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L32)
+Defined in: [client/components/item/PokeActioner.tsx:32](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L32)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 Whether one of the policies in the elements to poke
 is currently invalid
 
-Defined in: [client/components/item/PokeActioner.tsx:37](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L37)
+Defined in: [client/components/item/PokeActioner.tsx:37](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L37)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 Whether one of the properties in the elements to poke
 is currently invalid
 
-Defined in: [client/components/item/PokeActioner.tsx:27](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L27)
+Defined in: [client/components/item/PokeActioner.tsx:27](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L27)
 
 ___
 
@@ -110,9 +110,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L59)
+Defined in: [client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L59)
 
-Defined in: [client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L59)
+Defined in: [client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L59)
 
 ___
 
@@ -128,9 +128,9 @@ Pokes the elements to poke
 
 **Returns:** *void*
 
-Defined in: [client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L55)
+Defined in: [client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L55)
 
-Defined in: [client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L55)
+Defined in: [client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L55)
 
 ___
 
@@ -141,7 +141,7 @@ ___
 All poked elements currently in the item
 definition
 
-Defined in: [client/components/item/PokeActioner.tsx:42](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L42)
+Defined in: [client/components/item/PokeActioner.tsx:42](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L42)
 
 ___
 
@@ -157,6 +157,6 @@ Unpokeseverything
 
 **Returns:** *void*
 
-Defined in: [client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L51)
+Defined in: [client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L51)
 
-Defined in: [client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/PokeActioner.tsx#L51)
+Defined in: [client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/PokeActioner.tsx#L51)

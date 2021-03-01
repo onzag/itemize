@@ -30,7 +30,7 @@ Custom translation fields
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/index.ts:60](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L60)
+Defined in: [base/Root/Module/index.ts:60](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L60)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 The name of the module or the item definition
 
-Defined in: [base/Root/Module/index.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L40)
+Defined in: [base/Root/Module/index.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L40)
 
 ___
 
@@ -60,7 +60,7 @@ Name | Type |
 `parent`? | *object* |
 `read`? | *object* |
 
-Defined in: [base/Root/Module/index.ts:67](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L67)
+Defined in: [base/Root/Module/index.ts:67](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L67)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 The full text search field label for full text search mode
 
-Defined in: [base/Root/Module/index.ts:44](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L44)
+Defined in: [base/Root/Module/index.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L44)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 The full text search placeholder for full text search mode
 
-Defined in: [base/Root/Module/index.ts:48](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L48)
+Defined in: [base/Root/Module/index.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L48)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 A comma separated list of strings for full text search mode
 
-Defined in: [base/Root/Module/index.ts:56](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L56)
+Defined in: [base/Root/Module/index.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L56)
 
 ___
 
@@ -100,4 +100,4 @@ ___
 
 The error that comes from the full text search mode when you have input too much data
 
-Defined in: [base/Root/Module/index.ts:52](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/index.ts#L52)
+Defined in: [base/Root/Module/index.ts:52](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/index.ts#L52)

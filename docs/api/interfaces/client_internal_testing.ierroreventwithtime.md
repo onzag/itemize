@@ -26,7 +26,7 @@
 
 Inherited from: [IErrorEvent](base_remote_protocol.ierrorevent.md).[message](base_remote_protocol.ierrorevent.md#message)
 
-Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L47)
+Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L47)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 Inherited from: [IErrorEvent](base_remote_protocol.ierrorevent.md).[request](base_remote_protocol.ierrorevent.md#request)
 
-Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L48)
+Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L48)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L55)
+Defined in: [client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L55)

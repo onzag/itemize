@@ -31,7 +31,7 @@ The slot id of that item definition
 
 Inherited from: [IChangedFeedbackEvent](base_remote_protocol.ichangedfeedbackevent.md).[id](base_remote_protocol.ichangedfeedbackevent.md#id)
 
-Defined in: [base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L79)
+Defined in: [base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L79)
 
 ___
 
@@ -43,7 +43,7 @@ The item definition as a qualified name
 
 Inherited from: [IChangedFeedbackEvent](base_remote_protocol.ichangedfeedbackevent.md).[itemDefinition](base_remote_protocol.ichangedfeedbackevent.md#itemdefinition)
 
-Defined in: [base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L75)
+Defined in: [base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L75)
 
 ___
 
@@ -55,7 +55,7 @@ A timestamp that comes when type=last_modified
 
 Inherited from: [IChangedFeedbackEvent](base_remote_protocol.ichangedfeedbackevent.md).[lastModified](base_remote_protocol.ichangedfeedbackevent.md#lastmodified)
 
-Defined in: [base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L97)
+Defined in: [base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L97)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L103)
+Defined in: [client/internal/testing.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L103)
 
 ___
 
@@ -81,7 +81,7 @@ the case, check the lastModified property
 
 Inherited from: [IChangedFeedbackEvent](base_remote_protocol.ichangedfeedbackevent.md).[type](base_remote_protocol.ichangedfeedbackevent.md#type)
 
-Defined in: [base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L93)
+Defined in: [base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L93)
 
 ___
 
@@ -93,4 +93,4 @@ The version of that item definition
 
 Inherited from: [IChangedFeedbackEvent](base_remote_protocol.ichangedfeedbackevent.md).[version](base_remote_protocol.ichangedfeedbackevent.md#version)
 
-Defined in: [base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L83)
+Defined in: [base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L83)

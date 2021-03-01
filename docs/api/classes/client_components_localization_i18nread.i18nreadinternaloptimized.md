@@ -446,7 +446,7 @@ ___
 
 **Returns:** ReactNode
 
-Defined in: [client/components/localization/I18nRead.tsx:320](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L320)
+Defined in: [client/components/localization/I18nRead.tsx:320](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L320)
 
 ___
 

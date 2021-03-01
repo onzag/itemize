@@ -23,7 +23,7 @@ These are all the 4 interfaces
 
 uses an instance of the same property type input
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:18](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L18)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L18)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 uses an instance of the same property type input, or two for a range
 provides either an exact value or a range
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L23)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:23](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L23)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 uses location and radius for searching
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L31)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L31)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 full text search, uses a simple raw string as search
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L27)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:27](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L27)

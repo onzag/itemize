@@ -36,7 +36,7 @@ check [IParentedSearchRegisterRequest](base_remote_protocol.iparentedsearchregis
 
 the records that have been deleted
 
-Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L115)
+Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L115)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 the records that have been modified
 
-Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L119)
+Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L119)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 the new last record search result
 
-Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L123)
+Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L123)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 the new records that have been added
 
-Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L111)
+Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L111)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • **parentId**: *string*
 
-Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L150)
+Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L150)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 • **parentType**: *string*
 
-Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L149)
+Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L149)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 • **parentVersion**: *string*
 
-Defined in: [base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L151)
+Defined in: [base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L151)
 
 ___
 
@@ -100,4 +100,4 @@ ___
 
 the qualified path name or type of the either module or item definition
 
-Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L107)
+Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L107)

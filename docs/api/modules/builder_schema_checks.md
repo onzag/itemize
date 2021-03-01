@@ -32,7 +32,7 @@ in order to validate schemas using ajv
 
 Check the partial config (non-sensitive)
 
-Defined in: [builder/schema-checks.ts:62](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L62)
+Defined in: [builder/schema-checks.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L62)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 Check raw database config
 
-Defined in: [builder/schema-checks.ts:68](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L68)
+Defined in: [builder/schema-checks.ts:68](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L68)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 Check raw dump config
 
-Defined in: [builder/schema-checks.ts:74](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L74)
+Defined in: [builder/schema-checks.ts:74](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L74)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 Checks an item definition schema
 
-Defined in: [builder/schema-checks.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L30)
+Defined in: [builder/schema-checks.ts:30](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L30)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 Checks a module
 
-Defined in: [builder/schema-checks.ts:50](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L50)
+Defined in: [builder/schema-checks.ts:50](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L50)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 Checks a property definition array schema
 
-Defined in: [builder/schema-checks.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L36)
+Defined in: [builder/schema-checks.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L36)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 Check redis config
 
-Defined in: [builder/schema-checks.ts:80](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L80)
+Defined in: [builder/schema-checks.ts:80](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L80)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 Checks a root schema
 
-Defined in: [builder/schema-checks.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L24)
+Defined in: [builder/schema-checks.ts:24](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L24)
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 Check the partial sensitive configuration
 
-Defined in: [builder/schema-checks.ts:56](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L56)
+Defined in: [builder/schema-checks.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L56)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 • `Const` **checkSpecialPropertyValueSetSchemaValidate**: ValidateFunction
 
-Defined in: [builder/schema-checks.ts:44](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L44)
+Defined in: [builder/schema-checks.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L44)
 
 ## Functions
 
@@ -142,4 +142,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/schema-checks.ts:91](https://github.com/onzag/itemize/blob/3efa2a4a/builder/schema-checks.ts#L91)
+Defined in: [builder/schema-checks.ts:91](https://github.com/onzag/itemize/blob/0e9b128c/builder/schema-checks.ts#L91)

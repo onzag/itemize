@@ -33,4 +33,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx:170](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx#L170)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx:170](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx#L170)

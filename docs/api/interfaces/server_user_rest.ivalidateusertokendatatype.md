@@ -17,7 +17,7 @@
 
 • **validateUserEmail**: *string*
 
-Defined in: [server/user/rest.ts:11](https://github.com/onzag/itemize/blob/3efa2a4a/server/user/rest.ts#L11)
+Defined in: [server/user/rest.ts:11](https://github.com/onzag/itemize/blob/0e9b128c/server/user/rest.ts#L11)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **validateUserId**: *string*
 
-Defined in: [server/user/rest.ts:10](https://github.com/onzag/itemize/blob/3efa2a4a/server/user/rest.ts#L10)
+Defined in: [server/user/rest.ts:10](https://github.com/onzag/itemize/blob/0e9b128c/server/user/rest.ts#L10)

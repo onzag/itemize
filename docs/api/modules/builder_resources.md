@@ -31,4 +31,4 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [builder/resources.ts:191](https://github.com/onzag/itemize/blob/3efa2a4a/builder/resources.ts#L191)
+Defined in: [builder/resources.ts:191](https://github.com/onzag/itemize/blob/0e9b128c/builder/resources.ts#L191)

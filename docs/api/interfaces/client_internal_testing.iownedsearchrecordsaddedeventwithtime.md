@@ -30,7 +30,7 @@
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[createdBy](base_remote_protocol.iownedsearchrecordsevent.md#createdby)
 
-Defined in: [base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L136)
+Defined in: [base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L136)
 
 ___
 
@@ -42,7 +42,7 @@ the records that have been deleted
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[lostRecords](base_remote_protocol.iownedsearchrecordsevent.md#lostrecords)
 
-Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L115)
+Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L115)
 
 ___
 
@@ -54,7 +54,7 @@ the records that have been modified
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[modifiedRecords](base_remote_protocol.iownedsearchrecordsevent.md#modifiedrecords)
 
-Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L119)
+Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L119)
 
 ___
 
@@ -66,7 +66,7 @@ the new last record search result
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[newLastModified](base_remote_protocol.iownedsearchrecordsevent.md#newlastmodified)
 
-Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L123)
+Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L123)
 
 ___
 
@@ -78,7 +78,7 @@ the new records that have been added
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[newRecords](base_remote_protocol.iownedsearchrecordsevent.md#newrecords)
 
-Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L111)
+Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L111)
 
 ___
 
@@ -90,7 +90,7 @@ the qualified path name or type of the either module or item definition
 
 Inherited from: [IOwnedSearchRecordsEvent](base_remote_protocol.iownedsearchrecordsevent.md).[qualifiedPathName](base_remote_protocol.iownedsearchrecordsevent.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L107)
+Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L107)
 
 ___
 
@@ -98,4 +98,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L107)
+Defined in: [client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L107)

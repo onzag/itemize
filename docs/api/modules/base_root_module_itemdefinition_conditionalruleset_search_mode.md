@@ -33,7 +33,7 @@ Name | Type | Description |
 
 a raw conditional rule set that is the search mode form of this ruleset
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L36)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L36)
 
 ___
 
@@ -53,4 +53,4 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L19)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L19)

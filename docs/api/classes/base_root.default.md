@@ -55,7 +55,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](base_root.default.md)
 
-Defined in: [base/Root/index.ts:216](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L216)
+Defined in: [base/Root/index.ts:216](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L216)
 
 ## Properties
 
@@ -67,7 +67,7 @@ The child modules
 
 **`internal`** 
 
-Defined in: [base/Root/index.ts:193](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L193)
+Defined in: [base/Root/index.ts:193](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L193)
 
 ___
 
@@ -79,7 +79,7 @@ The raw data this root was generated from
 
 **`internal`** 
 
-Defined in: [base/Root/index.ts:162](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L162)
+Defined in: [base/Root/index.ts:162](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L162)
 
 ___
 
@@ -109,7 +109,7 @@ The registry is a quick utility that can be used to access these values
 
 #### Type declaration:
 
-Defined in: [base/Root/index.ts:185](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L185)
+Defined in: [base/Root/index.ts:185](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L185)
 
 ___
 
@@ -123,7 +123,7 @@ by the beforeSSRRender functionality
 
 **`internal`** 
 
-Defined in: [base/Root/index.ts:208](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L208)
+Defined in: [base/Root/index.ts:208](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L208)
 
 ___
 
@@ -135,7 +135,7 @@ A root state, normally used in
 the server side to store information
 in the root about execution
 
-Defined in: [base/Root/index.ts:200](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L200)
+Defined in: [base/Root/index.ts:200](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L200)
 
 ___
 
@@ -149,7 +149,7 @@ conditional rule set about what it should evaluate
 
 **`internal`** 
 
-Defined in: [base/Root/index.ts:216](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L216)
+Defined in: [base/Root/index.ts:216](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L216)
 
 ## Methods
 
@@ -173,7 +173,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [base/Root/index.ts:290](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L290)
+Defined in: [base/Root/index.ts:290](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L290)
 
 ___
 
@@ -189,7 +189,7 @@ the root to a clean pristine state
 
 **Returns:** *void*
 
-Defined in: [base/Root/index.ts:240](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L240)
+Defined in: [base/Root/index.ts:240](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L240)
 
 ___
 
@@ -213,7 +213,7 @@ allModules.forEach((m) => {
 
 an array of Module
 
-Defined in: [base/Root/index.ts:325](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L325)
+Defined in: [base/Root/index.ts:325](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L325)
 
 ___
 
@@ -245,7 +245,7 @@ main and the root, these usuall reside at `schema/main-i18n.properties` and `roo
 
 the whole i18n data object
 
-Defined in: [base/Root/index.ts:424](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L424)
+Defined in: [base/Root/index.ts:424](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L424)
 
 ___
 
@@ -280,7 +280,7 @@ Name | Type | Description |
 
 an object or null (if locale does not exist)
 
-Defined in: [base/Root/index.ts:449](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L449)
+Defined in: [base/Root/index.ts:449](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L449)
 
 ___
 
@@ -321,7 +321,7 @@ Name | Type | Description |
 
 an specific module
 
-Defined in: [base/Root/index.ts:356](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L356)
+Defined in: [base/Root/index.ts:356](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L356)
 
 ___
 
@@ -339,7 +339,7 @@ during a specific action
 
 an array of string that represents the server flags
 
-Defined in: [base/Root/index.ts:476](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L476)
+Defined in: [base/Root/index.ts:476](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L476)
 
 ___
 
@@ -362,7 +362,7 @@ Name | Type | Description |
 
 the previously stored value or null
 
-Defined in: [base/Root/index.ts:266](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L266)
+Defined in: [base/Root/index.ts:266](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L266)
 
 ___
 
@@ -383,7 +383,7 @@ This is not a very useful method itself but it's there
 
 an array of string with the module names
 
-Defined in: [base/Root/index.ts:306](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L306)
+Defined in: [base/Root/index.ts:306](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L306)
 
 ___
 
@@ -408,7 +408,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/index.ts:388](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L388)
+Defined in: [base/Root/index.ts:388](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L388)
 
 ___
 
@@ -430,7 +430,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/index.ts:277](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L277)
+Defined in: [base/Root/index.ts:277](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L277)
 
 ___
 
@@ -454,7 +454,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/index.ts:463](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L463)
+Defined in: [base/Root/index.ts:463](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L463)
 
 ___
 
@@ -477,7 +477,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/index.ts:255](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L255)
+Defined in: [base/Root/index.ts:255](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L255)
 
 ___
 
@@ -502,4 +502,4 @@ Name | Type | Description |
 
 a raw module or null
 
-Defined in: [base/Root/index.ts:122](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/index.ts#L122)
+Defined in: [base/Root/index.ts:122](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L122)

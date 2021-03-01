@@ -24,4 +24,4 @@ to send errors from the server side to the client side
 
 All errors
 
-Defined in: [base/errors.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/base/errors.ts#L69)
+Defined in: [base/errors.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/base/errors.ts#L69)

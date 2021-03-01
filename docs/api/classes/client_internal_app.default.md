@@ -75,7 +75,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](client_internal_app.default.md)
 
-Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L144)
+Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L144)
 
 ## Properties
 
@@ -130,7 +130,7 @@ the remote listener object that listens for the remote changes
 and does the registration of itemize items that are loaded in order for listen to changes
 as well as buildnumbers, currency factors changed info, etc...
 
-Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L144)
+Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L144)
 
 ___
 
@@ -150,7 +150,7 @@ This is the token state that is actually given by the token provider that sits i
 the application itself, the reason why this app itself needs it, it's because the remote listener
 as well as the update functions need token provider
 
-Defined in: [client/internal/app/index.tsx:138](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L138)
+Defined in: [client/internal/app/index.tsx:138](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L138)
 
 ___
 
@@ -290,7 +290,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/app/index.tsx:445](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L445)
+Defined in: [client/internal/app/index.tsx:445](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L445)
 
 ___
 
@@ -310,7 +310,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/app/index.tsx:515](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L515)
+Defined in: [client/internal/app/index.tsx:515](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L515)
 
 ___
 
@@ -329,7 +329,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/app/index.tsx:364](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L364)
+Defined in: [client/internal/app/index.tsx:364](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L364)
 
 ___
 
@@ -502,7 +502,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/app/index.tsx:327](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L327)
+Defined in: [client/internal/app/index.tsx:327](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L327)
 
 ___
 
@@ -560,7 +560,7 @@ Name | Type | Description |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/app/index.tsx:316](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L316)
+Defined in: [client/internal/app/index.tsx:316](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L316)
 
 ___
 
@@ -572,7 +572,7 @@ The render function
 
 **Returns:** *Element*
 
-Defined in: [client/internal/app/index.tsx:610](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L610)
+Defined in: [client/internal/app/index.tsx:610](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L610)
 
 ___
 
@@ -592,7 +592,7 @@ Name | Type | Description |
 
 the application in the right locale context
 
-Defined in: [client/internal/app/index.tsx:551](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L551)
+Defined in: [client/internal/app/index.tsx:551](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L551)
 
 ___
 
@@ -612,7 +612,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/app/index.tsx:224](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L224)
+Defined in: [client/internal/app/index.tsx:224](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L224)
 
 ___
 
@@ -656,7 +656,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/app/index.tsx:239](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L239)
+Defined in: [client/internal/app/index.tsx:239](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L239)
 
 ___
 
@@ -701,7 +701,7 @@ Currency factors is also service worked so it should work offline
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/app/index.tsx:201](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L201)
+Defined in: [client/internal/app/index.tsx:201](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L201)
 
 ___
 
@@ -723,4 +723,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/app/index.tsx:260](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/app/index.tsx#L260)
+Defined in: [client/internal/app/index.tsx:260](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/app/index.tsx#L260)

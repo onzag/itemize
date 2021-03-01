@@ -31,7 +31,7 @@ This is the raw json that comes from the json file that defines the schema
 
 • `Optional` **canUserExclude**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:94](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L94)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:94](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L94)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • `Optional` **canUserExcludeIf**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L95)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L95)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • `Optional` **defaultExcluded**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:96](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L96)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:96](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L96)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • `Optional` **defaultExcludedIf**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:97](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L97)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L97)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • **definition**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L79)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L79)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • `Optional` **disableSearch**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:101](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L101)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L101)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • `Optional` **enforcedProperties**: [*IPropertiesValueMappingDefinitonRawJSONDataType*](base_root_module_itemdefinition_propertiesvaluemappingdefiniton.ipropertiesvaluemappingdefinitonrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:91](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L91)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:91](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L91)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • `Optional` **excludedIf**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:93](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L93)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:93](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L93)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 • `Optional` **exclusionIsCallout**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:100](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L100)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:100](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L100)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:80](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L80)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:80](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L80)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 • **id**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:78](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L78)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:78](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L78)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 • `Optional` **predefinedProperties**: [*IPropertiesValueMappingDefinitonRawJSONDataType*](base_root_module_itemdefinition_propertiesvaluemappingdefiniton.ipropertiesvaluemappingdefinitonrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:92](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L92)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L92)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 • `Optional` **sinkIn**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L102)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L102)
 
 ___
 
@@ -137,4 +137,4 @@ ___
 
 • `Optional` **ternaryExclusionState**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:98](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/index.ts#L98)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:98](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L98)

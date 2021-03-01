@@ -24,4 +24,4 @@ using the raw unprocessed data into some multiple per language files
 
 **Returns:** *Promise*<void\>
 
-Defined in: [builder/index.ts:128](https://github.com/onzag/itemize/blob/3efa2a4a/builder/index.ts#L128)
+Defined in: [builder/index.ts:128](https://github.com/onzag/itemize/blob/0e9b128c/builder/index.ts#L128)

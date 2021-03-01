@@ -34,7 +34,7 @@ The renderer args
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[args](client_internal_components_propertyview.ipropertyviewrendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L19)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 Whether it should capitalize
 
-Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:18](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewSimple.tsx#L18)
+Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:18](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewSimple.tsx#L18)
 
 ___
 
@@ -56,7 +56,7 @@ The current value to be displayed
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[currentValue](client_internal_components_propertyview.ipropertyviewrendererprops.md#currentvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 The language code it's currently using
 
-Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:22](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewSimple.tsx#L22)
+Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:22](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewSimple.tsx#L22)
 
 ___
 
@@ -78,4 +78,4 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[rtl](client_internal_components_propertyview.ipropertyviewrendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/renderer.ts#L15)

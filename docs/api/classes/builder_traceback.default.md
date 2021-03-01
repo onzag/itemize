@@ -48,7 +48,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](builder_traceback.default.md)
 
-Defined in: [builder/Traceback.ts:87](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L87)
+Defined in: [builder/Traceback.ts:87](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L87)
 
 ## Properties
 
@@ -58,7 +58,7 @@ Defined in: [builder/Traceback.ts:87](https://github.com/onzag/itemize/blob/3efa
 
 The location of this specific traceback
 
-Defined in: [builder/Traceback.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L79)
+Defined in: [builder/Traceback.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L79)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 A parent traceback, as traceback stacks are mostly meant to be static
 they can be chained as a history
 
-Defined in: [builder/Traceback.ts:75](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L75)
+Defined in: [builder/Traceback.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L75)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 The json map pointers that were used, if any
 
-Defined in: [builder/Traceback.ts:83](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L83)
+Defined in: [builder/Traceback.ts:83](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L83)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 The raw string content of the file
 
-Defined in: [builder/Traceback.ts:87](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L87)
+Defined in: [builder/Traceback.ts:87](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L87)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 The stack contains all the traceback bits that have been accumulating
 
-Defined in: [builder/Traceback.ts:70](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L70)
+Defined in: [builder/Traceback.ts:70](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L70)
 
 ## Methods
 
@@ -117,7 +117,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/Traceback.ts:119](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L119)
+Defined in: [builder/Traceback.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L119)
 
 ___
 
@@ -135,7 +135,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/Traceback.ts:192](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L192)
+Defined in: [builder/Traceback.ts:192](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L192)
 
 ___
 
@@ -155,7 +155,7 @@ Name | Type | Description |
 
 a new traceback object that traces to that bit
 
-Defined in: [builder/Traceback.ts:128](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L128)
+Defined in: [builder/Traceback.ts:128](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L128)
 
 ___
 
@@ -177,7 +177,7 @@ Name | Type | Description |
 a new traceback pointing to a new location, the traceback
 has no pointers, nor file raw data
 
-Defined in: [builder/Traceback.ts:167](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L167)
+Defined in: [builder/Traceback.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L167)
 
 ___
 
@@ -197,4 +197,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/Traceback.ts:177](https://github.com/onzag/itemize/blob/3efa2a4a/builder/Traceback.ts#L177)
+Defined in: [builder/Traceback.ts:177](https://github.com/onzag/itemize/blob/0e9b128c/builder/Traceback.ts#L177)

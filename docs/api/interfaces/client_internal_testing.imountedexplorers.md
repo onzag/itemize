@@ -18,7 +18,7 @@
 
 • **id**: *string*
 
-Defined in: [client/internal/testing.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L115)
+Defined in: [client/internal/testing.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L115)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **label**: *string*
 
-Defined in: [client/internal/testing.ts:116](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L116)
+Defined in: [client/internal/testing.ts:116](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L116)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:117](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L117)
+Defined in: [client/internal/testing.ts:117](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L117)

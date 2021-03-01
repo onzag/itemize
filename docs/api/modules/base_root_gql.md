@@ -49,7 +49,7 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [base/Root/gql.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/gql.ts#L31)
+Defined in: [base/Root/gql.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L31)
 
 ___
 
@@ -72,7 +72,7 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [base/Root/gql.ts:39](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/gql.ts#L39)
+Defined in: [base/Root/gql.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L39)
 
 ## Functions
 
@@ -96,4 +96,4 @@ Name | Type | Description |
 
 a graphql schema with all the resolvers applied
 
-Defined in: [base/Root/gql.ts:101](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/gql.ts#L101)
+Defined in: [base/Root/gql.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L101)

@@ -24,7 +24,7 @@ form, support both images and standard files
 
 **`returns`** a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:166](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L166)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:166](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L166)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 the styles for the file entry
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:29](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L29)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx:29](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFile.tsx#L29)

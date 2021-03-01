@@ -24,7 +24,7 @@ All instances can literally be the same instance
 local cache, should be physically close to the cluster
 or run alongside it
 
-Defined in: [config.ts:322](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L322)
+Defined in: [config.ts:322](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L322)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 The global cache, used to store server data
 that is shared within instances
 
-Defined in: [config.ts:312](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L312)
+Defined in: [config.ts:312](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L312)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 The pubsub cache, also some form of global cache
 but used to inform changes of data to instances
 
-Defined in: [config.ts:317](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L317)
+Defined in: [config.ts:317](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L317)

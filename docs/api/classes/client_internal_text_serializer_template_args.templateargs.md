@@ -37,7 +37,7 @@ Name | Type |
 
 **Returns:** [*TemplateArgs*](client_internal_text_serializer_template_args.templateargs.md)
 
-Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L95)
+Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L95)
 
 ## Properties
 
@@ -45,7 +45,7 @@ Defined in: [client/internal/text/serializer/template-args.ts:95](https://github
 
 • **properties**: [*ITemplateArgsProperties*](../interfaces/client_internal_text_serializer_template_args.itemplateargsproperties.md)
 
-Defined in: [client/internal/text/serializer/template-args.ts:94](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L94)
+Defined in: [client/internal/text/serializer/template-args.ts:94](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L94)
 
 ___
 
@@ -65,9 +65,9 @@ Name | Type |
 
 **Returns:** ReactNode
 
-Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L95)
+Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L95)
 
-Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L95)
+Defined in: [client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L95)
 
 ## Methods
 
@@ -83,4 +83,4 @@ Name | Type |
 
 **Returns:** [*TemplateArgs*](client_internal_text_serializer_template_args.templateargs.md)
 
-Defined in: [client/internal/text/serializer/template-args.ts:101](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L101)
+Defined in: [client/internal/text/serializer/template-args.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L101)

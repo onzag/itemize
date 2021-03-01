@@ -25,7 +25,7 @@ The shape of the error itself
 
 • **message**: *string*
 
-Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L47)
+Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L47)
 
 ___
 
@@ -33,4 +33,4 @@ ___
 
 • **request**: *any*
 
-Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L48)
+Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L48)

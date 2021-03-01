@@ -35,7 +35,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*Ii18NType*](../interfaces/base_root.ii18ntype.md)\>
 
-Defined in: [builder/lang.ts:73](https://github.com/onzag/itemize/blob/3efa2a4a/builder/lang.ts#L73)
+Defined in: [builder/lang.ts:73](https://github.com/onzag/itemize/blob/0e9b128c/builder/lang.ts#L73)
 
 ___
 
@@ -57,4 +57,4 @@ Name | Type | Description |
 
 the new locale language data with only names
 
-Defined in: [builder/lang.ts:211](https://github.com/onzag/itemize/blob/3efa2a4a/builder/lang.ts#L211)
+Defined in: [builder/lang.ts:211](https://github.com/onzag/itemize/blob/0e9b128c/builder/lang.ts#L211)

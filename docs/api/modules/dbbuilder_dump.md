@@ -29,4 +29,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/dump.ts:283](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/dump.ts#L283)
+Defined in: [dbbuilder/dump.ts:283](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/dump.ts#L283)

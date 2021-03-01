@@ -57,7 +57,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:382](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L382)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:382](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L382)
 
 ___
 
@@ -67,4 +67,4 @@ ___
 
 And this is combined
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:374](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L374)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:374](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L374)

@@ -22,4 +22,4 @@ The item definition loader allows to handle cases of not found, blocked or error
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/item-loader.tsx:97](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/item-loader.tsx#L97)
+Defined in: [client/fast-prototyping/components/item-loader.tsx:97](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/item-loader.tsx#L97)

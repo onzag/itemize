@@ -447,7 +447,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/components/util/OgImageSetter.tsx:24](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/util/OgImageSetter.tsx#L24)
+Defined in: [client/components/util/OgImageSetter.tsx:24](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/OgImageSetter.tsx#L24)
 
 ___
 

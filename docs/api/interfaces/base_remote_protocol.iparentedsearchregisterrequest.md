@@ -30,7 +30,7 @@ check [[IParentedSearchRecordsAddedEvent]]
 
 • **parentId**: *string*
 
-Defined in: [base/remote-protocol.ts:342](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L342)
+Defined in: [base/remote-protocol.ts:342](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L342)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **parentType**: *string*
 
-Defined in: [base/remote-protocol.ts:341](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L341)
+Defined in: [base/remote-protocol.ts:341](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L341)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **parentVersion**: *string*
 
-Defined in: [base/remote-protocol.ts:343](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L343)
+Defined in: [base/remote-protocol.ts:343](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L343)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 • **qualifiedPathName**: *string*
 
-Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L299)
+Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L299)

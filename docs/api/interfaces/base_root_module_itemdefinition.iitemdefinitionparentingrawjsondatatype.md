@@ -20,7 +20,7 @@ canBeParentedBy this is the shape it comes as
 
 • `Optional` **item**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L86)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L86)
 
 ___
 
@@ -28,4 +28,4 @@ ___
 
 • **module**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:85](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L85)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:85](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L85)

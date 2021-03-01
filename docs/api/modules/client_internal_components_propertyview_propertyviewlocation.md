@@ -38,4 +38,4 @@ Name | Type | Description |
 
 a boolean on whether it is for all intents and purposes an equal location
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:53](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L53)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:53](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L53)

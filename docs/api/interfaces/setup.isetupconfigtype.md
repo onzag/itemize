@@ -26,7 +26,7 @@ area for utility reasons
 
 • **dbConfigDevelopment**: [*IDBConfigRawJSONDataType*](config.idbconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L30)
+Defined in: [setup/index.ts:30](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L30)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **dbConfigProduction**: [*IDBConfigRawJSONDataType*](config.idbconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:33](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L33)
+Defined in: [setup/index.ts:33](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L33)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **dumpConfig**: [*IDumpConfigRawJSONDataType*](config.idumpconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:35](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L35)
+Defined in: [setup/index.ts:35](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L35)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **redisConfigDevelopment**: [*IRedisConfigRawJSONDataType*](config.iredisconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L31)
+Defined in: [setup/index.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L31)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **redisConfigProduction**: [*IRedisConfigRawJSONDataType*](config.iredisconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L34)
+Defined in: [setup/index.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L34)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **sensitiveConfigDevelopment**: [*ISensitiveConfigRawJSONDataType*](config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L29)
+Defined in: [setup/index.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L29)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • **sensitiveConfigProduction**: [*ISensitiveConfigRawJSONDataType*](config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:32](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L32)
+Defined in: [setup/index.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L32)
 
 ___
 
@@ -82,4 +82,4 @@ ___
 
 • **standardConfig**: [*IConfigRawJSONDataType*](config.iconfigrawjsondatatype.md)
 
-Defined in: [setup/index.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L28)
+Defined in: [setup/index.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/setup/index.ts#L28)

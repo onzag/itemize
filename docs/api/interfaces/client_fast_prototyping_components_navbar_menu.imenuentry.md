@@ -28,7 +28,7 @@ how a menu is to be built
 
 A badge to display
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:50](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L50)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:50](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L50)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 The arguments to pass to the i18nRead element in order to display some text
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:63](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L63)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:63](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L63)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 The icon to use
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:46](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L46)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:46](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L46)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 The item definition to load in the item definition provider (optional)
 will need the module specified if this one specified
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:59](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L59)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:59](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L59)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 The module to load in the module provider (optional)
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:54](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L54)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L54)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 The path it will take to, aka, the navigation
 location
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:42](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L42)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:42](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L42)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 The role that has access to this
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:67](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L67)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:67](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L67)
 
 ___
 
@@ -100,4 +100,4 @@ ___
 
 Many roles, a list of roles, role (Single) has priority over this
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:71](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/navbar/menu.tsx#L71)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:71](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/navbar/menu.tsx#L71)

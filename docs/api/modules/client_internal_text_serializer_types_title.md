@@ -32,4 +32,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/title.ts:20](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/title.ts#L20)
+Defined in: [client/internal/text/serializer/types/title.ts:20](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/types/title.ts#L20)

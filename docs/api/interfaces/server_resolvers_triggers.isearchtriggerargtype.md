@@ -22,7 +22,7 @@
 
 • **appData**: [*IAppDataType*](server.iappdatatype.md)
 
-Defined in: [server/resolvers/triggers.ts:77](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L77)
+Defined in: [server/resolvers/triggers.ts:77](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L77)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **args**: [*IGQLArgs*](gql_querier.igqlargs.md)
 
-Defined in: [server/resolvers/triggers.ts:80](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L80)
+Defined in: [server/resolvers/triggers.ts:80](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L80)
 
 ___
 
@@ -51,9 +51,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/triggers.ts:87](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L87)
+Defined in: [server/resolvers/triggers.ts:87](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L87)
 
-Defined in: [server/resolvers/triggers.ts:87](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L87)
+Defined in: [server/resolvers/triggers.ts:87](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L87)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 • **itemDefinition**: [*default*](../classes/base_root_module_itemdefinition.default.md)
 
-Defined in: [server/resolvers/triggers.ts:78](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L78)
+Defined in: [server/resolvers/triggers.ts:78](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L78)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 • **module**: [*default*](../classes/base_root_module.default.md)
 
-Defined in: [server/resolvers/triggers.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L79)
+Defined in: [server/resolvers/triggers.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L79)
 
 ___
 
@@ -85,7 +85,7 @@ Name | Type |
 `id` | *string* |
 `role` | *string* |
 
-Defined in: [server/resolvers/triggers.ts:81](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L81)
+Defined in: [server/resolvers/triggers.ts:81](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L81)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 • **whereBuilder**: [*WhereBuilder*](../classes/database_wherebuilder.wherebuilder.md)
 
-Defined in: [server/resolvers/triggers.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/triggers.ts#L86)
+Defined in: [server/resolvers/triggers.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L86)

@@ -34,7 +34,7 @@ the ISEOCollectionRequest
 
 • **created\_at**: *string*
 
-Defined in: [server/seo/index.ts:33](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L33)
+Defined in: [server/seo/index.ts:33](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L33)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **id**: *string*
 
-Defined in: [server/seo/index.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L31)
+Defined in: [server/seo/index.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L31)
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 • **version**: *string*
 
-Defined in: [server/seo/index.ts:32](https://github.com/onzag/itemize/blob/3efa2a4a/server/seo/index.ts#L32)
+Defined in: [server/seo/index.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/server/seo/index.ts#L32)

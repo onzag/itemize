@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Pool*<[*default*](../classes/base_root.default.md)\>
 
-Defined in: [server/rootpool.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/server/rootpool.ts#L21)
+Defined in: [server/rootpool.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/server/rootpool.ts#L21)

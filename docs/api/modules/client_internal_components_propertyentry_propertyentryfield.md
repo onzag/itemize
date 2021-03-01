@@ -38,4 +38,4 @@ Name | Type | Description |
 
 **Returns:** [*NumericType*](../enums/client_internal_components_propertyentry_propertyentryfield.numerictype.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:38](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L38)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:38](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L38)

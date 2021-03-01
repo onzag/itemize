@@ -62,7 +62,7 @@ Name | Type |
 
 **Returns:** [*default*](client_components_util_titlesetter.default.md)
 
-Defined in: [client/components/util/TitleSetter.tsx:78](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/util/TitleSetter.tsx#L78)
+Defined in: [client/components/util/TitleSetter.tsx:78](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L78)
 
 ## Properties
 
@@ -433,7 +433,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/components/util/TitleSetter.tsx:82](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/util/TitleSetter.tsx#L82)
+Defined in: [client/components/util/TitleSetter.tsx:82](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L82)
 
 ___
 

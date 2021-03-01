@@ -76,7 +76,7 @@ it should be in the given language
 
 A react node can be given, used for passing the I18n component
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:319](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L319)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:319](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L319)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 Emulate render the element a couple of times in order to give the effect
 of many views
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:328](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L328)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:328](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L328)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 If the context is an array or iterable, then mark it as such
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:323](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L323)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:323](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L323)
 
 ___
 
@@ -109,7 +109,7 @@ The properties that the context contains
 
 #### Type declaration:
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:332](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L332)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:332](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L332)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 The type which will always be "context"
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:308](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L308)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:308](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L308)
 
 ___
 
@@ -142,6 +142,6 @@ Name | Type |
 
 **Returns:** ReactNode
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:312](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L312)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:312](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L312)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:312](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L312)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:312](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L312)

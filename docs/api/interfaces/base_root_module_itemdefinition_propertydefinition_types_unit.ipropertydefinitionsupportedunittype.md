@@ -23,7 +23,7 @@ in a normalized unit as specified
 
 • **normalizedUnit**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:37](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L37)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:37](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L37)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **normalizedValue**: *number*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L36)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L36)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **unit**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:35](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L35)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:35](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L35)
 
 ___
 
@@ -47,4 +47,4 @@ ___
 
 • **value**: *number*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L34)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L34)

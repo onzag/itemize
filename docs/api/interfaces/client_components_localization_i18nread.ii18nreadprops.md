@@ -31,7 +31,7 @@ these can be plain string, for simple replacement or literal react
 objects, using react objects will produce a react node as output
 rather than a string
 
-Defined in: [client/components/localization/I18nRead.tsx:82](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L82)
+Defined in: [client/components/localization/I18nRead.tsx:82](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L82)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 Whether to capitalize the output
 
-Defined in: [client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L101)
+Defined in: [client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L101)
 
 ___
 
@@ -64,9 +64,9 @@ Name | Type |
 
 **Returns:** ReactNode
 
-Defined in: [client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L97)
+Defined in: [client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L97)
 
-Defined in: [client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L97)
+Defined in: [client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L97)
 
 ___
 
@@ -78,7 +78,7 @@ Dangerous!... whether the content represents html instead of a plain string
 does not mix well with args if the output generated is a react node that
 does not serialize
 
-Defined in: [client/components/localization/I18nRead.tsx:88](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L88)
+Defined in: [client/components/localization/I18nRead.tsx:88](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L88)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 The wrapping tag for using in the html mode, by default is a div
 
-Defined in: [client/components/localization/I18nRead.tsx:92](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L92)
+Defined in: [client/components/localization/I18nRead.tsx:92](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L92)
 
 ___
 
@@ -115,7 +115,7 @@ as item definition, if nothing found (or no module context) it will go to the ne
 the root context is the last, and reads from the base root properties or the main i18n data properties
 if nothing found in this last context, an error is thrown
 
-Defined in: [client/components/localization/I18nRead.tsx:63](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L63)
+Defined in: [client/components/localization/I18nRead.tsx:63](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L63)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 A policy name to use as context, must go along policy type
 
-Defined in: [client/components/localization/I18nRead.tsx:75](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L75)
+Defined in: [client/components/localization/I18nRead.tsx:75](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L75)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 A policy type to use as context, must go along policy name
 
-Defined in: [client/components/localization/I18nRead.tsx:71](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L71)
+Defined in: [client/components/localization/I18nRead.tsx:71](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L71)
 
 ___
 
@@ -145,4 +145,4 @@ ___
 
 A property id to use as context
 
-Defined in: [client/components/localization/I18nRead.tsx:67](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nRead.tsx#L67)
+Defined in: [client/components/localization/I18nRead.tsx:67](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L67)

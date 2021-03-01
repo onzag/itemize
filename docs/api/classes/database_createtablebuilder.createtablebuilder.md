@@ -50,7 +50,7 @@ Builds a new create table query builder
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/CreateTableBuilder.ts:32](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L32)
+Defined in: [database/CreateTableBuilder.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L32)
 
 ## Properties
 
@@ -58,7 +58,7 @@ Defined in: [database/CreateTableBuilder.ts:32](https://github.com/onzag/itemize
 
 • `Private` **columns**: ICreateTableColumnDataWithExpressionAsDefault[]
 
-Defined in: [database/CreateTableBuilder.ts:32](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L32)
+Defined in: [database/CreateTableBuilder.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L32)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • `Private` **createIfNotExists**: *boolean*
 
-Defined in: [database/CreateTableBuilder.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L31)
+Defined in: [database/CreateTableBuilder.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L31)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 Table name in question we are updating against
 
-Defined in: [database/CreateTableBuilder.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L30)
+Defined in: [database/CreateTableBuilder.ts:30](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L30)
 
 ## Methods
 
@@ -96,7 +96,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L69)
 
 ___
 
@@ -116,7 +116,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L77)
 
 ___
 
@@ -136,7 +136,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/CreateTableBuilder.ts:48](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L48)
+Defined in: [database/CreateTableBuilder.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L48)
 
 ___
 
@@ -150,7 +150,7 @@ Clears the table name, if not exists state and columns
 
 itself
 
-Defined in: [database/CreateTableBuilder.ts:93](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L93)
+Defined in: [database/CreateTableBuilder.ts:93](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L93)
 
 ___
 
@@ -164,7 +164,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L102)
 
 ___
 
@@ -180,7 +180,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/CreateTableBuilder.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L105)
+Defined in: [database/CreateTableBuilder.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L105)
 
 ___
 
@@ -197,7 +197,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L165)
 
 ___
 
@@ -211,7 +211,7 @@ Makes the update be IF NOT EXISTS
 
 itself
 
-Defined in: [database/CreateTableBuilder.ts:84](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L84)
+Defined in: [database/CreateTableBuilder.ts:84](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L84)
 
 ___
 
@@ -225,7 +225,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L109)
 
 ___
 
@@ -246,7 +246,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L86)
 
 ___
 
@@ -267,7 +267,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L95)
 
 ___
 
@@ -287,7 +287,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/CreateTableBuilder.ts:75](https://github.com/onzag/itemize/blob/3efa2a4a/database/CreateTableBuilder.ts#L75)
+Defined in: [database/CreateTableBuilder.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/database/CreateTableBuilder.ts#L75)
 
 ___
 
@@ -303,4 +303,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L126)

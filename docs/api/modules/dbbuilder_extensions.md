@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/extensions.ts:16](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/extensions.ts#L16)
+Defined in: [dbbuilder/extensions.ts:16](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/extensions.ts#L16)

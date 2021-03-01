@@ -22,4 +22,4 @@ Name | Type |
 
 **Returns:** *Promise*<[*ISetupConfigType*](../interfaces/setup.isetupconfigtype.md)\>
 
-Defined in: [setup/src/index.ts:225](https://github.com/onzag/itemize/blob/3efa2a4a/setup/src/index.ts#L225)
+Defined in: [setup/src/index.ts:225](https://github.com/onzag/itemize/blob/0e9b128c/setup/src/index.ts#L225)

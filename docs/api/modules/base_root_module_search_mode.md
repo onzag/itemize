@@ -29,4 +29,4 @@ Name | Type | Description |
 
 a raw module
 
-Defined in: [base/Root/Module/search-mode.ts:18](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/search-mode.ts#L18)
+Defined in: [base/Root/Module/search-mode.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/search-mode.ts#L18)

@@ -17,4 +17,4 @@ contains all the components that take form for the renderer context for fast pro
 
 • `Const` **rendererContext**: [*IRendererContext*](../interfaces/client_providers_renderer.irenderercontext.md)
 
-Defined in: [client/fast-prototyping/renderers/index.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/index.ts#L26)
+Defined in: [client/fast-prototyping/renderers/index.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/index.ts#L26)

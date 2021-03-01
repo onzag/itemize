@@ -23,7 +23,7 @@ are considered and should be handled by your implementation
 
 Zoomed in the most, show an address
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:29](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L29)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:29](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L29)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 A default zoom status
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:25](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L25)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:25](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L25)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 Should mean the most zoomed out, show an country
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:21](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L21)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:21](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L21)

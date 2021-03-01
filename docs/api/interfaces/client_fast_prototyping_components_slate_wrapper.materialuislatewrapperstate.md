@@ -28,7 +28,7 @@ and the drawer itself
 
 Specifies the state of the drawer
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:730](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L730)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:730](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L730)
 
 ___
 
@@ -41,7 +41,7 @@ we lose access to the anchors and current elements now that we are in focus of s
 else so we need to store the element that was the current element that was in focus
 before that happened
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:747](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L747)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:747](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L747)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 Specifies whether the link dialog to input links and template links is open
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:715](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L715)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:715](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L715)
 
 ___
 
@@ -65,7 +65,7 @@ start, the drawer is always closed at the start, however, if we need to open the
 on mount we don't want any animation so we toggle this flag temporarily, it doesn't need to be part
 of the state as it's only used there
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:739](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L739)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:739](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L739)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 Specifies whether the link dialog to input templated html is open
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:725](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L725)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:725](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L725)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 Specifies whether the link dialog to input templated text is open
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:720](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L720)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:720](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L720)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 Specifies whether the video dialog to input the url for the video is open
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:710](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/wrapper.tsx#L710)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:710](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L710)
