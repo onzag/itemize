@@ -78,7 +78,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry_propertyentrytext.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:285](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L285)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:285](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L285)
 
 ## Properties
 
@@ -90,7 +90,7 @@ Contains a list of active data uris for the blob elements
 
 #### Type declaration:
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:283](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L283)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:283](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L283)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 We hold and cache our media property
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:257](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L257)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:257](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L257)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 We hold and cache our accepts for the media property
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:261](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L261)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:261](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L261)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 We hold and cache our accpets for the images in the media property
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:265](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L265)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:265](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L265)
 
 ___
 
@@ -160,7 +160,7 @@ so avoid having two entry at the same time
 
 #### Type declaration:
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:276](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L276)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:276](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L276)
 
 ___
 
@@ -319,7 +319,7 @@ Ran during mount of updates, caches the files that are in the media property
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:363](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L363)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:363](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L363)
 
 ___
 
@@ -337,7 +337,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:337](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L337)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:337](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L337)
 
 ___
 
@@ -367,7 +367,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:404](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L404)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:404](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L404)
 
 ___
 
@@ -383,7 +383,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:413](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L413)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:413](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L413)
 
 ___
 
@@ -447,7 +447,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:323](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L323)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:323](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L323)
 
 ___
 
@@ -488,7 +488,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:317](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L317)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:317](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L317)
 
 ___
 
@@ -498,7 +498,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:311](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L311)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:311](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L311)
 
 ___
 
@@ -561,7 +561,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:436](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L436)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:436](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L436)
 
 ___
 
@@ -577,7 +577,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:544](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L544)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:544](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L544)
 
 ___
 
@@ -597,7 +597,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IInsertedFileInformationType*](../interfaces/client_internal_components_propertyentry_propertyentrytext.iinsertedfileinformationtype.md)\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:628](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L628)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:628](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L628)
 
 ___
 
@@ -618,7 +618,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*IInsertedFileInformationType*](../interfaces/client_internal_components_propertyentry_propertyentrytext.iinsertedfileinformationtype.md)\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:566](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L566)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:566](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L566)
 
 ___
 
@@ -637,7 +637,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:527](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L527)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:527](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L527)
 
 ___
 
@@ -651,7 +651,7 @@ restoration, but also restore its related media property
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:479](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L479)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:479](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L479)
 
 ___
 
@@ -670,7 +670,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:493](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L493)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:493](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L493)
 
 ___
 
@@ -686,7 +686,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:555](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L555)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:555](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L555)
 
 ___
 
@@ -702,7 +702,7 @@ Name | Type |
 
 **Returns:** [*IPropertyDefinitionSupportedSingleFilesType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_files.ipropertydefinitionsupportedsinglefilestype.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:548](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L548)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:548](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L548)
 
 ___
 
@@ -718,7 +718,7 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:597](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L597)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:597](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L597)
 
 ___
 
@@ -734,7 +734,7 @@ Name | Type |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:614](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L614)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:614](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L614)
 
 ___
 
@@ -744,7 +744,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:774](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L774)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:774](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L774)
 
 ___
 
@@ -784,4 +784,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:747](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L747)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:747](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L747)

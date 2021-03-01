@@ -39,7 +39,7 @@ Name | Type |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/template-args.ts#L117)
+Defined in: [client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L117)
 
 ___
 
@@ -108,7 +108,7 @@ Name | Type |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/template-args.ts#L86)
+Defined in: [client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L86)
 
 ___
 
@@ -131,4 +131,4 @@ Name | Type |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/template-args.ts#L34)
+Defined in: [client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/template-args.ts#L34)

@@ -18,7 +18,7 @@
 
 • **actualValue**: *any*
 
-Defined in: [server/resolvers/basic.ts:631](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L631)
+Defined in: [server/resolvers/basic.ts:631](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L631)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **requestFields**: *any*
 
-Defined in: [server/resolvers/basic.ts:632](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L632)
+Defined in: [server/resolvers/basic.ts:632](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L632)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **toReturnToUser**: *any*
 
-Defined in: [server/resolvers/basic.ts:630](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L630)
+Defined in: [server/resolvers/basic.ts:630](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/basic.ts#L630)

@@ -25,4 +25,4 @@ Name | Type |
 `instance` | *Remote*<[*default*](../classes/client_internal_workers_cache_cache_worker.default.md)\> |
 `isSupported` | *any* |
 
-Defined in: [client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/workers/cache/index.ts#L35)
+Defined in: [client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/index.ts#L35)

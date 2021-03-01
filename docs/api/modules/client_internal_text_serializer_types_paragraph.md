@@ -24,7 +24,7 @@ for the paragraph element
 
 **Returns:** [*IParagraph*](../interfaces/client_internal_text_serializer_types_paragraph.iparagraph.md)
 
-Defined in: [client/internal/text/serializer/types/paragraph.ts:14](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/paragraph.ts#L14)
+Defined in: [client/internal/text/serializer/types/paragraph.ts:14](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/paragraph.ts#L14)
 
 ___
 
@@ -43,4 +43,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/paragraph.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/paragraph.ts#L27)
+Defined in: [client/internal/text/serializer/types/paragraph.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/paragraph.ts#L27)

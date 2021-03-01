@@ -29,4 +29,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/IncludeCalloutWarning/index.tsx:86](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/IncludeCalloutWarning/index.tsx#L86)
+Defined in: [client/internal/components/IncludeCalloutWarning/index.tsx:86](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/IncludeCalloutWarning/index.tsx#L86)

@@ -28,4 +28,4 @@ Name | Type | Description |
 
 the same arg
 
-Defined in: [setup/typescript/index.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/setup/typescript/index.ts#L19)
+Defined in: [setup/typescript/index.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/setup/typescript/index.ts#L19)

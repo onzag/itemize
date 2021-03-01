@@ -62,7 +62,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/server/index.ts:36](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L36)
+Defined in: [testing/server/index.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L36)
 
 ## Properties
 
@@ -70,7 +70,7 @@ Defined in: [testing/server/index.ts:36](https://github.com/onzag/itemize/blob/0
 
 • `Private` **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [testing/server/index.ts:33](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L33)
+Defined in: [testing/server/index.ts:33](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L33)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 • `Private` **fullHost**: *string*
 
-Defined in: [testing/server/index.ts:34](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L34)
+Defined in: [testing/server/index.ts:34](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L34)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 • `Private` **host**: *string*
 
-Defined in: [testing/server/index.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L29)
+Defined in: [testing/server/index.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L29)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 • `Private` **https**: *boolean*
 
-Defined in: [testing/server/index.ts:31](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L31)
+Defined in: [testing/server/index.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L31)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 • `Private` **port**: *string* \| *number*
 
-Defined in: [testing/server/index.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L30)
+Defined in: [testing/server/index.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L30)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 • `Private` **testingInfo**: [*ITestingInfoType*](../interfaces/testing_itemize.itestinginfotype.md)
 
-Defined in: [testing/server/index.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L28)
+Defined in: [testing/server/index.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L28)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 • `Private` **testingUserInfo**: [*IUserInfoAndTokensForTesting*](../interfaces/testing_server.iuserinfoandtokensfortesting.md)
 
-Defined in: [testing/server/index.ts:36](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L36)
+Defined in: [testing/server/index.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L36)
 
 ## Methods
 
@@ -135,7 +135,7 @@ use for cleanup
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L105)
+Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L105)
 
 ___
 
@@ -147,7 +147,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/server/index.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L46)
+Defined in: [testing/server/index.ts:46](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L46)
 
 ___
 
@@ -161,7 +161,7 @@ Build a brand new instance
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L71)
+Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L71)
 
 ___
 
@@ -182,7 +182,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L114)
+Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L114)
 
 ___
 
@@ -194,7 +194,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/server/index.ts:139](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L139)
+Defined in: [testing/server/index.ts:139](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L139)
 
 ___
 
@@ -212,7 +212,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L162)
+Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L162)
 
 ___
 
@@ -233,7 +233,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L129)
+Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L129)
 
 ___
 
@@ -247,7 +247,7 @@ Quits this test
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L220)
+Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L220)
 
 ___
 
@@ -262,7 +262,7 @@ and by all it means all of them
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L186)
+Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L186)
 
 ___
 
@@ -278,7 +278,7 @@ this
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L201)
+Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L201)
 
 ___
 
@@ -293,7 +293,7 @@ they should be on the same layer
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L172)
+Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L172)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type | Default value |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L141)
+Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L141)
 
 ___
 
@@ -329,7 +329,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L211)
+Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L211)
 
 ___
 
@@ -347,4 +347,4 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L152)
+Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L152)

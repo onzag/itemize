@@ -57,7 +57,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyview_propertyviewfile.default.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:46](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewFile.tsx#L46)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:46](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L46)
 
 ## Properties
 
@@ -428,7 +428,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:66](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewFile.tsx#L66)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:66](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L66)
 
 ___
 
@@ -438,7 +438,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:74](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewFile.tsx#L74)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:74](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L74)
 
 ___
 
@@ -477,4 +477,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewFile.tsx#L52)
+Defined in: [client/internal/components/PropertyView/PropertyViewFile.tsx:52](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewFile.tsx#L52)

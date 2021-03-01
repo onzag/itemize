@@ -30,4 +30,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/search-loader-with-pagination.tsx:44](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/search-loader-with-pagination.tsx#L44)
+Defined in: [client/fast-prototyping/components/search-loader-with-pagination.tsx:44](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/search-loader-with-pagination.tsx#L44)

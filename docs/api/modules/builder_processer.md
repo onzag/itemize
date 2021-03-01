@@ -36,7 +36,7 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:71](https://github.com/onzag/itemize/blob/0569bdf2/builder/processer.ts#L71)
+Defined in: [builder/processer.ts:71](https://github.com/onzag/itemize/blob/3efa2a4a/builder/processer.ts#L71)
 
 ___
 
@@ -83,7 +83,7 @@ Name | Type | Description |
 `properties`? | [*IPropertyDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition_propertydefinition.ipropertydefinitionrawjsondatatype.md)[] | The properties represent the list of properties it has   |
 `raw`? | *string* | This is the raw content of the file the pointers came from and it's also stripped after built is done   |
 `readRoleAccess`? | *string*[] | Read role permissions   |
-`requestLimiters`? | [*IRequestLimitersType*](../interfaces/root.irequestlimiterstype.md) | the request limiters   |
+`requestLimiters`? | [*IRequestLimitersType*](../interfaces/base_root.irequestlimiterstype.md) | the request limiters   |
 `searchRoleAccess`? | *string*[] | Permissions for search purposes   |
 `searchable`? | *boolean* | Whether the item definition is searchable, when a module is searchable and the item definition is not, the module precedes   |
 `type` | *item* | Basic type   |
@@ -94,7 +94,7 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/builder/processer.ts#L29)
+Defined in: [builder/processer.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/builder/processer.ts#L29)
 
 ___
 
@@ -132,14 +132,14 @@ Name | Type | Description |
 `propExtensions`? | [*IPropertyDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition_propertydefinition.ipropertydefinitionrawjsondatatype.md)[] | The prop extensions properties that this modules gives to all the item definitions   |
 `raw`? | *string* | This is the raw content of the file the pointers came from and it's also stripped after built is done   |
 `readRoleAccess`? | *string*[] | The read role access   |
-`requestLimiters`? | [*IRequestLimitersType*](../interfaces/root.irequestlimiterstype.md) | And AND request limiter is a very powerful one as this would ensure the creation of database indexes that will match and speed up these searches createdAt creates a limiter that requests any search to contain created_at createdBy creates a limiter that requests any search to contain created_by parenting requests for a parent and custom adds to custom properties that will be required at module level, these are basically args And AND index will ensure to add an ordered btree index to these   |
+`requestLimiters`? | [*IRequestLimitersType*](../interfaces/base_root.irequestlimiterstype.md) | And AND request limiter is a very powerful one as this would ensure the creation of database indexes that will match and speed up these searches createdAt creates a limiter that requests any search to contain created_at createdBy creates a limiter that requests any search to contain created_by parenting requests for a parent and custom adds to custom properties that will be required at module level, these are basically args And AND index will ensure to add an ordered btree index to these   |
 `searchRoleAccess`? | *string*[] | The search role access   |
 `searchable`? | *boolean* | Whether the module, and only the module itself is searchable   |
 `type` | *module* | The type is module   |
 
 the new json
 
-Defined in: [builder/processer.ts:115](https://github.com/onzag/itemize/blob/0569bdf2/builder/processer.ts#L115)
+Defined in: [builder/processer.ts:115](https://github.com/onzag/itemize/blob/3efa2a4a/builder/processer.ts#L115)
 
 ___
 
@@ -156,13 +156,13 @@ Name | Type |
 
 **Returns:** [*IPropertyDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition_propertydefinition.ipropertydefinitionrawjsondatatype.md)
 
-Defined in: [builder/processer.ts:90](https://github.com/onzag/itemize/blob/0569bdf2/builder/processer.ts#L90)
+Defined in: [builder/processer.ts:90](https://github.com/onzag/itemize/blob/3efa2a4a/builder/processer.ts#L90)
 
 ___
 
 ### processRoot
 
-▸ **processRoot**(`rawData`: [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md), `locale?`: *string*): *object*
+▸ **processRoot**(`rawData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md), `locale?`: *string*): *object*
 
 Cleans up build data from
 and builds a new json
@@ -171,7 +171,7 @@ and builds a new json
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawData` | [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md) | the raw data   |
+`rawData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the raw data   |
 `locale?` | *string* | the locale   |
 
 **Returns:** *object*
@@ -179,7 +179,7 @@ Name | Type | Description |
 Name | Type | Description |
 :------ | :------ | :------ |
 `children` | [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md)[] | All the modules contained within the root it is added after the build   |
-`i18nData` | [*Ii18NType*](../interfaces/root.ii18ntype.md) | The i18n information that comes from the properties file   |
+`i18nData` | [*Ii18NType*](../interfaces/base_root.ii18ntype.md) | The i18n information that comes from the properties file   |
 `location`? | *string* | Exists during the building process and represents the file location it is stripped after processing   |
 `pointers`? | *any* | Also exists during the building process only and it's the pointers that are used for tracebacks   |
 `raw`? | *string* | The raw content of the file itself, as a plain string, it's stripped after processing   |
@@ -187,4 +187,4 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:164](https://github.com/onzag/itemize/blob/0569bdf2/builder/processer.ts#L164)
+Defined in: [builder/processer.ts:164](https://github.com/onzag/itemize/blob/3efa2a4a/builder/processer.ts#L164)

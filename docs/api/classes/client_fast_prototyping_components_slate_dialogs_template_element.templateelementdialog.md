@@ -65,7 +65,7 @@ Name | Type | Description |
 
 **Returns:** [*TemplateElementDialog*](client_fast_prototyping_components_slate_dialogs_template_element.templateelementdialog.md)
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:103](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L103)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:103](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L103)
 
 ## Properties
 
@@ -247,7 +247,7 @@ and it should be done into the rich text
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:187](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L187)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:187](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L187)
 
 ___
 
@@ -259,7 +259,7 @@ Triggers once the dialog closes
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:227](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L227)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:227](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L227)
 
 ___
 
@@ -464,7 +464,7 @@ the initial state
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:128](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L128)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:128](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L128)
 
 ___
 
@@ -476,7 +476,7 @@ Render function
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:246](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L246)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:246](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L246)
 
 ___
 
@@ -544,4 +544,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:202](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L202)
+Defined in: [client/fast-prototyping/components/slate/dialogs/template-element.tsx:202](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L202)

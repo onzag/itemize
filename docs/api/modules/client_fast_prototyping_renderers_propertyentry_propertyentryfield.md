@@ -25,7 +25,7 @@ Supported args
 - descriptionAsAlert: the description as alert rather than the standard
 - onEnter: A function that triggers when the enter key is pressed
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:650](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L650)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:650](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L650)
 
 ___
 
@@ -35,4 +35,4 @@ ___
 
 The styles for the field
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:43](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L43)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:43](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L43)

@@ -19,7 +19,7 @@
 
 • **mountedExplorers**: [*IMountedExplorers*](client_internal_testing.imountedexplorers.md)[]
 
-Defined in: [client/internal/testing.ts:123](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L123)
+Defined in: [client/internal/testing.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L123)
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **mountedItems**: [*IMountedItem*](client_internal_testing.imounteditem.md)[]
 
-Defined in: [client/internal/testing.ts:121](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L121)
+Defined in: [client/internal/testing.ts:121](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L121)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **mountedModules**: [*IMountedModule*](client_internal_testing.imountedmodule.md)[]
 
-Defined in: [client/internal/testing.ts:122](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L122)
+Defined in: [client/internal/testing.ts:122](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L122)
 
 ___
 
@@ -63,4 +63,4 @@ Name | Type |
 `registerRequests` | [*IRegisterRequestWithTime*](client_internal_testing.iregisterrequestwithtime.md)[] |
 `unregisterRequests` | [*IUnregisterRequestWithTime*](client_internal_testing.iunregisterrequestwithtime.md)[] |
 
-Defined in: [client/internal/testing.ts:124](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L124)
+Defined in: [client/internal/testing.ts:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L124)

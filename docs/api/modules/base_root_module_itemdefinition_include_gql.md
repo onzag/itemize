@@ -16,7 +16,7 @@ the conversion function sql.ts does
 
 ### getGQLFieldsDefinitionForInclude
 
-▸ **getGQLFieldsDefinitionForInclude**(`include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `options`: { `optionalForm`: *boolean* ; `propertiesAsInput`: *boolean*  }): [*IGQLFieldsDefinitionType*](../interfaces/gql.igqlfieldsdefinitiontype.md)
+▸ **getGQLFieldsDefinitionForInclude**(`include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `options`: { `optionalForm`: *boolean* ; `propertiesAsInput`: *boolean*  }): [*IGQLFieldsDefinitionType*](../interfaces/base_root_gql.igqlfieldsdefinitiontype.md)
 
 Provides the graphql definition that will be required to store
 this include bit
@@ -30,9 +30,9 @@ Name | Type | Description |
 `options.optionalForm` | *boolean* | makes all the field of the include optional so they can be decided   |
 `options.propertiesAsInput` | *boolean* | if it's in input mode to get graphql input fields instead   |
 
-**Returns:** [*IGQLFieldsDefinitionType*](../interfaces/gql.igqlfieldsdefinitiontype.md)
+**Returns:** [*IGQLFieldsDefinitionType*](../interfaces/base_root_gql.igqlfieldsdefinitiontype.md)
 
 a list of field definitions that represent the include in graphql form
 for use within the graphql description
 
-Defined in: [base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/gql.ts#L28)
+Defined in: [base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/Include/gql.ts#L28)

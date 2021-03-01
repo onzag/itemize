@@ -26,7 +26,7 @@ Provides the configuration files down the line
 
 The context that provides the configuration
 
-Defined in: [client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/config-provider.tsx#L12)
+Defined in: [client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/config-provider.tsx#L12)
 
 ## Functions
 
@@ -46,4 +46,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/config-provider.tsx#L28)
+Defined in: [client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/providers/config-provider.tsx#L28)

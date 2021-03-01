@@ -46,7 +46,7 @@ better them to refine the search
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[accessibleCount](client_components_search_searchloader.isearchloaderarg.md#accessiblecount)
 
-Defined in: [client/components/search/SearchLoader.tsx:107](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L107)
+Defined in: [client/components/search/SearchLoader.tsx:107](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L107)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 Such as the current page which is the same, note that it's 0 indexed
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:20](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L20)
+Defined in: [client/components/search/PagedSearchLoader.tsx:20](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L20)
 
 ___
 
@@ -72,24 +72,24 @@ dismiss the errors
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L124)
+Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L124)
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[dismissError](client_components_search_searchloader.isearchloaderarg.md#dismisserror)
 
-Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L124)
+Defined in: [client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L124)
 
 ___
 
 ### error
 
-• **error**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
+• **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
 An error that occured during the get list execution to fetch
 the search results of a given page
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[error](client_components_search_searchloader.isearchloaderarg.md#error)
 
-Defined in: [client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L120)
+Defined in: [client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L120)
 
 ___
 
@@ -105,9 +105,9 @@ A function to go to previous page
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L24)
+Defined in: [client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L24)
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L24)
+Defined in: [client/components/search/PagedSearchLoader.tsx:24](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L24)
 
 ___
 
@@ -129,9 +129,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L32)
+Defined in: [client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L32)
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L32)
+Defined in: [client/components/search/PagedSearchLoader.tsx:32](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L32)
 
 ___
 
@@ -147,9 +147,9 @@ A function to go to next
 
 **Returns:** *void*
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L28)
+Defined in: [client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L28)
 
-Defined in: [client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/PagedSearchLoader.tsx#L28)
+Defined in: [client/components/search/PagedSearchLoader.tsx:28](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/PagedSearchLoader.tsx#L28)
 
 ___
 
@@ -161,7 +161,7 @@ whether there's a next page from the current selected
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[hasNextPage](client_components_search_searchloader.isearchloaderarg.md#hasnextpage)
 
-Defined in: [client/components/search/SearchLoader.tsx:111](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L111)
+Defined in: [client/components/search/SearchLoader.tsx:111](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L111)
 
 ___
 
@@ -173,7 +173,7 @@ Whether there's a previous page from the current selected
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[hasPrevPage](client_components_search_searchloader.isearchloaderarg.md#hasprevpage)
 
-Defined in: [client/components/search/SearchLoader.tsx:115](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L115)
+Defined in: [client/components/search/SearchLoader.tsx:115](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L115)
 
 ___
 
@@ -190,7 +190,7 @@ traditional search
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[isSearching](client_components_search_searchloader.isearchloaderarg.md#issearching)
 
-Defined in: [client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L83)
+Defined in: [client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L83)
 
 ___
 
@@ -205,7 +205,7 @@ the page count is only has to do with the accessible count of matches
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[pageCount](client_components_search_searchloader.isearchloaderarg.md#pagecount)
 
-Defined in: [client/components/search/SearchLoader.tsx:95](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L95)
+Defined in: [client/components/search/SearchLoader.tsx:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L95)
 
 ___
 
@@ -222,11 +222,11 @@ say you got an error, you can ask for a refresh
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L129)
+Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L129)
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[refreshPage](client_components_search_searchloader.isearchloaderarg.md#refreshpage)
 
-Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L129)
+Defined in: [client/components/search/SearchLoader.tsx:129](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L129)
 
 ___
 
@@ -239,7 +239,7 @@ search and this search only
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[searchId](client_components_search_searchloader.isearchloaderarg.md#searchid)
 
-Defined in: [client/components/search/SearchLoader.tsx:74](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L74)
+Defined in: [client/components/search/SearchLoader.tsx:74](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L74)
 
 ___
 
@@ -252,7 +252,7 @@ as well as organized, partial information of a search result
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[searchRecords](client_components_search_searchloader.isearchloaderarg.md#searchrecords)
 
-Defined in: [client/components/search/SearchLoader.tsx:88](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L88)
+Defined in: [client/components/search/SearchLoader.tsx:88](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L88)
 
 ___
 
@@ -265,4 +265,4 @@ in the server side
 
 Inherited from: [ISearchLoaderArg](client_components_search_searchloader.isearchloaderarg.md).[totalCount](client_components_search_searchloader.isearchloaderarg.md#totalcount)
 
-Defined in: [client/components/search/SearchLoader.tsx:100](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L100)
+Defined in: [client/components/search/SearchLoader.tsx:100](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L100)

@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IOwnedSearchFeedbackRequest*](remote_protocol.iownedsearchfeedbackrequest.md)
+* [*IOwnedSearchFeedbackRequest*](base_remote_protocol.iownedsearchfeedbackrequest.md)
 
   ↳ **IOwnedSearchFeedbackRequestWithTime**
 
@@ -25,9 +25,9 @@
 
 • **createdBy**: *string*
 
-Inherited from: [IOwnedSearchFeedbackRequest](remote_protocol.iownedsearchfeedbackrequest.md).[createdBy](remote_protocol.iownedsearchfeedbackrequest.md#createdby)
+Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[createdBy](base_remote_protocol.iownedsearchfeedbackrequest.md#createdby)
 
-Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L467)
+Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L467)
 
 ___
 
@@ -39,9 +39,9 @@ This is the database id field
 since they come in order it's easy to know if
 something has been added
 
-Inherited from: [IOwnedSearchFeedbackRequest](remote_protocol.iownedsearchfeedbackrequest.md).[lastModified](remote_protocol.iownedsearchfeedbackrequest.md#lastmodified)
+Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[lastModified](base_remote_protocol.iownedsearchfeedbackrequest.md#lastmodified)
 
-Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L456)
+Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L456)
 
 ___
 
@@ -52,9 +52,9 @@ ___
 The qualified path name either by module
 or item definition
 
-Inherited from: [IOwnedSearchFeedbackRequest](remote_protocol.iownedsearchfeedbackrequest.md).[qualifiedPathName](remote_protocol.iownedsearchfeedbackrequest.md#qualifiedpathname)
+Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[qualifiedPathName](base_remote_protocol.iownedsearchfeedbackrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L450)
+Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L450)
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L67)
+Defined in: [client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L67)

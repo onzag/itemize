@@ -17,7 +17,7 @@
 
 • **component**: *ComponentType*<[*IDrawerUIHandlerElementConfigCustomProps*](client_fast_prototyping_components_slate.idraweruihandlerelementconfigcustomprops.md)\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:230](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L230)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:230](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L230)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **type**: *custom*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:229](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L229)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:229](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/slate/index.tsx#L229)

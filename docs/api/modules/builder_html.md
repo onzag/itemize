@@ -29,4 +29,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [builder/html.ts:61](https://github.com/onzag/itemize/blob/0569bdf2/builder/html.ts#L61)
+Defined in: [builder/html.ts:61](https://github.com/onzag/itemize/blob/3efa2a4a/builder/html.ts#L61)

@@ -32,7 +32,7 @@ Contains the base query builder and a conditional one
 Represents a binding type, that binds to $1, $2, $3 etc... in the query itself
 supports string, number, boolean or an array of those
 
-Defined in: [database/base.ts:17](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L17)
+Defined in: [database/base.ts:17](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L17)
 
 ___
 
@@ -61,7 +61,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:215](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L215)
+Defined in: [database/base.ts:215](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L215)
 
 ___
 
@@ -73,7 +73,7 @@ An extended way to represent bindings as a tree, represents the basic bindings
 plus the query builder itself that can act as a compounded binding element
 [binding, binding, binding, [binding, binding, binding]...]
 
-Defined in: [database/base.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L24)
+Defined in: [database/base.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L24)
 
 ___
 
@@ -85,4 +85,4 @@ Represents a value that can be used to insert or update by, whatever
 needs to be assigned a value, we support string, number, booleans
 and raw values represented by an array and its bindings
 
-Defined in: [database/base.ts:11](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L11)
+Defined in: [database/base.ts:11](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L11)

@@ -30,7 +30,7 @@ Name | Type | Default value |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/index.ts:42](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/index.ts#L42)
+Defined in: [dbbuilder/index.ts:42](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/index.ts#L42)
 
 ___
 
@@ -46,7 +46,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [dbbuilder/index.ts:198](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/index.ts#L198)
+Defined in: [dbbuilder/index.ts:198](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/index.ts#L198)
 
 ___
 
@@ -66,4 +66,4 @@ Name | Type | Description |
 
 a boolean on the answer
 
-Defined in: [dbbuilder/index.ts:35](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/index.ts#L35)
+Defined in: [dbbuilder/index.ts:35](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/index.ts#L35)

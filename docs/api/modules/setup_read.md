@@ -44,7 +44,7 @@ Name | Type | Default value | Description |
 
 **Returns:** *Promise*<T\>
 
-Defined in: [setup/read.ts:271](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L271)
+Defined in: [setup/read.ts:271](https://github.com/onzag/itemize/blob/3efa2a4a/setup/read.ts#L271)
 
 ___
 
@@ -64,7 +64,7 @@ Name | Type | Description |
 
 a promise for a boolean
 
-Defined in: [setup/read.ts:403](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L403)
+Defined in: [setup/read.ts:403](https://github.com/onzag/itemize/blob/3efa2a4a/setup/read.ts#L403)
 
 ___
 
@@ -97,7 +97,7 @@ Name | Type | Description |
 
 the value it was read
 
-Defined in: [setup/read.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L65)
+Defined in: [setup/read.ts:65](https://github.com/onzag/itemize/blob/3efa2a4a/setup/read.ts#L65)
 
 ___
 
@@ -115,7 +115,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<{ `isDefault`: *boolean* ; `result`: *string*  }\>
 
-Defined in: [setup/read.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L26)
+Defined in: [setup/read.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/setup/read.ts#L26)
 
 ___
 
@@ -135,4 +135,4 @@ Name | Type | Description |
 
 a boolean on the answer
 
-Defined in: [setup/read.ts:18](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L18)
+Defined in: [setup/read.ts:18](https://github.com/onzag/itemize/blob/3efa2a4a/setup/read.ts#L18)

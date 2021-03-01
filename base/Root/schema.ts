@@ -3,7 +3,7 @@
  * of the root, this root schema is meant to be used in order to check
  * root json files
  *
- * @module schema
+ * @module
  */
 
 /**

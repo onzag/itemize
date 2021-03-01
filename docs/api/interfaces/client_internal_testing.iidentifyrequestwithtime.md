@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IIdentifyRequest*](remote_protocol.iidentifyrequest.md)
+* [*IIdentifyRequest*](base_remote_protocol.iidentifyrequest.md)
 
   ↳ **IIdentifyRequestWithTime**
 
@@ -24,7 +24,7 @@
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:59](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L59)
+Defined in: [client/internal/testing.ts:59](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L59)
 
 ___
 
@@ -32,9 +32,9 @@ ___
 
 • **token**: *string*
 
-Inherited from: [IIdentifyRequest](remote_protocol.iidentifyrequest.md).[token](remote_protocol.iidentifyrequest.md#token)
+Inherited from: [IIdentifyRequest](base_remote_protocol.iidentifyrequest.md).[token](base_remote_protocol.iidentifyrequest.md#token)
 
-Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L167)
+Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L167)
 
 ___
 
@@ -42,6 +42,6 @@ ___
 
 • **uuid**: *string*
 
-Inherited from: [IIdentifyRequest](remote_protocol.iidentifyrequest.md).[uuid](remote_protocol.iidentifyrequest.md#uuid)
+Inherited from: [IIdentifyRequest](base_remote_protocol.iidentifyrequest.md).[uuid](base_remote_protocol.iidentifyrequest.md#uuid)
 
-Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L166)
+Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L166)

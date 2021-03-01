@@ -34,4 +34,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/components/localization/I18nReadError.tsx:206](https://github.com/onzag/itemize/blob/0569bdf2/client/components/localization/I18nReadError.tsx#L206)
+Defined in: [client/components/localization/I18nReadError.tsx:206](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nReadError.tsx#L206)

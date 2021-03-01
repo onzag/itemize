@@ -60,7 +60,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/itemize.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L29)
+Defined in: [testing/itemize.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L29)
 
 ## Properties
 
@@ -68,7 +68,7 @@ Defined in: [testing/itemize.ts:29](https://github.com/onzag/itemize/blob/0569bd
 
 • `Private` **host**: *string*
 
-Defined in: [testing/itemize.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L26)
+Defined in: [testing/itemize.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L26)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • `Private` **https**: *boolean*
 
-Defined in: [testing/itemize.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L25)
+Defined in: [testing/itemize.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L25)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • `Private` **port**: *string* \| *number*
 
-Defined in: [testing/itemize.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L27)
+Defined in: [testing/itemize.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L27)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • `Private` **puppet**: *Browser*
 
-Defined in: [testing/itemize.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L29)
+Defined in: [testing/itemize.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L29)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • `Private` **testingInfo**: [*ITestingInfoType*](../interfaces/testing_itemize.itestinginfotype.md)
 
-Defined in: [testing/itemize.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L28)
+Defined in: [testing/itemize.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L28)
 
 ## Methods
 
@@ -117,7 +117,7 @@ use for cleanup
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L105)
+Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L105)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/itemize.ts:40](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L40)
+Defined in: [testing/itemize.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L40)
 
 ___
 
@@ -143,7 +143,7 @@ Build a brand new instance
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L71)
+Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L71)
 
 ___
 
@@ -164,7 +164,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L114)
+Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L114)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/itemize.ts:103](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L103)
+Defined in: [testing/itemize.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/testing/itemize.ts#L103)
 
 ___
 
@@ -194,7 +194,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L162)
+Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L162)
 
 ___
 
@@ -215,7 +215,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L129)
+Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L129)
 
 ___
 
@@ -229,7 +229,7 @@ Quits this test
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L220)
+Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L220)
 
 ___
 
@@ -244,7 +244,7 @@ and by all it means all of them
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L186)
+Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L186)
 
 ___
 
@@ -260,7 +260,7 @@ this
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L201)
+Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L201)
 
 ___
 
@@ -275,7 +275,7 @@ they should be on the same layer
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L172)
+Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L172)
 
 ___
 
@@ -293,7 +293,7 @@ Name | Type | Default value |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L141)
+Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L141)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L211)
+Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L211)
 
 ___
 
@@ -329,4 +329,4 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/0569bdf2/testing/index.ts#L152)
+Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/3efa2a4a/testing/index.ts#L152)

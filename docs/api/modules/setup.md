@@ -34,7 +34,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [setup/index.ts:102](https://github.com/onzag/itemize/blob/0569bdf2/setup/index.ts#L102)
+Defined in: [setup/index.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L102)
 
 ___
 
@@ -46,7 +46,7 @@ Ensures that the configuration directory exists
 
 **Returns:** *Promise*<void\>
 
-Defined in: [setup/index.ts:146](https://github.com/onzag/itemize/blob/0569bdf2/setup/index.ts#L146)
+Defined in: [setup/index.ts:146](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L146)
 
 ___
 
@@ -66,7 +66,7 @@ Name | Type | Description |
 
 the parsed content, or otherwise null if it doesn't exist
 
-Defined in: [setup/index.ts:179](https://github.com/onzag/itemize/blob/0569bdf2/setup/index.ts#L179)
+Defined in: [setup/index.ts:179](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L179)
 
 ___
 
@@ -87,4 +87,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [setup/index.ts:205](https://github.com/onzag/itemize/blob/0569bdf2/setup/index.ts#L205)
+Defined in: [setup/index.ts:205](https://github.com/onzag/itemize/blob/3efa2a4a/setup/index.ts#L205)

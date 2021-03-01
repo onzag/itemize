@@ -23,11 +23,11 @@
 
 ### error
 
-• **error**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
+• **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
 Inherited from: [IBasicActionResponse](client_providers_item.ibasicactionresponse.md).[error](client_providers_item.ibasicactionresponse.md#error)
 
-Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L112)
+Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L112)
 
 ___
 
@@ -35,4 +35,4 @@ ___
 
 • **value**: *any*
 
-Defined in: [client/providers/item.tsx:116](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L116)
+Defined in: [client/providers/item.tsx:116](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L116)

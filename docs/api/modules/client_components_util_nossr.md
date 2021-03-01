@@ -29,4 +29,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/components/util/NoSSR.tsx:58](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/NoSSR.tsx#L58)
+Defined in: [client/components/util/NoSSR.tsx:58](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/util/NoSSR.tsx#L58)

@@ -26,7 +26,7 @@ Contains the internal initialization function for initializing itemize app
 
 • `Const` **history**: *History*<{}\>
 
-Defined in: [client/index.tsx:108](https://github.com/onzag/itemize/blob/0569bdf2/client/index.tsx#L108)
+Defined in: [client/index.tsx:108](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L108)
 
 ## Functions
 
@@ -47,7 +47,7 @@ Name | Type | Description |
 
 the value of the cookie as a string or null
 
-Defined in: [client/index.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/index.tsx#L40)
+Defined in: [client/index.tsx:40](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L40)
 
 ___
 
@@ -65,13 +65,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/index.tsx:117](https://github.com/onzag/itemize/blob/0569bdf2/client/index.tsx#L117)
+Defined in: [client/index.tsx:117](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L117)
 
 ___
 
 ### initializeItemizeApp
 
-▸ **initializeItemizeApp**(`rendererContext`: [*IRendererContext*](../interfaces/client_providers_renderer.irenderercontext.md), `mainComponent`: React.ReactElement, `options?`: { `appWrapper?`: (`app`: React.ReactElement, `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md)) => React.ReactElement ; `mainWrapper?`: (`mainComponet`: React.ReactElement, `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md), `localeContext`: [*ILocaleContextType*](../interfaces/client_internal_providers_locale_provider.ilocalecontexttype.md)) => React.ReactElement ; `serverMode?`: { `clientDetails`: { `country`: *string* ; `currency`: *string* ; `guessedData`: *string* ; `lang`: *string*  } ; `collector?`: [*ICollectorType*](../interfaces/client.icollectortype.md) ; `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md) ; `langLocales`: [*ILangLocalesType*](../interfaces/root.ilanglocalestype.md) ; `req`: *any* ; `res`: *any* ; `root`: [*default*](../classes/root.default.md) ; `ssrContext`: [*ISSRContextType*](../interfaces/client_internal_providers_ssr_provider.issrcontexttype.md) ; `userLocalizationService`: *any*  }  }): *Promise*<{ `id`: *string* ; `node`: ReactNode  }\>
+▸ **initializeItemizeApp**(`rendererContext`: [*IRendererContext*](../interfaces/client_providers_renderer.irenderercontext.md), `mainComponent`: React.ReactElement, `options?`: { `appWrapper?`: (`app`: React.ReactElement, `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md)) => React.ReactElement ; `mainWrapper?`: (`mainComponet`: React.ReactElement, `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md), `localeContext`: [*ILocaleContextType*](../interfaces/client_internal_providers_locale_provider.ilocalecontexttype.md)) => React.ReactElement ; `serverMode?`: { `clientDetails`: { `country`: *string* ; `currency`: *string* ; `guessedData`: *string* ; `lang`: *string*  } ; `collector?`: [*ICollectorType*](../interfaces/client.icollectortype.md) ; `config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md) ; `langLocales`: [*ILangLocalesType*](../interfaces/base_root.ilanglocalestype.md) ; `req`: *any* ; `res`: *any* ; `root`: [*default*](../classes/base_root.default.md) ; `ssrContext`: [*ISSRContextType*](../interfaces/client_internal_providers_ssr_provider.issrcontexttype.md) ; `userLocalizationService`: *any*  }  }): *Promise*<{ `id`: *string* ; `node`: ReactNode  }\>
 
 The main function that initializes the itemize app, it's meant both to work
 on the server and the client side, however it's optimized for client side functionality
@@ -94,13 +94,13 @@ Name | Type | Description |
 `options.serverMode.clientDetails.lang` | *string* | - |
 `options.serverMode.collector?` | [*ICollectorType*](../interfaces/client.icollectortype.md) | - |
 `options.serverMode.config` | [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md) | - |
-`options.serverMode.langLocales` | [*ILangLocalesType*](../interfaces/root.ilanglocalestype.md) | - |
+`options.serverMode.langLocales` | [*ILangLocalesType*](../interfaces/base_root.ilanglocalestype.md) | - |
 `options.serverMode.req` | *any* | - |
 `options.serverMode.res` | *any* | - |
-`options.serverMode.root` | [*default*](../classes/root.default.md) | - |
+`options.serverMode.root` | [*default*](../classes/base_root.default.md) | - |
 `options.serverMode.ssrContext` | [*ISSRContextType*](../interfaces/client_internal_providers_ssr_provider.issrcontexttype.md) | - |
 `options.serverMode.userLocalizationService` | *any* | - |
 
 **Returns:** *Promise*<{ `id`: *string* ; `node`: ReactNode  }\>
 
-Defined in: [client/index.tsx:221](https://github.com/onzag/itemize/blob/0569bdf2/client/index.tsx#L221)
+Defined in: [client/index.tsx:221](https://github.com/onzag/itemize/blob/3efa2a4a/client/index.tsx#L221)

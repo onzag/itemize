@@ -4,7 +4,7 @@
  * exists out of consideration but contains mostly types and the combination
  * of functions
  *
- * @module gql
+ * @module
  */
 
 import Root from ".";

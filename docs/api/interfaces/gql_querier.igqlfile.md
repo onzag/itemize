@@ -33,7 +33,7 @@ to be and send
 
 an unique id
 
-Defined in: [gql-querier.ts:80](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L80)
+Defined in: [gql-querier.ts:80](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L80)
 
 ___
 
@@ -47,7 +47,7 @@ height, set by the client, is limited to 128 characters
 encoding is WxH;name,name,name as many names as there are special
 dimensions, large, small and medium do not count
 
-Defined in: [gql-querier.ts:96](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L96)
+Defined in: [gql-querier.ts:96](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L96)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 the name of the file
 
-Defined in: [gql-querier.ts:72](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L72)
+Defined in: [gql-querier.ts:72](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L72)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 The size of the file in bytes
 
-Defined in: [gql-querier.ts:88](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L88)
+Defined in: [gql-querier.ts:88](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L88)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 A source, either a File, Blob or a read stream
 
-Defined in: [gql-querier.ts:100](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L100)
+Defined in: [gql-querier.ts:100](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L100)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 The mime type
 
-Defined in: [gql-querier.ts:76](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L76)
+Defined in: [gql-querier.ts:76](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L76)
 
 ___
 
@@ -97,4 +97,4 @@ ___
 
 the url where it is stored
 
-Defined in: [gql-querier.ts:84](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L84)
+Defined in: [gql-querier.ts:84](https://github.com/onzag/itemize/blob/3efa2a4a/gql-querier.ts#L84)

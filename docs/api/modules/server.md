@@ -33,7 +33,7 @@ of the server side of things
 
 • `Const` **app**: *Express*
 
-Defined in: [server/index.ts:118](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L118)
+Defined in: [server/index.ts:118](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L118)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • `Const` **logger**: winston.Logger
 
-Defined in: [server/index.ts:78](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L78)
+Defined in: [server/index.ts:78](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L78)
 
 ## Functions
 
@@ -60,7 +60,7 @@ Name | Type |
 
 **Returns:** *Promise*<{ `classesUsed`: [*IServiceProviderClassType*](../interfaces/server_services.iserviceproviderclasstype.md)<any\>[] ; `cloudClients`: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md) ; `instancesUsed`: [*default*](../classes/server_services_base_storageprovider.default.md)<any\>[]  }\>
 
-Defined in: [server/index.ts:204](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L204)
+Defined in: [server/index.ts:204](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L204)
 
 ___
 
@@ -80,4 +80,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/index.ts:294](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L294)
+Defined in: [server/index.ts:294](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L294)

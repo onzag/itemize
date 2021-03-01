@@ -22,13 +22,13 @@ for speeding up things and setting up unique constraints
 
 • `Const` **MAX\_PG\_INDEX\_SIZE**: *60*= 60
 
-Defined in: [dbbuilder/build-index.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-index.ts#L19)
+Defined in: [dbbuilder/build-index.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/build-index.ts#L19)
 
 ## Functions
 
 ### buildIndexes
 
-▸ **buildIndexes**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)): *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)\>
+▸ **buildIndexes**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)): *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)\>
 
 Builds all the indexes
 
@@ -37,14 +37,14 @@ Builds all the indexes
 Name | Type | Description |
 :------ | :------ | :------ |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database instance   |
-`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the current database schema   |
-`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the new database schema as requested   |
+`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the current database schema   |
+`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the new database schema as requested   |
 
-**Returns:** *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)\>
+**Returns:** *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)\>
 
 the resulting database schema and the new current
 
-Defined in: [dbbuilder/build-index.ts:40](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-index.ts#L40)
+Defined in: [dbbuilder/build-index.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/build-index.ts#L40)
 
 ___
 
@@ -60,4 +60,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [dbbuilder/build-index.ts:16](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-index.ts#L16)
+Defined in: [dbbuilder/build-index.ts:16](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/build-index.ts#L16)

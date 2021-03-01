@@ -62,7 +62,7 @@ Name | Type |
 `properties.save.anyOf` | ({ `additionalProperties`: *undefined* ; `type`: *string* = "boolean" } \| { `additionalProperties`: { `anyOf`: ({ `additionalProperties`: *undefined* ; `items`: *undefined* ; `maxItems`: *undefined* = 2; `minItems`: *undefined* = 2; `type`: *string* = "boolean" } \| { `additionalProperties`: *undefined* ; `items`: { `anyOf`: *undefined* ; `type`: *string* = "number" } ; `maxItems`: *undefined* = 2; `minItems`: *undefined* = 2; `type`: *string* = "array" } \| { `additionalProperties`: *undefined* ; `items`: { `anyOf`: { `type`: *string* = "string" }[] ; `type`: *undefined* = "number" } ; `maxItems`: *number* = 2; `minItems`: *number* = 2; `type`: *string* = "array" } \| { `additionalProperties`: { `anyOf`: ({ `items`: *undefined* ; `maxItems`: *undefined* = 2; `minItems`: *undefined* = 2; `type`: *string* = "boolean" } \| { `items`: { `anyOf`: *undefined* ; `type`: *string* = "number" } ; `maxItems`: *undefined* = 2; `minItems`: *undefined* = 2; `type`: *string* = "array" } \| { `items`: { `anyOf`: { `type`: *string* = "string" }[] ; `type`: *undefined* = "number" } ; `maxItems`: *number* = 2; `minItems`: *number* = 2; `type`: *string* = "array" })[]  } ; `items`: *undefined* ; `maxItems`: *undefined* = 2; `minItems`: *undefined* = 2; `type`: *string* = "object" })[]  } ; `type`: *string* = "object" })[] |
 `type` | *string* |
 
-Defined in: [config.ts:414](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L414)
+Defined in: [config.ts:414](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L414)
 
 ___
 
@@ -150,7 +150,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [config.ts:521](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L521)
+Defined in: [config.ts:521](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L521)
 
 ___
 
@@ -179,7 +179,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [config.ts:658](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L658)
+Defined in: [config.ts:658](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L658)
 
 ___
 
@@ -241,7 +241,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [config.ts:740](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L740)
+Defined in: [config.ts:740](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L740)
 
 ___
 
@@ -270,7 +270,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [config.ts:690](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L690)
+Defined in: [config.ts:690](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L690)
 
 ___
 
@@ -331,4 +331,4 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [config.ts:328](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L328)
+Defined in: [config.ts:328](https://github.com/onzag/itemize/blob/3efa2a4a/config.ts#L328)

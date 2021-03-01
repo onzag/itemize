@@ -34,4 +34,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/search/SearchLoader.tsx:738](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L738)
+Defined in: [client/components/search/SearchLoader.tsx:738](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L738)

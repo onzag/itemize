@@ -60,7 +60,7 @@ Name | Type |
 
 **Returns:** [*PropertyViewLocation*](client_internal_components_propertyview_propertyviewlocation.propertyviewlocation.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:70](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L70)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:70](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L70)
 
 ## Properties
 
@@ -277,7 +277,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:93](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L93)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:93](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L93)
 
 ___
 
@@ -425,7 +425,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:128](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L128)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:128](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L128)
 
 ___
 
@@ -441,7 +441,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:123](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L123)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:123](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L123)
 
 ___
 
@@ -451,7 +451,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:162](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L162)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:162](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L162)
 
 ___
 
@@ -491,4 +491,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:147](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewLocation.tsx#L147)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:147](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyView/PropertyViewLocation.tsx#L147)

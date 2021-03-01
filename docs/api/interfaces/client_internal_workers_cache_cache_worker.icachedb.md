@@ -34,7 +34,7 @@ Name | Type |
 `key` | *string* |
 `value` | [*ICacheMatchType*](client_internal_workers_cache_cache_worker.icachematchtype.md) |
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:103](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/workers/cache/cache.worker.ts#L103)
+Defined in: [client/internal/workers/cache/cache.worker.ts:103](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L103)
 
 ___
 
@@ -51,4 +51,4 @@ Name | Type |
 `key` | *string* |
 `value` | [*ISearchMatchType*](client_internal_workers_cache_cache_worker.isearchmatchtype.md) |
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:110](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/workers/cache/cache.worker.ts#L110)
+Defined in: [client/internal/workers/cache/cache.worker.ts:110](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.ts#L110)

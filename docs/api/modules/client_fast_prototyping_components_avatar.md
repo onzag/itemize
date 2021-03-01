@@ -21,7 +21,7 @@ Will display an avatar for a given user, this fast prototyping
 component makes no assumptions and as such you will have to implement
 your own wrapper around it to make your own avatar type
 
-Defined in: [client/fast-prototyping/components/avatar.tsx:341](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/avatar.tsx#L341)
+Defined in: [client/fast-prototyping/components/avatar.tsx:341](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/avatar.tsx#L341)
 
 ___
 
@@ -34,4 +34,4 @@ so it can be passed as a custom renderer via the entry, eg...
 <Entry id="profile_picture" renderer={AvatarRenderer}/> rather
 than using the default
 
-Defined in: [client/fast-prototyping/components/avatar.tsx:366](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/avatar.tsx#L366)
+Defined in: [client/fast-prototyping/components/avatar.tsx:366](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/avatar.tsx#L366)

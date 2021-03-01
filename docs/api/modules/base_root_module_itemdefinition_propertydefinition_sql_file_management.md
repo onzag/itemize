@@ -37,7 +37,7 @@ Name | Type | Description |
 
 a void promise from when this is done
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:350](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L350)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:350](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L350)
 
 ___
 
@@ -64,13 +64,13 @@ Name | Type | Description |
 
 Name | Type |
 :------ | :------ |
-`consumeStreams` | [*ConsumeStreamsFnType*](sql.md#consumestreamsfntype) |
+`consumeStreams` | [*ConsumeStreamsFnType*](base_root_sql.md#consumestreamsfntype) |
 `value` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[] |
 
 the new values and the consume streams function that will actually consume the
 streams to store in the remote storage solution
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:40](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L40)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L40)
 
 ___
 
@@ -98,13 +98,13 @@ Name | Type | Description |
 
 Name | Type |
 :------ | :------ |
-`consumeStreams` | [*ConsumeStreamsFnType*](sql.md#consumestreamsfntype) |
+`consumeStreams` | [*ConsumeStreamsFnType*](base_root_sql.md#consumestreamsfntype) |
 `value` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md) |
 
 the new value (or null) consume streams function that will actually consume the
 streams to store in the remote storage solution
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:122](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L122)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:122](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L122)
 
 ___
 
@@ -127,4 +127,4 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:423](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L423)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts:423](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management.ts#L423)

@@ -17,7 +17,7 @@ as for the lang.json file
 
 ### buildLang
 
-▸ **buildLang**(`rawDataConfig`: [*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md), `actualRootLocation`: *string*, `i18nBaseFileLocation`: *string*, `traceback`: [*default*](../classes/builder_traceback.default.md)): *Promise*<[*Ii18NType*](../interfaces/root.ii18ntype.md)\>
+▸ **buildLang**(`rawDataConfig`: [*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md), `actualRootLocation`: *string*, `i18nBaseFileLocation`: *string*, `traceback`: [*default*](../classes/builder_traceback.default.md)): *Promise*<[*Ii18NType*](../interfaces/base_root.ii18ntype.md)\>
 
 Build the core language data that holds information
 about the language itself and other localizables
@@ -33,15 +33,15 @@ Name | Type | Description |
 `i18nBaseFileLocation` | *string* | - |
 `traceback` | [*default*](../classes/builder_traceback.default.md) | the traceback in the location   |
 
-**Returns:** *Promise*<[*Ii18NType*](../interfaces/root.ii18ntype.md)\>
+**Returns:** *Promise*<[*Ii18NType*](../interfaces/base_root.ii18ntype.md)\>
 
-Defined in: [builder/lang.ts:73](https://github.com/onzag/itemize/blob/0569bdf2/builder/lang.ts#L73)
+Defined in: [builder/lang.ts:73](https://github.com/onzag/itemize/blob/3efa2a4a/builder/lang.ts#L73)
 
 ___
 
 ### clearLang
 
-▸ **clearLang**(`rawData`: [*Ii18NType*](../interfaces/root.ii18ntype.md), `rawDataConfig`: [*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md)): [*ILangLocalesType*](../interfaces/root.ilanglocalestype.md)
+▸ **clearLang**(`rawData`: [*Ii18NType*](../interfaces/base_root.ii18ntype.md), `rawDataConfig`: [*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md)): [*ILangLocalesType*](../interfaces/base_root.ilanglocalestype.md)
 
 Clears language data in such a way that it leaves only the name
 and the supported locales
@@ -50,11 +50,11 @@ and the supported locales
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawData` | [*Ii18NType*](../interfaces/root.ii18ntype.md) | the raw locale language data   |
+`rawData` | [*Ii18NType*](../interfaces/base_root.ii18ntype.md) | the raw locale language data   |
 `rawDataConfig` | [*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md) | the raw data config   |
 
-**Returns:** [*ILangLocalesType*](../interfaces/root.ilanglocalestype.md)
+**Returns:** [*ILangLocalesType*](../interfaces/base_root.ilanglocalestype.md)
 
 the new locale language data with only names
 
-Defined in: [builder/lang.ts:211](https://github.com/onzag/itemize/blob/0569bdf2/builder/lang.ts#L211)
+Defined in: [builder/lang.ts:211](https://github.com/onzag/itemize/blob/3efa2a4a/builder/lang.ts#L211)

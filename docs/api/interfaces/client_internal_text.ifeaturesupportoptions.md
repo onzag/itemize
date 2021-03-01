@@ -46,7 +46,7 @@ The supported containers, might be null
 if all supported, note that this will
 not affect the base container
 
-Defined in: [client/internal/text/index.tsx:230](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L230)
+Defined in: [client/internal/text/index.tsx:230](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L230)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 the supported custom elements
 
-Defined in: [client/internal/text/index.tsx:220](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L220)
+Defined in: [client/internal/text/index.tsx:220](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L220)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 The supported rich classes, might be null
 if all supported
 
-Defined in: [client/internal/text/index.tsx:239](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L239)
+Defined in: [client/internal/text/index.tsx:239](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L239)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 whether we support containers
 
-Defined in: [client/internal/text/index.tsx:224](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L224)
+Defined in: [client/internal/text/index.tsx:224](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L224)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 Whether we support customs
 
-Defined in: [client/internal/text/index.tsx:216](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L216)
+Defined in: [client/internal/text/index.tsx:216](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L216)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 Whether custom styles using the style tag
 are acceptable
 
-Defined in: [client/internal/text/index.tsx:207](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L207)
+Defined in: [client/internal/text/index.tsx:207](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L207)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 Whether external links specifying an external
 protocol outside the current page are acceptable
 
-Defined in: [client/internal/text/index.tsx:190](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L190)
+Defined in: [client/internal/text/index.tsx:190](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L190)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 Whether files are supporeted
 
-Defined in: [client/internal/text/index.tsx:175](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L175)
+Defined in: [client/internal/text/index.tsx:175](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L175)
 
 ___
 
@@ -131,7 +131,7 @@ The accept type that the input should accept
 for filling the file type, it can be null, if
 it doesn't support files, or when viewing
 
-Defined in: [client/internal/text/index.tsx:181](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L181)
+Defined in: [client/internal/text/index.tsx:181](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L181)
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 Whether it supports images
 
-Defined in: [client/internal/text/index.tsx:161](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L161)
+Defined in: [client/internal/text/index.tsx:161](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L161)
 
 ___
 
@@ -153,7 +153,7 @@ The accept type that the input should accept
 for filling the image type, it can be null, if
 it doesn't support images, or when viewing
 
-Defined in: [client/internal/text/index.tsx:167](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L167)
+Defined in: [client/internal/text/index.tsx:167](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L167)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 Whether links are acceptable
 
-Defined in: [client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L185)
+Defined in: [client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L185)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 Whether lists are acceptable, ul, ol etc...
 
-Defined in: [client/internal/text/index.tsx:194](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L194)
+Defined in: [client/internal/text/index.tsx:194](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L194)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 Whether quotes are acceptable
 
-Defined in: [client/internal/text/index.tsx:198](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L198)
+Defined in: [client/internal/text/index.tsx:198](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L198)
 
 ___
 
@@ -193,7 +193,7 @@ ___
 
 whether rich classes are supported
 
-Defined in: [client/internal/text/index.tsx:234](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L234)
+Defined in: [client/internal/text/index.tsx:234](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L234)
 
 ___
 
@@ -203,7 +203,7 @@ ___
 
 Whether templating is supported
 
-Defined in: [client/internal/text/index.tsx:211](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L211)
+Defined in: [client/internal/text/index.tsx:211](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L211)
 
 ___
 
@@ -213,7 +213,7 @@ ___
 
 Whether titles are acceptable
 
-Defined in: [client/internal/text/index.tsx:202](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L202)
+Defined in: [client/internal/text/index.tsx:202](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L202)
 
 ___
 
@@ -223,4 +223,4 @@ ___
 
 Whether it supports videos
 
-Defined in: [client/internal/text/index.tsx:171](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L171)
+Defined in: [client/internal/text/index.tsx:171](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L171)

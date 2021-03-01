@@ -25,7 +25,7 @@ this is the form they have deep in after the name
 
 • `Optional` **applyingIncludes**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L47)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:47](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L47)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • `Optional` **applyingProperties**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:45](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L45)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:45](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L45)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • `Optional` **applyingPropertyOnlyAppliesWhenCurrentIsNonNull**: *boolean*
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L46)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:46](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L46)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • `Optional` **itemDefinition**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:59](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L59)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:59](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L59)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 • `Optional` **module**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:58](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L58)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:58](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L58)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • **properties**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:42](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L42)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:42](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L42)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 • **roles**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:41](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L41)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:41](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L41)

@@ -6,7 +6,7 @@
  * Usually you do not access or instantiate the root by default or your application
  * but you might access it in the server side, for example via appData
  *
- * @module Root
+ * @module
  */
 
 import Module, { IModuleRawJSONDataType } from "./Module";

@@ -39,9 +39,9 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L149)
+Defined in: [client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L149)
 
-Defined in: [client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L149)
+Defined in: [client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L149)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 Whether the resulting search results should clean on dismount
 
-Defined in: [client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L158)
+Defined in: [client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L158)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 The current page we are in
 
-Defined in: [client/components/search/SearchLoader.tsx:145](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L145)
+Defined in: [client/components/search/SearchLoader.tsx:145](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L145)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 Whether to disable the external checks for the item definition
 results provider props
 
-Defined in: [client/components/search/SearchLoader.tsx:163](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L163)
+Defined in: [client/components/search/SearchLoader.tsx:163](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L163)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 whether to include the policies in the resulting
 item definition loader props
 
-Defined in: [client/components/search/SearchLoader.tsx:154](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L154)
+Defined in: [client/components/search/SearchLoader.tsx:154](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L154)
 
 ___
 
@@ -112,9 +112,9 @@ Name | Type |
 
 **Returns:** *number* \| *void*
 
-Defined in: [client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L179)
+Defined in: [client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L179)
 
-Defined in: [client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L179)
+Defined in: [client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L179)
 
 ___
 
@@ -126,7 +126,7 @@ The page size, be careful on not making the page size too
 large as this can be forbidden, depends on max search results
 at once
 
-Defined in: [client/components/search/SearchLoader.tsx:141](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L141)
+Defined in: [client/components/search/SearchLoader.tsx:141](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L141)
 
 ___
 
@@ -138,4 +138,4 @@ The static state for the children item definition, TOTAL for
 basically not even asking for feedback (useful when the search was traditional)
 or NO_LISTENING for just not getting updates but asking for feedback
 
-Defined in: [client/components/search/SearchLoader.tsx:169](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchLoader.tsx#L169)
+Defined in: [client/components/search/SearchLoader.tsx:169](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/search/SearchLoader.tsx#L169)

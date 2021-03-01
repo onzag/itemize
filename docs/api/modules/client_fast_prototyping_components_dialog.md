@@ -19,7 +19,7 @@ Contains a generic dialog component based on MUI that is meant to be extended
 
 The dialog itself, non-responsive and rather generic
 
-Defined in: [client/fast-prototyping/components/dialog.tsx:95](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/dialog.tsx#L95)
+Defined in: [client/fast-prototyping/components/dialog.tsx:95](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/dialog.tsx#L95)
 
 ___
 
@@ -31,4 +31,4 @@ This is a responsive version of the dialog
 it's able to go in fullscreen mode automatically
 takes all the other props
 
-Defined in: [client/fast-prototyping/components/dialog.tsx:137](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/dialog.tsx#L137)
+Defined in: [client/fast-prototyping/components/dialog.tsx:137](https://github.com/onzag/itemize/blob/3efa2a4a/client/fast-prototyping/components/dialog.tsx#L137)

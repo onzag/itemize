@@ -24,7 +24,7 @@ The sensitive openstack container information
 
 • **authUrl**: *string*
 
-Defined in: [server/services/openstack.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L29)
+Defined in: [server/services/openstack.ts:29](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L29)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **containerName**: *string*
 
-Defined in: [server/services/openstack.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L30)
+Defined in: [server/services/openstack.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L30)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **domainId**: *string*
 
-Defined in: [server/services/openstack.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L27)
+Defined in: [server/services/openstack.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L27)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **domainName**: *string*
 
-Defined in: [server/services/openstack.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L28)
+Defined in: [server/services/openstack.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L28)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **password**: *string*
 
-Defined in: [server/services/openstack.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L25)
+Defined in: [server/services/openstack.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L25)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 • **region**: *string*
 
-Defined in: [server/services/openstack.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L26)
+Defined in: [server/services/openstack.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L26)
 
 ___
 
@@ -72,4 +72,4 @@ ___
 
 • **username**: *string*
 
-Defined in: [server/services/openstack.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/server/services/openstack.ts#L24)
+Defined in: [server/services/openstack.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/openstack.ts#L24)

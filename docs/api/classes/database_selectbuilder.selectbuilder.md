@@ -62,7 +62,7 @@ Builds a new select query builder
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L31)
+Defined in: [database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L31)
 
 ## Properties
 
@@ -70,7 +70,7 @@ Defined in: [database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob
 
 • **fromBuilder**: [*FromBuilder*](database_frombuilder.frombuilder.md)
 
-Defined in: [database/SelectBuilder.ts:23](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L23)
+Defined in: [database/SelectBuilder.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L23)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 • **groupByBuilder**: [*GroupByBuilder*](database_groupbybuilder.groupbybuilder.md)
 
-Defined in: [database/SelectBuilder.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L26)
+Defined in: [database/SelectBuilder.ts:26](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L26)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 • **havingBuilder**: [*HavingBuilder*](database_havingbuilder.havingbuilder.md)
 
-Defined in: [database/SelectBuilder.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L27)
+Defined in: [database/SelectBuilder.ts:27](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L27)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 • `Private` **ilimit**: *number*
 
-Defined in: [database/SelectBuilder.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L30)
+Defined in: [database/SelectBuilder.ts:30](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L30)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 • `Private` **ioffset**: *number*
 
-Defined in: [database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L31)
+Defined in: [database/SelectBuilder.ts:31](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L31)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 • **joinBuilder**: [*JoinBuilder*](database_joinbuilder.joinbuilder.md)
 
-Defined in: [database/SelectBuilder.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L24)
+Defined in: [database/SelectBuilder.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L24)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 • **orderByBuilder**: [*OrderByBuilder*](database_orderbybuilder.orderbybuilder.md)
 
-Defined in: [database/SelectBuilder.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L28)
+Defined in: [database/SelectBuilder.ts:28](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L28)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 The expressions that we are selecting
 
-Defined in: [database/SelectBuilder.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L21)
+Defined in: [database/SelectBuilder.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L21)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 • **whereBuilder**: [*WhereBuilder*](database_wherebuilder.wherebuilder.md)
 
-Defined in: [database/SelectBuilder.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L25)
+Defined in: [database/SelectBuilder.ts:25](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L25)
 
 ## Methods
 
@@ -156,7 +156,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L69)
 
 ___
 
@@ -176,7 +176,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L77)
 
 ___
 
@@ -190,7 +190,7 @@ Clears the seleted expressions, limit and offset but does not affect the builder
 
 itself
 
-Defined in: [database/SelectBuilder.ts:122](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L122)
+Defined in: [database/SelectBuilder.ts:122](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L122)
 
 ___
 
@@ -204,7 +204,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L102)
 
 ___
 
@@ -219,7 +219,7 @@ nor the limit or offset
 
 itself
 
-Defined in: [database/SelectBuilder.ts:104](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L104)
+Defined in: [database/SelectBuilder.ts:104](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L104)
 
 ___
 
@@ -235,7 +235,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/SelectBuilder.ts:161](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L161)
+Defined in: [database/SelectBuilder.ts:161](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L161)
 
 ___
 
@@ -252,7 +252,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L165)
 
 ___
 
@@ -272,7 +272,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:134](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L134)
+Defined in: [database/SelectBuilder.ts:134](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L134)
 
 ___
 
@@ -292,7 +292,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:148](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L148)
+Defined in: [database/SelectBuilder.ts:148](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L148)
 
 ___
 
@@ -306,7 +306,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L109)
 
 ___
 
@@ -326,7 +326,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L65)
+Defined in: [database/SelectBuilder.ts:65](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L65)
 
 ___
 
@@ -346,7 +346,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:54](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L54)
+Defined in: [database/SelectBuilder.ts:54](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L54)
 
 ___
 
@@ -367,7 +367,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:78](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L78)
+Defined in: [database/SelectBuilder.ts:78](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L78)
 
 ___
 
@@ -388,7 +388,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/SelectBuilder.ts:90](https://github.com/onzag/itemize/blob/0569bdf2/database/SelectBuilder.ts#L90)
+Defined in: [database/SelectBuilder.ts:90](https://github.com/onzag/itemize/blob/3efa2a4a/database/SelectBuilder.ts#L90)
 
 ___
 
@@ -409,7 +409,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L86)
 
 ___
 
@@ -430,7 +430,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L95)
 
 ___
 
@@ -446,4 +446,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/3efa2a4a/database/base.ts#L126)

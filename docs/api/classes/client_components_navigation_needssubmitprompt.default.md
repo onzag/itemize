@@ -269,7 +269,7 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
 
 ___
 
@@ -427,7 +427,7 @@ ___
 
 ### confirmationCallback
 
-▸ **confirmationCallback**(`actioner`: [*ISubmitActionerInfoArgType*](../interfaces/client_components_item_submitactioner.isubmitactionerinfoargtype.md)): *Promise*<[*EndpointErrorType*](../modules/errors.md#endpointerrortype)\>
+▸ **confirmationCallback**(`actioner`: [*ISubmitActionerInfoArgType*](../interfaces/client_components_item_submitactioner.isubmitactionerinfoargtype.md)): *Promise*<[*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)\>
 
 Performs the actioner callback that the Prompt component expects
 
@@ -437,11 +437,11 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `actioner` | [*ISubmitActionerInfoArgType*](../interfaces/client_components_item_submitactioner.isubmitactionerinfoargtype.md) | the submit actioner arg   |
 
-**Returns:** *Promise*<[*EndpointErrorType*](../modules/errors.md#endpointerrortype)\>
+**Returns:** *Promise*<[*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)\>
 
 a promise for an error (or null)
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
 
 ___
 
@@ -493,7 +493,7 @@ The render function
 
 **Returns:** *Element*
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
 
 ___
 

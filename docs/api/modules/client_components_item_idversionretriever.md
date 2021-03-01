@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/IdVersionRetriever.tsx#L65)
+Defined in: [client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/item/IdVersionRetriever.tsx#L65)

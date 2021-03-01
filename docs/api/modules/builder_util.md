@@ -34,7 +34,7 @@ Name | Type | Description |
 
 a boolean
 
-Defined in: [builder/util.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/builder/util.ts#L24)
+Defined in: [builder/util.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/builder/util.ts#L24)
 
 ___
 
@@ -56,7 +56,7 @@ Name | Type | Description |
 
 a boolean
 
-Defined in: [builder/util.ts:49](https://github.com/onzag/itemize/blob/0569bdf2/builder/util.ts#L49)
+Defined in: [builder/util.ts:49](https://github.com/onzag/itemize/blob/3efa2a4a/builder/util.ts#L49)
 
 ___
 
@@ -79,7 +79,7 @@ Name | Type | Description |
 
 the name
 
-Defined in: [builder/util.ts:169](https://github.com/onzag/itemize/blob/0569bdf2/builder/util.ts#L169)
+Defined in: [builder/util.ts:169](https://github.com/onzag/itemize/blob/3efa2a4a/builder/util.ts#L169)
 
 ___
 
@@ -104,4 +104,4 @@ Name | Type | Default value | Description |
 
 a string with the right location
 
-Defined in: [builder/util.ts:70](https://github.com/onzag/itemize/blob/0569bdf2/builder/util.ts#L70)
+Defined in: [builder/util.ts:70](https://github.com/onzag/itemize/blob/3efa2a4a/builder/util.ts#L70)

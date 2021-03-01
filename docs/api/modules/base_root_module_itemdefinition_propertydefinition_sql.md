@@ -48,7 +48,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:556](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L556)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:556](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L556)
 
 ___
 
@@ -74,7 +74,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:507](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L507)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:507](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L507)
 
 ___
 
@@ -100,7 +100,7 @@ Name | Type | Description |
 
 **Returns:** *boolean* \| [*string*, *any*[]]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:416](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L416)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:416](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L416)
 
 ___
 
@@ -127,13 +127,13 @@ Name | Type | Description |
 
 **Returns:** *boolean* \| [*string*, *any*[]]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:453](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L453)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:453](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L453)
 
 ___
 
 ### convertGQLValueToSQLValueForProperty
 
-▸ **convertGQLValueToSQLValueForProperty**(`serverData`: *any*, `mod`: [*default*](../classes/base_root_module.default.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `data`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `oldData`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md), `uploadsClient`: [*default*](../classes/server_services_base_storageprovider.default.md)<any\>, `domain`: *string*, `dictionary`: *string*): [*ISQLStreamComposedTableRowValue*](../interfaces/sql.isqlstreamcomposedtablerowvalue.md)
+▸ **convertGQLValueToSQLValueForProperty**(`serverData`: *any*, `mod`: [*default*](../classes/base_root_module.default.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `data`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `oldData`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md), `uploadsClient`: [*default*](../classes/server_services_base_storageprovider.default.md)<any\>, `domain`: *string*, `dictionary`: *string*): [*ISQLStreamComposedTableRowValue*](../interfaces/base_root_sql.isqlstreamcomposedtablerowvalue.md)
 
 Converts a graphql value into a sql value, that is graphql data into row
 data to be immediately added to the database as it is
@@ -153,18 +153,18 @@ Name | Type | Description |
 `domain` | *string* | - |
 `dictionary` | *string* | the dictionary to use in full text search mode   |
 
-**Returns:** [*ISQLStreamComposedTableRowValue*](../interfaces/sql.isqlstreamcomposedtablerowvalue.md)
+**Returns:** [*ISQLStreamComposedTableRowValue*](../interfaces/base_root_sql.isqlstreamcomposedtablerowvalue.md)
 
 a composed value with a partial row value and the consume streams functionality
 included in it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:318](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L318)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:318](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L318)
 
 ___
 
 ### convertSQLValueToGQLValueForProperty
 
-▸ **convertSQLValueToGQLValueForProperty**(`serverData`: *any*, `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `row`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)): [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)
+▸ **convertSQLValueToGQLValueForProperty**(`serverData`: *any*, `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `row`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)
 
 Takes row data information that is in the SQL form and converts
 it into a graphql form, only for this specific property
@@ -177,19 +177,19 @@ Name | Type | Description |
 `itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) | the item definition that contains the property   |
 `include` | [*default*](../classes/base_root_module_itemdefinition_include.default.md) | the include within the item definition, or null   |
 `propertyDefinition` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | the property definition in question   |
-`row` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | the row that we want to extract information from   |
+`row` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the row that we want to extract information from   |
 
 **Returns:** [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)
 
 the graphql value for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:243](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L243)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:243](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L243)
 
 ___
 
 ### getSQLTableDefinitionForProperty
 
-▸ **getSQLTableDefinitionForProperty**(`itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md)): [*ISQLTableDefinitionType*](../interfaces/sql.isqltabledefinitiontype.md)
+▸ **getSQLTableDefinitionForProperty**(`itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `propertyDefinition`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md)): [*ISQLTableDefinitionType*](../interfaces/base_root_sql.isqltabledefinitiontype.md)
 
 Provides the table bit that is necessary to include this property and
 this property alone, that is a table bit
@@ -202,17 +202,17 @@ Name | Type | Description |
 `include` | [*default*](../classes/base_root_module_itemdefinition_include.default.md) | the include within the item definition, or null   |
 `propertyDefinition` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | the property definition in question   |
 
-**Returns:** [*ISQLTableDefinitionType*](../interfaces/sql.isqltabledefinitiontype.md)
+**Returns:** [*ISQLTableDefinitionType*](../interfaces/base_root_sql.isqltabledefinitiontype.md)
 
 the partial sql table definition for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:214](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L214)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:214](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L214)
 
 ___
 
 ### getStandardSQLFnFor
 
-▸ **getStandardSQLFnFor**(`type`: *string*, `ext?`: *string*, `indexCalculator?`: (`subtype`: *string*, `sqlPrefix`: *string*, `id`: *string*) => [*ISQLTableIndexType*](../interfaces/sql.isqltableindextype.md)): *function*
+▸ **getStandardSQLFnFor**(`type`: *string*, `ext?`: *string*, `indexCalculator?`: (`subtype`: *string*, `sqlPrefix`: *string*, `id`: *string*) => [*ISQLTableIndexType*](../interfaces/base_root_sql.isqltableindextype.md)): *function*
 
 Provides the sql function that defines the schema that is used to build
 the partial table definition
@@ -223,13 +223,13 @@ Name | Type | Default value | Description |
 :------ | :------ | :------ | :------ |
 `type` | *string* | - | the postgresql type   |
 `ext` | *string* | null | a extension to require for this type   |
-`indexCalculator?` | (`subtype`: *string*, `sqlPrefix`: *string*, `id`: *string*) => [*ISQLTableIndexType*](../interfaces/sql.isqltableindextype.md) | - | an function to decide how to build an index for this type   |
+`indexCalculator?` | (`subtype`: *string*, `sqlPrefix`: *string*, `id`: *string*) => [*ISQLTableIndexType*](../interfaces/base_root_sql.isqltableindextype.md) | - | an function to decide how to build an index for this type   |
 
-**Returns:** (`arg`: [*ISQLArgInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md)) => [*ISQLTableDefinitionType*](../interfaces/sql.isqltabledefinitiontype.md)
+**Returns:** (`arg`: [*ISQLArgInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md)) => [*ISQLTableDefinitionType*](../interfaces/base_root_sql.isqltabledefinitiontype.md)
 
 a function that returns the partial table definition object with the given type
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:36](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L36)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:36](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L36)
 
 ___
 
@@ -249,7 +249,7 @@ Name | Type | Description |
 
 an array of the columns to index
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:202](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L202)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:202](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L202)
 
 ___
 
@@ -270,13 +270,13 @@ Name | Type | Description |
 a valid args to use in the where expression or an object
 for where many
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:180](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L180)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:180](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L180)
 
 ___
 
 ### standardSQLInFn
 
-▸ **standardSQLInFn**(`arg`: [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md)): [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
+▸ **standardSQLInFn**(`arg`: [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md)): [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
 
 The standard sql in function that specifies how a property inputs its value
 into a table
@@ -287,11 +287,11 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `arg` | [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md) | the in arg   |
 
-**Returns:** [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
+**Returns:** [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
 
 the partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:92](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L92)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:92](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L92)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type | Description |
 
 an array of string with the order by
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:69](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L69)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:69](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L69)
 
 ___
 
@@ -333,7 +333,7 @@ Name | Type | Description |
 
 the property value out
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:123](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L123)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:123](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L123)
 
 ___
 
@@ -354,7 +354,7 @@ Name | Type | Description |
 
 the supported type json parsed
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
 
 ___
 
@@ -374,7 +374,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:150](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L150)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:150](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L150)
 
 ___
 
@@ -395,13 +395,13 @@ Name | Type | Description |
 
 the rows to select
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:79](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L79)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:79](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L79)
 
 ___
 
 ### stardardSQLInWithJSONStringifyFn
 
-▸ **stardardSQLInWithJSONStringifyFn**(`arg`: [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md)): [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
+▸ **stardardSQLInWithJSONStringifyFn**(`arg`: [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md)): [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
 
 The standard sql in function that inputs its value but
 uses JSON stringify as a serialization tool
@@ -412,8 +412,8 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `arg` | [*ISQLInInfo*](../interfaces/base_root_module_itemdefinition_propertydefinition_types.isqlininfo.md) | the in arg   |
 
-**Returns:** [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
+**Returns:** [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
 
 the partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:105](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L105)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:105](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L105)

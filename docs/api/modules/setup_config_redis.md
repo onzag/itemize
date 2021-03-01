@@ -24,4 +24,4 @@ Name | Type |
 
 **Returns:** *Promise*<[*IRedisConfigRawJSONDataType*](../interfaces/config.iredisconfigrawjsondatatype.md)\>
 
-Defined in: [setup/config/redis.ts:4](https://github.com/onzag/itemize/blob/0569bdf2/setup/config/redis.ts#L4)
+Defined in: [setup/config/redis.ts:4](https://github.com/onzag/itemize/blob/3efa2a4a/setup/config/redis.ts#L4)

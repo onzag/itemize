@@ -34,7 +34,7 @@
 
 • **id**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • `Optional` **include**: [*default*](../classes/base_root_module_itemdefinition_include.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **itemDefinition**: [*default*](../classes/base_root_module_itemdefinition.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **prefix**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **property**: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)

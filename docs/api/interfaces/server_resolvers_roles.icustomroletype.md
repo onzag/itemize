@@ -32,9 +32,9 @@ Name | Type |
 
 **Returns:** *boolean* \| *Promise*<boolean\>
 
-Defined in: [server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L41)
+Defined in: [server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L41)
 
-Defined in: [server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L41)
+Defined in: [server/resolvers/roles.ts:41](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L41)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • `Optional` **item**: *string*[]
 
-Defined in: [server/resolvers/roles.ts:40](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L40)
+Defined in: [server/resolvers/roles.ts:40](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L40)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • `Optional` **module**: *string*[]
 
-Defined in: [server/resolvers/roles.ts:39](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L39)
+Defined in: [server/resolvers/roles.ts:39](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L39)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • `Optional` **priority**: *number*
 
-Defined in: [server/resolvers/roles.ts:42](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L42)
+Defined in: [server/resolvers/roles.ts:42](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L42)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **role**: *string*
 
-Defined in: [server/resolvers/roles.ts:38](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L38)
+Defined in: [server/resolvers/roles.ts:38](https://github.com/onzag/itemize/blob/3efa2a4a/server/resolvers/roles.ts#L38)

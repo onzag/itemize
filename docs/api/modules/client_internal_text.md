@@ -42,7 +42,7 @@
 The list of allowed classes for text as defined by the text-specs
 this will prevent users from class injection
 
-Defined in: [client/internal/text/index.tsx:30](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L30)
+Defined in: [client/internal/text/index.tsx:30](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L30)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 The list of allowed prefixes
 
-Defined in: [client/internal/text/index.tsx:44](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L44)
+Defined in: [client/internal/text/index.tsx:44](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L44)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • `Const` **CONTAINER\_CLASS**: *container*= "container"
 
-Defined in: [client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L37)
+Defined in: [client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L37)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 • `Const` **CONTAINER\_CLASS\_PREFIX**: *string*
 
-Defined in: [client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L38)
+Defined in: [client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L38)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • `Const` **CUSTOM\_CLASS\_PREFIX**: *custom-*= "custom-"
 
-Defined in: [client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L39)
+Defined in: [client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L39)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • `Const` **RICH\_TEXT\_CLASS\_PREFIX**: *rich-text--*= "rich-text--"
 
-Defined in: [client/internal/text/index.tsx:36](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L36)
+Defined in: [client/internal/text/index.tsx:36](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L36)
 
 ___
 
@@ -102,7 +102,7 @@ Name | Type |
 `ADD_TAGS` | *string*[] |
 `ALLOW_UNKNOWN_PROTOCOLS` | *boolean* |
 
-Defined in: [client/internal/text/index.tsx:17](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L17)
+Defined in: [client/internal/text/index.tsx:17](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L17)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 Modify the content of the children based on
 the template args
 
-Defined in: [client/internal/text/index.tsx:88](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L88)
+Defined in: [client/internal/text/index.tsx:88](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L88)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 Custom handlers to modify the information within the system
 use args
 
-Defined in: [client/internal/text/index.tsx:97](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L97)
+Defined in: [client/internal/text/index.tsx:97](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L97)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 Template events that are supported these
 exist as data-on-[event]="{{event}}"
 
-Defined in: [client/internal/text/index.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L52)
+Defined in: [client/internal/text/index.tsx:52](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L52)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 Styles that might pop in when using templates
 exist as data-[supportedTemplateStyle]-style="position:absolute;"
 
-Defined in: [client/internal/text/index.tsx:79](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L79)
+Defined in: [client/internal/text/index.tsx:79](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L79)
 
 ## Functions
 
@@ -164,7 +164,7 @@ Name | Type |
 
 **Returns:** *number*
 
-Defined in: [client/internal/text/index.tsx:527](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L527)
+Defined in: [client/internal/text/index.tsx:527](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L527)
 
 ___
 
@@ -189,7 +189,7 @@ Name | Type |
 
 **Returns:** [*IRootLevelDocument*](../interfaces/client_internal_text_serializer.irootleveldocument.md)
 
-Defined in: [client/internal/text/index.tsx:551](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L551)
+Defined in: [client/internal/text/index.tsx:551](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L551)
 
 ___
 
@@ -213,7 +213,7 @@ Name | Type | Description |
 
 a node
 
-Defined in: [client/internal/text/index.tsx:275](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L275)
+Defined in: [client/internal/text/index.tsx:275](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L275)
 
 ___
 
@@ -247,7 +247,7 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [client/internal/text/index.tsx:738](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L738)
+Defined in: [client/internal/text/index.tsx:738](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L738)
 
 ___
 
@@ -275,7 +275,7 @@ Name | Type | Description |
 
 **Returns:** *object*
 
-Defined in: [client/internal/text/index.tsx:769](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L769)
+Defined in: [client/internal/text/index.tsx:769](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L769)
 
 ___
 
@@ -298,7 +298,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/internal/text/index.tsx:250](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L250)
+Defined in: [client/internal/text/index.tsx:250](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L250)
 
 ___
 
@@ -317,7 +317,7 @@ Name | Type |
 
 **Returns:** *string* \| HTMLElement[]
 
-Defined in: [client/internal/text/index.tsx:506](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L506)
+Defined in: [client/internal/text/index.tsx:506](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L506)
 
 ___
 
@@ -336,4 +336,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/internal/text/index.tsx:515](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L515)
+Defined in: [client/internal/text/index.tsx:515](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/index.tsx#L515)

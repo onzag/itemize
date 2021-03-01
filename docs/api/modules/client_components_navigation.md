@@ -25,7 +25,7 @@ Simply go back
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/index.tsx:148](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/index.tsx#L148)
+Defined in: [client/components/navigation/index.tsx:148](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/index.tsx#L148)
 
 ___
 
@@ -46,7 +46,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/index.tsx:124](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/index.tsx#L124)
+Defined in: [client/components/navigation/index.tsx:124](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/index.tsx#L124)
 
 ___
 
@@ -66,7 +66,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/index.tsx:109](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/index.tsx#L109)
+Defined in: [client/components/navigation/index.tsx:109](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/index.tsx#L109)
 
 ___
 
@@ -93,7 +93,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/index.tsx:50](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/index.tsx#L50)
+Defined in: [client/components/navigation/index.tsx:50](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/index.tsx#L50)
 
 ___
 
@@ -119,4 +119,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/index.tsx:17](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/index.tsx#L17)
+Defined in: [client/components/navigation/index.tsx:17](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/navigation/index.tsx#L17)

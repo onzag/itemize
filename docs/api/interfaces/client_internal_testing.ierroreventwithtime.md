@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IErrorEvent*](remote_protocol.ierrorevent.md)
+* [*IErrorEvent*](base_remote_protocol.ierrorevent.md)
 
   ↳ **IErrorEventWithTime**
 
@@ -24,9 +24,9 @@
 
 • **message**: *string*
 
-Inherited from: [IErrorEvent](remote_protocol.ierrorevent.md).[message](remote_protocol.ierrorevent.md#message)
+Inherited from: [IErrorEvent](base_remote_protocol.ierrorevent.md).[message](base_remote_protocol.ierrorevent.md#message)
 
-Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L47)
+Defined in: [base/remote-protocol.ts:47](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L47)
 
 ___
 
@@ -34,9 +34,9 @@ ___
 
 • **request**: *any*
 
-Inherited from: [IErrorEvent](remote_protocol.ierrorevent.md).[request](remote_protocol.ierrorevent.md#request)
+Inherited from: [IErrorEvent](base_remote_protocol.ierrorevent.md).[request](base_remote_protocol.ierrorevent.md#request)
 
-Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L48)
+Defined in: [base/remote-protocol.ts:48](https://github.com/onzag/itemize/blob/3efa2a4a/base/remote-protocol.ts#L48)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L55)
+Defined in: [client/internal/testing.ts:55](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/testing.ts#L55)

@@ -22,7 +22,7 @@
 
 • **garbageMadeUpToken**: *string*
 
-Defined in: [testing/server/index.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L24)
+Defined in: [testing/server/index.ts:24](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L24)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **invalidRoleTestToken**: *string*
 
-Defined in: [testing/server/index.ts:23](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L23)
+Defined in: [testing/server/index.ts:23](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L23)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **invalidSessionIdTestToken**: *string*
 
-Defined in: [testing/server/index.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L21)
+Defined in: [testing/server/index.ts:21](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L21)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **invalidSignatureTestToken**: *string*
 
-Defined in: [testing/server/index.ts:22](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L22)
+Defined in: [testing/server/index.ts:22](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L22)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **malformedTestToken**: *string*
 
-Defined in: [testing/server/index.ts:20](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L20)
+Defined in: [testing/server/index.ts:20](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L20)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • **testToken**: *string*
 
-Defined in: [testing/server/index.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L19)
+Defined in: [testing/server/index.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L19)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **testUser**: *any*
 
-Defined in: [testing/server/index.ts:18](https://github.com/onzag/itemize/blob/0569bdf2/testing/server/index.ts#L18)
+Defined in: [testing/server/index.ts:18](https://github.com/onzag/itemize/blob/3efa2a4a/testing/server/index.ts#L18)

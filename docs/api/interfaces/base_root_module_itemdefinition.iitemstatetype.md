@@ -29,7 +29,7 @@ Represents the whole item definition state
 
 The id that was used
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:319](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L319)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:319](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L319)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 The version that was used
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:323](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L323)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:323](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L323)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 The original graphql flattened value that was applied (if any)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:315](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L315)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:315](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L315)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 All the state of the includes within itself
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:303](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L303)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:303](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L303)
 
 ___
 
@@ -72,7 +72,7 @@ this is used in the search mode in order to store search results as a way
 to keep them linked to the state that is used in that way some data
 might be assigned to this state
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:330](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L330)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:330](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L330)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 The name of the item definition
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:299](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L299)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:299](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L299)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 The qualified name of the item definition
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:295](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L295)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:295](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L295)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 The module this item definition resides (name only)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:291](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L291)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:291](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L291)
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 All the policies state
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:311](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L311)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:311](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L311)
 
 ___
 
@@ -122,4 +122,4 @@ ___
 
 All the states of the properties included
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:307](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/index.ts#L307)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:307](https://github.com/onzag/itemize/blob/3efa2a4a/base/Root/Module/ItemDefinition/index.ts#L307)

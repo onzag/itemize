@@ -5,7 +5,7 @@
  * This is just a bunch of types that specifies a protocol this is the protocol
  * that is implemented by the remote listener
  *
- * @module remote-protocol
+ * @module
  */
 
 import { IGQLSearchRecord } from "../gql-querier";

@@ -22,7 +22,7 @@
 
 • `Const` **ModuleContext**: *Context*<[*IModuleContextType*](../interfaces/client_providers_module.imodulecontexttype.md)\>
 
-Defined in: [client/providers/module.tsx:13](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/module.tsx#L13)
+Defined in: [client/providers/module.tsx:13](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/module.tsx#L13)
 
 ## Functions
 
@@ -38,4 +38,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/providers/module.tsx:92](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/module.tsx#L92)
+Defined in: [client/providers/module.tsx:92](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/module.tsx#L92)

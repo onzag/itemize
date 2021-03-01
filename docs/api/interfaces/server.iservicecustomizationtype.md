@@ -21,7 +21,7 @@
 
 • `Optional` **currencyFactorsProvider**: [*IServiceProviderClassType*](server_services.iserviceproviderclasstype.md)<any\>
 
-Defined in: [server/index.ts:187](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L187)
+Defined in: [server/index.ts:187](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L187)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/index.ts:189](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L189)
+Defined in: [server/index.ts:189](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L189)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • `Optional` **locationSearchProvider**: [*IServiceProviderClassType*](server_services.iserviceproviderclasstype.md)<any\>
 
-Defined in: [server/index.ts:188](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L188)
+Defined in: [server/index.ts:188](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L188)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • `Optional` **mailServiceProvider**: [*IServiceProviderClassType*](server_services.iserviceproviderclasstype.md)<any\>
 
-Defined in: [server/index.ts:185](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L185)
+Defined in: [server/index.ts:185](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L185)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • `Optional` **storageServiceProviders**: [*IStorageProviders*](server.istorageproviders.md)
 
-Defined in: [server/index.ts:184](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L184)
+Defined in: [server/index.ts:184](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L184)
 
 ___
 
@@ -63,4 +63,4 @@ ___
 
 • `Optional` **userLocalizationProvider**: [*IServiceProviderClassType*](server_services.iserviceproviderclasstype.md)<any\>
 
-Defined in: [server/index.ts:186](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L186)
+Defined in: [server/index.ts:186](https://github.com/onzag/itemize/blob/3efa2a4a/server/index.ts#L186)

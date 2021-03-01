@@ -2,7 +2,7 @@
  * Basically just contains types and the function that specifies how the whole
  * database for the itemize project should be described
  *
- * @module sql
+ * @module
  */
 
 import { getSQLTablesSchemaForModule } from "./Module/sql";

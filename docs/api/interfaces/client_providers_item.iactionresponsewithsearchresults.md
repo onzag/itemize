@@ -30,17 +30,17 @@ A response given by search
 
 • **count**: *number*
 
-Defined in: [client/providers/item.tsx:139](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L139)
+Defined in: [client/providers/item.tsx:139](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L139)
 
 ___
 
 ### error
 
-• **error**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
+• **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
 Inherited from: [IBasicActionResponse](client_providers_item.ibasicactionresponse.md).[error](client_providers_item.ibasicactionresponse.md#error)
 
-Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L112)
+Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L112)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **limit**: *number*
 
-Defined in: [client/providers/item.tsx:140](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L140)
+Defined in: [client/providers/item.tsx:140](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L140)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **offset**: *number*
 
-Defined in: [client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L141)
+Defined in: [client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L141)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 • **records**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/providers/item.tsx:137](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L137)
+Defined in: [client/providers/item.tsx:137](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L137)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 • **results**: [*IGQLValue*](gql_querier.igqlvalue.md)[]
 
-Defined in: [client/providers/item.tsx:138](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L138)
+Defined in: [client/providers/item.tsx:138](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L138)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 • **searchId**: *string*
 
-Defined in: [client/providers/item.tsx:136](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L136)
+Defined in: [client/providers/item.tsx:136](https://github.com/onzag/itemize/blob/3efa2a4a/client/providers/item.tsx#L136)

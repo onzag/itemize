@@ -30,4 +30,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/login/IfLogStatus.tsx:79](https://github.com/onzag/itemize/blob/0569bdf2/client/components/login/IfLogStatus.tsx#L79)
+Defined in: [client/components/login/IfLogStatus.tsx:79](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/login/IfLogStatus.tsx#L79)

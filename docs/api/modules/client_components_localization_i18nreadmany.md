@@ -31,7 +31,7 @@ Name | Type | Description |
 a react node, it is marked as any because typescript gets buggy
 when such a function returns a react node
 
-Defined in: [client/components/localization/I18nReadMany.tsx:91](https://github.com/onzag/itemize/blob/0569bdf2/client/components/localization/I18nReadMany.tsx#L91)
+Defined in: [client/components/localization/I18nReadMany.tsx:91](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nReadMany.tsx#L91)
 
 ___
 
@@ -56,4 +56,4 @@ Name | Type | Description |
 
 **Returns:** ReactNode
 
-Defined in: [client/components/localization/I18nReadMany.tsx:47](https://github.com/onzag/itemize/blob/0569bdf2/client/components/localization/I18nReadMany.tsx#L47)
+Defined in: [client/components/localization/I18nReadMany.tsx:47](https://github.com/onzag/itemize/blob/3efa2a4a/client/components/localization/I18nReadMany.tsx#L47)

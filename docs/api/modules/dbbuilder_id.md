@@ -16,7 +16,7 @@ the tables
 
 ### postprocessIdTriggers
 
-▸ **postprocessIdTriggers**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)): *Promise*<void\>
+▸ **postprocessIdTriggers**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)): *Promise*<void\>
 
 Processes the triggers that are required in the tables that hold an id
 
@@ -25,11 +25,11 @@ Processes the triggers that are required in the tables that hold an id
 Name | Type | Description |
 :------ | :------ | :------ |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database instance   |
-`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the database schema as requested    |
+`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the database schema as requested    |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/id.ts:57](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/id.ts#L57)
+Defined in: [dbbuilder/id.ts:57](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/id.ts#L57)
 
 ___
 
@@ -47,4 +47,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/id.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/id.ts#L46)
+Defined in: [dbbuilder/id.ts:46](https://github.com/onzag/itemize/blob/3efa2a4a/dbbuilder/id.ts#L46)

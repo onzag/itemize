@@ -3,7 +3,7 @@
  * which specifies a pattern that is to be used in order
  * to send errors from the server side to the client side
  * 
- * @module errors
+ * @module
  */
 
 /**

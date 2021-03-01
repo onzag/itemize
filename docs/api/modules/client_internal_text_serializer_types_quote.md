@@ -32,4 +32,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/quote.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/quote.ts#L19)
+Defined in: [client/internal/text/serializer/types/quote.ts:19](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/text/serializer/types/quote.ts#L19)

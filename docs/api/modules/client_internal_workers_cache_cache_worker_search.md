@@ -18,7 +18,7 @@ Contains the filtering and ordering function to perform actual searches
 
 ### search
 
-▸ **search**(`rootProxy`: [*default*](../classes/root.default.md), `db`: *IDBPDatabase*<[*ICacheDB*](../interfaces/client_internal_workers_cache_cache_worker.icachedb.md)\>, `searchRecords`: [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[], `searchArgs`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md)): *Promise*<[*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]\>
+▸ **search**(`rootProxy`: [*default*](../classes/base_root.default.md), `db`: *IDBPDatabase*<[*ICacheDB*](../interfaces/client_internal_workers_cache_cache_worker.icachedb.md)\>, `searchRecords`: [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[], `searchArgs`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md)): *Promise*<[*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]\>
 
 Given a bunch of search records it will perform
 the ordering and filtering of such records to return
@@ -29,11 +29,11 @@ cache, this is a heavy process
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rootProxy` | [*default*](../classes/root.default.md) | the root proxy we need to extract the functionality for ordering and checking equality   |
+`rootProxy` | [*default*](../classes/base_root.default.md) | the root proxy we need to extract the functionality for ordering and checking equality   |
 `db` | *IDBPDatabase*<[*ICacheDB*](../interfaces/client_internal_workers_cache_cache_worker.icachedb.md)\> | the database object   |
 `searchRecords` | [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[] | the search records we got   |
 `searchArgs` | [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) | the search arguments (that would be sent to the server) an we need to emulate for    |
 
 **Returns:** *Promise*<[*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]\>
 
-Defined in: [client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/workers/cache/cache.worker.search.ts#L66)
+Defined in: [client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/workers/cache/cache.worker.search.ts#L66)

@@ -33,7 +33,7 @@ http://www.mapanet.eu/en/resources/Currencies.asp
 
 • `Const` **arrCountries**: [*ICountryType*](../interfaces/imported_resources.icountrytype.md)[]
 
-Defined in: [imported-resources/index.ts:56](https://github.com/onzag/itemize/blob/0569bdf2/imported-resources/index.ts#L56)
+Defined in: [imported-resources/index.ts:56](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L56)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • `Const` **arrCurrencies**: [*ICurrencyType*](../interfaces/imported_resources.icurrencytype.md)[]
 
-Defined in: [imported-resources/index.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/imported-resources/index.ts#L65)
+Defined in: [imported-resources/index.ts:65](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L65)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • `Const` **countries**: [*ICountryDataType*](../interfaces/imported_resources.icountrydatatype.md)
 
-Defined in: [imported-resources/index.ts:54](https://github.com/onzag/itemize/blob/0569bdf2/imported-resources/index.ts#L54)
+Defined in: [imported-resources/index.ts:54](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L54)
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 • `Const` **currencies**: [*ICurrencyDataType*](../interfaces/imported_resources.icurrencydatatype.md)
 
-Defined in: [imported-resources/index.ts:55](https://github.com/onzag/itemize/blob/0569bdf2/imported-resources/index.ts#L55)
+Defined in: [imported-resources/index.ts:55](https://github.com/onzag/itemize/blob/3efa2a4a/imported-resources/index.ts#L55)

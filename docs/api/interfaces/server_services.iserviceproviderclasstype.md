@@ -39,7 +39,7 @@ Name | Type |
 
 **Returns:** [*ServiceProvider*](../classes/server_services.serviceprovider.md)<T\>
 
-Defined in: [server/services/index.ts:286](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L286)
+Defined in: [server/services/index.ts:286](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L286)
 
 ## Properties
 
@@ -59,9 +59,9 @@ Name | Type |
 
 **Returns:** *Router* \| *Promise*<Router\>
 
-Defined in: [server/services/index.ts:293](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L293)
+Defined in: [server/services/index.ts:293](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L293)
 
-Defined in: [server/services/index.ts:293](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L293)
+Defined in: [server/services/index.ts:293](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L293)
 
 ___
 
@@ -75,9 +75,9 @@ ___
 
 **Returns:** [*ITriggerRegistry*](server_resolvers_triggers.itriggerregistry.md) \| *Promise*<[*ITriggerRegistry*](server_resolvers_triggers.itriggerregistry.md)\>
 
-Defined in: [server/services/index.ts:294](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L294)
+Defined in: [server/services/index.ts:294](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L294)
 
-Defined in: [server/services/index.ts:294](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L294)
+Defined in: [server/services/index.ts:294](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L294)
 
 ___
 
@@ -91,6 +91,6 @@ ___
 
 **Returns:** [*ServiceProviderType*](../enums/server_services.serviceprovidertype.md)
 
-Defined in: [server/services/index.ts:295](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L295)
+Defined in: [server/services/index.ts:295](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L295)
 
-Defined in: [server/services/index.ts:295](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L295)
+Defined in: [server/services/index.ts:295](https://github.com/onzag/itemize/blob/3efa2a4a/server/services/index.ts#L295)

@@ -65,7 +65,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry_propertyentryfield.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:229](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L229)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:229](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L229)
 
 ## Properties
 
@@ -264,7 +264,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:278](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L278)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:278](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L278)
 
 ___
 
@@ -280,7 +280,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:294](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L294)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:294](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L294)
 
 ___
 
@@ -388,7 +388,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:362](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L362)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:362](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L362)
 
 ___
 
@@ -419,7 +419,7 @@ Provides information about the currency currency
 an array where, 0 is the current currency and 1 is the default currency
 according to what we have selected in our localization options
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:485](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L485)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:485](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L485)
 
 ___
 
@@ -435,7 +435,7 @@ we have internal data for it or not
 an array where, 0 is currentUnit by state, 1 is the standard metric unit code to use
 2 is the imperial unit to use, and 3 is whether the user prefers imperial
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:456](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L456)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:456](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L456)
 
 ___
 
@@ -478,7 +478,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:501](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L501)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:501](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L501)
 
 ___
 
@@ -496,7 +496,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:415](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L415)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:415](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L415)
 
 ___
 
@@ -514,7 +514,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:372](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L372)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:372](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L372)
 
 ___
 
@@ -524,7 +524,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:659](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L659)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:659](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L659)
 
 ___
 
@@ -564,7 +564,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:338](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L338)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:338](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L338)
 
 ___
 
@@ -585,4 +585,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:255](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L255)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:255](https://github.com/onzag/itemize/blob/3efa2a4a/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L255)
