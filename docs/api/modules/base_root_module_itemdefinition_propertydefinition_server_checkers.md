@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a boolean on whether the unique index is valid
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)

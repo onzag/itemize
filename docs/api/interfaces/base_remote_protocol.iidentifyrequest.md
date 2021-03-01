@@ -25,7 +25,7 @@ Pass an uuid and a token
 
 • **token**: *string*
 
-Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L167)
+Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L167)
 
 ___
 
@@ -33,4 +33,4 @@ ___
 
 • **uuid**: *string*
 
-Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L166)
+Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L166)

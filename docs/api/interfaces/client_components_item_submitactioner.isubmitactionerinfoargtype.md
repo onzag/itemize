@@ -41,9 +41,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L55)
+Defined in: [client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L55)
 
-Defined in: [client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L55)
+Defined in: [client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L55)
 
 ___
 
@@ -59,9 +59,9 @@ Dismiss the error state, and make it clean
 
 **Returns:** *void*
 
-Defined in: [client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L42)
+Defined in: [client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L42)
 
-Defined in: [client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L42)
+Defined in: [client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L42)
 
 ___
 
@@ -77,9 +77,9 @@ dismiss the submitted state and make it clean
 
 **Returns:** *void*
 
-Defined in: [client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L46)
+Defined in: [client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L46)
 
-Defined in: [client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L46)
+Defined in: [client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L46)
 
 ___
 
@@ -102,9 +102,9 @@ Name | Type |
 
 **Returns:** *Promise*<[*IActionResponseWithId*](client_providers_item.iactionresponsewithid.md)\>
 
-Defined in: [client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L51)
+Defined in: [client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L51)
 
-Defined in: [client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L51)
+Defined in: [client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L51)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 A submit error that happened after the last submit in this same
 item definition slot
 
-Defined in: [client/components/item/SubmitActioner.tsx:29](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L29)
+Defined in: [client/components/item/SubmitActioner.tsx:29](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L29)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 Whether it submitted, sucesfully
 
-Defined in: [client/components/item/SubmitActioner.tsx:38](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L38)
+Defined in: [client/components/item/SubmitActioner.tsx:38](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L38)
 
 ___
 
@@ -136,4 +136,4 @@ ___
 Whether it is currently submitting, useful for showing a spinner or something
 as you cannot really submit while submitting
 
-Defined in: [client/components/item/SubmitActioner.tsx:34](https://github.com/onzag/itemize/blob/28218320/client/components/item/SubmitActioner.tsx#L34)
+Defined in: [client/components/item/SubmitActioner.tsx:34](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/SubmitActioner.tsx#L34)

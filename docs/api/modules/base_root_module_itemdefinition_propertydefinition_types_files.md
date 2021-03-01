@@ -27,7 +27,7 @@ Contains the files type description
 The type of a files type is an array of single files that itself are of type IGQLFile as they use
 the gqlFields and the gqlAddFileToFields which adds file functionality
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
 
 ## Variables
 
@@ -37,4 +37,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:2
 
 The type value represents the behaviour of files in the app
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)

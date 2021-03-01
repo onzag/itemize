@@ -26,7 +26,7 @@ Name | Type |
 `MEDIUM` | *number* |
 `SMALL` | *number* |
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
 
 ___
 
@@ -40,7 +40,7 @@ Supported args:
 
 - descriptionAsAlert: displays the description if exists as alert rather than the standard
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:736](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L736)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:736](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L736)
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 The styles for the location entry
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)

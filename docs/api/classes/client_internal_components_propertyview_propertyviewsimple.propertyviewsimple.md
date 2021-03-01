@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** [*PropertyViewSimple*](client_internal_components_propertyview_propertyviewsimple.propertyviewsimple.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:28](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewSimple.tsx#L28)
+Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:28](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewSimple.tsx#L28)
 
 ## Properties
 
@@ -429,7 +429,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewSimple.tsx#L46)
+Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:46](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewSimple.tsx#L46)
 
 ___
 
@@ -468,4 +468,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:32](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewSimple.tsx#L32)
+Defined in: [client/internal/components/PropertyView/PropertyViewSimple.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewSimple.tsx#L32)

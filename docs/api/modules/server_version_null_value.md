@@ -30,4 +30,4 @@ Name | Type | Description |
 
 the same value, this function modifies the value in place
 
-Defined in: [server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/28218320/server/version-null-value.ts#L15)
+Defined in: [server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/server/version-null-value.ts#L15)

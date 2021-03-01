@@ -61,7 +61,7 @@ when creating values where the user is expected to do a partial creation as
 he is not allowed access to certain property, eg user role, so it is ensured
 that the null value will be coerced into the default
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:232](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L232)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:232](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L232)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 create role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:241](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L241)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:241](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L241)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 default value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:168](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L168)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:168](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L168)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 default value if with conditions
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:176](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L176)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:176](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L176)
 
 ___
 
@@ -101,7 +101,7 @@ ___
 
 disable ranged search and only allow exact
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:212](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L212)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:212](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L212)
 
 ___
 
@@ -113,7 +113,7 @@ disable retrieval, property value is never retrieved
 it can only be set or updated, good for sensitive data
 like passwords
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:218](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L218)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:218](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L218)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 Edit role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:245](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L245)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:245](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L245)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 Single enforced value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:196](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L196)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:196](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L196)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 enforced values
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:192](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L192)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:192](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L192)
 
 ___
 
@@ -153,7 +153,7 @@ ___
 
 hidden does not show at all
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:155](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L155)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:155](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L155)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 hidden if conditional
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:200](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L200)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:200](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L200)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 Makes the field hidden if value is enforced
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:151](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L151)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:151](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L151)
 
 ___
 
@@ -184,7 +184,7 @@ ___
 html style autocomplete, mainly used for browser level
 autocompletition
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:164](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L164)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:164](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L164)
 
 ___
 
@@ -197,7 +197,7 @@ the structure is defined in the constants
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:84](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L84)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:84](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L84)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 
 the property identifier
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:79](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L79)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:79](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L79)
 
 ___
 
@@ -217,7 +217,7 @@ ___
 
 conditional custom invalid value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:184](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L184)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:184](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L184)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 
 The maximum accepted value (numeric types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:102](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L102)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:102](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L102)
 
 ___
 
@@ -237,7 +237,7 @@ ___
 
 The max accepted decimal count (numeric types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:114](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L114)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:114](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L114)
 
 ___
 
@@ -247,7 +247,7 @@ ___
 
 The maximum accepted lenght (composed types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:110](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L110)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:110](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L110)
 
 ___
 
@@ -257,7 +257,7 @@ ___
 
 The minimum accepted value (numeric types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:98](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L98)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:98](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L98)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 The min accepted decimal count (numeric types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:118](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L118)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:118](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L118)
 
 ___
 
@@ -277,7 +277,7 @@ ___
 
 The minimum accepted lenght (composed types)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:106](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L106)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:106](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L106)
 
 ___
 
@@ -288,7 +288,7 @@ ___
 Whether the unique is non sensitive, as in non case sensitive
 only valid for string types
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:138](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L138)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:138](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L138)
 
 ___
 
@@ -299,7 +299,7 @@ ___
 Makes the value be null if hidden
 does not perform checks so it makes it valid
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:147](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L147)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:147](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L147)
 
 ___
 
@@ -309,7 +309,7 @@ ___
 
 whether it can be null or not
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:142](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L142)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:142](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L142)
 
 ___
 
@@ -321,7 +321,7 @@ A pattern to match, only really makes sense
 on the string, password and text type, must
 be a valid regex
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:124](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L124)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:124](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L124)
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 Read role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:237](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L237)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:237](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L237)
 
 ___
 
@@ -341,7 +341,7 @@ ___
 
 default value for search mode
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:172](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L172)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:172](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L172)
 
 ___
 
@@ -351,7 +351,7 @@ ___
 
 default value for search mode
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:180](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L180)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:180](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L180)
 
 ___
 
@@ -361,7 +361,7 @@ ___
 
 hidden in search mode
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:159](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L159)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:159](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L159)
 
 ___
 
@@ -371,7 +371,7 @@ ___
 
 hidden in search mode
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:204](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L204)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:204](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L204)
 
 ___
 
@@ -381,7 +381,7 @@ ___
 
 conditional custom invalid value in search only
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:188](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L188)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:188](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L188)
 
 ___
 
@@ -392,7 +392,7 @@ ___
 Property is only used for custom
 searches
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:250](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L250)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:250](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L250)
 
 ___
 
@@ -402,7 +402,7 @@ ___
 
 whether it is searchable or not
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:208](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L208)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:208](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L208)
 
 ___
 
@@ -415,7 +415,7 @@ description, you set the value here
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:223](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L223)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:223](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L223)
 
 ___
 
@@ -425,7 +425,7 @@ ___
 
 An optional subtype
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:94](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L94)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:94](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L94)
 
 ___
 
@@ -435,7 +435,7 @@ ___
 
 the type of the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:90](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L90)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:90](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L90)
 
 ___
 
@@ -445,7 +445,7 @@ ___
 
 whether it is unique, this is an external check
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:133](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L133)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:133](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L133)
 
 ___
 
@@ -455,4 +455,4 @@ ___
 
 values for the property set
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:129](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L129)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:129](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L129)

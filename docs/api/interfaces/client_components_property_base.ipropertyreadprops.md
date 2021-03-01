@@ -32,7 +32,7 @@ The reader props
 
 whether to cache files when running the url absoluter
 
-Defined in: [client/components/property/base.tsx:148](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L148)
+Defined in: [client/components/property/base.tsx:148](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L148)
 
 ___
 
@@ -55,9 +55,9 @@ Name | Type |
 
 **Returns:** ReactNode
 
-Defined in: [client/components/property/base.tsx:138](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L138)
+Defined in: [client/components/property/base.tsx:138](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L138)
 
-Defined in: [client/components/property/base.tsx:138](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L138)
+Defined in: [client/components/property/base.tsx:138](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L138)
 
 ___
 
@@ -70,7 +70,7 @@ provider
 
 Inherited from: [IPropertyBaseProps](client_components_property_base.ipropertybaseprops.md).[id](client_components_property_base.ipropertybaseprops.md#id)
 
-Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L31)
+Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L31)
 
 ___
 
@@ -82,7 +82,7 @@ the policy name, should be provided with a policy type
 
 Inherited from: [IPropertyBaseProps](client_components_property_base.ipropertybaseprops.md).[policyName](client_components_property_base.ipropertybaseprops.md#policyname)
 
-Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L44)
+Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L44)
 
 ___
 
@@ -94,7 +94,7 @@ the policy type, should be provided with a policy name
 
 Inherited from: [IPropertyBaseProps](client_components_property_base.ipropertybaseprops.md).[policyType](client_components_property_base.ipropertybaseprops.md#policytype)
 
-Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L40)
+Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L40)
 
 ___
 
@@ -107,7 +107,7 @@ only truly available in search mode
 
 Inherited from: [IPropertyBaseProps](client_components_property_base.ipropertybaseprops.md).[searchVariant](client_components_property_base.ipropertybaseprops.md#searchvariant)
 
-Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L36)
+Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L36)
 
 ___
 
@@ -119,4 +119,4 @@ whether to use the applied value rather than the
 actual current value the applied value is synced
 with the server
 
-Defined in: [client/components/property/base.tsx:144](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L144)
+Defined in: [client/components/property/base.tsx:144](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L144)

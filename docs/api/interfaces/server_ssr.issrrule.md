@@ -34,7 +34,7 @@ Name | Type |
 `role` | *string* |
 `token` | *string* |
 
-Defined in: [server/ssr/index.ts:29](https://github.com/onzag/itemize/blob/28218320/server/ssr/index.ts#L29)
+Defined in: [server/ssr/index.ts:29](https://github.com/onzag/itemize/blob/55e63f2c/server/ssr/index.ts#L29)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 The language that the rule is rendering at
 
-Defined in: [server/ssr/index.ts:15](https://github.com/onzag/itemize/blob/28218320/server/ssr/index.ts#L15)
+Defined in: [server/ssr/index.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/server/ssr/index.ts#L15)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 All the other available languages, this is used to build
 the href langs
 
-Defined in: [server/ssr/index.ts:20](https://github.com/onzag/itemize/blob/28218320/server/ssr/index.ts#L20)
+Defined in: [server/ssr/index.ts:20](https://github.com/onzag/itemize/blob/55e63f2c/server/ssr/index.ts#L20)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 Whether we will simply not use SSR at all
 
-Defined in: [server/ssr/index.ts:38](https://github.com/onzag/itemize/blob/28218320/server/ssr/index.ts#L38)
+Defined in: [server/ssr/index.ts:38](https://github.com/onzag/itemize/blob/55e63f2c/server/ssr/index.ts#L38)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 whether it is a right to left language so it
 can be accounted for in the HTML
 
-Defined in: [server/ssr/index.ts:25](https://github.com/onzag/itemize/blob/28218320/server/ssr/index.ts#L25)
+Defined in: [server/ssr/index.ts:25](https://github.com/onzag/itemize/blob/55e63f2c/server/ssr/index.ts#L25)

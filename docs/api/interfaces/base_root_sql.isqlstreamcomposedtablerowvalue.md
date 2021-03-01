@@ -19,7 +19,7 @@ A sql composed row value
 
 • **consumeStreams**: [*ConsumeStreamsFnType*](../modules/base_root_sql.md#consumestreamsfntype)
 
-Defined in: [base/Root/sql.ts:118](https://github.com/onzag/itemize/blob/28218320/base/Root/sql.ts#L118)
+Defined in: [base/Root/sql.ts:118](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L118)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **value**: [*ISQLTableRowValue*](base_root_sql.isqltablerowvalue.md)
 
-Defined in: [base/Root/sql.ts:117](https://github.com/onzag/itemize/blob/28218320/base/Root/sql.ts#L117)
+Defined in: [base/Root/sql.ts:117](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L117)

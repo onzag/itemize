@@ -26,7 +26,7 @@ that graphql returns
 
 The id for the pg id
 
-Defined in: [gql-querier.ts:29](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L29)
+Defined in: [gql-querier.ts:29](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L29)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 Whent he record was created
 
-Defined in: [gql-querier.ts:37](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L37)
+Defined in: [gql-querier.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L37)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 The type of the search record, basically a qualified name
 
-Defined in: [gql-querier.ts:25](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L25)
+Defined in: [gql-querier.ts:25](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L25)
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 The version for the pg version
 
-Defined in: [gql-querier.ts:33](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L33)
+Defined in: [gql-querier.ts:33](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L33)

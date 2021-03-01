@@ -20,7 +20,7 @@
 
 • **instanceUUID**: *string*
 
-Defined in: [client/internal/testing.ts:47](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L47)
+Defined in: [client/internal/testing.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L47)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **module**: *string*
 
-Defined in: [client/internal/testing.ts:48](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L48)
+Defined in: [client/internal/testing.ts:48](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L48)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **mountTime**: *string*
 
-Defined in: [client/internal/testing.ts:49](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L49)
+Defined in: [client/internal/testing.ts:49](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L49)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **unmountTime**: *string*
 
-Defined in: [client/internal/testing.ts:51](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L51)
+Defined in: [client/internal/testing.ts:51](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L51)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **updateTime**: *string*
 
-Defined in: [client/internal/testing.ts:50](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L50)
+Defined in: [client/internal/testing.ts:50](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L50)

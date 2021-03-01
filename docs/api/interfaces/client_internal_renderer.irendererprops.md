@@ -34,7 +34,7 @@ The renderer args
 
 #### Type declaration:
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/28218320/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L19)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 Whether it is in rtl mode for a rtl language
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/28218320/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L15)

@@ -23,7 +23,7 @@ of traditional searches rather than records based search
 
 • **count**: *number*
 
-Defined in: [gql-querier.ts:58](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L58)
+Defined in: [gql-querier.ts:58](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L58)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **last\_modified**: *string*
 
-Defined in: [gql-querier.ts:61](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L61)
+Defined in: [gql-querier.ts:61](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L61)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **limit**: *number*
 
-Defined in: [gql-querier.ts:59](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L59)
+Defined in: [gql-querier.ts:59](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L59)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • **offset**: *number*
 
-Defined in: [gql-querier.ts:60](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L60)
+Defined in: [gql-querier.ts:60](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L60)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 • **results**: [*IGQLValue*](gql_querier.igqlvalue.md)[]
 
-Defined in: [gql-querier.ts:57](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L57)
+Defined in: [gql-querier.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L57)

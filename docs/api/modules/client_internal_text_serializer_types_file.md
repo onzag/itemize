@@ -32,4 +32,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/types/file.tsx#L19)
+Defined in: [client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/types/file.tsx#L19)

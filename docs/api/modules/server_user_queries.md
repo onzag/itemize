@@ -22,4 +22,4 @@ Name | Type |
 
 **Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
 
-Defined in: [server/user/queries.ts:26](https://github.com/onzag/itemize/blob/28218320/server/user/queries.ts#L26)
+Defined in: [server/user/queries.ts:26](https://github.com/onzag/itemize/blob/55e63f2c/server/user/queries.ts#L26)

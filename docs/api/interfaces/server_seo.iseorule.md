@@ -72,7 +72,7 @@ the parent in the parent_id using raw db (there's no cache on the global manager
 is in; you might want to use a memory cache while the parametrizer run, the parametrizer can return a promise so
 it can be async
 
-Defined in: [server/seo/index.ts:118](https://github.com/onzag/itemize/blob/28218320/server/seo/index.ts#L118)
+Defined in: [server/seo/index.ts:118](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/index.ts#L118)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 Whether this is a crawable url, you might set this value to true or
 false, depending on you
 
-Defined in: [server/seo/index.ts:63](https://github.com/onzag/itemize/blob/28218320/server/seo/index.ts#L63)
+Defined in: [server/seo/index.ts:63](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/index.ts#L63)
 
 ___
 
@@ -111,6 +111,6 @@ Name | Type |
 
 **Returns:** [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
 
-Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/28218320/server/seo/index.ts#L125)
+Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/index.ts#L125)
 
-Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/28218320/server/seo/index.ts#L125)
+Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/index.ts#L125)

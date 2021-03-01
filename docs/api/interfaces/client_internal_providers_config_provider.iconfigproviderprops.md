@@ -19,7 +19,7 @@ Props for the config provider
 
 • **children**: ReactNode
 
-Defined in: [client/internal/providers/config-provider.tsx:18](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/config-provider.tsx#L18)
+Defined in: [client/internal/providers/config-provider.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/config-provider.tsx#L18)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **value**: [*IConfigRawJSONDataType*](config.iconfigrawjsondatatype.md)
 
-Defined in: [client/internal/providers/config-provider.tsx:19](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/config-provider.tsx#L19)
+Defined in: [client/internal/providers/config-provider.tsx:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/config-provider.tsx#L19)

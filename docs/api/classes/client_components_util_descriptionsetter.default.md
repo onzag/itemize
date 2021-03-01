@@ -447,7 +447,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/components/util/DescriptionSetter.tsx:24](https://github.com/onzag/itemize/blob/28218320/client/components/util/DescriptionSetter.tsx#L24)
+Defined in: [client/components/util/DescriptionSetter.tsx:24](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/DescriptionSetter.tsx#L24)
 
 ___
 

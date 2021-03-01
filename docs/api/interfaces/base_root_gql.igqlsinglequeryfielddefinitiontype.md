@@ -21,7 +21,7 @@ that define an entry point in the query for it to be a graphql query
 
 • **args**: [*IGQLFieldsDefinitionType*](base_root_gql.igqlfieldsdefinitiontype.md)
 
-Defined in: [base/Root/gql.ts:82](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L82)
+Defined in: [base/Root/gql.ts:82](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L82)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **resolve**: *any*
 
-Defined in: [base/Root/gql.ts:83](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L83)
+Defined in: [base/Root/gql.ts:83](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L83)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 • **type**: GraphQLOutputType
 
-Defined in: [base/Root/gql.ts:81](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L81)
+Defined in: [base/Root/gql.ts:81](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L81)

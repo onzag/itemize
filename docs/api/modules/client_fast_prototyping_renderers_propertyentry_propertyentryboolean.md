@@ -27,7 +27,7 @@ boolean entry for it, supports the following args
 
 **`returns`** a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:92](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L92)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:92](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L92)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 The styles of the renderer
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:18](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L18)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryBoolean.tsx#L18)

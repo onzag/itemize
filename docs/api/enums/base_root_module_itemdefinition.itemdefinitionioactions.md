@@ -22,7 +22,7 @@ within an item definition
 
 • **CREATE**: = "CREATE"
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:339](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L339)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:339](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L339)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **DELETE**: = "DELETE"
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:341](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L341)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:341](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L341)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **EDIT**: = "EDIT"
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:340](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L340)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:340](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L340)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 • **READ**: = "READ"
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:338](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L338)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:338](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L338)

@@ -41,7 +41,7 @@ Name | Type | Description |
 
 a query string url with the service worker query string parameters
 
-Defined in: [client/components/util/index.tsx:249](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L249)
+Defined in: [client/components/util/index.tsx:249](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L249)
 
 ___
 
@@ -60,7 +60,7 @@ Name | Type | Description |
 
 **Returns:** [*IImageSizes*](../interfaces/client_components_util.iimagesizes.md)
 
-Defined in: [client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L170)
+Defined in: [client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L170)
 
 ___
 
@@ -85,4 +85,4 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L25)
+Defined in: [client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L25)

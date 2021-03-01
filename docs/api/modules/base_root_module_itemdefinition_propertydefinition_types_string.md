@@ -23,7 +23,7 @@ Contains the string type description
 
 The string type is described, by, you guessed it, a string
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:57](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L57)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L57)
 
 ## Variables
 
@@ -33,7 +33,7 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:
 
 The behaviour of strings is described by this type
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:73](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L73)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:73](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L73)
 
 ___
 
@@ -41,4 +41,4 @@ ___
 
 • `Const` **exactStringSearchSubtypes**: *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:59](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L59)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:59](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L59)

@@ -28,4 +28,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/fast-prototyping/components/navbar/outdated-text.tsx:25](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/navbar/outdated-text.tsx#L25)
+Defined in: [client/fast-prototyping/components/navbar/outdated-text.tsx:25](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/navbar/outdated-text.tsx#L25)

@@ -29,4 +29,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/offline/OfflineStatusRetriever.tsx:112](https://github.com/onzag/itemize/blob/28218320/client/components/offline/OfflineStatusRetriever.tsx#L112)
+Defined in: [client/components/offline/OfflineStatusRetriever.tsx:112](https://github.com/onzag/itemize/blob/55e63f2c/client/components/offline/OfflineStatusRetriever.tsx#L112)

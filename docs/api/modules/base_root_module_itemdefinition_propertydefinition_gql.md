@@ -35,4 +35,4 @@ Name | Type | Description |
 
 the partial graphql fields definition for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/gql.ts:30](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/gql.ts#L30)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/gql.ts:30](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/gql.ts#L30)

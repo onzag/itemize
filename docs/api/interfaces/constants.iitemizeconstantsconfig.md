@@ -32,7 +32,7 @@
 
 The supported mime types for images
 
-Defined in: [constants.ts:76](https://github.com/onzag/itemize/blob/28218320/constants.ts#L76)
+Defined in: [constants.ts:76](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L76)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 The maximum size of a given graphql query in bytes
 
-Defined in: [constants.ts:56](https://github.com/onzag/itemize/blob/28218320/constants.ts#L56)
+Defined in: [constants.ts:56](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L56)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 Each files property can have a number of files, this number specifies the
 top amount of files in a property
 
-Defined in: [constants.ts:46](https://github.com/onzag/itemize/blob/28218320/constants.ts#L46)
+Defined in: [constants.ts:46](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L46)
 
 ___
 
@@ -65,7 +65,7 @@ The total amount of files that exist in a single request, this is the total
 sum of files; this number is used for a max theorethical, as in it combines
 the max file size and this number to specify a size limit
 
-Defined in: [constants.ts:52](https://github.com/onzag/itemize/blob/28218320/constants.ts#L52)
+Defined in: [constants.ts:52](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L52)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 The MAX file size of each given independent file, remember to ensure that
 your nginx config is in line with this number, this should be a byte number
 
-Defined in: [constants.ts:41](https://github.com/onzag/itemize/blob/28218320/constants.ts#L41)
+Defined in: [constants.ts:41](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L41)
 
 ___
 
@@ -88,7 +88,7 @@ Defines how many characters (yes characters) a text type might have max
 please define maxLenght in the property itself for specific checking
 this check is expensive so checking twice is not good
 
-Defined in: [constants.ts:36](https://github.com/onzag/itemize/blob/28218320/constants.ts#L36)
+Defined in: [constants.ts:36](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L36)
 
 ___
 
@@ -100,7 +100,7 @@ The maximum amount of remote listeners a socket can
 have at once before the server denies adding more
 these are used for realtime updates
 
-Defined in: [constants.ts:96](https://github.com/onzag/itemize/blob/28218320/constants.ts#L96)
+Defined in: [constants.ts:96](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L96)
 
 ___
 
@@ -111,7 +111,7 @@ ___
 The maximum number of characters the search field can
 have that is build for the search mode
 
-Defined in: [constants.ts:72](https://github.com/onzag/itemize/blob/28218320/constants.ts#L72)
+Defined in: [constants.ts:72](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L72)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 The maximum amount of search records that a module and its item
 children can retrieve at once in a given search query
 
-Defined in: [constants.ts:67](https://github.com/onzag/itemize/blob/28218320/constants.ts#L67)
+Defined in: [constants.ts:67](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L67)
 
 ___
 
@@ -134,7 +134,7 @@ The maximum amount of search results that a module and its item
 children can retrieve at once in a given search query
 this also affects the get list command
 
-Defined in: [constants.ts:62](https://github.com/onzag/itemize/blob/28218320/constants.ts#L62)
+Defined in: [constants.ts:62](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L62)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 Defines how many characters a string type might have
 
-Defined in: [constants.ts:30](https://github.com/onzag/itemize/blob/28218320/constants.ts#L30)
+Defined in: [constants.ts:30](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L30)
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 The maximum supported year
 
-Defined in: [constants.ts:26](https://github.com/onzag/itemize/blob/28218320/constants.ts#L26)
+Defined in: [constants.ts:26](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L26)
 
 ___
 
@@ -170,7 +170,7 @@ note that unsubscribe will remain being a protected
 username no matter what, even if you fail
 to specify it
 
-Defined in: [constants.ts:106](https://github.com/onzag/itemize/blob/28218320/constants.ts#L106)
+Defined in: [constants.ts:106](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L106)
 
 ___
 
@@ -184,7 +184,7 @@ updating the currency information
 
 this is a millisecond amount
 
-Defined in: [constants.ts:84](https://github.com/onzag/itemize/blob/28218320/constants.ts#L84)
+Defined in: [constants.ts:84](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L84)
 
 ___
 
@@ -196,4 +196,4 @@ The time it takes for sitemaps to be refreshed
 
 this is a millisecond amount
 
-Defined in: [constants.ts:90](https://github.com/onzag/itemize/blob/28218320/constants.ts#L90)
+Defined in: [constants.ts:90](https://github.com/onzag/itemize/blob/55e63f2c/constants.ts#L90)

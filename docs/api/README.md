@@ -6,6 +6,17 @@ This is the API documentation for itemize, it is built from the source using typ
 
 Server and Client are the most important for development.
 
+## Core API elements
+
+- [config](modules/config.md)
+- [constants](modules/constants.md)
+- [gql-querier](modules/gql_querier.md)
+- [gql-util](modules/gql_util.md)
+- [imported-resources](modules/imported_resources.md)
+- [main](modules/main.md)
+- [nanodate](modules/nanodate.md)
+- [util](modules/util.md)
+
 ## Base
 
 Represents the base core of the itemize application
@@ -80,7 +91,7 @@ The server section contains utilities and the core code that is used to generate
 
 Any action related to modifying the server behaviour, custom rest endpoints, creating and defining custom services to be executed in our server is specified in these parts of the API.
 
-### Core Files
+### Core Elements
 
 - [server](modules/server.md)
 - [global-manager](modules/server_global_manager.md)
@@ -396,3 +407,18 @@ Represents the code that is used primarily in the client side.
 - [UpdateBuilder](modules/database_updatebuilder.md)
 - [WhereBuilder](modules/database_wherebuilder.md)
 - [WithBuilder](modules/database_withbuilder.md)
+
+## Testing
+
+Represents the modules and files that are using for testing and building tests
+
+- [testing](modules/testing.md)
+- [client](modules/testing_client.md)
+    * [explorer](modules/testing_client_explorer.md)
+- [itemize](modules/testing_itemize.md)
+- [server](modules/testing_server.md)
+    * [database](modules/testing_server_database.md)
+    * [graphql](modules/testing_server_graphql.md)
+    * [redis](modules/testing_server_redis.md)
+    * [robots](modules/testing_server_robots.md)
+    * [token](modules/testing_server_token.md)

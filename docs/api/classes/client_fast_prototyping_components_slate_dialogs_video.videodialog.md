@@ -67,7 +67,7 @@ Name | Type | Description |
 
 **Returns:** [*VideoDialog*](client_fast_prototyping_components_slate_dialogs_video.videodialog.md)
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:77](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L77)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:77](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L77)
 
 ## Properties
 
@@ -128,7 +128,7 @@ ___
 
 The reference used in the text field input used for focusing
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:77](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L77)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:77](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L77)
 
 ___
 
@@ -260,7 +260,7 @@ status decides whether to show an error or close
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:112](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L112)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:112](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L112)
 
 ___
 
@@ -272,7 +272,7 @@ Closes the dialog in place
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:143](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L143)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:143](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L143)
 
 ___
 
@@ -436,7 +436,7 @@ Focuses the video text field on mount
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:103](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L103)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:103](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L103)
 
 ___
 
@@ -486,7 +486,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:158](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L158)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:158](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L158)
 
 ___
 
@@ -498,7 +498,7 @@ Render function
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:165](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L165)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:165](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L165)
 
 ___
 
@@ -566,4 +566,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:132](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/dialogs/video.tsx#L132)
+Defined in: [client/fast-prototyping/components/slate/dialogs/video.tsx:132](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/dialogs/video.tsx#L132)

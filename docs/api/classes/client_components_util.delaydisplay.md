@@ -59,7 +59,7 @@ Name | Type |
 
 **Returns:** [*DelayDisplay*](client_components_util.delaydisplay.md)
 
-Defined in: [client/components/util/index.tsx:297](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L297)
+Defined in: [client/components/util/index.tsx:297](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L297)
 
 ## Properties
 
@@ -118,7 +118,7 @@ ___
 
 • `Private` **timer**: *Timer*
 
-Defined in: [client/components/util/index.tsx:297](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L297)
+Defined in: [client/components/util/index.tsx:297](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L297)
 
 ___
 
@@ -266,7 +266,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/index.tsx:305](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L305)
+Defined in: [client/components/util/index.tsx:305](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L305)
 
 ___
 
@@ -352,7 +352,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/index.tsx:312](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L312)
+Defined in: [client/components/util/index.tsx:312](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L312)
 
 ___
 
@@ -433,7 +433,7 @@ ___
 
 **Returns:** *object*
 
-Defined in: [client/components/util/index.tsx:315](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L315)
+Defined in: [client/components/util/index.tsx:315](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L315)
 
 ___
 

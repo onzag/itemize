@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** [*PropertyViewBoolean*](client_internal_components_propertyview_propertyviewboolean.propertyviewboolean.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:32](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L32)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L32)
 
 ## Properties
 
@@ -429,7 +429,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:50](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L50)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:50](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L50)
 
 ___
 
@@ -468,4 +468,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:36](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L36)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:36](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L36)

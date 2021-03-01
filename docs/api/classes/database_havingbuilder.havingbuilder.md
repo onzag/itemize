@@ -60,7 +60,7 @@ Name | Type | Default value |
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/HavingBuilder.ts:11](https://github.com/onzag/itemize/blob/28218320/database/HavingBuilder.ts#L11)
+Defined in: [database/HavingBuilder.ts:11](https://github.com/onzag/itemize/blob/55e63f2c/database/HavingBuilder.ts#L11)
 
 ## Properties
 
@@ -73,7 +73,7 @@ you fancy
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md).[type](database_base.conditionalbuilder.md#type)
 
-Defined in: [database/base.ts:238](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L238)
+Defined in: [database/base.ts:238](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L238)
 
 ## Methods
 
@@ -93,7 +93,7 @@ Name | Type | Description |
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L69)
 
 ___
 
@@ -113,7 +113,7 @@ Name | Type | Description |
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L77)
 
 ___
 
@@ -134,7 +134,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/HavingBuilder.ts:37](https://github.com/onzag/itemize/blob/28218320/database/HavingBuilder.ts#L37)
+Defined in: [database/HavingBuilder.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/database/HavingBuilder.ts#L37)
 
 ___
 
@@ -150,7 +150,7 @@ itself
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:347](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L347)
+Defined in: [database/base.ts:347](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L347)
 
 ___
 
@@ -164,7 +164,7 @@ Removes all binding sources
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L102)
 
 ___
 
@@ -180,7 +180,7 @@ a string that represents the condition
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:357](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L357)
+Defined in: [database/base.ts:357](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L357)
 
 ___
 
@@ -205,7 +205,7 @@ itself
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:288](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L288)
+Defined in: [database/base.ts:288](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L288)
 
 ___
 
@@ -222,7 +222,7 @@ a list of basic bindings
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L165)
 
 ___
 
@@ -237,7 +237,7 @@ whatsoever
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:256](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L256)
+Defined in: [database/base.ts:256](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L256)
 
 ___
 
@@ -258,7 +258,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/HavingBuilder.ts:47](https://github.com/onzag/itemize/blob/28218320/database/HavingBuilder.ts#L47)
+Defined in: [database/HavingBuilder.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/database/HavingBuilder.ts#L47)
 
 ___
 
@@ -272,7 +272,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L109)
 
 ___
 
@@ -293,7 +293,7 @@ Name | Type | Description |
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L86)
 
 ___
 
@@ -314,7 +314,7 @@ Name | Type | Description |
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L95)
 
 ___
 
@@ -328,7 +328,7 @@ The override method that specifies how to create a subcondition
 
 Overrides: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/HavingBuilder.ts:27](https://github.com/onzag/itemize/blob/28218320/database/HavingBuilder.ts#L27)
+Defined in: [database/HavingBuilder.ts:27](https://github.com/onzag/itemize/blob/55e63f2c/database/HavingBuilder.ts#L27)
 
 ___
 
@@ -344,4 +344,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [ConditionalBuilder](database_base.conditionalbuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L126)

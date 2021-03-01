@@ -23,7 +23,7 @@
 
 • `Optional` **data**: *any*
 
-Defined in: [base/remote-protocol.ts:538](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L538)
+Defined in: [base/remote-protocol.ts:538](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L538)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • `Optional` **event**: *any*
 
-Defined in: [base/remote-protocol.ts:533](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L533)
+Defined in: [base/remote-protocol.ts:533](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L533)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • `Optional` **listenerUUID**: *string*
 
-Defined in: [base/remote-protocol.ts:534](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L534)
+Defined in: [base/remote-protocol.ts:534](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L534)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • `Optional` **mergedIndexIdentifier**: *string*
 
-Defined in: [base/remote-protocol.ts:537](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L537)
+Defined in: [base/remote-protocol.ts:537](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L537)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • `Optional` **request**: *any*
 
-Defined in: [base/remote-protocol.ts:532](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L532)
+Defined in: [base/remote-protocol.ts:532](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L532)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • **serverInstanceGroupId**: *string*
 
-Defined in: [base/remote-protocol.ts:536](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L536)
+Defined in: [base/remote-protocol.ts:536](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L536)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • **source**: *local* \| *global*
 
-Defined in: [base/remote-protocol.ts:535](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L535)
+Defined in: [base/remote-protocol.ts:535](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L535)
 
 ___
 
@@ -79,4 +79,4 @@ ___
 
 • **type**: *string*
 
-Defined in: [base/remote-protocol.ts:531](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L531)
+Defined in: [base/remote-protocol.ts:531](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L531)

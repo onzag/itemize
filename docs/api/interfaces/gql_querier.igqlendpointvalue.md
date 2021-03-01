@@ -21,7 +21,7 @@ A graphql endpoint output
 
 #### Type declaration:
 
-Defined in: [gql-querier.ts:146](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L146)
+Defined in: [gql-querier.ts:146](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L146)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 • `Optional` **errors**: { `extensions`: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype) ; `path?`: *string*[]  }[]
 
-Defined in: [gql-querier.ts:149](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L149)
+Defined in: [gql-querier.ts:149](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L149)

@@ -26,7 +26,7 @@
 
 Inherited from: [IOwnedSearchRegisterRequest](base_remote_protocol.iownedsearchregisterrequest.md).[createdBy](base_remote_protocol.iownedsearchregisterrequest.md#createdby)
 
-Defined in: [base/remote-protocol.ts:312](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L312)
+Defined in: [base/remote-protocol.ts:312](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L312)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 Inherited from: [IOwnedSearchRegisterRequest](base_remote_protocol.iownedsearchregisterrequest.md).[qualifiedPathName](base_remote_protocol.iownedsearchregisterrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L299)
+Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L299)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L83)
+Defined in: [client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L83)

@@ -33,7 +33,7 @@
 
 • `Optional` **onBlur**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:18](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L18)
+Defined in: [client/internal/text/serializer/base.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L18)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • `Optional` **onClick**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:17](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L17)
+Defined in: [client/internal/text/serializer/base.tsx:17](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L17)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • `Optional` **onFocus**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:19](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L19)
+Defined in: [client/internal/text/serializer/base.tsx:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L19)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 • `Optional` **onInput**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:20](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L20)
+Defined in: [client/internal/text/serializer/base.tsx:20](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L20)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • `Optional` **onKeyDown**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:21](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L21)
+Defined in: [client/internal/text/serializer/base.tsx:21](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L21)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 • `Optional` **onKeyPress**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:22](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L22)
+Defined in: [client/internal/text/serializer/base.tsx:22](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L22)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 • `Optional` **onKeyUp**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:23](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L23)
+Defined in: [client/internal/text/serializer/base.tsx:23](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L23)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 • `Optional` **onMouseDown**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:24](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L24)
+Defined in: [client/internal/text/serializer/base.tsx:24](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L24)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 • `Optional` **onMouseEnter**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:25](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L25)
+Defined in: [client/internal/text/serializer/base.tsx:25](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L25)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 • `Optional` **onMouseLeave**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:26](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L26)
+Defined in: [client/internal/text/serializer/base.tsx:26](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L26)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 • `Optional` **onMouseMove**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:27](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L27)
+Defined in: [client/internal/text/serializer/base.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L27)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 • `Optional` **onMouseOver**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:28](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L28)
+Defined in: [client/internal/text/serializer/base.tsx:28](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L28)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 • `Optional` **onMouseWheel**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:29](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L29)
+Defined in: [client/internal/text/serializer/base.tsx:29](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L29)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 • `Optional` **onTouchCancel**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:33](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L33)
+Defined in: [client/internal/text/serializer/base.tsx:33](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L33)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 • `Optional` **onTouchEnd**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:32](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L32)
+Defined in: [client/internal/text/serializer/base.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L32)
 
 ___
 
@@ -153,7 +153,7 @@ ___
 
 • `Optional` **onTouchMove**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:31](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L31)
+Defined in: [client/internal/text/serializer/base.tsx:31](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L31)
 
 ___
 
@@ -161,7 +161,7 @@ ___
 
 • `Optional` **onTouchStart**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:30](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L30)
+Defined in: [client/internal/text/serializer/base.tsx:30](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L30)
 
 ___
 
@@ -169,4 +169,4 @@ ___
 
 • `Optional` **onWheel**: *any*
 
-Defined in: [client/internal/text/serializer/base.tsx:34](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L34)
+Defined in: [client/internal/text/serializer/base.tsx:34](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L34)

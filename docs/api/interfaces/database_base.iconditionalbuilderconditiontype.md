@@ -23,7 +23,7 @@ Represents a conditional builder condition
 The condition itself can be a subcondition
 or an expression itself
 
-Defined in: [database/base.ts:200](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L200)
+Defined in: [database/base.ts:200](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L200)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 The gate that is going to use
 
-Defined in: [database/base.ts:204](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L204)
+Defined in: [database/base.ts:204](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L204)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 An optional prefix that comes after the and rule
 
-Defined in: [database/base.ts:208](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L208)
+Defined in: [database/base.ts:208](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L208)

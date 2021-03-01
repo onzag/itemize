@@ -40,4 +40,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/property/base.tsx:184](https://github.com/onzag/itemize/blob/28218320/client/components/property/base.tsx#L184)
+Defined in: [client/components/property/base.tsx:184](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/base.tsx#L184)

@@ -22,7 +22,7 @@ Contains the date type description
 
 The date is represented as a single string
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts:39](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts#L39)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts#L39)
 
 ## Variables
 
@@ -32,4 +32,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts:39
 
 The type specifies how a date behaves in the app
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts:44](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts#L44)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts:44](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/date.ts#L44)

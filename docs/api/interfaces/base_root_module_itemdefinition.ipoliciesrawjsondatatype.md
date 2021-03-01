@@ -21,7 +21,7 @@ This is basically the types themselves
 
 • `Optional` **delete**: [*IPolicyRawJSONDataType*](base_root_module_itemdefinition.ipolicyrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:75](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L75)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:75](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L75)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • `Optional` **edit**: [*IPolicyRawJSONDataType*](base_root_module_itemdefinition.ipolicyrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:74](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L74)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:74](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L74)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • `Optional` **parent**: [*IPolicyRawJSONDataType*](base_root_module_itemdefinition.ipolicyrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:77](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L77)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L77)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • `Optional` **read**: [*IPolicyRawJSONDataType*](base_root_module_itemdefinition.ipolicyrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:76](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L76)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:76](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L76)

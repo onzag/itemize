@@ -28,7 +28,7 @@ Name | Type |
 
 **Returns:** *Promise*<{ `DATA`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
-Defined in: [server/resolvers/actions/add.ts:48](https://github.com/onzag/itemize/blob/28218320/server/resolvers/actions/add.ts#L48)
+Defined in: [server/resolvers/actions/add.ts:48](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/add.ts#L48)
 
 ___
 
@@ -44,4 +44,4 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/add.ts:548](https://github.com/onzag/itemize/blob/28218320/server/resolvers/actions/add.ts#L548)
+Defined in: [server/resolvers/actions/add.ts:548](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/add.ts#L548)

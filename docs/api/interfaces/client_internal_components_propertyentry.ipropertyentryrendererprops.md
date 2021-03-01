@@ -73,7 +73,7 @@ The renderer args
 
 Inherited from: [IRendererProps](client_internal_renderer.irendererprops.md).[args](client_internal_renderer.irendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/28218320/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L19)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 Whether the entry should autofocus
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:103](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L103)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:103](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L103)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 A boolean, normally true if our current applied value differs from our
 current value, this check is exceptional as it uses the local equal function
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:75](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L75)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:75](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L75)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 The currently applied value that is in sync with the server side
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:70](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L70)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:70](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L70)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 The current internal value, if any given
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L98)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L98)
 
 ___
 
@@ -128,7 +128,7 @@ if there's no currently invalid reason, this usually means
 the item was forced into the invalid state by the passing
 of a flag
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:94](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L94)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:94](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L94)
 
 ___
 
@@ -141,7 +141,7 @@ value that does not correlate directly to the actual property
 state; things such as being poked, or the user having forced
 a value for this play a role as well
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:86](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L86)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:86](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L86)
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 The current value
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L79)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L79)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 The description of the property, properties might or might not have descriptions
 this is locale specific; the description might not be passed if specified by the UI
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:61](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L61)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:61](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L61)
 
 ___
 
@@ -174,7 +174,7 @@ The disabled flag is passed often when the value is somehow
 enforced, this means that the field cannot truly be editted
 and attempts are futile to modify
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:109](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L109)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:109](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L109)
 
 ___
 
@@ -192,9 +192,9 @@ currentInvalidReason gets populated even if the field is not poked
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:116](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L116)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:116](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L116)
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:116](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L116)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:116](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L116)
 
 ___
 
@@ -204,7 +204,7 @@ ___
 
 Icon are an UI defined property for an icon to use during the view, handle as you wish
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:65](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L65)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:65](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L65)
 
 ___
 
@@ -215,7 +215,7 @@ ___
 label of the property, every property should have a label unless it's hidden
 this is locale specific
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:51](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L51)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:51](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L51)
 
 ___
 
@@ -241,9 +241,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:124](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L124)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:124](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L124)
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:124](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L124)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:124](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L124)
 
 ___
 
@@ -260,9 +260,9 @@ when doing this
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:129](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L129)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:129](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L129)
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:129](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L129)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:129](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L129)
 
 ___
 
@@ -273,7 +273,7 @@ ___
 The placeholder of the property, every property should have a placeholder unless it's hidden
 this is locale specific
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:56](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L56)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:56](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L56)
 
 ___
 
@@ -283,7 +283,7 @@ ___
 
 The property id in question
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:45](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/index.tsx#L45)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:45](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L45)
 
 ___
 
@@ -295,4 +295,4 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IRendererProps](client_internal_renderer.irendererprops.md).[rtl](client_internal_renderer.irendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/28218320/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L15)

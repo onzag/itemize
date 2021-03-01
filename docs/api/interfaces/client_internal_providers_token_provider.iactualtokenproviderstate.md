@@ -32,7 +32,7 @@ gets the job done
 
 An error that occured during login
 
-Defined in: [client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L36)
+Defined in: [client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L36)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 The user id
 
-Defined in: [client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L28)
+Defined in: [client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L28)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 Whether it's currently logging in
 
-Defined in: [client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L40)
+Defined in: [client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L40)
 
 ___
 
@@ -68,7 +68,7 @@ that will dissapear right away and interface flicker
 is ready should be true in SSR mode as the server has "checked"
 the token
 
-Defined in: [client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L50)
+Defined in: [client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L50)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 The user role
 
-Defined in: [client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L32)
+Defined in: [client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L32)
 
 ___
 
@@ -88,4 +88,4 @@ ___
 
 The token we have got now
 
-Defined in: [client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/token-provider.tsx#L24)
+Defined in: [client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L24)

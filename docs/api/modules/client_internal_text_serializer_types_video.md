@@ -32,4 +32,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/types/video.tsx#L20)
+Defined in: [client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/types/video.tsx#L20)

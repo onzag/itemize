@@ -46,7 +46,7 @@ Name | Type |
 
 **Returns:** [*EndpointError*](base_errors.endpointerror.md)
 
-Defined in: [base/errors.ts:82](https://github.com/onzag/itemize/blob/28218320/base/errors.ts#L82)
+Defined in: [base/errors.ts:82](https://github.com/onzag/itemize/blob/55e63f2c/base/errors.ts#L82)
 
 ## Properties
 
@@ -54,7 +54,7 @@ Defined in: [base/errors.ts:82](https://github.com/onzag/itemize/blob/28218320/b
 
 • **data**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [base/errors.ts:82](https://github.com/onzag/itemize/blob/28218320/base/errors.ts#L82)
+Defined in: [base/errors.ts:82](https://github.com/onzag/itemize/blob/55e63f2c/base/errors.ts#L82)
 
 ___
 

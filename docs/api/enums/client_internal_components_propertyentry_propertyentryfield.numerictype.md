@@ -22,7 +22,7 @@ An enum which is useful for numeric types
 
 For currency, unit and number
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:23](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L23)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:23](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L23)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 For year, integer
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:27](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L27)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L27)
 
 ___
 
@@ -42,4 +42,4 @@ ___
 
 Not a number, for textual types
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:31](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L31)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryField.tsx:31](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L31)

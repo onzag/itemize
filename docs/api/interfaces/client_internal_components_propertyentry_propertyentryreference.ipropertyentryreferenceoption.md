@@ -17,7 +17,7 @@
 
 • **id**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:12](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L12)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:12](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L12)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **text**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:13](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L13)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:13](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L13)

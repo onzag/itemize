@@ -51,7 +51,7 @@ or it detects a change in the properties, this basically triggers
 the .search function with these arguments whenever it is detected
 it should do so
 
-Defined in: [client/providers/item.tsx:561](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L561)
+Defined in: [client/providers/item.tsx:561](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L561)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 Forces the automatic search to happen even if the search already holds
 a state
 
-Defined in: [client/providers/item.tsx:566](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L566)
+Defined in: [client/providers/item.tsx:566](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L566)
 
 ___
 
@@ -78,7 +78,7 @@ on your entry field but sometimes you would
 rather get instant results, as eg. your filters are selects
 rather than entries with text
 
-Defined in: [client/providers/item.tsx:580](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L580)
+Defined in: [client/providers/item.tsx:580](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L580)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 Makes automatic search happen only on mount
 
-Defined in: [client/providers/item.tsx:570](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L570)
+Defined in: [client/providers/item.tsx:570](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L570)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 avoids running loadValue
 
-Defined in: [client/providers/item.tsx:636](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L636)
+Defined in: [client/providers/item.tsx:636](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L636)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 children that will be feed into the context
 
-Defined in: [client/providers/item.tsx:507](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L507)
+Defined in: [client/providers/item.tsx:507](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L507)
 
 ___
 
@@ -121,7 +121,7 @@ or the mount id changes; always remember to set a mountId property
 for using this in order to be able to difference item definition
 loaders between themselves
 
-Defined in: [client/providers/item.tsx:616](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L616)
+Defined in: [client/providers/item.tsx:616](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L616)
 
 ___
 
@@ -138,7 +138,7 @@ error popping on, saying that the username is taken, but you are logging in so t
 external check is unecessary; note that disabling external checks has no effect
 if the item definition has no externally checked properties
 
-Defined in: [client/providers/item.tsx:554](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L554)
+Defined in: [client/providers/item.tsx:554](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L554)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 the id, specifying an id makes a huge difference
 
-Defined in: [client/providers/item.tsx:524](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L524)
+Defined in: [client/providers/item.tsx:524](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L524)
 
 ___
 
@@ -158,7 +158,7 @@ ___
 
 the version
 
-Defined in: [client/providers/item.tsx:528](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L528)
+Defined in: [client/providers/item.tsx:528](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L528)
 
 ___
 
@@ -168,7 +168,7 @@ ___
 
 excludes the policies from being part of the state
 
-Defined in: [client/providers/item.tsx:609](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L609)
+Defined in: [client/providers/item.tsx:609](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L609)
 
 ___
 
@@ -180,7 +180,7 @@ only includes the items specified in the list in the state
 
 #### Type declaration:
 
-Defined in: [client/providers/item.tsx:605](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L605)
+Defined in: [client/providers/item.tsx:605](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L605)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 allows insertion of the parent context within the children
 
-Defined in: [client/providers/item.tsx:645](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L645)
+Defined in: [client/providers/item.tsx:645](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L645)
 
 ___
 
@@ -202,7 +202,7 @@ the item definition slash/separated/path
 if you don't specify this, the context will be
 based on the prop extensions emulated item definition
 
-Defined in: [client/providers/item.tsx:520](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L520)
+Defined in: [client/providers/item.tsx:520](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L520)
 
 ___
 
@@ -212,7 +212,7 @@ ___
 
 Allows to load the moderation fields
 
-Defined in: [client/providers/item.tsx:538](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L538)
+Defined in: [client/providers/item.tsx:538](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L538)
 
 ___
 
@@ -223,7 +223,7 @@ ___
 Load searches from the popstate event, use with the option for
 storeResultsInNavigation and the same identifier
 
-Defined in: [client/providers/item.tsx:585](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L585)
+Defined in: [client/providers/item.tsx:585](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L585)
 
 ___
 
@@ -235,7 +235,7 @@ Loads the unversioned version if the version
 given is not found since every value must have
 an unversioned primary form
 
-Defined in: [client/providers/item.tsx:534](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L534)
+Defined in: [client/providers/item.tsx:534](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L534)
 
 ___
 
@@ -245,7 +245,7 @@ ___
 
 uses long term caching with the worker cache strategy
 
-Defined in: [client/providers/item.tsx:628](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L628)
+Defined in: [client/providers/item.tsx:628](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L628)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 marks the item for destruction as the user logs out
 
-Defined in: [client/providers/item.tsx:632](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L632)
+Defined in: [client/providers/item.tsx:632](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L632)
 
 ___
 
@@ -268,7 +268,7 @@ that the on dismount functions are called
 if this changes, otherwise they will only be called
 on the literal componentWillUnmount alone
 
-Defined in: [client/providers/item.tsx:514](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L514)
+Defined in: [client/providers/item.tsx:514](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L514)
 
 ___
 
@@ -290,9 +290,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:661](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L661)
+Defined in: [client/providers/item.tsx:661](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L661)
 
-Defined in: [client/providers/item.tsx:661](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L661)
+Defined in: [client/providers/item.tsx:661](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L661)
 
 ___
 
@@ -314,9 +314,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:657](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L657)
+Defined in: [client/providers/item.tsx:657](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L657)
 
-Defined in: [client/providers/item.tsx:657](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L657)
+Defined in: [client/providers/item.tsx:657](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L657)
 
 ___
 
@@ -338,9 +338,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:649](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L649)
+Defined in: [client/providers/item.tsx:649](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L649)
 
-Defined in: [client/providers/item.tsx:649](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L649)
+Defined in: [client/providers/item.tsx:649](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L649)
 
 ___
 
@@ -364,9 +364,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:667](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L667)
+Defined in: [client/providers/item.tsx:667](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L667)
 
-Defined in: [client/providers/item.tsx:667](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L667)
+Defined in: [client/providers/item.tsx:667](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L667)
 
 ___
 
@@ -388,9 +388,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:653](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L653)
+Defined in: [client/providers/item.tsx:653](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L653)
 
-Defined in: [client/providers/item.tsx:653](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L653)
+Defined in: [client/providers/item.tsx:653](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L653)
 
 ___
 
@@ -402,7 +402,7 @@ Similar to setters but the values are just prefilled and as such are not
 readonly, prefills only get executed during the initial mount
 of the component
 
-Defined in: [client/providers/item.tsx:596](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L596)
+Defined in: [client/providers/item.tsx:596](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L596)
 
 ___
 
@@ -413,7 +413,7 @@ ___
 only downloads and includes the properties specified in the list
 in the state
 
-Defined in: [client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L601)
+Defined in: [client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L601)
 
 ___
 
@@ -424,7 +424,7 @@ ___
 whether this is about the search counterpart for using
 with searches, this opens a whole can of worms
 
-Defined in: [client/providers/item.tsx:543](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L543)
+Defined in: [client/providers/item.tsx:543](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L543)
 
 ___
 
@@ -435,7 +435,7 @@ ___
 Setters for setting values for the properties within the item definition
 itself, useful not to depend on mounting at time
 
-Defined in: [client/providers/item.tsx:590](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L590)
+Defined in: [client/providers/item.tsx:590](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L590)
 
 ___
 
@@ -449,7 +449,7 @@ remote changes
 a total static component does not even ask for feedback
 it displays what it initially gets, wherever it comes from
 
-Defined in: [client/providers/item.tsx:624](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L624)
+Defined in: [client/providers/item.tsx:624](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L624)
 
 ___
 
@@ -460,4 +460,4 @@ ___
 loads using the slow method but it can be more efficient
 as it will load values with a timeout
 
-Defined in: [client/providers/item.tsx:641](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L641)
+Defined in: [client/providers/item.tsx:641](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L641)

@@ -36,7 +36,7 @@ containers id
 
 #### Type declaration:
 
-Defined in: [config.ts:239](https://github.com/onzag/itemize/blob/28218320/config.ts#L239)
+Defined in: [config.ts:239](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L239)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 the currency layer access key,
 can be null, currency type won't work
 
-Defined in: [config.ts:216](https://github.com/onzag/itemize/blob/28218320/config.ts#L216)
+Defined in: [config.ts:216](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L216)
 
 ___
 
@@ -59,7 +59,7 @@ Custom information added to the sensitive config
 
 #### Type declaration:
 
-Defined in: [config.ts:276](https://github.com/onzag/itemize/blob/28218320/config.ts#L276)
+Defined in: [config.ts:276](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L276)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 The default container id used when required, eg. creating an admin
 
-Defined in: [config.ts:252](https://github.com/onzag/itemize/blob/28218320/config.ts#L252)
+Defined in: [config.ts:252](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L252)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 A development key, allows to use development files in its full form on the production
 interface
 
-Defined in: [config.ts:272](https://github.com/onzag/itemize/blob/28218320/config.ts#L272)
+Defined in: [config.ts:272](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L272)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 a json web token key to use, itemize uses JWT and as such it can be trusted
 to call other external APIs
 
-Defined in: [config.ts:261](https://github.com/onzag/itemize/blob/28218320/config.ts#L261)
+Defined in: [config.ts:261](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L261)
 
 ___
 
@@ -101,7 +101,7 @@ ___
 
 A local container (if any)
 
-Defined in: [config.ts:248](https://github.com/onzag/itemize/blob/28218320/config.ts#L248)
+Defined in: [config.ts:248](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L248)
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 The here maps api key, can be null, address search won't work
 
-Defined in: [config.ts:220](https://github.com/onzag/itemize/blob/28218320/config.ts#L220)
+Defined in: [config.ts:220](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L220)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 The mail service information, api key what not
 
-Defined in: [config.ts:224](https://github.com/onzag/itemize/blob/28218320/config.ts#L224)
+Defined in: [config.ts:224](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L224)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 The mail domain that is used when sending emails from
 
-Defined in: [config.ts:228](https://github.com/onzag/itemize/blob/28218320/config.ts#L228)
+Defined in: [config.ts:228](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L228)
 
 ___
 
@@ -143,7 +143,7 @@ The mail storage item definition path
 it must pass some criteria in order to be valid
 as emails get added there
 
-Defined in: [config.ts:234](https://github.com/onzag/itemize/blob/28218320/config.ts#L234)
+Defined in: [config.ts:234](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L234)
 
 ___
 
@@ -155,7 +155,7 @@ A secondary json web token key to use, for tasks where these tokens might be
 used on less secure third party tasks and are not used in more critical tasks
 eg. for email services
 
-Defined in: [config.ts:267](https://github.com/onzag/itemize/blob/28218320/config.ts#L267)
+Defined in: [config.ts:267](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L267)
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 The seo container id used when storing sitemaps
 
-Defined in: [config.ts:256](https://github.com/onzag/itemize/blob/28218320/config.ts#L256)
+Defined in: [config.ts:256](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L256)
 
 ___
 
@@ -175,4 +175,4 @@ ___
 
 Used for localization services to localize users
 
-Defined in: [config.ts:211](https://github.com/onzag/itemize/blob/28218320/config.ts#L211)
+Defined in: [config.ts:211](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L211)

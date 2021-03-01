@@ -31,7 +31,7 @@ Name | Type | Description |
 
 a WeChat icon
 
-Defined in: [client/fast-prototyping/mui-core/social-icons.tsx:32](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/mui-core/social-icons.tsx#L32)
+Defined in: [client/fast-prototyping/mui-core/social-icons.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/mui-core/social-icons.tsx#L32)
 
 ___
 
@@ -52,4 +52,4 @@ Name | Type | Description |
 
 a WeChat icon
 
-Defined in: [client/fast-prototyping/mui-core/social-icons.tsx:19](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/mui-core/social-icons.tsx#L19)
+Defined in: [client/fast-prototyping/mui-core/social-icons.tsx:19](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/mui-core/social-icons.tsx#L19)

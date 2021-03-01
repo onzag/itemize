@@ -29,4 +29,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/28218320/client/components/property/Entry.tsx#L17)
+Defined in: [client/components/property/Entry.tsx:17](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/Entry.tsx#L17)

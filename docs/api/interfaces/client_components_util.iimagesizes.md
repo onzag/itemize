@@ -33,7 +33,7 @@ eg. in the reader are already absoluted
 
 • **imageLargeSizeURL**: *string*
 
-Defined in: [client/components/util/index.tsx:159](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L159)
+Defined in: [client/components/util/index.tsx:159](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L159)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **imageMediumSizeURL**: *string*
 
-Defined in: [client/components/util/index.tsx:157](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L157)
+Defined in: [client/components/util/index.tsx:157](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L157)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **imageSmallSizeURL**: *string*
 
-Defined in: [client/components/util/index.tsx:158](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L158)
+Defined in: [client/components/util/index.tsx:158](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L158)
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 • **imageStandardSizeURL**: *string*
 
-Defined in: [client/components/util/index.tsx:160](https://github.com/onzag/itemize/blob/28218320/client/components/util/index.tsx#L160)
+Defined in: [client/components/util/index.tsx:160](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/index.tsx#L160)

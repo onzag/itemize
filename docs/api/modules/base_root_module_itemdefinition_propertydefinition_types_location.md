@@ -22,4 +22,4 @@ Contains the location type description
 
 The type describes the behaviour of the location in the app
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:67](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L67)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:67](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L67)

@@ -42,7 +42,7 @@ Name | Type | Description |
 
 a fields definition object that represents the whole item definition as it was specified
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:50](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L50)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:50](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L50)
 
 ___
 
@@ -66,7 +66,7 @@ Name | Type | Description |
 
 a partial graphql fields definition that only contains the policies
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:127](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L127)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:127](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L127)
 
 ___
 
@@ -89,7 +89,7 @@ Name | Type | Description |
 
 the mutation fields for the mutation object to do ADD, EDIT and DELETE
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:440](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L440)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:440](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L440)
 
 ___
 
@@ -111,7 +111,7 @@ Name | Type | Description |
 
 the fields for the main query object to do GET, GET_LIST and SEARCH
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:294](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L294)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:294](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L294)
 
 ___
 
@@ -134,7 +134,7 @@ Name | Type | Description |
 the graphql query object that shows its not flattened form it is always
 the same as it's flattened
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:194](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L194)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:194](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L194)
 
 ___
 
@@ -156,4 +156,4 @@ Name | Type | Description |
 the graphql type that should be used to refer to this item definition, it is always
 the same as it's cached once it's first retrieved
 
-Defined in: [base/Root/Module/ItemDefinition/gql.ts:161](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/gql.ts#L161)
+Defined in: [base/Root/Module/ItemDefinition/gql.ts:161](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/gql.ts#L161)

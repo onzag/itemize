@@ -21,7 +21,7 @@ by the callback
 
 • **lostRecords**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/internal/app/remote-listener.ts:58](https://github.com/onzag/itemize/blob/28218320/client/internal/app/remote-listener.ts#L58)
+Defined in: [client/internal/app/remote-listener.ts:58](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/app/remote-listener.ts#L58)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **modifiedRecords**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/internal/app/remote-listener.ts:57](https://github.com/onzag/itemize/blob/28218320/client/internal/app/remote-listener.ts#L57)
+Defined in: [client/internal/app/remote-listener.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/app/remote-listener.ts#L57)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 • **newRecords**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/internal/app/remote-listener.ts:56](https://github.com/onzag/itemize/blob/28218320/client/internal/app/remote-listener.ts#L56)
+Defined in: [client/internal/app/remote-listener.ts:56](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/app/remote-listener.ts#L56)

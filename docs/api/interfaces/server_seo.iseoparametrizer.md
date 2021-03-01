@@ -25,4 +25,4 @@ everything you need
 
 #### Type declaration:
 
-Defined in: [server/seo/index.ts:18](https://github.com/onzag/itemize/blob/28218320/server/seo/index.ts#L18)
+Defined in: [server/seo/index.ts:18](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/index.ts#L18)

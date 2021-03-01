@@ -26,7 +26,7 @@ The property entry text renderer, note that this renderer isn't used only for ri
 but rather for any text type that is either plain or html, a text without a subtype
 will use the same as field
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:303](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L303)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:303](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L303)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 The styles for the text entry
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:34](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L34)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:34](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L34)

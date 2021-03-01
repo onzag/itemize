@@ -22,7 +22,7 @@ Refers to toolbar prescence elements that are added
 
 The element to be added
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:184](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L184)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:184](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L184)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 Given icon to use in the toolbar
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:173](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L173)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:173](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L173)
 
 ___
 
@@ -45,4 +45,4 @@ if a react node is provided this node will be modified
 and added a children as (i18nValue: string) => React.Node
 eg. the i18nRead element
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:180](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L180)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:180](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L180)

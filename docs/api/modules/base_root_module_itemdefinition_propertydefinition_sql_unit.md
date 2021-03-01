@@ -36,7 +36,7 @@ Name | Type | Description |
 
 a patial row definition
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:17](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L17)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:17](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L17)
 
 ___
 
@@ -56,7 +56,7 @@ Name | Type | Description |
 
 the rows to be btree indexed
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:136](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L136)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:136](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L136)
 
 ___
 
@@ -76,7 +76,7 @@ Name | Type | Description |
 
 a partial row comparison
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:145](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L145)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:145](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L145)
 
 ___
 
@@ -96,7 +96,7 @@ Name | Type | Description |
 
 a partial row value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:52](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L52)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:52](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L52)
 
 ___
 
@@ -116,7 +116,7 @@ Name | Type | Description |
 
 the three string order by rule
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:127](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L127)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:127](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L127)
 
 ___
 
@@ -136,7 +136,7 @@ Name | Type | Description |
 
 a supported unit type (or null)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:75](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L75)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:75](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L75)
 
 ___
 
@@ -156,7 +156,7 @@ Name | Type | Description |
 
 a boolean on whether the equality succeed or not
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:155](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L155)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:155](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L155)
 
 ___
 
@@ -176,7 +176,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:93](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L93)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:93](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L93)
 
 ___
 
@@ -194,4 +194,4 @@ Name | Type | Description |
 
 **Returns:** *string*[]
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:38](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L38)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:38](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L38)

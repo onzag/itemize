@@ -27,7 +27,7 @@ The unregister version of [IOwnedSearchRegisterRequest](base_remote_protocol.iow
 
 • **createdBy**: *string*
 
-Defined in: [base/remote-protocol.ts:386](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L386)
+Defined in: [base/remote-protocol.ts:386](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L386)
 
 ___
 
@@ -35,4 +35,4 @@ ___
 
 • **qualifiedPathName**: *string*
 
-Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L375)
+Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L375)

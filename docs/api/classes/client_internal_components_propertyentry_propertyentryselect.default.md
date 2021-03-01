@@ -59,7 +59,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry_propertyentryselect.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:58](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L58)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:58](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L58)
 
 ## Properties
 
@@ -390,7 +390,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:70](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L70)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:70](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L70)
 
 ___
 
@@ -440,7 +440,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:98](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L98)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:98](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L98)
 
 ___
 
@@ -480,4 +480,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:76](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L76)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntrySelect.tsx:76](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntrySelect.tsx#L76)

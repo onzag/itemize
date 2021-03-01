@@ -64,7 +64,7 @@ Name | Type |
 
 **Returns:** [*CurrencyPicker*](client_fast_prototyping_components_currency_picker.currencypicker.md)
 
-Defined in: [client/fast-prototyping/components/currency-picker.tsx:52](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/currency-picker.tsx#L52)
+Defined in: [client/fast-prototyping/components/currency-picker.tsx:52](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/currency-picker.tsx#L52)
 
 ## Properties
 
@@ -441,7 +441,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/currency-picker.tsx:64](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/currency-picker.tsx#L64)
+Defined in: [client/fast-prototyping/components/currency-picker.tsx:64](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/currency-picker.tsx#L64)
 
 ___
 
@@ -458,7 +458,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/currency-picker.tsx:74](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/currency-picker.tsx#L74)
+Defined in: [client/fast-prototyping/components/currency-picker.tsx:74](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/currency-picker.tsx#L74)
 
 ___
 
@@ -468,7 +468,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/currency-picker.tsx:69](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/currency-picker.tsx#L69)
+Defined in: [client/fast-prototyping/components/currency-picker.tsx:69](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/currency-picker.tsx#L69)
 
 ___
 
@@ -478,7 +478,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/currency-picker.tsx:84](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/currency-picker.tsx#L84)
+Defined in: [client/fast-prototyping/components/currency-picker.tsx:84](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/currency-picker.tsx#L84)
 
 ___
 

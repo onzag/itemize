@@ -27,7 +27,7 @@
 
 Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[createdBy](base_remote_protocol.iownedsearchfeedbackrequest.md#createdby)
 
-Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L467)
+Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L467)
 
 ___
 
@@ -41,7 +41,7 @@ something has been added
 
 Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[lastModified](base_remote_protocol.iownedsearchfeedbackrequest.md#lastmodified)
 
-Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L456)
+Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L456)
 
 ___
 
@@ -54,7 +54,7 @@ or item definition
 
 Inherited from: [IOwnedSearchFeedbackRequest](base_remote_protocol.iownedsearchfeedbackrequest.md).[qualifiedPathName](base_remote_protocol.iownedsearchfeedbackrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L450)
+Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L450)
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L67)
+Defined in: [client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L67)

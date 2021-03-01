@@ -62,7 +62,7 @@ Name | Type |
 `argumentsFoundFilePaths` | *any* |
 `requestFields` | *any* |
 
-Defined in: [client/internal/gql-client-util.ts:65](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L65)
+Defined in: [client/internal/gql-client-util.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L65)
 
 ___
 
@@ -92,7 +92,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IGQLFile*](../interfaces/gql_querier.igqlfile.md) \| [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[]\>
 
-Defined in: [client/internal/gql-client-util.ts:298](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L298)
+Defined in: [client/internal/gql-client-util.ts:298](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L298)
 
 ___
 
@@ -124,7 +124,7 @@ Name | Type | Description |
 a promise with an error, the fields that can be used to retrieve the same value in a get
 query, and the value that was retrieved
 
-Defined in: [client/internal/gql-client-util.ts:730](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L730)
+Defined in: [client/internal/gql-client-util.ts:730](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L730)
 
 ___
 
@@ -151,7 +151,7 @@ Name | Type | Description |
 
 a promise with an error on whether it succeed or not
 
-Defined in: [client/internal/gql-client-util.ts:646](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L646)
+Defined in: [client/internal/gql-client-util.ts:646](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L646)
 
 ___
 
@@ -179,7 +179,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
-Defined in: [client/internal/gql-client-util.ts:830](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L830)
+Defined in: [client/internal/gql-client-util.ts:830](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L830)
 
 ___
 
@@ -211,7 +211,7 @@ Name | Type | Description |
 
 a promise with a bunch of information
 
-Defined in: [client/internal/gql-client-util.ts:485](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L485)
+Defined in: [client/internal/gql-client-util.ts:485](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L485)
 
 ___
 
@@ -234,4 +234,4 @@ a promise with the error, results (for traditional), the records, the count
 which might me larger than the number of records, however the record length should
 be equal to the limit, and the offset given
 
-Defined in: [client/internal/gql-client-util.ts:1022](https://github.com/onzag/itemize/blob/28218320/client/internal/gql-client-util.ts#L1022)
+Defined in: [client/internal/gql-client-util.ts:1022](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L1022)
