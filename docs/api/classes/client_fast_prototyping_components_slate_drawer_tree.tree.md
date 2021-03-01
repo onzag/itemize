@@ -71,7 +71,7 @@ Name | Type |
 
 **Returns:** [*Tree*](client_fast_prototyping_components_slate_drawer_tree.tree.md)
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:185](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L185)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:185](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L185)
 
 ## Properties
 
@@ -79,7 +79,7 @@ Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:185](https
 
 • `Private` **bodyDiv**: HTMLDivElement
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:182](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L182)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:182](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L182)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • `Private` **buttonRef**: *RefObject*<HTMLButtonElement\>
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:185](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L185)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:185](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L185)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 • `Private` **internalsRef**: *RefObject*<HTMLDivElement\>
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:184](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L184)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:184](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L184)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 • `Private` **lastEffectTime**: *number*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:183](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L183)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:183](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L183)
 
 ___
 
@@ -321,7 +321,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:212](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L212)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:212](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L212)
 
 ___
 
@@ -429,7 +429,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:315](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L315)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:315](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L315)
 
 ___
 
@@ -445,7 +445,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:305](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L305)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:305](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L305)
 
 ___
 
@@ -461,7 +461,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:310](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L310)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:310](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L310)
 
 ___
 
@@ -518,7 +518,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:295](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L295)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:295](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L295)
 
 ___
 
@@ -534,7 +534,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:289](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L289)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:289](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L289)
 
 ___
 
@@ -550,7 +550,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:292](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L292)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:292](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L292)
 
 ___
 
@@ -567,7 +567,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:249](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L249)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:249](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L249)
 
 ___
 
@@ -577,7 +577,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:258](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L258)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:258](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L258)
 
 ___
 
@@ -587,7 +587,7 @@ ___
 
 **Returns:** *object*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:344](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L344)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:344](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L344)
 
 ___
 
@@ -654,7 +654,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:274](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L274)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:274](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L274)
 
 ___
 
@@ -670,7 +670,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:264](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L264)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:264](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L264)
 
 ___
 
@@ -686,4 +686,4 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:269](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/drawer/tree.tsx#L269)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:269](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/drawer/tree.tsx#L269)

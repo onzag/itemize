@@ -20,7 +20,7 @@ These represent the enum of the include and exclusion state of an include
 
 • **ANY**: = "ANY"
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:27](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L27)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:27](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/Include/index.ts#L27)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **EXCLUDED**: = "EXCLUDED"
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:25](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L25)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:25](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/Include/index.ts#L25)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **INCLUDED**: = "INCLUDED"
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/Include/index.ts#L26)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:26](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/Include/index.ts#L26)

@@ -32,7 +32,7 @@ check [IOwnedSearchRegisterRequest](base_remote_protocol.iownedsearchregisterreq
 
 • **createdBy**: *string*
 
-Defined in: [base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L136)
+Defined in: [base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L136)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 the records that have been deleted
 
-Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L115)
+Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L115)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 the records that have been modified
 
-Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L119)
+Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L119)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 the new last record search result
 
-Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L123)
+Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L123)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 the new records that have been added
 
-Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L111)
+Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L111)
 
 ___
 
@@ -82,4 +82,4 @@ ___
 
 the qualified path name or type of the either module or item definition
 
-Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L107)
+Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L107)

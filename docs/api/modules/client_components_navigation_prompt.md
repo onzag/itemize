@@ -24,4 +24,4 @@ The prompt dialog component is used when possible by
 react router, and since this prompt is just logical
 it needs to consume such component
 
-Defined in: [client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/Prompt.tsx#L18)
+Defined in: [client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/28218320/client/components/navigation/Prompt.tsx#L18)

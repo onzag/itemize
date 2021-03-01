@@ -27,7 +27,7 @@ it supports the following renderer args
 
 **`returns`** a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:108](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L108)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:108](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L108)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 The styles for the date time entry
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:31](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L31)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:31](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L31)

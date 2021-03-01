@@ -22,4 +22,4 @@ Name | Type |
 
 **Returns:** *ReactElement*<any, string \| (`props`: *any*) => *ReactElement*<any, string \| (props: any) =\> ReactElement<any, string \| ... \| (new (props: any) =\> Component<any, any, any\>)\> \| (`props`: *any*) => *Component*<any, any, any\>\> \| (`props`: *any*) => *Component*<any, any, any\>\>
 
-Defined in: [client/components/navigation/LocationRetriever.tsx:8](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/LocationRetriever.tsx#L8)
+Defined in: [client/components/navigation/LocationRetriever.tsx:8](https://github.com/onzag/itemize/blob/28218320/client/components/navigation/LocationRetriever.tsx#L8)

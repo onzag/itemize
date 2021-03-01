@@ -28,4 +28,4 @@ Name | Type | Description |
 
 the same arg
 
-Defined in: [setup/git/index.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/setup/git/index.ts#L18)
+Defined in: [setup/git/index.ts:18](https://github.com/onzag/itemize/blob/28218320/setup/git/index.ts#L18)

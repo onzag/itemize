@@ -22,7 +22,7 @@ so that references can be respected
 
 • `Const` **MAX\_PG\_FK\_SIZE**: *60*= 60
 
-Defined in: [dbbuilder/build-foreign-key.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-foreign-key.ts#L34)
+Defined in: [dbbuilder/build-foreign-key.ts:34](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-foreign-key.ts#L34)
 
 ## Functions
 
@@ -44,7 +44,7 @@ Name | Type | Description |
 
 the resulting database schema and the new current
 
-Defined in: [dbbuilder/build-foreign-key.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-foreign-key.ts#L43)
+Defined in: [dbbuilder/build-foreign-key.ts:43](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-foreign-key.ts#L43)
 
 ___
 
@@ -60,4 +60,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [dbbuilder/build-foreign-key.ts:31](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-foreign-key.ts#L31)
+Defined in: [dbbuilder/build-foreign-key.ts:31](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-foreign-key.ts#L31)

@@ -58,7 +58,7 @@ Name | Type | Description |
 
 **Returns:** [*Collector*](server_ssr_collect.collector.md)
 
-Defined in: [server/ssr/collect.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L92)
+Defined in: [server/ssr/collect.ts:92](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L92)
 
 ## Properties
 
@@ -69,7 +69,7 @@ Defined in: [server/ssr/collect.ts:92](https://github.com/onzag/itemize/blob/0e9
 The app data that is being used while rendering
 this
 
-Defined in: [server/ssr/collect.ts:82](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L82)
+Defined in: [server/ssr/collect.ts:82](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L82)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 The SSR rule that is being used
 
-Defined in: [server/ssr/collect.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L86)
+Defined in: [server/ssr/collect.ts:86](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L86)
 
 ___
 
@@ -94,7 +94,7 @@ for collection for the same item
 
 #### Type declaration:
 
-Defined in: [server/ssr/collect.ts:68](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L68)
+Defined in: [server/ssr/collect.ts:68](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L68)
 
 ___
 
@@ -106,7 +106,7 @@ Same but gives a rejected promise instead
 
 #### Type declaration:
 
-Defined in: [server/ssr/collect.ts:74](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L74)
+Defined in: [server/ssr/collect.ts:74](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L74)
 
 ___
 
@@ -118,7 +118,7 @@ All the collection statuses per result
 
 #### Type declaration:
 
-Defined in: [server/ssr/collect.ts:59](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L59)
+Defined in: [server/ssr/collect.ts:59](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L59)
 
 ___
 
@@ -130,7 +130,7 @@ A signature for forbidden elements that did not
 pass the security scrutiny, either by the default
 rule or because of read triggers
 
-Defined in: [server/ssr/collect.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L92)
+Defined in: [server/ssr/collect.ts:92](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L92)
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 Represents all the collected results
 
-Defined in: [server/ssr/collect.ts:55](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L55)
+Defined in: [server/ssr/collect.ts:55](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L55)
 
 ## Methods
 
@@ -161,7 +161,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/ssr/collect.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L167)
+Defined in: [server/ssr/collect.ts:167](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L167)
 
 ___
 
@@ -175,7 +175,7 @@ constains this forbidden information
 
 **Returns:** *string*
 
-Defined in: [server/ssr/collect.ts:149](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L149)
+Defined in: [server/ssr/collect.ts:149](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L149)
 
 ___
 
@@ -189,7 +189,7 @@ was built at if nothing else is found
 
 **Returns:** Date
 
-Defined in: [server/ssr/collect.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L111)
+Defined in: [server/ssr/collect.ts:111](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L111)
 
 ___
 
@@ -201,7 +201,7 @@ Provides all the resulting queries for use in the client side
 
 **Returns:** [*ISSRCollectedQueryType*](../interfaces/client_internal_providers_ssr_provider.issrcollectedquerytype.md)[]
 
-Defined in: [server/ssr/collect.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L126)
+Defined in: [server/ssr/collect.ts:126](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L126)
 
 ___
 
@@ -215,7 +215,7 @@ the mode it was rendered at for it
 
 **Returns:** *string*
 
-Defined in: [server/ssr/collect.ts:136](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L136)
+Defined in: [server/ssr/collect.ts:136](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L136)
 
 ___
 
@@ -227,4 +227,4 @@ Informs whether the collection caught up forbidden resources
 
 **Returns:** *boolean*
 
-Defined in: [server/ssr/collect.ts:156](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L156)
+Defined in: [server/ssr/collect.ts:156](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L156)

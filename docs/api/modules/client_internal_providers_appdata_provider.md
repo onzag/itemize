@@ -27,4 +27,4 @@ Contains the data provider that provides application specific information
 The data context provides the root as well as remote listener and whether
 the update is blocked to any component that demands it under the tree
 
-Defined in: [client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/appdata-provider.tsx#L35)
+Defined in: [client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/appdata-provider.tsx#L35)

@@ -28,7 +28,7 @@ this represents rules that are built for includes
 
 • `Optional` **condition**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • `Optional` **gate**: [*ConditionalRuleGateType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#conditionalrulegatetype)
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -48,7 +48,7 @@ includes can either by matched by id or by name
 the id of an include is unique, and is matched by using #identifier
 and the name just doesn't include the numeral
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:99](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L99)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:99](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L99)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 the inclusion state expected for the conditional rule to apply
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L103)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:103](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L103)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • `Optional` **serverFlag**: [*ConditionalRuleServerFlagType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#conditionalruleserverflagtype)
 
-Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+Defined in: [base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)

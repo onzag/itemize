@@ -35,4 +35,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/components/item/ItemLoader.tsx:104](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/ItemLoader.tsx#L104)
+Defined in: [client/components/item/ItemLoader.tsx:104](https://github.com/onzag/itemize/blob/28218320/client/components/item/ItemLoader.tsx#L104)

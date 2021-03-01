@@ -39,7 +39,7 @@ Name | Type | Description |
 
 the new generated column or null if failed to generate
 
-Defined in: [dbbuilder/build-tables.ts:46](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L46)
+Defined in: [dbbuilder/build-tables.ts:46](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L46)
 
 ___
 
@@ -61,7 +61,7 @@ Name | Type | Description |
 
 a promise with the definition that was actually built
 
-Defined in: [dbbuilder/build-tables.ts:382](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L382)
+Defined in: [dbbuilder/build-tables.ts:382](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L382)
 
 ___
 
@@ -83,7 +83,7 @@ Name | Type | Description |
 
 a promise for the actual table that was built or null if not added
 
-Defined in: [dbbuilder/build-tables.ts:233](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L233)
+Defined in: [dbbuilder/build-tables.ts:233](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L233)
 
 ___
 
@@ -107,7 +107,7 @@ Name | Type | Description |
 
 the result of dropping the column, usually null, but the column schema itself if cancelled
 
-Defined in: [dbbuilder/build-tables.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L111)
+Defined in: [dbbuilder/build-tables.ts:111](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L111)
 
 ___
 
@@ -130,7 +130,7 @@ Name | Type | Description |
 
 the result of dropping the table, usually null, unless cancelled
 
-Defined in: [dbbuilder/build-tables.ts:346](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L346)
+Defined in: [dbbuilder/build-tables.ts:346](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L346)
 
 ___
 
@@ -154,7 +154,7 @@ Name | Type | Description |
 
 the updated result if managed
 
-Defined in: [dbbuilder/build-tables.ts:168](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L168)
+Defined in: [dbbuilder/build-tables.ts:168](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L168)
 
 ___
 
@@ -178,4 +178,4 @@ Name | Type | Description |
 
 the actual schema it managed to generate
 
-Defined in: [dbbuilder/build-tables.ts:282](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-tables.ts#L282)
+Defined in: [dbbuilder/build-tables.ts:282](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-tables.ts#L282)

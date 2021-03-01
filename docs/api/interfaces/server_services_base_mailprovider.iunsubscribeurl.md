@@ -22,7 +22,7 @@ The unsubscribe url form
 A non-redirected url, that simply will give a status
 of 200 if succeeded
 
-Defined in: [server/services/base/MailProvider.ts:33](https://github.com/onzag/itemize/blob/0e9b128c/server/services/base/MailProvider.ts#L33)
+Defined in: [server/services/base/MailProvider.ts:33](https://github.com/onzag/itemize/blob/28218320/server/services/base/MailProvider.ts#L33)
 
 ___
 
@@ -33,4 +33,4 @@ ___
 A redirected url that redirects to the APP to show
 a human readable message
 
-Defined in: [server/services/base/MailProvider.ts:28](https://github.com/onzag/itemize/blob/0e9b128c/server/services/base/MailProvider.ts#L28)
+Defined in: [server/services/base/MailProvider.ts:28](https://github.com/onzag/itemize/blob/28218320/server/services/base/MailProvider.ts#L28)

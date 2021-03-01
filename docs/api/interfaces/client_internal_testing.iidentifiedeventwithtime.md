@@ -16,4 +16,4 @@
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:99](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L99)
+Defined in: [client/internal/testing.ts:99](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L99)

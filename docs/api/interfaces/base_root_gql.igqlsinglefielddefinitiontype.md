@@ -22,7 +22,7 @@ per field
 
 • `Optional` **description**: *string*
 
-Defined in: [base/Root/gql.ts:68](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L68)
+Defined in: [base/Root/gql.ts:68](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L68)
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **type**: GraphQLOutputType
 
-Defined in: [base/Root/gql.ts:67](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L67)
+Defined in: [base/Root/gql.ts:67](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L67)

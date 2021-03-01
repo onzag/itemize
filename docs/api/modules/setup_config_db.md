@@ -30,4 +30,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IDBConfigRawJSONDataType*](../interfaces/config.idbconfigrawjsondatatype.md)\>
 
-Defined in: [setup/config/db.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/setup/config/db.ts#L19)
+Defined in: [setup/config/db.ts:19](https://github.com/onzag/itemize/blob/28218320/setup/config/db.ts#L19)

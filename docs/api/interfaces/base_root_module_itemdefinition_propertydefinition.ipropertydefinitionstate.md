@@ -32,7 +32,7 @@ This is the state you receive from a property once you request it
 
 whether it represents a default value (it is not user set in this case)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:280](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L280)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:280](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L280)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 whether the value is enforced (by enforcedProperties or other means), not user set as well
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:284](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L284)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:284](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L284)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 whether the property is mean to be hidden and not interacted by the user
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:288](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L288)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:288](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L288)
 
 ___
 
@@ -67,7 +67,7 @@ an internal value is null if it considers itself not in sync in which case
 the app should still be able to display something from the value, internal values
 are basically only returned if the state value is the current value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:310](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L310)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:310](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L310)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 the reason of why it is not valid (it can also be a custom reason)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:296](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L296)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:296](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L296)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 the property id in question
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:341](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L341)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:341](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L341)
 
 ___
 
@@ -99,7 +99,7 @@ the applied value, this is the value that is set up in the state by the applying
 function and it might differ from the state value as the user modifies it, this is
 the original value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:323](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L323)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:323](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L323)
 
 ___
 
@@ -112,7 +112,7 @@ in the state, in most case it is equal to the value; for example in case of
 a default value, the state value is null, but the actual value is something else
 usually the internal value is correlated to the state value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:317](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L317)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:317](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L317)
 
 ___
 
@@ -126,7 +126,7 @@ applyValue is used when loading values, whereas setCurrentValue is used for user
 this means you can tell appart modifications of the state value from either computer
 or user input as long as it was used accordingly
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:337](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L337)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:337](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L337)
 
 ___
 
@@ -138,7 +138,7 @@ whether the state value has been modified by any external force, either programa
 or not, this will usually be true for any value other than null, usually becomes true
 once the field is touched even once
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:329](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L329)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:329](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L329)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 whether this value was user set
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:276](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L276)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:276](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L276)
 
 ___
 
@@ -158,7 +158,7 @@ ___
 
 whether the value is valid
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:292](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L292)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:292](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L292)
 
 ___
 
@@ -169,4 +169,4 @@ ___
 the value that the property currently has, it can be different from state
 values because
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:301](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L301)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:301](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L301)

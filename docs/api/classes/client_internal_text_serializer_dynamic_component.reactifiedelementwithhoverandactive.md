@@ -63,7 +63,7 @@ Name | Type |
 
 **Returns:** [*ReactifiedElementWithHoverAndActive*](client_internal_text_serializer_dynamic_component.reactifiedelementwithhoverandactive.md)
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:31](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L31)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:31](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L31)
 
 ## Properties
 
@@ -441,7 +441,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:70](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L70)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:70](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L70)
 
 ___
 
@@ -458,7 +458,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:62](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L62)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:62](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L62)
 
 ___
 
@@ -475,7 +475,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L54)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:54](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L54)
 
 ___
 
@@ -492,7 +492,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:46](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L46)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L46)
 
 ___
 
@@ -502,7 +502,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/text/serializer/dynamic-component.tsx:78](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/dynamic-component.tsx#L78)
+Defined in: [client/internal/text/serializer/dynamic-component.tsx:78](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/dynamic-component.tsx#L78)
 
 ___
 

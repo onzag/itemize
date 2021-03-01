@@ -67,7 +67,7 @@ Name | Type |
 
 **Returns:** [*GlobalManager*](server_global_manager.globalmanager.md)
 
-Defined in: [server/global-manager.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L54)
+Defined in: [server/global-manager.ts:54](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L54)
 
 ## Properties
 
@@ -75,7 +75,7 @@ Defined in: [server/global-manager.ts:54](https://github.com/onzag/itemize/blob/
 
 • `Private` **config**: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md)
 
-Defined in: [server/global-manager.ts:49](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L49)
+Defined in: [server/global-manager.ts:49](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L49)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 • `Private` **currencyFactorsProvider**: [*default*](server_services_base_currencyfactorsprovider.default.md)<any\>
 
-Defined in: [server/global-manager.ts:46](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L46)
+Defined in: [server/global-manager.ts:46](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L46)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/global-manager.ts:51](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L51)
+Defined in: [server/global-manager.ts:51](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L51)
 
 ___
 
@@ -101,7 +101,7 @@ ___
 
 • `Private` **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [server/global-manager.ts:38](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L38)
+Defined in: [server/global-manager.ts:38](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L38)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 • `Private` **globalCache**: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/global-manager.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L39)
+Defined in: [server/global-manager.ts:39](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L39)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 • `Private` **idefNeedsMantenience**: [*default*](base_root_module_itemdefinition.default.md)[]
 
-Defined in: [server/global-manager.ts:41](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L41)
+Defined in: [server/global-manager.ts:41](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L41)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 • `Private` **mailProvider**: [*default*](server_services_base_mailprovider.default.md)<any\>
 
-Defined in: [server/global-manager.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L48)
+Defined in: [server/global-manager.ts:48](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L48)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 • `Private` **modNeedsMantenience**: [*default*](base_root_module.default.md)[]
 
-Defined in: [server/global-manager.ts:42](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L42)
+Defined in: [server/global-manager.ts:42](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L42)
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 • `Private` **redisPub**: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/global-manager.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L40)
+Defined in: [server/global-manager.ts:40](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L40)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 • `Private` **registry**: [*RegistryService*](server_services_registry.registryservice.md)
 
-Defined in: [server/global-manager.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L54)
+Defined in: [server/global-manager.ts:54](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L54)
 
 ___
 
@@ -157,7 +157,7 @@ ___
 
 • `Private` **root**: [*default*](base_root.default.md)
 
-Defined in: [server/global-manager.ts:37](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L37)
+Defined in: [server/global-manager.ts:37](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L37)
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 • `Private` **sensitiveConfig**: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [server/global-manager.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L47)
+Defined in: [server/global-manager.ts:47](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L47)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 • `Private` **seoGenLastUpdated**: *number*
 
-Defined in: [server/global-manager.ts:45](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L45)
+Defined in: [server/global-manager.ts:45](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L45)
 
 ___
 
@@ -181,7 +181,7 @@ ___
 
 • `Private` **seoGenerator**: [*SEOGenerator*](server_seo_generator.seogenerator.md)
 
-Defined in: [server/global-manager.ts:50](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L50)
+Defined in: [server/global-manager.ts:50](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L50)
 
 ___
 
@@ -189,7 +189,7 @@ ___
 
 • `Private` **serverData**: [*IServerDataType*](../interfaces/server.iserverdatatype.md)
 
-Defined in: [server/global-manager.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L43)
+Defined in: [server/global-manager.ts:43](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L43)
 
 ___
 
@@ -197,7 +197,7 @@ ___
 
 • `Private` **serverDataLastUpdated**: *number*
 
-Defined in: [server/global-manager.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L44)
+Defined in: [server/global-manager.ts:44](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L44)
 
 ## Methods
 
@@ -207,7 +207,7 @@ Defined in: [server/global-manager.ts:44](https://github.com/onzag/itemize/blob/
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L119)
+Defined in: [server/global-manager.ts:119](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L119)
 
 ___
 
@@ -217,7 +217,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:564](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L564)
+Defined in: [server/global-manager.ts:564](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L564)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:582](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L582)
+Defined in: [server/global-manager.ts:582](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L582)
 
 ___
 
@@ -237,7 +237,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L105)
+Defined in: [server/global-manager.ts:105](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L105)
 
 ___
 
@@ -253,7 +253,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/global-manager.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L101)
+Defined in: [server/global-manager.ts:101](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L101)
 
 ___
 
@@ -269,7 +269,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/global-manager.ts:285](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L285)
+Defined in: [server/global-manager.ts:285](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L285)
 
 ___
 
@@ -285,7 +285,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/global-manager.ts:264](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L264)
+Defined in: [server/global-manager.ts:264](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L264)
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [server/global-manager.ts:311](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L311)
+Defined in: [server/global-manager.ts:311](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L311)
 
 ___
 
@@ -314,7 +314,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:443](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L443)
+Defined in: [server/global-manager.ts:443](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L443)
 
 ___
 
@@ -330,7 +330,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:419](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L419)
+Defined in: [server/global-manager.ts:419](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L419)
 
 ___
 
@@ -346,7 +346,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:408](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L408)
+Defined in: [server/global-manager.ts:408](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L408)
 
 ___
 
@@ -356,7 +356,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/global-manager.ts:400](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L400)
+Defined in: [server/global-manager.ts:400](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L400)
 
 ___
 
@@ -372,4 +372,4 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/global-manager.ts:98](https://github.com/onzag/itemize/blob/0e9b128c/server/global-manager.ts#L98)
+Defined in: [server/global-manager.ts:98](https://github.com/onzag/itemize/blob/28218320/server/global-manager.ts#L98)

@@ -39,7 +39,7 @@ Name | Type | Description |
 
 **Returns:** T
 
-Defined in: [server/token.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/server/token.ts#L61)
+Defined in: [server/token.ts:61](https://github.com/onzag/itemize/blob/28218320/server/token.ts#L61)
 
 ___
 
@@ -59,7 +59,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [server/token.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/server/token.ts#L18)
+Defined in: [server/token.ts:18](https://github.com/onzag/itemize/blob/28218320/server/token.ts#L18)
 
 ___
 
@@ -85,4 +85,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<T\>
 
-Defined in: [server/token.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/server/token.ts#L40)
+Defined in: [server/token.ts:40](https://github.com/onzag/itemize/blob/28218320/server/token.ts#L40)

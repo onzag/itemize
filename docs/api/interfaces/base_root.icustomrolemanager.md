@@ -31,6 +31,6 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [base/Root/index.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L56)
+Defined in: [base/Root/index.ts:56](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L56)
 
-Defined in: [base/Root/index.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L56)
+Defined in: [base/Root/index.ts:56](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L56)

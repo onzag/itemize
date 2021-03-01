@@ -23,7 +23,7 @@ that is created to be chosen in the drawer
 
 The relevant argument of the ui handler
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:245](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L245)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:245](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L245)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 The way for the input to be specified
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:249](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L249)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:249](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L249)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 The ui handler in question
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:241](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L241)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:241](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L241)

@@ -17,7 +17,7 @@
 
 • **unsubscribeProperty**: *string*
 
-Defined in: [server/user/rest.ts:16](https://github.com/onzag/itemize/blob/0e9b128c/server/user/rest.ts#L16)
+Defined in: [server/user/rest.ts:16](https://github.com/onzag/itemize/blob/28218320/server/user/rest.ts#L16)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **unsubscribeUserId**: *string*
 
-Defined in: [server/user/rest.ts:15](https://github.com/onzag/itemize/blob/0e9b128c/server/user/rest.ts#L15)
+Defined in: [server/user/rest.ts:15](https://github.com/onzag/itemize/blob/28218320/server/user/rest.ts#L15)

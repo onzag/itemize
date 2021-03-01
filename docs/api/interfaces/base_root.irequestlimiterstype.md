@@ -25,7 +25,7 @@ they are also used for optimization and matenience operations
 
 • **condition**: *AND* \| *OR*
 
-Defined in: [base/Root/index.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L44)
+Defined in: [base/Root/index.ts:44](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L44)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • `Optional` **createdBy**: *boolean*
 
-Defined in: [base/Root/index.ts:46](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L46)
+Defined in: [base/Root/index.ts:46](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L46)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • `Optional` **custom**: *string*[]
 
-Defined in: [base/Root/index.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L48)
+Defined in: [base/Root/index.ts:48](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L48)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • `Optional` **parenting**: *boolean*
 
-Defined in: [base/Root/index.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L47)
+Defined in: [base/Root/index.ts:47](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L47)
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 • `Optional` **since**: *number*
 
-Defined in: [base/Root/index.ts:45](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/index.ts#L45)
+Defined in: [base/Root/index.ts:45](https://github.com/onzag/itemize/blob/28218320/base/Root/index.ts#L45)

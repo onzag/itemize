@@ -27,7 +27,7 @@
 
 Inherited from: [IRegisterRequest](base_remote_protocol.iregisterrequest.md).[id](base_remote_protocol.iregisterrequest.md#id)
 
-Defined in: [base/remote-protocol.ts:198](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L198)
+Defined in: [base/remote-protocol.ts:198](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L198)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 Inherited from: [IRegisterRequest](base_remote_protocol.iregisterrequest.md).[itemDefinition](base_remote_protocol.iregisterrequest.md#itemdefinition)
 
-Defined in: [base/remote-protocol.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L197)
+Defined in: [base/remote-protocol.ts:197](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L197)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L75)
+Defined in: [client/internal/testing.ts:75](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L75)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 Inherited from: [IRegisterRequest](base_remote_protocol.iregisterrequest.md).[version](base_remote_protocol.iregisterrequest.md#version)
 
-Defined in: [base/remote-protocol.ts:199](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L199)
+Defined in: [base/remote-protocol.ts:199](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L199)

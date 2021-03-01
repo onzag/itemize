@@ -32,7 +32,7 @@ custom data is passed to the item definition triggers
 so you can perform custom functionality based on it
 this data should be serializable
 
-Defined in: [server/custom-graphql/index.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L43)
+Defined in: [server/custom-graphql/index.ts:43](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/index.ts#L43)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 Will throw an error when this is provided and not provide any token
 
-Defined in: [server/custom-graphql/index.ts:47](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L47)
+Defined in: [server/custom-graphql/index.ts:47](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/index.ts#L47)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 Specifies an expiration date
 
-Defined in: [server/custom-graphql/index.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L36)
+Defined in: [server/custom-graphql/index.ts:36](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/index.ts#L36)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 Specifies an user id that the token should be built for
 
-Defined in: [server/custom-graphql/index.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L26)
+Defined in: [server/custom-graphql/index.ts:26](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/index.ts#L26)
 
 ___
 
@@ -74,4 +74,4 @@ Specifies the role that the token should have, if you don't specify
 a role and don't have anyone on whom it's made in behalf of, then it'll
 stick to being a guest
 
-Defined in: [server/custom-graphql/index.ts:32](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/index.ts#L32)
+Defined in: [server/custom-graphql/index.ts:32](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/index.ts#L32)

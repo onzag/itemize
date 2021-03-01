@@ -28,7 +28,7 @@
 
 • **args**: [*IGQLArgs*](gql_querier.igqlargs.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:117](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L117)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:117](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L117)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **gqlValue**: [*IGQLValue*](gql_querier.igqlvalue.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:118](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L118)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:118](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L118)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[id](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#id)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[include](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#include)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[itemDefinition](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#itemdefinition)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[prefix](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#prefix)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
 
 ___
 
@@ -86,4 +86,4 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[property](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#property)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)

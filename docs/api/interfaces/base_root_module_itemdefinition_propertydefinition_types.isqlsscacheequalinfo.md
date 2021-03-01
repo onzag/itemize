@@ -31,7 +31,7 @@
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[id](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#id)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[include](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#include)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[itemDefinition](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#itemdefinition)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[prefix](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#prefix)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[property](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#property)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 • **row**: [*ISQLTableRowValue*](base_root_sql.isqltablerowvalue.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:103](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L103)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:103](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L103)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 Inherited from: [ISQLArgInfo](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md).[serverData](base_root_module_itemdefinition_propertydefinition_types.isqlarginfo.md#serverdata)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -97,4 +97,4 @@ ___
 
 • **value**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L102)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:102](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L102)

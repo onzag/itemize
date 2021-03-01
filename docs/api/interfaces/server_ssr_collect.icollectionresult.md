@@ -22,7 +22,7 @@ This is what a collection result looks like
 
 The date when the result was last modified
 
-Defined in: [server/ssr/collect.ts:26](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L26)
+Defined in: [server/ssr/collect.ts:26](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L26)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 The query value, the same that is passed to the client side
 this contains the value and all the attributes
 
-Defined in: [server/ssr/collect.ts:35](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L35)
+Defined in: [server/ssr/collect.ts:35](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L35)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 The signature for this specific collection result
 
-Defined in: [server/ssr/collect.ts:30](https://github.com/onzag/itemize/blob/0e9b128c/server/ssr/collect.ts#L30)
+Defined in: [server/ssr/collect.ts:30](https://github.com/onzag/itemize/blob/28218320/server/ssr/collect.ts#L30)

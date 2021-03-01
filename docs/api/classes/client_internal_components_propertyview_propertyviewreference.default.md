@@ -66,7 +66,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyview_propertyviewreference.default.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
 
 ## Properties
 
@@ -96,7 +96,7 @@ ___
 
 • `Private` **currentlyFindingValueFor**: [*string*, *string*]
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:45](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L45)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:45](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L45)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 • `Private` **ssrServerOnlyValue**: *string*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
 
 ___
 
@@ -261,7 +261,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:166](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L166)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:166](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L166)
 
 ___
 
@@ -291,7 +291,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:64](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L64)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:64](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L64)
 
 ___
 
@@ -307,7 +307,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:277](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L277)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:277](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L277)
 
 ___
 
@@ -424,7 +424,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:194](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L194)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:194](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L194)
 
 ___
 
@@ -461,7 +461,7 @@ Name | Type | Description |
 
 a string value or null if nothing found
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:132](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L132)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:132](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L132)
 
 ___
 
@@ -500,7 +500,7 @@ Provides the special data for the reference
 an array where 0 is the item definition that is target, 1 is the property definition
 we are using for display
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:97](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L97)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:97](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L97)
 
 ___
 
@@ -510,7 +510,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:336](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L336)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:336](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L336)
 
 ___
 
@@ -550,4 +550,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:318](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewReference.tsx#L318)
+Defined in: [client/internal/components/PropertyView/PropertyViewReference.tsx:318](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewReference.tsx#L318)

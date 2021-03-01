@@ -30,7 +30,7 @@ Name | Type |
 
 **Returns:** [*MutatingTemplateArgs*](client_internal_text_serializer_template_args.mutatingtemplateargs.md)
 
-Defined in: [client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L111)
+Defined in: [client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/template-args.ts#L111)
 
 ## Properties
 
@@ -38,4 +38,4 @@ Defined in: [client/internal/text/serializer/template-args.ts:111](https://githu
 
 • **mutatingWrapper**: [*TemplateArgMutatingWrapperFn*](../modules/client_internal_text_serializer_template_args.md#templateargmutatingwrapperfn)
 
-Defined in: [client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/template-args.ts#L111)
+Defined in: [client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/template-args.ts#L111)

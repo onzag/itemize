@@ -37,7 +37,7 @@ The standard basic configuration structure
 
 The application name
 
-Defined in: [config.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L48)
+Defined in: [config.ts:48](https://github.com/onzag/itemize/blob/28218320/config.ts#L48)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 The cacheable external hostnames, add hostnames here eg. fonts.googleapis.com to tell the service worker
 that these hostnames should be cached
 
-Defined in: [config.ts:85](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L85)
+Defined in: [config.ts:85](https://github.com/onzag/itemize/blob/28218320/config.ts#L85)
 
 ___
 
@@ -62,7 +62,7 @@ eg. myopenstackprovider.com/mycontainer/AUTH_123/ or whatever custom domain you 
 
 #### Type declaration:
 
-Defined in: [config.ts:127](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L127)
+Defined in: [config.ts:127](https://github.com/onzag/itemize/blob/28218320/config.ts#L127)
 
 ___
 
@@ -76,7 +76,7 @@ the value should be container id
 
 #### Type declaration:
 
-Defined in: [config.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L119)
+Defined in: [config.ts:119](https://github.com/onzag/itemize/blob/28218320/config.ts#L119)
 
 ___
 
@@ -88,7 +88,7 @@ Special custom configuration
 
 #### Type declaration:
 
-Defined in: [config.ts:133](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L133)
+Defined in: [config.ts:133](https://github.com/onzag/itemize/blob/28218320/config.ts#L133)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 The hostname used in development mode, used to avoid SEO hijaking
 
-Defined in: [config.ts:108](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L108)
+Defined in: [config.ts:108](https://github.com/onzag/itemize/blob/28218320/config.ts#L108)
 
 ___
 
@@ -111,7 +111,7 @@ you might specify only unregionalized versions, eg instead of en-GB en-US only e
 
 #### Type declaration:
 
-Defined in: [config.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L61)
+Defined in: [config.ts:61](https://github.com/onzag/itemize/blob/28218320/config.ts#L61)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 The schema entry, usually schema/root
 
-Defined in: [config.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L44)
+Defined in: [config.ts:44](https://github.com/onzag/itemize/blob/28218320/config.ts#L44)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 The country code the app fallbacks to if some error happens
 also the default for development
 
-Defined in: [config.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L92)
+Defined in: [config.ts:92](https://github.com/onzag/itemize/blob/28218320/config.ts#L92)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 The currency the app fallbacks to if some error happens
 also the default for development
 
-Defined in: [config.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L102)
+Defined in: [config.ts:102](https://github.com/onzag/itemize/blob/28218320/config.ts#L102)
 
 ___
 
@@ -154,7 +154,7 @@ ___
 The language the app fallbacks to if some error happens
 also the default for development
 
-Defined in: [config.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L97)
+Defined in: [config.ts:97](https://github.com/onzag/itemize/blob/28218320/config.ts#L97)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 The font name to use
 
-Defined in: [config.ts:80](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L80)
+Defined in: [config.ts:80](https://github.com/onzag/itemize/blob/28218320/config.ts#L80)
 
 ___
 
@@ -174,7 +174,7 @@ ___
 
 The font url to use
 
-Defined in: [config.ts:76](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L76)
+Defined in: [config.ts:76](https://github.com/onzag/itemize/blob/28218320/config.ts#L76)
 
 ___
 
@@ -184,7 +184,7 @@ ___
 
 The web manifest configuration
 
-Defined in: [config.ts:72](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L72)
+Defined in: [config.ts:72](https://github.com/onzag/itemize/blob/28218320/config.ts#L72)
 
 ___
 
@@ -194,7 +194,7 @@ ___
 
 The hostname used in production mode, used to avoid SEO hijacking
 
-Defined in: [config.ts:112](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L112)
+Defined in: [config.ts:112](https://github.com/onzag/itemize/blob/28218320/config.ts#L112)
 
 ___
 
@@ -205,7 +205,7 @@ ___
 The supported user roles
 ADMIN is an expected role for this
 
-Defined in: [config.ts:68](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L68)
+Defined in: [config.ts:68](https://github.com/onzag/itemize/blob/28218320/config.ts#L68)
 
 ___
 
@@ -215,7 +215,7 @@ ___
 
 Of the supported languages, which ones are right to left
 
-Defined in: [config.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L56)
+Defined in: [config.ts:56](https://github.com/onzag/itemize/blob/28218320/config.ts#L56)
 
 ___
 
@@ -225,4 +225,4 @@ ___
 
 The supported languages as an array of string
 
-Defined in: [config.ts:52](https://github.com/onzag/itemize/blob/0e9b128c/config.ts#L52)
+Defined in: [config.ts:52](https://github.com/onzag/itemize/blob/28218320/config.ts#L52)

@@ -1,5 +1,5 @@
 {
   "entryPoints": ["./"],
-  "exclude": ["./nodejs", "./node_modules", "./types"],
+  "exclude": ["./nodejs", "./node_modules", "./types", "./docs"],
   "out": "docs/api"
 }

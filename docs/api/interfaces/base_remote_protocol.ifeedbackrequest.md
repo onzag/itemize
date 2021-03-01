@@ -27,7 +27,7 @@ which mirrors [IRegisterRequest](base_remote_protocol.iregisterrequest.md)
 
 • **id**: *string*
 
-Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L267)
+Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L267)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **itemDefinition**: *string*
 
-Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L266)
+Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L266)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **version**: *string*
 
-Defined in: [base/remote-protocol.ts:268](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L268)
+Defined in: [base/remote-protocol.ts:268](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L268)

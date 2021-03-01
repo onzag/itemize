@@ -50,7 +50,7 @@ Name | Type | Description |
 
 **Returns:** [*ItemizeRawDB*](server_raw_db.itemizerawdb.md)
 
-Defined in: [server/raw-db.ts:42](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L42)
+Defined in: [server/raw-db.ts:42](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L42)
 
 ## Properties
 
@@ -58,7 +58,7 @@ Defined in: [server/raw-db.ts:42](https://github.com/onzag/itemize/blob/0e9b128c
 
 • **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [server/raw-db.ts:42](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L42)
+Defined in: [server/raw-db.ts:42](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L42)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • `Private` **redisPub**: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/raw-db.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L39)
+Defined in: [server/raw-db.ts:39](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L39)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • `Private` **root**: [*default*](base_root.default.md)
 
-Defined in: [server/raw-db.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L40)
+Defined in: [server/raw-db.ts:40](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L40)
 
 ## Methods
 
@@ -95,7 +95,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<{ `itemQualifiedPathName`: *any* ; `lastModified`: *any* ; `moduleQualifiedPathName`: *string* ; `row`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)  }\>
 
-Defined in: [server/raw-db.ts:92](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L92)
+Defined in: [server/raw-db.ts:92](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L92)
 
 ___
 
@@ -118,7 +118,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/raw-db.ts:176](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L176)
+Defined in: [server/raw-db.ts:176](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L176)
 
 ___
 
@@ -154,7 +154,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/raw-db.ts:401](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L401)
+Defined in: [server/raw-db.ts:401](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L401)
 
 ___
 
@@ -187,7 +187,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/raw-db.ts:372](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L372)
+Defined in: [server/raw-db.ts:372](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L372)
 
 ___
 
@@ -228,7 +228,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/raw-db.ts:348](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L348)
+Defined in: [server/raw-db.ts:348](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L348)
 
 ___
 
@@ -254,7 +254,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)[]\>
 
-Defined in: [server/raw-db.ts:447](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L447)
+Defined in: [server/raw-db.ts:447](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L447)
 
 ___
 
@@ -274,7 +274,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)[]\>
 
-Defined in: [server/raw-db.ts:412](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L412)
+Defined in: [server/raw-db.ts:412](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L412)
 
 ___
 
@@ -300,7 +300,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
 
-Defined in: [server/raw-db.ts:554](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L554)
+Defined in: [server/raw-db.ts:554](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L554)
 
 ___
 
@@ -321,4 +321,4 @@ Name | Type | Description |
 
 the transaction time
 
-Defined in: [server/raw-db.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/server/raw-db.ts#L62)
+Defined in: [server/raw-db.ts:62](https://github.com/onzag/itemize/blob/28218320/server/raw-db.ts#L62)

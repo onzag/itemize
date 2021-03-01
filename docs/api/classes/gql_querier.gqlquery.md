@@ -52,7 +52,7 @@ Name | Type | Description |
 
 **Returns:** [*GQLQuery*](gql_querier.gqlquery.md)
 
-Defined in: [gql-querier.ts:179](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L179)
+Defined in: [gql-querier.ts:179](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L179)
 
 ## Properties
 
@@ -62,7 +62,7 @@ Defined in: [gql-querier.ts:179](https://github.com/onzag/itemize/blob/0e9b128c/
 
 Files that have been found that are unprocessed
 
-Defined in: [gql-querier.ts:175](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L175)
+Defined in: [gql-querier.ts:175](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L175)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 list of listeners
 
-Defined in: [gql-querier.ts:179](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L179)
+Defined in: [gql-querier.ts:179](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L179)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 All the processed queries from the query list
 
-Defined in: [gql-querier.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L167)
+Defined in: [gql-querier.ts:167](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L167)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 The type of this query
 
-Defined in: [gql-querier.ts:171](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L171)
+Defined in: [gql-querier.ts:171](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L171)
 
 ## Methods
 
@@ -110,7 +110,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [gql-querier.ts:327](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L327)
+Defined in: [gql-querier.ts:327](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L327)
 
 ___
 
@@ -132,7 +132,7 @@ Name | Type | Description |
 
 new processed args
 
-Defined in: [gql-querier.ts:391](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L391)
+Defined in: [gql-querier.ts:391](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L391)
 
 ___
 
@@ -144,7 +144,7 @@ Provides all the attached files
 
 **Returns:** [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[]
 
-Defined in: [gql-querier.ts:357](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L357)
+Defined in: [gql-querier.ts:357](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L357)
 
 ___
 
@@ -157,7 +157,7 @@ how the main query is expected to recieve those arguments
 
 **Returns:** *object*
 
-Defined in: [gql-querier.ts:376](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L376)
+Defined in: [gql-querier.ts:376](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L376)
 
 ___
 
@@ -170,7 +170,7 @@ file form that will map the variables to the form data
 
 **Returns:** *object*
 
-Defined in: [gql-querier.ts:346](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L346)
+Defined in: [gql-querier.ts:346](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L346)
 
 ___
 
@@ -189,7 +189,7 @@ Name | Type |
 
 the formdata for the operations
 
-Defined in: [gql-querier.ts:335](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L335)
+Defined in: [gql-querier.ts:335](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L335)
 
 ___
 
@@ -202,7 +202,7 @@ spec that will map to the operations
 
 **Returns:** *object*
 
-Defined in: [gql-querier.ts:365](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L365)
+Defined in: [gql-querier.ts:365](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L365)
 
 ___
 
@@ -220,7 +220,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [gql-querier.ts:320](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L320)
+Defined in: [gql-querier.ts:320](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L320)
 
 ___
 
@@ -238,7 +238,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [gql-querier.ts:211](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L211)
+Defined in: [gql-querier.ts:211](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L211)
 
 ___
 
@@ -255,7 +255,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [gql-querier.ts:241](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L241)
+Defined in: [gql-querier.ts:241](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L241)
 
 ___
 
@@ -275,4 +275,4 @@ Name | Type | Description |
 
 a list of aliases to remap the results from to the given name
 
-Defined in: [gql-querier.ts:261](https://github.com/onzag/itemize/blob/0e9b128c/gql-querier.ts#L261)
+Defined in: [gql-querier.ts:261](https://github.com/onzag/itemize/blob/28218320/gql-querier.ts#L261)

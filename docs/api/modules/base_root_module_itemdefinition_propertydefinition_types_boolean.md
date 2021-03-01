@@ -22,7 +22,7 @@ Contains the boolean type description
 
 The representation of a boolean type is equal to a boolean
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L29)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:29](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L29)
 
 ## Variables
 
@@ -32,4 +32,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts
 
 The that specifies how a boolean behaves in the app
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:33](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L33)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts:33](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean.ts#L33)

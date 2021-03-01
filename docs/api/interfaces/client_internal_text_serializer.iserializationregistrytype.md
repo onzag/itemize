@@ -33,7 +33,7 @@ Name | Type | Description |
 `byTag` | IDeserializeRegistryType | by tag simply uses the tag name of the given component   |
 `text` | (`n`: Node) => [*IText*](client_internal_text_serializer_types_text.itext.md) | This is for the text element   |
 
-Defined in: [client/internal/text/serializer/index.ts:114](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L114)
+Defined in: [client/internal/text/serializer/index.ts:114](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L114)
 
 ___
 
@@ -46,7 +46,7 @@ into a react component
 
 #### Type declaration:
 
-Defined in: [client/internal/text/serializer/index.ts:139](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L139)
+Defined in: [client/internal/text/serializer/index.ts:139](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L139)
 
 ___
 
@@ -59,4 +59,4 @@ or text node to a HTML node
 
 #### Type declaration:
 
-Defined in: [client/internal/text/serializer/index.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L102)
+Defined in: [client/internal/text/serializer/index.ts:102](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L102)

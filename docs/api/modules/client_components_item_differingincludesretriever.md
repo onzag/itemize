@@ -28,4 +28,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/DifferingIncludesRetriever.tsx#L80)
+Defined in: [client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/28218320/client/components/item/DifferingIncludesRetriever.tsx#L80)

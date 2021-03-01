@@ -42,7 +42,7 @@ Name | Type | Description |
 
 **Returns:** *object*
 
-Defined in: [client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L110)
+Defined in: [client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L110)
 
 ___
 
@@ -61,7 +61,7 @@ Name | Type |
 
 **Returns:** [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
 
-Defined in: [client/internal/text/serializer/base.tsx:1041](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L1041)
+Defined in: [client/internal/text/serializer/base.tsx:1041](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L1041)
 
 ___
 
@@ -81,7 +81,7 @@ Name | Type | Description |
 
 **Returns:** [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
 
-Defined in: [client/internal/text/serializer/base.tsx:798](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L798)
+Defined in: [client/internal/text/serializer/base.tsx:798](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L798)
 
 ___
 
@@ -105,7 +105,7 @@ Name | Type | Description |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L420)
+Defined in: [client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L420)
 
 ___
 
@@ -126,7 +126,7 @@ Name | Type | Description |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L168)
+Defined in: [client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L168)
 
 ___
 
@@ -148,7 +148,7 @@ Name | Type | Description |
 
 **Returns:** React.ReactNode
 
-Defined in: [client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L211)
+Defined in: [client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L211)
 
 ___
 
@@ -174,4 +174,4 @@ Name | Type | Description |
 
 a html element
 
-Defined in: [client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/base.tsx#L332)
+Defined in: [client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/base.tsx#L332)

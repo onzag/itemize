@@ -22,7 +22,7 @@ of type select
 
 • **label**: ReactNode
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:193](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L193)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:193](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L193)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **options**: { `label`: ReactNode ; `value`: *string*  }[]
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:202](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L202)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:202](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L202)
 
 ___
 
@@ -43,7 +43,7 @@ if a react node is provided this node will be modified
 and added a children as (i18nValue: string) => React.Node
 eg. the i18nRead element
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:201](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L201)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:201](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L201)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 • **type**: *select*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:192](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L192)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:192](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L192)

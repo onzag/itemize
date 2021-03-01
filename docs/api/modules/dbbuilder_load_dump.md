@@ -30,7 +30,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/load-dump.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/load-dump.ts#L40)
+Defined in: [dbbuilder/load-dump.ts:40](https://github.com/onzag/itemize/blob/28218320/dbbuilder/load-dump.ts#L40)
 
 ___
 
@@ -50,4 +50,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/load-dump.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/load-dump.ts#L97)
+Defined in: [dbbuilder/load-dump.ts:97](https://github.com/onzag/itemize/blob/28218320/dbbuilder/load-dump.ts#L97)

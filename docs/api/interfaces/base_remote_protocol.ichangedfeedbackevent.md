@@ -30,7 +30,7 @@ The changed feedback event contains very specific fields
 
 The slot id of that item definition
 
-Defined in: [base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L79)
+Defined in: [base/remote-protocol.ts:79](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L79)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 The item definition as a qualified name
 
-Defined in: [base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L75)
+Defined in: [base/remote-protocol.ts:75](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L75)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 A timestamp that comes when type=last_modified
 
-Defined in: [base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L97)
+Defined in: [base/remote-protocol.ts:97](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L97)
 
 ___
 
@@ -66,7 +66,7 @@ last_modified: comes as an answer to a feedback request, check for the last_modi
 in your client cache to see if the server version is more recent and re-request it if that is
 the case, check the lastModified property
 
-Defined in: [base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L93)
+Defined in: [base/remote-protocol.ts:93](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L93)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 
 The version of that item definition
 
-Defined in: [base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L83)
+Defined in: [base/remote-protocol.ts:83](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L83)

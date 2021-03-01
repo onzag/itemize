@@ -55,7 +55,7 @@ Name | Type | Description |
 
 **Returns:** [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [database/index.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L54)
+Defined in: [database/index.ts:54](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L54)
 
 ## Properties
 
@@ -67,7 +67,7 @@ A client that is taken from the pool, normally
 this will be undefined unless specified in the constructor
 for child connections used for transactions
 
-Defined in: [database/index.ts:44](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L44)
+Defined in: [database/index.ts:44](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L44)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 Forces the logging even if env is not development
 
-Defined in: [database/index.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L54)
+Defined in: [database/index.ts:54](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L54)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 This is the pg pool
 
-Defined in: [database/index.ts:38](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L38)
+Defined in: [database/index.ts:38](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L38)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 Suppresses console logging
 
-Defined in: [database/index.ts:49](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L49)
+Defined in: [database/index.ts:49](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L49)
 
 ## Methods
 
@@ -110,7 +110,7 @@ development
 
 **Returns:** *void*
 
-Defined in: [database/index.ts:84](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L84)
+Defined in: [database/index.ts:84](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L84)
 
 ___
 
@@ -124,7 +124,7 @@ Provides a single alter table builder
 
 a new alter table builder
 
-Defined in: [database/index.ts:207](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L207)
+Defined in: [database/index.ts:207](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L207)
 
 ___
 
@@ -138,7 +138,7 @@ Provides the current active pg client, only really existant on transactions
 
 the client
 
-Defined in: [database/index.ts:223](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L223)
+Defined in: [database/index.ts:223](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L223)
 
 ___
 
@@ -152,7 +152,7 @@ Provides a single create table builder
 
 a new create table builder
 
-Defined in: [database/index.ts:199](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L199)
+Defined in: [database/index.ts:199](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L199)
 
 ___
 
@@ -166,7 +166,7 @@ Provides a single insert builder
 
 a new insert builder
 
-Defined in: [database/index.ts:191](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L191)
+Defined in: [database/index.ts:191](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L191)
 
 ___
 
@@ -180,7 +180,7 @@ Provides the current active pg pool
 
 the pool
 
-Defined in: [database/index.ts:215](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L215)
+Defined in: [database/index.ts:215](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L215)
 
 ___
 
@@ -194,7 +194,7 @@ Provides a single select builder
 
 a new select builder
 
-Defined in: [database/index.ts:183](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L183)
+Defined in: [database/index.ts:183](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L183)
 
 ___
 
@@ -208,7 +208,7 @@ Provides a single update builder
 
 a new update builder
 
-Defined in: [database/index.ts:175](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L175)
+Defined in: [database/index.ts:175](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L175)
 
 ___
 
@@ -229,7 +229,7 @@ Name | Type | Description |
 
 a promise of a query result
 
-Defined in: [database/index.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L95)
+Defined in: [database/index.ts:95](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L95)
 
 ___
 
@@ -250,7 +250,7 @@ Name | Type | Description |
 
 a promise of a single row
 
-Defined in: [database/index.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L167)
+Defined in: [database/index.ts:167](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L167)
 
 ___
 
@@ -271,7 +271,7 @@ Name | Type | Description |
 
 a promise of a list of rows
 
-Defined in: [database/index.ts:156](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L156)
+Defined in: [database/index.ts:156](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L156)
 
 ___
 
@@ -291,7 +291,7 @@ Name | Type | Description |
 
 whatever you returned in your arg function
 
-Defined in: [database/index.ts:232](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L232)
+Defined in: [database/index.ts:232](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L232)
 
 ___
 
@@ -303,4 +303,4 @@ Suppresses console logging
 
 **Returns:** *void*
 
-Defined in: [database/index.ts:76](https://github.com/onzag/itemize/blob/0e9b128c/database/index.ts#L76)
+Defined in: [database/index.ts:76](https://github.com/onzag/itemize/blob/28218320/database/index.ts#L76)

@@ -62,7 +62,7 @@ Name | Type |
 
 **Returns:** [*ActualTitleSetter*](client_components_util_titlesetter.actualtitlesetter.md)
 
-Defined in: [client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L35)
+Defined in: [client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L35)
 
 ## Properties
 
@@ -123,7 +123,7 @@ ___
 
 Stores title readers to inform them of changes
 
-Defined in: [client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L35)
+Defined in: [client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L35)
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/TitleSetter.tsx:40](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L40)
+Defined in: [client/components/util/TitleSetter.tsx:40](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L40)
 
 ___
 
@@ -287,7 +287,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/util/TitleSetter.tsx:54](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L54)
+Defined in: [client/components/util/TitleSetter.tsx:54](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L54)
 
 ___
 
@@ -351,7 +351,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/TitleSetter.tsx:61](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L61)
+Defined in: [client/components/util/TitleSetter.tsx:61](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L61)
 
 ___
 
@@ -432,7 +432,7 @@ ___
 
 **Returns:** ReactNode
 
-Defined in: [client/components/util/TitleSetter.tsx:65](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/TitleSetter.tsx#L65)
+Defined in: [client/components/util/TitleSetter.tsx:65](https://github.com/onzag/itemize/blob/28218320/client/components/util/TitleSetter.tsx#L65)
 
 ___
 

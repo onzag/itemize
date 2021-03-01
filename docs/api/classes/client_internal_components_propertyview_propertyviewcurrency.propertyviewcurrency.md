@@ -56,7 +56,7 @@ Name | Type |
 
 **Returns:** [*PropertyViewCurrency*](client_internal_components_propertyview_propertyviewcurrency.propertyviewcurrency.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:58](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L58)
+Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:58](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L58)
 
 ## Properties
 
@@ -427,7 +427,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:76](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L76)
+Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:76](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L76)
 
 ___
 
@@ -466,4 +466,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:62](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L62)
+Defined in: [client/internal/components/PropertyView/PropertyViewCurrency.tsx:62](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/PropertyViewCurrency.tsx#L62)

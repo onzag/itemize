@@ -76,7 +76,7 @@ Name | Type | Description |
 
 **Returns:** [*Cache*](server_cache.cache.md)
 
-Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L66)
+Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L66)
 
 ## Properties
 
@@ -84,7 +84,7 @@ Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/0e9b128c/
 
 • `Private` **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [server/cache.ts:55](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L55)
+Defined in: [server/cache.ts:55](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L55)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • `Private` **domain**: *string*
 
-Defined in: [server/cache.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L56)
+Defined in: [server/cache.ts:56](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L56)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • `Private` **listener**: [*Listener*](server_listener.listener.md)
 
-Defined in: [server/cache.ts:60](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L60)
+Defined in: [server/cache.ts:60](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L60)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/cache.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L62)
+Defined in: [server/cache.ts:62](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L62)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 • `Private` **redisClient**: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/cache.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L54)
+Defined in: [server/cache.ts:54](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L54)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 • `Private` **root**: [*default*](base_root.default.md)
 
-Defined in: [server/cache.ts:58](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L58)
+Defined in: [server/cache.ts:58](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L58)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 • `Private` **sensitiveConfig**: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [server/cache.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L61)
+Defined in: [server/cache.ts:61](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L61)
 
 ___
 
@@ -142,7 +142,7 @@ ___
 
 • `Private` **serverData**: [*IServerDataType*](../interfaces/server.iserverdatatype.md)
 
-Defined in: [server/cache.ts:59](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L59)
+Defined in: [server/cache.ts:59](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L59)
 
 ___
 
@@ -150,7 +150,7 @@ ___
 
 • `Private` **storageClients**: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md)
 
-Defined in: [server/cache.ts:57](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L57)
+Defined in: [server/cache.ts:57](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L57)
 
 ## Methods
 
@@ -173,7 +173,7 @@ Name | Type | Description |
 
 a simple boolean
 
-Defined in: [server/cache.ts:899](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L899)
+Defined in: [server/cache.ts:899](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L899)
 
 ___
 
@@ -195,7 +195,7 @@ Name | Type | Description |
 
 a list of modules
 
-Defined in: [server/cache.ts:915](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L915)
+Defined in: [server/cache.ts:915](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L915)
 
 ___
 
@@ -216,7 +216,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:945](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L945)
+Defined in: [server/cache.ts:945](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L945)
 
 ___
 
@@ -237,7 +237,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:190](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L190)
+Defined in: [server/cache.ts:190](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L190)
 
 ___
 
@@ -263,7 +263,7 @@ Name | Type | Description |
 
 a promise with the value
 
-Defined in: [server/cache.ts:110](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L110)
+Defined in: [server/cache.ts:110](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L110)
 
 ___
 
@@ -275,7 +275,7 @@ Provides the current server data
 
 **Returns:** [*IServerDataType*](../interfaces/server.iserverdatatype.md)
 
-Defined in: [server/cache.ts:1486](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1486)
+Defined in: [server/cache.ts:1486](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1486)
 
 ___
 
@@ -299,7 +299,7 @@ Name | Type | Description |
 
 a void promise when done
 
-Defined in: [server/cache.ts:1510](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1510)
+Defined in: [server/cache.ts:1510](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1510)
 
 ___
 
@@ -317,7 +317,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1570](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1570)
+Defined in: [server/cache.ts:1570](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1570)
 
 ___
 
@@ -335,7 +335,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:1494](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1494)
+Defined in: [server/cache.ts:1494](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1494)
 
 ___
 
@@ -353,7 +353,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:169](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L169)
+Defined in: [server/cache.ts:169](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L169)
 
 ___
 
@@ -384,7 +384,7 @@ Name | Type | Description |
 
 a total sql combined row value that can be converted into grapqhl
 
-Defined in: [server/cache.ts:306](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L306)
+Defined in: [server/cache.ts:306](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L306)
 
 ___
 
@@ -407,7 +407,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1037](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1037)
+Defined in: [server/cache.ts:1037](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1037)
 
 ___
 
@@ -428,7 +428,7 @@ Name | Type | Description |
 
 a list of whole sql combined table row values
 
-Defined in: [server/cache.ts:1475](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1475)
+Defined in: [server/cache.ts:1475](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1475)
 
 ___
 
@@ -450,7 +450,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [server/cache.ts:1345](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1345)
+Defined in: [server/cache.ts:1345](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1345)
 
 ___
 
@@ -479,7 +479,7 @@ Name | Type | Description |
 
 a total combined table row value that can be converted into graphql
 
-Defined in: [server/cache.ts:628](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L628)
+Defined in: [server/cache.ts:628](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L628)
 
 ___
 
@@ -503,7 +503,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:570](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L570)
+Defined in: [server/cache.ts:570](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L570)
 
 ___
 
@@ -528,7 +528,7 @@ Name | Type | Description |
 
 a whole sql value that can be converted into graphql if necessary
 
-Defined in: [server/cache.ts:1379](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1379)
+Defined in: [server/cache.ts:1379](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1379)
 
 ___
 
@@ -549,7 +549,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:101](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L101)
+Defined in: [server/cache.ts:101](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L101)
 
 ___
 
@@ -566,7 +566,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:147](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L147)
+Defined in: [server/cache.ts:147](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L147)
 
 ___
 
@@ -589,7 +589,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:207](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L207)
+Defined in: [server/cache.ts:207](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L207)
 
 ___
 
@@ -603,4 +603,4 @@ the cache is wiped by the cluster manager which handles the cache
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1558](https://github.com/onzag/itemize/blob/0e9b128c/server/cache.ts#L1558)
+Defined in: [server/cache.ts:1558](https://github.com/onzag/itemize/blob/28218320/server/cache.ts#L1558)

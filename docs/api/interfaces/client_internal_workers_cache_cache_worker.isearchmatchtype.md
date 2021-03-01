@@ -27,7 +27,7 @@ themselves, this is possibly a limited list, and it's always 0 offset
 Whether all the records in that list have been preloaded
 as matched on the cache itself
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L84)
+Defined in: [client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.ts#L84)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 The fields that were requested and should be contained
 in each one of these search matches
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:75](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L75)
+Defined in: [client/internal/workers/cache/cache.worker.ts:75](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.ts#L75)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 The last record date of that records list
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:88](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L88)
+Defined in: [client/internal/workers/cache/cache.worker.ts:88](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.ts#L88)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 The limit we limited ourselves to, the list can however
 be larger than the limit as it might grow by events
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:93](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L93)
+Defined in: [client/internal/workers/cache/cache.worker.ts:93](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.ts#L93)
 
 ___
 
@@ -69,4 +69,4 @@ ___
 
 The value as a list of search records
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.ts#L79)
+Defined in: [client/internal/workers/cache/cache.worker.ts:79](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.ts#L79)

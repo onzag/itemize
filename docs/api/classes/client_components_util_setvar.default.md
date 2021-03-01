@@ -139,7 +139,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [client/components/util/SetVar.tsx:11](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L11)
+Defined in: [client/components/util/SetVar.tsx:11](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L11)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [client/components/util/SetVar.tsx:10](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L10)
+Defined in: [client/components/util/SetVar.tsx:10](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L10)
 
 ___
 
@@ -297,7 +297,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/SetVar.tsx:35](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L35)
+Defined in: [client/components/util/SetVar.tsx:35](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L35)
 
 ___
 
@@ -383,7 +383,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/SetVar.tsx:51](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L51)
+Defined in: [client/components/util/SetVar.tsx:51](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L51)
 
 ___
 
@@ -464,7 +464,7 @@ ___
 
 **Returns:** *any*
 
-Defined in: [client/components/util/SetVar.tsx:55](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L55)
+Defined in: [client/components/util/SetVar.tsx:55](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L55)
 
 ___
 
@@ -503,7 +503,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/components/util/SetVar.tsx:39](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L39)
+Defined in: [client/components/util/SetVar.tsx:39](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L39)
 
 ___
 
@@ -519,7 +519,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/util/SetVar.tsx:29](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L29)
+Defined in: [client/components/util/SetVar.tsx:29](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L29)
 
 ___
 
@@ -536,7 +536,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/util/SetVar.tsx:12](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L12)
+Defined in: [client/components/util/SetVar.tsx:12](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L12)
 
 ___
 
@@ -553,4 +553,4 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/util/SetVar.tsx:20](https://github.com/onzag/itemize/blob/0e9b128c/client/components/util/SetVar.tsx#L20)
+Defined in: [client/components/util/SetVar.tsx:20](https://github.com/onzag/itemize/blob/28218320/client/components/util/SetVar.tsx#L20)

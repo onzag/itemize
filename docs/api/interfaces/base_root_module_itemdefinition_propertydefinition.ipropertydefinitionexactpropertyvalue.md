@@ -20,4 +20,4 @@ a value to a property
 
 • **exactValue**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:362](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L362)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:362](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L362)

@@ -28,4 +28,4 @@ return a token for a given user id, other endpoints can return something else
 these custom endpoints are meant for usage for non-clients, eg. sensors and they
 are not meant to interact with the page but rather with the grapqhl API
 
-Defined in: [server/custom-graphql/graphql-token-object.ts:21](https://github.com/onzag/itemize/blob/0e9b128c/server/custom-graphql/graphql-token-object.ts#L21)
+Defined in: [server/custom-graphql/graphql-token-object.ts:21](https://github.com/onzag/itemize/blob/28218320/server/custom-graphql/graphql-token-object.ts#L21)

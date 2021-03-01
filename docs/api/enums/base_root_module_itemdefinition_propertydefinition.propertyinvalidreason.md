@@ -28,7 +28,7 @@ These are the main errors a property is able to give
 
 • **FROM\_LARGER\_THAN\_TO**: = "FROM\_LARGER\_THAN\_TO"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:45](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L45)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:45](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L45)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **INVALID\_SUBTYPE\_VALUE**: = "INVALID\_SUBTYPE\_VALUE"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L43)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:43](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L43)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **INVALID\_VALUE**: = "INVALID\_VALUE"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:36](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L36)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:36](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L36)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **MUST\_BE\_SPECIFIED**: = "MUST\_BE\_SPECIFIED"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:51](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L51)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:51](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L51)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • **NOT\_NULLABLE**: = "NOT\_NULLABLE"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:41](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L41)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:41](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L41)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 • **NOT\_UNIQUE**: = "NOT\_UNIQUE"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L48)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:48](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L48)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • **TOO\_FEW\_DECIMALS**: = "TOO\_FEW\_DECIMALS"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L40)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:40](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L40)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • **TOO\_LARGE**: = "TOO\_LARGE"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:37](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L37)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:37](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L37)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • **TOO\_MANY\_DECIMALS**: = "TOO\_MANY\_DECIMALS"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L39)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:39](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L39)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • **TOO\_SMALL**: = "TOO\_SMALL"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:38](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L38)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:38](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L38)
 
 ___
 
@@ -108,4 +108,4 @@ ___
 
 • **TO\_SMALLER\_THAN\_FROM**: = "TO\_SMALLER\_THAN\_FROM"
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:46](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L46)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:46](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L46)

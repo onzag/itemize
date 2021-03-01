@@ -22,4 +22,4 @@ Name | Type |
 
 **Returns:** [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)
 
-Defined in: [server/resolvers/index.ts:11](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/index.ts#L11)
+Defined in: [server/resolvers/index.ts:11](https://github.com/onzag/itemize/blob/28218320/server/resolvers/index.ts#L11)

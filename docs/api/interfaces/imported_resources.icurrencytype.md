@@ -20,7 +20,7 @@
 
 • **code**: *string*
 
-Defined in: [imported-resources/index.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L39)
+Defined in: [imported-resources/index.ts:39](https://github.com/onzag/itemize/blob/28218320/imported-resources/index.ts#L39)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **decimals**: *number*
 
-Defined in: [imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L43)
+Defined in: [imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/28218320/imported-resources/index.ts#L43)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [imported-resources/index.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L40)
+Defined in: [imported-resources/index.ts:40](https://github.com/onzag/itemize/blob/28218320/imported-resources/index.ts#L40)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **rounding**: *number*
 
-Defined in: [imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L42)
+Defined in: [imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/28218320/imported-resources/index.ts#L42)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **symbol**: *string*
 
-Defined in: [imported-resources/index.ts:41](https://github.com/onzag/itemize/blob/0e9b128c/imported-resources/index.ts#L41)
+Defined in: [imported-resources/index.ts:41](https://github.com/onzag/itemize/blob/28218320/imported-resources/index.ts#L41)

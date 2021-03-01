@@ -269,7 +269,7 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/28218320/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
 
 ___
 
@@ -441,7 +441,7 @@ Name | Type | Description |
 
 a promise for an error (or null)
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/28218320/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
 
 ___
 
@@ -493,7 +493,7 @@ The render function
 
 **Returns:** *Element*
 
-Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/0e9b128c/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
+Defined in: [client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/28218320/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
 
 ___
 

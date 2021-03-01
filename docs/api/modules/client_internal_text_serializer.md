@@ -37,7 +37,7 @@ to handle the standard itemize text specification
 This is what a rich element can be, it can be all these
 but it's not a text
 
-Defined in: [client/internal/text/serializer/index.ts:179](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L179)
+Defined in: [client/internal/text/serializer/index.ts:179](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L179)
 
 ## Variables
 
@@ -48,7 +48,7 @@ Defined in: [client/internal/text/serializer/index.ts:179](https://github.com/on
 This is the actual serialization registry that the serializer is used
 by default is started up empty
 
-Defined in: [client/internal/text/serializer/index.ts:148](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L148)
+Defined in: [client/internal/text/serializer/index.ts:148](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L148)
 
 ## Functions
 
@@ -69,7 +69,7 @@ Name | Type | Description |
 
 a root level document
 
-Defined in: [client/internal/text/serializer/index.ts:301](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L301)
+Defined in: [client/internal/text/serializer/index.ts:301](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L301)
 
 ___
 
@@ -90,7 +90,7 @@ Name | Type | Description |
 
 a RichElement or a text node
 
-Defined in: [client/internal/text/serializer/index.ts:378](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L378)
+Defined in: [client/internal/text/serializer/index.ts:378](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L378)
 
 ___
 
@@ -110,7 +110,7 @@ Name | Type | Description |
 
 **Returns:** [*IRootLevelDocument*](../interfaces/client_internal_text_serializer.irootleveldocument.md)
 
-Defined in: [client/internal/text/serializer/index.ts:508](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L508)
+Defined in: [client/internal/text/serializer/index.ts:508](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L508)
 
 ___
 
@@ -130,4 +130,4 @@ Name | Type |
 
 **Returns:** HTMLElement[] \| *string*
 
-Defined in: [client/internal/text/serializer/index.ts:210](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/text/serializer/index.ts#L210)
+Defined in: [client/internal/text/serializer/index.ts:210](https://github.com/onzag/itemize/blob/28218320/client/internal/text/serializer/index.ts#L210)

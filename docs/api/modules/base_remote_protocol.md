@@ -69,7 +69,7 @@ that is implemented by the remote listener
 The build number event is an event streamed from the
 server to the client once this client has connected
 
-Defined in: [base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L19)
+Defined in: [base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L19)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 Event that comes from the server when something has
 changed or as an answer from a feedback request
 
-Defined in: [base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L67)
+Defined in: [base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L67)
 
 ___
 
@@ -93,7 +93,7 @@ every socket that just happens to be connected, not just identified but just
 connected into it, while the data could be attached, we really want to perform
 the request to the server in order to ensure that it is cached
 
-Defined in: [base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L34)
+Defined in: [base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L34)
 
 ___
 
@@ -105,7 +105,7 @@ This is streamed to the client once the server hits an error
 that was somehow caused by the client, there's no much use
 for an error event other than notice invalid requests
 
-Defined in: [base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L41)
+Defined in: [base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L41)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 a request that is sent to the server in order to
 request feedback for a single item definition
 
-Defined in: [base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L260)
+Defined in: [base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L260)
 
 ___
 
@@ -138,7 +138,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:271](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L271)
+Defined in: [base/remote-protocol.ts:271](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L271)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 Identified event comes once the user has been identified properly
 
-Defined in: [base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L54)
+Defined in: [base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L54)
 
 ___
 
@@ -160,7 +160,7 @@ The identify request comes when a socket first connects and identifies
 itself (this must be the first request, or otherwise other requests will
 be ignored)
 
-Defined in: [base/remote-protocol.ts:161](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L161)
+Defined in: [base/remote-protocol.ts:161](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L161)
 
 ___
 
@@ -180,7 +180,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:170](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L170)
+Defined in: [base/remote-protocol.ts:170](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L170)
 
 ___
 
@@ -192,7 +192,7 @@ Event that occurs when the user has been kicked, when log out
 from all devices has been triggered, users are kicked out and forcefully
 logged out, this even also occurs on an invalid identified event
 
-Defined in: [base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L61)
+Defined in: [base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L61)
 
 ___
 
@@ -202,7 +202,7 @@ ___
 
 The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:462](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L462)
+Defined in: [base/remote-protocol.ts:462](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L462)
 
 ___
 
@@ -213,7 +213,7 @@ ___
 When they are owned items, as a search has been cached using a creator
 as a base
 
-Defined in: [base/remote-protocol.ts:130](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L130)
+Defined in: [base/remote-protocol.ts:130](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L130)
 
 ___
 
@@ -224,7 +224,7 @@ ___
 this is necessary for owned searches in order to run created by
 cached searches and then request for updates
 
-Defined in: [base/remote-protocol.ts:306](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L306)
+Defined in: [base/remote-protocol.ts:306](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L306)
 
 ___
 
@@ -234,7 +234,7 @@ ___
 
 The unregister version of [OWNED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#owned_search_register_request)
 
-Defined in: [base/remote-protocol.ts:381](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L381)
+Defined in: [base/remote-protocol.ts:381](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L381)
 
 ___
 
@@ -256,7 +256,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:470](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L470)
+Defined in: [base/remote-protocol.ts:470](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L470)
 
 ___
 
@@ -276,7 +276,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:315](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L315)
+Defined in: [base/remote-protocol.ts:315](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L315)
 
 ___
 
@@ -296,7 +296,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:388](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L388)
+Defined in: [base/remote-protocol.ts:388](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L388)
 
 ___
 
@@ -306,7 +306,7 @@ ___
 
 The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:493](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L493)
+Defined in: [base/remote-protocol.ts:493](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L493)
 
 ___
 
@@ -317,7 +317,7 @@ ___
 When they are parented items the parent type and id, that has been cached
 using those
 
-Defined in: [base/remote-protocol.ts:143](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L143)
+Defined in: [base/remote-protocol.ts:143](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L143)
 
 ___
 
@@ -328,7 +328,7 @@ ___
 this is necessary for parented searches in order to run parented by
 cached searches and then request for updates
 
-Defined in: [base/remote-protocol.ts:335](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L335)
+Defined in: [base/remote-protocol.ts:335](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L335)
 
 ___
 
@@ -338,7 +338,7 @@ ___
 
 The unregister version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:407](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L407)
+Defined in: [base/remote-protocol.ts:407](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L407)
 
 ___
 
@@ -364,7 +364,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:502](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L502)
+Defined in: [base/remote-protocol.ts:502](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L502)
 
 ___
 
@@ -388,7 +388,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:345](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L345)
+Defined in: [base/remote-protocol.ts:345](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L345)
 
 ___
 
@@ -412,7 +412,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:416](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L416)
+Defined in: [base/remote-protocol.ts:416](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L416)
 
 ___
 
@@ -423,7 +423,7 @@ ___
 The request that is sent to the server in order to register
 a single item definition for updates and changes
 
-Defined in: [base/remote-protocol.ts:190](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L190)
+Defined in: [base/remote-protocol.ts:190](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L190)
 
 ___
 
@@ -445,7 +445,7 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:202](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L202)
+Defined in: [base/remote-protocol.ts:202](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L202)
 
 ___
 
@@ -456,7 +456,7 @@ ___
 Request to unregister and stop getting notifications from
 a single item definition
 
-Defined in: [base/remote-protocol.ts:226](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L226)
+Defined in: [base/remote-protocol.ts:226](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L226)
 
 ___
 
@@ -478,4 +478,4 @@ Name | Type |
 `required` | *string*[] |
 `type` | *string* |
 
-Defined in: [base/remote-protocol.ts:236](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L236)
+Defined in: [base/remote-protocol.ts:236](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L236)

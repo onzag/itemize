@@ -9,7 +9,7 @@
   "types": "nodejs/index",
   "scripts": {
     "install": "tsc && node ./sass-json-handler.js",
-    "docs": "typedoc --plugin typedoc-plugin-markdown && cp ./docs/_src/api-readme.md ./docs/api/README.md"
+    "docs": "typedoc --plugin typedoc-plugin-markdown && node ./docs/_src/process-src.js"
   },
   "author": "Onza Systems - Edward Gonzalez",
   "license": "AGPL3",

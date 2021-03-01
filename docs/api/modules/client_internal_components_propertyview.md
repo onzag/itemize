@@ -42,7 +42,7 @@ Name | Type | Description |
 
 areact element
 
-Defined in: [client/internal/components/PropertyView/index.tsx:353](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/index.tsx#L353)
+Defined in: [client/internal/components/PropertyView/index.tsx:353](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/index.tsx#L353)
 
 ___
 
@@ -58,4 +58,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/index.tsx:411](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/components/PropertyView/index.tsx#L411)
+Defined in: [client/internal/components/PropertyView/index.tsx:411](https://github.com/onzag/itemize/blob/28218320/client/internal/components/PropertyView/index.tsx#L411)

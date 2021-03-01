@@ -79,7 +79,7 @@ for all subtests
 
 • `Private` **currentStep**: *after* \| *it* \| *describe* \| *before*= null
 
-Defined in: [testing/index.ts:66](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L66)
+Defined in: [testing/index.ts:66](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L66)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • `Private` **describeQueue**: { `label`: *string* ; `test`: [*Test*](testing.test.md)  }[]
 
-Defined in: [testing/index.ts:57](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L57)
+Defined in: [testing/index.ts:57](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L57)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 • `Private` **doSkipAll**: *boolean*= false
 
-Defined in: [testing/index.ts:63](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L63)
+Defined in: [testing/index.ts:63](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L63)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 • `Private` **doSkipLayer**: *boolean*= false
 
-Defined in: [testing/index.ts:64](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L64)
+Defined in: [testing/index.ts:64](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L64)
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 • `Private` **doSkipNext**: *boolean*= false
 
-Defined in: [testing/index.ts:62](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L62)
+Defined in: [testing/index.ts:62](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L62)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 • `Private` **doStop**: *boolean*= false
 
-Defined in: [testing/index.ts:65](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L65)
+Defined in: [testing/index.ts:65](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L65)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 • `Private` **itQueue**: *ItHandle*[]
 
-Defined in: [testing/index.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L56)
+Defined in: [testing/index.ts:56](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L56)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 • `Private` **warningQueue**: *WarnHandle*[]
 
-Defined in: [testing/index.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L61)
+Defined in: [testing/index.ts:61](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L61)
 
 ## Methods
 
@@ -150,7 +150,7 @@ use for cleanup
 
 **Returns:** *any*
 
-Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L105)
+Defined in: [testing/index.ts:105](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L105)
 
 ___
 
@@ -166,7 +166,7 @@ well
 
 **Returns:** *any*
 
-Defined in: [testing/index.ts:88](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L88)
+Defined in: [testing/index.ts:88](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L88)
 
 ___
 
@@ -178,7 +178,7 @@ Build a brand new instance
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L71)
+Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L71)
 
 ___
 
@@ -197,7 +197,7 @@ Name | Type | Default value | Description |
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L114)
+Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L114)
 
 ___
 
@@ -211,7 +211,7 @@ Executes during just after before has been executed
 
 **Returns:** *any*
 
-Defined in: [testing/index.ts:96](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L96)
+Defined in: [testing/index.ts:96](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L96)
 
 ___
 
@@ -229,7 +229,7 @@ Name | Type | Default value |
 
 **Returns:** *Promise*<{ `passed`: *number* ; `total`: *number* ; `warnings`: *number*  }\>
 
-Defined in: [testing/index.ts:340](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L340)
+Defined in: [testing/index.ts:340](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L340)
 
 ___
 
@@ -245,7 +245,7 @@ Name | Type |
 
 **Returns:** *Promise*<{ `passed`: *number* ; `total`: *number* ; `warnings`: *number*  }\>
 
-Defined in: [testing/index.ts:224](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L224)
+Defined in: [testing/index.ts:224](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L224)
 
 ___
 
@@ -261,7 +261,7 @@ Name | Type |
 
 **Returns:** *WarnHandle*
 
-Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L162)
+Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L162)
 
 ___
 
@@ -280,7 +280,7 @@ Name | Type | Default value | Description |
 
 **Returns:** *ItHandle*
 
-Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L129)
+Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L129)
 
 ___
 
@@ -292,7 +292,7 @@ Quits this test
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L220)
+Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L220)
 
 ___
 
@@ -305,7 +305,7 @@ and by all it means all of them
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L186)
+Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L186)
 
 ___
 
@@ -319,7 +319,7 @@ this
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L201)
+Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L201)
 
 ___
 
@@ -332,7 +332,7 @@ they should be on the same layer
 
 **Returns:** *void*
 
-Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L172)
+Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L172)
 
 ___
 
@@ -348,7 +348,7 @@ Name | Type | Default value |
 
 **Returns:** *ItHandle*
 
-Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L141)
+Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L141)
 
 ___
 
@@ -364,7 +364,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L211)
+Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L211)
 
 ___
 
@@ -380,4 +380,4 @@ Name | Type |
 
 **Returns:** *WarnHandle*
 
-Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/0e9b128c/testing/index.ts#L152)
+Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/28218320/testing/index.ts#L152)

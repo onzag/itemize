@@ -33,7 +33,7 @@ something has been added
 
 Inherited from: [IParentedSearchFeedbackRequest](base_remote_protocol.iparentedsearchfeedbackrequest.md).[lastModified](base_remote_protocol.iparentedsearchfeedbackrequest.md#lastmodified)
 
-Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L456)
+Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L456)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 Inherited from: [IParentedSearchFeedbackRequest](base_remote_protocol.iparentedsearchfeedbackrequest.md).[parentId](base_remote_protocol.iparentedsearchfeedbackrequest.md#parentid)
 
-Defined in: [base/remote-protocol.ts:499](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L499)
+Defined in: [base/remote-protocol.ts:499](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L499)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 Inherited from: [IParentedSearchFeedbackRequest](base_remote_protocol.iparentedsearchfeedbackrequest.md).[parentType](base_remote_protocol.iparentedsearchfeedbackrequest.md#parenttype)
 
-Defined in: [base/remote-protocol.ts:498](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L498)
+Defined in: [base/remote-protocol.ts:498](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L498)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 Inherited from: [IParentedSearchFeedbackRequest](base_remote_protocol.iparentedsearchfeedbackrequest.md).[parentVersion](base_remote_protocol.iparentedsearchfeedbackrequest.md#parentversion)
 
-Defined in: [base/remote-protocol.ts:500](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L500)
+Defined in: [base/remote-protocol.ts:500](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L500)
 
 ___
 
@@ -76,7 +76,7 @@ or item definition
 
 Inherited from: [IParentedSearchFeedbackRequest](base_remote_protocol.iparentedsearchfeedbackrequest.md).[qualifiedPathName](base_remote_protocol.iparentedsearchfeedbackrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L450)
+Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L450)
 
 ___
 
@@ -84,4 +84,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:71](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L71)
+Defined in: [client/internal/testing.ts:71](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L71)

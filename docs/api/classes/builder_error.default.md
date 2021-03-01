@@ -51,7 +51,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](builder_error.default.md)
 
-Defined in: [builder/Error.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/builder/Error.ts#L18)
+Defined in: [builder/Error.ts:18](https://github.com/onzag/itemize/blob/28218320/builder/Error.ts#L18)
 
 ## Properties
 
@@ -118,7 +118,7 @@ ___
 
 • `Private` **traceback**: [*default*](builder_traceback.default.md)
 
-Defined in: [builder/Error.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/builder/Error.ts#L18)
+Defined in: [builder/Error.ts:18](https://github.com/onzag/itemize/blob/28218320/builder/Error.ts#L18)
 
 ## Methods
 
@@ -149,4 +149,4 @@ displays the error message to stdout
 
 **Returns:** *void*
 
-Defined in: [builder/Error.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/builder/Error.ts#L39)
+Defined in: [builder/Error.ts:39](https://github.com/onzag/itemize/blob/28218320/builder/Error.ts#L39)

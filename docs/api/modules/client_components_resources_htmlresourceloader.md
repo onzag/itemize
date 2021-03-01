@@ -31,4 +31,4 @@ Name | Type | Description |
 
 an react component that wraps this html content
 
-Defined in: [client/components/resources/HTMLResourceLoader.tsx:236](https://github.com/onzag/itemize/blob/0e9b128c/client/components/resources/HTMLResourceLoader.tsx#L236)
+Defined in: [client/components/resources/HTMLResourceLoader.tsx:236](https://github.com/onzag/itemize/blob/28218320/client/components/resources/HTMLResourceLoader.tsx#L236)

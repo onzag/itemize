@@ -148,7 +148,7 @@ Name | Type | Description |
 
 **Returns:** [*SlateEditor*](client_fast_prototyping_components_slate.slateeditor.md)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1503](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1503)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1503](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1503)
 
 ## Properties
 
@@ -162,7 +162,7 @@ affect the actual focus, as the caret is anyway lost when you click on something
 but most of these buttons once done cause a regain on focus, however, an animation might play
 that can be distracting and rather annoying otherwise
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1401](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1401)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1401](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1401)
 
 ___
 
@@ -174,7 +174,7 @@ Blurring is rather complex on this, and pressing the toolbar buttons and all aro
 causes flickering on the blur animations, so this blur timeout will ensure to call onblur
 only if it's not just to call onfocus later
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1393](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1393)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1393](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1393)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 Represents the react editor element that is created
 using slate
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1382](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1382)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1382](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1382)
 
 ___
 
@@ -219,7 +219,7 @@ This flag allows to disable removing empty text nodes that exist in the current 
 when set to true, eg. if we set a bold text node, while in most case we want these empty text nodes
 gone, not all the time
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1407](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1407)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1407](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1407)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 
 • `Private` **isUnmounted**: *boolean*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1423](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1423)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1423](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1423)
 
 ___
 
@@ -245,7 +245,7 @@ flag allows to keep track of that so.
 4. because of the flag the change function knows the löast change was a selected delete and tells the anchor
 recalculation not to reuse old anchors
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1419](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1419)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1419](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1419)
 
 ___
 
@@ -253,7 +253,7 @@ ___
 
 • `Private` **originalInsertData**: *any*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1422](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1422)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1422](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1422)
 
 ___
 
@@ -261,7 +261,7 @@ ___
 
 • `Private` **originalSetFragmentData**: *any*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1421](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1421)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1421](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1421)
 
 ___
 
@@ -301,7 +301,7 @@ ___
 This is the update timeout that is used in order to run onChange events when
 the user stops typing and not on every keystroke, because rich text is expensive
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1387](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1387)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1387](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1387)
 
 ___
 
@@ -444,7 +444,7 @@ Name | Type | Description |
 
 **Returns:** IAvailableElementCSSClassName[]
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4775](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4775)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4775](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4775)
 
 ___
 
@@ -458,7 +458,7 @@ to cause a refocus, this prevents that
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3262](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3262)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3262](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3262)
 
 ___
 
@@ -473,7 +473,7 @@ list one
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2428](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2428)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2428](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2428)
 
 ___
 
@@ -513,7 +513,7 @@ Name | Type |
 `currentSuperBlockElementAnchor` | Path |
 `currentText` | [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md) |
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2581](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2581)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2581](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2581)
 
 ___
 
@@ -534,7 +534,7 @@ Name | Type | Description |
 
 a boolean on whether they should merge
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1900](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1900)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1900](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1900)
 
 ___
 
@@ -566,7 +566,7 @@ Basic old school component did mount
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4835](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4835)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4835](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4835)
 
 ___
 
@@ -583,7 +583,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1808](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1808)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1808](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1808)
 
 ___
 
@@ -650,7 +650,7 @@ is the case
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4851](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4851)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4851](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4851)
 
 ___
 
@@ -700,7 +700,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2372](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2372)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2372](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2372)
 
 ___
 
@@ -719,7 +719,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2358](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2358)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2358](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2358)
 
 ___
 
@@ -732,7 +732,7 @@ or one that has been manually selected using selectPath
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3431](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3431)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3431](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3431)
 
 ___
 
@@ -751,7 +751,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1753](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1753)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1753](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1753)
 
 ___
 
@@ -772,7 +772,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*RichElement*](../modules/client_internal_text_serializer.md#richelement)\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1637](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1637)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1637](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1637)
 
 ___
 
@@ -791,7 +791,7 @@ Name | Type | Description |
 
 **Returns:** [*ITemplateArgsContext*](../interfaces/client_fast_prototyping_components_slate.itemplateargscontext.md)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2953](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2953)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2953](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2953)
 
 ___
 
@@ -803,7 +803,7 @@ A helper function to call react focus back into the editor
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3455](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3455)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3455](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3455)
 
 ___
 
@@ -824,7 +824,7 @@ Name | Type | Description |
 
 a void promise once it's done
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3466](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3466)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3466](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3466)
 
 ___
 
@@ -852,7 +852,7 @@ Formats the current text as bold
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4622](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4622)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4622](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4622)
 
 ___
 
@@ -864,7 +864,7 @@ formats the current text as italic
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4669](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4669)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4669](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4669)
 
 ___
 
@@ -876,7 +876,7 @@ formats the current text as italic
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4716](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4716)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4716](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4716)
 
 ___
 
@@ -889,7 +889,7 @@ to know what it can and can't do
 
 **Returns:** [*IAccessibleFeatureSupportOptions*](../interfaces/client_fast_prototyping_components_slate.iaccessiblefeaturesupportoptions.md)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4919](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4919)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4919](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4919)
 
 ___
 
@@ -902,7 +902,7 @@ to construct rich text data
 
 **Returns:** [*IHelperFunctions*](../interfaces/client_fast_prototyping_components_slate.ihelperfunctions.md)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4862](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4862)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4862](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4862)
 
 ___
 
@@ -938,7 +938,7 @@ Performs a hard blur event and the paths are cleared out
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3278](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3278)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3278](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3278)
 
 ___
 
@@ -950,7 +950,7 @@ Override for the default editor insert break function
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2256](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2256)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2256](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2256)
 
 ___
 
@@ -969,7 +969,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3826](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3826)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3826](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3826)
 
 ___
 
@@ -988,7 +988,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3888](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3888)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3888](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3888)
 
 ___
 
@@ -1006,7 +1006,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1718](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1718)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1718](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1718)
 
 ___
 
@@ -1025,7 +1025,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4495](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4495)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4495](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4495)
 
 ___
 
@@ -1045,7 +1045,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3773](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3773)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3773](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3773)
 
 ___
 
@@ -1073,7 +1073,7 @@ Name | Type | Description |
 
 a void promise once it's done
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3496](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3496)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3496](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3496)
 
 ___
 
@@ -1087,7 +1087,7 @@ alt+enter in order to escape the superblock
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2519](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2519)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2519](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2519)
 
 ___
 
@@ -1108,7 +1108,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3604](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3604)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3604](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3604)
 
 ___
 
@@ -1130,7 +1130,7 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3562](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3562)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3562](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3562)
 
 ___
 
@@ -1151,7 +1151,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4541](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4541)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4541](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4541)
 
 ___
 
@@ -1172,7 +1172,7 @@ Name | Type | Description |
 
 a boolean on whether it succeeded
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3655](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3655)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3655](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3655)
 
 ___
 
@@ -1192,7 +1192,7 @@ Name | Type | Description |
 
 a boolean on whether it represents an inline element
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2214](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2214)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2214](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2214)
 
 ___
 
@@ -1212,7 +1212,7 @@ Name | Type | Description |
 
 a boolean on whether it represents a void element
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2223](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2223)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2223](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2223)
 
 ___
 
@@ -1231,7 +1231,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3344](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3344)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3344](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3344)
 
 ___
 
@@ -1250,7 +1250,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1921](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1921)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1921](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1921)
 
 ___
 
@@ -1268,7 +1268,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2809](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2809)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2809](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2809)
 
 ___
 
@@ -1287,7 +1287,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3224](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3224)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3224](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3224)
 
 ___
 
@@ -1307,7 +1307,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2790](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2790)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2790](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2790)
 
 ___
 
@@ -1325,7 +1325,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4821](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4821)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4821](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4821)
 
 ___
 
@@ -1339,7 +1339,7 @@ this trickery
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2839](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2839)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2839](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2839)
 
 ___
 
@@ -1352,7 +1352,7 @@ the blocking of the blur event
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3271](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3271)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3271](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3271)
 
 ___
 
@@ -1364,7 +1364,7 @@ Render function
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4969](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4969)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4969](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4969)
 
 ___
 
@@ -1382,7 +1382,7 @@ Name | Type | Description |
 
 **Returns:** *any*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2999](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2999)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2999](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2999)
 
 ___
 
@@ -1400,7 +1400,7 @@ Name | Type | Description |
 
 **Returns:** *any*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3204](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3204)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3204](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3204)
 
 ___
 
@@ -1419,7 +1419,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3301](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3301)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3301](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3301)
 
 ___
 
@@ -1439,7 +1439,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4385](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4385)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4385](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4385)
 
 ___
 
@@ -1463,7 +1463,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4444](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4444)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4444](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4444)
 
 ___
 
@@ -1482,7 +1482,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4416](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4416)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4416](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4416)
 
 ___
 
@@ -1501,7 +1501,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4590](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4590)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4590](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4590)
 
 ___
 
@@ -1520,7 +1520,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4613](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4613)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4613](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4613)
 
 ___
 
@@ -1538,7 +1538,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1789](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1789)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1789](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1789)
 
 ___
 
@@ -1557,7 +1557,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4405](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4405)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4405](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4405)
 
 ___
 
@@ -1576,7 +1576,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4601](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4601)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4601](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4601)
 
 ___
 
@@ -1595,7 +1595,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4427](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4427)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4427](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4427)
 
 ___
 
@@ -1637,7 +1637,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4394](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4394)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4394](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4394)
 
 ___
 
@@ -1662,7 +1662,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4462](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4462)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4462](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4462)
 
 ___
 
@@ -1682,7 +1682,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4475](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4475)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4475](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4475)
 
 ___
 
@@ -1700,7 +1700,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2899](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2899)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2899](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2899)
 
 ___
 
@@ -1719,7 +1719,7 @@ Name | Type | Description |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:2851](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L2851)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:2851](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L2851)
 
 ___
 
@@ -1731,7 +1731,7 @@ Performs a soft blur event
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3291](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3291)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3291](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3291)
 
 ___
 
@@ -1753,7 +1753,7 @@ Name | Type | Description |
 
 a boolean if the link was valid and toggleLink
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4218](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4218)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4218](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4218)
 
 ___
 
@@ -1772,7 +1772,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4120](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4120)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4120](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4120)
 
 ___
 
@@ -1790,7 +1790,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:3949](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L3949)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:3949](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L3949)
 
 ___
 
@@ -1809,7 +1809,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:4035](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L4035)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:4035](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L4035)
 
 ___
 
@@ -1831,4 +1831,4 @@ Name | Type | Description |
 
 a partial of the new state or null
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1432](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1432)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1432](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1432)

@@ -19,7 +19,7 @@ The arg that it provides
 
 • **id**: *string*
 
-Defined in: [client/components/item/IdVersionRetriever.tsx:19](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/IdVersionRetriever.tsx#L19)
+Defined in: [client/components/item/IdVersionRetriever.tsx:19](https://github.com/onzag/itemize/blob/28218320/client/components/item/IdVersionRetriever.tsx#L19)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **version**: *string*
 
-Defined in: [client/components/item/IdVersionRetriever.tsx:20](https://github.com/onzag/itemize/blob/0e9b128c/client/components/item/IdVersionRetriever.tsx#L20)
+Defined in: [client/components/item/IdVersionRetriever.tsx:20](https://github.com/onzag/itemize/blob/28218320/client/components/item/IdVersionRetriever.tsx#L20)

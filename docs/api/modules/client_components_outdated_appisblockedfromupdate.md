@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/outdated/AppIsBlockedFromUpdate.tsx:48](https://github.com/onzag/itemize/blob/0e9b128c/client/components/outdated/AppIsBlockedFromUpdate.tsx#L48)
+Defined in: [client/components/outdated/AppIsBlockedFromUpdate.tsx:48](https://github.com/onzag/itemize/blob/28218320/client/components/outdated/AppIsBlockedFromUpdate.tsx#L48)

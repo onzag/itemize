@@ -19,7 +19,7 @@ The ssr provider props that creates the context
 
 • **children**: ReactNode
 
-Defined in: [client/internal/providers/ssr-provider.tsx:102](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L102)
+Defined in: [client/internal/providers/ssr-provider.tsx:102](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/ssr-provider.tsx#L102)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **value**: [*ISSRContextType*](client_internal_providers_ssr_provider.issrcontexttype.md)
 
-Defined in: [client/internal/providers/ssr-provider.tsx:103](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/providers/ssr-provider.tsx#L103)
+Defined in: [client/internal/providers/ssr-provider.tsx:103](https://github.com/onzag/itemize/blob/28218320/client/internal/providers/ssr-provider.tsx#L103)

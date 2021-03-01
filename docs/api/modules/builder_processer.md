@@ -36,7 +36,7 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:71](https://github.com/onzag/itemize/blob/0e9b128c/builder/processer.ts#L71)
+Defined in: [builder/processer.ts:71](https://github.com/onzag/itemize/blob/28218320/builder/processer.ts#L71)
 
 ___
 
@@ -94,7 +94,7 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:29](https://github.com/onzag/itemize/blob/0e9b128c/builder/processer.ts#L29)
+Defined in: [builder/processer.ts:29](https://github.com/onzag/itemize/blob/28218320/builder/processer.ts#L29)
 
 ___
 
@@ -139,7 +139,7 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/builder/processer.ts#L115)
+Defined in: [builder/processer.ts:115](https://github.com/onzag/itemize/blob/28218320/builder/processer.ts#L115)
 
 ___
 
@@ -156,7 +156,7 @@ Name | Type |
 
 **Returns:** [*IPropertyDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition_propertydefinition.ipropertydefinitionrawjsondatatype.md)
 
-Defined in: [builder/processer.ts:90](https://github.com/onzag/itemize/blob/0e9b128c/builder/processer.ts#L90)
+Defined in: [builder/processer.ts:90](https://github.com/onzag/itemize/blob/28218320/builder/processer.ts#L90)
 
 ___
 
@@ -187,4 +187,4 @@ Name | Type | Description |
 
 the new json
 
-Defined in: [builder/processer.ts:164](https://github.com/onzag/itemize/blob/0e9b128c/builder/processer.ts#L164)
+Defined in: [builder/processer.ts:164](https://github.com/onzag/itemize/blob/28218320/builder/processer.ts#L164)

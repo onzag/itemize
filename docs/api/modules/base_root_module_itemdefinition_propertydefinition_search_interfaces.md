@@ -36,7 +36,7 @@ Name | Type |
 `SEARCH` | *string* |
 `TO` | *string* |
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:37](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L37)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:37](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L37)
 
 ___
 
@@ -48,4 +48,4 @@ this correlates to our search interface enum, enums are numbers basically
 so when we want to get which interfaces each uses, we refer to this
 array of arrays
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L69)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts:69](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces.ts#L69)

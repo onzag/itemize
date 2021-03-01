@@ -38,4 +38,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/localization/I18nRead.tsx:338](https://github.com/onzag/itemize/blob/0e9b128c/client/components/localization/I18nRead.tsx#L338)
+Defined in: [client/components/localization/I18nRead.tsx:338](https://github.com/onzag/itemize/blob/28218320/client/components/localization/I18nRead.tsx#L338)

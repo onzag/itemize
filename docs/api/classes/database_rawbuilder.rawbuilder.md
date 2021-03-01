@@ -55,7 +55,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/database/RawBuilder.ts#L18)
+Defined in: [database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/28218320/database/RawBuilder.ts#L18)
 
 ## Properties
 
@@ -65,7 +65,7 @@ Defined in: [database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/0e
 
 The raw expression
 
-Defined in: [database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/0e9b128c/database/RawBuilder.ts#L18)
+Defined in: [database/RawBuilder.ts:18](https://github.com/onzag/itemize/blob/28218320/database/RawBuilder.ts#L18)
 
 ## Methods
 
@@ -85,7 +85,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L69)
 
 ___
 
@@ -105,7 +105,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L77)
 
 ___
 
@@ -119,7 +119,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L102)
 
 ___
 
@@ -135,7 +135,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/RawBuilder.ts:39](https://github.com/onzag/itemize/blob/0e9b128c/database/RawBuilder.ts#L39)
+Defined in: [database/RawBuilder.ts:39](https://github.com/onzag/itemize/blob/28218320/database/RawBuilder.ts#L39)
 
 ___
 
@@ -152,7 +152,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L165)
 
 ___
 
@@ -166,7 +166,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L109)
 
 ___
 
@@ -187,7 +187,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L86)
 
 ___
 
@@ -208,7 +208,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L95)
 
 ___
 
@@ -224,4 +224,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0e9b128c/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/28218320/database/base.ts#L126)

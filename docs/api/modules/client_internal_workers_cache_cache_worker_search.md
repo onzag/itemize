@@ -36,4 +36,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]\>
 
-Defined in: [client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/workers/cache/cache.worker.search.ts#L66)
+Defined in: [client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/28218320/client/internal/workers/cache/cache.worker.search.ts#L66)

@@ -34,7 +34,7 @@ the records that have been deleted
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[lostRecords](base_remote_protocol.iparentedsearchrecordsevent.md#lostrecords)
 
-Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L115)
+Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L115)
 
 ___
 
@@ -46,7 +46,7 @@ the records that have been modified
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[modifiedRecords](base_remote_protocol.iparentedsearchrecordsevent.md#modifiedrecords)
 
-Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L119)
+Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L119)
 
 ___
 
@@ -58,7 +58,7 @@ the new last record search result
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[newLastModified](base_remote_protocol.iparentedsearchrecordsevent.md#newlastmodified)
 
-Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L123)
+Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L123)
 
 ___
 
@@ -70,7 +70,7 @@ the new records that have been added
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[newRecords](base_remote_protocol.iparentedsearchrecordsevent.md#newrecords)
 
-Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L111)
+Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L111)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentId](base_remote_protocol.iparentedsearchrecordsevent.md#parentid)
 
-Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L150)
+Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L150)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentType](base_remote_protocol.iparentedsearchrecordsevent.md#parenttype)
 
-Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L149)
+Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L149)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentVersion](base_remote_protocol.iparentedsearchrecordsevent.md#parentversion)
 
-Defined in: [base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L151)
+Defined in: [base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L151)
 
 ___
 
@@ -112,7 +112,7 @@ the qualified path name or type of the either module or item definition
 
 Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[qualifiedPathName](base_remote_protocol.iparentedsearchrecordsevent.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L107)
+Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L107)
 
 ___
 
@@ -120,4 +120,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L111)
+Defined in: [client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L111)

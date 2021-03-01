@@ -42,7 +42,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:53](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L53)
+Defined in: [builder/checkers.ts:53](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L53)
 
 ___
 
@@ -63,7 +63,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1115](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L1115)
+Defined in: [builder/checkers.ts:1115](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L1115)
 
 ___
 
@@ -87,7 +87,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:519](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L519)
+Defined in: [builder/checkers.ts:519](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L519)
 
 ___
 
@@ -109,7 +109,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:168](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L168)
+Defined in: [builder/checkers.ts:168](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L168)
 
 ___
 
@@ -129,7 +129,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1184](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L1184)
+Defined in: [builder/checkers.ts:1184](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L1184)
 
 ___
 
@@ -152,7 +152,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:676](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L676)
+Defined in: [builder/checkers.ts:676](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L676)
 
 ___
 
@@ -173,7 +173,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:776](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L776)
+Defined in: [builder/checkers.ts:776](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L776)
 
 ___
 
@@ -191,7 +191,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1474](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L1474)
+Defined in: [builder/checkers.ts:1474](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L1474)
 
 ___
 
@@ -211,7 +211,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1369](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L1369)
+Defined in: [builder/checkers.ts:1369](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L1369)
 
 ___
 
@@ -231,4 +231,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1446](https://github.com/onzag/itemize/blob/0e9b128c/builder/checkers.ts#L1446)
+Defined in: [builder/checkers.ts:1446](https://github.com/onzag/itemize/blob/28218320/builder/checkers.ts#L1446)

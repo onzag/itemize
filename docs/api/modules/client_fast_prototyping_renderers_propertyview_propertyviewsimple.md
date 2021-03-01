@@ -34,4 +34,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx:24](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx#L24)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx:24](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewSimple.tsx#L24)

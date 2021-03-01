@@ -19,7 +19,7 @@
 
 #### Type declaration:
 
-Defined in: [server/resolvers/triggers.ts:94](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L94)
+Defined in: [server/resolvers/triggers.ts:94](https://github.com/onzag/itemize/blob/28218320/server/resolvers/triggers.ts#L94)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/resolvers/triggers.ts:97](https://github.com/onzag/itemize/blob/0e9b128c/server/resolvers/triggers.ts#L97)
+Defined in: [server/resolvers/triggers.ts:97](https://github.com/onzag/itemize/blob/28218320/server/resolvers/triggers.ts#L97)

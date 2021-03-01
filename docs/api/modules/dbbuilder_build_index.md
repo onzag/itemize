@@ -22,7 +22,7 @@ for speeding up things and setting up unique constraints
 
 • `Const` **MAX\_PG\_INDEX\_SIZE**: *60*= 60
 
-Defined in: [dbbuilder/build-index.ts:19](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-index.ts#L19)
+Defined in: [dbbuilder/build-index.ts:19](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-index.ts#L19)
 
 ## Functions
 
@@ -44,7 +44,7 @@ Name | Type | Description |
 
 the resulting database schema and the new current
 
-Defined in: [dbbuilder/build-index.ts:40](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-index.ts#L40)
+Defined in: [dbbuilder/build-index.ts:40](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-index.ts#L40)
 
 ___
 
@@ -60,4 +60,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [dbbuilder/build-index.ts:16](https://github.com/onzag/itemize/blob/0e9b128c/dbbuilder/build-index.ts#L16)
+Defined in: [dbbuilder/build-index.ts:16](https://github.com/onzag/itemize/blob/28218320/dbbuilder/build-index.ts#L16)

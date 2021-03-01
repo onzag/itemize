@@ -19,4 +19,4 @@ within itsefl
 
 • **buildnumber**: *string*
 
-Defined in: [base/remote-protocol.ts:25](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L25)
+Defined in: [base/remote-protocol.ts:25](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L25)

@@ -27,7 +27,7 @@
 
 Inherited from: [IUnregisterRequest](base_remote_protocol.iunregisterrequest.md).[id](base_remote_protocol.iunregisterrequest.md#id)
 
-Defined in: [base/remote-protocol.ts:232](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L232)
+Defined in: [base/remote-protocol.ts:232](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L232)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 Inherited from: [IUnregisterRequest](base_remote_protocol.iunregisterrequest.md).[itemDefinition](base_remote_protocol.iunregisterrequest.md#itemdefinition)
 
-Defined in: [base/remote-protocol.ts:231](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L231)
+Defined in: [base/remote-protocol.ts:231](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L231)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:79](https://github.com/onzag/itemize/blob/0e9b128c/client/internal/testing.ts#L79)
+Defined in: [client/internal/testing.ts:79](https://github.com/onzag/itemize/blob/28218320/client/internal/testing.ts#L79)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 Inherited from: [IUnregisterRequest](base_remote_protocol.iunregisterrequest.md).[version](base_remote_protocol.iunregisterrequest.md#version)
 
-Defined in: [base/remote-protocol.ts:233](https://github.com/onzag/itemize/blob/0e9b128c/base/remote-protocol.ts#L233)
+Defined in: [base/remote-protocol.ts:233](https://github.com/onzag/itemize/blob/28218320/base/remote-protocol.ts#L233)

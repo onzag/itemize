@@ -32,7 +32,7 @@ Name | Type | Description |
 
 new merged request fields
 
-Defined in: [gql-util.ts:61](https://github.com/onzag/itemize/blob/0e9b128c/gql-util.ts#L61)
+Defined in: [gql-util.ts:61](https://github.com/onzag/itemize/blob/28218320/gql-util.ts#L61)
 
 ___
 
@@ -51,7 +51,7 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [gql-util.ts:100](https://github.com/onzag/itemize/blob/0e9b128c/gql-util.ts#L100)
+Defined in: [gql-util.ts:100](https://github.com/onzag/itemize/blob/28218320/gql-util.ts#L100)
 
 ___
 
@@ -73,4 +73,4 @@ Name | Type | Description |
 
 a boolean
 
-Defined in: [gql-util.ts:17](https://github.com/onzag/itemize/blob/0e9b128c/gql-util.ts#L17)
+Defined in: [gql-util.ts:17](https://github.com/onzag/itemize/blob/28218320/gql-util.ts#L17)

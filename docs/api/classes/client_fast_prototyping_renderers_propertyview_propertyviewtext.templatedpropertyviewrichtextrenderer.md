@@ -59,7 +59,7 @@ Name | Type |
 
 **Returns:** [*TemplatedPropertyViewRichTextRenderer*](client_fast_prototyping_renderers_propertyview_propertyviewtext.templatedpropertyviewrichtextrenderer.md)
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:338](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L338)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:338](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L338)
 
 ## Properties
 
@@ -430,7 +430,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:348](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L348)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:348](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L348)
 
 ___
 
@@ -469,4 +469,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:342](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L342)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:342](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L342)

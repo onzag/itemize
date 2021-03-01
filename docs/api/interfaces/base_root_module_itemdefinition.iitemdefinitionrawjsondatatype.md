@@ -53,7 +53,7 @@ The raw form of the item definition from the processed schema
 Whether it can be parented by other item definitions, these
 represent a list of rules
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:252](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L252)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:252](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L252)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 Whether an user role can create in behalf
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:228](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L228)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:228](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L228)
 
 ___
 
@@ -75,7 +75,7 @@ The actual child definitions that this item definition contains
 this is appended during process as an array of this same object
 aka it recurses as a tree
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:197](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L197)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:197](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L197)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 A list of roles of which this item definition is allowed to be
 used to create in behalf
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:234](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L234)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:234](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L234)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 A list of roles which the item definition is allowed to create
 in behalf to
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:246](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L246)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:246](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L246)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 Create role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:175](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L175)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:175](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L175)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 A list of roles which this item definition is allowed to
 be used to make custom ids
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:240](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L240)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:240](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L240)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 Delete role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:183](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L183)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:183](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L183)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 Edit role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:179](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L179)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:179](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L179)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 Whether versioning is enabled
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:142](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L142)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:142](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L142)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 The i18n data that is attached to that item definition it also doesn't exist
 in the unprocessed data but comes from the properties file
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:128](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L128)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:128](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L128)
 
 ___
 
@@ -170,7 +170,7 @@ ___
 Also stripped after processed, represents the file location for the
 i18n properties file
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:107](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L107)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:107](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L107)
 
 ___
 
@@ -183,7 +183,7 @@ and represents the list of imported definitions
 that exist within the module and are used for includes
 these are paths
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:191](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L191)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:191](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L191)
 
 ___
 
@@ -193,7 +193,7 @@ ___
 
 The includes exist within the item definition
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:133](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L133)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:133](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L133)
 
 ___
 
@@ -204,7 +204,7 @@ ___
 Location only exists during the building process and it's stripped
 and represents the file location the file is
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:102](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L102)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:102](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L102)
 
 ___
 
@@ -214,7 +214,7 @@ ___
 
 Whether it actually must always be parented
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:256](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L256)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:256](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L256)
 
 ___
 
@@ -225,7 +225,7 @@ ___
 The name doesn't exist within the raw unprocessed data but it's added and
 it's equal to the file name or the folder name in case of index.json
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:123](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L123)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:123](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L123)
 
 ___
 
@@ -237,7 +237,7 @@ This only really makes sense in the user case and it basically
 shifts the ownership of the object to be its id rather than its created_by
 attribute
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:210](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L210)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:210](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L210)
 
 ___
 
@@ -249,7 +249,7 @@ If a role doesn't fit the criteria specified in the list the owner of
 a given item cannot truly be read and the created_by field becomes
 the unspecified owner
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:217](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L217)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:217](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L217)
 
 ___
 
@@ -259,7 +259,7 @@ ___
 
 A list of roles who have access to parenting
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:260](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L260)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:260](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L260)
 
 ___
 
@@ -270,7 +270,7 @@ ___
 The pointers come during the parsing method and are stripped as well
 after built and it's used to create tracebacks from the raw data
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:112](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L112)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:112](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L112)
 
 ___
 
@@ -281,7 +281,7 @@ ___
 the policies in the raw json form as they are specified
 in the unprocessed file
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:203](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L203)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:203](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L203)
 
 ___
 
@@ -291,7 +291,7 @@ ___
 
 The properties represent the list of properties it has
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:137](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L137)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:137](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L137)
 
 ___
 
@@ -302,7 +302,7 @@ ___
 This is the raw content of the file the pointers came from and it's also
 stripped after built is done
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:117](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L117)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:117](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L117)
 
 ___
 
@@ -312,7 +312,7 @@ ___
 
 Read role permissions
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:171](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L171)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:171](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L171)
 
 ___
 
@@ -322,7 +322,7 @@ ___
 
 the request limiters
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:264](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L264)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:264](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L264)
 
 ___
 
@@ -332,7 +332,7 @@ ___
 
 Permissions for search purposes
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:167](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L167)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:167](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L167)
 
 ___
 
@@ -343,7 +343,7 @@ ___
 Whether the item definition is searchable, when a module is searchable
 and the item definition is not, the module precedes
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:223](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L223)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:223](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L223)
 
 ___
 
@@ -353,7 +353,7 @@ ___
 
 Basic type
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:96](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L96)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:96](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L96)
 
 ___
 
@@ -363,7 +363,7 @@ ___
 
 Whether the version can be a country
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:152](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L152)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:152](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L152)
 
 ___
 
@@ -373,7 +373,7 @@ ___
 
 Whether the version can be a language
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:157](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L157)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:157](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L157)
 
 ___
 
@@ -383,7 +383,7 @@ ___
 
 Whether the version can be a country language concat pair such as en-US or fi-FI
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:147](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L147)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:147](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L147)
 
 ___
 
@@ -393,4 +393,4 @@ ___
 
 The roles that are allowed to do versioning
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:162](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/Module/ItemDefinition/index.ts#L162)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:162](https://github.com/onzag/itemize/blob/28218320/base/Root/Module/ItemDefinition/index.ts#L162)

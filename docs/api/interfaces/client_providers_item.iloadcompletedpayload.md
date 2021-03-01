@@ -27,7 +27,7 @@
 
 Inherited from: [IActionResponseWithValue](client_providers_item.iactionresponsewithvalue.md).[error](client_providers_item.iactionresponsewithvalue.md#error)
 
-Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L112)
+Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L112)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **forId**: *string*
 
-Defined in: [client/providers/item.tsx:120](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L120)
+Defined in: [client/providers/item.tsx:120](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L120)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **forVersion**: *string*
 
-Defined in: [client/providers/item.tsx:121](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L121)
+Defined in: [client/providers/item.tsx:121](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L121)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 Inherited from: [IActionResponseWithValue](client_providers_item.iactionresponsewithvalue.md).[value](client_providers_item.iactionresponsewithvalue.md#value)
 
-Defined in: [client/providers/item.tsx:116](https://github.com/onzag/itemize/blob/0e9b128c/client/providers/item.tsx#L116)
+Defined in: [client/providers/item.tsx:116](https://github.com/onzag/itemize/blob/28218320/client/providers/item.tsx#L116)

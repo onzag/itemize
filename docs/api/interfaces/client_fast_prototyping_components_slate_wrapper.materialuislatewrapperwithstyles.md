@@ -51,7 +51,7 @@ where it is expected to be used
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[children](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#children)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1047](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1047)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1047](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1047)
 
 ___
 
@@ -75,7 +75,7 @@ indeed provide this as a prop for the render
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[currentLoadError](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#currentloaderror)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1055](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1055)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1055](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1055)
 
 ___
 
@@ -87,7 +87,7 @@ The disjointed mode
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[disjointedMode](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#disjointedmode)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1077](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1077)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1077](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1077)
 
 ___
 
@@ -104,11 +104,11 @@ as the currentLoadError
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1060)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1060)
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[dismissCurrentLoadError](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#dismisscurrentloaderror)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1060)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1060)
 
 ___
 
@@ -120,7 +120,7 @@ Drawer extras for the ui handled types
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[drawerUIHandlerExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#draweruihandlerextras)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1069](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1069)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1069](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1069)
 
 ___
 
@@ -134,7 +134,7 @@ and whatnot from it
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[featureSupport](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#featuresupport)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1035](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1035)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1035](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1035)
 
 ___
 
@@ -147,7 +147,7 @@ and modify nodes
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[helpers](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#helpers)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1040](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1040)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1040](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1040)
 
 ___
 
@@ -159,7 +159,7 @@ Whether to hide the drawer
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[hideDrawer](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#hidedrawer)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1073](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1073)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1073](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1073)
 
 ___
 
@@ -169,7 +169,7 @@ ___
 
 A generic error message
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:239](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L239)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:239](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/wrapper.tsx#L239)
 
 ___
 
@@ -179,7 +179,7 @@ ___
 
 A generic ok
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:243](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L243)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:243](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/wrapper.tsx#L243)
 
 ___
 
@@ -189,7 +189,7 @@ ___
 
 The whole of the i18n rich information that is given by default
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:247](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/wrapper.tsx#L247)
+Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:247](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/wrapper.tsx#L247)
 
 ___
 
@@ -203,7 +203,7 @@ so it can get state information
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[state](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#state)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1029](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1029)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1029](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1029)
 
 ___
 
@@ -216,4 +216,4 @@ to be used either by ui handled components and whatnot
 
 Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[toolbarExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#toolbarextras)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:1065](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/components/slate/index.tsx#L1065)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:1065](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/components/slate/index.tsx#L1065)

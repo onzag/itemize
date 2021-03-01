@@ -49,9 +49,7 @@ Itemize source code was designed to be as legible and understandable as possible
 
 ## API
 
- - [Schemas](./api/schemas.md)
- - [Providers](./api/providers.md)
- - [Components](./api/components.md)
+ - [Itemize API](./api)
 
 ## Advanced
 

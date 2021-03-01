@@ -27,7 +27,7 @@ This is all the base resolvers we are expecting out off itemize
 
 • **addItemDefinition**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:55](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L55)
+Defined in: [base/Root/gql.ts:55](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L55)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **deleteItemDefinition**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:57](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L57)
+Defined in: [base/Root/gql.ts:57](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L57)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **editItemDefinition**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:56](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L56)
+Defined in: [base/Root/gql.ts:56](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L56)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **getItemDefinition**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:48](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L48)
+Defined in: [base/Root/gql.ts:48](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L48)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 • **getItemDefinitionList**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:49](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L49)
+Defined in: [base/Root/gql.ts:49](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L49)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 • **getModuleList**: [*FGraphQLModResolverType*](../modules/base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [base/Root/gql.ts:54](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L54)
+Defined in: [base/Root/gql.ts:54](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L54)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 • **searchItemDefinition**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:50](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L50)
+Defined in: [base/Root/gql.ts:50](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L50)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 • **searchItemDefinitionTraditional**: [*FGraphQLIdefResolverType*](../modules/base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [base/Root/gql.ts:51](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L51)
+Defined in: [base/Root/gql.ts:51](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L51)
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 • **searchModule**: [*FGraphQLModResolverType*](../modules/base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [base/Root/gql.ts:52](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L52)
+Defined in: [base/Root/gql.ts:52](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L52)
 
 ___
 
@@ -99,4 +99,4 @@ ___
 
 • **searchModuleTraditional**: [*FGraphQLModResolverType*](../modules/base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [base/Root/gql.ts:53](https://github.com/onzag/itemize/blob/0e9b128c/base/Root/gql.ts#L53)
+Defined in: [base/Root/gql.ts:53](https://github.com/onzag/itemize/blob/28218320/base/Root/gql.ts#L53)

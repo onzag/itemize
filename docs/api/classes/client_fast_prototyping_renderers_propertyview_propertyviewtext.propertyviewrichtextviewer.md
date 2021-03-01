@@ -66,7 +66,7 @@ Name | Type | Description |
 
 **Returns:** [*PropertyViewRichTextViewer*](client_fast_prototyping_renderers_propertyview_propertyviewtext.propertyviewrichtextviewer.md)
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:172](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L172)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:172](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L172)
 
 ## Properties
 
@@ -76,7 +76,7 @@ Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx
 
 A cheap div we use for transformations
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:172](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L172)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:172](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L172)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 The reference for our div
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:168](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L168)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:168](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L168)
 
 ___
 
@@ -267,7 +267,7 @@ Attach the events that are required for lazyloading
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:265](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L265)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:265](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L265)
 
 ___
 
@@ -297,7 +297,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:299](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L299)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:299](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L299)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:306](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L306)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:306](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L306)
 
 ___
 
@@ -440,7 +440,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:194](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L194)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:194](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L194)
 
 ___
 
@@ -476,7 +476,7 @@ Prepares the lazy loader, runs on mounting or changing
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:236](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L236)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:236](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L236)
 
 ___
 
@@ -486,7 +486,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:321](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L321)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:321](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L321)
 
 ___
 
@@ -526,7 +526,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:312](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L312)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:312](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L312)
 
 ___
 
@@ -544,4 +544,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:256](https://github.com/onzag/itemize/blob/0e9b128c/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L256)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:256](https://github.com/onzag/itemize/blob/28218320/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L256)
