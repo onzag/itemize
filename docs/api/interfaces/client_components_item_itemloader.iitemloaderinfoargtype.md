@@ -27,18 +27,18 @@ for the conditional rendering
 
 Whether the item is blocked
 
-Defined in: [client/components/item/ItemLoader.tsx:37](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L37)
+Defined in: [client/components/item/ItemLoader.tsx:37](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L37)
 
 ___
 
 ### error
 
-• **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
+• **error**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
 
 An error that occured during loading, not found does not count for this
 as null is a valid value, this is more for forbidden, no network, and whatnot
 
-Defined in: [client/components/item/ItemLoader.tsx:46](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L46)
+Defined in: [client/components/item/ItemLoader.tsx:46](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L46)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Whether you have moderation access to the item despite it being blocked
 
-Defined in: [client/components/item/ItemLoader.tsx:41](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L41)
+Defined in: [client/components/item/ItemLoader.tsx:41](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L41)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Whether it is ready and loaded
 
-Defined in: [client/components/item/ItemLoader.tsx:25](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L25)
+Defined in: [client/components/item/ItemLoader.tsx:25](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L25)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 Whether is currently loading, from memory, cache, etc...
 
-Defined in: [client/components/item/ItemLoader.tsx:29](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L29)
+Defined in: [client/components/item/ItemLoader.tsx:29](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L29)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 Whether it is not found, as in the item definition did not exist
 
-Defined in: [client/components/item/ItemLoader.tsx:33](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L33)
+Defined in: [client/components/item/ItemLoader.tsx:33](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L33)
 
 ___
 
@@ -94,6 +94,6 @@ A function that allows to try to reload the element
 
 **Returns:** *Promise*<[*IBasicActionResponse*](client_providers_item.ibasicactionresponse.md)\>
 
-Defined in: [client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L50)
+Defined in: [client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L50)
 
-Defined in: [client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/ItemLoader.tsx#L50)
+Defined in: [client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/ItemLoader.tsx#L50)

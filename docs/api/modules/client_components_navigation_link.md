@@ -29,4 +29,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/components/navigation/Link.tsx:78](https://github.com/onzag/itemize/blob/11a98dec/client/components/navigation/Link.tsx#L78)
+Defined in: [client/components/navigation/Link.tsx:78](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/Link.tsx#L78)

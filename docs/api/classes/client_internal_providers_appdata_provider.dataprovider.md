@@ -447,7 +447,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/providers/appdata-provider.tsx:56](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/appdata-provider.tsx#L56)
+Defined in: [client/internal/providers/appdata-provider.tsx:56](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/appdata-provider.tsx#L56)
 
 ___
 
@@ -486,4 +486,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/providers/appdata-provider.tsx:50](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/appdata-provider.tsx#L50)
+Defined in: [client/internal/providers/appdata-provider.tsx:50](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/appdata-provider.tsx#L50)

@@ -68,7 +68,7 @@ Represents a variable for templating for the data-on-blur event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[blur](client_internal_text_serializer_base.ielementbase.md#blur)
 
-Defined in: [client/internal/text/serializer/base.tsx:929](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L929)
+Defined in: [client/internal/text/serializer/base.tsx:929](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L929)
 
 ___
 
@@ -80,7 +80,7 @@ The children of the image is a text node
 as defined by the specifications of slate
 even when nothing is writable there
 
-Defined in: [client/internal/text/serializer/types/file.tsx:185](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L185)
+Defined in: [client/internal/text/serializer/types/file.tsx:185](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L185)
 
 ___
 
@@ -93,7 +93,7 @@ Represents a variable for templating for the data-on-click event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[click](client_internal_text_serializer_base.ielementbase.md#click)
 
-Defined in: [client/internal/text/serializer/base.tsx:924](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L924)
+Defined in: [client/internal/text/serializer/base.tsx:924](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L924)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 cannot contain anything
 
-Defined in: [client/internal/text/serializer/types/file.tsx:158](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L158)
+Defined in: [client/internal/text/serializer/types/file.tsx:158](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L158)
 
 ___
 
@@ -117,7 +117,7 @@ data-context
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[context](client_internal_text_serializer_base.ielementbase.md#context)
 
-Defined in: [client/internal/text/serializer/base.tsx:913](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L913)
+Defined in: [client/internal/text/serializer/base.tsx:913](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L913)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 file extension
 
-Defined in: [client/internal/text/serializer/types/file.tsx:170](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L170)
+Defined in: [client/internal/text/serializer/types/file.tsx:170](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L170)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 file name
 
-Defined in: [client/internal/text/serializer/types/file.tsx:162](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L162)
+Defined in: [client/internal/text/serializer/types/file.tsx:162](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L162)
 
 ___
 
@@ -150,7 +150,7 @@ Represents a variable for templating for the data-on-focus event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[focus](client_internal_text_serializer_base.ielementbase.md#focus)
 
-Defined in: [client/internal/text/serializer/base.tsx:934](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L934)
+Defined in: [client/internal/text/serializer/base.tsx:934](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L934)
 
 ___
 
@@ -164,7 +164,7 @@ data-for-each
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[forEach](client_internal_text_serializer_base.ielementbase.md#foreach)
 
-Defined in: [client/internal/text/serializer/base.tsx:919](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L919)
+Defined in: [client/internal/text/serializer/base.tsx:919](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L919)
 
 ___
 
@@ -176,7 +176,7 @@ An optional name, just used to be displayed in the tree
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[givenName](client_internal_text_serializer_base.ielementbase.md#givenname)
 
-Defined in: [client/internal/text/serializer/base.tsx:853](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L853)
+Defined in: [client/internal/text/serializer/base.tsx:853](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L853)
 
 ___
 
@@ -190,7 +190,7 @@ of the given element
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[html](client_internal_text_serializer_base.ielementbase.md#html)
 
-Defined in: [client/internal/text/serializer/base.tsx:889](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L889)
+Defined in: [client/internal/text/serializer/base.tsx:889](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L889)
 
 ___
 
@@ -203,7 +203,7 @@ and if condition for conditional rendering
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[ifCondition](client_internal_text_serializer_base.ielementbase.md#ifcondition)
 
-Defined in: [client/internal/text/serializer/base.tsx:883](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L883)
+Defined in: [client/internal/text/serializer/base.tsx:883](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L883)
 
 ___
 
@@ -216,7 +216,7 @@ Represents a variable for templating for the data-on-input event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[input](client_internal_text_serializer_base.ielementbase.md#input)
 
-Defined in: [client/internal/text/serializer/base.tsx:939](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L939)
+Defined in: [client/internal/text/serializer/base.tsx:939](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L939)
 
 ___
 
@@ -229,7 +229,7 @@ Represents a variable for templating for the data-on-keydown event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[keydown](client_internal_text_serializer_base.ielementbase.md#keydown)
 
-Defined in: [client/internal/text/serializer/base.tsx:944](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L944)
+Defined in: [client/internal/text/serializer/base.tsx:944](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L944)
 
 ___
 
@@ -242,7 +242,7 @@ Represents a variable for templating for the data-on-keypress event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[keypress](client_internal_text_serializer_base.ielementbase.md#keypress)
 
-Defined in: [client/internal/text/serializer/base.tsx:949](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L949)
+Defined in: [client/internal/text/serializer/base.tsx:949](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L949)
 
 ___
 
@@ -255,7 +255,7 @@ Represents a variable for templating for the data-on-keyup event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[keyup](client_internal_text_serializer_base.ielementbase.md#keyup)
 
-Defined in: [client/internal/text/serializer/base.tsx:954](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L954)
+Defined in: [client/internal/text/serializer/base.tsx:954](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L954)
 
 ___
 
@@ -268,7 +268,7 @@ Represents a variable for templating for the data-on-mousedown event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mousedown](client_internal_text_serializer_base.ielementbase.md#mousedown)
 
-Defined in: [client/internal/text/serializer/base.tsx:959](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L959)
+Defined in: [client/internal/text/serializer/base.tsx:959](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L959)
 
 ___
 
@@ -281,7 +281,7 @@ Represents a variable for templating for the data-on-mouseenter event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mouseenter](client_internal_text_serializer_base.ielementbase.md#mouseenter)
 
-Defined in: [client/internal/text/serializer/base.tsx:964](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L964)
+Defined in: [client/internal/text/serializer/base.tsx:964](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L964)
 
 ___
 
@@ -294,7 +294,7 @@ Represents a variable for templating for the data-on-mouseleave event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mouseleave](client_internal_text_serializer_base.ielementbase.md#mouseleave)
 
-Defined in: [client/internal/text/serializer/base.tsx:969](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L969)
+Defined in: [client/internal/text/serializer/base.tsx:969](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L969)
 
 ___
 
@@ -307,7 +307,7 @@ Represents a variable for templating for the data-on-mousemove event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mousemove](client_internal_text_serializer_base.ielementbase.md#mousemove)
 
-Defined in: [client/internal/text/serializer/base.tsx:974](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L974)
+Defined in: [client/internal/text/serializer/base.tsx:974](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L974)
 
 ___
 
@@ -320,7 +320,7 @@ Represents a variable for templating for the data-on-mouseup event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mouseout](client_internal_text_serializer_base.ielementbase.md#mouseout)
 
-Defined in: [client/internal/text/serializer/base.tsx:984](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L984)
+Defined in: [client/internal/text/serializer/base.tsx:984](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L984)
 
 ___
 
@@ -333,7 +333,7 @@ Represents a variable for templating for the data-on-mouseover event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mouseover](client_internal_text_serializer_base.ielementbase.md#mouseover)
 
-Defined in: [client/internal/text/serializer/base.tsx:979](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L979)
+Defined in: [client/internal/text/serializer/base.tsx:979](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L979)
 
 ___
 
@@ -346,7 +346,7 @@ Represents a variable for templating for the data-on-mouseup event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mouseup](client_internal_text_serializer_base.ielementbase.md#mouseup)
 
-Defined in: [client/internal/text/serializer/base.tsx:989](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L989)
+Defined in: [client/internal/text/serializer/base.tsx:989](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L989)
 
 ___
 
@@ -359,7 +359,7 @@ Represents a variable for templating for the data-on-mousewheel event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[mousewheel](client_internal_text_serializer_base.ielementbase.md#mousewheel)
 
-Defined in: [client/internal/text/serializer/base.tsx:994](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L994)
+Defined in: [client/internal/text/serializer/base.tsx:994](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L994)
 
 ___
 
@@ -374,7 +374,7 @@ the rich-text-- classes types
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[richClassList](client_internal_text_serializer_base.ielementbase.md#richclasslist)
 
-Defined in: [client/internal/text/serializer/base.tsx:876](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L876)
+Defined in: [client/internal/text/serializer/base.tsx:876](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L876)
 
 ___
 
@@ -384,7 +384,7 @@ ___
 
 file size
 
-Defined in: [client/internal/text/serializer/types/file.tsx:166](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L166)
+Defined in: [client/internal/text/serializer/types/file.tsx:166](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L166)
 
 ___
 
@@ -394,7 +394,7 @@ ___
 
 url of the file
 
-Defined in: [client/internal/text/serializer/types/file.tsx:174](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L174)
+Defined in: [client/internal/text/serializer/types/file.tsx:174](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L174)
 
 ___
 
@@ -405,7 +405,7 @@ ___
 src id of the file
 data-src-id
 
-Defined in: [client/internal/text/serializer/types/file.tsx:179](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L179)
+Defined in: [client/internal/text/serializer/types/file.tsx:179](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L179)
 
 ___
 
@@ -419,7 +419,7 @@ within it
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[style](client_internal_text_serializer_base.ielementbase.md#style)
 
-Defined in: [client/internal/text/serializer/base.tsx:859](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L859)
+Defined in: [client/internal/text/serializer/base.tsx:859](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L859)
 
 ___
 
@@ -432,7 +432,7 @@ and it's the style for when the item is in an active state
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[styleActive](client_internal_text_serializer_base.ielementbase.md#styleactive)
 
-Defined in: [client/internal/text/serializer/base.tsx:869](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L869)
+Defined in: [client/internal/text/serializer/base.tsx:869](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L869)
 
 ___
 
@@ -445,7 +445,7 @@ is applied during a hover event, represents data-style-hover
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[styleHover](client_internal_text_serializer_base.ielementbase.md#stylehover)
 
-Defined in: [client/internal/text/serializer/base.tsx:864](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L864)
+Defined in: [client/internal/text/serializer/base.tsx:864](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L864)
 
 ___
 
@@ -459,7 +459,7 @@ of the given element
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[textContent](client_internal_text_serializer_base.ielementbase.md#textcontent)
 
-Defined in: [client/internal/text/serializer/base.tsx:895](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L895)
+Defined in: [client/internal/text/serializer/base.tsx:895](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L895)
 
 ___
 
@@ -472,7 +472,7 @@ Represents a variable for templating for the data-on-touchcancel event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[touchcancel](client_internal_text_serializer_base.ielementbase.md#touchcancel)
 
-Defined in: [client/internal/text/serializer/base.tsx:1014](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L1014)
+Defined in: [client/internal/text/serializer/base.tsx:1014](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L1014)
 
 ___
 
@@ -485,7 +485,7 @@ Represents a variable for templating for the data-on-touchend event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[touchend](client_internal_text_serializer_base.ielementbase.md#touchend)
 
-Defined in: [client/internal/text/serializer/base.tsx:1009](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L1009)
+Defined in: [client/internal/text/serializer/base.tsx:1009](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L1009)
 
 ___
 
@@ -498,7 +498,7 @@ Represents a variable for templating for the data-on-touchmove event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[touchmove](client_internal_text_serializer_base.ielementbase.md#touchmove)
 
-Defined in: [client/internal/text/serializer/base.tsx:1004](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L1004)
+Defined in: [client/internal/text/serializer/base.tsx:1004](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L1004)
 
 ___
 
@@ -511,7 +511,7 @@ Represents a variable for templating for the data-on-touchstart event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[touchstart](client_internal_text_serializer_base.ielementbase.md#touchstart)
 
-Defined in: [client/internal/text/serializer/base.tsx:999](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L999)
+Defined in: [client/internal/text/serializer/base.tsx:999](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L999)
 
 ___
 
@@ -521,7 +521,7 @@ ___
 
 The type
 
-Defined in: [client/internal/text/serializer/types/file.tsx:154](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/file.tsx#L154)
+Defined in: [client/internal/text/serializer/types/file.tsx:154](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/file.tsx#L154)
 
 ___
 
@@ -535,7 +535,7 @@ data-ui-handler
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[uiHandler](client_internal_text_serializer_base.ielementbase.md#uihandler)
 
-Defined in: [client/internal/text/serializer/base.tsx:901](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L901)
+Defined in: [client/internal/text/serializer/base.tsx:901](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L901)
 
 ___
 
@@ -549,7 +549,7 @@ Arguments for the ui handler
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[uiHandlerArgs](client_internal_text_serializer_base.ielementbase.md#uihandlerargs)
 
-Defined in: [client/internal/text/serializer/base.tsx:905](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L905)
+Defined in: [client/internal/text/serializer/base.tsx:905](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L905)
 
 ___
 
@@ -562,4 +562,4 @@ Represents a variable for templating for the data-on-wheel event
 
 Inherited from: [IElementBase](client_internal_text_serializer_base.ielementbase.md).[wheel](client_internal_text_serializer_base.ielementbase.md#wheel)
 
-Defined in: [client/internal/text/serializer/base.tsx:1019](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/base.tsx#L1019)
+Defined in: [client/internal/text/serializer/base.tsx:1019](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/base.tsx#L1019)

@@ -20,7 +20,7 @@ This file provides the utility that builds custom graphql endpoints
 
 ### buildCustomTokenQueries
 
-▸ **buildCustomTokenQueries**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `customTokens`: [*ICustomTokensType*](../interfaces/server_custom_graphql.icustomtokenstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+▸ **buildCustomTokenQueries**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `customTokens`: [*ICustomTokensType*](../interfaces/server_custom_graphql.icustomtokenstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
 This function contains a customs tokens type into a real
 graphql definition
@@ -32,6 +32,6 @@ Name | Type | Description |
 `appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) | the application data   |
 `customTokens` | [*ICustomTokensType*](../interfaces/server_custom_graphql.icustomtokenstype.md) | the customs token definition    |
 
-**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
-Defined in: [server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/11a98dec/server/custom-graphql/index.ts#L103)
+Defined in: [server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/0569bdf2/server/custom-graphql/index.ts#L103)

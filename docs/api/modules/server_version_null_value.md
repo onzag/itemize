@@ -15,7 +15,7 @@ so empty string is used in such a case, but we need to clear that up after parse
 
 ### convertVersionsIntoNullsWhenNecessary
 
-▸ **convertVersionsIntoNullsWhenNecessary**(`value`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
+▸ **convertVersionsIntoNullsWhenNecessary**(`value`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)): [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
 
 Modifies the value in place to remove empty string version values
 which are invalid to nulls
@@ -24,10 +24,10 @@ which are invalid to nulls
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`value` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the value in question   |
+`value` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | the value in question   |
 
-**Returns:** [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
+**Returns:** [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)
 
 the same value, this function modifies the value in place
 
-Defined in: [server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/11a98dec/server/version-null-value.ts#L15)
+Defined in: [server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/0569bdf2/server/version-null-value.ts#L15)

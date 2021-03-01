@@ -35,4 +35,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/components/search/SearchActioner.tsx:102](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L102)
+Defined in: [client/components/search/SearchActioner.tsx:102](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L102)

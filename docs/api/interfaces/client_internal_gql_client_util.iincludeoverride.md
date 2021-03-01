@@ -18,7 +18,7 @@
 
 • `Optional` **exclusionState**: *INCLUDED* \| *EXCLUDED* \| *ANY*
 
-Defined in: [client/internal/gql-client-util.ts:45](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L45)
+Defined in: [client/internal/gql-client-util.ts:45](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L45)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **id**: *string*
 
-Defined in: [client/internal/gql-client-util.ts:44](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L44)
+Defined in: [client/internal/gql-client-util.ts:44](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L44)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • `Optional` **overrides**: [*IPropertyOverride*](client_internal_gql_client_util.ipropertyoverride.md)[]
 
-Defined in: [client/internal/gql-client-util.ts:46](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L46)
+Defined in: [client/internal/gql-client-util.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L46)

@@ -66,7 +66,7 @@ for such
 
 The classes that are available for the containers
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:597](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L597)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:597](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L597)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 The customs that are available
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:593](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L593)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:593](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L593)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 The classes that are available by the rich text
 non prefixed
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:589](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L589)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:589](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L589)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 Able to insert any custom element from
 custom toolbar
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:583](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L583)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:583](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L583)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 Whether a container can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:521](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L521)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:521](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L521)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 Whether a custom element can be inserted at the given
 location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:530](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L530)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:530](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L530)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 Whether a file can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:513](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L513)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:513](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L513)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 Whether an image can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:505](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L505)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:505](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L505)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 Whether a link can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:517](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L517)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:517](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L517)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 Whether a list can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:525](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L525)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:525](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L525)
 
 ___
 
@@ -169,7 +169,7 @@ ___
 
 Whether a quote can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:534](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L534)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:534](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L534)
 
 ___
 
@@ -179,7 +179,7 @@ ___
 
 Whether a rich class element can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:542](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L542)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:542](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L542)
 
 ___
 
@@ -189,7 +189,7 @@ ___
 
 Whether a title element can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:538](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L538)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:538](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L538)
 
 ___
 
@@ -199,7 +199,7 @@ ___
 
 Whether a video can be inserted at the given location
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:509](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L509)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:509](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L509)
 
 ___
 
@@ -210,7 +210,7 @@ ___
 Whether an action function can be set on the given element
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:573](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L573)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:573](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L573)
 
 ___
 
@@ -221,7 +221,7 @@ ___
 Whether the active style can be set
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:558](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L558)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:558](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L558)
 
 ___
 
@@ -232,7 +232,7 @@ ___
 Whether the dynamic href can be set for links
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:563](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L563)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:563](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L563)
 
 ___
 
@@ -243,7 +243,7 @@ ___
 Whether we can set the hover style
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:553](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L553)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:553](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L553)
 
 ___
 
@@ -254,7 +254,7 @@ ___
 Whether a loop can be established
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:578](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L578)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:578](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L578)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 Whether the style of the current element can be set
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:547](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L547)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:547](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L547)
 
 ___
 
@@ -275,7 +275,7 @@ ___
 Whether an UI handler can be set on the given element
 normally true if templating is true
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:568](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/index.tsx#L568)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:568](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/index.tsx#L568)
 
 ___
 
@@ -289,7 +289,7 @@ not affect the base container
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportedContainers](client_internal_text.ifeaturesupportoptions.md#supportedcontainers)
 
-Defined in: [client/internal/text/index.tsx:230](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L230)
+Defined in: [client/internal/text/index.tsx:230](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L230)
 
 ___
 
@@ -301,7 +301,7 @@ the supported custom elements
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportedCustoms](client_internal_text.ifeaturesupportoptions.md#supportedcustoms)
 
-Defined in: [client/internal/text/index.tsx:220](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L220)
+Defined in: [client/internal/text/index.tsx:220](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L220)
 
 ___
 
@@ -314,7 +314,7 @@ if all supported
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportedRichClasses](client_internal_text.ifeaturesupportoptions.md#supportedrichclasses)
 
-Defined in: [client/internal/text/index.tsx:239](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L239)
+Defined in: [client/internal/text/index.tsx:239](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L239)
 
 ___
 
@@ -326,7 +326,7 @@ whether we support containers
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsContainers](client_internal_text.ifeaturesupportoptions.md#supportscontainers)
 
-Defined in: [client/internal/text/index.tsx:224](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L224)
+Defined in: [client/internal/text/index.tsx:224](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L224)
 
 ___
 
@@ -338,7 +338,7 @@ Whether we support customs
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsCustom](client_internal_text.ifeaturesupportoptions.md#supportscustom)
 
-Defined in: [client/internal/text/index.tsx:216](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L216)
+Defined in: [client/internal/text/index.tsx:216](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L216)
 
 ___
 
@@ -351,7 +351,7 @@ are acceptable
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsCustomStyles](client_internal_text.ifeaturesupportoptions.md#supportscustomstyles)
 
-Defined in: [client/internal/text/index.tsx:207](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L207)
+Defined in: [client/internal/text/index.tsx:207](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L207)
 
 ___
 
@@ -364,7 +364,7 @@ protocol outside the current page are acceptable
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsExternalLinks](client_internal_text.ifeaturesupportoptions.md#supportsexternallinks)
 
-Defined in: [client/internal/text/index.tsx:190](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L190)
+Defined in: [client/internal/text/index.tsx:190](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L190)
 
 ___
 
@@ -376,7 +376,7 @@ Whether files are supporeted
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsFiles](client_internal_text.ifeaturesupportoptions.md#supportsfiles)
 
-Defined in: [client/internal/text/index.tsx:175](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L175)
+Defined in: [client/internal/text/index.tsx:175](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L175)
 
 ___
 
@@ -390,7 +390,7 @@ it doesn't support files, or when viewing
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsFilesAccept](client_internal_text.ifeaturesupportoptions.md#supportsfilesaccept)
 
-Defined in: [client/internal/text/index.tsx:181](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L181)
+Defined in: [client/internal/text/index.tsx:181](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L181)
 
 ___
 
@@ -402,7 +402,7 @@ Whether it supports images
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsImages](client_internal_text.ifeaturesupportoptions.md#supportsimages)
 
-Defined in: [client/internal/text/index.tsx:161](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L161)
+Defined in: [client/internal/text/index.tsx:161](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L161)
 
 ___
 
@@ -416,7 +416,7 @@ it doesn't support images, or when viewing
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsImagesAccept](client_internal_text.ifeaturesupportoptions.md#supportsimagesaccept)
 
-Defined in: [client/internal/text/index.tsx:167](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L167)
+Defined in: [client/internal/text/index.tsx:167](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L167)
 
 ___
 
@@ -428,7 +428,7 @@ Whether links are acceptable
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsLinks](client_internal_text.ifeaturesupportoptions.md#supportslinks)
 
-Defined in: [client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L185)
+Defined in: [client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L185)
 
 ___
 
@@ -440,7 +440,7 @@ Whether lists are acceptable, ul, ol etc...
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsLists](client_internal_text.ifeaturesupportoptions.md#supportslists)
 
-Defined in: [client/internal/text/index.tsx:194](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L194)
+Defined in: [client/internal/text/index.tsx:194](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L194)
 
 ___
 
@@ -452,7 +452,7 @@ Whether quotes are acceptable
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsQuote](client_internal_text.ifeaturesupportoptions.md#supportsquote)
 
-Defined in: [client/internal/text/index.tsx:198](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L198)
+Defined in: [client/internal/text/index.tsx:198](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L198)
 
 ___
 
@@ -464,7 +464,7 @@ whether rich classes are supported
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsRichClasses](client_internal_text.ifeaturesupportoptions.md#supportsrichclasses)
 
-Defined in: [client/internal/text/index.tsx:234](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L234)
+Defined in: [client/internal/text/index.tsx:234](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L234)
 
 ___
 
@@ -476,7 +476,7 @@ Whether templating is supported
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsTemplating](client_internal_text.ifeaturesupportoptions.md#supportstemplating)
 
-Defined in: [client/internal/text/index.tsx:211](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L211)
+Defined in: [client/internal/text/index.tsx:211](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L211)
 
 ___
 
@@ -488,7 +488,7 @@ Whether titles are acceptable
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsTitle](client_internal_text.ifeaturesupportoptions.md#supportstitle)
 
-Defined in: [client/internal/text/index.tsx:202](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L202)
+Defined in: [client/internal/text/index.tsx:202](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L202)
 
 ___
 
@@ -500,4 +500,4 @@ Whether it supports videos
 
 Inherited from: [IFeatureSupportOptions](client_internal_text.ifeaturesupportoptions.md).[supportsVideos](client_internal_text.ifeaturesupportoptions.md#supportsvideos)
 
-Defined in: [client/internal/text/index.tsx:171](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/index.tsx#L171)
+Defined in: [client/internal/text/index.tsx:171](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/index.tsx#L171)

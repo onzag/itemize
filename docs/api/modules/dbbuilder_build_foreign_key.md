@@ -22,13 +22,13 @@ so that references can be respected
 
 • `Const` **MAX\_PG\_FK\_SIZE**: *60*= 60
 
-Defined in: [dbbuilder/build-foreign-key.ts:34](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/build-foreign-key.ts#L34)
+Defined in: [dbbuilder/build-foreign-key.ts:34](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-foreign-key.ts#L34)
 
 ## Functions
 
 ### buildForeignKeys
 
-▸ **buildForeignKeys**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)): *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)\>
+▸ **buildForeignKeys**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `currentDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)): *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)\>
 
 Builds all the foreign keys
 
@@ -37,14 +37,14 @@ Builds all the foreign keys
 Name | Type | Description |
 :------ | :------ | :------ |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database instance   |
-`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the current database schema   |
-`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the new database schema as requested   |
+`currentDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the current database schema   |
+`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the new database schema as requested   |
 
-**Returns:** *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)\>
+**Returns:** *Promise*<[*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)\>
 
 the resulting database schema and the new current
 
-Defined in: [dbbuilder/build-foreign-key.ts:43](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/build-foreign-key.ts#L43)
+Defined in: [dbbuilder/build-foreign-key.ts:43](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-foreign-key.ts#L43)
 
 ___
 
@@ -60,4 +60,4 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [dbbuilder/build-foreign-key.ts:31](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/build-foreign-key.ts#L31)
+Defined in: [dbbuilder/build-foreign-key.ts:31](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/build-foreign-key.ts#L31)

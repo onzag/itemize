@@ -36,7 +36,7 @@ Name | Type |
 
 **Returns:** [*CustomRoleManager*](server_resolvers_roles.customrolemanager.md)
 
-Defined in: [server/resolvers/roles.ts:48](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L48)
+Defined in: [server/resolvers/roles.ts:48](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L48)
 
 ## Properties
 
@@ -44,7 +44,7 @@ Defined in: [server/resolvers/roles.ts:48](https://github.com/onzag/itemize/blob
 
 • `Private` **argEnv**: ICustomRoleGranterArg
 
-Defined in: [server/resolvers/roles.ts:48](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L48)
+Defined in: [server/resolvers/roles.ts:48](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L48)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • `Private` **filteredRoles**: [*ICustomRoleType*](../interfaces/server_resolvers_roles.icustomroletype.md)[]
 
-Defined in: [server/resolvers/roles.ts:46](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L46)
+Defined in: [server/resolvers/roles.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L46)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/resolvers/roles.ts:47](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L47)
+Defined in: [server/resolvers/roles.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L47)
 
 ## Methods
 
@@ -78,7 +78,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [server/resolvers/roles.ts:75](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L75)
+Defined in: [server/resolvers/roles.ts:75](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L75)
 
 ___
 
@@ -94,4 +94,4 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [server/resolvers/roles.ts:66](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L66)
+Defined in: [server/resolvers/roles.ts:66](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L66)

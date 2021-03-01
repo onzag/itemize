@@ -20,7 +20,7 @@
 
 • **CREATION**: = "CREATION"
 
-Defined in: [server/resolvers/roles.ts:12](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L12)
+Defined in: [server/resolvers/roles.ts:12](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L12)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **MODIFYING**: = "MODIFYING"
 
-Defined in: [server/resolvers/roles.ts:13](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L13)
+Defined in: [server/resolvers/roles.ts:13](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L13)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **REMOVAL**: = "REMOVAL"
 
-Defined in: [server/resolvers/roles.ts:16](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L16)
+Defined in: [server/resolvers/roles.ts:16](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L16)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **RETRIEVING**: = "RETRIEVING"
 
-Defined in: [server/resolvers/roles.ts:14](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L14)
+Defined in: [server/resolvers/roles.ts:14](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L14)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **SEARCHING**: = "SEARCHING"
 
-Defined in: [server/resolvers/roles.ts:15](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/roles.ts#L15)
+Defined in: [server/resolvers/roles.ts:15](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/roles.ts#L15)

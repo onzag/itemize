@@ -34,7 +34,7 @@ The base interface, all entry, read, view, set contain these attributes
 the id of the property that must exist under the item definition
 provider
 
-Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/11a98dec/client/components/property/base.tsx#L31)
+Defined in: [client/components/property/base.tsx:31](https://github.com/onzag/itemize/blob/0569bdf2/client/components/property/base.tsx#L31)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 the policy name, should be provided with a policy type
 
-Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/11a98dec/client/components/property/base.tsx#L44)
+Defined in: [client/components/property/base.tsx:44](https://github.com/onzag/itemize/blob/0569bdf2/client/components/property/base.tsx#L44)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 the policy type, should be provided with a policy name
 
-Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/11a98dec/client/components/property/base.tsx#L40)
+Defined in: [client/components/property/base.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/components/property/base.tsx#L40)
 
 ___
 
@@ -65,4 +65,4 @@ ___
 A search variant, exact, from, to, radius, etc...
 only truly available in search mode
 
-Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/11a98dec/client/components/property/base.tsx#L36)
+Defined in: [client/components/property/base.tsx:36](https://github.com/onzag/itemize/blob/0569bdf2/client/components/property/base.tsx#L36)

@@ -32,4 +32,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/link.ts:17](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/link.ts#L17)
+Defined in: [client/internal/text/serializer/types/link.ts:17](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/link.ts#L17)

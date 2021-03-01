@@ -55,7 +55,7 @@ Whether file urls are to be cached
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[cacheFiles](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#cachefiles)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L133)
+Defined in: [client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L133)
 
 ___
 
@@ -69,7 +69,7 @@ Provided by the user check base.tsx
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[capitalize](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#capitalize)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L101)
+Defined in: [client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L101)
 
 ___
 
@@ -81,7 +81,7 @@ Config is a conditional include that will pass the config to the handler
 
 Context Provided, Conditional, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:146](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L146)
+Defined in: [client/internal/components/PropertyView/index.tsx:146](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L146)
 
 ___
 
@@ -98,7 +98,7 @@ retrieved from the applied value from the item-definition.tsx context in the giv
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[containerId](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#containerid)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L59)
+Defined in: [client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L59)
 
 ___
 
@@ -110,7 +110,7 @@ the current country
 
 Context Provided, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:198](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L198)
+Defined in: [client/internal/components/PropertyView/index.tsx:198](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L198)
 
 ___
 
@@ -122,7 +122,7 @@ The currency being used
 
 Context Provided, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:178](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L178)
+Defined in: [client/internal/components/PropertyView/index.tsx:178](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L178)
 
 ___
 
@@ -136,7 +136,7 @@ Context provided, standard handler only
 
 #### Type declaration:
 
-Defined in: [client/internal/components/PropertyView/index.tsx:184](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L184)
+Defined in: [client/internal/components/PropertyView/index.tsx:184](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L184)
 
 ___
 
@@ -151,7 +151,7 @@ retrieved from the item-definition.tsx context
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[forId](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#forid)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L81)
+Defined in: [client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L81)
 
 ___
 
@@ -166,19 +166,19 @@ retrieved from the item-definition.tsx context
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[forVersion](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#forversion)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L88)
+Defined in: [client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L88)
 
 ___
 
 ### i18n
 
-• **i18n**: [*Ii18NType*](base_root.ii18ntype.md)
+• **i18n**: [*Ii18NType*](root.ii18ntype.md)
 
 standard i18n data from the root
 
 Context Provided, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:192](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L192)
+Defined in: [client/internal/components/PropertyView/index.tsx:192](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L192)
 
 ___
 
@@ -193,7 +193,7 @@ retrieved from the item-definition.tsx context
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[include](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#include)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L66)
+Defined in: [client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L66)
 
 ___
 
@@ -209,7 +209,7 @@ retrieved from the item-definition.tsx context
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[itemDefinition](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#itemdefinition)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L74)
+Defined in: [client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L74)
 
 ___
 
@@ -221,7 +221,7 @@ The language being used
 
 Context Provided, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:166](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L166)
+Defined in: [client/internal/components/PropertyView/index.tsx:166](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L166)
 
 ___
 
@@ -236,7 +236,7 @@ retrieved from the item-definition.tsx context
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[property](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#property)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L95)
+Defined in: [client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L95)
 
 ___
 
@@ -254,7 +254,7 @@ Calculated, Standard Handler Only
 
 Overrides: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[renderer](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#renderer)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:209](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L209)
+Defined in: [client/internal/components/PropertyView/index.tsx:209](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L209)
 
 ___
 
@@ -273,7 +273,7 @@ Calculated, Standard Handler Only
 
 Overrides: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[rendererArgs](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#rendererargs)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:220](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L220)
+Defined in: [client/internal/components/PropertyView/index.tsx:220](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L220)
 
 ___
 
@@ -285,7 +285,7 @@ Whether this language is rtl
 
 Context Provided, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:172](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L172)
+Defined in: [client/internal/components/PropertyView/index.tsx:172](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L172)
 
 ___
 
@@ -298,7 +298,7 @@ handler, used in references mainly
 
 Context Provided, Conditional, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:159](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L159)
+Defined in: [client/internal/components/PropertyView/index.tsx:159](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L159)
 
 ___
 
@@ -314,7 +314,7 @@ filtered for this specific property from the item-definition.tsx context state v
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[state](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#state)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L109)
+Defined in: [client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L109)
 
 ___
 
@@ -326,7 +326,7 @@ Token is a conditional include that will pass the token to the handler
 
 Context Provided, Conditional, Standard Handler Only
 
-Defined in: [client/internal/components/PropertyView/index.tsx:152](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L152)
+Defined in: [client/internal/components/PropertyView/index.tsx:152](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L152)
 
 ___
 
@@ -341,4 +341,4 @@ Provided by the user check base.tsx
 
 Inherited from: [IPropertyViewMainHandlerProps](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md).[useAppliedValue](client_internal_components_propertyview.ipropertyviewmainhandlerprops.md#useappliedvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L116)
+Defined in: [client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L116)

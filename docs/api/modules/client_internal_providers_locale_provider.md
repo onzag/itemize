@@ -27,4 +27,4 @@ Contains the locale provider that provides locale information
 The locale context provides the locale information down all the way
 to any component that demands it
 
-Defined in: [client/internal/providers/locale-provider.tsx:77](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/locale-provider.tsx#L77)
+Defined in: [client/internal/providers/locale-provider.tsx:77](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/locale-provider.tsx#L77)

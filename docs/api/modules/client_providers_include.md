@@ -22,7 +22,7 @@
 
 • `Const` **IncludeContext**: *Context*<[*IIncludeContext*](../interfaces/client_providers_include.iincludecontext.md)\>
 
-Defined in: [client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/11a98dec/client/providers/include.tsx#L11)
+Defined in: [client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/include.tsx#L11)
 
 ## Functions
 
@@ -38,4 +38,4 @@ Name | Type |
 
 **Returns:** *Element*
 
-Defined in: [client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/11a98dec/client/providers/include.tsx#L45)
+Defined in: [client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/include.tsx#L45)

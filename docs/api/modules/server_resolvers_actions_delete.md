@@ -13,25 +13,25 @@
 
 ### deleteItemDefinition
 
-▸ **deleteItemDefinition**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<any\>
+▸ **deleteItemDefinition**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<any\>
 
 #### Parameters:
 
 Name | Type |
 :------ | :------ |
 `appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
+`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/gql.igraphqlidefresolverargs.md) |
 `itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/actions/delete.ts#L29)
+Defined in: [server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/actions/delete.ts#L29)
 
 ___
 
 ### deleteItemDefinitionFn
 
-▸ **deleteItemDefinitionFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **deleteItemDefinitionFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](gql.md#fgraphqlidefresolvertype)
 
 #### Parameters:
 
@@ -39,6 +39,6 @@ Name | Type |
 :------ | :------ |
 `appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+**Returns:** [*FGraphQLIdefResolverType*](gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/delete.ts:286](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/actions/delete.ts#L286)
+Defined in: [server/resolvers/actions/delete.ts:286](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/actions/delete.ts#L286)

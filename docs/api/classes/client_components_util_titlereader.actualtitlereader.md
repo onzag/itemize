@@ -56,7 +56,7 @@ Name | Type |
 
 **Returns:** [*ActualTitleReader*](client_components_util_titlereader.actualtitlereader.md)
 
-Defined in: [client/components/util/TitleReader.tsx:16](https://github.com/onzag/itemize/blob/11a98dec/client/components/util/TitleReader.tsx#L16)
+Defined in: [client/components/util/TitleReader.tsx:16](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/TitleReader.tsx#L16)
 
 ## Properties
 
@@ -255,7 +255,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/TitleReader.tsx:20](https://github.com/onzag/itemize/blob/11a98dec/client/components/util/TitleReader.tsx#L20)
+Defined in: [client/components/util/TitleReader.tsx:20](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/TitleReader.tsx#L20)
 
 ___
 
@@ -341,7 +341,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/TitleReader.tsx:24](https://github.com/onzag/itemize/blob/11a98dec/client/components/util/TitleReader.tsx#L24)
+Defined in: [client/components/util/TitleReader.tsx:24](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/TitleReader.tsx#L24)
 
 ___
 
@@ -422,7 +422,7 @@ ___
 
 **Returns:** *string*
 
-Defined in: [client/components/util/TitleReader.tsx:28](https://github.com/onzag/itemize/blob/11a98dec/client/components/util/TitleReader.tsx#L28)
+Defined in: [client/components/util/TitleReader.tsx:28](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/TitleReader.tsx#L28)
 
 ___
 

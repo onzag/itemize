@@ -61,7 +61,7 @@ Name | Type |
 
 **Returns:** [*FileLoadErrorDialog*](client_fast_prototyping_components_slate_dialogs_file.fileloaderrordialog.md)
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
+Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
 
 ## Properties
 
@@ -432,7 +432,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:48](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/dialogs/file.tsx#L48)
+Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:48](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/file.tsx#L48)
 
 ___
 
@@ -442,7 +442,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:54](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/dialogs/file.tsx#L54)
+Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:54](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/file.tsx#L54)
 
 ___
 
@@ -454,7 +454,7 @@ The render function
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:60](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/dialogs/file.tsx#L60)
+Defined in: [client/fast-prototyping/components/slate/dialogs/file.tsx:60](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/dialogs/file.tsx#L60)
 
 ___
 

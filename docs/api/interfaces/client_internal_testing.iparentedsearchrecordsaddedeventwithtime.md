@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IParentedSearchRecordsEvent*](base_remote_protocol.iparentedsearchrecordsevent.md)
+* [*IParentedSearchRecordsEvent*](remote_protocol.iparentedsearchrecordsevent.md)
 
   ↳ **IParentedSearchRecordsAddedEventWithTime**
 
@@ -32,9 +32,9 @@
 
 the records that have been deleted
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[lostRecords](base_remote_protocol.iparentedsearchrecordsevent.md#lostrecords)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[lostRecords](remote_protocol.iparentedsearchrecordsevent.md#lostrecords)
 
-Defined in: [base/remote-protocol.ts:114](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L114)
+Defined in: [base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L115)
 
 ___
 
@@ -44,9 +44,9 @@ ___
 
 the records that have been modified
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[modifiedRecords](base_remote_protocol.iparentedsearchrecordsevent.md#modifiedrecords)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[modifiedRecords](remote_protocol.iparentedsearchrecordsevent.md#modifiedrecords)
 
-Defined in: [base/remote-protocol.ts:118](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L118)
+Defined in: [base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L119)
 
 ___
 
@@ -56,9 +56,9 @@ ___
 
 the new last record search result
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[newLastModified](base_remote_protocol.iparentedsearchrecordsevent.md#newlastmodified)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[newLastModified](remote_protocol.iparentedsearchrecordsevent.md#newlastmodified)
 
-Defined in: [base/remote-protocol.ts:122](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L122)
+Defined in: [base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L123)
 
 ___
 
@@ -68,9 +68,9 @@ ___
 
 the new records that have been added
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[newRecords](base_remote_protocol.iparentedsearchrecordsevent.md#newrecords)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[newRecords](remote_protocol.iparentedsearchrecordsevent.md#newrecords)
 
-Defined in: [base/remote-protocol.ts:110](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L110)
+Defined in: [base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L111)
 
 ___
 
@@ -78,9 +78,9 @@ ___
 
 • **parentId**: *string*
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentId](base_remote_protocol.iparentedsearchrecordsevent.md#parentid)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[parentId](remote_protocol.iparentedsearchrecordsevent.md#parentid)
 
-Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L149)
+Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L150)
 
 ___
 
@@ -88,9 +88,9 @@ ___
 
 • **parentType**: *string*
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentType](base_remote_protocol.iparentedsearchrecordsevent.md#parenttype)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[parentType](remote_protocol.iparentedsearchrecordsevent.md#parenttype)
 
-Defined in: [base/remote-protocol.ts:148](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L148)
+Defined in: [base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L149)
 
 ___
 
@@ -98,9 +98,9 @@ ___
 
 • **parentVersion**: *string*
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[parentVersion](base_remote_protocol.iparentedsearchrecordsevent.md#parentversion)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[parentVersion](remote_protocol.iparentedsearchrecordsevent.md#parentversion)
 
-Defined in: [base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L150)
+Defined in: [base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L151)
 
 ___
 
@@ -110,9 +110,9 @@ ___
 
 the qualified path name or type of the either module or item definition
 
-Inherited from: [IParentedSearchRecordsEvent](base_remote_protocol.iparentedsearchrecordsevent.md).[qualifiedPathName](base_remote_protocol.iparentedsearchrecordsevent.md#qualifiedpathname)
+Inherited from: [IParentedSearchRecordsEvent](remote_protocol.iparentedsearchrecordsevent.md).[qualifiedPathName](remote_protocol.iparentedsearchrecordsevent.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:106](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L106)
+Defined in: [base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L107)
 
 ___
 
@@ -120,4 +120,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/11a98dec/client/internal/testing.ts#L111)
+Defined in: [client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L111)

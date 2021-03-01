@@ -27,7 +27,7 @@ and does data checks on the json files
 
 **Returns:** *Promise*<[*IBuilderBasicConfigType*](../interfaces/builder_config.ibuilderbasicconfigtype.md)\>
 
-Defined in: [builder/config.ts:77](https://github.com/onzag/itemize/blob/11a98dec/builder/config.ts#L77)
+Defined in: [builder/config.ts:77](https://github.com/onzag/itemize/blob/0569bdf2/builder/config.ts#L77)
 
 ___
 
@@ -53,4 +53,4 @@ Name | Type |
 
 **Returns:** *Promise*<T\>
 
-Defined in: [builder/config.ts:27](https://github.com/onzag/itemize/blob/11a98dec/builder/config.ts#L27)
+Defined in: [builder/config.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/builder/config.ts#L27)

@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/item/DeleteActioner.tsx:105](https://github.com/onzag/itemize/blob/11a98dec/client/components/item/DeleteActioner.tsx#L105)
+Defined in: [client/components/item/DeleteActioner.tsx:105](https://github.com/onzag/itemize/blob/0569bdf2/client/components/item/DeleteActioner.tsx#L105)

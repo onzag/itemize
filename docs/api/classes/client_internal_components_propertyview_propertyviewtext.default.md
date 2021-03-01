@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyview_propertyviewtext.default.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:33](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/PropertyViewText.tsx#L33)
+Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:33](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewText.tsx#L33)
 
 ## Properties
 
@@ -429,7 +429,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:51](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/PropertyViewText.tsx#L51)
+Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:51](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewText.tsx#L51)
 
 ___
 
@@ -468,4 +468,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:37](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/PropertyViewText.tsx#L37)
+Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:37](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewText.tsx#L37)

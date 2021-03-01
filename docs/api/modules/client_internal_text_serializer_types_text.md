@@ -37,7 +37,7 @@ Name | Type |
 `text` | *string* |
 `underline` | *boolean* |
 
-Defined in: [client/internal/text/serializer/types/text.tsx:18](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/text.tsx#L18)
+Defined in: [client/internal/text/serializer/types/text.tsx:18](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/text.tsx#L18)
 
 ___
 
@@ -56,4 +56,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/internal/text/serializer/types/text.tsx:32](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/types/text.tsx#L32)
+Defined in: [client/internal/text/serializer/types/text.tsx:32](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/types/text.tsx#L32)

@@ -29,7 +29,7 @@
 
 The action being ran
 
-Defined in: [server/resolvers/triggers.ts:51](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L51)
+Defined in: [server/resolvers/triggers.ts:51](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L51)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 App data of the entire application
 
-Defined in: [server/resolvers/triggers.ts:21](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L21)
+Defined in: [server/resolvers/triggers.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L21)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 Arguments that are not part of the patch that were passed to graphql
 
-Defined in: [server/resolvers/triggers.ts:39](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L39)
+Defined in: [server/resolvers/triggers.ts:39](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L39)
 
 ___
 
@@ -72,9 +72,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/triggers.ts:73](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L73)
+Defined in: [server/resolvers/triggers.ts:73](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L73)
 
-Defined in: [server/resolvers/triggers.ts:73](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L73)
+Defined in: [server/resolvers/triggers.ts:73](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L73)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 The id of the item we are working with, it is null for
 CREATE, but it is set for CREATED and others
 
-Defined in: [server/resolvers/triggers.ts:56](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L56)
+Defined in: [server/resolvers/triggers.ts:56](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L56)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 the item definition in question
 
-Defined in: [server/resolvers/triggers.ts:43](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L43)
+Defined in: [server/resolvers/triggers.ts:43](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L43)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 The module in question
 
-Defined in: [server/resolvers/triggers.ts:47](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L47)
+Defined in: [server/resolvers/triggers.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L47)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 the new value that it is hosting usually only available
 on done requests
 
-Defined in: [server/resolvers/triggers.ts:30](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L30)
+Defined in: [server/resolvers/triggers.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L30)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 the current value that the database is hosting
 
-Defined in: [server/resolvers/triggers.ts:25](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L25)
+Defined in: [server/resolvers/triggers.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L25)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 A partial arg based update for the value, remember this is a partial
 value
 
-Defined in: [server/resolvers/triggers.ts:35](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L35)
+Defined in: [server/resolvers/triggers.ts:35](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L35)
 
 ___
 
@@ -155,7 +155,7 @@ Name | Type |
 `id` | *string* |
 `role` | *string* |
 
-Defined in: [server/resolvers/triggers.ts:65](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L65)
+Defined in: [server/resolvers/triggers.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L65)
 
 ___
 
@@ -166,4 +166,4 @@ ___
 The version of the item we are working with, it is null for
 CREATE, but it is set for CREATED and others
 
-Defined in: [server/resolvers/triggers.ts:61](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L61)
+Defined in: [server/resolvers/triggers.ts:61](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L61)

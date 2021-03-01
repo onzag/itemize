@@ -16,7 +16,7 @@ as the root registires are modified during SSR rendering
 
 ### retrieveRootPool
 
-▸ **retrieveRootPool**(`rawData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md)): *Pool*<[*default*](../classes/base_root.default.md)\>
+▸ **retrieveRootPool**(`rawData`: [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md)): *Pool*<[*default*](../classes/root.default.md)\>
 
 Provides a pool of root
 
@@ -24,8 +24,8 @@ Provides a pool of root
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the root raw data    |
+`rawData` | [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md) | the root raw data    |
 
-**Returns:** *Pool*<[*default*](../classes/base_root.default.md)\>
+**Returns:** *Pool*<[*default*](../classes/root.default.md)\>
 
-Defined in: [server/rootpool.ts:21](https://github.com/onzag/itemize/blob/11a98dec/server/rootpool.ts#L21)
+Defined in: [server/rootpool.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/server/rootpool.ts#L21)

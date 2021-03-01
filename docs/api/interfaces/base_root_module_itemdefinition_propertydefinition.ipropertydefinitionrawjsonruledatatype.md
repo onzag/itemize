@@ -19,7 +19,7 @@ A conditition for conditional values
 
 • **if**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:61](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:61](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L61)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **value**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:60](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L60)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:60](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L60)

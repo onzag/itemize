@@ -27,4 +27,4 @@ mantains sync with the title property
 
 **Returns:** *Element*
 
-Defined in: [client/components/util/TitleReader.tsx:47](https://github.com/onzag/itemize/blob/11a98dec/client/components/util/TitleReader.tsx#L47)
+Defined in: [client/components/util/TitleReader.tsx:47](https://github.com/onzag/itemize/blob/0569bdf2/client/components/util/TitleReader.tsx#L47)

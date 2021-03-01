@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IOwnedSearchRegisterRequest*](base_remote_protocol.iownedsearchregisterrequest.md)
+* [*IOwnedSearchRegisterRequest*](remote_protocol.iownedsearchregisterrequest.md)
 
   ↳ **IOwnedSearchRegisterRequestWithTime**
 
@@ -24,9 +24,9 @@
 
 • **createdBy**: *string*
 
-Inherited from: [IOwnedSearchRegisterRequest](base_remote_protocol.iownedsearchregisterrequest.md).[createdBy](base_remote_protocol.iownedsearchregisterrequest.md#createdby)
+Inherited from: [IOwnedSearchRegisterRequest](remote_protocol.iownedsearchregisterrequest.md).[createdBy](remote_protocol.iownedsearchregisterrequest.md#createdby)
 
-Defined in: [base/remote-protocol.ts:311](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L311)
+Defined in: [base/remote-protocol.ts:312](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L312)
 
 ___
 
@@ -34,9 +34,9 @@ ___
 
 • **qualifiedPathName**: *string*
 
-Inherited from: [IOwnedSearchRegisterRequest](base_remote_protocol.iownedsearchregisterrequest.md).[qualifiedPathName](base_remote_protocol.iownedsearchregisterrequest.md#qualifiedpathname)
+Inherited from: [IOwnedSearchRegisterRequest](remote_protocol.iownedsearchregisterrequest.md).[qualifiedPathName](remote_protocol.iownedsearchregisterrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:298](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L298)
+Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L299)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/11a98dec/client/internal/testing.ts#L83)
+Defined in: [client/internal/testing.ts:83](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L83)

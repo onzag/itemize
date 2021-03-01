@@ -22,7 +22,7 @@
 
 • **CREATE**: = 0
 
-Defined in: [server/resolvers/triggers.ts:8](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L8)
+Defined in: [server/resolvers/triggers.ts:8](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L8)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **CREATED**: = 1
 
-Defined in: [server/resolvers/triggers.ts:9](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L9)
+Defined in: [server/resolvers/triggers.ts:9](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L9)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **DELETE**: = 4
 
-Defined in: [server/resolvers/triggers.ts:12](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L12)
+Defined in: [server/resolvers/triggers.ts:12](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L12)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **DELETED**: = 5
 
-Defined in: [server/resolvers/triggers.ts:13](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L13)
+Defined in: [server/resolvers/triggers.ts:13](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L13)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **EDIT**: = 2
 
-Defined in: [server/resolvers/triggers.ts:10](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L10)
+Defined in: [server/resolvers/triggers.ts:10](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L10)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • **EDITED**: = 3
 
-Defined in: [server/resolvers/triggers.ts:11](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L11)
+Defined in: [server/resolvers/triggers.ts:11](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L11)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **READ**: = 6
 
-Defined in: [server/resolvers/triggers.ts:14](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L14)
+Defined in: [server/resolvers/triggers.ts:14](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L14)

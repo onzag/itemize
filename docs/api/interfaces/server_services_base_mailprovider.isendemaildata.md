@@ -29,7 +29,7 @@ This is the from line in the shape of
 username <name@domain.com> that wants to specify
 as the user
 
-Defined in: [server/services/base/MailProvider.ts:46](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L46)
+Defined in: [server/services/base/MailProvider.ts:46](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L46)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 The html content
 
-Defined in: [server/services/base/MailProvider.ts:63](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L63)
+Defined in: [server/services/base/MailProvider.ts:63](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L63)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 The subject attribute
 
-Defined in: [server/services/base/MailProvider.ts:55](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L55)
+Defined in: [server/services/base/MailProvider.ts:55](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L55)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 The plain text content
 
-Defined in: [server/services/base/MailProvider.ts:59](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L59)
+Defined in: [server/services/base/MailProvider.ts:59](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L59)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 A single email or a list of emails that are supposed
 to be sent to
 
-Defined in: [server/services/base/MailProvider.ts:51](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L51)
+Defined in: [server/services/base/MailProvider.ts:51](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L51)
 
 ___
 
@@ -82,7 +82,7 @@ if provided this represents a mailto protocol
 that can be used for the List-Unsubscribe header
 and it is fairly generic
 
-Defined in: [server/services/base/MailProvider.ts:69](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L69)
+Defined in: [server/services/base/MailProvider.ts:69](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L69)
 
 ___
 
@@ -97,4 +97,4 @@ over this one
 
 #### Type declaration:
 
-Defined in: [server/services/base/MailProvider.ts:76](https://github.com/onzag/itemize/blob/11a98dec/server/services/base/MailProvider.ts#L76)
+Defined in: [server/services/base/MailProvider.ts:76](https://github.com/onzag/itemize/blob/0569bdf2/server/services/base/MailProvider.ts#L76)

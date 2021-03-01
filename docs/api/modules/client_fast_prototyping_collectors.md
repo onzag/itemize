@@ -20,4 +20,4 @@ in SSR
 This collector is a valid collector type for usage with the
 style collector for the initialization of the app in the server side
 
-Defined in: [client/fast-prototyping/collectors.ts:22](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/collectors.ts#L22)
+Defined in: [client/fast-prototyping/collectors.ts:22](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/collectors.ts#L22)

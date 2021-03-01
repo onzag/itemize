@@ -29,7 +29,7 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [setup/exec.ts:14](https://github.com/onzag/itemize/blob/11a98dec/setup/exec.ts#L14)
+Defined in: [setup/exec.ts:14](https://github.com/onzag/itemize/blob/0569bdf2/setup/exec.ts#L14)
 
 ___
 
@@ -51,4 +51,4 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [setup/exec.ts:54](https://github.com/onzag/itemize/blob/11a98dec/setup/exec.ts#L54)
+Defined in: [setup/exec.ts:54](https://github.com/onzag/itemize/blob/0569bdf2/setup/exec.ts#L54)

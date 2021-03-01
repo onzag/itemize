@@ -22,4 +22,4 @@ display a dialog as long as they are there
 
 **`returns`** a react element
 
-Defined in: [client/fast-prototyping/components/navbar/external-dialogs.tsx:29](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/navbar/external-dialogs.tsx#L29)
+Defined in: [client/fast-prototyping/components/navbar/external-dialogs.tsx:29](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/navbar/external-dialogs.tsx#L29)

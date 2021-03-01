@@ -62,7 +62,7 @@ Name | Type |
 
 **Returns:** [*SlowLoadingElement*](client_fast_prototyping_components_util.slowloadingelement.md)
 
-Defined in: [client/fast-prototyping/components/util.tsx:150](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L150)
+Defined in: [client/fast-prototyping/components/util.tsx:150](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L150)
 
 ## Properties
 
@@ -125,7 +125,7 @@ Becomes true once unmounted, avoid setState on
 unmounted components if the element really takes a while
 to load
 
-Defined in: [client/fast-prototyping/components/util.tsx:136](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L136)
+Defined in: [client/fast-prototyping/components/util.tsx:136](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L136)
 
 ___
 
@@ -273,7 +273,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/util.tsx:176](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L176)
+Defined in: [client/fast-prototyping/components/util.tsx:176](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L176)
 
 ___
 
@@ -290,7 +290,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/util.tsx:179](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L179)
+Defined in: [client/fast-prototyping/components/util.tsx:179](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L179)
 
 ___
 
@@ -354,7 +354,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/util.tsx:185](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L185)
+Defined in: [client/fast-prototyping/components/util.tsx:185](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L185)
 
 ___
 
@@ -435,7 +435,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/util.tsx:159](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L159)
+Defined in: [client/fast-prototyping/components/util.tsx:159](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L159)
 
 ___
 
@@ -445,7 +445,7 @@ ___
 
 **Returns:** *object*
 
-Defined in: [client/fast-prototyping/components/util.tsx:188](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L188)
+Defined in: [client/fast-prototyping/components/util.tsx:188](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L188)
 
 ___
 
@@ -485,7 +485,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/components/util.tsx:171](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L171)
+Defined in: [client/fast-prototyping/components/util.tsx:171](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L171)
 
 ___
 
@@ -502,4 +502,4 @@ Name | Type |
 
 **Returns:** *Partial*<SlowLoadingElementState\>
 
-Defined in: [client/fast-prototyping/components/util.tsx:138](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/util.tsx#L138)
+Defined in: [client/fast-prototyping/components/util.tsx:138](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/util.tsx#L138)

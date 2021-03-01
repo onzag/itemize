@@ -27,6 +27,6 @@ loadValue
 
 ### error
 
-• **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
+• **error**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/11a98dec/client/providers/item.tsx#L112)
+Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/item.tsx#L112)

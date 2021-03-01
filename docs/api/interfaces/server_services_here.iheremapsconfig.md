@@ -16,4 +16,4 @@
 
 • **apiKey**: *string*
 
-Defined in: [server/services/here.ts:26](https://github.com/onzag/itemize/blob/11a98dec/server/services/here.ts#L26)
+Defined in: [server/services/here.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/server/services/here.ts#L26)

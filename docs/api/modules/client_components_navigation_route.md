@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/11a98dec/client/components/navigation/Route.tsx#L16)
+Defined in: [client/components/navigation/Route.tsx:16](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/Route.tsx#L16)

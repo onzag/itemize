@@ -17,7 +17,7 @@
 
 • `Optional` **item**: [*IBaseTriggerRegistry*](server_resolvers_triggers.ibasetriggerregistry.md)
 
-Defined in: [server/resolvers/triggers.ts:104](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L104)
+Defined in: [server/resolvers/triggers.ts:104](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L104)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • `Optional` **module**: [*IBaseTriggerRegistry*](server_resolvers_triggers.ibasetriggerregistry.md)
 
-Defined in: [server/resolvers/triggers.ts:103](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/triggers.ts#L103)
+Defined in: [server/resolvers/triggers.ts:103](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/triggers.ts#L103)

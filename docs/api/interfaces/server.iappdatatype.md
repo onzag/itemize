@@ -45,7 +45,7 @@
 
 • **buildnumber**: *string*
 
-Defined in: [server/index.ts:157](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L157)
+Defined in: [server/index.ts:157](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L157)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **cache**: [*Cache*](../classes/server_cache.cache.md)
 
-Defined in: [server/index.ts:150](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L150)
+Defined in: [server/index.ts:150](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L150)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 • **config**: [*IConfigRawJSONDataType*](config.iconfigrawjsondatatype.md)
 
-Defined in: [server/index.ts:146](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L146)
+Defined in: [server/index.ts:146](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L146)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 • **customRoles**: [*ICustomRoleType*](server_resolvers_roles.icustomroletype.md)[]
 
-Defined in: [server/index.ts:169](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L169)
+Defined in: [server/index.ts:169](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L169)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/index.ts:166](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L166)
+Defined in: [server/index.ts:166](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L166)
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 • **customUserTokenQuery**: *any*
 
-Defined in: [server/index.ts:160](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L160)
+Defined in: [server/index.ts:160](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L160)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 • **databaseConnection**: [*DatabaseConnection*](../classes/database.databaseconnection.md)
 
-Defined in: [server/index.ts:148](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L148)
+Defined in: [server/index.ts:148](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L148)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 • **indexDevelopment**: *string*
 
-Defined in: [server/index.ts:144](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L144)
+Defined in: [server/index.ts:144](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L144)
 
 ___
 
@@ -111,15 +111,15 @@ ___
 
 • **indexProduction**: *string*
 
-Defined in: [server/index.ts:145](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L145)
+Defined in: [server/index.ts:145](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L145)
 
 ___
 
 ### langLocales
 
-• **langLocales**: [*ILangLocalesType*](base_root.ilanglocalestype.md)
+• **langLocales**: [*ILangLocalesType*](root.ilanglocalestype.md)
 
-Defined in: [server/index.ts:141](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L141)
+Defined in: [server/index.ts:141](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L141)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 • **listener**: [*Listener*](../classes/server_listener.listener.md)
 
-Defined in: [server/index.ts:149](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L149)
+Defined in: [server/index.ts:149](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L149)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 • **locationSearchService**: [*default*](../classes/server_services_base_locationsearchprovider.default.md)<any\>
 
-Defined in: [server/index.ts:164](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L164)
+Defined in: [server/index.ts:164](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L164)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 • **logger**: *Logger*
 
-Defined in: [server/index.ts:161](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L161)
+Defined in: [server/index.ts:161](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L161)
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 • **mailService**: [*default*](../classes/server_services_base_mailprovider.default.md)<any\>
 
-Defined in: [server/index.ts:162](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L162)
+Defined in: [server/index.ts:162](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L162)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 • **rawDB**: [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md)
 
-Defined in: [server/index.ts:170](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L170)
+Defined in: [server/index.ts:170](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L170)
 
 ___
 
@@ -167,7 +167,7 @@ ___
 
 • **redis**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:151](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L151)
+Defined in: [server/index.ts:151](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L151)
 
 ___
 
@@ -175,7 +175,7 @@ ___
 
 • **redisGlobal**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:152](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L152)
+Defined in: [server/index.ts:152](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L152)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 • **redisLocalPub**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:155](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L155)
+Defined in: [server/index.ts:155](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L155)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 • **redisLocalSub**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:156](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L156)
+Defined in: [server/index.ts:156](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L156)
 
 ___
 
@@ -199,7 +199,7 @@ ___
 
 • **redisPub**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:153](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L153)
+Defined in: [server/index.ts:153](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L153)
 
 ___
 
@@ -207,7 +207,7 @@ ___
 
 • **redisSub**: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)
 
-Defined in: [server/index.ts:154](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L154)
+Defined in: [server/index.ts:154](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L154)
 
 ___
 
@@ -215,23 +215,23 @@ ___
 
 • **registry**: [*RegistryService*](../classes/server_services_registry.registryservice.md)
 
-Defined in: [server/index.ts:165](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L165)
+Defined in: [server/index.ts:165](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L165)
 
 ___
 
 ### root
 
-• **root**: [*default*](../classes/base_root.default.md)
+• **root**: [*default*](../classes/root.default.md)
 
-Defined in: [server/index.ts:139](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L139)
+Defined in: [server/index.ts:139](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L139)
 
 ___
 
 ### rootPool
 
-• **rootPool**: *Pool*<[*default*](../classes/base_root.default.md)\>
+• **rootPool**: *Pool*<[*default*](../classes/root.default.md)\>
 
-Defined in: [server/index.ts:140](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L140)
+Defined in: [server/index.ts:140](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L140)
 
 ___
 
@@ -239,7 +239,7 @@ ___
 
 • **sensitiveConfig**: [*ISensitiveConfigRawJSONDataType*](config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [server/index.ts:147](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L147)
+Defined in: [server/index.ts:147](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L147)
 
 ___
 
@@ -247,7 +247,7 @@ ___
 
 • **seoConfig**: [*ISEOConfig*](server.iseoconfig.md)
 
-Defined in: [server/index.ts:143](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L143)
+Defined in: [server/index.ts:143](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L143)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 • **ssrConfig**: [*ISSRConfig*](server.issrconfig.md)
 
-Defined in: [server/index.ts:142](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L142)
+Defined in: [server/index.ts:142](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L142)
 
 ___
 
@@ -263,7 +263,7 @@ ___
 
 • **storage**: [*IStorageProvidersObject*](server_services_base_storageprovider.istorageprovidersobject.md)
 
-Defined in: [server/index.ts:159](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L159)
+Defined in: [server/index.ts:159](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L159)
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 • **triggers**: [*ITriggerRegistry*](server_resolvers_triggers.itriggerregistry.md)
 
-Defined in: [server/index.ts:158](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L158)
+Defined in: [server/index.ts:158](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L158)
 
 ___
 
@@ -279,4 +279,4 @@ ___
 
 • **userLocalizationService**: [*default*](../classes/server_services_base_userlocalizationprovider.default.md)<any\>
 
-Defined in: [server/index.ts:163](https://github.com/onzag/itemize/blob/11a98dec/server/index.ts#L163)
+Defined in: [server/index.ts:163](https://github.com/onzag/itemize/blob/0569bdf2/server/index.ts#L163)

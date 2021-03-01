@@ -19,7 +19,7 @@
 
 • **GLOBAL**: = "GLOBAL"
 
-Defined in: [server/services/index.ts:23](https://github.com/onzag/itemize/blob/11a98dec/server/services/index.ts#L23)
+Defined in: [server/services/index.ts:23](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L23)
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **HYBRID**: = "HYBRID"
 
-Defined in: [server/services/index.ts:25](https://github.com/onzag/itemize/blob/11a98dec/server/services/index.ts#L25)
+Defined in: [server/services/index.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L25)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **LOCAL**: = "LOCAL"
 
-Defined in: [server/services/index.ts:24](https://github.com/onzag/itemize/blob/11a98dec/server/services/index.ts#L24)
+Defined in: [server/services/index.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L24)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **NONE**: = "NONE"
 
-Defined in: [server/services/index.ts:26](https://github.com/onzag/itemize/blob/11a98dec/server/services/index.ts#L26)
+Defined in: [server/services/index.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/server/services/index.ts#L26)

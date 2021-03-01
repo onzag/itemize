@@ -29,7 +29,7 @@ the getState function (with or without external checking)
 
 Whether the exclusion can be set according to the current rules
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:43](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L43)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:43](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L43)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 The exclusion state as specified, an ANY exclusion state only occurs
 in ternary mode
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:39](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L39)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:39](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L39)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 The include identifier from the item definition
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:47](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L47)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L47)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 The item definition name it contains (not its parent)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:51](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L51)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:51](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L51)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 The item definition state it contains (not its parent)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:55](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L55)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:55](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L55)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 The state specified exclusion state by the user or another interaction
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:59](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L59)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:59](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L59)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 The state specified exclusion that has been applied using the apply value functionality
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:63](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:63](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L63)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 Whether this state has been manually set
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:71](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L71)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:71](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L71)
 
 ___
 
@@ -110,4 +110,4 @@ ___
 
 Whether this state has been modified by any action, either apply or set
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:67](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/Include/index.ts#L67)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:67](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/Include/index.ts#L67)

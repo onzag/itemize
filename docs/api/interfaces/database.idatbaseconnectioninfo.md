@@ -23,7 +23,7 @@ for a single node in an extended instance
 
 • **database**: *string*
 
-Defined in: [database/index.ts:24](https://github.com/onzag/itemize/blob/11a98dec/database/index.ts#L24)
+Defined in: [database/index.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/database/index.ts#L24)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **host**: *string*
 
-Defined in: [database/index.ts:23](https://github.com/onzag/itemize/blob/11a98dec/database/index.ts#L23)
+Defined in: [database/index.ts:23](https://github.com/onzag/itemize/blob/0569bdf2/database/index.ts#L23)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **password**: *string*
 
-Defined in: [database/index.ts:25](https://github.com/onzag/itemize/blob/11a98dec/database/index.ts#L25)
+Defined in: [database/index.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/database/index.ts#L25)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • **port**: *number*
 
-Defined in: [database/index.ts:26](https://github.com/onzag/itemize/blob/11a98dec/database/index.ts#L26)
+Defined in: [database/index.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/database/index.ts#L26)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 • **user**: *string*
 
-Defined in: [database/index.ts:22](https://github.com/onzag/itemize/blob/11a98dec/database/index.ts#L22)
+Defined in: [database/index.ts:22](https://github.com/onzag/itemize/blob/0569bdf2/database/index.ts#L22)

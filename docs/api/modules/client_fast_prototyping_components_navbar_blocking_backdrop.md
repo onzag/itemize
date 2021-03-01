@@ -25,4 +25,4 @@ it is part of the navbar by default
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/navbar/blocking-backdrop.tsx:52](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L52)
+Defined in: [client/fast-prototyping/components/navbar/blocking-backdrop.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L52)

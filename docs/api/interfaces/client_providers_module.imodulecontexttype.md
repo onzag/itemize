@@ -17,7 +17,7 @@
 
 • **mod**: [*default*](../classes/base_root_module.default.md)
 
-Defined in: [client/providers/module.tsx:9](https://github.com/onzag/itemize/blob/11a98dec/client/providers/module.tsx#L9)
+Defined in: [client/providers/module.tsx:9](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/module.tsx#L9)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **remoteListener**: [*RemoteListener*](../classes/client_internal_app_remote_listener.remotelistener.md)
 
-Defined in: [client/providers/module.tsx:10](https://github.com/onzag/itemize/blob/11a98dec/client/providers/module.tsx#L10)
+Defined in: [client/providers/module.tsx:10](https://github.com/onzag/itemize/blob/0569bdf2/client/providers/module.tsx#L10)

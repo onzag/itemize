@@ -72,7 +72,7 @@ the parent in the parent_id using raw db (there's no cache on the global manager
 is in; you might want to use a memory cache while the parametrizer run, the parametrizer can return a promise so
 it can be async
 
-Defined in: [server/seo/index.ts:118](https://github.com/onzag/itemize/blob/11a98dec/server/seo/index.ts#L118)
+Defined in: [server/seo/index.ts:118](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/index.ts#L118)
 
 ___
 
@@ -83,13 +83,13 @@ ___
 Whether this is a crawable url, you might set this value to true or
 false, depending on you
 
-Defined in: [server/seo/index.ts:63](https://github.com/onzag/itemize/blob/11a98dec/server/seo/index.ts#L63)
+Defined in: [server/seo/index.ts:63](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/index.ts#L63)
 
 ___
 
 ### parametrize
 
-• `Optional` **parametrize**: (`arg`: { `collectedResults`: [*ISEOCollectedResult*](server_seo.iseocollectedresult.md)[] ; `rawDB`: [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md) ; `root`: [*default*](../classes/base_root.default.md)  }) => [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
+• `Optional` **parametrize**: (`arg`: { `collectedResults`: [*ISEOCollectedResult*](server_seo.iseocollectedresult.md)[] ; `rawDB`: [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md) ; `root`: [*default*](../classes/root.default.md)  }) => [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
 
 This is the parametrize function, only makes sense to use when you specify the collect attribute as this needs
 to make use of collected results, however you might specify parametrize without using collect at all, but bear in mind that
@@ -98,7 +98,7 @@ collect
 
 #### Type declaration:
 
-▸ (`arg`: { `collectedResults`: [*ISEOCollectedResult*](server_seo.iseocollectedresult.md)[] ; `rawDB`: [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md) ; `root`: [*default*](../classes/base_root.default.md)  }): [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
+▸ (`arg`: { `collectedResults`: [*ISEOCollectedResult*](server_seo.iseocollectedresult.md)[] ; `rawDB`: [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md) ; `root`: [*default*](../classes/root.default.md)  }): [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
 
 #### Parameters:
 
@@ -107,10 +107,10 @@ Name | Type |
 `arg` | *object* |
 `arg.collectedResults` | [*ISEOCollectedResult*](server_seo.iseocollectedresult.md)[] |
 `arg.rawDB` | [*ItemizeRawDB*](../classes/server_raw_db.itemizerawdb.md) |
-`arg.root` | [*default*](../classes/base_root.default.md) |
+`arg.root` | [*default*](../classes/root.default.md) |
 
 **Returns:** [*ISEOParametrizer*](server_seo.iseoparametrizer.md)[] \| *Promise*<[*ISEOParametrizer*](server_seo.iseoparametrizer.md)[]\>
 
-Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/11a98dec/server/seo/index.ts#L125)
+Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/index.ts#L125)
 
-Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/11a98dec/server/seo/index.ts#L125)
+Defined in: [server/seo/index.ts:125](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/index.ts#L125)

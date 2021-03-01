@@ -18,10 +18,10 @@ A navigation prompt that prompts if a condition evaluates to true
 
 ### PromptDialogComponent
 
-Ƭ **PromptDialogComponent**: *React.ComponentType*<{ `args?`: *any* ; `confirmationCallbackError`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `confirmationCallbackErrorClean`: () => *void* ; `confirming`: *boolean* ; `onCancel`: () => *void* ; `onConfirm`: () => *void* ; `onDiscard`: () => *void* ; `open`: *boolean*  }\>
+Ƭ **PromptDialogComponent**: *React.ComponentType*<{ `args?`: *any* ; `confirmationCallbackError`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `confirmationCallbackErrorClean`: () => *void* ; `confirming`: *boolean* ; `onCancel`: () => *void* ; `onConfirm`: () => *void* ; `onDiscard`: () => *void* ; `open`: *boolean*  }\>
 
 The prompt dialog component is used when possible by
 react router, and since this prompt is just logical
 it needs to consume such component
 
-Defined in: [client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/11a98dec/client/components/navigation/Prompt.tsx#L18)
+Defined in: [client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/0569bdf2/client/components/navigation/Prompt.tsx#L18)

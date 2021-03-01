@@ -185,4 +185,4 @@ Name | Type |
 `additionalProperties.type` | *string* |
 `type` | *string* |
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)

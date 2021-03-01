@@ -19,4 +19,4 @@ this is what a single collected result looks like
 
 • **collected**: [*ISEOCollectedData*](server_seo.iseocollecteddata.md)[]
 
-Defined in: [server/seo/index.ts:52](https://github.com/onzag/itemize/blob/11a98dec/server/seo/index.ts#L52)
+Defined in: [server/seo/index.ts:52](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/index.ts#L52)

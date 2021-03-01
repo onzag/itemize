@@ -35,4 +35,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/property/Setter.tsx:22](https://github.com/onzag/itemize/blob/11a98dec/client/components/property/Setter.tsx#L22)
+Defined in: [client/components/property/Setter.tsx:22](https://github.com/onzag/itemize/blob/0569bdf2/client/components/property/Setter.tsx#L22)

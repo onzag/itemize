@@ -22,7 +22,7 @@ The database config
 
 • **database**: *string*
 
-Defined in: [config.ts:289](https://github.com/onzag/itemize/blob/11a98dec/config.ts#L289)
+Defined in: [config.ts:289](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L289)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **host**: *string*
 
-Defined in: [config.ts:285](https://github.com/onzag/itemize/blob/11a98dec/config.ts#L285)
+Defined in: [config.ts:285](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L285)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **password**: *string*
 
-Defined in: [config.ts:288](https://github.com/onzag/itemize/blob/11a98dec/config.ts#L288)
+Defined in: [config.ts:288](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L288)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **port**: *number*
 
-Defined in: [config.ts:286](https://github.com/onzag/itemize/blob/11a98dec/config.ts#L286)
+Defined in: [config.ts:286](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L286)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 • **user**: *string*
 
-Defined in: [config.ts:287](https://github.com/onzag/itemize/blob/11a98dec/config.ts#L287)
+Defined in: [config.ts:287](https://github.com/onzag/itemize/blob/0569bdf2/config.ts#L287)

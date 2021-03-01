@@ -19,7 +19,7 @@ the module, refer to this file for the graphql generation side of things
 
 ### getGQLFieldsDefinitionForModule
 
-▸ **getGQLFieldsDefinitionForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `options`: { `excludeBase`: *boolean* ; `optionalForm`: *boolean* ; `propertiesAsInput`: *boolean* ; `retrievalMode`: *boolean*  }): [*IGQLFieldsDefinitionType*](../interfaces/base_root_gql.igqlfieldsdefinitiontype.md)
+▸ **getGQLFieldsDefinitionForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `options`: { `excludeBase`: *boolean* ; `optionalForm`: *boolean* ; `propertiesAsInput`: *boolean* ; `retrievalMode`: *boolean*  }): [*IGQLFieldsDefinitionType*](../interfaces/gql.igqlfieldsdefinitiontype.md)
 
 Provides the fields definition for the module itself, and for all
 items inside the module which extend these fields, modules by default
@@ -36,17 +36,17 @@ Name | Type | Description |
 `options.propertiesAsInput` | *boolean* | if the properties should be in input form   |
 `options.retrievalMode` | *boolean* | whether it is in retrieval mode   |
 
-**Returns:** [*IGQLFieldsDefinitionType*](../interfaces/base_root_gql.igqlfieldsdefinitiontype.md)
+**Returns:** [*IGQLFieldsDefinitionType*](../interfaces/gql.igqlfieldsdefinitiontype.md)
 
 all the fields definition for the module
 
-Defined in: [base/Root/Module/gql.ts:39](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/gql.ts#L39)
+Defined in: [base/Root/Module/gql.ts:39](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/gql.ts#L39)
 
 ___
 
 ### getGQLMutationFieldsForModule
 
-▸ **getGQLMutationFieldsForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `resolvers?`: [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+▸ **getGQLMutationFieldsForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `resolvers?`: [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
 Because modules have no mutations, it provides all the mutation
 fields of the item definitions the module contains
@@ -56,19 +56,19 @@ fields of the item definitions the module contains
 Name | Type | Description |
 :------ | :------ | :------ |
 `mod` | [*default*](../classes/base_root_module.default.md) | the module in question   |
-`resolvers?` | [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md) | the resolvers that will be used to resolve the query, these are the generic resolvers that are consumed   |
+`resolvers?` | [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md) | the resolvers that will be used to resolve the query, these are the generic resolvers that are consumed   |
 
-**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
 a query fields definition type for all the sub definitions
 
-Defined in: [base/Root/Module/gql.ts:318](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/gql.ts#L318)
+Defined in: [base/Root/Module/gql.ts:318](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/gql.ts#L318)
 
 ___
 
 ### getGQLQueryFieldsForModule
 
-▸ **getGQLQueryFieldsForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `resolvers?`: [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+▸ **getGQLQueryFieldsForModule**(`mod`: [*default*](../classes/base_root_module.default.md), `resolvers?`: [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
 Provides the query fields in order to create the query
 for a given module, the only query fields you have access to
@@ -81,13 +81,13 @@ a whole level search into all the items it contains
 Name | Type | Description |
 :------ | :------ | :------ |
 `mod` | [*default*](../classes/base_root_module.default.md) | the module in question   |
-`resolvers?` | [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md) | the resolvers that will be used to resolve the query, these are the generic resolvers that are consumed   |
+`resolvers?` | [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md) | the resolvers that will be used to resolve the query, these are the generic resolvers that are consumed   |
 
-**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/gql.igqlqueryfieldsdefinitiontype.md)
 
 the fields for the main query object to do GET_LIST and SEARCH
 
-Defined in: [base/Root/Module/gql.ts:189](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/gql.ts#L189)
+Defined in: [base/Root/Module/gql.ts:189](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/gql.ts#L189)
 
 ___
 
@@ -108,7 +108,7 @@ Name | Type | Description |
 
 the output type for the module object
 
-Defined in: [base/Root/Module/gql.ts:106](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/gql.ts#L106)
+Defined in: [base/Root/Module/gql.ts:106](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/gql.ts#L106)
 
 ___
 
@@ -129,4 +129,4 @@ Name | Type | Description |
 
 the module type this module refers to (it is cached)
 
-Defined in: [base/Root/Module/gql.ts:78](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/gql.ts#L78)
+Defined in: [base/Root/Module/gql.ts:78](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/gql.ts#L78)

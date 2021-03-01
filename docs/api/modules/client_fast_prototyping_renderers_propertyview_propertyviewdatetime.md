@@ -34,4 +34,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewDateTime.tsx:22](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/renderers/PropertyView/PropertyViewDateTime.tsx#L22)
+Defined in: [client/fast-prototyping/renderers/PropertyView/PropertyViewDateTime.tsx:22](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/renderers/PropertyView/PropertyViewDateTime.tsx#L22)

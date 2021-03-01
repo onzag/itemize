@@ -61,7 +61,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](base_root_module_itemdefinition_propertiesvaluemappingdefiniton.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
 
 ## Properties
 
@@ -69,7 +69,7 @@ Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/ind
 
 • **parentItemDefinition**: [*default*](base_root_module_itemdefinition.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:53](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L53)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 • **rawData**: [*IPropertiesValueMappingDefinitonRawJSONDataType*](../interfaces/base_root_module_itemdefinition_propertiesvaluemappingdefiniton.ipropertiesvaluemappingdefinitonrawjsondatatype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:51](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L51)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 • **referredItemDefinition**: [*default*](base_root_module_itemdefinition.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:52](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L52)
 
 ## Methods
 
@@ -99,7 +99,7 @@ Gives a property map in the form id and value for properties
 
 the property map with property values
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:79](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L79)
 
 ___
 
@@ -120,7 +120,7 @@ Name | Type | Description |
 either a peroperty supported value or a property
 definition itself for referred properties
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:108](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L108)
 
 ___
 
@@ -141,4 +141,4 @@ Name | Type | Description |
 
 a boolean on whether it has such a property value
 
-Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)
+Defined in: [base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts:97](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton/index.ts#L97)

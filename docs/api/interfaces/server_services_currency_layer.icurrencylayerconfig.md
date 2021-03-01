@@ -17,7 +17,7 @@
 
 • **apiKey**: *string*
 
-Defined in: [server/services/currency-layer.ts:20](https://github.com/onzag/itemize/blob/11a98dec/server/services/currency-layer.ts#L20)
+Defined in: [server/services/currency-layer.ts:20](https://github.com/onzag/itemize/blob/0569bdf2/server/services/currency-layer.ts#L20)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **httpsEnabled**: *boolean*
 
-Defined in: [server/services/currency-layer.ts:21](https://github.com/onzag/itemize/blob/11a98dec/server/services/currency-layer.ts#L21)
+Defined in: [server/services/currency-layer.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/server/services/currency-layer.ts#L21)

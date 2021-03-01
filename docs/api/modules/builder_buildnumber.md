@@ -26,4 +26,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [builder/buildnumber.ts:17](https://github.com/onzag/itemize/blob/11a98dec/builder/buildnumber.ts#L17)
+Defined in: [builder/buildnumber.ts:17](https://github.com/onzag/itemize/blob/0569bdf2/builder/buildnumber.ts#L17)

@@ -27,4 +27,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md)\>
 
-Defined in: [setup/config/standard.ts:15](https://github.com/onzag/itemize/blob/11a98dec/setup/config/standard.ts#L15)
+Defined in: [setup/config/standard.ts:15](https://github.com/onzag/itemize/blob/0569bdf2/setup/config/standard.ts#L15)

@@ -19,4 +19,4 @@ this is also used in conditions
 
 • **property**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:369](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L369)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:369](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L369)

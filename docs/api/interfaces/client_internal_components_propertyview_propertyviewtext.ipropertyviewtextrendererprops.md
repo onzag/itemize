@@ -36,7 +36,7 @@ The renderer args
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[args](client_internal_components_propertyview.ipropertyviewrendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/11a98dec/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/renderer.ts#L19)
 
 ___
 
@@ -48,7 +48,7 @@ The current value to be displayed
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[currentValue](client_internal_components_propertyview.ipropertyviewrendererprops.md#currentvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Whether it is rich text, as in its subtype is html
 
-Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:23](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/PropertyViewText.tsx#L23)
+Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:23](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewText.tsx#L23)
 
 ___
 
@@ -70,7 +70,7 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[rtl](client_internal_components_propertyview.ipropertyviewrendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/11a98dec/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/renderer.ts#L15)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 Whether it is type html or plain
 
-Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:27](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyView/PropertyViewText.tsx#L27)
+Defined in: [client/internal/components/PropertyView/PropertyViewText.tsx:27](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyView/PropertyViewText.tsx#L27)

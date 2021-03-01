@@ -22,4 +22,4 @@ Name | Type |
 
 **Returns:** *object*
 
-Defined in: [server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/11a98dec/server/user/mutations.ts#L3)
+Defined in: [server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/0569bdf2/server/user/mutations.ts#L3)

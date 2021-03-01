@@ -15,7 +15,7 @@ are deemed necessary by the schema
 
 ### prepareExtensions
 
-▸ **prepareExtensions**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md)): *Promise*<void\>
+▸ **prepareExtensions**(`databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `newDatabaseSchema`: [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md)): *Promise*<void\>
 
 Builds all the extensions as they are required to be processed
 
@@ -24,8 +24,8 @@ Builds all the extensions as they are required to be processed
 Name | Type | Description |
 :------ | :------ | :------ |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database instance   |
-`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/base_root_sql.isqlschemadefinitiontype.md) | the new database schema as requested    |
+`newDatabaseSchema` | [*ISQLSchemaDefinitionType*](../interfaces/sql.isqlschemadefinitiontype.md) | the new database schema as requested    |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/extensions.ts:16](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/extensions.ts#L16)
+Defined in: [dbbuilder/extensions.ts:16](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/extensions.ts#L16)

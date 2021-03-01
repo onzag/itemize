@@ -54,7 +54,7 @@ Builds a new update query builder
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L30)
+Defined in: [database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L30)
 
 ## Properties
 
@@ -62,7 +62,7 @@ Defined in: [database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob
 
 • **fromBuilder**: [*FromBuilder*](database_frombuilder.frombuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:28](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L28)
+Defined in: [database/UpdateBuilder.ts:28](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L28)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 Whether it's an update only query
 
-Defined in: [database/UpdateBuilder.ts:25](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L25)
+Defined in: [database/UpdateBuilder.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L25)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 • **returningBuilder**: [*ReturningBuilder*](database_returningbuilder.returningbuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L30)
+Defined in: [database/UpdateBuilder.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L30)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 • **setBuilder**: [*SetBuilder*](database_setbuilder.setbuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:27](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L27)
+Defined in: [database/UpdateBuilder.ts:27](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L27)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 • `Private` **tableAlias**: *string*
 
-Defined in: [database/UpdateBuilder.ts:21](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L21)
+Defined in: [database/UpdateBuilder.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L21)
 
 ___
 
@@ -106,7 +106,7 @@ ___
 
 Table name in question we are updating against
 
-Defined in: [database/UpdateBuilder.ts:20](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L20)
+Defined in: [database/UpdateBuilder.ts:20](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L20)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 • **whereBuilder**: [*WhereBuilder*](database_wherebuilder.wherebuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:29](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L29)
+Defined in: [database/UpdateBuilder.ts:29](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L29)
 
 ## Methods
 
@@ -134,7 +134,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L69)
 
 ___
 
@@ -154,7 +154,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L77)
 
 ___
 
@@ -174,7 +174,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/UpdateBuilder.ts:66](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L66)
+Defined in: [database/UpdateBuilder.ts:66](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L66)
 
 ___
 
@@ -188,7 +188,7 @@ Clears the table name, alias, and only state
 
 itself
 
-Defined in: [database/UpdateBuilder.ts:84](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L84)
+Defined in: [database/UpdateBuilder.ts:84](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L84)
 
 ___
 
@@ -202,7 +202,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L102)
 
 ___
 
@@ -218,7 +218,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/UpdateBuilder.ts:95](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L95)
+Defined in: [database/UpdateBuilder.ts:95](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L95)
 
 ___
 
@@ -235,7 +235,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L165)
 
 ___
 
@@ -249,7 +249,7 @@ Makes the update be UPDATE ONLY
 
 itself
 
-Defined in: [database/UpdateBuilder.ts:75](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L75)
+Defined in: [database/UpdateBuilder.ts:75](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L75)
 
 ___
 
@@ -263,7 +263,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L109)
 
 ___
 
@@ -284,7 +284,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L86)
 
 ___
 
@@ -305,7 +305,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L95)
 
 ___
 
@@ -325,7 +325,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/UpdateBuilder.ts:56](https://github.com/onzag/itemize/blob/11a98dec/database/UpdateBuilder.ts#L56)
+Defined in: [database/UpdateBuilder.ts:56](https://github.com/onzag/itemize/blob/0569bdf2/database/UpdateBuilder.ts#L56)
 
 ___
 
@@ -341,4 +341,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L126)

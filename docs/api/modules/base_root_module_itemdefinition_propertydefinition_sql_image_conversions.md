@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a void promise for when this is done
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/image-conversions.ts:114](https://github.com/onzag/itemize/blob/11a98dec/base/Root/Module/ItemDefinition/PropertyDefinition/sql/image-conversions.ts#L114)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/image-conversions.ts:114](https://github.com/onzag/itemize/blob/0569bdf2/base/Root/Module/ItemDefinition/PropertyDefinition/sql/image-conversions.ts#L114)

@@ -27,4 +27,4 @@ Name | Type | Description |
 
 **Returns:** [*IDumpConfigRawJSONDataType*](../interfaces/config.idumpconfigrawjsondatatype.md)
 
-Defined in: [setup/config/dump.ts:13](https://github.com/onzag/itemize/blob/11a98dec/setup/config/dump.ts#L13)
+Defined in: [setup/config/dump.ts:13](https://github.com/onzag/itemize/blob/0569bdf2/setup/config/dump.ts#L13)

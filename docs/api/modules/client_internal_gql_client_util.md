@@ -62,7 +62,7 @@ Name | Type |
 `argumentsFoundFilePaths` | *any* |
 `requestFields` | *any* |
 
-Defined in: [client/internal/gql-client-util.ts:65](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L65)
+Defined in: [client/internal/gql-client-util.ts:65](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L65)
 
 ___
 
@@ -92,13 +92,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IGQLFile*](../interfaces/gql_querier.igqlfile.md) \| [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[]\>
 
-Defined in: [client/internal/gql-client-util.ts:298](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L298)
+Defined in: [client/internal/gql-client-util.ts:298](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L298)
 
 ___
 
 ### runAddQueryFor
 
-▸ **runAddQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `containerId`: *string* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `forId`: *string* ; `forVersion`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+▸ **runAddQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `containerId`: *string* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `forId`: *string* ; `forVersion`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
 Runs an add query for a given item definition
 
@@ -119,18 +119,18 @@ Name | Type | Description |
 `arg.token` | *string* | the token we are using for the addition process   |
 `arg.waitAndMerge?` | *boolean* | - |
 
-**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
 a promise with an error, the fields that can be used to retrieve the same value in a get
 query, and the value that was retrieved
 
-Defined in: [client/internal/gql-client-util.ts:730](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L730)
+Defined in: [client/internal/gql-client-util.ts:730](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L730)
 
 ___
 
 ### runDeleteQueryFor
 
-▸ **runDeleteQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype)  }\>
+▸ **runDeleteQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype)  }\>
 
 #### Parameters:
 
@@ -147,17 +147,17 @@ Name | Type | Description |
 `arg.version` | *string* | the version that we are deleting for (or null)   |
 `arg.waitAndMerge?` | *boolean* | - |
 
-**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype)  }\>
+**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype)  }\>
 
 a promise with an error on whether it succeed or not
 
-Defined in: [client/internal/gql-client-util.ts:646](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L646)
+Defined in: [client/internal/gql-client-util.ts:646](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L646)
 
 ___
 
 ### runEditQueryFor
 
-▸ **runEditQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+▸ **runEditQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `listenerUUID`: *string* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
 Runs an edit query for a given item definition
 
@@ -177,15 +177,15 @@ Name | Type | Description |
 `arg.version` | *string* | the version we are editing, or null   |
 `arg.waitAndMerge?` | *boolean* | - |
 
-**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+**Returns:** *Promise*<{ `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
-Defined in: [client/internal/gql-client-util.ts:830](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L830)
+Defined in: [client/internal/gql-client-util.ts:830](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L830)
 
 ___
 
 ### runGetQueryFor
 
-▸ **runGetQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `returnMemoryCachedValues`: *boolean* ; `returnWorkerCachedValues`: *boolean* ; `returnWorkerCachedValuesIfNoInternet?`: *boolean* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `cached`: *boolean* ; `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `memoryCached`: *boolean* ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+▸ **runGetQueryFor**(`arg`: { `args`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) ; `cacheStore`: *boolean* ; `fields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `language`: *string* ; `returnMemoryCachedValues`: *boolean* ; `returnWorkerCachedValues`: *boolean* ; `returnWorkerCachedValuesIfNoInternet?`: *boolean* ; `token`: *string* ; `version`: *string* ; `waitAndMerge?`: *boolean*  }): *Promise*<{ `cached`: *boolean* ; `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `memoryCached`: *boolean* ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
 Runs a get query for a given item definition and its args
 
@@ -207,11 +207,11 @@ Name | Type | Description |
 `arg.version` | *string* | the version we are requesting for   |
 `arg.waitAndMerge?` | *boolean* | - |
 
-**Returns:** *Promise*<{ `cached`: *boolean* ; `error`: [*EndpointErrorType*](base_errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `memoryCached`: *boolean* ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
+**Returns:** *Promise*<{ `cached`: *boolean* ; `error`: [*EndpointErrorType*](errors.md#endpointerrortype) ; `getQueryFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) ; `memoryCached`: *boolean* ; `value`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)  }\>
 
 a promise with a bunch of information
 
-Defined in: [client/internal/gql-client-util.ts:485](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L485)
+Defined in: [client/internal/gql-client-util.ts:485](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L485)
 
 ___
 
@@ -234,4 +234,4 @@ a promise with the error, results (for traditional), the records, the count
 which might me larger than the number of records, however the record length should
 be equal to the limit, and the offset given
 
-Defined in: [client/internal/gql-client-util.ts:1022](https://github.com/onzag/itemize/blob/11a98dec/client/internal/gql-client-util.ts#L1022)
+Defined in: [client/internal/gql-client-util.ts:1022](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/gql-client-util.ts#L1022)

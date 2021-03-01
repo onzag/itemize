@@ -41,9 +41,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L52)
+Defined in: [client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L52)
 
-Defined in: [client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L52)
+Defined in: [client/components/search/SearchActioner.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L52)
 
 ___
 
@@ -59,9 +59,9 @@ Dismiss the search error
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L36)
+Defined in: [client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L36)
 
-Defined in: [client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L36)
+Defined in: [client/components/search/SearchActioner.tsx:36](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L36)
 
 ___
 
@@ -77,9 +77,9 @@ Dissmiss the search results
 
 **Returns:** *void*
 
-Defined in: [client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L32)
+Defined in: [client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L32)
 
-Defined in: [client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L32)
+Defined in: [client/components/search/SearchActioner.tsx:32](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L32)
 
 ___
 
@@ -101,19 +101,19 @@ Name | Type |
 
 **Returns:** *Promise*<[*IActionResponseWithSearchResults*](client_providers_item.iactionresponsewithsearchresults.md)\>
 
-Defined in: [client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L48)
+Defined in: [client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L48)
 
-Defined in: [client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L48)
+Defined in: [client/components/search/SearchActioner.tsx:48](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L48)
 
 ___
 
 ### searchError
 
-• **searchError**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
+• **searchError**: [*EndpointErrorType*](../modules/errors.md#endpointerrortype)
 
 An error that occured during the last search (whole context)
 
-Defined in: [client/components/search/SearchActioner.tsx:28](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L28)
+Defined in: [client/components/search/SearchActioner.tsx:28](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L28)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 Search records (whole context)
 
-Defined in: [client/components/search/SearchActioner.tsx:44](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L44)
+Defined in: [client/components/search/SearchActioner.tsx:44](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L44)
 
 ___
 
@@ -133,4 +133,4 @@ ___
 
 Currently searching (this is true for the whole context)
 
-Defined in: [client/components/search/SearchActioner.tsx:40](https://github.com/onzag/itemize/blob/11a98dec/client/components/search/SearchActioner.tsx#L40)
+Defined in: [client/components/search/SearchActioner.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/components/search/SearchActioner.tsx#L40)

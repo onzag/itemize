@@ -29,7 +29,7 @@ The token context contains the current token state as well as several
 functions, it should sit inside the application and over the main
 component
 
-Defined in: [client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/token-provider.tsx#L118)
+Defined in: [client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/token-provider.tsx#L118)
 
 ## Functions
 
@@ -49,4 +49,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/token-provider.tsx#L125)
+Defined in: [client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/token-provider.tsx#L125)

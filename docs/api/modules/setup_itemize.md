@@ -28,4 +28,4 @@ Name | Type | Description |
 
 the same arg
 
-Defined in: [setup/itemize/index.ts:19](https://github.com/onzag/itemize/blob/11a98dec/setup/itemize/index.ts#L19)
+Defined in: [setup/itemize/index.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/setup/itemize/index.ts#L19)

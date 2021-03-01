@@ -30,4 +30,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/localization/AppCurrencyRetriever.tsx:26](https://github.com/onzag/itemize/blob/11a98dec/client/components/localization/AppCurrencyRetriever.tsx#L26)
+Defined in: [client/components/localization/AppCurrencyRetriever.tsx:26](https://github.com/onzag/itemize/blob/0569bdf2/client/components/localization/AppCurrencyRetriever.tsx#L26)

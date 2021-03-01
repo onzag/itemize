@@ -20,11 +20,11 @@ but rather it's processed again
 
 ### args
 
-• `Optional` **args**: [*IGQLFieldsDefinitionType*](base_root_gql.igqlfieldsdefinitiontype.md)
+• `Optional` **args**: [*IGQLFieldsDefinitionType*](gql.igqlfieldsdefinitiontype.md)
 
 These are the args that the graphql query needs to take
 
-Defined in: [server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/11a98dec/server/custom-graphql/index.ts#L80)
+Defined in: [server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/0569bdf2/server/custom-graphql/index.ts#L80)
 
 ___
 
@@ -51,6 +51,6 @@ Name | Type |
 
 **Returns:** [*IReferredTokenStructure*](server_custom_graphql.ireferredtokenstructure.md) \| *Promise*<[*IReferredTokenStructure*](server_custom_graphql.ireferredtokenstructure.md)\>
 
-Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/11a98dec/server/custom-graphql/index.ts#L60)
+Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/0569bdf2/server/custom-graphql/index.ts#L60)
 
-Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/11a98dec/server/custom-graphql/index.ts#L60)
+Defined in: [server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/0569bdf2/server/custom-graphql/index.ts#L60)

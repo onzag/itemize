@@ -31,7 +31,7 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [server/mode.ts:17](https://github.com/onzag/itemize/blob/11a98dec/server/mode.ts#L17)
+Defined in: [server/mode.ts:17](https://github.com/onzag/itemize/blob/0569bdf2/server/mode.ts#L17)
 
 ___
 
@@ -50,4 +50,4 @@ Name | Type | Description |
 
 **Returns:** *development* \| *production*
 
-Defined in: [server/mode.ts:33](https://github.com/onzag/itemize/blob/11a98dec/server/mode.ts#L33)
+Defined in: [server/mode.ts:33](https://github.com/onzag/itemize/blob/0569bdf2/server/mode.ts#L33)

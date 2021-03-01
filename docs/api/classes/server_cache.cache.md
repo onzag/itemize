@@ -55,7 +55,7 @@ all the servers
 
 ### constructor
 
-\+ **new Cache**(`redisClient`: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md), `databaseConnection`: [*DatabaseConnection*](database.databaseconnection.md), `sensitiveConfig`: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md), `storageClients`: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md), `domain`: *string*, `root`: [*default*](base_root.default.md), `initialServerData`: [*IServerDataType*](../interfaces/server.iserverdatatype.md)): [*Cache*](server_cache.cache.md)
+\+ **new Cache**(`redisClient`: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md), `databaseConnection`: [*DatabaseConnection*](database.databaseconnection.md), `sensitiveConfig`: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md), `storageClients`: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md), `domain`: *string*, `root`: [*default*](root.default.md), `initialServerData`: [*IServerDataType*](../interfaces/server.iserverdatatype.md)): [*Cache*](server_cache.cache.md)
 
 Builds a new cache instance, before the cache is ready
 it needs to be able to access the listener as well, but due
@@ -71,12 +71,12 @@ Name | Type | Description |
 `sensitiveConfig` | [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md) | - |
 `storageClients` | [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md) | - |
 `domain` | *string* | - |
-`root` | [*default*](base_root.default.md) | the root of itemize    |
+`root` | [*default*](root.default.md) | the root of itemize    |
 `initialServerData` | [*IServerDataType*](../interfaces/server.iserverdatatype.md) | - |
 
 **Returns:** [*Cache*](server_cache.cache.md)
 
-Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L66)
+Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L66)
 
 ## Properties
 
@@ -84,7 +84,7 @@ Defined in: [server/cache.ts:66](https://github.com/onzag/itemize/blob/11a98dec/
 
 • `Private` **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [server/cache.ts:55](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L55)
+Defined in: [server/cache.ts:55](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L55)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • `Private` **domain**: *string*
 
-Defined in: [server/cache.ts:56](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L56)
+Defined in: [server/cache.ts:56](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L56)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • `Private` **listener**: [*Listener*](server_listener.listener.md)
 
-Defined in: [server/cache.ts:60](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L60)
+Defined in: [server/cache.ts:60](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L60)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/cache.ts:62](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L62)
+Defined in: [server/cache.ts:62](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L62)
 
 ___
 
@@ -118,15 +118,15 @@ ___
 
 • `Private` **redisClient**: [*ItemizeRedisClient*](server_redis.itemizeredisclient.md)
 
-Defined in: [server/cache.ts:54](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L54)
+Defined in: [server/cache.ts:54](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L54)
 
 ___
 
 ### root
 
-• `Private` **root**: [*default*](base_root.default.md)
+• `Private` **root**: [*default*](root.default.md)
 
-Defined in: [server/cache.ts:58](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L58)
+Defined in: [server/cache.ts:58](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L58)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 • `Private` **sensitiveConfig**: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [server/cache.ts:61](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L61)
+Defined in: [server/cache.ts:61](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L61)
 
 ___
 
@@ -142,7 +142,7 @@ ___
 
 • `Private` **serverData**: [*IServerDataType*](../interfaces/server.iserverdatatype.md)
 
-Defined in: [server/cache.ts:59](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L59)
+Defined in: [server/cache.ts:59](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L59)
 
 ___
 
@@ -150,7 +150,7 @@ ___
 
 • `Private` **storageClients**: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md)
 
-Defined in: [server/cache.ts:57](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L57)
+Defined in: [server/cache.ts:57](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L57)
 
 ## Methods
 
@@ -173,7 +173,7 @@ Name | Type | Description |
 
 a simple boolean
 
-Defined in: [server/cache.ts:899](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L899)
+Defined in: [server/cache.ts:899](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L899)
 
 ___
 
@@ -195,7 +195,7 @@ Name | Type | Description |
 
 a list of modules
 
-Defined in: [server/cache.ts:915](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L915)
+Defined in: [server/cache.ts:915](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L915)
 
 ___
 
@@ -216,13 +216,13 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:945](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L945)
+Defined in: [server/cache.ts:945](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L945)
 
 ___
 
 ### forceCacheInto
 
-▸ `Private`**forceCacheInto**(`idefTable`: *string*, `id`: *string*, `version`: *string*, `value`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): *Promise*<void\>
+▸ `Private`**forceCacheInto**(`idefTable`: *string*, `id`: *string*, `version`: *string*, `value`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)): *Promise*<void\>
 
 forces a cached value for a given item definition table in an id and version
 
@@ -233,11 +233,11 @@ Name | Type | Description |
 `idefTable` | *string* | the item definition table or its qualified name   |
 `id` | *string* | the id   |
 `version` | *string* | the version or null   |
-`value` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the value to store    |
+`value` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | the value to store    |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:190](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L190)
+Defined in: [server/cache.ts:190](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L190)
 
 ___
 
@@ -263,7 +263,7 @@ Name | Type | Description |
 
 a promise with the value
 
-Defined in: [server/cache.ts:110](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L110)
+Defined in: [server/cache.ts:110](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L110)
 
 ___
 
@@ -275,13 +275,13 @@ Provides the current server data
 
 **Returns:** [*IServerDataType*](../interfaces/server.iserverdatatype.md)
 
-Defined in: [server/cache.ts:1486](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1486)
+Defined in: [server/cache.ts:1486](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1486)
 
 ___
 
 ### onChangeInformed
 
-▸ **onChangeInformed**(`itemDefinition`: *string*, `id`: *string*, `version`: *string*, `data?`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): *Promise*<void\>
+▸ **onChangeInformed**(`itemDefinition`: *string*, `id`: *string*, `version`: *string*, `data?`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)): *Promise*<void\>
 
 This function triggers once the remote listener has detected a change that has been done by
 another server instance to a value that we are supposedly currently holding in memory
@@ -293,13 +293,13 @@ Name | Type | Description |
 `itemDefinition` | *string* | the item definition qualified name   |
 `id` | *string* | the id of such   |
 `version` | *string* | the version or null   |
-`data?` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the entire SQL result   |
+`data?` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | the entire SQL result   |
 
 **Returns:** *Promise*<void\>
 
 a void promise when done
 
-Defined in: [server/cache.ts:1510](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1510)
+Defined in: [server/cache.ts:1510](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1510)
 
 ___
 
@@ -317,7 +317,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1570](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1570)
+Defined in: [server/cache.ts:1570](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1570)
 
 ___
 
@@ -335,7 +335,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:1494](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1494)
+Defined in: [server/cache.ts:1494](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1494)
 
 ___
 
@@ -353,13 +353,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:169](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L169)
+Defined in: [server/cache.ts:169](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L169)
 
 ___
 
 ### requestCreation
 
-▸ **requestCreation**(`itemDefinition`: [*default*](base_root_module_itemdefinition.default.md), `forId`: *string*, `version`: *string*, `value`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `createdBy`: *string*, `dictionary`: *string*, `containerId`: *string*, `parent`: { `id`: *string* ; `type`: *string* ; `version`: *string*  }, `listenerUUID`: *string*): *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+▸ **requestCreation**(`itemDefinition`: [*default*](base_root_module_itemdefinition.default.md), `forId`: *string*, `version`: *string*, `value`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `createdBy`: *string*, `dictionary`: *string*, `containerId`: *string*, `parent`: { `id`: *string* ; `type`: *string* ; `version`: *string*  }, `listenerUUID`: *string*): *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 Request the creation of a new item definition value for an specific item definition
 
@@ -380,11 +380,11 @@ Name | Type | Description |
 `parent.version` | *string* | the parent version   |
 `listenerUUID` | *string* | the listener uuid   |
 
-**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 a total sql combined row value that can be converted into grapqhl
 
-Defined in: [server/cache.ts:306](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L306)
+Defined in: [server/cache.ts:306](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L306)
 
 ___
 
@@ -407,13 +407,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1037](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1037)
+Defined in: [server/cache.ts:1037](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1037)
 
 ___
 
 ### requestListCache
 
-▸ **requestListCache**(`records`: [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]): *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)[]\>
+▸ **requestListCache**(`records`: [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[]): *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)[]\>
 
 TODO Optimize this, right now it retrieves the list one by one
 Requests a whole list of search results
@@ -424,11 +424,11 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `records` | [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[] | the records to request for   |
 
-**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)[]\>
+**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)[]\>
 
 a list of whole sql combined table row values
 
-Defined in: [server/cache.ts:1475](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1475)
+Defined in: [server/cache.ts:1475](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1475)
 
 ___
 
@@ -450,13 +450,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<string\>
 
-Defined in: [server/cache.ts:1345](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1345)
+Defined in: [server/cache.ts:1345](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1345)
 
 ___
 
 ### requestUpdate
 
-▸ **requestUpdate**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `update`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `currentValue`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md), `editedBy`: *string*, `dictionary`: *string*, `containerId`: *string*, `listenerUUID`: *string*): *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+▸ **requestUpdate**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `update`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `currentValue`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md), `editedBy`: *string*, `dictionary`: *string*, `containerId`: *string*, `listenerUUID`: *string*): *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 Requests an update for an item definition where new values are set for this existent item
 definition value, these are taken as instructions and no checks are done on it
@@ -475,17 +475,17 @@ Name | Type | Description |
 `containerId` | *string* | the container id where this item is stored, please when using update ensure to select the same container that the item is already created otherwise this will break the uploads and make them unreachable if you are passing no uploads it's safe to leave as null   |
 `listenerUUID` | *string* | the listener uuid, from the listener, this ensures that the executor of this action doesn't get a notification, you can pass null for this if this is a computer operation and let every listener to be informed while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the listener uuid ensures only those that needs updates will get them   |
 
-**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 a total combined table row value that can be converted into graphql
 
-Defined in: [server/cache.ts:628](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L628)
+Defined in: [server/cache.ts:628](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L628)
 
 ___
 
 ### requestUpdateSimple
 
-▸ **requestUpdateSimple**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `update`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `dictionary`: *string*, `currentRawValueSQL?`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): *Promise*<void\>
+▸ **requestUpdateSimple**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `update`: [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), `dictionary`: *string*, `currentRawValueSQL?`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)): *Promise*<void\>
 
 Requests an update for an item definition in a simple way
 this might have more overhead than the normal request update
@@ -499,17 +499,17 @@ Name | Type |
 `version` | *string* |
 `update` | [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md) |
 `dictionary` | *string* |
-`currentRawValueSQL?` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) |
+`currentRawValueSQL?` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:570](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L570)
+Defined in: [server/cache.ts:570](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L570)
 
 ___
 
 ### requestValue
 
-▸ **requestValue**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `options?`: { `refresh?`: *boolean* ; `useMemoryCache?`: *boolean*  }): *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+▸ **requestValue**(`item`: *string* \| [*default*](base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `options?`: { `refresh?`: *boolean* ; `useMemoryCache?`: *boolean*  }): *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 Requests a value from the cache
 
@@ -524,11 +524,11 @@ Name | Type | Description |
 `options.refresh?` | *boolean* | whether to skip the cache and request directly from the database and update the cache   |
 `options.useMemoryCache?` | *boolean* | a total opposite of refresh, (do not use together as refresh beats this one) which will use a 1 second memory cache to retrieve values and store them, use this if you think the value might be used consecutively and you don't care about accuraccy that much   |
 
-**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 a whole sql value that can be converted into graphql if necessary
 
-Defined in: [server/cache.ts:1379](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1379)
+Defined in: [server/cache.ts:1379](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1379)
 
 ___
 
@@ -549,7 +549,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:101](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L101)
+Defined in: [server/cache.ts:101](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L101)
 
 ___
 
@@ -566,7 +566,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:147](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L147)
+Defined in: [server/cache.ts:147](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L147)
 
 ___
 
@@ -589,7 +589,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/cache.ts:207](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L207)
+Defined in: [server/cache.ts:207](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L207)
 
 ___
 
@@ -603,4 +603,4 @@ the cache is wiped by the cluster manager which handles the cache
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/cache.ts:1558](https://github.com/onzag/itemize/blob/11a98dec/server/cache.ts#L1558)
+Defined in: [server/cache.ts:1558](https://github.com/onzag/itemize/blob/0569bdf2/server/cache.ts#L1558)

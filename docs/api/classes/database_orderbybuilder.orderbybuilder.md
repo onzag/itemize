@@ -51,7 +51,7 @@ Builds a new order by query
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L25)
+Defined in: [database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L25)
 
 ## Properties
 
@@ -61,7 +61,7 @@ Defined in: [database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blo
 
 The expressions we are ordering by
 
-Defined in: [database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L25)
+Defined in: [database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L25)
 
 ## Methods
 
@@ -81,7 +81,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L69)
 
 ___
 
@@ -101,7 +101,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L77)
 
 ___
 
@@ -115,7 +115,7 @@ Clears all the expressions in the order by builder
 
 itself
 
-Defined in: [database/OrderByBuilder.ts:109](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L109)
+Defined in: [database/OrderByBuilder.ts:109](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L109)
 
 ___
 
@@ -129,7 +129,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L102)
 
 ___
 
@@ -145,7 +145,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/OrderByBuilder.ts:119](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L119)
+Defined in: [database/OrderByBuilder.ts:119](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L119)
 
 ___
 
@@ -162,7 +162,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L165)
 
 ___
 
@@ -185,7 +185,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/OrderByBuilder.ts:72](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L72)
+Defined in: [database/OrderByBuilder.ts:72](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L72)
 
 ___
 
@@ -207,7 +207,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/OrderByBuilder.ts:60](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L60)
+Defined in: [database/OrderByBuilder.ts:60](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L60)
 
 ___
 
@@ -230,7 +230,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/OrderByBuilder.ts:42](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L42)
+Defined in: [database/OrderByBuilder.ts:42](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L42)
 
 ___
 
@@ -253,7 +253,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/OrderByBuilder.ts:92](https://github.com/onzag/itemize/blob/11a98dec/database/OrderByBuilder.ts#L92)
+Defined in: [database/OrderByBuilder.ts:92](https://github.com/onzag/itemize/blob/0569bdf2/database/OrderByBuilder.ts#L92)
 
 ___
 
@@ -267,7 +267,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L109)
 
 ___
 
@@ -288,7 +288,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L86)
 
 ___
 
@@ -309,7 +309,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L95)
 
 ___
 
@@ -325,4 +325,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/11a98dec/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/0569bdf2/database/base.ts#L126)

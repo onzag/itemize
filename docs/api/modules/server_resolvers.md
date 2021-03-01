@@ -12,7 +12,7 @@
 
 ### default
 
-▸ **default**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)
+▸ **default**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md)
 
 #### Parameters:
 
@@ -20,6 +20,6 @@ Name | Type |
 :------ | :------ |
 `appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
 
-**Returns:** [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)
+**Returns:** [*IGraphQLResolversType*](../interfaces/gql.igraphqlresolverstype.md)
 
-Defined in: [server/resolvers/index.ts:11](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/index.ts#L11)
+Defined in: [server/resolvers/index.ts:11](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/index.ts#L11)

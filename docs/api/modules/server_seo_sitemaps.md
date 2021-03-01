@@ -36,4 +36,4 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/11a98dec/server/seo/sitemaps.ts#L41)
+Defined in: [server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/sitemaps.ts#L41)

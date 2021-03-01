@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/slate/drawer/styles.tsx:295](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/slate/drawer/styles.tsx#L295)
+Defined in: [client/fast-prototyping/components/slate/drawer/styles.tsx:295](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/slate/drawer/styles.tsx#L295)

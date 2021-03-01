@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-* [*IFeedbackRequest*](base_remote_protocol.ifeedbackrequest.md)
+* [*IFeedbackRequest*](remote_protocol.ifeedbackrequest.md)
 
   ↳ **IFeedbackRequestWithTime**
 
@@ -25,9 +25,9 @@
 
 • **id**: *string*
 
-Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[id](base_remote_protocol.ifeedbackrequest.md#id)
+Inherited from: [IFeedbackRequest](remote_protocol.ifeedbackrequest.md).[id](remote_protocol.ifeedbackrequest.md#id)
 
-Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L266)
+Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L267)
 
 ___
 
@@ -35,9 +35,9 @@ ___
 
 • **itemDefinition**: *string*
 
-Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[itemDefinition](base_remote_protocol.ifeedbackrequest.md#itemdefinition)
+Inherited from: [IFeedbackRequest](remote_protocol.ifeedbackrequest.md).[itemDefinition](remote_protocol.ifeedbackrequest.md#itemdefinition)
 
-Defined in: [base/remote-protocol.ts:265](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L265)
+Defined in: [base/remote-protocol.ts:266](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L266)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/11a98dec/client/internal/testing.ts#L63)
+Defined in: [client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/testing.ts#L63)
 
 ___
 
@@ -53,6 +53,6 @@ ___
 
 • **version**: *string*
 
-Inherited from: [IFeedbackRequest](base_remote_protocol.ifeedbackrequest.md).[version](base_remote_protocol.ifeedbackrequest.md#version)
+Inherited from: [IFeedbackRequest](remote_protocol.ifeedbackrequest.md).[version](remote_protocol.ifeedbackrequest.md#version)
 
-Defined in: [base/remote-protocol.ts:267](https://github.com/onzag/itemize/blob/11a98dec/base/remote-protocol.ts#L267)
+Defined in: [base/remote-protocol.ts:268](https://github.com/onzag/itemize/blob/0569bdf2/base/remote-protocol.ts#L268)

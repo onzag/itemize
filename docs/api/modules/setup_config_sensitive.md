@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md)\>
 
-Defined in: [setup/config/sensitive.ts:33](https://github.com/onzag/itemize/blob/11a98dec/setup/config/sensitive.ts#L33)
+Defined in: [setup/config/sensitive.ts:33](https://github.com/onzag/itemize/blob/0569bdf2/setup/config/sensitive.ts#L33)

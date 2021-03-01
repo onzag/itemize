@@ -29,7 +29,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dev-environment/index.ts:24](https://github.com/onzag/itemize/blob/11a98dec/dev-environment/index.ts#L24)
+Defined in: [dev-environment/index.ts:24](https://github.com/onzag/itemize/blob/0569bdf2/dev-environment/index.ts#L24)
 
 ___
 
@@ -48,4 +48,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dev-environment/index.ts:175](https://github.com/onzag/itemize/blob/11a98dec/dev-environment/index.ts#L175)
+Defined in: [dev-environment/index.ts:175](https://github.com/onzag/itemize/blob/0569bdf2/dev-environment/index.ts#L175)

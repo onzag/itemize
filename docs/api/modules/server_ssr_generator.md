@@ -29,4 +29,4 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/ssr/generator.tsx:30](https://github.com/onzag/itemize/blob/11a98dec/server/ssr/generator.tsx#L30)
+Defined in: [server/ssr/generator.tsx:30](https://github.com/onzag/itemize/blob/0569bdf2/server/ssr/generator.tsx#L30)

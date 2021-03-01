@@ -22,7 +22,7 @@
 
 • **buildnumber**: *string*
 
-Defined in: [testing/itemize.ts:21](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L21)
+Defined in: [testing/itemize.ts:21](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L21)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **config**: [*IConfigRawJSONDataType*](config.iconfigrawjsondatatype.md)
 
-Defined in: [testing/itemize.ts:16](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L16)
+Defined in: [testing/itemize.ts:16](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L16)
 
 ___
 
@@ -38,15 +38,15 @@ ___
 
 • **dbConfig**: [*IDBConfigRawJSONDataType*](config.idbconfigrawjsondatatype.md)
 
-Defined in: [testing/itemize.ts:18](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L18)
+Defined in: [testing/itemize.ts:18](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L18)
 
 ___
 
 ### langLocales
 
-• **langLocales**: [*ILangLocalesType*](base_root.ilanglocalestype.md)
+• **langLocales**: [*ILangLocalesType*](root.ilanglocalestype.md)
 
-Defined in: [testing/itemize.ts:20](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L20)
+Defined in: [testing/itemize.ts:20](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L20)
 
 ___
 
@@ -54,15 +54,15 @@ ___
 
 • **redisConfig**: [*IRedisConfigRawJSONDataType*](config.iredisconfigrawjsondatatype.md)
 
-Defined in: [testing/itemize.ts:19](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L19)
+Defined in: [testing/itemize.ts:19](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L19)
 
 ___
 
 ### root
 
-• **root**: [*default*](../classes/base_root.default.md)
+• **root**: [*default*](../classes/root.default.md)
 
-Defined in: [testing/itemize.ts:15](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L15)
+Defined in: [testing/itemize.ts:15](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L15)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **sensitiveConfig**: [*ISensitiveConfigRawJSONDataType*](config.isensitiveconfigrawjsondatatype.md)
 
-Defined in: [testing/itemize.ts:17](https://github.com/onzag/itemize/blob/11a98dec/testing/itemize.ts#L17)
+Defined in: [testing/itemize.ts:17](https://github.com/onzag/itemize/blob/0569bdf2/testing/itemize.ts#L17)

@@ -52,7 +52,7 @@ Name | Type | Description |
 
 **Returns:** *boolean*
 
-Defined in: [server/resolvers/basic.ts:197](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L197)
+Defined in: [server/resolvers/basic.ts:197](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L197)
 
 ___
 
@@ -72,7 +72,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:452](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L452)
+Defined in: [server/resolvers/basic.ts:452](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L452)
 
 ___
 
@@ -93,7 +93,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:404](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L404)
+Defined in: [server/resolvers/basic.ts:404](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L404)
 
 ___
 
@@ -110,7 +110,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:252](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L252)
+Defined in: [server/resolvers/basic.ts:252](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L252)
 
 ___
 
@@ -127,7 +127,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:418](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L418)
+Defined in: [server/resolvers/basic.ts:418](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L418)
 
 ___
 
@@ -147,7 +147,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:878](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L878)
+Defined in: [server/resolvers/basic.ts:878](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L878)
 
 ___
 
@@ -168,7 +168,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L483)
+Defined in: [server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L483)
 
 ___
 
@@ -185,7 +185,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:601](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L601)
+Defined in: [server/resolvers/basic.ts:601](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L601)
 
 ___
 
@@ -202,7 +202,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L47)
+Defined in: [server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L47)
 
 ___
 
@@ -219,7 +219,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:58](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L58)
+Defined in: [server/resolvers/basic.ts:58](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L58)
 
 ___
 
@@ -229,13 +229,13 @@ ___
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:54](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L54)
+Defined in: [server/resolvers/basic.ts:54](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L54)
 
 ___
 
 ### filterAndPrepareGQLValue
 
-▸ **filterAndPrepareGQLValue**(`serverData`: *any*, `value`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md), `requestedFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md), `role`: *string*, `parentModuleOrIdef`: [*default*](../classes/base_root_module_itemdefinition.default.md) \| [*default*](../classes/base_root_module.default.md)): [*IFilteredAndPreparedValueType*](../interfaces/server_resolvers_basic.ifilteredandpreparedvaluetype.md)
+▸ **filterAndPrepareGQLValue**(`serverData`: *any*, `value`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md), `requestedFields`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md), `role`: *string*, `parentModuleOrIdef`: [*default*](../classes/base_root_module_itemdefinition.default.md) \| [*default*](../classes/base_root_module.default.md)): [*IFilteredAndPreparedValueType*](../interfaces/server_resolvers_basic.ifilteredandpreparedvaluetype.md)
 
 Filters and prepares a graphql value for output to the rest endpoint
 given the value that has given by the server, the requested fields
@@ -248,14 +248,14 @@ the form comes with the DATA and the externalized fields
 Name | Type | Description |
 :------ | :------ | :------ |
 `serverData` | *any* | - |
-`value` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the value gotten from the sql database   |
+`value` | [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | the value gotten from the sql database   |
 `requestedFields` | [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) | the requested fields, flattened   |
 `role` | *string* | the role of the user requesting the data   |
 `parentModuleOrIdef` | [*default*](../classes/base_root_module_itemdefinition.default.md) \| [*default*](../classes/base_root_module.default.md) | the parent module or item definition the value belongs to    |
 
 **Returns:** [*IFilteredAndPreparedValueType*](../interfaces/server_resolvers_basic.ifilteredandpreparedvaluetype.md)
 
-Defined in: [server/resolvers/basic.ts:646](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L646)
+Defined in: [server/resolvers/basic.ts:646](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L646)
 
 ___
 
@@ -275,7 +275,7 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [server/resolvers/basic.ts:515](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L515)
+Defined in: [server/resolvers/basic.ts:515](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L515)
 
 ___
 
@@ -291,13 +291,13 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [server/resolvers/basic.ts:237](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L237)
+Defined in: [server/resolvers/basic.ts:237](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L237)
 
 ___
 
 ### runPolicyCheck
 
-▸ **runPolicyCheck**(`arg`: { `cache`: [*Cache*](../classes/server_cache.cache.md) ; `gqlArgValue`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) ; `gqlFlattenedRequestedFiels`: *any* ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `parentId?`: *string* ; `parentModule?`: *string* ; `parentType?`: *string* ; `parentVersion?`: *string* ; `policyTypes`: *string*[] ; `preParentValidation?`: (`content`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) ; `preValidation?`: (`content`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) ; `role`: *string* ; `version`: *string*  }): *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+▸ **runPolicyCheck**(`arg`: { `cache`: [*Cache*](../classes/server_cache.cache.md) ; `gqlArgValue`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) ; `gqlFlattenedRequestedFiels`: *any* ; `id`: *string* ; `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md) ; `parentId?`: *string* ; `parentModule?`: *string* ; `parentType?`: *string* ; `parentVersion?`: *string* ; `policyTypes`: *string*[] ; `preParentValidation?`: (`content`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) ; `preValidation?`: (`content`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) ; `role`: *string* ; `version`: *string*  }): *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
 Runs a policy check on the requested information
 
@@ -316,14 +316,14 @@ Name | Type | Description |
 `arg.parentType?` | *string* | the parent type (qualified name and table) to use in a policy type parent   |
 `arg.parentVersion?` | *string* | - |
 `arg.policyTypes` | *string*[] | - |
-`arg.preParentValidation?` | (`content`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | - |
-`arg.preValidation?` | (`content`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | a validation to do, validate if the row doesn't exist here, and anything else necessary the function will crash by Internal server error if no validation is done if the row is null; return a value if you want to force it to return instead without an error   |
+`arg.preParentValidation?` | (`content`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | - |
+`arg.preValidation?` | (`content`: [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)) => *void* \| [*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md) | a validation to do, validate if the row doesn't exist here, and anything else necessary the function will crash by Internal server error if no validation is done if the row is null; return a value if you want to force it to return instead without an error   |
 `arg.role` | *string* | the role of the current user   |
 `arg.version` | *string* | the version of the item definition on the database   |
 
-**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)\>
+**Returns:** *Promise*<[*ISQLTableRowValue*](../interfaces/sql.isqltablerowvalue.md)\>
 
-Defined in: [server/resolvers/basic.ts:955](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L955)
+Defined in: [server/resolvers/basic.ts:955](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L955)
 
 ___
 
@@ -350,7 +350,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:728](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L728)
+Defined in: [server/resolvers/basic.ts:728](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L728)
 
 ___
 
@@ -371,7 +371,7 @@ Name | Type | Description |
 
 **Returns:** [[*IGQLArgs*](../interfaces/gql_querier.igqlargs.md), [*IGQLArgs*](../interfaces/gql_querier.igqlargs.md)]
 
-Defined in: [server/resolvers/basic.ts:909](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L909)
+Defined in: [server/resolvers/basic.ts:909](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L909)
 
 ___
 
@@ -391,13 +391,13 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/resolvers/basic.ts:529](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L529)
+Defined in: [server/resolvers/basic.ts:529](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L529)
 
 ___
 
 ### validateParentingRules
 
-▸ **validateParentingRules**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `parentId`: *string*, `parentVersion`: *string*, `parentType`: *string*, `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `userId`: *string*, `role`: *string*, `rolesManager`: [*ICustomRoleManager*](../interfaces/base_root.icustomrolemanager.md)): *Promise*<void\>
+▸ **validateParentingRules**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `parentId`: *string*, `parentVersion`: *string*, `parentType`: *string*, `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `userId`: *string*, `role`: *string*, `rolesManager`: [*ICustomRoleManager*](../interfaces/root.icustomrolemanager.md)): *Promise*<void\>
 
 Validates that the parenting rules are respected for the item definition
 in question that wants to be created
@@ -413,11 +413,11 @@ Name | Type | Description |
 `itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) | the item definition that is attempting to child   |
 `userId` | *string* | the user id   |
 `role` | *string* | the role    |
-`rolesManager` | [*ICustomRoleManager*](../interfaces/base_root.icustomrolemanager.md) | - |
+`rolesManager` | [*ICustomRoleManager*](../interfaces/root.icustomrolemanager.md) | - |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:126](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L126)
+Defined in: [server/resolvers/basic.ts:126](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L126)
 
 ___
 
@@ -437,7 +437,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*IServerSideTokenDataType*](../interfaces/server_resolvers_basic.iserversidetokendatatype.md)\>
 
-Defined in: [server/resolvers/basic.ts:74](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L74)
+Defined in: [server/resolvers/basic.ts:74](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L74)
 
 ___
 
@@ -457,4 +457,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/resolvers/basic.ts:552](https://github.com/onzag/itemize/blob/11a98dec/server/resolvers/basic.ts#L552)
+Defined in: [server/resolvers/basic.ts:552](https://github.com/onzag/itemize/blob/0569bdf2/server/resolvers/basic.ts#L552)

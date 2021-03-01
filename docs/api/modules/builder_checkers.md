@@ -42,7 +42,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:53](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L53)
+Defined in: [builder/checkers.ts:53](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L53)
 
 ___
 
@@ -63,7 +63,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1115](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L1115)
+Defined in: [builder/checkers.ts:1115](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L1115)
 
 ___
 
@@ -87,13 +87,13 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:519](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L519)
+Defined in: [builder/checkers.ts:519](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L519)
 
 ___
 
 ### checkItemDefinition
 
-▸ **checkItemDefinition**(`rawRootData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md), `rawData`: [*IItemDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition.iitemdefinitionrawjsondatatype.md), `parentModule`: [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md), `traceback`: [*default*](../classes/builder_traceback.default.md)): *void*
+▸ **checkItemDefinition**(`rawRootData`: [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md), `rawData`: [*IItemDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition.iitemdefinitionrawjsondatatype.md), `parentModule`: [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md), `traceback`: [*default*](../classes/builder_traceback.default.md)): *void*
 
 Checks an item definition so that all its imports, name, and so on
 do match the specification as it is required
@@ -102,20 +102,20 @@ do match the specification as it is required
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawRootData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the root data   |
+`rawRootData` | [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md) | the root data   |
 `rawData` | [*IItemDefinitionRawJSONDataType*](../interfaces/base_root_module_itemdefinition.iitemdefinitionrawjsondatatype.md) | the item definition data   |
 `parentModule` | [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md) | the raw parent module   |
 `traceback` | [*default*](../classes/builder_traceback.default.md) | the traceback object    |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:168](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L168)
+Defined in: [builder/checkers.ts:168](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L168)
 
 ___
 
 ### checkModule
 
-▸ **checkModule**(`rawRootData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md), `rawData`: [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md), `traceback`: [*default*](../classes/builder_traceback.default.md)): *void*
+▸ **checkModule**(`rawRootData`: [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md), `rawData`: [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md), `traceback`: [*default*](../classes/builder_traceback.default.md)): *void*
 
 Checks a module for consistency as well as all its prop extensions
 
@@ -123,13 +123,13 @@ Checks a module for consistency as well as all its prop extensions
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawRootData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the root data where this module is located   |
+`rawRootData` | [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md) | the root data where this module is located   |
 `rawData` | [*IModuleRawJSONDataType*](../interfaces/base_root_module.imodulerawjsondatatype.md) | the raw data of the module itself   |
 `traceback` | [*default*](../classes/builder_traceback.default.md) | the traceback object    |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1184](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L1184)
+Defined in: [builder/checkers.ts:1184](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L1184)
 
 ___
 
@@ -152,7 +152,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:676](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L676)
+Defined in: [builder/checkers.ts:676](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L676)
 
 ___
 
@@ -173,13 +173,13 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:776](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L776)
+Defined in: [builder/checkers.ts:776](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L776)
 
 ___
 
 ### checkRoot
 
-▸ **checkRoot**(`rawData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md)): *void*
+▸ **checkRoot**(`rawData`: [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md)): *void*
 
 Checks the entire root of the itemize schema
 
@@ -187,11 +187,11 @@ Checks the entire root of the itemize schema
 
 Name | Type | Description |
 :------ | :------ | :------ |
-`rawData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the root    |
+`rawData` | [*IRootRawJSONDataType*](../interfaces/root.irootrawjsondatatype.md) | the root    |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1474](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L1474)
+Defined in: [builder/checkers.ts:1474](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L1474)
 
 ___
 
@@ -211,7 +211,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1369](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L1369)
+Defined in: [builder/checkers.ts:1369](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L1369)
 
 ___
 
@@ -231,4 +231,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [builder/checkers.ts:1446](https://github.com/onzag/itemize/blob/11a98dec/builder/checkers.ts#L1446)
+Defined in: [builder/checkers.ts:1446](https://github.com/onzag/itemize/blob/0569bdf2/builder/checkers.ts#L1446)

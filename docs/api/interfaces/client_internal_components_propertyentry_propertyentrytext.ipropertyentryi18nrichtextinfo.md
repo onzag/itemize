@@ -81,7 +81,7 @@
 
 • **actions**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:96](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L96)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:96](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L96)
 
 ___
 
@@ -98,7 +98,7 @@ Name | Type |
 `submit` | *string* |
 `title` | *string* |
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:132](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L132)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:132](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L132)
 
 ___
 
@@ -115,7 +115,7 @@ Name | Type |
 `submit` | *string* |
 `title` | *string* |
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:125](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L125)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:125](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L125)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 • **alt**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:71](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L71)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:71](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L71)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 • **classes**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:92](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L92)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:92](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L92)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 • **container**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:73](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L73)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:73](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L73)
 
 ___
 
@@ -147,7 +147,7 @@ ___
 
 • **context**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:98](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L98)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:98](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L98)
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 • **custom**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:76](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L76)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:76](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L76)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 • **each**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:97](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L97)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:97](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L97)
 
 ___
 
@@ -171,7 +171,7 @@ ___
 
 • **file**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:77](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L77)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:77](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L77)
 
 ___
 
@@ -179,7 +179,7 @@ ___
 
 • **formatAddContainerLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:51](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L51)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:51](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L51)
 
 ___
 
@@ -187,7 +187,7 @@ ___
 
 • **formatAddCustomLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:52](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L52)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:52](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L52)
 
 ___
 
@@ -195,7 +195,7 @@ ___
 
 • **formatAddFileLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:50](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L50)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:50](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L50)
 
 ___
 
@@ -203,7 +203,7 @@ ___
 
 • **formatAddImageLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:48](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L48)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:48](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L48)
 
 ___
 
@@ -211,7 +211,7 @@ ___
 
 • **formatAddTemplateHTML**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:66](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L66)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:66](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L66)
 
 ___
 
@@ -219,7 +219,7 @@ ___
 
 • **formatAddTemplateText**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:65](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L65)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:65](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L65)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 
 • **formatAddVideoLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:49](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L49)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:49](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L49)
 
 ___
 
@@ -235,7 +235,7 @@ ___
 
 • **formatBoldLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:40](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L40)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L40)
 
 ___
 
@@ -243,7 +243,7 @@ ___
 
 • **formatDeleteElement**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:67](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L67)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:67](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L67)
 
 ___
 
@@ -251,7 +251,7 @@ ___
 
 • **formatItalicLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:41](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L41)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:41](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L41)
 
 ___
 
@@ -259,7 +259,7 @@ ___
 
 • **formatLinkLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:43](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L43)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:43](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L43)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 • **formatListBulletedLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:47](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L47)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:47](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L47)
 
 ___
 
@@ -275,7 +275,7 @@ ___
 
 • **formatListNumberedLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:46](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L46)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:46](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L46)
 
 ___
 
@@ -283,7 +283,7 @@ ___
 
 • **formatMakeLoop**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:60](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L60)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:60](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L60)
 
 ___
 
@@ -291,7 +291,7 @@ ___
 
 • **formatMore**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:68](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L68)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:68](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L68)
 
 ___
 
@@ -299,7 +299,7 @@ ___
 
 • **formatQuoteLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:45](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L45)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:45](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L45)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 • **formatSetActiveStyleLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:55](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L55)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:55](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L55)
 
 ___
 
@@ -315,7 +315,7 @@ ___
 
 • **formatSetClassLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:56](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L56)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:56](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L56)
 
 ___
 
@@ -323,7 +323,7 @@ ___
 
 • **formatSetContext**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:58](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L58)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:58](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L58)
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 • **formatSetEventHandlers**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:57](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L57)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:57](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L57)
 
 ___
 
@@ -339,7 +339,7 @@ ___
 
 • **formatSetHoverStyleLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:54](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L54)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:54](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L54)
 
 ___
 
@@ -347,7 +347,7 @@ ___
 
 • **formatSetRenderCondition**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:59](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L59)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:59](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L59)
 
 ___
 
@@ -355,7 +355,7 @@ ___
 
 • **formatSetStyleLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:53](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L53)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:53](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L53)
 
 ___
 
@@ -363,7 +363,7 @@ ___
 
 • **formatSetUIHandlerArgLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:62](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L62)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:62](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L62)
 
 ___
 
@@ -371,7 +371,7 @@ ___
 
 • **formatSetUIHandlerArgName**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:63](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L63)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:63](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L63)
 
 ___
 
@@ -379,7 +379,7 @@ ___
 
 • **formatSetUIHandlerArgValue**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:64](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L64)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:64](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L64)
 
 ___
 
@@ -387,7 +387,7 @@ ___
 
 • **formatSetUIHandlerLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:61](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L61)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:61](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L61)
 
 ___
 
@@ -395,7 +395,7 @@ ___
 
 • **formatTitleLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:44](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L44)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:44](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L44)
 
 ___
 
@@ -403,7 +403,7 @@ ___
 
 • **formatUnderlineLabel**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:42](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L42)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:42](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L42)
 
 ___
 
@@ -411,7 +411,7 @@ ___
 
 • **image**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:78](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L78)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:78](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L78)
 
 ___
 
@@ -419,7 +419,7 @@ ___
 
 • **inline**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:74](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L74)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:74](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L74)
 
 ___
 
@@ -427,7 +427,7 @@ ___
 
 • **interactive**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:88](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L88)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:88](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L88)
 
 ___
 
@@ -435,7 +435,7 @@ ___
 
 • **link**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:79](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L79)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:79](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L79)
 
 ___
 
@@ -443,7 +443,7 @@ ___
 
 • **list**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:80](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L80)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:80](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L80)
 
 ___
 
@@ -451,7 +451,7 @@ ___
 
 • **listItem**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:81](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L81)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:81](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L81)
 
 ___
 
@@ -469,7 +469,7 @@ Name | Type |
 `submit` | *string* |
 `title` | *string* |
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:104](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L104)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:104](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L104)
 
 ___
 
@@ -477,7 +477,7 @@ ___
 
 • **name**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:70](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L70)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:70](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L70)
 
 ___
 
@@ -485,7 +485,7 @@ ___
 
 • **paragraph**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:82](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L82)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:82](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L82)
 
 ___
 
@@ -493,7 +493,7 @@ ___
 
 • **quote**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:83](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L83)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:83](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L83)
 
 ___
 
@@ -501,7 +501,7 @@ ___
 
 • **renderCondition**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:99](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L99)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:99](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L99)
 
 ___
 
@@ -524,7 +524,7 @@ Name | Type |
 `templatedUnspecified` | *string* |
 `title` | *string* |
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:112](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L112)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:112](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L112)
 
 ___
 
@@ -532,7 +532,7 @@ ___
 
 • **settings**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:93](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L93)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:93](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L93)
 
 ___
 
@@ -540,7 +540,7 @@ ___
 
 • **sizes**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:72](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L72)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:72](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L72)
 
 ___
 
@@ -548,7 +548,7 @@ ___
 
 • **standalone**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:102](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L102)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:102](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L102)
 
 ___
 
@@ -556,7 +556,7 @@ ___
 
 • **style**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:89](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L89)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:89](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L89)
 
 ___
 
@@ -564,7 +564,7 @@ ___
 
 • **styleActive**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:90](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L90)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:90](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L90)
 
 ___
 
@@ -572,7 +572,7 @@ ___
 
 • **styleHover**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:91](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L91)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:91](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L91)
 
 ___
 
@@ -580,7 +580,7 @@ ___
 
 • **styled**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:86](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L86)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:86](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L86)
 
 ___
 
@@ -588,7 +588,7 @@ ___
 
 • **styles**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:94](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L94)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:94](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L94)
 
 ___
 
@@ -596,7 +596,7 @@ ___
 
 • **template**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:87](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L87)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:87](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L87)
 
 ___
 
@@ -604,7 +604,7 @@ ___
 
 • **templating**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:95](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L95)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:95](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L95)
 
 ___
 
@@ -612,7 +612,7 @@ ___
 
 • **text**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:75](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L75)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:75](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L75)
 
 ___
 
@@ -620,7 +620,7 @@ ___
 
 • **title**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:84](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L84)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:84](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L84)
 
 ___
 
@@ -628,7 +628,7 @@ ___
 
 • **type**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:101](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L101)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:101](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L101)
 
 ___
 
@@ -636,7 +636,7 @@ ___
 
 • **uiHandler**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:100](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L100)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:100](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L100)
 
 ___
 
@@ -644,4 +644,4 @@ ___
 
 • **video**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:85](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L85)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryText.tsx:85](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L85)

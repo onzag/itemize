@@ -448,7 +448,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/providers/locale-provider.tsx:102](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/locale-provider.tsx#L102)
+Defined in: [client/internal/providers/locale-provider.tsx:102](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/locale-provider.tsx#L102)
 
 ___
 
@@ -487,4 +487,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/providers/locale-provider.tsx:93](https://github.com/onzag/itemize/blob/11a98dec/client/internal/providers/locale-provider.tsx#L93)
+Defined in: [client/internal/providers/locale-provider.tsx:93](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/providers/locale-provider.tsx#L93)

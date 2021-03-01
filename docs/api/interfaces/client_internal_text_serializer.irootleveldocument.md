@@ -23,7 +23,7 @@ an unique uuid
 
 • **children**: [*RichElement*](../modules/client_internal_text_serializer.md#richelement)[]
 
-Defined in: [client/internal/text/serializer/index.ts:190](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/index.ts#L190)
+Defined in: [client/internal/text/serializer/index.ts:190](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/index.ts#L190)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **id**: *string*
 
-Defined in: [client/internal/text/serializer/index.ts:189](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/index.ts#L189)
+Defined in: [client/internal/text/serializer/index.ts:189](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/index.ts#L189)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **rich**: *boolean*
 
-Defined in: [client/internal/text/serializer/index.ts:188](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/index.ts#L188)
+Defined in: [client/internal/text/serializer/index.ts:188](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/index.ts#L188)
 
 ___
 
@@ -47,4 +47,4 @@ ___
 
 • **type**: *document*
 
-Defined in: [client/internal/text/serializer/index.ts:187](https://github.com/onzag/itemize/blob/11a98dec/client/internal/text/serializer/index.ts#L187)
+Defined in: [client/internal/text/serializer/index.ts:187](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/text/serializer/index.ts#L187)

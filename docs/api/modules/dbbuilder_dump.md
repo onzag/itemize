@@ -15,7 +15,7 @@ it can be reloaded (refreshed)
 
 ### default
 
-▸ **default**(`version`: *string*, `databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `root`: [*default*](../classes/base_root.default.md)): *Promise*<void\>
+▸ **default**(`version`: *string*, `databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `root`: [*default*](../classes/root.default.md)): *Promise*<void\>
 
 Actually runs the dump
 
@@ -25,8 +25,8 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `version` | *string* | either development or production   |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database instance to read from   |
-`root` | [*default*](../classes/base_root.default.md) | the root instance    |
+`root` | [*default*](../classes/root.default.md) | the root instance    |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/dump.ts:283](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/dump.ts#L283)
+Defined in: [dbbuilder/dump.ts:283](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/dump.ts#L283)

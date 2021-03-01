@@ -30,4 +30,4 @@ Name | Type | Description |
 
 a void promise
 
-Defined in: [builder/moment.ts:20](https://github.com/onzag/itemize/blob/11a98dec/builder/moment.ts#L20)
+Defined in: [builder/moment.ts:20](https://github.com/onzag/itemize/blob/0569bdf2/builder/moment.ts#L20)

@@ -50,7 +50,7 @@ Name | Type | Description |
 
 a grapqhl query class instance
 
-Defined in: [gql-querier.ts:645](https://github.com/onzag/itemize/blob/11a98dec/gql-querier.ts#L645)
+Defined in: [gql-querier.ts:645](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L645)
 
 ___
 
@@ -70,7 +70,7 @@ Name | Type | Description |
 
 a grapqhl query class instance
 
-Defined in: [gql-querier.ts:636](https://github.com/onzag/itemize/blob/11a98dec/gql-querier.ts#L636)
+Defined in: [gql-querier.ts:636](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L636)
 
 ___
 
@@ -94,4 +94,4 @@ Name | Type | Description |
 
 a promise for a graphql endpoint value
 
-Defined in: [gql-querier.ts:665](https://github.com/onzag/itemize/blob/11a98dec/gql-querier.ts#L665)
+Defined in: [gql-querier.ts:665](https://github.com/onzag/itemize/blob/0569bdf2/gql-querier.ts#L665)

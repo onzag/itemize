@@ -24,7 +24,7 @@ where the sitemap should be
 
 Just a list of urls
 
-Defined in: [server/seo/sitemaps.ts:30](https://github.com/onzag/itemize/blob/11a98dec/server/seo/sitemaps.ts#L30)
+Defined in: [server/seo/sitemaps.ts:30](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/sitemaps.ts#L30)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 Whether it is an index type, index types is what truly contains these fields on the itemize structure for sitemaps is
 
-Defined in: [server/seo/sitemaps.ts:26](https://github.com/onzag/itemize/blob/11a98dec/server/seo/sitemaps.ts#L26)
+Defined in: [server/seo/sitemaps.ts:26](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/sitemaps.ts#L26)
 
 ___
 
@@ -46,4 +46,4 @@ A main index will contain this filed, it is normally null for eg. the main entry
 index but the last queried is when some bit of data was last queried in the form of URL_RULE.MODULE_PATH.ITEM_PATH
 and it contains a date where it will ask for what it was created after that, this is used for collection
 
-Defined in: [server/seo/sitemaps.ts:22](https://github.com/onzag/itemize/blob/11a98dec/server/seo/sitemaps.ts#L22)
+Defined in: [server/seo/sitemaps.ts:22](https://github.com/onzag/itemize/blob/0569bdf2/server/seo/sitemaps.ts#L22)

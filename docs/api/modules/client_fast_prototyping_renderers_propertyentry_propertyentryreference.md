@@ -27,7 +27,7 @@ Supported args:
 - descriptionAsAlert: displays the description if exists as alert rather than the standard
 - onEnter: A function that triggers when the enter key is pressed
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:663](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L663)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:663](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L663)
 
 ___
 
@@ -37,4 +37,4 @@ ___
 
 The styles for the reference
 
-Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:42](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L42)
+Defined in: [client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:42](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L42)

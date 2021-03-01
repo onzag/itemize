@@ -30,13 +30,13 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/load-dump.ts:40](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/load-dump.ts#L40)
+Defined in: [dbbuilder/load-dump.ts:40](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/load-dump.ts#L40)
 
 ___
 
 ### default
 
-▸ **default**(`configVersion`: *string*, `databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `root`: [*default*](../classes/base_root.default.md)): *Promise*<void\>
+▸ **default**(`configVersion`: *string*, `databaseConnection`: [*DatabaseConnection*](../classes/database.databaseconnection.md), `root`: [*default*](../classes/root.default.md)): *Promise*<void\>
 
 Performs the dump loading
 
@@ -46,8 +46,8 @@ Name | Type | Description |
 :------ | :------ | :------ |
 `configVersion` | *string* | either development or production   |
 `databaseConnection` | [*DatabaseConnection*](../classes/database.databaseconnection.md) | the database connection   |
-`root` | [*default*](../classes/base_root.default.md) | the root    |
+`root` | [*default*](../classes/root.default.md) | the root    |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [dbbuilder/load-dump.ts:97](https://github.com/onzag/itemize/blob/11a98dec/dbbuilder/load-dump.ts#L97)
+Defined in: [dbbuilder/load-dump.ts:97](https://github.com/onzag/itemize/blob/0569bdf2/dbbuilder/load-dump.ts#L97)

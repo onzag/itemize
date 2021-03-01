@@ -17,7 +17,7 @@
 
 • **apiKey**: *string*
 
-Defined in: [server/services/ipstack.ts:37](https://github.com/onzag/itemize/blob/11a98dec/server/services/ipstack.ts#L37)
+Defined in: [server/services/ipstack.ts:37](https://github.com/onzag/itemize/blob/0569bdf2/server/services/ipstack.ts#L37)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **httpsEnabled**: *boolean*
 
-Defined in: [server/services/ipstack.ts:38](https://github.com/onzag/itemize/blob/11a98dec/server/services/ipstack.ts#L38)
+Defined in: [server/services/ipstack.ts:38](https://github.com/onzag/itemize/blob/0569bdf2/server/services/ipstack.ts#L38)

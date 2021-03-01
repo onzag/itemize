@@ -27,7 +27,7 @@ how these properties are given
 The slot id that is to be used, or null
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:25](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L25)
+Defined in: [client/internal/components/PropertySetter/index.tsx:25](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L25)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 The slot version that is to be used, or null
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:30](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L30)
+Defined in: [client/internal/components/PropertySetter/index.tsx:30](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L30)
 
 ___
 
@@ -63,9 +63,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L45)
+Defined in: [client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L45)
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L45)
+Defined in: [client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L45)
 
 ___
 
@@ -91,9 +91,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L40)
+Defined in: [client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L40)
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L40)
+Defined in: [client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L40)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 The property that is to be set
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:20](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L20)
+Defined in: [client/internal/components/PropertySetter/index.tsx:20](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L20)
 
 ___
 
@@ -115,4 +115,4 @@ ___
 The value that is to be set
 Provided by the user
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:35](https://github.com/onzag/itemize/blob/11a98dec/client/internal/components/PropertySetter/index.tsx#L35)
+Defined in: [client/internal/components/PropertySetter/index.tsx:35](https://github.com/onzag/itemize/blob/0569bdf2/client/internal/components/PropertySetter/index.tsx#L35)

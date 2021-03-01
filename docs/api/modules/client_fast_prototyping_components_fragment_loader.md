@@ -23,4 +23,4 @@ The item definition loader allows to handle cases of not found, blocked or error
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/fragment-loader.tsx:64](https://github.com/onzag/itemize/blob/11a98dec/client/fast-prototyping/components/fragment-loader.tsx#L64)
+Defined in: [client/fast-prototyping/components/fragment-loader.tsx:64](https://github.com/onzag/itemize/blob/0569bdf2/client/fast-prototyping/components/fragment-loader.tsx#L64)

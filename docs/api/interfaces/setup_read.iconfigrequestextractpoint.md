@@ -29,7 +29,7 @@ The form that allows to define how we are requesting an entire configuration
 
 Prevents modification of already existant values
 
-Defined in: [setup/read.ts:261](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L261)
+Defined in: [setup/read.ts:261](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L261)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 The default value only supported for
 standard types and not config or multiconfig
 
-Defined in: [setup/read.ts:235](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L235)
+Defined in: [setup/read.ts:235](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L235)
 
 ___
 
@@ -53,7 +53,7 @@ as it defines how we extract this data, it defines all the variables
 we are defining in this config or multiconfig,
 this will not be used in standard field request types as it defines nothing
 
-Defined in: [setup/read.ts:221](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L221)
+Defined in: [setup/read.ts:221](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L221)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 Whether the value is hidden, only supported
 for standard types
 
-Defined in: [setup/read.ts:240](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L240)
+Defined in: [setup/read.ts:240](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L240)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 The message we should display for it
 
-Defined in: [setup/read.ts:230](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L230)
+Defined in: [setup/read.ts:230](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L230)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 Whether to nullify false values, only used
 for standard fields
 
-Defined in: [setup/read.ts:252](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L252)
+Defined in: [setup/read.ts:252](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L252)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 prefers to keep a configuration and multi
 configuration request into an unfilled state
 
-Defined in: [setup/read.ts:257](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L257)
+Defined in: [setup/read.ts:257](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L257)
 
 ___
 
@@ -108,7 +108,7 @@ What we are reading, it can be a simple type, a configuration, on a object
 of configuration, or a multiconfig, basically has keys for many configuration
 if no type specified, it will consider it a string
 
-Defined in: [setup/read.ts:214](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L214)
+Defined in: [setup/read.ts:214](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L214)
 
 ___
 
@@ -134,9 +134,9 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [setup/read.ts:247](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L247)
+Defined in: [setup/read.ts:247](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L247)
 
-Defined in: [setup/read.ts:247](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L247)
+Defined in: [setup/read.ts:247](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L247)
 
 ___
 
@@ -147,4 +147,4 @@ ___
 The variable name we are defining for this, since this represents a single
 variable in a json structure
 
-Defined in: [setup/read.ts:226](https://github.com/onzag/itemize/blob/11a98dec/setup/read.ts#L226)
+Defined in: [setup/read.ts:226](https://github.com/onzag/itemize/blob/0569bdf2/setup/read.ts#L226)

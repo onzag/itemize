@@ -26,4 +26,4 @@ Name | Type | Description |
 
 **Returns:** *string*
 
-Defined in: [client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/11a98dec/client/components/localization/index.tsx#L13)
+Defined in: [client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/0569bdf2/client/components/localization/index.tsx#L13)

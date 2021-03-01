@@ -26,4 +26,4 @@ Name | Type | Description |
 
 the same arg
 
-Defined in: [setup/docker/index.ts:35](https://github.com/onzag/itemize/blob/11a98dec/setup/docker/index.ts#L35)
+Defined in: [setup/docker/index.ts:35](https://github.com/onzag/itemize/blob/0569bdf2/setup/docker/index.ts#L35)
