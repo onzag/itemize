@@ -2,7 +2,7 @@
  * Contains the classes for the loading of searches via pages in order to create
  * a pagination in search mode
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -2,7 +2,7 @@
  * This file contains the search actioner which is capable of triggering searches
  * in the item definition context
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

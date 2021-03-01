@@ -2,7 +2,7 @@
  * Contains a pool of root, we need a pool of root because
  * we are unable to render an itemize app being used at once
  * as the root registires are modified during SSR rendering
- * @packageDocumentation
+ * @module
  */
 
 import { Pool } from "tarn";

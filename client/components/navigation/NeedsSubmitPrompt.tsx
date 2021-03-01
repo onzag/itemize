@@ -2,7 +2,7 @@
  * Allows for the prompt of a dialog to request for confirmation of non-submitted
  * data from item definitions
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

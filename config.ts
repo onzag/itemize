@@ -1,6 +1,6 @@
 /**
  * Represents the stanard redis and sensitive config information an schemas
- * @packageDocumentation
+ * @module
  */
 
 /**

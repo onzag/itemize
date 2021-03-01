@@ -2,7 +2,7 @@
  * Contains the serialization, reactification and deserialization functions
  * for the video element
  * 
- * @packageDocumentation
+ * @module
  */
 
 

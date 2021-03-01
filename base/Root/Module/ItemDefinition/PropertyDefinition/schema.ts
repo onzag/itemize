@@ -2,7 +2,7 @@
  * Contains the schema for the property definition as it should
  * be defined in the json form
  *
- * @packageDocumentation
+ * @module
  */
 
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";

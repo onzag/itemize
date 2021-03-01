@@ -1,7 +1,7 @@
 /**
  * Contains a country picker that allows the user to fully select their own country
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -22,7 +22,7 @@ rather than passing four args
 
 • **args**: *any*
 
-Defined in: [base/Root/gql.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L22)
+Defined in: [base/Root/gql.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/gql.ts#L22)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **context**: *any*
 
-Defined in: [base/Root/gql.ts:23](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L23)
+Defined in: [base/Root/gql.ts:23](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/gql.ts#L23)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **info**: *any*
 
-Defined in: [base/Root/gql.ts:24](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L24)
+Defined in: [base/Root/gql.ts:24](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/gql.ts#L24)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 • **source**: *any*
 
-Defined in: [base/Root/gql.ts:21](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/gql.ts#L21)
+Defined in: [base/Root/gql.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/gql.ts#L21)

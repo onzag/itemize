@@ -5,7 +5,7 @@
  * The wrapper component is added as a property to the slate editor itself so other wrappers
  * can be added as replacement, you can also design your own wrapper based on this one
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";

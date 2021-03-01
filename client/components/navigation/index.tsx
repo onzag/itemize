@@ -2,7 +2,7 @@
  * Containst function that are usable for handling navigation
  * between the application
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { Location } from "history";

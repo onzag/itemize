@@ -4,7 +4,7 @@
  * 
  * The list represents ol and ul element itself
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { deserializeElement, IReactifyArg, ISerializationRegistryType, RichElement } from "..";

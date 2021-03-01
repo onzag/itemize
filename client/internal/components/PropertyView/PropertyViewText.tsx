@@ -1,7 +1,7 @@
 /**
  * Contains the property view text handler as well as some other
  * functionality that is used for handling text
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

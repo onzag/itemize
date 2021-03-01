@@ -4,7 +4,7 @@
  * upon this class, as it's meant to apply for a button, however it also allows
  * for displaying errors and trigger actions after success or failure
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

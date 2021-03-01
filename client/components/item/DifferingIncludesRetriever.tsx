@@ -1,7 +1,7 @@
 /**
  * Contains the DifferingIncludesRetriever class
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -2,7 +2,7 @@
  * Extra social icons that are not available in the standard material ui icons
  * list
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

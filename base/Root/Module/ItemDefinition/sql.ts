@@ -3,7 +3,7 @@
  * to query item definitions from the postgresql database, refer to this file
  * once you need to figure out how resources are requested
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

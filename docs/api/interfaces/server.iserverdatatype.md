@@ -18,4 +18,4 @@
 
 #### Type declaration:
 
-Defined in: [server/index.ts:174](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L174)
+Defined in: [server/index.ts:174](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L174)

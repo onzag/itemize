@@ -1,6 +1,6 @@
 /**
  * Contains the with query builder that allows to create WITH queries
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

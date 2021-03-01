@@ -1,7 +1,7 @@
 /**
  * Simply provides the current currency
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

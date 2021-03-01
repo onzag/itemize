@@ -2,7 +2,7 @@
  * This file contains the dynamic styled component that represents an element with hover
  * an active styles
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

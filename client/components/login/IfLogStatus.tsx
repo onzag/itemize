@@ -2,7 +2,7 @@
  * Contains the class that allows to generate conditional rendering
  * on whether the user is logged in or not
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -36,7 +36,7 @@ The renderer args
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[args](client_internal_components_propertyview.ipropertyviewrendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/renderer.ts#L19)
 
 ___
 
@@ -48,7 +48,7 @@ can the viewport center be reset? this allows
 to show a button when the viewport can indeed
 be reset
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:33](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L33)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:33](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L33)
 
 ___
 
@@ -60,7 +60,7 @@ The current value to be displayed
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[currentValue](client_internal_components_propertyview.ipropertyviewrendererprops.md#currentvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -76,9 +76,9 @@ Reset viewport center
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L27)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:27](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L27)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L27)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:27](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L27)
 
 ___
 
@@ -100,9 +100,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:23](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L23)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:23](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L23)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:23](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L23)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:23](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L23)
 
 ___
 
@@ -114,7 +114,7 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[rtl](client_internal_components_propertyview.ipropertyviewrendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/renderer.ts#L15)
 
 ___
 
@@ -124,4 +124,4 @@ ___
 
 A viewport that is currently in use
 
-Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewLocation.tsx#L19)
+Defined in: [client/internal/components/PropertyView/PropertyViewLocation.tsx:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewLocation.tsx#L19)

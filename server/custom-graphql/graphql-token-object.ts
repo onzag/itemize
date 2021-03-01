@@ -3,7 +3,7 @@
  * while tokens might contain more information than this token might suggest
  * this is the standard shape for a token endpoint and it's what the app token
  * service offers
- * @packageDocumentation
+ * @module
  */
 
 import { GraphQLString, GraphQLObjectType } from "graphql";

@@ -1,7 +1,7 @@
 /**
  * The navbar for the fast prototyping usage and what it comes by default
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React, { useState } from "react";

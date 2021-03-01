@@ -2,7 +2,7 @@
  * This is one of the hearts of itemize and represents the item definition
  * for items as it defines how they are meant to be conformed, by includes and properties
  *
- * @packageDocumentation
+ * @module
  */
 
 import Include, { IIncludeRawJSONDataType, IIncludeState, IncludeExclusionState } from "./Include";

@@ -1,7 +1,7 @@
 /**
  * Contains the boolean type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

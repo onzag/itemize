@@ -1,7 +1,7 @@
 /**
  * This file contains the collector that collects results based on what the react
  * tree has asked to collect for
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLTableRowValue } from "../../base/Root/sql";

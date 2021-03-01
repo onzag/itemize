@@ -1,6 +1,6 @@
 /**
  * Contains the fast prototyping element for renering a file entry
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";

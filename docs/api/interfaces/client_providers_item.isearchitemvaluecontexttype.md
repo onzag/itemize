@@ -17,7 +17,7 @@
 
 • **currentlySearching**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/providers/item.tsx:493](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L493)
+Defined in: [client/providers/item.tsx:493](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L493)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **searchFields**: *any*
 
-Defined in: [client/providers/item.tsx:494](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L494)
+Defined in: [client/providers/item.tsx:494](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L494)

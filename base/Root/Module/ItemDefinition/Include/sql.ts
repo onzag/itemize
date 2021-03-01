@@ -3,7 +3,7 @@
  * setup includes into and out of the postgresql database as well
  * as how to build the definition for the tables
  *
- * @packageDocumentation
+ * @module
  */
 
 import { EXCLUSION_STATE_SUFFIX } from "../../../../../constants";

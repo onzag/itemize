@@ -3,7 +3,7 @@
  * like pointers, file information, trackers and location; and also strippes
  * unecessary language information if deemed required
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IRootRawJSONDataType } from "../base/Root";

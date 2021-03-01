@@ -1,6 +1,6 @@
 /**
  * These scripts are injected to the package json
- * @packageDocumentation
+ * @module
  */
 
 export default {

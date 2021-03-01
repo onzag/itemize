@@ -22,7 +22,7 @@ A redis single connection configuration
 
 • `Optional` **db**: *number*
 
-Defined in: [config.ts:299](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L299)
+Defined in: [config.ts:299](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L299)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • `Optional` **host**: *string*
 
-Defined in: [config.ts:296](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L296)
+Defined in: [config.ts:296](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L296)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • `Optional` **password**: *string*
 
-Defined in: [config.ts:300](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L300)
+Defined in: [config.ts:300](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L300)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • `Optional` **path**: *string*
 
-Defined in: [config.ts:298](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L298)
+Defined in: [config.ts:298](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L298)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 • `Optional` **port**: *number*
 
-Defined in: [config.ts:297](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L297)
+Defined in: [config.ts:297](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L297)

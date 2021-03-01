@@ -82,7 +82,7 @@ that it might have regardless
 For templating
 Represents a variable for templating for the data-on-blur event
 
-Defined in: [client/internal/text/serializer/base.tsx:929](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L929)
+Defined in: [client/internal/text/serializer/base.tsx:929](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L929)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-click event
 
-Defined in: [client/internal/text/serializer/base.tsx:924](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L924)
+Defined in: [client/internal/text/serializer/base.tsx:924](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L924)
 
 ___
 
@@ -105,7 +105,7 @@ for templating
 Represents a chosen context and it applies to the property
 data-context
 
-Defined in: [client/internal/text/serializer/base.tsx:913](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L913)
+Defined in: [client/internal/text/serializer/base.tsx:913](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L913)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-focus event
 
-Defined in: [client/internal/text/serializer/base.tsx:934](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L934)
+Defined in: [client/internal/text/serializer/base.tsx:934](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L934)
 
 ___
 
@@ -128,7 +128,7 @@ for templating
 Represents the chosen each context and it applies to the property
 data-for-each
 
-Defined in: [client/internal/text/serializer/base.tsx:919](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L919)
+Defined in: [client/internal/text/serializer/base.tsx:919](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L919)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 An optional name, just used to be displayed in the tree
 
-Defined in: [client/internal/text/serializer/base.tsx:853](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L853)
+Defined in: [client/internal/text/serializer/base.tsx:853](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L853)
 
 ___
 
@@ -150,7 +150,7 @@ For templating
 Represents replacement html content for the inner HTML
 of the given element
 
-Defined in: [client/internal/text/serializer/base.tsx:889](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L889)
+Defined in: [client/internal/text/serializer/base.tsx:889](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L889)
 
 ___
 
@@ -161,7 +161,7 @@ ___
 For templating
 and if condition for conditional rendering
 
-Defined in: [client/internal/text/serializer/base.tsx:883](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L883)
+Defined in: [client/internal/text/serializer/base.tsx:883](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L883)
 
 ___
 
@@ -172,7 +172,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-input event
 
-Defined in: [client/internal/text/serializer/base.tsx:939](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L939)
+Defined in: [client/internal/text/serializer/base.tsx:939](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L939)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-keydown event
 
-Defined in: [client/internal/text/serializer/base.tsx:944](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L944)
+Defined in: [client/internal/text/serializer/base.tsx:944](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L944)
 
 ___
 
@@ -194,7 +194,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-keypress event
 
-Defined in: [client/internal/text/serializer/base.tsx:949](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L949)
+Defined in: [client/internal/text/serializer/base.tsx:949](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L949)
 
 ___
 
@@ -205,7 +205,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-keyup event
 
-Defined in: [client/internal/text/serializer/base.tsx:954](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L954)
+Defined in: [client/internal/text/serializer/base.tsx:954](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L954)
 
 ___
 
@@ -216,7 +216,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mousedown event
 
-Defined in: [client/internal/text/serializer/base.tsx:959](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L959)
+Defined in: [client/internal/text/serializer/base.tsx:959](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L959)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mouseenter event
 
-Defined in: [client/internal/text/serializer/base.tsx:964](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L964)
+Defined in: [client/internal/text/serializer/base.tsx:964](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L964)
 
 ___
 
@@ -238,7 +238,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mouseleave event
 
-Defined in: [client/internal/text/serializer/base.tsx:969](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L969)
+Defined in: [client/internal/text/serializer/base.tsx:969](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L969)
 
 ___
 
@@ -249,7 +249,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mousemove event
 
-Defined in: [client/internal/text/serializer/base.tsx:974](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L974)
+Defined in: [client/internal/text/serializer/base.tsx:974](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L974)
 
 ___
 
@@ -260,7 +260,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mouseup event
 
-Defined in: [client/internal/text/serializer/base.tsx:984](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L984)
+Defined in: [client/internal/text/serializer/base.tsx:984](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L984)
 
 ___
 
@@ -271,7 +271,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mouseover event
 
-Defined in: [client/internal/text/serializer/base.tsx:979](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L979)
+Defined in: [client/internal/text/serializer/base.tsx:979](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L979)
 
 ___
 
@@ -282,7 +282,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mouseup event
 
-Defined in: [client/internal/text/serializer/base.tsx:989](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L989)
+Defined in: [client/internal/text/serializer/base.tsx:989](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L989)
 
 ___
 
@@ -293,7 +293,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-mousewheel event
 
-Defined in: [client/internal/text/serializer/base.tsx:994](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L994)
+Defined in: [client/internal/text/serializer/base.tsx:994](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L994)
 
 ___
 
@@ -306,7 +306,7 @@ these classes represent the extra classes and not the base
 classes that are applied for the given type, so it's primarily
 the rich-text-- classes types
 
-Defined in: [client/internal/text/serializer/base.tsx:876](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L876)
+Defined in: [client/internal/text/serializer/base.tsx:876](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L876)
 
 ___
 
@@ -318,7 +318,7 @@ This is the standard style that translates to the style tag
 following the text specifications only some properties are allowed
 within it
 
-Defined in: [client/internal/text/serializer/base.tsx:859](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L859)
+Defined in: [client/internal/text/serializer/base.tsx:859](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L859)
 
 ___
 
@@ -329,7 +329,7 @@ ___
 Same as the style tag with the same rules but represents data-style-active
 and it's the style for when the item is in an active state
 
-Defined in: [client/internal/text/serializer/base.tsx:869](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L869)
+Defined in: [client/internal/text/serializer/base.tsx:869](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L869)
 
 ___
 
@@ -340,7 +340,7 @@ ___
 This is similar to the style tag but represents the style tag as it
 is applied during a hover event, represents data-style-hover
 
-Defined in: [client/internal/text/serializer/base.tsx:864](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L864)
+Defined in: [client/internal/text/serializer/base.tsx:864](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L864)
 
 ___
 
@@ -352,7 +352,7 @@ For templating
 Represents replacement for textual content
 of the given element
 
-Defined in: [client/internal/text/serializer/base.tsx:895](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L895)
+Defined in: [client/internal/text/serializer/base.tsx:895](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L895)
 
 ___
 
@@ -363,7 +363,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-touchcancel event
 
-Defined in: [client/internal/text/serializer/base.tsx:1014](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L1014)
+Defined in: [client/internal/text/serializer/base.tsx:1014](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L1014)
 
 ___
 
@@ -374,7 +374,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-touchend event
 
-Defined in: [client/internal/text/serializer/base.tsx:1009](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L1009)
+Defined in: [client/internal/text/serializer/base.tsx:1009](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L1009)
 
 ___
 
@@ -385,7 +385,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-touchmove event
 
-Defined in: [client/internal/text/serializer/base.tsx:1004](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L1004)
+Defined in: [client/internal/text/serializer/base.tsx:1004](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L1004)
 
 ___
 
@@ -396,7 +396,7 @@ ___
 For templating
 Represents a variable for templating for the data-on-touchstart event
 
-Defined in: [client/internal/text/serializer/base.tsx:999](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L999)
+Defined in: [client/internal/text/serializer/base.tsx:999](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L999)
 
 ___
 
@@ -408,7 +408,7 @@ For templating
 Represents a chosen ui handler and it applies to the property
 data-ui-handler
 
-Defined in: [client/internal/text/serializer/base.tsx:901](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L901)
+Defined in: [client/internal/text/serializer/base.tsx:901](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L901)
 
 ___
 
@@ -420,7 +420,7 @@ Arguments for the ui handler
 
 #### Type declaration:
 
-Defined in: [client/internal/text/serializer/base.tsx:905](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L905)
+Defined in: [client/internal/text/serializer/base.tsx:905](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L905)
 
 ___
 
@@ -431,4 +431,4 @@ ___
 For templating
 Represents a variable for templating for the data-on-wheel event
 
-Defined in: [client/internal/text/serializer/base.tsx:1019](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/text/serializer/base.tsx#L1019)
+Defined in: [client/internal/text/serializer/base.tsx:1019](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L1019)

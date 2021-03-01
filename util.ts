@@ -1,7 +1,7 @@
 /**
  * Contains general utility functions to be used within the itemize app
  *
- * @packageDocumentation
+ * @module
  */
 
 import MomentDef from "moment";

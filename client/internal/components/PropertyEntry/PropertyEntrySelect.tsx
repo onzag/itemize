@@ -1,6 +1,6 @@
 /**
  * The entry select renderer for specific valid values
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

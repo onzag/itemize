@@ -4,7 +4,7 @@
  * and tells the clients that are connected to this specific instance, it provides
  * functionality to update, create and delete item definition values
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

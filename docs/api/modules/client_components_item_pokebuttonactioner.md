@@ -31,4 +31,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/item/PokeButtonActioner.tsx:61](https://github.com/onzag/itemize/blob/55e63f2c/client/components/item/PokeButtonActioner.tsx#L61)
+Defined in: [client/components/item/PokeButtonActioner.tsx:61](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/item/PokeButtonActioner.tsx#L61)

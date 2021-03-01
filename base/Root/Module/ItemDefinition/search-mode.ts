@@ -2,7 +2,7 @@
  * This file specifies how search mode for item definitions are built
  * given its raw data
  *
- * @packageDocumentation
+ * @module
  */
 
 import ItemDefinition, { IItemDefinitionRawJSONDataType } from ".";

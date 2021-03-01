@@ -2,7 +2,7 @@
  * Contains the submit, search and delete button for fast prototyping
  * usage
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React, { useState } from "react";

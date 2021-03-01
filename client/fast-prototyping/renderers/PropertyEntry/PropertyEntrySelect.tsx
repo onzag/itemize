@@ -4,7 +4,7 @@
  * The select entry field renderer is used for types, number, integer and string when
  * they have defined values
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

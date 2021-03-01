@@ -2,7 +2,7 @@
  * This file is in charge of building the postgresql indexes on the database
  * for speeding up things and setting up unique constraints
  *
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors/safe";

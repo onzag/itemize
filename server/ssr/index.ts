@@ -1,7 +1,7 @@
 /**
  * This file contains all the interfaces that are used to define SSR rules
  * it used to be big, but now it has become simple
- * @packageDocumentation
+ * @module
  */
 
 /**

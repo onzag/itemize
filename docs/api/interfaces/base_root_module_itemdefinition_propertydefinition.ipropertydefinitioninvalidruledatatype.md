@@ -19,7 +19,7 @@ This is the invalid rule once compiled
 
 • **error**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:265](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L265)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:265](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L265)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **if**: [*default*](../classes/base_root_module_itemdefinition_conditionalruleset.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:266](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L266)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:266](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L266)

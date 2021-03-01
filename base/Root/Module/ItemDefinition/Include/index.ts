@@ -4,7 +4,7 @@
  *
  * Related files schema.ts and checkers.ts
  *
- * @packageDocumentation
+ * @module
  */
 
 import ItemDefinition, { IItemStateType, ItemDefinitionIOActions } from "..";

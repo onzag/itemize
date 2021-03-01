@@ -1,7 +1,7 @@
 /**
  * Utilities for loading item definitions
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

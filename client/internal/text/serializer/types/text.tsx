@@ -5,7 +5,7 @@
  * the text node is special as it's not a rich element itself and supports
  * quite different things from the rich element itself
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

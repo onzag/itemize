@@ -30,7 +30,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [server/resolvers/actions/search.ts:46](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L46)
+Defined in: [server/resolvers/actions/search.ts:46](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L46)
 
 ___
 
@@ -49,7 +49,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
 
-Defined in: [server/resolvers/actions/search.ts:405](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L405)
+Defined in: [server/resolvers/actions/search.ts:405](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L405)
 
 ___
 
@@ -65,7 +65,7 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/search.ts:837](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L837)
+Defined in: [server/resolvers/actions/search.ts:837](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L837)
 
 ___
 
@@ -83,7 +83,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
 
-Defined in: [server/resolvers/actions/search.ts:397](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L397)
+Defined in: [server/resolvers/actions/search.ts:397](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L397)
 
 ___
 
@@ -99,7 +99,7 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/search.ts:845](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L845)
+Defined in: [server/resolvers/actions/search.ts:845](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L845)
 
 ___
 
@@ -118,7 +118,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
 
-Defined in: [server/resolvers/actions/search.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L65)
+Defined in: [server/resolvers/actions/search.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L65)
 
 ___
 
@@ -134,7 +134,7 @@ Name | Type |
 
 **Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [server/resolvers/actions/search.ts:841](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L841)
+Defined in: [server/resolvers/actions/search.ts:841](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L841)
 
 ___
 
@@ -152,7 +152,7 @@ Name | Type |
 
 **Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
 
-Defined in: [server/resolvers/actions/search.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L57)
+Defined in: [server/resolvers/actions/search.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L57)
 
 ___
 
@@ -168,4 +168,4 @@ Name | Type |
 
 **Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [server/resolvers/actions/search.ts:849](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/search.ts#L849)
+Defined in: [server/resolvers/actions/search.ts:849](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L849)

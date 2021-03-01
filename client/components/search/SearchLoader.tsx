@@ -2,7 +2,7 @@
  * Provides the functionality to load search results that have been obtained via the
  * item definition context and reside in such context but haven't been loaded
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

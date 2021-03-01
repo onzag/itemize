@@ -1,6 +1,6 @@
 /**
  * Contains the order by query builder that allows to create ORDER BY statments
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

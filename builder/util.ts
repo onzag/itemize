@@ -2,7 +2,7 @@
  * Some utilities used during the building process, mostly for file
  * management
  *
- * @packageDocumentation
+ * @module
  */
 
 import path from "path";

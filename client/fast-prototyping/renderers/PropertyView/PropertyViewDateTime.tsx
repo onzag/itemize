@@ -1,7 +1,7 @@
 /**
  * Contains the property view datetime renderer
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyViewDateTimeRendererProps } from "../../../internal/components/PropertyView/PropertyViewDateTime";

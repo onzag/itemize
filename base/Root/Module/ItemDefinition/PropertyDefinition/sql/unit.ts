@@ -1,7 +1,7 @@
 /**
  * This file provides the sql functionality for the unit type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo,

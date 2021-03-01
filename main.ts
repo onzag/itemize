@@ -2,7 +2,7 @@
 
 /**
  * Main entry file for itemize
- * @packageDocumentation
+ * @module
  */
 
 import setup from "./setup";

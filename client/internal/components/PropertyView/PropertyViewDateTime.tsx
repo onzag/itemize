@@ -1,6 +1,6 @@
 /**
  * The date time view handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

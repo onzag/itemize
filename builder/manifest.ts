@@ -1,7 +1,7 @@
 /**
  * This file generates the manifest files based on the config and the root
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

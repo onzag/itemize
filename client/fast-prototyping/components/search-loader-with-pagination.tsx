@@ -1,7 +1,7 @@
 /**
  * Contains the search loader with an already paginated component
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";

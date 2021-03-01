@@ -1,7 +1,7 @@
 /**
  * Allows to create conditional rendering for when the app is offline
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

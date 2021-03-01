@@ -5,7 +5,7 @@ import { IBuilderBasicConfigType } from "./config";
  * This file exists as a necessity in order to create dynamic json from config
  * fields in the data
  *
- * @packageDocumentation
+ * @module
  */
 
 /**

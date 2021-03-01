@@ -2,7 +2,7 @@
  * Contains the fast prototyping collector for collection usage
  * in SSR
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

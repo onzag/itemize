@@ -1,7 +1,7 @@
 /**
  * The language picker component allows the user to choose a language and update the app
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -1,6 +1,6 @@
 /**
  * Provides the dialogs pertinent to links
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

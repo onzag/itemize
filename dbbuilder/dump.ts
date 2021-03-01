@@ -2,7 +2,7 @@
  * Contains the dumper that dumps the database fractionally so that
  * it can be reloaded (refreshed)
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

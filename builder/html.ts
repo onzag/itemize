@@ -2,7 +2,7 @@
  * Builds the HTML file that is used as the index entry for the itemize
  * application
  *
- * @packageDocumentation
+ * @module
  */
 
 import { escapeStringRegexp } from "../util";

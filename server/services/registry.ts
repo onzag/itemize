@@ -2,7 +2,7 @@
  * This file contains the registry service
  * a special service file that is used within
  * other services for storing critical information
- * @packageDocumentation
+ * @module
  */
 
 import { DatabaseConnection } from "../../database";

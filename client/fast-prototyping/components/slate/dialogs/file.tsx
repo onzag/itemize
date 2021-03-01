@@ -1,6 +1,6 @@
 /**
  * Provides the dialogs that are used for the file
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

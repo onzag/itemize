@@ -1,7 +1,7 @@
 /**
  * This is the dialogs that shows when the user wants to insert
  * a templated element bit, both html and text type
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

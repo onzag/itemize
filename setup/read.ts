@@ -2,7 +2,7 @@
  * Constains function to read information from the console in order to be used
  * during the setup process
  * 
- * @packageDocumentation
+ * @module
  */
 
 import read from "read";

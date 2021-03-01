@@ -31,4 +31,4 @@ Name | Type | Description |
 
 the node information
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:88](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/drawer/tree.tsx#L88)
+Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:88](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/drawer/tree.tsx#L88)

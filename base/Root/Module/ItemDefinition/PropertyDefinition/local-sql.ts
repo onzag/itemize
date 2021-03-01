@@ -5,7 +5,7 @@
  * They exist for use within the redis cache
  * within the server and client side respectively
  *
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLSSCacheEqualInfo, ILocalEqualInfo } from "./types";

@@ -3,7 +3,7 @@
  * the application and are part of its buildnumber (aka static) with caching
  * functionality
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

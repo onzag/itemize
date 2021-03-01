@@ -70,7 +70,7 @@ The whole item definition context
 
 • **blocked**: *boolean*
 
-Defined in: [client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L357)
+Defined in: [client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L357)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 • **blockedButDataAccessible**: *boolean*
 
-Defined in: [client/providers/item.tsx:361](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L361)
+Defined in: [client/providers/item.tsx:361](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L361)
 
 ___
 
@@ -100,9 +100,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:427](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L427)
+Defined in: [client/providers/item.tsx:427](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L427)
 
-Defined in: [client/providers/item.tsx:427](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L427)
+Defined in: [client/providers/item.tsx:427](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L427)
 
 ___
 
@@ -116,9 +116,9 @@ ___
 
 **Returns:** *Promise*<[*IBasicActionResponse*](client_providers_item.ibasicactionresponse.md)\>
 
-Defined in: [client/providers/item.tsx:425](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L425)
+Defined in: [client/providers/item.tsx:425](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L425)
 
-Defined in: [client/providers/item.tsx:425](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L425)
+Defined in: [client/providers/item.tsx:425](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L425)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 • **deleteError**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:377](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L377)
+Defined in: [client/providers/item.tsx:377](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L377)
 
 ___
 
@@ -134,7 +134,7 @@ ___
 
 • **deleted**: *boolean*
 
-Defined in: [client/providers/item.tsx:382](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L382)
+Defined in: [client/providers/item.tsx:382](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L382)
 
 ___
 
@@ -142,7 +142,7 @@ ___
 
 • **deleting**: *boolean*
 
-Defined in: [client/providers/item.tsx:379](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L379)
+Defined in: [client/providers/item.tsx:379](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L379)
 
 ___
 
@@ -156,9 +156,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:471](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L471)
+Defined in: [client/providers/item.tsx:471](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L471)
 
-Defined in: [client/providers/item.tsx:471](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L471)
+Defined in: [client/providers/item.tsx:471](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L471)
 
 ___
 
@@ -172,9 +172,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:472](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L472)
+Defined in: [client/providers/item.tsx:472](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L472)
 
-Defined in: [client/providers/item.tsx:472](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L472)
+Defined in: [client/providers/item.tsx:472](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L472)
 
 ___
 
@@ -188,9 +188,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:468](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L468)
+Defined in: [client/providers/item.tsx:468](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L468)
 
-Defined in: [client/providers/item.tsx:468](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L468)
+Defined in: [client/providers/item.tsx:468](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L468)
 
 ___
 
@@ -204,9 +204,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:473](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L473)
+Defined in: [client/providers/item.tsx:473](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L473)
 
-Defined in: [client/providers/item.tsx:473](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L473)
+Defined in: [client/providers/item.tsx:473](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L473)
 
 ___
 
@@ -220,9 +220,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L474)
+Defined in: [client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L474)
 
-Defined in: [client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L474)
+Defined in: [client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L474)
 
 ___
 
@@ -236,9 +236,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:469](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L469)
+Defined in: [client/providers/item.tsx:469](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L469)
 
-Defined in: [client/providers/item.tsx:469](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L469)
+Defined in: [client/providers/item.tsx:469](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L469)
 
 ___
 
@@ -252,9 +252,9 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:470](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L470)
+Defined in: [client/providers/item.tsx:470](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L470)
 
-Defined in: [client/providers/item.tsx:470](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L470)
+Defined in: [client/providers/item.tsx:470](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L470)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 • **forId**: *string*
 
-Defined in: [client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L349)
+Defined in: [client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L349)
 
 ___
 
@@ -270,7 +270,7 @@ ___
 
 • **forVersion**: *string*
 
-Defined in: [client/providers/item.tsx:351](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L351)
+Defined in: [client/providers/item.tsx:351](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L351)
 
 ___
 
@@ -278,7 +278,7 @@ ___
 
 • **idef**: [*default*](../classes/base_root_module_itemdefinition.default.md)
 
-Defined in: [client/providers/item.tsx:343](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L343)
+Defined in: [client/providers/item.tsx:343](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L343)
 
 ___
 
@@ -298,9 +298,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:489](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L489)
+Defined in: [client/providers/item.tsx:489](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L489)
 
-Defined in: [client/providers/item.tsx:489](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L489)
+Defined in: [client/providers/item.tsx:489](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L489)
 
 ___
 
@@ -308,7 +308,7 @@ ___
 
 • **injectedParentContext**: [*IItemContextType*](client_providers_item.iitemcontexttype.md)
 
-Defined in: [client/providers/item.tsx:484](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L484)
+Defined in: [client/providers/item.tsx:484](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L484)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 • **loadError**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:363](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L363)
+Defined in: [client/providers/item.tsx:363](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L363)
 
 ___
 
@@ -324,7 +324,7 @@ ___
 
 • **loaded**: *boolean*
 
-Defined in: [client/providers/item.tsx:367](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L367)
+Defined in: [client/providers/item.tsx:367](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L367)
 
 ___
 
@@ -332,7 +332,7 @@ ___
 
 • **loading**: *boolean*
 
-Defined in: [client/providers/item.tsx:365](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L365)
+Defined in: [client/providers/item.tsx:365](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L365)
 
 ___
 
@@ -340,7 +340,7 @@ ___
 
 • **notFound**: *boolean*
 
-Defined in: [client/providers/item.tsx:354](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L354)
+Defined in: [client/providers/item.tsx:354](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L354)
 
 ___
 
@@ -361,9 +361,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L448)
+Defined in: [client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L448)
 
-Defined in: [client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L448)
+Defined in: [client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L448)
 
 ___
 
@@ -385,9 +385,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:437](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L437)
+Defined in: [client/providers/item.tsx:437](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L437)
 
-Defined in: [client/providers/item.tsx:437](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L437)
+Defined in: [client/providers/item.tsx:437](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L437)
 
 ___
 
@@ -409,9 +409,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:461](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L461)
+Defined in: [client/providers/item.tsx:461](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L461)
 
-Defined in: [client/providers/item.tsx:461](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L461)
+Defined in: [client/providers/item.tsx:461](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L461)
 
 ___
 
@@ -434,9 +434,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L455)
+Defined in: [client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L455)
 
-Defined in: [client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L455)
+Defined in: [client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L455)
 
 ___
 
@@ -456,9 +456,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L443)
+Defined in: [client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L443)
 
-Defined in: [client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L443)
+Defined in: [client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L443)
 
 ___
 
@@ -478,9 +478,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:477](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L477)
+Defined in: [client/providers/item.tsx:477](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L477)
 
-Defined in: [client/providers/item.tsx:477](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L477)
+Defined in: [client/providers/item.tsx:477](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L477)
 
 ___
 
@@ -488,7 +488,7 @@ ___
 
 • **pokedElements**: [*IPokeElementsType*](client_providers_item.ipokeelementstype.md)
 
-Defined in: [client/providers/item.tsx:416](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L416)
+Defined in: [client/providers/item.tsx:416](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L416)
 
 ___
 
@@ -508,9 +508,9 @@ Name | Type |
 
 **Returns:** *Promise*<[*IActionResponseWithValue*](client_providers_item.iactionresponsewithvalue.md)\>
 
-Defined in: [client/providers/item.tsx:420](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L420)
+Defined in: [client/providers/item.tsx:420](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L420)
 
-Defined in: [client/providers/item.tsx:420](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L420)
+Defined in: [client/providers/item.tsx:420](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L420)
 
 ___
 
@@ -518,7 +518,7 @@ ___
 
 • **remoteListener**: [*RemoteListener*](../classes/client_internal_app_remote_listener.remotelistener.md)
 
-Defined in: [client/providers/item.tsx:481](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L481)
+Defined in: [client/providers/item.tsx:481](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L481)
 
 ___
 
@@ -538,9 +538,9 @@ Name | Type |
 
 **Returns:** *Promise*<[*IActionResponseWithSearchResults*](client_providers_item.iactionresponsewithsearchresults.md)\>
 
-Defined in: [client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L432)
+Defined in: [client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L432)
 
-Defined in: [client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L432)
+Defined in: [client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L432)
 
 ___
 
@@ -548,7 +548,7 @@ ___
 
 • **searchCount**: *number*
 
-Defined in: [client/providers/item.tsx:393](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L393)
+Defined in: [client/providers/item.tsx:393](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L393)
 
 ___
 
@@ -556,7 +556,7 @@ ___
 
 • **searchError**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:384](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L384)
+Defined in: [client/providers/item.tsx:384](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L384)
 
 ___
 
@@ -564,7 +564,7 @@ ___
 
 • **searchFields**: *any*
 
-Defined in: [client/providers/item.tsx:406](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L406)
+Defined in: [client/providers/item.tsx:406](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L406)
 
 ___
 
@@ -572,7 +572,7 @@ ___
 
 • **searchId**: *string*
 
-Defined in: [client/providers/item.tsx:396](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L396)
+Defined in: [client/providers/item.tsx:396](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L396)
 
 ___
 
@@ -580,7 +580,7 @@ ___
 
 • **searchLimit**: *number*
 
-Defined in: [client/providers/item.tsx:391](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L391)
+Defined in: [client/providers/item.tsx:391](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L391)
 
 ___
 
@@ -588,7 +588,7 @@ ___
 
 • **searchOffset**: *number*
 
-Defined in: [client/providers/item.tsx:392](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L392)
+Defined in: [client/providers/item.tsx:392](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L392)
 
 ___
 
@@ -596,7 +596,7 @@ ___
 
 • **searchOwner**: *string*
 
-Defined in: [client/providers/item.tsx:399](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L399)
+Defined in: [client/providers/item.tsx:399](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L399)
 
 ___
 
@@ -604,7 +604,7 @@ ___
 
 • **searchRecords**: [*IGQLSearchRecord*](gql_querier.igqlsearchrecord.md)[]
 
-Defined in: [client/providers/item.tsx:389](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L389)
+Defined in: [client/providers/item.tsx:389](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L389)
 
 ___
 
@@ -614,7 +614,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [client/providers/item.tsx:408](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L408)
+Defined in: [client/providers/item.tsx:408](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L408)
 
 ___
 
@@ -622,7 +622,7 @@ ___
 
 • **searchRequestedProperties**: *string*[]
 
-Defined in: [client/providers/item.tsx:407](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L407)
+Defined in: [client/providers/item.tsx:407](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L407)
 
 ___
 
@@ -630,7 +630,7 @@ ___
 
 • **searchResults**: [*IGQLValue*](gql_querier.igqlvalue.md)[]
 
-Defined in: [client/providers/item.tsx:390](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L390)
+Defined in: [client/providers/item.tsx:390](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L390)
 
 ___
 
@@ -638,7 +638,7 @@ ___
 
 • **searchShouldCache**: *boolean*
 
-Defined in: [client/providers/item.tsx:403](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L403)
+Defined in: [client/providers/item.tsx:403](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L403)
 
 ___
 
@@ -646,7 +646,7 @@ ___
 
 • **searchWasRestored**: *boolean*
 
-Defined in: [client/providers/item.tsx:397](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L397)
+Defined in: [client/providers/item.tsx:397](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L397)
 
 ___
 
@@ -654,7 +654,7 @@ ___
 
 • **searching**: *boolean*
 
-Defined in: [client/providers/item.tsx:386](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L386)
+Defined in: [client/providers/item.tsx:386](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L386)
 
 ___
 
@@ -662,7 +662,7 @@ ___
 
 • **state**: [*IItemStateType*](base_root_module_itemdefinition.iitemstatetype.md)
 
-Defined in: [client/providers/item.tsx:346](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L346)
+Defined in: [client/providers/item.tsx:346](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L346)
 
 ___
 
@@ -682,9 +682,9 @@ Name | Type |
 
 **Returns:** *Promise*<[*IActionResponseWithId*](client_providers_item.iactionresponsewithid.md)\>
 
-Defined in: [client/providers/item.tsx:423](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L423)
+Defined in: [client/providers/item.tsx:423](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L423)
 
-Defined in: [client/providers/item.tsx:423](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L423)
+Defined in: [client/providers/item.tsx:423](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L423)
 
 ___
 
@@ -692,7 +692,7 @@ ___
 
 • **submitError**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L369)
+Defined in: [client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L369)
 
 ___
 
@@ -700,7 +700,7 @@ ___
 
 • **submitted**: *boolean*
 
-Defined in: [client/providers/item.tsx:375](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L375)
+Defined in: [client/providers/item.tsx:375](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L375)
 
 ___
 
@@ -708,7 +708,7 @@ ___
 
 • **submitting**: *boolean*
 
-Defined in: [client/providers/item.tsx:371](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L371)
+Defined in: [client/providers/item.tsx:371](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L371)
 
 ___
 
@@ -722,6 +722,6 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/providers/item.tsx:478](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L478)
+Defined in: [client/providers/item.tsx:478](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L478)
 
-Defined in: [client/providers/item.tsx:478](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L478)
+Defined in: [client/providers/item.tsx:478](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L478)

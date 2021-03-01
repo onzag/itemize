@@ -24,4 +24,4 @@ might be disabled by request
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/navbar/index.tsx:113](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/navbar/index.tsx#L113)
+Defined in: [client/fast-prototyping/components/navbar/index.tsx:113](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/index.tsx#L113)

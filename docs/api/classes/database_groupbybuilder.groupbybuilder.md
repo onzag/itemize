@@ -48,7 +48,7 @@ Provides the group by builders that allows to create GROUP BY sql statments
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/GroupByBuilder.ts:12](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L12)
+Defined in: [database/GroupByBuilder.ts:12](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L12)
 
 ## Properties
 
@@ -56,7 +56,7 @@ Defined in: [database/GroupByBuilder.ts:12](https://github.com/onzag/itemize/blo
 
 • `Private` **expressions**: *string*[]
 
-Defined in: [database/GroupByBuilder.ts:12](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L12)
+Defined in: [database/GroupByBuilder.ts:12](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L12)
 
 ## Methods
 
@@ -76,7 +76,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L69)
 
 ___
 
@@ -96,7 +96,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L77)
 
 ___
 
@@ -116,7 +116,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/GroupByBuilder.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L22)
+Defined in: [database/GroupByBuilder.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L22)
 
 ___
 
@@ -137,7 +137,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/GroupByBuilder.ts:32](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L32)
+Defined in: [database/GroupByBuilder.ts:32](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L32)
 
 ___
 
@@ -158,7 +158,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/GroupByBuilder.ts:44](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L44)
+Defined in: [database/GroupByBuilder.ts:44](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L44)
 
 ___
 
@@ -172,7 +172,7 @@ Removes all the expressions that were used to group by
 
 itself
 
-Defined in: [database/GroupByBuilder.ts:68](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L68)
+Defined in: [database/GroupByBuilder.ts:68](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L68)
 
 ___
 
@@ -186,7 +186,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L102)
 
 ___
 
@@ -202,7 +202,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/GroupByBuilder.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/database/GroupByBuilder.ts#L57)
+Defined in: [database/GroupByBuilder.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/database/GroupByBuilder.ts#L57)
 
 ___
 
@@ -219,7 +219,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L165)
 
 ___
 
@@ -233,7 +233,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L109)
 
 ___
 
@@ -254,7 +254,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L86)
 
 ___
 
@@ -275,7 +275,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L95)
 
 ___
 
@@ -291,4 +291,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L126)

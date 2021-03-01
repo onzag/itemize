@@ -1,7 +1,7 @@
 /**
  * This is the root server file and does the initialization
  * of the server side of things
- * @packageDocumentation
+ * @module
  */
 
 import express from "express";

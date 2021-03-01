@@ -72,7 +72,7 @@ Constructs a new query
 
 **Returns:** [*QueryBuilder*](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L57)
+Defined in: [database/base.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L57)
 
 ## Properties
 
@@ -83,7 +83,7 @@ Defined in: [database/base.ts:57](https://github.com/onzag/itemize/blob/55e63f2c
 These are all the bindings that are used by the query builder
 in order
 
-Defined in: [database/base.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L57)
+Defined in: [database/base.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L57)
 
 ## Methods
 
@@ -101,7 +101,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L69)
 
 ___
 
@@ -119,7 +119,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L77)
 
 ___
 
@@ -131,7 +131,7 @@ Removes all binding sources
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L102)
 
 ___
 
@@ -146,7 +146,7 @@ this function needs to be overriden
 
 **Returns:** *string*
 
-Defined in: [database/base.ts:118](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L118)
+Defined in: [database/base.ts:118](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L118)
 
 ___
 
@@ -161,7 +161,7 @@ should match the compilation
 
 a list of basic bindings
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L165)
 
 ___
 
@@ -173,7 +173,7 @@ Removes the last added biding source and returns it
 
 **Returns:** [*ExtendedBindingType*](../modules/database_base.md#extendedbindingtype)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L109)
 
 ___
 
@@ -192,7 +192,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L86)
 
 ___
 
@@ -211,7 +211,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L95)
 
 ___
 
@@ -225,4 +225,4 @@ Returns the SQL result for usage in the query builder
 
 a sql builder result with the bindings and the query itself
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L126)

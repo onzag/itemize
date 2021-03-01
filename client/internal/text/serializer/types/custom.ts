@@ -3,7 +3,7 @@
  * for the custom element, which is basically a div with a custom prefixed
  * class name
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg } from "..";

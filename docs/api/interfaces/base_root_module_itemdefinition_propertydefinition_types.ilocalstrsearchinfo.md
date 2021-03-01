@@ -28,7 +28,7 @@
 
 • **gqlValue**: [*IGQLValue*](gql_querier.igqlvalue.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:123](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L123)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:123](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L123)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[id](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#id)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[include](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#include)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[itemDefinition](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#itemdefinition)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[prefix](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#prefix)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[property](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#property)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
 
 ___
 
@@ -86,4 +86,4 @@ ___
 
 • **search**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:122](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L122)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:122](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L122)

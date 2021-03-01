@@ -3,7 +3,7 @@
  * rich text editors and designed to be used with the PropertyEntryText type
  * even if it can also be used in a standalone way
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

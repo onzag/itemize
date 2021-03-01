@@ -32,7 +32,7 @@ emulated searches within it
 
 • `Const` **CACHE\_NAME**: *ITEMIZE_CACHE*= "ITEMIZE\_CACHE"
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:117](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L117)
+Defined in: [client/internal/workers/cache/cache.worker.ts:117](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L117)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • `Const` **QUERIES\_TABLE\_NAME**: *queries*= "queries"
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:119](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L119)
+Defined in: [client/internal/workers/cache/cache.worker.ts:119](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L119)
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 • `Const` **SEARCHES\_TABLE\_NAME**: *searches*= "searches"
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:120](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L120)
+Defined in: [client/internal/workers/cache/cache.worker.ts:120](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L120)

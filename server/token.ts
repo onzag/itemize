@@ -4,7 +4,7 @@
  * because JWT tokens are sessioned, the reason JWT is used is because
  * tokens can be manufactured based on the jwtKey so other services
  * can be able to communicate with an itemize server easily
- * @packageDocumentation
+ * @module
  */
 
 import jwt from "jsonwebtoken";

@@ -1,7 +1,7 @@
 /**
  * A reexport of the material UI core
  * 
- * @packageDocumentation
+ * @module
  */
 
 import Button from "@material-ui/core/Button";

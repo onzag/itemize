@@ -35,4 +35,4 @@ Name | Type | Description |
 a list of field definitions that represent the include in graphql form
 for use within the graphql description
 
-Defined in: [base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/gql.ts#L28)
+Defined in: [base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/gql.ts#L28)

@@ -2,7 +2,7 @@
  * Contains the property view simple renderer that simply displays a thing
  * used in raw properties and in simple properties such as text or numbers
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyViewSimpleRendererProps } from "../../../internal/components/PropertyView/PropertyViewSimple";

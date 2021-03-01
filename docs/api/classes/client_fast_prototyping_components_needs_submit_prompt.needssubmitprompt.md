@@ -447,7 +447,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/needs-submit-prompt.tsx:132](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/needs-submit-prompt.tsx#L132)
+Defined in: [client/fast-prototyping/components/needs-submit-prompt.tsx:132](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/needs-submit-prompt.tsx#L132)
 
 ___
 

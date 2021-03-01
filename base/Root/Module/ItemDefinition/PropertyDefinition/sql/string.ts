@@ -1,7 +1,7 @@
 /**
  * This file contains the sql server side functions for the string type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLSearchInfo, ISQLStrSearchInfo } from "../types";

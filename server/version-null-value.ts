@@ -1,7 +1,7 @@
 /**
  * PostgreSQL does not support versions as being null, but technically versions are null
  * so empty string is used in such a case, but we need to clear that up after parsed
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLTableRowValue } from "../base/Root/sql";

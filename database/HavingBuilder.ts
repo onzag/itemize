@@ -1,6 +1,6 @@
 /**
  * Provides the having builder that allows to create HAVING statments
- * @packageDocumentation
+ * @module
  */
 
 import { ConditionalBuilder, ConditionalBuilderFn } from "./base";

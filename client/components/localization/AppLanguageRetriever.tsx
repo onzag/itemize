@@ -1,7 +1,7 @@
 /**
  * Simply provides the current language
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

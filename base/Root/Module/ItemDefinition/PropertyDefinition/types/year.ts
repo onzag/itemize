@@ -1,7 +1,7 @@
 /**
  * Contains the year type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

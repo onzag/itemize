@@ -1,7 +1,7 @@
 /**
  * Contains a generic dialog component based on MUI that is meant to be extended
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

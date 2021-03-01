@@ -1,6 +1,6 @@
 /**
  * These are the default ignores
- * @packageDocumentation
+ * @module
  */
 
 export default [

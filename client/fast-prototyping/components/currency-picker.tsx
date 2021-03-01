@@ -2,7 +2,7 @@
  * Contains the currency picker fast prototyping element which allows the user
  * to select a currency
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

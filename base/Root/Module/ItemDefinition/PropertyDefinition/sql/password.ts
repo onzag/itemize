@@ -1,7 +1,7 @@
 /**
  * This file contains the password server side sql functionality
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLInInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";

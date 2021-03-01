@@ -2,7 +2,7 @@
  * This file contains the critical build for the search mode build of a module
  * given an input of a module to be converted into its search form
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IModuleRawJSONDataType } from ".";

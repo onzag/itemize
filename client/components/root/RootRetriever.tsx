@@ -1,7 +1,7 @@
 /**
  * Does the very simple job of retrieving the root
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

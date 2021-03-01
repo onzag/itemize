@@ -28,4 +28,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/components/root/RootRetriever.tsx:26](https://github.com/onzag/itemize/blob/55e63f2c/client/components/root/RootRetriever.tsx#L26)
+Defined in: [client/components/root/RootRetriever.tsx:26](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/root/RootRetriever.tsx#L26)

@@ -28,7 +28,7 @@
 
 Inherited from: [IParentedSearchRegisterRequest](base_remote_protocol.iparentedsearchregisterrequest.md).[parentId](base_remote_protocol.iparentedsearchregisterrequest.md#parentid)
 
-Defined in: [base/remote-protocol.ts:342](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L342)
+Defined in: [base/remote-protocol.ts:342](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L342)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 Inherited from: [IParentedSearchRegisterRequest](base_remote_protocol.iparentedsearchregisterrequest.md).[parentType](base_remote_protocol.iparentedsearchregisterrequest.md#parenttype)
 
-Defined in: [base/remote-protocol.ts:341](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L341)
+Defined in: [base/remote-protocol.ts:341](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L341)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Inherited from: [IParentedSearchRegisterRequest](base_remote_protocol.iparentedsearchregisterrequest.md).[parentVersion](base_remote_protocol.iparentedsearchregisterrequest.md#parentversion)
 
-Defined in: [base/remote-protocol.ts:343](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L343)
+Defined in: [base/remote-protocol.ts:343](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L343)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Inherited from: [IParentedSearchRegisterRequest](base_remote_protocol.iparentedsearchregisterrequest.md).[qualifiedPathName](base_remote_protocol.iparentedsearchregisterrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L299)
+Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L299)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:91](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L91)
+Defined in: [client/internal/testing.ts:91](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/testing.ts#L91)

@@ -107,7 +107,7 @@ Name | Type | Description |
 
 **Returns:** [*default*](base_root_module_itemdefinition_include.default.md)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:210](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L210)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:210](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L210)
 
 ## Properties
 
@@ -115,7 +115,7 @@ Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:210](https://githu
 
 • **\_gqlInObj**: *any*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:150](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L150)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:150](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L150)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 • **\_gqlInObjOpt**: *any*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:154](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L154)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:154](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L154)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 • **\_gqlOutObj**: *any*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:152](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L152)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:152](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L152)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 • **\_gqlOutObjOpt**: *any*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:156](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L156)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:156](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L156)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 The allowance of exclusion (compiled)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:169](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L169)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:169](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L169)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 The default exclusion state rule (compiled)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:173](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L173)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:173](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L173)
 
 ___
 
@@ -169,7 +169,7 @@ ___
 
 Enforced properties (compiled)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:178](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L178)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:178](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L178)
 
 ___
 
@@ -179,7 +179,7 @@ ___
 
 The excluded if rules (compiled)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:165](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L165)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:165](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L165)
 
 ___
 
@@ -189,7 +189,7 @@ ___
 
 The item definition the include refers to
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:161](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L161)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:161](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L161)
 
 ___
 
@@ -199,7 +199,7 @@ ___
 
 The parent item definition of this include
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:142](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L142)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:142](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L142)
 
 ___
 
@@ -209,7 +209,7 @@ ___
 
 The parent module where this include sits
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:146](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L146)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:146](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L146)
 
 ___
 
@@ -219,7 +219,7 @@ ___
 
 Predefined properties (compiled)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:182](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L182)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:182](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L182)
 
 ___
 
@@ -229,7 +229,7 @@ ___
 
 The raw data that comes from the compiled schema
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:138](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L138)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:138](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L138)
 
 ___
 
@@ -242,7 +242,7 @@ the enforced, but the stateful
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:188](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L188)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:188](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L188)
 
 ___
 
@@ -254,7 +254,7 @@ The applied exclusion
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:201](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L201)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:201](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L201)
 
 ___
 
@@ -267,7 +267,7 @@ by the user or a value has been applied
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:208](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L208)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:208](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L208)
 
 ___
 
@@ -280,7 +280,7 @@ by the user or a value has been applied
 
 #### Type declaration:
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:195](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L195)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:195](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L195)
 
 ## Methods
 
@@ -302,7 +302,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:650](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L650)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:650](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L650)
 
 ___
 
@@ -327,7 +327,7 @@ Name | Type | Description |
 
 a graphql fields object
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:380](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L380)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:380](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L380)
 
 ___
 
@@ -351,7 +351,7 @@ Name | Type | Description |
 
 a boolean that tells whether if it can be toggled
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:475](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L475)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:475](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L475)
 
 ___
 
@@ -377,7 +377,7 @@ Name | Type | Description |
 
 a boolean on whether it has role access
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:351](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L351)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:351](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L351)
 
 ___
 
@@ -396,7 +396,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:277](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L277)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:277](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L277)
 
 ___
 
@@ -415,7 +415,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:699](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L699)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:699](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L699)
 
 ___
 
@@ -430,7 +430,7 @@ extenrally checked, either an indexed one
 
 a boolean on whether it contains such a property or not
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:774](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L774)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:774](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L774)
 
 ___
 
@@ -451,7 +451,7 @@ Name | Type | Description |
 
 the applied value
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:571](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L571)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:571](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L571)
 
 ___
 
@@ -472,7 +472,7 @@ Name | Type | Description |
 
 a boolean whether it's excluded or not
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:424](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L424)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:424](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L424)
 
 ___
 
@@ -502,7 +502,7 @@ Name | Type |
 
 an object or null (if locale not valid)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:757](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L757)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:757](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L757)
 
 ___
 
@@ -523,7 +523,7 @@ Name | Type | Description |
 
 a string or null (if locale not valid)
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:741](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L741)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:741](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L741)
 
 ___
 
@@ -538,7 +538,7 @@ the unique id is, well, unique for this item
 
 the unique id of the include
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:535](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L535)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:535](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L535)
 
 ___
 
@@ -552,7 +552,7 @@ Provides the item definition that this include refers to
 
 the item definition
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:782](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L782)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:782](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L782)
 
 ___
 
@@ -567,7 +567,7 @@ the item definition children this item is attached to
 
 a string with the item definition name
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:526](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L526)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:526](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L526)
 
 ___
 
@@ -582,7 +582,7 @@ other things
 
 a prefixed string that is the prefixed qualified identifier
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:553](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L553)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:553](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L553)
 
 ___
 
@@ -596,7 +596,7 @@ Provides the qualfiied name for the exclusion state
 
 the string that represents the exclusion identifier
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:561](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L561)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:561](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L561)
 
 ___
 
@@ -611,7 +611,7 @@ that is an INCLUDE prefixed with the identifier
 
 a string that is the qualified identifier
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:544](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L544)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:544](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L544)
 
 ___
 
@@ -626,7 +626,7 @@ instances
 
 all sinking properties as instances
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:335](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L335)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:335](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L335)
 
 ___
 
@@ -640,7 +640,7 @@ Provides the ids of the sinking properties
 
 an array of the sinking properties ids
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:313](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L313)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:313](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L313)
 
 ___
 
@@ -660,7 +660,7 @@ Name | Type | Description |
 
 a single property, if available, otherwise throws an error
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:322](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L322)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:322](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L322)
 
 ___
 
@@ -682,7 +682,7 @@ Name | Type | Description |
 
 a promise for the state of the include
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:617](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L617)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:617](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L617)
 
 ___
 
@@ -705,7 +705,7 @@ Name | Type | Description |
 
 the state of the include
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:588](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L588)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:588](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L588)
 
 ___
 
@@ -721,7 +721,7 @@ instance is missing it, this is for key items, eg. car, wheels missing.
 
 a boolean on whether the exclusion must be called out
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:504](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L504)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:504](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L504)
 
 ___
 
@@ -737,7 +737,7 @@ because it's used during the search mode
 
 a boolean on whether the exclusion is ternary
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:494](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L494)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:494](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L494)
 
 ___
 
@@ -755,7 +755,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:790](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L790)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:790](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L790)
 
 ___
 
@@ -774,7 +774,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:717](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L717)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:717](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L717)
 
 ___
 
@@ -794,7 +794,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:514](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L514)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:514](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L514)
 
 ___
 
@@ -808,4 +808,4 @@ Basically returns the raw data of this item
 
 the json value raw data
 
-Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:765](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/index.ts#L765)
+Defined in: [base/Root/Module/ItemDefinition/Include/index.ts:765](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/index.ts#L765)

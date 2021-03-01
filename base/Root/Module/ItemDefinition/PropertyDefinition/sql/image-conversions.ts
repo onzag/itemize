@@ -3,7 +3,7 @@
  * transform it into all the different sizes that have been specified by the property
  * this is the case for files when a image type is detected
  *
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition from "..";

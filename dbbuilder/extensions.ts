@@ -2,7 +2,7 @@
  * Adds the pgcrypto and the postgis extensions that are necessary if and only if they
  * are deemed necessary by the schema
  *
- * @packageDocumentation
+ * @module
  */
 
 import { DatabaseConnection } from "../database";

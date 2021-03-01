@@ -3,7 +3,7 @@
  * streams and are to be stored in the database the files are sent somewhere else
  * and the url is actually what it's stored
  *
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition from "..";

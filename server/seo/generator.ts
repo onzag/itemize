@@ -1,7 +1,7 @@
 /**
  * This file contains the seo generator and helper interfaces
  * for using for SEO purposes
- * @packageDocumentation
+ * @module
  */
 
 import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOParametrizer } from ".";

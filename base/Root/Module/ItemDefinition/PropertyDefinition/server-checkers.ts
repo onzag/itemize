@@ -3,7 +3,7 @@
  * in the server side, they are done against the database rather than
  * using fetch requests that ultimately end up running these functions
  *
- * @packageDocumentation
+ * @module
  */
 
 import { PropertyDefinitionSupportedType } from "./types";

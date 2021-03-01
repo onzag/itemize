@@ -20,7 +20,7 @@
 
 The id of the index in order to perform double table indexes
 
-Defined in: [base/Root/sql.ts:16](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L16)
+Defined in: [base/Root/sql.ts:16](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L16)
 
 ___
 
@@ -32,7 +32,7 @@ The index level a numeric value to sort it as, the level
 makes the order of columns in the key which might have
 performance effects
 
-Defined in: [base/Root/sql.ts:26](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L26)
+Defined in: [base/Root/sql.ts:26](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L26)
 
 ___
 
@@ -42,4 +42,4 @@ ___
 
 The type of the index, unique, gin, btree...
 
-Defined in: [base/Root/sql.ts:20](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L20)
+Defined in: [base/Root/sql.ts:20](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L20)

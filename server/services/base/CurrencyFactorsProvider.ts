@@ -4,7 +4,7 @@
  * any service that is intended to be a currency factors provider
  * should follow this interface type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ServiceProvider, ServiceProviderType } from "..";

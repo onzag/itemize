@@ -26,7 +26,7 @@ Contains the internal initialization function for initializing itemize app
 
 • `Const` **history**: *History*<{}\>
 
-Defined in: [client/index.tsx:108](https://github.com/onzag/itemize/blob/55e63f2c/client/index.tsx#L108)
+Defined in: [client/index.tsx:108](https://github.com/onzag/itemize/blob/5fcde7cf/client/index.tsx#L108)
 
 ## Functions
 
@@ -47,7 +47,7 @@ Name | Type | Description |
 
 the value of the cookie as a string or null
 
-Defined in: [client/index.tsx:40](https://github.com/onzag/itemize/blob/55e63f2c/client/index.tsx#L40)
+Defined in: [client/index.tsx:40](https://github.com/onzag/itemize/blob/5fcde7cf/client/index.tsx#L40)
 
 ___
 
@@ -65,7 +65,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/index.tsx:117](https://github.com/onzag/itemize/blob/55e63f2c/client/index.tsx#L117)
+Defined in: [client/index.tsx:117](https://github.com/onzag/itemize/blob/5fcde7cf/client/index.tsx#L117)
 
 ___
 
@@ -103,4 +103,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<{ `id`: *string* ; `node`: ReactNode  }\>
 
-Defined in: [client/index.tsx:221](https://github.com/onzag/itemize/blob/55e63f2c/client/index.tsx#L221)
+Defined in: [client/index.tsx:221](https://github.com/onzag/itemize/blob/5fcde7cf/client/index.tsx#L221)

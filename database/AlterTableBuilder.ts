@@ -1,6 +1,6 @@
 /**
  * Contains the create table query builder that allows to create ALTER TABLE queries
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder, ValueType } from "./base";
@@ -21,7 +21,7 @@ interface IAlterTableColumnDataWithExpressionAsDefault {
 
 /**
  * The alter table query builder that allows to create ALTER TABLE queries
- * @packageDocumentation
+ * @module
  */
 export class AlterTableBuilder extends QueryBuilder {
   /**

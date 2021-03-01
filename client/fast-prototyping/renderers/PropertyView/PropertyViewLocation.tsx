@@ -1,7 +1,7 @@
 /**
  * Contains the property view location renderer
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

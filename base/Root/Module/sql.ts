@@ -3,7 +3,7 @@
  * queries within the module itself as well as to define the parent module table that is
  * to be used in the item definition for properties in common
  *
- * @packageDocumentation
+ * @module
  */
 
 import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX, IOrderByRuleType } from "../../../constants";

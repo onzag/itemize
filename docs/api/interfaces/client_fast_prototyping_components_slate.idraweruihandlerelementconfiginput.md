@@ -21,7 +21,7 @@ of type input
 
 • **label**: ReactNode
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:211](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L211)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:211](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L211)
 
 ___
 
@@ -34,7 +34,7 @@ if a react node is provided this node will be modified
 and added a children as (i18nValue: string) => React.Node
 eg. the i18nRead element
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:219](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L219)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:219](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L219)
 
 ___
 
@@ -42,4 +42,4 @@ ___
 
 • **type**: *input*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:210](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L210)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:210](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L210)

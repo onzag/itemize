@@ -1,7 +1,7 @@
 /**
  * Exists to contain basic renderer information about what every
  * renderer should have accessible
- * @packageDocumentation
+ * @module
  */
 
  /**

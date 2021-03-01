@@ -1,6 +1,6 @@
 /**
  * Provides the group by builder that allows to create GROUP BY statements
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

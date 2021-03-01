@@ -3,7 +3,7 @@
  * regarding notFound, blocked, data accessible, loading, loaded, etc... with
  * conditional rendering
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

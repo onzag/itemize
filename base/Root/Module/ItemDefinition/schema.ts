@@ -2,7 +2,7 @@
  * This file contains the schema that defines how item definitions should look like
  * in the schema form
  *
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinitionSchema from "./PropertyDefinition/schema";

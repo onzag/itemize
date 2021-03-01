@@ -4,7 +4,7 @@
  * necessary and shouldn't be touched and others that should
  * be overriden into what is a standard service
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { logger } from "../..";

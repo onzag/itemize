@@ -45,7 +45,7 @@ Name | Type |
 
 **Returns:** [*DataCorruptionError*](client_internal_workers_cache_cache_worker_search.datacorruptionerror.md)
 
-Defined in: [client/internal/workers/cache/cache.worker.search.ts:45](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.search.ts#L45)
+Defined in: [client/internal/workers/cache/cache.worker.search.ts:45](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.search.ts#L45)
 
 ## Properties
 

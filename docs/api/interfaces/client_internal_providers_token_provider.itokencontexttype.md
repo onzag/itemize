@@ -41,9 +41,9 @@ Dismiss the current login error
 
 **Returns:** *void*
 
-Defined in: [client/internal/providers/token-provider.tsx:110](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L110)
+Defined in: [client/internal/providers/token-provider.tsx:110](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L110)
 
-Defined in: [client/internal/providers/token-provider.tsx:110](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L110)
+Defined in: [client/internal/providers/token-provider.tsx:110](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L110)
 
 ___
 
@@ -55,7 +55,7 @@ An error that occured during login
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[error](client_internal_providers_token_provider.iactualtokenproviderstate.md#error)
 
-Defined in: [client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L36)
+Defined in: [client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L36)
 
 ___
 
@@ -67,7 +67,7 @@ The user id
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[id](client_internal_providers_token_provider.iactualtokenproviderstate.md#id)
 
-Defined in: [client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L28)
+Defined in: [client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L28)
 
 ___
 
@@ -79,7 +79,7 @@ Whether it's currently logging in
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[isLoggingIn](client_internal_providers_token_provider.iactualtokenproviderstate.md#isloggingin)
 
-Defined in: [client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L40)
+Defined in: [client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L40)
 
 ___
 
@@ -97,7 +97,7 @@ the token
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[isReady](client_internal_providers_token_provider.iactualtokenproviderstate.md#isready)
 
-Defined in: [client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L50)
+Defined in: [client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L50)
 
 ___
 
@@ -131,9 +131,9 @@ Name | Type |
 
 **Returns:** *Promise*<{ `error`: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype) ; `id`: *string* ; `role`: *string*  }\>
 
-Defined in: [client/internal/providers/token-provider.tsx:101](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L101)
+Defined in: [client/internal/providers/token-provider.tsx:101](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L101)
 
-Defined in: [client/internal/providers/token-provider.tsx:101](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L101)
+Defined in: [client/internal/providers/token-provider.tsx:101](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L101)
 
 ___
 
@@ -150,9 +150,9 @@ the token provider only manages simple functionality about the current app state
 
 **Returns:** *void*
 
-Defined in: [client/internal/providers/token-provider.tsx:106](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L106)
+Defined in: [client/internal/providers/token-provider.tsx:106](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L106)
 
-Defined in: [client/internal/providers/token-provider.tsx:106](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L106)
+Defined in: [client/internal/providers/token-provider.tsx:106](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L106)
 
 ___
 
@@ -164,7 +164,7 @@ The user role
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[role](client_internal_providers_token_provider.iactualtokenproviderstate.md#role)
 
-Defined in: [client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L32)
+Defined in: [client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L32)
 
 ___
 
@@ -176,4 +176,4 @@ The token we have got now
 
 Inherited from: [IActualTokenProviderState](client_internal_providers_token_provider.iactualtokenproviderstate.md).[token](client_internal_providers_token_provider.iactualtokenproviderstate.md#token)
 
-Defined in: [client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/token-provider.tsx#L24)
+Defined in: [client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L24)

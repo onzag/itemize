@@ -2,7 +2,7 @@
  * This file provides the drawer content that exists side to the rich text editor
  * when it is allowed to hold a drawer, the drawer contains a range of options to enable
  * templating or custom styling
- * @packageDocumentation
+ * @module
  */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";

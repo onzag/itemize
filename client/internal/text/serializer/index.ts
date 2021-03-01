@@ -2,7 +2,7 @@
  * This file contains the serializer and deserializer basic functionality that allows
  * to handle the standard itemize text specification
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

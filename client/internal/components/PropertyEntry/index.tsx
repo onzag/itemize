@@ -1,7 +1,7 @@
 /**
  * Contains the property entry main component that defines how properties
  * are to be managed within itemize for entry
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition, {

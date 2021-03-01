@@ -1,7 +1,7 @@
 /**
  * Contains the text type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

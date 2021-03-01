@@ -1,7 +1,7 @@
 /**
  * Contains the dev dependencies that the parent project
  * should have, these are for building the project with webpack
- * @packageDocumentation
+ * @module
  */
 
 export default {

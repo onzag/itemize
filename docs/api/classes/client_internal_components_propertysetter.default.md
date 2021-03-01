@@ -59,7 +59,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertysetter.default.md)
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:52](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertySetter/index.tsx#L52)
+Defined in: [client/internal/components/PropertySetter/index.tsx:52](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertySetter/index.tsx#L52)
 
 ## Properties
 
@@ -258,7 +258,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:56](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertySetter/index.tsx#L56)
+Defined in: [client/internal/components/PropertySetter/index.tsx:56](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertySetter/index.tsx#L56)
 
 ___
 
@@ -274,7 +274,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:65](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertySetter/index.tsx#L65)
+Defined in: [client/internal/components/PropertySetter/index.tsx:65](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertySetter/index.tsx#L65)
 
 ___
 
@@ -338,7 +338,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:91](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertySetter/index.tsx#L91)
+Defined in: [client/internal/components/PropertySetter/index.tsx:91](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertySetter/index.tsx#L91)
 
 ___
 
@@ -419,7 +419,7 @@ ___
 
 **Returns:** ReactNode
 
-Defined in: [client/internal/components/PropertySetter/index.tsx:95](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertySetter/index.tsx#L95)
+Defined in: [client/internal/components/PropertySetter/index.tsx:95](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertySetter/index.tsx#L95)
 
 ___
 

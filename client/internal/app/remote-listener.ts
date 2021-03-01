@@ -3,7 +3,7 @@
  * to communicate with the server for changes as well as to register
  * listeners
  * 
- * @packageDocumentation
+ * @module
  */
 
 import io from "socket.io-client";

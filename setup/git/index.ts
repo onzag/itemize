@@ -1,6 +1,6 @@
 /**
  * Setup step to take care of git configuration
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

@@ -1,7 +1,7 @@
 /**
  * Provides the itemize redis client class
  * the itemize redis client differs a little bit from the standard client
- * @packageDocumentation
+ * @module
  */
 
 import { ISingleRedisConfigRawJSONDataType } from "../config";

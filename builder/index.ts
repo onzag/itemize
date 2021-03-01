@@ -3,7 +3,7 @@
  * to generate everything in itemize, from the SQL database, to the endpoints
  * using the raw unprocessed data into some multiple per language files
  *
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition, {

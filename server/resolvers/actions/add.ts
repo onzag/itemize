@@ -1,7 +1,7 @@
 /**
  * This file contains the action for adding for every item definition that
  * is added
- * @packageDocumentation
+ * @module
  */
 
 import { IAppDataType, logger } from "../../";

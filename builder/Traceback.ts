@@ -4,7 +4,7 @@
  * in order to tell developers where they have messed up the schema
  * definition of itemize
  *
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors/safe";

@@ -1,13 +1,13 @@
 /**
  * Provides the set builder that allows to create SET statments
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder, IManyValueType, ValueType, BasicBindingType } from "./base";
 
 /**
  * The set builder that allows to create SET statments
- * @packageDocumentation
+ * @module
  */
 export class SetBuilder extends QueryBuilder {
   /**

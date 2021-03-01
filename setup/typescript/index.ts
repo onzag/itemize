@@ -1,6 +1,6 @@
 /**
  * Setups typescript and the tsc compiler
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

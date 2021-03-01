@@ -2,7 +2,7 @@
  * Contains utilities for building a grapqhl client to interact
  * with the server, this is meant only for the javascript context
  * itself as it performs a lot of storing, checking and so on
- * @packageDocumentation
+ * @module
  */
 
 import {

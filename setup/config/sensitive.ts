@@ -1,6 +1,6 @@
 /**
  * Allows to set up a sensitive configuration information
- * @packageDocumentation
+ * @module
  */
 
 import { ISensitiveConfigRawJSONDataType } from "../../config";

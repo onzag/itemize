@@ -42,7 +42,7 @@ Name | Type | Description |
 
 a list of raw added selected fields
 
-Defined in: [base/Root/Module/ItemDefinition/sql.ts:361](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/sql.ts#L361)
+Defined in: [base/Root/Module/ItemDefinition/sql.ts:361](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/sql.ts#L361)
 
 ___
 
@@ -71,7 +71,7 @@ Name | Type | Description |
 
 a sql value
 
-Defined in: [base/Root/Module/ItemDefinition/sql.ts:270](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/sql.ts#L270)
+Defined in: [base/Root/Module/ItemDefinition/sql.ts:270](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/sql.ts#L270)
 
 ___
 
@@ -97,7 +97,7 @@ Name | Type | Description |
 
 a graphql value
 
-Defined in: [base/Root/Module/ItemDefinition/sql.ts:198](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/sql.ts#L198)
+Defined in: [base/Root/Module/ItemDefinition/sql.ts:198](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/sql.ts#L198)
 
 ___
 
@@ -121,7 +121,7 @@ Name | Type | Description |
 
 a complete table definition type
 
-Defined in: [base/Root/Module/ItemDefinition/sql.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/sql.ts#L47)
+Defined in: [base/Root/Module/ItemDefinition/sql.ts:47](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/sql.ts#L47)
 
 ___
 
@@ -143,4 +143,4 @@ Name | Type | Description |
 
 a partial sql schema definition for the whole database (adds tables)
 
-Defined in: [base/Root/Module/ItemDefinition/sql.ts:167](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/sql.ts#L167)
+Defined in: [base/Root/Module/ItemDefinition/sql.ts:167](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/sql.ts#L167)

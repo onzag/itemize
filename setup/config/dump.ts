@@ -1,6 +1,6 @@
 /**
  * Allows to set up a the dump configuration information
- * @packageDocumentation
+ * @module
  */
 
 import { ISensitiveConfigRawJSONDataType, IDumpConfigRawJSONDataType } from "../../config";

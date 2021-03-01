@@ -50,7 +50,7 @@ Builds a new alter table query builder
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L32)
+Defined in: [database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L32)
 
 ## Properties
 
@@ -58,7 +58,7 @@ Defined in: [database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/
 
 • `Private` **action**: *string*
 
-Defined in: [database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L32)
+Defined in: [database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L32)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • `Private` **columnRule**: IAlterTableColumnDataWithExpressionAsDefault
 
-Defined in: [database/AlterTableBuilder.ts:31](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L31)
+Defined in: [database/AlterTableBuilder.ts:31](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L31)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 Table name in question we are updating against
 
-Defined in: [database/AlterTableBuilder.ts:30](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L30)
+Defined in: [database/AlterTableBuilder.ts:30](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L30)
 
 ## Methods
 
@@ -96,7 +96,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L69)
+Defined in: [database/base.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L69)
 
 ___
 
@@ -116,7 +116,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L77)
+Defined in: [database/base.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L77)
 
 ___
 
@@ -137,7 +137,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/AlterTableBuilder.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L47)
+Defined in: [database/AlterTableBuilder.ts:47](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L47)
 
 ___
 
@@ -151,7 +151,7 @@ Clears the table name, if not exists state and columns
 
 itself
 
-Defined in: [database/AlterTableBuilder.ts:98](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L98)
+Defined in: [database/AlterTableBuilder.ts:98](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L98)
 
 ___
 
@@ -163,7 +163,7 @@ Clears only the alters without modifying the table name
 
 **Returns:** *void*
 
-Defined in: [database/AlterTableBuilder.ts:88](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L88)
+Defined in: [database/AlterTableBuilder.ts:88](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L88)
 
 ___
 
@@ -177,7 +177,7 @@ Removes all binding sources
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L102)
+Defined in: [database/base.ts:102](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L102)
 
 ___
 
@@ -193,7 +193,7 @@ a string that represents the compiled result
 
 Overrides: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/AlterTableBuilder.ts:108](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L108)
+Defined in: [database/AlterTableBuilder.ts:108](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L108)
 
 ___
 
@@ -210,7 +210,7 @@ a list of basic bindings
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L165)
+Defined in: [database/base.ts:165](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L165)
 
 ___
 
@@ -224,7 +224,7 @@ Removes the last added biding source and returns it
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L109)
+Defined in: [database/base.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L109)
 
 ___
 
@@ -245,7 +245,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L86)
+Defined in: [database/base.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L86)
 
 ___
 
@@ -266,7 +266,7 @@ Name | Type | Description |
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L95)
+Defined in: [database/base.ts:95](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L95)
 
 ___
 
@@ -286,7 +286,7 @@ Name | Type | Description |
 
 itself
 
-Defined in: [database/AlterTableBuilder.ts:80](https://github.com/onzag/itemize/blob/55e63f2c/database/AlterTableBuilder.ts#L80)
+Defined in: [database/AlterTableBuilder.ts:80](https://github.com/onzag/itemize/blob/5fcde7cf/database/AlterTableBuilder.ts#L80)
 
 ___
 
@@ -302,4 +302,4 @@ a sql builder result with the bindings and the query itself
 
 Inherited from: [QueryBuilder](database_base.querybuilder.md)
 
-Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/55e63f2c/database/base.ts#L126)
+Defined in: [database/base.ts:126](https://github.com/onzag/itemize/blob/5fcde7cf/database/base.ts#L126)

@@ -29,7 +29,7 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:16](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L16)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:16](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L16)
 
 ___
 
@@ -49,4 +49,4 @@ Name | Type | Description |
 
 a boolean on whether it was searched by it
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:49](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L49)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:49](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L49)

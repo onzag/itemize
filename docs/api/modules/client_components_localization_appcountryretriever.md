@@ -29,4 +29,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/localization/AppCountryRetriever.tsx:25](https://github.com/onzag/itemize/blob/55e63f2c/client/components/localization/AppCountryRetriever.tsx#L25)
+Defined in: [client/components/localization/AppCountryRetriever.tsx:25](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/localization/AppCountryRetriever.tsx#L25)

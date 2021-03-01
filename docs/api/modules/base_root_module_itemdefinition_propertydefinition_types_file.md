@@ -20,7 +20,7 @@ Contains the single file type description
 
 Ƭ **PropertyDefinitionSupportedFileType**: [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
 
 ## Variables
 
@@ -30,4 +30,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13
 
 The type value represents the behaviour of files in the app
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:18](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L18)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:18](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L18)

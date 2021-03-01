@@ -2,7 +2,7 @@
  * Nice utility function that allows to read the title of the application
  * that is currently being used in the document title itself
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

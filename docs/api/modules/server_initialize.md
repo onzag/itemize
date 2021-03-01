@@ -30,4 +30,4 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [server/initialize.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/server/initialize.ts#L109)
+Defined in: [server/initialize.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/server/initialize.ts#L109)

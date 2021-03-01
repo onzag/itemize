@@ -26,7 +26,7 @@ and also a part of the standard config
 
 generic background color (android/chrome/FF)
 
-Defined in: [config.ts:26](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L26)
+Defined in: [config.ts:26](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L26)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 The display for the app
 
-Defined in: [config.ts:34](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L34)
+Defined in: [config.ts:34](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L34)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 The safari mask icon color
 
-Defined in: [config.ts:14](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L14)
+Defined in: [config.ts:14](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L14)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 The microsoft tile color used in metro ui
 
-Defined in: [config.ts:18](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L18)
+Defined in: [config.ts:18](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L18)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 The orientation of the app
 
-Defined in: [config.ts:30](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L30)
+Defined in: [config.ts:30](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L30)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 
 generic theme color (android/chome/FF)
 
-Defined in: [config.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L22)
+Defined in: [config.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L22)

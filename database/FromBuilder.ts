@@ -1,6 +1,6 @@
 /**
  * Provides a builder for a FROM statments
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

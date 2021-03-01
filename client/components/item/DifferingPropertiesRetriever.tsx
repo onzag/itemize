@@ -1,7 +1,7 @@
 /**
  * Contains the differing properties retriever class
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

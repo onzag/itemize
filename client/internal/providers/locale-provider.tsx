@@ -1,6 +1,6 @@
 /**
  * Contains the locale provider that provides locale information
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

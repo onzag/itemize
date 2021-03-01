@@ -1,7 +1,7 @@
 /**
  * Contains functions to perform gql queries as well
  * as the product interfaces for these queries
- * @packageDocumentation
+ * @module
  */
 
 import { Stream } from "stream";

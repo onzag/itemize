@@ -446,7 +446,7 @@ ___
 
 **Returns:** *any*
 
-Defined in: [client/components/localization/I18nReadError.tsx:197](https://github.com/onzag/itemize/blob/55e63f2c/client/components/localization/I18nReadError.tsx#L197)
+Defined in: [client/components/localization/I18nReadError.tsx:197](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/localization/I18nReadError.tsx#L197)
 
 ___
 

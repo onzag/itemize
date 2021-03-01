@@ -2,7 +2,7 @@
  * This file contains the property definition that defines all the interactions
  * that occur within a property of an item
  *
- * @packageDocumentation
+ * @module
  */
 
 import ItemDefinition, { ItemDefinitionIOActions } from "..";

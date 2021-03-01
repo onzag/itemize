@@ -1,6 +1,6 @@
 /**
  * The standard handler for the property view simple
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

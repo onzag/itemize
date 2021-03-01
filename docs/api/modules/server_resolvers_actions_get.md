@@ -29,7 +29,7 @@ Name | Type |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [server/resolvers/actions/get.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L37)
+Defined in: [server/resolvers/actions/get.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L37)
 
 ___
 
@@ -45,7 +45,7 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/get.ts:642](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L642)
+Defined in: [server/resolvers/actions/get.ts:642](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L642)
 
 ___
 
@@ -63,7 +63,7 @@ Name | Type |
 
 **Returns:** *Promise*<{ `results`: *any*[]  }\>
 
-Defined in: [server/resolvers/actions/get.ts:261](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L261)
+Defined in: [server/resolvers/actions/get.ts:261](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L261)
 
 ___
 
@@ -79,7 +79,7 @@ Name | Type |
 
 **Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
 
-Defined in: [server/resolvers/actions/get.ts:646](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L646)
+Defined in: [server/resolvers/actions/get.ts:646](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L646)
 
 ___
 
@@ -97,7 +97,7 @@ Name | Type |
 
 **Returns:** *Promise*<{ `results`: *any*[]  }\>
 
-Defined in: [server/resolvers/actions/get.ts:462](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L462)
+Defined in: [server/resolvers/actions/get.ts:462](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L462)
 
 ___
 
@@ -113,4 +113,4 @@ Name | Type |
 
 **Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
 
-Defined in: [server/resolvers/actions/get.ts:650](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/actions/get.ts#L650)
+Defined in: [server/resolvers/actions/get.ts:650](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L650)

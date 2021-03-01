@@ -3,7 +3,7 @@
  * for the container element, which is basically a div with a container
  * class name
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";

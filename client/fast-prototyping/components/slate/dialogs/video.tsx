@@ -1,7 +1,7 @@
 /**
  * This file provides the dialog that is used in order to allow for the url
  * input for inserting a video into the rich text
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

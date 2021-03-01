@@ -32,4 +32,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/login/LogActioner.tsx:291](https://github.com/onzag/itemize/blob/55e63f2c/client/components/login/LogActioner.tsx#L291)
+Defined in: [client/components/login/LogActioner.tsx:291](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/login/LogActioner.tsx#L291)

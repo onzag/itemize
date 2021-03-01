@@ -43,9 +43,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/user/UserActioner.tsx:71](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L71)
+Defined in: [client/components/user/UserActioner.tsx:71](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L71)
 
-Defined in: [client/components/user/UserActioner.tsx:71](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L71)
+Defined in: [client/components/user/UserActioner.tsx:71](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L71)
 
 ___
 
@@ -61,9 +61,9 @@ dismiss this stateful error
 
 **Returns:** *void*
 
-Defined in: [client/components/user/UserActioner.tsx:65](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L65)
+Defined in: [client/components/user/UserActioner.tsx:65](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L65)
 
-Defined in: [client/components/user/UserActioner.tsx:65](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L65)
+Defined in: [client/components/user/UserActioner.tsx:65](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L65)
 
 ___
 
@@ -79,9 +79,9 @@ Allows to dismiss this stateful success
 
 **Returns:** *void*
 
-Defined in: [client/components/user/UserActioner.tsx:56](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L56)
+Defined in: [client/components/user/UserActioner.tsx:56](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L56)
 
-Defined in: [client/components/user/UserActioner.tsx:56](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L56)
+Defined in: [client/components/user/UserActioner.tsx:56](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L56)
 
 ___
 
@@ -108,9 +108,9 @@ Name | Type |
 
 **Returns:** *Promise*<{ `error`: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)  }\>
 
-Defined in: [client/components/user/UserActioner.tsx:41](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L41)
+Defined in: [client/components/user/UserActioner.tsx:41](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L41)
 
-Defined in: [client/components/user/UserActioner.tsx:41](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L41)
+Defined in: [client/components/user/UserActioner.tsx:41](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L41)
 
 ___
 
@@ -128,9 +128,9 @@ read from such context
 
 **Returns:** *Promise*<{ `error`: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)  }\>
 
-Defined in: [client/components/user/UserActioner.tsx:33](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L33)
+Defined in: [client/components/user/UserActioner.tsx:33](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L33)
 
-Defined in: [client/components/user/UserActioner.tsx:33](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L33)
+Defined in: [client/components/user/UserActioner.tsx:33](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L33)
 
 ___
 
@@ -146,9 +146,9 @@ Sends the email validation, for the current logged in user
 
 **Returns:** *Promise*<{ `error`: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)  }\>
 
-Defined in: [client/components/user/UserActioner.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L27)
+Defined in: [client/components/user/UserActioner.tsx:27](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L27)
 
-Defined in: [client/components/user/UserActioner.tsx:27](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L27)
+Defined in: [client/components/user/UserActioner.tsx:27](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L27)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 stateful error, similar to stateful success, but when an error occured, this will be the same error
 as the one returned by the function
 
-Defined in: [client/components/user/UserActioner.tsx:61](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L61)
+Defined in: [client/components/user/UserActioner.tsx:61](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L61)
 
 ___
 
@@ -171,7 +171,7 @@ stateful on progress, a boolean that specifies the last action being on progress
 can be executed in this actioner are stateful, which means they do not belong to any context
 so many user actioners will not coincide on its state
 
-Defined in: [client/components/user/UserActioner.tsx:47](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L47)
+Defined in: [client/components/user/UserActioner.tsx:47](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L47)
 
 ___
 
@@ -182,4 +182,4 @@ ___
 stateful success, the logic is similar to the stateful on progress but to specify success of the last
 action
 
-Defined in: [client/components/user/UserActioner.tsx:52](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L52)
+Defined in: [client/components/user/UserActioner.tsx:52](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L52)

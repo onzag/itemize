@@ -21,7 +21,7 @@
 
 • `Optional` **custom**: *boolean*
 
-Defined in: [server/resolvers/basic.ts:42](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L42)
+Defined in: [server/resolvers/basic.ts:42](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L42)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • `Optional` **customData**: *any*
 
-Defined in: [server/resolvers/basic.ts:44](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L44)
+Defined in: [server/resolvers/basic.ts:44](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L44)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **id**: *string*
 
-Defined in: [server/resolvers/basic.ts:38](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L38)
+Defined in: [server/resolvers/basic.ts:38](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L38)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • `Optional` **isRealUser**: *boolean*
 
-Defined in: [server/resolvers/basic.ts:43](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L43)
+Defined in: [server/resolvers/basic.ts:43](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L43)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **role**: *string*
 
-Defined in: [server/resolvers/basic.ts:35](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L35)
+Defined in: [server/resolvers/basic.ts:35](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L35)
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 • `Optional` **sessionId**: *number*
 
-Defined in: [server/resolvers/basic.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/basic.ts#L39)
+Defined in: [server/resolvers/basic.ts:39](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/basic.ts#L39)

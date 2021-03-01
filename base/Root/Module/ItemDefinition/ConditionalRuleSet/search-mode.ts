@@ -3,7 +3,7 @@
  * module tries to convert a module into its search form, this file contains
  * the instructions specific to the conditional rule set conversion
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionRawJSONDataType, IPropertyDefinitionReferredPropertyValue } from "../PropertyDefinition";

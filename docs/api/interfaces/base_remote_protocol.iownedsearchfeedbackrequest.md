@@ -28,7 +28,7 @@ The feedback version of [IParentedSearchRegisterRequest](base_remote_protocol.ip
 
 • **createdBy**: *string*
 
-Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L467)
+Defined in: [base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L467)
 
 ___
 
@@ -40,7 +40,7 @@ This is the database id field
 since they come in order it's easy to know if
 something has been added
 
-Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L456)
+Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L456)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 The qualified path name either by module
 or item definition
 
-Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L450)
+Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L450)

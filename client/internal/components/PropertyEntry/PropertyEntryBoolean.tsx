@@ -1,6 +1,6 @@
 /**
  * Contains the boolean handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

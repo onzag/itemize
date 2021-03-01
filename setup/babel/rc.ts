@@ -1,6 +1,6 @@
 /**
  * Contains the standard file for babel.config.json
- * @packageDocumentation
+ * @module
  */
 
 export default {

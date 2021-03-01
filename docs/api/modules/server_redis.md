@@ -33,4 +33,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<[*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)\>
 
-Defined in: [server/redis.ts:142](https://github.com/onzag/itemize/blob/55e63f2c/server/redis.ts#L142)
+Defined in: [server/redis.ts:142](https://github.com/onzag/itemize/blob/5fcde7cf/server/redis.ts#L142)

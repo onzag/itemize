@@ -1,7 +1,7 @@
 /**
  * Contains the base app structure that holds the main component which
  * is the custom application file
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

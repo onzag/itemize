@@ -23,7 +23,7 @@
 
 • **authUrl**: *string*
 
-Defined in: [server/services/openstack.ts:17](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L17)
+Defined in: [server/services/openstack.ts:17](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L17)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **domainId**: *string*
 
-Defined in: [server/services/openstack.ts:14](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L14)
+Defined in: [server/services/openstack.ts:14](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L14)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **domainName**: *string*
 
-Defined in: [server/services/openstack.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L15)
+Defined in: [server/services/openstack.ts:15](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L15)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • **keystoneAuthVersion**: *string*
 
-Defined in: [server/services/openstack.ts:12](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L12)
+Defined in: [server/services/openstack.ts:12](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L12)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **password**: *string*
 
-Defined in: [server/services/openstack.ts:16](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L16)
+Defined in: [server/services/openstack.ts:16](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L16)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 • **provider**: *openstack*
 
-Defined in: [server/services/openstack.ts:10](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L10)
+Defined in: [server/services/openstack.ts:10](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L10)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 • **region**: *string*
 
-Defined in: [server/services/openstack.ts:13](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L13)
+Defined in: [server/services/openstack.ts:13](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L13)
 
 ___
 
@@ -79,4 +79,4 @@ ___
 
 • **username**: *string*
 
-Defined in: [server/services/openstack.ts:11](https://github.com/onzag/itemize/blob/55e63f2c/server/services/openstack.ts#L11)
+Defined in: [server/services/openstack.ts:11](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/openstack.ts#L11)

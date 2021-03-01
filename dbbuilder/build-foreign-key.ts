@@ -2,7 +2,7 @@
  * This file is in charge of building the foreign keys of an stablished current database
  * so that references can be respected
  *
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors/safe";

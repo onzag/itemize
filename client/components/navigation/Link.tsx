@@ -2,7 +2,7 @@
  * Provides the Link class which allows for linking in the
  * application and doing redirects
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

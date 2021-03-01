@@ -31,4 +31,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/property/Reader.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/components/property/Reader.tsx#L18)
+Defined in: [client/components/property/Reader.tsx:18](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/property/Reader.tsx#L18)

@@ -1,7 +1,7 @@
 /**
  * Configuration bit for the database
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IDBConfigRawJSONDataType } from "../../config";

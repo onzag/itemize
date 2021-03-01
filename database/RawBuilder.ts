@@ -1,7 +1,7 @@
 /**
  * Provides a raw query builder, it's not very useful
  * but it's there
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

@@ -28,7 +28,7 @@ check [[IOwnedSearchRecordsAddedEvent]]
 
 • **createdBy**: *string*
 
-Defined in: [base/remote-protocol.ts:312](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L312)
+Defined in: [base/remote-protocol.ts:312](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L312)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **qualifiedPathName**: *string*
 
-Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L299)
+Defined in: [base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L299)

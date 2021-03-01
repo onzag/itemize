@@ -1,7 +1,7 @@
 /**
  * The outdated text similarly to the outdated dialog will pop up if the app is outdated
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

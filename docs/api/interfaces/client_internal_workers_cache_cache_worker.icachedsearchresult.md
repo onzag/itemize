@@ -25,7 +25,7 @@ in the server side; the cache worker creates this
 Whether the data might be stale, as in old data that needs
 to be rechecked an update
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:58](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L58)
+Defined in: [client/internal/workers/cache/cache.worker.ts:58](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L58)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 The graphql value that it emulates from the server side
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:53](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L53)
+Defined in: [client/internal/workers/cache/cache.worker.ts:53](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L53)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 When was this last search modified
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:62](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L62)
+Defined in: [client/internal/workers/cache/cache.worker.ts:62](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L62)

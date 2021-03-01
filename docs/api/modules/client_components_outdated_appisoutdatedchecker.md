@@ -36,4 +36,4 @@ Name | Type | Description |
 
 a react component
 
-Defined in: [client/components/outdated/AppIsOutdatedChecker.tsx:90](https://github.com/onzag/itemize/blob/55e63f2c/client/components/outdated/AppIsOutdatedChecker.tsx#L90)
+Defined in: [client/components/outdated/AppIsOutdatedChecker.tsx:90](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/outdated/AppIsOutdatedChecker.tsx#L90)

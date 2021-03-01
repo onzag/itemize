@@ -1,7 +1,7 @@
 /**
  * Contains the functionality for executing the development environment based on some config
  * 
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

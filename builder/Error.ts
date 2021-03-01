@@ -2,7 +2,7 @@
  * Contains the errors that are thrown during the build and check
  * process
  *
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors/safe";

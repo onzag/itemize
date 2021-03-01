@@ -1,7 +1,7 @@
 /**
  * A dialog that pops up when the app is outdated and asks for a refresh
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

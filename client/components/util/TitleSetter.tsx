@@ -2,7 +2,7 @@
  * The title setter allows to set the title of the application dinamically
  * despite of where we are in the app
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

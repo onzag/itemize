@@ -1,6 +1,6 @@
 /**
  * This file provides the utility that builds custom graphql endpoints
- * @packageDocumentation
+ * @module
  */
 
 import { IAppDataType } from "..";

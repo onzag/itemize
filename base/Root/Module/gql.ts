@@ -2,7 +2,7 @@
  * Contains all the graphql functions that are used and generated for and within
  * the module, refer to this file for the graphql generation side of things
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

@@ -24,7 +24,7 @@ JSON Itemize definition
 
 The remote listener
 
-Defined in: [client/internal/providers/appdata-provider.tsx:22](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/appdata-provider.tsx#L22)
+Defined in: [client/internal/providers/appdata-provider.tsx:22](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/appdata-provider.tsx#L22)
 
 ___
 
@@ -36,7 +36,7 @@ whether the app is blocked from an update, happens
 when an update is triggered but another older version
 is still running
 
-Defined in: [client/internal/providers/appdata-provider.tsx:28](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/appdata-provider.tsx#L28)
+Defined in: [client/internal/providers/appdata-provider.tsx:28](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/appdata-provider.tsx#L28)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 The root itself
 
-Defined in: [client/internal/providers/appdata-provider.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/providers/appdata-provider.tsx#L18)
+Defined in: [client/internal/providers/appdata-provider.tsx:18](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/appdata-provider.tsx#L18)

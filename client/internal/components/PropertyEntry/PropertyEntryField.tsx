@@ -1,6 +1,6 @@
 /**
  * Contains the field handler for field types
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

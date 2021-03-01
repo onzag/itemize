@@ -1,6 +1,6 @@
 /**
  * Utility to execute commands in sh, even in sudo mode
- * @packageDocumentation
+ * @module
  */
 
 import { spawn } from "child_process";

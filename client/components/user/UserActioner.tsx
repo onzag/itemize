@@ -6,7 +6,7 @@
  * please refer to the Log actioners for login and signup functions
  * these are separated
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

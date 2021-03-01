@@ -2,7 +2,7 @@
  * Constains the redirect component which basically does a 302 redirect
  * but on the client side and as part of the DOM (kinda)
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -1,7 +1,7 @@
 /**
  * Contains the string type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

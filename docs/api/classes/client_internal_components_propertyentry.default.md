@@ -65,7 +65,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:624](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L624)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:624](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/index.tsx#L624)
 
 ## Properties
 
@@ -264,7 +264,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:629](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L629)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:629](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/index.tsx#L629)
 
 ___
 
@@ -434,7 +434,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/index.tsx:635](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/index.tsx#L635)
+Defined in: [client/internal/components/PropertyEntry/index.tsx:635](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/index.tsx#L635)
 
 ___
 

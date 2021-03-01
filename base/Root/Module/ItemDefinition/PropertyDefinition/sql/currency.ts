@@ -1,7 +1,7 @@
 /**
  * Contains the sql and server side specific functions for the currency type
  *
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";

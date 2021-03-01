@@ -28,4 +28,4 @@ Name | Type | Description |
 
 **Returns:** *Router*
 
-Defined in: [server/rest.ts:23](https://github.com/onzag/itemize/blob/55e63f2c/server/rest.ts#L23)
+Defined in: [server/rest.ts:23](https://github.com/onzag/itemize/blob/5fcde7cf/server/rest.ts#L23)

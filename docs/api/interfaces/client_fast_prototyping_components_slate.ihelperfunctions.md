@@ -75,7 +75,7 @@ Name | Type |
 `withoutMerging` | (`editor`: HistoryEditor, `fn`: () => *void*) => *void* |
 `withoutSaving` | (`editor`: HistoryEditor, `fn`: () => *void*) => *void* |
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:620](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L620)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:620](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L620)
 
 ___
 
@@ -104,7 +104,7 @@ Name | Type |
 `start` | (`range`: Range) => Point |
 `transform` | (`range`: Range, `op`: Operation, `options?`: { `affinity?`: *forward* \| *backward* \| *outward* \| *inward*  }) => Range |
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:630](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L630)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:630](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L630)
 
 ___
 
@@ -137,7 +137,7 @@ Name | Type |
 `toSlatePoint` | (`editor`: ReactEditor, `domPoint`: DOMPoint) => Point |
 `toSlateRange` | (`editor`: ReactEditor, `domRange`: Range \| StaticRange \| Selection) => Range |
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:615](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L615)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:615](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L615)
 
 ___
 
@@ -173,7 +173,7 @@ Name | Type |
 `unwrapNodes` | (`editor`: Editor, `options`: { `at?`: Path \| Range \| Point ; `match?`: (`node`: Node) => *boolean* ; `mode?`: *all* \| *highest* \| *lowest* ; `split?`: *boolean* ; `voids?`: *boolean*  }) => *void* |
 `wrapNodes` | (`editor`: Editor, `element`: Element, `options?`: { `at?`: Path \| Range \| Point ; `match?`: (`node`: Node) => *boolean* ; `mode?`: *all* \| *highest* \| *lowest* ; `split?`: *boolean* ; `voids?`: *boolean*  }) => *void* |
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:625](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L625)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:625](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L625)
 
 ___
 
@@ -192,9 +192,9 @@ not using this function should not have any effect
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:857](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L857)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:857](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L857)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:857](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L857)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:857](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L857)
 
 ___
 
@@ -210,9 +210,9 @@ Deletes the node at the selected path
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:649](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L649)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:649](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L649)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:649](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L649)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:649](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L649)
 
 ___
 
@@ -223,7 +223,7 @@ ___
 This is the editor instance of the given
 editor
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:610](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L610)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:610](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L610)
 
 ___
 
@@ -239,9 +239,9 @@ focuses the text editor
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:654](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L654)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:654](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L654)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:654](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L654)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:654](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L654)
 
 ___
 
@@ -265,9 +265,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:659](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L659)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:659](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L659)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:659](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L659)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:659](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L659)
 
 ___
 
@@ -286,9 +286,9 @@ It will refocus once done
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:767](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L767)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:767](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L767)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:767](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L767)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:767](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L767)
 
 ___
 
@@ -307,9 +307,9 @@ It will refocus once done
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:774](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L774)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:774](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L774)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:774](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L774)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:774](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L774)
 
 ___
 
@@ -328,9 +328,9 @@ It will refocus once done
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:781](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L781)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:781](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L781)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:781](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L781)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:781](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L781)
 
 ___
 
@@ -346,9 +346,9 @@ Performs a hard blur, and even the selected paths are lost
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:868](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L868)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:868](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L868)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:868](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L868)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:868](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L868)
 
 ___
 
@@ -380,9 +380,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:691](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L691)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:691](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L691)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:691](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L691)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:691](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L691)
 
 ___
 
@@ -411,9 +411,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L699)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L699)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L699)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:699](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L699)
 
 ___
 
@@ -440,9 +440,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L732)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L732)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L732)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:732](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L732)
 
 ___
 
@@ -469,9 +469,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L681)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L681)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L681)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:681](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L681)
 
 ___
 
@@ -502,9 +502,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:668](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L668)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:668](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L668)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:668](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L668)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:668](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L668)
 
 ___
 
@@ -536,9 +536,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:717](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L717)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:717](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L717)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:717](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L717)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:717](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L717)
 
 ___
 
@@ -570,9 +570,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L708)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L708)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L708)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:708](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L708)
 
 ___
 
@@ -605,9 +605,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:725](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L725)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:725](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L725)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:725](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L725)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:725](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L725)
 
 ___
 
@@ -636,9 +636,9 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:675](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L675)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:675](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L675)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:675](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L675)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:675](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L675)
 
 ___
 
@@ -661,9 +661,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:644](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L644)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:644](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L644)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:644](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L644)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:644](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L644)
 
 ___
 
@@ -682,9 +682,9 @@ not using this function should not have any effect
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:864](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L864)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:864](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L864)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:864](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L864)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:864](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L864)
 
 ___
 
@@ -711,9 +711,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:639](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L639)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:639](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L639)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:639](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L639)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:639](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L639)
 
 ___
 
@@ -742,9 +742,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:790](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L790)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:790](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L790)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:790](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L790)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:790](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L790)
 
 ___
 
@@ -770,9 +770,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:849](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L849)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:849](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L849)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:849](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L849)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:849](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L849)
 
 ___
 
@@ -797,9 +797,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L809)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L809)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L809)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L809)
 
 ___
 
@@ -824,9 +824,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L815)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L815)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L815)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L815)
 
 ___
 
@@ -851,9 +851,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:837](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L837)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:837](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L837)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:837](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L837)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:837](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L837)
 
 ___
 
@@ -878,9 +878,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L803)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L803)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L803)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L803)
 
 ___
 
@@ -905,9 +905,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:821](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L821)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:821](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L821)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:821](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L821)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:821](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L821)
 
 ___
 
@@ -932,9 +932,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:843](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L843)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:843](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L843)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:843](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L843)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:843](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L843)
 
 ___
 
@@ -959,9 +959,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:797](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L797)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:797](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L797)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:797](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L797)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:797](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L797)
 
 ___
 
@@ -987,9 +987,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L827)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L827)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L827)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L827)
 
 ___
 
@@ -1013,9 +1013,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:831](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L831)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:831](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L831)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:831](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L831)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:831](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L831)
 
 ___
 
@@ -1031,9 +1031,9 @@ Performs a soft blur event
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:872](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L872)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:872](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L872)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:872](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L872)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:872](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L872)
 
 ___
 
@@ -1062,9 +1062,9 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L759)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L759)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L759)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L759)
 
 ___
 
@@ -1089,9 +1089,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L751)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L751)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L751)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L751)
 
 ___
 
@@ -1115,9 +1115,9 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:739](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L739)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:739](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L739)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:739](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L739)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:739](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L739)
 
 ___
 
@@ -1142,6 +1142,6 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:745](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L745)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:745](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L745)
 
-Defined in: [client/fast-prototyping/components/slate/index.tsx:745](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/slate/index.tsx#L745)
+Defined in: [client/fast-prototyping/components/slate/index.tsx:745](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L745)

@@ -29,7 +29,7 @@ The unregister version of [IParentedSearchRegisterRequest](base_remote_protocol.
 
 • **parentId**: *string*
 
-Defined in: [base/remote-protocol.ts:413](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L413)
+Defined in: [base/remote-protocol.ts:413](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L413)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **parentType**: *string*
 
-Defined in: [base/remote-protocol.ts:412](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L412)
+Defined in: [base/remote-protocol.ts:412](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L412)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **parentVersion**: *string*
 
-Defined in: [base/remote-protocol.ts:414](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L414)
+Defined in: [base/remote-protocol.ts:414](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L414)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 • **qualifiedPathName**: *string*
 
-Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L375)
+Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L375)

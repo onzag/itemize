@@ -1,6 +1,6 @@
 /**
  * Contains the create table query builder that allows to create CREATE TABLE queries
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder, ValueType } from "./base";
@@ -21,7 +21,7 @@ interface ICreateTableColumnDataWithExpressionAsDefault {
 
 /**
  * The create table query builder that allows to create CREATE TABLE queries
- * @packageDocumentation
+ * @module
  */
 export class CreateTableBuilder extends QueryBuilder {
   /**

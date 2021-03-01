@@ -8,7 +8,7 @@
  * Comprehensive currency list names in many languages, downloaded original csv and converted to json
  * http://www.mapanet.eu/en/resources/Currencies.asp
  * 
- * @packageDocumentation
+ * @module
  */
 
 import countriesJSON from "./countries.json";

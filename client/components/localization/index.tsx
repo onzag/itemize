@@ -1,7 +1,7 @@
 /**
  * This file contains utilities for localization
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { capitalize as utilcapitalize} from "../../../util";

@@ -27,4 +27,4 @@ Name | Type |
 
 **Returns:** *Router*
 
-Defined in: [server/user/rest.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/server/user/rest.ts#L19)
+Defined in: [server/user/rest.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/server/user/rest.ts#L19)

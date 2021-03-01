@@ -2,7 +2,7 @@
  * The description setter allows to set the description of the application
  * this setter only has effect server side
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

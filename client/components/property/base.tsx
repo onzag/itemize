@@ -2,7 +2,7 @@
  * Contains the base function that handles read, view, and entry all of them
  * in a single function single the logic that handles this under the hood is remarkably similar
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

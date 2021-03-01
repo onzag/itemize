@@ -19,7 +19,7 @@ A condition to give custom errors when the condition holds true
 
 • **error**: *string*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:68](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L68)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:68](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L68)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **if**: [*IConditionalRuleSetRawJSONDataType*](../modules/base_root_module_itemdefinition_conditionalruleset.md#iconditionalrulesetrawjsondatatype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L69)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L69)

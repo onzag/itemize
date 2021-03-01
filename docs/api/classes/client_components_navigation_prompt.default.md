@@ -62,7 +62,7 @@ Name | Type |
 
 **Returns:** [*default*](client_components_navigation_prompt.default.md)
 
-Defined in: [client/components/navigation/Prompt.tsx:114](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L114)
+Defined in: [client/components/navigation/Prompt.tsx:114](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L114)
 
 ## Properties
 
@@ -94,7 +94,7 @@ ___
 
 The original location the prompt was mounted for
 
-Defined in: [client/components/navigation/Prompt.tsx:114](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L114)
+Defined in: [client/components/navigation/Prompt.tsx:114](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L114)
 
 ___
 
@@ -254,7 +254,7 @@ just stay where we are and avoid to go where we were going
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/Prompt.tsx:157](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L157)
+Defined in: [client/components/navigation/Prompt.tsx:157](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L157)
 
 ___
 
@@ -286,7 +286,7 @@ As we mount
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/Prompt.tsx:232](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L232)
+Defined in: [client/components/navigation/Prompt.tsx:232](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L232)
 
 ___
 
@@ -374,7 +374,7 @@ As we unmount
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/Prompt.tsx:242](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L242)
+Defined in: [client/components/navigation/Prompt.tsx:242](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L242)
 
 ___
 
@@ -417,7 +417,7 @@ Confirm the dialog, aka confirm the changes and proceed
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/components/navigation/Prompt.tsx:197](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L197)
+Defined in: [client/components/navigation/Prompt.tsx:197](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L197)
 
 ___
 
@@ -429,7 +429,7 @@ Discard the dialog, aka ignore it, and proceed to where we were going
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/Prompt.tsx:178](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L178)
+Defined in: [client/components/navigation/Prompt.tsx:178](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L178)
 
 ___
 
@@ -490,7 +490,7 @@ Name | Type | Description |
 
 a boolean
 
-Defined in: [client/components/navigation/Prompt.tsx:138](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L138)
+Defined in: [client/components/navigation/Prompt.tsx:138](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L138)
 
 ___
 
@@ -510,7 +510,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [client/components/navigation/Prompt.tsx:221](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L221)
+Defined in: [client/components/navigation/Prompt.tsx:221](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L221)
 
 ___
 
@@ -522,7 +522,7 @@ Renders the component
 
 **Returns:** *Element*
 
-Defined in: [client/components/navigation/Prompt.tsx:250](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/Prompt.tsx#L250)
+Defined in: [client/components/navigation/Prompt.tsx:250](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/Prompt.tsx#L250)
 
 ___
 

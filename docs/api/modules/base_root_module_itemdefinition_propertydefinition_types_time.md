@@ -22,7 +22,7 @@ Contains the time type description
 
 Time is defined as a string, it's clock time
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:40](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L40)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:40](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L40)
 
 ## Variables
 
@@ -32,4 +32,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:40
 
 The behaviour of the time is described by this type
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:45](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L45)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts:45](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/time.ts#L45)

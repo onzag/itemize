@@ -65,7 +65,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/server/redis.ts:23](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L23)
+Defined in: [testing/server/redis.ts:23](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L23)
 
 ## Properties
 
@@ -73,7 +73,7 @@ Defined in: [testing/server/redis.ts:23](https://github.com/onzag/itemize/blob/5
 
 • `Private` **databaseConnection**: [*DatabaseConnection*](database.databaseconnection.md)
 
-Defined in: [testing/server/redis.ts:17](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L17)
+Defined in: [testing/server/redis.ts:17](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L17)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 • `Private` **fullHost**: *string*
 
-Defined in: [testing/server/redis.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L15)
+Defined in: [testing/server/redis.ts:15](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L15)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 • `Private` **redisClient**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L22)
+Defined in: [testing/server/redis.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L22)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 • `Private` **redisGlobalClient**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:23](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L23)
+Defined in: [testing/server/redis.ts:23](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L23)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 • `Private` **redisLocalPub**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:20](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L20)
+Defined in: [testing/server/redis.ts:20](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L20)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 • `Private` **redisLocalSub**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:21](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L21)
+Defined in: [testing/server/redis.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L21)
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 • `Private` **redisPub**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:18](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L18)
+Defined in: [testing/server/redis.ts:18](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L18)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 • `Private` **redisSub**: *RedisClient*
 
-Defined in: [testing/server/redis.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L19)
+Defined in: [testing/server/redis.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L19)
 
 ___
 
@@ -137,7 +137,7 @@ ___
 
 • `Private` **testingInfo**: [*ITestingInfoType*](../interfaces/testing_itemize.itestinginfotype.md)
 
-Defined in: [testing/server/redis.ts:13](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L13)
+Defined in: [testing/server/redis.ts:13](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L13)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 • `Private` **testingUserInfo**: [*IUserInfoAndTokensForTesting*](../interfaces/testing_server.iuserinfoandtokensfortesting.md)
 
-Defined in: [testing/server/redis.ts:14](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L14)
+Defined in: [testing/server/redis.ts:14](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L14)
 
 ## Methods
 
@@ -157,7 +157,7 @@ Defined in: [testing/server/redis.ts:14](https://github.com/onzag/itemize/blob/5
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/server/redis.ts:223](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L223)
+Defined in: [testing/server/redis.ts:223](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L223)
 
 ___
 
@@ -169,7 +169,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/server/redis.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L39)
+Defined in: [testing/server/redis.ts:39](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L39)
 
 ___
 
@@ -183,7 +183,7 @@ Build a brand new instance
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L71)
+Defined in: [testing/index.ts:71](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L71)
 
 ___
 
@@ -204,7 +204,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L114)
+Defined in: [testing/index.ts:114](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L114)
 
 ___
 
@@ -216,7 +216,7 @@ ___
 
 Overrides: [Test](testing.test.md)
 
-Defined in: [testing/server/redis.ts:48](https://github.com/onzag/itemize/blob/55e63f2c/testing/server/redis.ts#L48)
+Defined in: [testing/server/redis.ts:48](https://github.com/onzag/itemize/blob/5fcde7cf/testing/server/redis.ts#L48)
 
 ___
 
@@ -234,7 +234,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L162)
+Defined in: [testing/index.ts:162](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L162)
 
 ___
 
@@ -255,7 +255,7 @@ Name | Type | Default value | Description |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L129)
+Defined in: [testing/index.ts:129](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L129)
 
 ___
 
@@ -269,7 +269,7 @@ Quits this test
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L220)
+Defined in: [testing/index.ts:220](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L220)
 
 ___
 
@@ -284,7 +284,7 @@ and by all it means all of them
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L186)
+Defined in: [testing/index.ts:186](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L186)
 
 ___
 
@@ -300,7 +300,7 @@ this
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L201)
+Defined in: [testing/index.ts:201](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L201)
 
 ___
 
@@ -315,7 +315,7 @@ they should be on the same layer
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L172)
+Defined in: [testing/index.ts:172](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L172)
 
 ___
 
@@ -333,7 +333,7 @@ Name | Type | Default value |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L141)
+Defined in: [testing/index.ts:141](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L141)
 
 ___
 
@@ -351,7 +351,7 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L211)
+Defined in: [testing/index.ts:211](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L211)
 
 ___
 
@@ -369,4 +369,4 @@ Name | Type |
 
 Inherited from: [Test](testing.test.md)
 
-Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/55e63f2c/testing/index.ts#L152)
+Defined in: [testing/index.ts:152](https://github.com/onzag/itemize/blob/5fcde7cf/testing/index.ts#L152)

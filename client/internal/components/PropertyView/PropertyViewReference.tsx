@@ -1,7 +1,7 @@
 /**
  * Contains the view handler for the reference
  * subtype, aka integer/reference
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

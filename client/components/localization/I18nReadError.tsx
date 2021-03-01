@@ -3,7 +3,7 @@
  * either by the backend, emulated or local errors; regardless
  * of context
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

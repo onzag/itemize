@@ -35,4 +35,4 @@ Name | Type |
 
 **Returns:** *any*
 
-Defined in: [client/components/navigation/LocationStateReader.tsx:82](https://github.com/onzag/itemize/blob/55e63f2c/client/components/navigation/LocationStateReader.tsx#L82)
+Defined in: [client/components/navigation/LocationStateReader.tsx:82](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/navigation/LocationStateReader.tsx#L82)

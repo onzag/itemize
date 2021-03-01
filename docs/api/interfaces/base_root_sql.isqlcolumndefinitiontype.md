@@ -25,7 +25,7 @@ How a column is to be defined in sql, this is the SQL schema
 
 A value to make it be default to for this column
 
-Defined in: [base/Root/sql.ts:45](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L45)
+Defined in: [base/Root/sql.ts:45](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L45)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 An optional extension that is required for this
 type in order to function properly
 
-Defined in: [base/Root/sql.ts:84](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L84)
+Defined in: [base/Root/sql.ts:84](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L84)
 
 ___
 
@@ -57,7 +57,7 @@ Name | Type | Description |
 `table` | *string* | The other table it relates to (this column specifically)   |
 `updateAction` | *string* | The action to take once the relationship is updated   |
 
-Defined in: [base/Root/sql.ts:49](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L49)
+Defined in: [base/Root/sql.ts:49](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L49)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 An index definition
 
-Defined in: [base/Root/sql.ts:79](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L79)
+Defined in: [base/Root/sql.ts:79](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L79)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 Whether it is not null, it is recommended not to use
 this very often
 
-Defined in: [base/Root/sql.ts:41](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L41)
+Defined in: [base/Root/sql.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L41)
 
 ___
 
@@ -88,4 +88,4 @@ ___
 
 Postgresql type
 
-Defined in: [base/Root/sql.ts:36](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/sql.ts#L36)
+Defined in: [base/Root/sql.ts:36](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/sql.ts#L36)

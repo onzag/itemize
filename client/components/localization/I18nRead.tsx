@@ -2,7 +2,7 @@
  * Provides the read functionality to read language content in the
  * item definition, module, or even the root context
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

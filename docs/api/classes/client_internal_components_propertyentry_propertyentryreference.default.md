@@ -89,7 +89,7 @@ Name | Type |
 
 **Returns:** [*default*](client_internal_components_propertyentry_propertyentryreference.default.md)
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:69](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L69)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:69](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L69)
 
 ## Properties
 
@@ -119,7 +119,7 @@ ___
 
 • `Private` **currentlyFindingValueFor**: [*string*, *string*]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:54](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L54)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:54](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L54)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 • `Private` **isUnmounted**: *boolean*= false
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:69](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L69)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:69](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L69)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 • `Private` **lastCachedSearch**: [*IPropertyEntryReferenceOption*](../interfaces/client_internal_components_propertyentry_propertyentryreference.ipropertyentryreferenceoption.md)[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:62](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L62)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:62](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L62)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 • `Private` **lastCachedSearchPreventedIds**: *string*[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:65](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L65)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:65](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L65)
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 • `Private` **lastCachedSearchPreventedProperties**: [*default*](base_root_module_itemdefinition_propertydefinition.default.md)[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:63](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L63)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:63](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L63)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 • `Private` **lastCachedSearchPreventedPropertiesIds**: *string*[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:64](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L64)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:64](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L64)
 
 ___
 
@@ -167,7 +167,7 @@ ___
 
 • `Private` **lastSearchArgumentLimit**: *number*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:58](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L58)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:58](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L58)
 
 ___
 
@@ -175,7 +175,7 @@ ___
 
 • `Private` **lastSearchArgumentLoadAll**: *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:57](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L57)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:57](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L57)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 • `Private` **lastSearchArgumentPreventEqualityWithProperties**: *string*[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:60](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L60)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:60](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L60)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 • `Private` **lastSearchArgumentPreventIds**: *string*[]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:59](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L59)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:59](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L59)
 
 ___
 
@@ -199,7 +199,7 @@ ___
 
 • `Private` **lastSearchId**: *number*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:55](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L55)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:55](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L55)
 
 ___
 
@@ -228,7 +228,7 @@ ___
 
 • `Private` **searchTimeout**: *Timeout*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:53](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L53)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:53](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L53)
 
 ___
 
@@ -236,7 +236,7 @@ ___
 
 • `Private` **ssrServerOnlyValue**: *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:67](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L67)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:67](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L67)
 
 ___
 
@@ -378,7 +378,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:187](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L187)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:187](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L187)
 
 ___
 
@@ -394,7 +394,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:175](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L175)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:175](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L175)
 
 ___
 
@@ -404,7 +404,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:414](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L414)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:414](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L414)
 
 ___
 
@@ -421,7 +421,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:104](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L104)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:104](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L104)
 
 ___
 
@@ -451,7 +451,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:120](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L120)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:120](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L120)
 
 ___
 
@@ -467,7 +467,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:659](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L659)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:659](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L659)
 
 ___
 
@@ -531,7 +531,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:136](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L136)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:136](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L136)
 
 ___
 
@@ -572,7 +572,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:653](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L653)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:653](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L653)
 
 ___
 
@@ -582,7 +582,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:647](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L647)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:647](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L647)
 
 ___
 
@@ -592,7 +592,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:98](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L98)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:98](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L98)
 
 ___
 
@@ -609,7 +609,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:463](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L463)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:463](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L463)
 
 ___
 
@@ -642,7 +642,7 @@ Name | Type |
 
 **Returns:** *string*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:437](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L437)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:437](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L437)
 
 ___
 
@@ -676,7 +676,7 @@ ___
 
 **Returns:** [[*default*](base_root_module_itemdefinition.default.md), [*default*](base_root_module_itemdefinition_propertydefinition.default.md), [*default*](base_root_module_itemdefinition_propertydefinition.default.md)]
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:378](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L378)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:378](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L378)
 
 ___
 
@@ -694,7 +694,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:540](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L540)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:540](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L540)
 
 ___
 
@@ -704,7 +704,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:632](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L632)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:632](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L632)
 
 ___
 
@@ -722,7 +722,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:608](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L608)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:608](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L608)
 
 ___
 
@@ -738,7 +738,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:628](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L628)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:628](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L628)
 
 ___
 
@@ -755,7 +755,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:544](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L544)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:544](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L544)
 
 ___
 
@@ -772,7 +772,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:551](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L551)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:551](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L551)
 
 ___
 
@@ -788,7 +788,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:191](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L191)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:191](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L191)
 
 ___
 
@@ -804,7 +804,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:181](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L181)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:181](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L181)
 
 ___
 
@@ -814,7 +814,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:715](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L715)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:715](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L715)
 
 ___
 
@@ -833,7 +833,7 @@ Name | Type |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:195](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L195)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:195](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L195)
 
 ___
 
@@ -873,7 +873,7 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:693](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L693)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:693](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L693)
 
 ___
 
@@ -890,4 +890,4 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:144](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L144)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryReference.tsx:144](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L144)

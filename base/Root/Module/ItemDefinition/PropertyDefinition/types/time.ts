@@ -1,7 +1,7 @@
 /**
  * Contains the time type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

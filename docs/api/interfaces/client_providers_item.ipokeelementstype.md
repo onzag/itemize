@@ -20,7 +20,7 @@
 
 #### Type declaration:
 
-Defined in: [client/providers/item.tsx:334](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L334)
+Defined in: [client/providers/item.tsx:334](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L334)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **policies**: [*PolicyPathType*](../modules/client_providers_item.md#policypathtype)[]
 
-Defined in: [client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L335)
+Defined in: [client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L335)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **properties**: *string*[]
 
-Defined in: [client/providers/item.tsx:333](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L333)
+Defined in: [client/providers/item.tsx:333](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L333)

@@ -1,7 +1,7 @@
 /**
  * Contains the location type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

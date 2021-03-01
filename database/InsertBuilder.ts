@@ -1,6 +1,6 @@
 /**
  * Contains the insert query builder that allows to create INSERT queries
- * @packageDocumentation
+ * @module
  */
 
 import { IManyValueType, QueryBuilder } from "./base";

@@ -28,7 +28,7 @@
 
 Inherited from: [IParentedSearchUnregisterRequest](base_remote_protocol.iparentedsearchunregisterrequest.md).[parentId](base_remote_protocol.iparentedsearchunregisterrequest.md#parentid)
 
-Defined in: [base/remote-protocol.ts:413](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L413)
+Defined in: [base/remote-protocol.ts:413](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L413)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 Inherited from: [IParentedSearchUnregisterRequest](base_remote_protocol.iparentedsearchunregisterrequest.md).[parentType](base_remote_protocol.iparentedsearchunregisterrequest.md#parenttype)
 
-Defined in: [base/remote-protocol.ts:412](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L412)
+Defined in: [base/remote-protocol.ts:412](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L412)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Inherited from: [IParentedSearchUnregisterRequest](base_remote_protocol.iparentedsearchunregisterrequest.md).[parentVersion](base_remote_protocol.iparentedsearchunregisterrequest.md#parentversion)
 
-Defined in: [base/remote-protocol.ts:414](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L414)
+Defined in: [base/remote-protocol.ts:414](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L414)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Inherited from: [IParentedSearchUnregisterRequest](base_remote_protocol.iparentedsearchunregisterrequest.md).[qualifiedPathName](base_remote_protocol.iparentedsearchunregisterrequest.md#qualifiedpathname)
 
-Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L375)
+Defined in: [base/remote-protocol.ts:375](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L375)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L95)
+Defined in: [client/internal/testing.ts:95](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/testing.ts#L95)

@@ -1,7 +1,7 @@
 /**
  * This file contains the styles options that exist within the drawer in order
  * to set all the inline styles for the component
- * @packageDocumentation
+ * @module
  */
 
 import { RichElement } from "../../../../internal/text/serializer";

@@ -3,7 +3,7 @@
  * login and logout actions, they must be placed inside the provider of an item definition
  * of type user
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

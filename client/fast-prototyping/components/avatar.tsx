@@ -1,7 +1,7 @@
 /**
  * The avatar allows to show an user avatar in a nice way using the mui avatar
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

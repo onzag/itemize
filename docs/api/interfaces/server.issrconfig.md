@@ -35,9 +35,9 @@ Name | Type |
 
 **Returns:** *ReactElement*<any, string \| (`props`: *any*) => *ReactElement*<any, string \| (props: any) =\> ReactElement<any, string \| ... \| (new (props: any) =\> Component<any, any, any\>)\> \| (`props`: *any*) => *Component*<any, any, any\>\> \| (`props`: *any*) => *Component*<any, any, any\>\>
 
-Defined in: [server/index.ts:129](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L129)
+Defined in: [server/index.ts:129](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L129)
 
-Defined in: [server/index.ts:129](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L129)
+Defined in: [server/index.ts:129](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L129)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • `Optional` **collector**: [*ICollectorType*](client.icollectortype.md)
 
-Defined in: [server/index.ts:131](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L131)
+Defined in: [server/index.ts:131](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L131)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **mainComponent**: *ReactElement*<any, string \| (`props`: *any*) => *ReactElement*<any, string \| (props: any) =\> ReactElement<any, string \| ... \| (new (props: any) =\> Component<any, any, any\>)\> \| (`props`: *any*) => *Component*<any, any, any\>\> \| (`props`: *any*) => *Component*<any, any, any\>\>
 
-Defined in: [server/index.ts:128](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L128)
+Defined in: [server/index.ts:128](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L128)
 
 ___
 
@@ -75,9 +75,9 @@ Name | Type |
 
 **Returns:** *ReactElement*<any, string \| (`props`: *any*) => *ReactElement*<any, string \| (props: any) =\> ReactElement<any, string \| ... \| (new (props: any) =\> Component<any, any, any\>)\> \| (`props`: *any*) => *Component*<any, any, any\>\> \| (`props`: *any*) => *Component*<any, any, any\>\>
 
-Defined in: [server/index.ts:130](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L130)
+Defined in: [server/index.ts:130](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L130)
 
-Defined in: [server/index.ts:130](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L130)
+Defined in: [server/index.ts:130](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L130)
 
 ___
 
@@ -85,4 +85,4 @@ ___
 
 • **rendererContext**: [*IRendererContext*](client_providers_renderer.irenderercontext.md)
 
-Defined in: [server/index.ts:127](https://github.com/onzag/itemize/blob/55e63f2c/server/index.ts#L127)
+Defined in: [server/index.ts:127](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L127)

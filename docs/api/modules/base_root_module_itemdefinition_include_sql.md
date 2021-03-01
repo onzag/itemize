@@ -36,7 +36,7 @@ Name | Type | Description |
 
 **Returns:** *void*
 
-Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:213](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/sql.ts#L213)
+Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:213](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/sql.ts#L213)
 
 ___
 
@@ -65,7 +65,7 @@ Name | Type | Description |
 
 the partial sql result to be added into the table
 
-Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:137](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/sql.ts#L137)
+Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:137](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/sql.ts#L137)
 
 ___
 
@@ -90,7 +90,7 @@ Name | Type | Description |
 
 a partial graphql value
 
-Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:75](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/sql.ts#L75)
+Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:75](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/sql.ts#L75)
 
 ___
 
@@ -112,4 +112,4 @@ Name | Type | Description |
 
 the partial table definition schema for the include, prefixed and with the exclusion state
 
-Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:30](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/Include/sql.ts#L30)
+Defined in: [base/Root/Module/ItemDefinition/Include/sql.ts:30](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/Include/sql.ts#L30)

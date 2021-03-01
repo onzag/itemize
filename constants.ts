@@ -3,7 +3,7 @@
  * while they can be changed it's not truly recommended, this is mainly for
  * internal usage and to keep configuration and have an idea
  * 
- * @packageDocumentation
+ * @module
  */
 
 import {

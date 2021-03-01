@@ -1,7 +1,7 @@
 /**
  * Contains fast prototyping utilities for fast developing
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

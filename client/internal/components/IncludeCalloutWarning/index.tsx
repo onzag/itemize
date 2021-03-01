@@ -1,7 +1,7 @@
 /**
  * This is the include callout warning handler that handles how the include callout warning
  * is supposed to be shown
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -1,7 +1,7 @@
 /**
  * This file contains the schema of the unprocessed form of the module
  *
- * @packageDocumentation
+ * @module
  */
 
 /**

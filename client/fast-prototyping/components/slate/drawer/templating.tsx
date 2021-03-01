@@ -1,7 +1,7 @@
 /**
  * This file contains the templating options that exist within the drawer in order
  * to set the for-each and context key
- * @packageDocumentation
+ * @module
  */
 
 import { RichElement } from "../../../../internal/text/serializer";

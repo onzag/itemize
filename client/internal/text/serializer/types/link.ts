@@ -2,7 +2,7 @@
  * Contains the serialization, reactification and deserialization functions
  * for the link element
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IReactifyArg, ISerializationRegistryType } from "..";

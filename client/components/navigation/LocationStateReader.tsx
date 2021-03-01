@@ -2,7 +2,7 @@
  * This file contains the location state reader which reads a pseudo state
  * obtained via the browser history api or the query string
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -1,6 +1,6 @@
 /**
  * Contains the where query builder that allows to create WHERE statments
- * @packageDocumentation
+ * @module
  */
 
 import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from "./base";

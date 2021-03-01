@@ -2,7 +2,7 @@
  * Contains the standard tsconfig, as well as the paths for importing
  * note that this configuration requires of tspaths-register so that they do
  * indeed work on the execution mode
- * @packageDocumentation
+ * @module
  */
 
 export default {

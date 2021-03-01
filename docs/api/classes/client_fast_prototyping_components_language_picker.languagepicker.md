@@ -64,7 +64,7 @@ Name | Type |
 
 **Returns:** [*LanguagePicker*](client_fast_prototyping_components_language_picker.languagepicker.md)
 
-Defined in: [client/fast-prototyping/components/language-picker.tsx:75](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/language-picker.tsx#L75)
+Defined in: [client/fast-prototyping/components/language-picker.tsx:75](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/language-picker.tsx#L75)
 
 ## Properties
 
@@ -441,7 +441,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/language-picker.tsx:87](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/language-picker.tsx#L87)
+Defined in: [client/fast-prototyping/components/language-picker.tsx:87](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/language-picker.tsx#L87)
 
 ___
 
@@ -458,7 +458,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/language-picker.tsx:97](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/language-picker.tsx#L97)
+Defined in: [client/fast-prototyping/components/language-picker.tsx:97](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/language-picker.tsx#L97)
 
 ___
 
@@ -468,7 +468,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/fast-prototyping/components/language-picker.tsx:92](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/language-picker.tsx#L92)
+Defined in: [client/fast-prototyping/components/language-picker.tsx:92](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/language-picker.tsx#L92)
 
 ___
 
@@ -478,7 +478,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/components/language-picker.tsx:108](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/language-picker.tsx#L108)
+Defined in: [client/fast-prototyping/components/language-picker.tsx:108](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/language-picker.tsx#L108)
 
 ___
 

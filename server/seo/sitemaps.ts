@@ -1,7 +1,7 @@
 /**
  * This file builds the sitemaps and converts the JSON type
  * structure to the XML type
- * @packageDocumentation
+ * @module
  */
 
 export interface ISitemapLastQueryType {

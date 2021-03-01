@@ -2,7 +2,7 @@
  * Utilizes the needs submit prompt in order to prompt the user
  * about missing changes
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

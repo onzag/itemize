@@ -17,7 +17,7 @@
 
 • **id**: *string*
 
-Defined in: [client/internal/gql-client-util.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L39)
+Defined in: [client/internal/gql-client-util.ts:39](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/gql-client-util.ts#L39)
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **value**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [client/internal/gql-client-util.ts:40](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/gql-client-util.ts#L40)
+Defined in: [client/internal/gql-client-util.ts:40](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/gql-client-util.ts#L40)

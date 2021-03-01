@@ -6,7 +6,7 @@
  * This renderer is used for text/plain and text/html, aka rich text, but not with
  * any other non-subtype text, it will use the field instead
  * 
- * @packageDocumentation
+ * @module
  */
 import React from "react";
 import {

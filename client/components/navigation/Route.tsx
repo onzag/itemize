@@ -2,7 +2,7 @@
  * Provides the route which is able to create routes that will work
  * under any language
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

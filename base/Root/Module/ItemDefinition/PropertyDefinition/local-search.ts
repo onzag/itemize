@@ -4,7 +4,7 @@
  * running in the server side, these tend to run in the IndexedDB
  * database
  *
- * @packageDocumentation
+ * @module
  */
 
 import { PropertyDefinitionSearchInterfacesPrefixes } from "./search-interfaces";

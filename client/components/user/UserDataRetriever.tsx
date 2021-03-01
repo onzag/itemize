@@ -1,7 +1,7 @@
 /**
  * Does the very simple job of retrieving the current user data
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

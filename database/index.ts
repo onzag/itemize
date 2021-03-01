@@ -3,7 +3,7 @@
  * queries against a posgreSQL database either using a raw method
  * or using its many query builders
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { Pool, PoolClient, QueryResult } from "pg";

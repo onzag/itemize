@@ -45,7 +45,7 @@ typescript, this file acts as a registry of sorts
 
 All the supported types combined
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:410](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L410)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:410](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L410)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 All the supported property types
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L37)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L37)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 So this is how properties are defined to give an overview on
 how they are supposed to be managed
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:358](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L358)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:358](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L358)
 
 ## Variables
 
@@ -76,4 +76,4 @@ Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:3
 
 The standard definition and registry of all types in itemize
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:364](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L364)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:364](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L364)

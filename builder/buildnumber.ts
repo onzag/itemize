@@ -1,7 +1,7 @@
 /**
  * Builds the builnumber file
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

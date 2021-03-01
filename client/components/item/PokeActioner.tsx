@@ -3,7 +3,7 @@
  * poked elements by are meant display errors and their actual status, as
  * "they have been poked by the user" in some way or form
  * 
- * @packageDocumentation 
+ * @module 
  */
 
 import React from "react";

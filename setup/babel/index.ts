@@ -1,7 +1,7 @@
 /**
  * Babel RC configurator
  * 
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

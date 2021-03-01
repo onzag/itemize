@@ -1,7 +1,7 @@
 /**
  * Contains the files type description
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

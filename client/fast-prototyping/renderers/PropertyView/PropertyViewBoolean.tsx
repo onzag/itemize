@@ -1,7 +1,7 @@
 /**
  * The property view boolean renderer a rather straightforward renderer
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyViewBooleanRendererProps } from "../../../internal/components/PropertyView/PropertyViewBoolean";

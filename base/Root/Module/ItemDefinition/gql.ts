@@ -2,7 +2,7 @@
  * This file contains all the graphql functions that need to be used to request
  * and process an item definition, from the definition to how it must be queried
  *
- * @packageDocumentation
+ * @module
  */
 
 import { GraphQLOutputType, GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInt, GraphQLInputObjectType, GraphQLString } from "graphql";

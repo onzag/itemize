@@ -22,7 +22,7 @@ with all the possible types involved
 
 • `Optional` **delete**: [*IPolicyType*](base_root_module_itemdefinition.ipolicytype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:380](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L380)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:380](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L380)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • `Optional` **edit**: [*IPolicyType*](base_root_module_itemdefinition.ipolicytype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:379](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L379)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:379](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L379)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • `Optional` **parent**: [*IPolicyType*](base_root_module_itemdefinition.ipolicytype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:382](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L382)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:382](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L382)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 • `Optional` **read**: [*IPolicyType*](base_root_module_itemdefinition.ipolicytype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:381](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L381)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:381](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L381)

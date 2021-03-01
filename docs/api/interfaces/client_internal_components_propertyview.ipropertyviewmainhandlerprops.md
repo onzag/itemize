@@ -44,7 +44,7 @@ Name |
 
 Whether file urls are to be cached
 
-Defined in: [client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L133)
+Defined in: [client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L133)
 
 ___
 
@@ -56,7 +56,7 @@ Whether to capitalize the output value
 
 Provided by the user check base.tsx
 
-Defined in: [client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L101)
+Defined in: [client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L101)
 
 ___
 
@@ -71,7 +71,7 @@ are "currently" stored not where they will be stored once submit is done
 Automatically Provided check base.tsx
 retrieved from the applied value from the item-definition.tsx context in the given slot
 
-Defined in: [client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L59)
+Defined in: [client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L59)
 
 ___
 
@@ -84,7 +84,7 @@ The slot id in question, or null
 Automatically Provided check base.tsx
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L81)
+Defined in: [client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L81)
 
 ___
 
@@ -97,7 +97,7 @@ The slot version in question, or null
 Automatically Provided check base.tsx
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L88)
+Defined in: [client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L88)
 
 ___
 
@@ -110,7 +110,7 @@ An optional include, or null, where the property is encountered
 Automatically Provided check base.tsx
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L66)
+Defined in: [client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L66)
 
 ___
 
@@ -124,7 +124,7 @@ combination, but nonetheless always available
 Automatically Provided check base.tsx
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L74)
+Defined in: [client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L74)
 
 ___
 
@@ -137,7 +137,7 @@ The property in question
 Automatically Provided check base.tsx
 retrieved from the item-definition.tsx context
 
-Defined in: [client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L95)
+Defined in: [client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L95)
 
 ___
 
@@ -149,7 +149,7 @@ An alernative renderer chosen for this
 
 Developer Provided check base.tsx
 
-Defined in: [client/internal/components/PropertyView/index.tsx:122](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L122)
+Defined in: [client/internal/components/PropertyView/index.tsx:122](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L122)
 
 ___
 
@@ -162,7 +162,7 @@ the alternative
 
 Developer Provided check base.tsx
 
-Defined in: [client/internal/components/PropertyView/index.tsx:129](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L129)
+Defined in: [client/internal/components/PropertyView/index.tsx:129](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L129)
 
 ___
 
@@ -176,7 +176,7 @@ but this value is more efficient to access
 Automatically Provided check base.tsx
 filtered for this specific property from the item-definition.tsx context state value
 
-Defined in: [client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L109)
+Defined in: [client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L109)
 
 ___
 
@@ -189,4 +189,4 @@ value
 
 Provided by the user check base.tsx
 
-Defined in: [client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L116)
+Defined in: [client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L116)

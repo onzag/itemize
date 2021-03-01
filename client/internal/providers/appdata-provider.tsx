@@ -1,6 +1,6 @@
 /**
  * Contains the data provider that provides application specific information
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

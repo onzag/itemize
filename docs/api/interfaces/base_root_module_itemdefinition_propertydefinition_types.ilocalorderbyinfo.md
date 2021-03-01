@@ -30,7 +30,7 @@
 
 • **a**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:134](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L134)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:134](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L134)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **b**: [*PropertyDefinitionSupportedType*](../modules/base_root_module_itemdefinition_propertydefinition_types.md#propertydefinitionsupportedtype)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:135](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L135)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:135](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L135)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **direction**: *asc* \| *desc*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:132](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L132)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:132](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L132)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[id](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#id)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:61](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L61)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[include](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#include)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L65)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[itemDefinition](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#itemdefinition)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:64](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L64)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • **nulls**: *first* \| *last*
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:133](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L133)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:133](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L133)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[prefix](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#prefix)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:62](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L62)
 
 ___
 
@@ -104,4 +104,4 @@ ___
 
 Inherited from: [IArgInfo](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md).[property](base_root_module_itemdefinition_propertydefinition_types.iarginfo.md#property)
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:63](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L63)

@@ -2,7 +2,7 @@
  * Contains all the logic that is used within the modules and submodules
  * modules are containers that offer properties in common for item definitions
  *
- * @packageDocumentation
+ * @module
  */
 
 import ItemDefinition, {

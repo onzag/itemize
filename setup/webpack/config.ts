@@ -1,7 +1,7 @@
 /**
  * Contains the standard webpack config
  * as a string
- * @packageDocumentation
+ * @module
  */
 
 export default `const path = require('path');

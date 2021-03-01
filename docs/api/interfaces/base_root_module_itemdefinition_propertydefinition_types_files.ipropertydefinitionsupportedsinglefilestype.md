@@ -32,7 +32,7 @@ an unique id
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[id](gql_querier.igqlfile.md#id)
 
-Defined in: [gql-querier.ts:80](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L80)
+Defined in: [gql-querier.ts:80](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L80)
 
 ___
 
@@ -48,7 +48,7 @@ dimensions, large, small and medium do not count
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[metadata](gql_querier.igqlfile.md#metadata)
 
-Defined in: [gql-querier.ts:96](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L96)
+Defined in: [gql-querier.ts:96](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L96)
 
 ___
 
@@ -60,7 +60,7 @@ the name of the file
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[name](gql_querier.igqlfile.md#name)
 
-Defined in: [gql-querier.ts:72](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L72)
+Defined in: [gql-querier.ts:72](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L72)
 
 ___
 
@@ -72,7 +72,7 @@ The size of the file in bytes
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[size](gql_querier.igqlfile.md#size)
 
-Defined in: [gql-querier.ts:88](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L88)
+Defined in: [gql-querier.ts:88](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L88)
 
 ___
 
@@ -84,7 +84,7 @@ A source, either a File, Blob or a read stream
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[src](gql_querier.igqlfile.md#src)
 
-Defined in: [gql-querier.ts:100](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L100)
+Defined in: [gql-querier.ts:100](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L100)
 
 ___
 
@@ -96,7 +96,7 @@ The mime type
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[type](gql_querier.igqlfile.md#type)
 
-Defined in: [gql-querier.ts:76](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L76)
+Defined in: [gql-querier.ts:76](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L76)
 
 ___
 
@@ -108,4 +108,4 @@ the url where it is stored
 
 Inherited from: [IGQLFile](gql_querier.igqlfile.md).[url](gql_querier.igqlfile.md#url)
 
-Defined in: [gql-querier.ts:84](https://github.com/onzag/itemize/blob/55e63f2c/gql-querier.ts#L84)
+Defined in: [gql-querier.ts:84](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L84)

@@ -1,6 +1,6 @@
 /**
  * This contains the rather simple property setter component
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -3,7 +3,7 @@
  * queries to singular item definition values as well as it allows
  * to store searched in owner or parented search mode and perform
  * emulated searches within it
- * @packageDocumentation
+ * @module
  */
 
 import "core-js/stable";

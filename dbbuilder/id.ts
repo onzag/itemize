@@ -1,7 +1,7 @@
 /**
  * This file contains the utilities for the id type to be handled inside
  * the tables
- * @packageDocumentation
+ * @module
  */
 
 import { DatabaseConnection } from "../database";

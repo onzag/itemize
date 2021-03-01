@@ -3,7 +3,7 @@
  * these are basically 4, also contains all the utilities and prefixes
  * that are related to these interfaces
  *
- * @packageDocumentation
+ * @module
  */
 
 import { PREFIX_BUILD } from "../../../../../constants";

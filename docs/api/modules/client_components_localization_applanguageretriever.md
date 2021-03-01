@@ -31,4 +31,4 @@ Name | Type | Description |
 
 a react node
 
-Defined in: [client/components/localization/AppLanguageRetriever.tsx:35](https://github.com/onzag/itemize/blob/55e63f2c/client/components/localization/AppLanguageRetriever.tsx#L35)
+Defined in: [client/components/localization/AppLanguageRetriever.tsx:35](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/localization/AppLanguageRetriever.tsx#L35)

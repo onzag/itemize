@@ -2,7 +2,7 @@
  * Contains the builder that builds the database based on the schema
  * that is generated during the compiltation process
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

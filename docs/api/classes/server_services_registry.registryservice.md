@@ -88,7 +88,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L51)
+Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L51)
 
 ## Properties
 
@@ -98,7 +98,7 @@ Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[appConfig](server_services.serviceprovider.md#appconfig)
 
-Defined in: [server/services/index.ts:34](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L34)
+Defined in: [server/services/index.ts:34](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L34)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[appSensitiveConfig](server_services.serviceprovider.md#appsensitiveconfig)
 
-Defined in: [server/services/index.ts:35](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L35)
+Defined in: [server/services/index.ts:35](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L35)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[config](server_services.serviceprovider.md#config)
 
-Defined in: [server/services/index.ts:32](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L32)
+Defined in: [server/services/index.ts:32](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L32)
 
 ___
 
@@ -130,7 +130,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalCustomServices](server_services.serviceprovider.md#globalcustomservices)
 
-Defined in: [server/services/index.ts:43](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L43)
+Defined in: [server/services/index.ts:43](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L43)
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalDatabaseConnection](server_services.serviceprovider.md#globaldatabaseconnection)
 
-Defined in: [server/services/index.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L37)
+Defined in: [server/services/index.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L37)
 
 ___
 
@@ -150,7 +150,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalInstance](server_services.serviceprovider.md#globalinstance)
 
-Defined in: [server/services/index.ts:50](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L50)
+Defined in: [server/services/index.ts:50](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L50)
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalMailProvider](server_services.serviceprovider.md#globalmailprovider)
 
-Defined in: [server/services/index.ts:42](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L42)
+Defined in: [server/services/index.ts:42](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L42)
 
 ___
 
@@ -170,7 +170,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalRawDB](server_services.serviceprovider.md#globalrawdb)
 
-Defined in: [server/services/index.ts:40](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L40)
+Defined in: [server/services/index.ts:40](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L40)
 
 ___
 
@@ -180,7 +180,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalRedis](server_services.serviceprovider.md#globalredis)
 
-Defined in: [server/services/index.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L39)
+Defined in: [server/services/index.ts:39](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L39)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalRedisPub](server_services.serviceprovider.md#globalredispub)
 
-Defined in: [server/services/index.ts:38](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L38)
+Defined in: [server/services/index.ts:38](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L38)
 
 ___
 
@@ -200,7 +200,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[globalRoot](server_services.serviceprovider.md#globalroot)
 
-Defined in: [server/services/index.ts:41](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L41)
+Defined in: [server/services/index.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L41)
 
 ___
 
@@ -210,7 +210,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[instanceName](server_services.serviceprovider.md#instancename)
 
-Defined in: [server/services/index.ts:49](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L49)
+Defined in: [server/services/index.ts:49](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L49)
 
 ___
 
@@ -220,7 +220,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[localAppData](server_services.serviceprovider.md#localappdata)
 
-Defined in: [server/services/index.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L47)
+Defined in: [server/services/index.ts:47](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L47)
 
 ___
 
@@ -230,7 +230,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[localInstance](server_services.serviceprovider.md#localinstance)
 
-Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L51)
+Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L51)
 
 ___
 
@@ -240,7 +240,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md).[registry](server_services.serviceprovider.md#registry)
 
-Defined in: [server/services/index.ts:33](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L33)
+Defined in: [server/services/index.ts:33](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L33)
 
 ## Methods
 
@@ -259,7 +259,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/services/registry.ts:131](https://github.com/onzag/itemize/blob/55e63f2c/server/services/registry.ts#L131)
+Defined in: [server/services/registry.ts:131](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/registry.ts#L131)
 
 ___
 
@@ -274,7 +274,7 @@ it will do the run function and then re-run as specified
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:155](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L155)
+Defined in: [server/services/index.ts:155](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L155)
 
 ___
 
@@ -292,7 +292,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:105](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L105)
+Defined in: [server/services/index.ts:105](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L105)
 
 ___
 
@@ -311,7 +311,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<IAllKeyResult\>
 
-Defined in: [server/services/registry.ts:57](https://github.com/onzag/itemize/blob/55e63f2c/server/services/registry.ts#L57)
+Defined in: [server/services/registry.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/registry.ts#L57)
 
 ___
 
@@ -323,7 +323,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L69)
+Defined in: [server/services/index.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L69)
 
 ___
 
@@ -343,7 +343,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<any\>
 
-Defined in: [server/services/registry.ts:95](https://github.com/onzag/itemize/blob/55e63f2c/server/services/registry.ts#L95)
+Defined in: [server/services/registry.ts:95](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/registry.ts#L95)
 
 ___
 
@@ -375,7 +375,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:242](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L242)
+Defined in: [server/services/index.ts:242](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L242)
 
 ___
 
@@ -392,7 +392,7 @@ should run over again
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:215](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L215)
+Defined in: [server/services/index.ts:215](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L215)
 
 ___
 
@@ -409,7 +409,7 @@ so that they trigger just as normal trigger will do
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:269](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L269)
+Defined in: [server/services/index.ts:269](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L269)
 
 ___
 
@@ -430,7 +430,7 @@ this function executes
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:206](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L206)
+Defined in: [server/services/index.ts:206](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L206)
 
 ___
 
@@ -442,7 +442,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:73](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L73)
+Defined in: [server/services/index.ts:73](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L73)
 
 ___
 
@@ -454,7 +454,7 @@ ___
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L77)
+Defined in: [server/services/index.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L77)
 
 ___
 
@@ -473,7 +473,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:85](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L85)
+Defined in: [server/services/index.ts:85](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L85)
 
 ___
 
@@ -492,7 +492,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:89](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L89)
+Defined in: [server/services/index.ts:89](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L89)
 
 ___
 
@@ -511,7 +511,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:81](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L81)
+Defined in: [server/services/index.ts:81](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L81)
 
 ___
 
@@ -527,7 +527,7 @@ Executes some code
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:223](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L223)
+Defined in: [server/services/index.ts:223](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L223)
 
 ___
 
@@ -545,7 +545,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L65)
+Defined in: [server/services/index.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L65)
 
 ___
 
@@ -565,7 +565,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/services/registry.ts:35](https://github.com/onzag/itemize/blob/55e63f2c/server/services/registry.ts#L35)
+Defined in: [server/services/registry.ts:35](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/registry.ts#L35)
 
 ___
 
@@ -588,7 +588,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:113](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L113)
+Defined in: [server/services/index.ts:113](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L113)
 
 ___
 
@@ -606,7 +606,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:133](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L133)
+Defined in: [server/services/index.ts:133](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L133)
 
 ___
 
@@ -624,7 +624,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L109)
+Defined in: [server/services/index.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L109)
 
 ___
 
@@ -654,7 +654,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:259](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L259)
+Defined in: [server/services/index.ts:259](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L259)
 
 ___
 
@@ -673,7 +673,7 @@ This gets attached if a class is used rather than per instance
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:281](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L281)
+Defined in: [server/services/index.ts:281](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L281)
 
 ___
 
@@ -685,7 +685,7 @@ ___
 
 Overrides: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/registry.ts:25](https://github.com/onzag/itemize/blob/55e63f2c/server/services/registry.ts#L25)
+Defined in: [server/services/registry.ts:25](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/registry.ts#L25)
 
 ___
 
@@ -704,7 +704,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:97](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L97)
+Defined in: [server/services/index.ts:97](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L97)
 
 ___
 
@@ -723,7 +723,7 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:101](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L101)
+Defined in: [server/services/index.ts:101](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L101)
 
 ___
 
@@ -742,4 +742,4 @@ Name | Type |
 
 Inherited from: [ServiceProvider](server_services.serviceprovider.md)
 
-Defined in: [server/services/index.ts:93](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L93)
+Defined in: [server/services/index.ts:93](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L93)

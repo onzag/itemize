@@ -3,7 +3,7 @@
  * the base structure of the tables and the database itself, by
  * morphing SQL schemas into one another
  *
- * @packageDocumentation
+ * @module
  */
 
 import read from "read";

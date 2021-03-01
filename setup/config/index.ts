@@ -2,7 +2,7 @@
  * Setups the configuration basically modifies the configuration in place
  * this setup is supposed to build
  * 
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

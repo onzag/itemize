@@ -1,7 +1,7 @@
 /**
  * Contains the password type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

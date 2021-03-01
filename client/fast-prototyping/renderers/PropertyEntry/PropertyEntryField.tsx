@@ -1,6 +1,6 @@
 /**
  * The entry for field based (text/number) types
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

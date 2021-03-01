@@ -2,7 +2,7 @@
  * Doesn't do much other than save and store the config file for
  * dist purposes
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

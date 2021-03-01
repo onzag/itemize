@@ -1,6 +1,6 @@
 /**
  * Contains the base query builder and a conditional one
- * @packageDocumentation
+ * @module
  */
 
 /**

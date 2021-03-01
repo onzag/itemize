@@ -3,7 +3,7 @@
  * retrieve and set the values of properties, it doesn't contain the conversion functions
  * sql.ts does
  *
- * @packageDocumentation
+ * @module
  */
 
 import { GraphQLInputObjectType, GraphQLObjectType, GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from "graphql";

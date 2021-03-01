@@ -3,7 +3,7 @@
  * this is very useful when using unversioned loaded values in order to know if it's the unversioned
  * that is loaded
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

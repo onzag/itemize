@@ -1,6 +1,6 @@
 /**
  * Contains the property view file handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

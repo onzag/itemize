@@ -5,7 +5,7 @@
  *
  * related files index.ts and checkers.ts
  *
- * @packageDocumentation
+ * @module
  */
 
  /**

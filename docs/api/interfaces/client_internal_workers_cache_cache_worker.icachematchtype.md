@@ -26,7 +26,7 @@ since the value can be blocked
 
 The fields that can be requested for that value
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:41](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L41)
+Defined in: [client/internal/workers/cache/cache.worker.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L41)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 The value of the match
 
-Defined in: [client/internal/workers/cache/cache.worker.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/workers/cache/cache.worker.ts#L37)
+Defined in: [client/internal/workers/cache/cache.worker.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/cache.worker.ts#L37)

@@ -1,6 +1,6 @@
 /**
  * Provides the configuration files down the line
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

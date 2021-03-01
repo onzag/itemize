@@ -1,7 +1,7 @@
 /**
  * This file contains the standard reply that would be given by a custom graphql endpoint
  * when this graphql endpoint does not return an error
- * @packageDocumentation
+ * @module
  */
 
 import { GraphQLString, GraphQLObjectType, GraphQLNonNull } from "graphql";

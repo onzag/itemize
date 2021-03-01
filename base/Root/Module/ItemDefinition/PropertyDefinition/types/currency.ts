@@ -1,7 +1,7 @@
 /**
  * Contains the currency type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { currencies } from "../../../../../../imported-resources";

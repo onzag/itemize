@@ -22,4 +22,4 @@ The outdated dialog will pop up if the application is outdated and needs an upda
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/navbar/outdated-dialog.tsx:49](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/navbar/outdated-dialog.tsx#L49)
+Defined in: [client/fast-prototyping/components/navbar/outdated-dialog.tsx:49](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/outdated-dialog.tsx#L49)

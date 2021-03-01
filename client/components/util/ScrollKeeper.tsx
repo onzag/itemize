@@ -4,7 +4,7 @@
  * 
  * it's a memory leaky implementation but should do just fine
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -1,6 +1,6 @@
 /**
  * Setups webpack for the project
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

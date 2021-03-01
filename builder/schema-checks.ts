@@ -2,7 +2,7 @@
  * This file specifies how schema checks are ran against json sources
  * in order to validate schemas using ajv
  *
- * @packageDocumentation
+ * @module
  */
 
 import Ajv from "ajv";

@@ -1,7 +1,7 @@
 /**
  * This file contains the all mighty SSR generator
  * that does a lot of the heavy lifting
- * @packageDocumentation
+ * @module
  */
 
 import { IAppDataType, logger } from "..";

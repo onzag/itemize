@@ -1,7 +1,7 @@
 /**
  * This file is in charge of running all the steps for the setup of an itemize app
  * 
- * @packageDocumentation
+ * @module
  */
 
 import colors from "colors";

@@ -2,7 +2,7 @@
  * Contains SQL helper functions to be used within the property definition in order
  * to be able to perform searches of them in the database
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

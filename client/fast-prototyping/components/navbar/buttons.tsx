@@ -1,7 +1,7 @@
 /**
  * Contains the buttons that are part of the navbar
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

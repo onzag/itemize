@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** [*default*](client_components_util_readvar.default.md)
 
-Defined in: [client/components/util/ReadVar.tsx:11](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L11)
+Defined in: [client/components/util/ReadVar.tsx:11](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L11)
 
 ## Properties
 
@@ -88,7 +88,7 @@ ___
 
 • `Private` **isUnmounted**: *boolean*= false
 
-Defined in: [client/components/util/ReadVar.tsx:11](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L11)
+Defined in: [client/components/util/ReadVar.tsx:11](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L11)
 
 ___
 
@@ -265,7 +265,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/ReadVar.tsx:22](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L22)
+Defined in: [client/components/util/ReadVar.tsx:22](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L22)
 
 ___
 
@@ -281,7 +281,7 @@ Name | Type |
 
 **Returns:** *void*
 
-Defined in: [client/components/util/ReadVar.tsx:25](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L25)
+Defined in: [client/components/util/ReadVar.tsx:25](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L25)
 
 ___
 
@@ -345,7 +345,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/ReadVar.tsx:32](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L32)
+Defined in: [client/components/util/ReadVar.tsx:32](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L32)
 
 ___
 
@@ -426,7 +426,7 @@ ___
 
 **Returns:** *void*
 
-Defined in: [client/components/util/ReadVar.tsx:17](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L17)
+Defined in: [client/components/util/ReadVar.tsx:17](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L17)
 
 ___
 
@@ -436,7 +436,7 @@ ___
 
 **Returns:** ReactNode
 
-Defined in: [client/components/util/ReadVar.tsx:35](https://github.com/onzag/itemize/blob/55e63f2c/client/components/util/ReadVar.tsx#L35)
+Defined in: [client/components/util/ReadVar.tsx:35](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/ReadVar.tsx#L35)
 
 ___
 

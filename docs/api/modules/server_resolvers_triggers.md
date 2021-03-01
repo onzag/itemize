@@ -42,7 +42,7 @@ Name | Type |
 
 **Returns:** [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| *Promise*<[*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)\>
 
-Defined in: [server/resolvers/triggers.ts:90](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/triggers.ts#L90)
+Defined in: [server/resolvers/triggers.ts:90](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L90)
 
 ___
 
@@ -62,7 +62,7 @@ Name | Type |
 
 **Returns:** *void* \| *Promise*<void\>
 
-Defined in: [server/resolvers/triggers.ts:91](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/triggers.ts#L91)
+Defined in: [server/resolvers/triggers.ts:91](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L91)
 
 ## Functions
 
@@ -78,4 +78,4 @@ Name | Type |
 
 **Returns:** [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)
 
-Defined in: [server/resolvers/triggers.ts:166](https://github.com/onzag/itemize/blob/55e63f2c/server/resolvers/triggers.ts#L166)
+Defined in: [server/resolvers/triggers.ts:166](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L166)

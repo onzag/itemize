@@ -32,7 +32,7 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/wrappers.tsx:42](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/wrappers.tsx#L42)
+Defined in: [client/fast-prototyping/wrappers.tsx:42](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/wrappers.tsx#L42)
 
 ___
 
@@ -56,4 +56,4 @@ Name | Type | Description |
 
 **Returns:** *Element*
 
-Defined in: [client/fast-prototyping/wrappers.tsx:74](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/wrappers.tsx#L74)
+Defined in: [client/fast-prototyping/wrappers.tsx:74](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/wrappers.tsx#L74)

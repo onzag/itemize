@@ -32,7 +32,7 @@ Name | Type | Description |
 
 an array of property definitions
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L86)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L86)
 
 ___
 
@@ -52,4 +52,4 @@ Name | Type | Description |
 
 an array of string for the ids in search mode for the property
 
-Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:22](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L22)
+Defined in: [base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L22)

@@ -1,6 +1,6 @@
 /**
  * Contains the property view currency handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

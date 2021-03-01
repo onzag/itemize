@@ -3,7 +3,7 @@
  * for the inline element, which is basically a span which contains only text
  * it's primarily used for the templated components
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";

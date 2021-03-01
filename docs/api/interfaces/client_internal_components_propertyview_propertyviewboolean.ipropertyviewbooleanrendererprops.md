@@ -35,7 +35,7 @@ The renderer args
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[args](client_internal_components_propertyview.ipropertyviewrendererprops.md#args)
 
-Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L19)
+Defined in: [client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/renderer.ts#L19)
 
 ___
 
@@ -47,7 +47,7 @@ The current value to be displayed
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[currentValue](client_internal_components_propertyview.ipropertyviewrendererprops.md#currentvalue)
 
-Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/index.tsx#L43)
+Defined in: [client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 No in the user language
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:22](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L22)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:22](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L22)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 unspecified in the user language
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:26](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L26)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:26](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L26)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 Yes, in the user language
 
-Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:18](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L18)
+Defined in: [client/internal/components/PropertyView/PropertyViewBoolean.tsx:18](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L18)
 
 ___
 
@@ -89,4 +89,4 @@ Whether it is in rtl mode for a rtl language
 
 Inherited from: [IPropertyViewRendererProps](client_internal_components_propertyview.ipropertyviewrendererprops.md).[rtl](client_internal_components_propertyview.ipropertyviewrendererprops.md#rtl)
 
-Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/renderer.ts#L15)
+Defined in: [client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/renderer.ts#L15)

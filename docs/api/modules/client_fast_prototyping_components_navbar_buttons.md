@@ -25,4 +25,4 @@ It also contains the avatar
 
 **`returns`** a react component
 
-Defined in: [client/fast-prototyping/components/navbar/buttons.tsx:83](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/navbar/buttons.tsx#L83)
+Defined in: [client/fast-prototyping/components/navbar/buttons.tsx:83](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/buttons.tsx#L83)

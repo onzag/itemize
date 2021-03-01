@@ -1,6 +1,6 @@
 /**
  * Contains the filtering and ordering function to perform actual searches
- * @packageDocumentation
+ * @module
  */
 
 import { IGQLArgs, IGQLSearchRecord } from "../../../../gql-querier";

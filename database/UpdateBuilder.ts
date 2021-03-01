@@ -1,6 +1,6 @@
 /**
  * Contains the update query builder that allows to create UPDATE queries
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";
@@ -11,7 +11,7 @@ import { WhereBuilder } from "./WhereBuilder";
 
 /**
  * The update query builder that allows to create UPDATE queries
- * @packageDocumentation
+ * @module
  */
 export class UpdateBuilder extends QueryBuilder {
   /**

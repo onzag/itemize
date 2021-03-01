@@ -2,7 +2,7 @@
  * Contains the serialization, reactification and deserialization functions
  * for the quote element
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { deserializeElement, IReactifyArg, ISerializationRegistryType} from "..";

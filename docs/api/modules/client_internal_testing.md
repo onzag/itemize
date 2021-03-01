@@ -44,4 +44,4 @@ This data is serializable on purpose
 
 **Returns:** *void*
 
-Defined in: [client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L147)
+Defined in: [client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/testing.ts#L147)

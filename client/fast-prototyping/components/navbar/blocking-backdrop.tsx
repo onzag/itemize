@@ -1,7 +1,7 @@
 /**
  * The blocking backdrop is the component that appears when the app is blocked from an update
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

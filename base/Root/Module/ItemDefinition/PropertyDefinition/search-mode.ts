@@ -3,7 +3,7 @@
  * the search module for used within searches, basically this is an alternative
  * item definition and alternative property that is used during searches
  *
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition, { IPropertyDefinitionRawJSONDataType, PropertyInvalidReason } from ".";

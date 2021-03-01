@@ -22,7 +22,7 @@ received
 
 • **content**: *string*
 
-Defined in: [server/services/base/MailProvider.ts:89](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L89)
+Defined in: [server/services/base/MailProvider.ts:89](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L89)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **from**: *string*
 
-Defined in: [server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L86)
+Defined in: [server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L86)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **subject**: *string*
 
-Defined in: [server/services/base/MailProvider.ts:88](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L88)
+Defined in: [server/services/base/MailProvider.ts:88](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L88)
 
 ___
 
@@ -46,4 +46,4 @@ ___
 
 • **to**: *string*
 
-Defined in: [server/services/base/MailProvider.ts:87](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L87)
+Defined in: [server/services/base/MailProvider.ts:87](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L87)

@@ -1,7 +1,7 @@
 /**
  * Contains the component that checks if the app is blocked from update
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

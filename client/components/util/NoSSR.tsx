@@ -2,7 +2,7 @@
  * Allows to disable SSR to a given section of code, only takes into effect
  * if the server detects SSR is being used otherwise will render normally
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

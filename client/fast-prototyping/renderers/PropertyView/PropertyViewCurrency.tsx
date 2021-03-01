@@ -1,7 +1,7 @@
 /**
  * Contains the property view currency renderer
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyViewCurrencyRendererProps } from "../../../internal/components/PropertyView/PropertyViewCurrency";

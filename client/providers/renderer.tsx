@@ -1,7 +1,7 @@
 /**
  * Specifies how renderers are to be provided down the app in order
  * to render the app
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

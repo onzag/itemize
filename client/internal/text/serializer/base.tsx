@@ -3,7 +3,7 @@
  * and deserialization of every and each component, the base properties
  * are the properties that every node has
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -8,7 +8,7 @@
  * many things happen during an update, cleaning of the service workers cache,
  * and refreshing the app
  *
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

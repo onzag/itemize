@@ -26,4 +26,4 @@ Provides a menu for the navbar
 
 **`returns`** a react element
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:180](https://github.com/onzag/itemize/blob/55e63f2c/client/fast-prototyping/components/navbar/menu.tsx#L180)
+Defined in: [client/fast-prototyping/components/navbar/menu.tsx:180](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/menu.tsx#L180)

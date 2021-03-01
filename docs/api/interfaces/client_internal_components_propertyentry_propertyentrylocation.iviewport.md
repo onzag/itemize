@@ -25,7 +25,7 @@ for the zooms
 
 The center in the lat, lng form
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:43](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L43)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:43](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L43)
 
 ___
 
@@ -36,4 +36,4 @@ ___
 The zoom, either one of our default types or as you manually
 change an user defined custom number
 
-Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:48](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L48)
+Defined in: [client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:48](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L48)

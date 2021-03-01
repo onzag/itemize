@@ -30,7 +30,7 @@ Name | Type | Description |
 `primaryContainerId` | *string* | If none of the version mappers nor the previous container id mappers match and the previous container id is not found in the current configuration this container will be used instead   |
 `versionMapper`? | *object* | Specifies a container based on a version, it will try to get one from the list in order of priority   |
 
-Defined in: [config.ts:178](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L178)
+Defined in: [config.ts:178](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L178)
 
 ___
 
@@ -42,4 +42,4 @@ Specifies the dump process
 If it's a boolean, dump all, otherwse
 we only dump specific modules
 
-Defined in: [config.ts:173](https://github.com/onzag/itemize/blob/55e63f2c/config.ts#L173)
+Defined in: [config.ts:173](https://github.com/onzag/itemize/blob/5fcde7cf/config.ts#L173)

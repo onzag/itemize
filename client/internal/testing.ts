@@ -5,7 +5,7 @@
  * 
  * This data is serializable on purpose
  * 
- * @packageDocumentation
+ * @module
  */
 
 import {

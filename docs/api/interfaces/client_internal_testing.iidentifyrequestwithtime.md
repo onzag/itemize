@@ -24,7 +24,7 @@
 
 • **time**: *string*
 
-Defined in: [client/internal/testing.ts:59](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/testing.ts#L59)
+Defined in: [client/internal/testing.ts:59](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/testing.ts#L59)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 Inherited from: [IIdentifyRequest](base_remote_protocol.iidentifyrequest.md).[token](base_remote_protocol.iidentifyrequest.md#token)
 
-Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L167)
+Defined in: [base/remote-protocol.ts:167](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L167)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 Inherited from: [IIdentifyRequest](base_remote_protocol.iidentifyrequest.md).[uuid](base_remote_protocol.iidentifyrequest.md#uuid)
 
-Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L166)
+Defined in: [base/remote-protocol.ts:166](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L166)

@@ -2,7 +2,7 @@
  * Contains logic for the implementation of a button that pokes elements once pressed, it's built
  * on top of the poke actioner
  *
- * @packageDocumentation
+ * @module
  */
 
 import PokeActioner from "./PokeActioner";

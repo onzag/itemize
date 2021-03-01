@@ -1,7 +1,7 @@
 /**
  * Service worker file that injects the service worker
  * into the current application if possible
- * @packageDocumentation
+ * @module
  */
 
 if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {

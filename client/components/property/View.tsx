@@ -2,7 +2,7 @@
  * Contains the view component that pipes the data to the all mighty function
  * in base.tsx
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyViewProps, EntryViewReadSet } from "./base";

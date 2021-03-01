@@ -2,7 +2,7 @@
  * Contains the serialization, reactification and deserialization functions
  * for the title element
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { title } from "process";

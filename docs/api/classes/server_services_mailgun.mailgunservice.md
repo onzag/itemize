@@ -86,7 +86,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L51)
+Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L51)
 
 ## Properties
 
@@ -96,7 +96,7 @@ Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[appConfig](server_services_base_mailprovider.default.md#appconfig)
 
-Defined in: [server/services/index.ts:34](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L34)
+Defined in: [server/services/index.ts:34](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L34)
 
 ___
 
@@ -106,7 +106,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[appSensitiveConfig](server_services_base_mailprovider.default.md#appsensitiveconfig)
 
-Defined in: [server/services/index.ts:35](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L35)
+Defined in: [server/services/index.ts:35](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L35)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 • `Private` **cantReceiveEmail**: *boolean*= false
 
-Defined in: [server/services/mailgun.ts:8](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L8)
+Defined in: [server/services/mailgun.ts:8](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L8)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[config](server_services_base_mailprovider.default.md#config)
 
-Defined in: [server/services/index.ts:32](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L32)
+Defined in: [server/services/index.ts:32](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L32)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalCustomServices](server_services_base_mailprovider.default.md#globalcustomservices)
 
-Defined in: [server/services/index.ts:43](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L43)
+Defined in: [server/services/index.ts:43](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L43)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalDatabaseConnection](server_services_base_mailprovider.default.md#globaldatabaseconnection)
 
-Defined in: [server/services/index.ts:37](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L37)
+Defined in: [server/services/index.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L37)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalInstance](server_services_base_mailprovider.default.md#globalinstance)
 
-Defined in: [server/services/index.ts:50](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L50)
+Defined in: [server/services/index.ts:50](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L50)
 
 ___
 
@@ -166,7 +166,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalMailProvider](server_services_base_mailprovider.default.md#globalmailprovider)
 
-Defined in: [server/services/index.ts:42](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L42)
+Defined in: [server/services/index.ts:42](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L42)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalRawDB](server_services_base_mailprovider.default.md#globalrawdb)
 
-Defined in: [server/services/index.ts:40](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L40)
+Defined in: [server/services/index.ts:40](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L40)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalRedis](server_services_base_mailprovider.default.md#globalredis)
 
-Defined in: [server/services/index.ts:39](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L39)
+Defined in: [server/services/index.ts:39](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L39)
 
 ___
 
@@ -196,7 +196,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalRedisPub](server_services_base_mailprovider.default.md#globalredispub)
 
-Defined in: [server/services/index.ts:38](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L38)
+Defined in: [server/services/index.ts:38](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L38)
 
 ___
 
@@ -206,7 +206,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[globalRoot](server_services_base_mailprovider.default.md#globalroot)
 
-Defined in: [server/services/index.ts:41](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L41)
+Defined in: [server/services/index.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L41)
 
 ___
 
@@ -216,7 +216,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[instanceName](server_services_base_mailprovider.default.md#instancename)
 
-Defined in: [server/services/index.ts:49](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L49)
+Defined in: [server/services/index.ts:49](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L49)
 
 ___
 
@@ -226,7 +226,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[localAppData](server_services_base_mailprovider.default.md#localappdata)
 
-Defined in: [server/services/index.ts:47](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L47)
+Defined in: [server/services/index.ts:47](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L47)
 
 ___
 
@@ -236,7 +236,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[localInstance](server_services_base_mailprovider.default.md#localinstance)
 
-Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L51)
+Defined in: [server/services/index.ts:51](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L51)
 
 ___
 
@@ -244,7 +244,7 @@ ___
 
 • `Private` **mailgun**: Mailgun
 
-Defined in: [server/services/mailgun.ts:7](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L7)
+Defined in: [server/services/mailgun.ts:7](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L7)
 
 ___
 
@@ -254,7 +254,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md).[registry](server_services_base_mailprovider.default.md#registry)
 
-Defined in: [server/services/index.ts:33](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L33)
+Defined in: [server/services/index.ts:33](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L33)
 
 ## Methods
 
@@ -264,7 +264,7 @@ Defined in: [server/services/index.ts:33](https://github.com/onzag/itemize/blob/
 
 **Returns:** *void*
 
-Defined in: [server/services/mailgun.ts:142](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L142)
+Defined in: [server/services/mailgun.ts:142](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L142)
 
 ___
 
@@ -279,7 +279,7 @@ it will do the run function and then re-run as specified
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:155](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L155)
+Defined in: [server/services/index.ts:155](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L155)
 
 ___
 
@@ -297,7 +297,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:105](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L105)
+Defined in: [server/services/index.ts:105](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L105)
 
 ___
 
@@ -309,7 +309,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L69)
+Defined in: [server/services/index.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L69)
 
 ___
 
@@ -321,7 +321,7 @@ ___
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:149](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L149)
+Defined in: [server/services/mailgun.ts:149](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L149)
 
 ___
 
@@ -333,7 +333,7 @@ ___
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:116](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L116)
+Defined in: [server/services/mailgun.ts:116](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L116)
 
 ___
 
@@ -350,7 +350,7 @@ so that they trigger just as normal trigger will do
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:269](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L269)
+Defined in: [server/services/index.ts:269](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L269)
 
 ___
 
@@ -362,7 +362,7 @@ ___
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:14](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L14)
+Defined in: [server/services/mailgun.ts:14](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L14)
 
 ___
 
@@ -374,7 +374,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:73](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L73)
+Defined in: [server/services/index.ts:73](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L73)
 
 ___
 
@@ -386,7 +386,7 @@ ___
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L77)
+Defined in: [server/services/index.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L77)
 
 ___
 
@@ -405,7 +405,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:85](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L85)
+Defined in: [server/services/index.ts:85](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L85)
 
 ___
 
@@ -424,7 +424,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:89](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L89)
+Defined in: [server/services/index.ts:89](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L89)
 
 ___
 
@@ -443,7 +443,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:81](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L81)
+Defined in: [server/services/index.ts:81](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L81)
 
 ___
 
@@ -466,7 +466,7 @@ Name | Type | Description |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/base/MailProvider.ts:591](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L591)
+Defined in: [server/services/base/MailProvider.ts:591](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L591)
 
 ___
 
@@ -478,7 +478,7 @@ ___
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:136](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L136)
+Defined in: [server/services/mailgun.ts:136](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L136)
 
 ___
 
@@ -496,7 +496,7 @@ Name | Type |
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:59](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L59)
+Defined in: [server/services/mailgun.ts:59](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L59)
 
 ___
 
@@ -534,7 +534,7 @@ Name | Type | Description |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/base/MailProvider.ts:332](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L332)
+Defined in: [server/services/base/MailProvider.ts:332](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L332)
 
 ___
 
@@ -566,7 +566,7 @@ Name | Type | Description |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/base/MailProvider.ts:144](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/MailProvider.ts#L144)
+Defined in: [server/services/base/MailProvider.ts:144](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/MailProvider.ts#L144)
 
 ___
 
@@ -584,7 +584,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:65](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L65)
+Defined in: [server/services/index.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L65)
 
 ___
 
@@ -607,7 +607,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:113](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L113)
+Defined in: [server/services/index.ts:113](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L113)
 
 ___
 
@@ -625,7 +625,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:133](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L133)
+Defined in: [server/services/index.ts:133](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L133)
 
 ___
 
@@ -643,7 +643,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:109](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L109)
+Defined in: [server/services/index.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L109)
 
 ___
 
@@ -673,7 +673,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:259](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L259)
+Defined in: [server/services/index.ts:259](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L259)
 
 ___
 
@@ -692,7 +692,7 @@ This gets attached if a class is used rather than per instance
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:281](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L281)
+Defined in: [server/services/index.ts:281](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L281)
 
 ___
 
@@ -704,7 +704,7 @@ ___
 
 Overrides: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/mailgun.ts:10](https://github.com/onzag/itemize/blob/55e63f2c/server/services/mailgun.ts#L10)
+Defined in: [server/services/mailgun.ts:10](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/mailgun.ts#L10)
 
 ___
 
@@ -723,7 +723,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:97](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L97)
+Defined in: [server/services/index.ts:97](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L97)
 
 ___
 
@@ -742,7 +742,7 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:101](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L101)
+Defined in: [server/services/index.ts:101](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L101)
 
 ___
 
@@ -761,4 +761,4 @@ Name | Type |
 
 Inherited from: [default](server_services_base_mailprovider.default.md)
 
-Defined in: [server/services/index.ts:93](https://github.com/onzag/itemize/blob/55e63f2c/server/services/index.ts#L93)
+Defined in: [server/services/index.ts:93](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/index.ts#L93)

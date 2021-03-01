@@ -36,4 +36,4 @@ and item definitions
 
 **Returns:** *any*
 
-Defined in: [base/Root/Module/index.ts:107](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/index.ts#L107)
+Defined in: [base/Root/Module/index.ts:107](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/index.ts#L107)

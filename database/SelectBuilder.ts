@@ -1,6 +1,6 @@
 /**
  * Contains the select query builder that allows to create SELECT queries
- * @packageDocumentation
+ * @module
  */
 
 import { BasicBindingType, QueryBuilder } from "./base";

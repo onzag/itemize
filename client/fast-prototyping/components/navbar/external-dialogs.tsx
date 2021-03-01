@@ -1,7 +1,7 @@
 /**
  * Contains an external dialog that are usually referred errors and messages
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -2,7 +2,7 @@
  * The property entry boolean fast prototyping renderer uses material ui to render
  * an entry for a boolean value
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";

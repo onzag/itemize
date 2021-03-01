@@ -2,7 +2,7 @@
  * Contains the serialization, reactification and deserialization functions
  * for the file element
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

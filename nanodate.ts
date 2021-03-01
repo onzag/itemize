@@ -1,6 +1,6 @@
 /**
  * Contains the nanodate class in it
- * @packageDocumentation
+ * @module
  */
 
 // the composed precision of the nanodate, basically how much more precision

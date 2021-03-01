@@ -1,7 +1,7 @@
 /**
  * Contains the entry for the location type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import "../../../internal/theme/leaflet.scss";

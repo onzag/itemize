@@ -3,7 +3,7 @@
  * as well as to propagate these changes to the caches and all the running
  * clusters
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLTableRowValue } from "../base/Root/sql";

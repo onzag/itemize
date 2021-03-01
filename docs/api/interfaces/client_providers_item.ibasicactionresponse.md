@@ -29,4 +29,4 @@ loadValue
 
 • **error**: [*EndpointErrorType*](../modules/base_errors.md#endpointerrortype)
 
-Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L112)
+Defined in: [client/providers/item.tsx:112](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L112)

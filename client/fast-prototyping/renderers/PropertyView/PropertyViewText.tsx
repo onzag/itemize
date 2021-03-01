@@ -3,7 +3,7 @@
  * thing used for text/plain or text/html text, but not unsubtyped
  * text
  * 
- * @packageDocumentation
+ * @module
  */
 
 import {

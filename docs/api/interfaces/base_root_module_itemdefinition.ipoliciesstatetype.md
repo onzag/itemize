@@ -21,7 +21,7 @@ Represents all the state of policies
 
 • `Optional` **delete**: [*IPolicyStateType*](base_root_module_itemdefinition.ipolicystatetype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:279](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L279)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:279](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L279)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • `Optional` **edit**: [*IPolicyStateType*](base_root_module_itemdefinition.ipolicystatetype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:278](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L278)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:278](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L278)
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • `Optional` **parent**: [*IPolicyStateType*](base_root_module_itemdefinition.ipolicystatetype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:281](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L281)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:281](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L281)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • `Optional` **read**: [*IPolicyStateType*](base_root_module_itemdefinition.ipolicystatetype.md)
 
-Defined in: [base/Root/Module/ItemDefinition/index.ts:280](https://github.com/onzag/itemize/blob/55e63f2c/base/Root/Module/ItemDefinition/index.ts#L280)
+Defined in: [base/Root/Module/ItemDefinition/index.ts:280](https://github.com/onzag/itemize/blob/5fcde7cf/base/Root/Module/ItemDefinition/index.ts#L280)

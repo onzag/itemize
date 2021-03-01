@@ -1,7 +1,7 @@
 /**
  * Contains the number type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

@@ -1,6 +1,6 @@
 /**
  * The gargantuan entry text handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

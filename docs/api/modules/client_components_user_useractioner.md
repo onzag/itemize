@@ -41,4 +41,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/components/user/UserActioner.tsx:371](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserActioner.tsx#L371)
+Defined in: [client/components/user/UserActioner.tsx:371](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserActioner.tsx#L371)

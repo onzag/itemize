@@ -1,6 +1,6 @@
 /**
  * The ssr provider file
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

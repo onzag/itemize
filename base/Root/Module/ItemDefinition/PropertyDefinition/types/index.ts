@@ -3,7 +3,7 @@
  * some mild checkers just in case as well as the types that are used within
  * typescript, this file acts as a registry of sorts
  *
- * @packageDocumentation
+ * @module
  */
 
 import { GraphQLOutputType } from "graphql";

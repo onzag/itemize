@@ -3,7 +3,7 @@
  * ones as well as whatever else the programmer adds and it even optimizes
  * these by running some optimizers
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

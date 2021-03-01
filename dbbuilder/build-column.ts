@@ -2,7 +2,7 @@
  * This file contains the functions that are used in order to setup
  * columns in the database schema to be built
  *
- * @packageDocumentation
+ * @module
  */
 
 import { CreateTableBuilder } from "../database/CreateTableBuilder";

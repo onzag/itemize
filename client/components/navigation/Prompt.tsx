@@ -1,7 +1,7 @@
 /**
  * A navigation prompt that prompts if a condition evaluates to true
  *
- * @packageDocumentation
+ * @module
  */
 
 import { EndpointErrorType } from "../../../base/errors";

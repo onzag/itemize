@@ -1,7 +1,7 @@
 /**
  * Provides the sql functions for use with the text type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo } from "../types";

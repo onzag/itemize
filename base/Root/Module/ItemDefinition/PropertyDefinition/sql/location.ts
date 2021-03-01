@@ -1,7 +1,7 @@
 /**
  * This file contains the sql functionality to be used with the location type
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,

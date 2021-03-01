@@ -1,6 +1,6 @@
 /**
  * Contains the entry file handler
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

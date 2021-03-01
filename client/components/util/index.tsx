@@ -2,7 +2,7 @@
  * Containst very useful utility functions that are used within
  * the itemize application for many purposes
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

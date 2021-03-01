@@ -3,7 +3,7 @@
  * information for the main language file that belongs to the root as well
  * as for the lang.json file
  *
- * @packageDocumentation
+ * @module
  */
 
 import Traceback from "./Traceback";

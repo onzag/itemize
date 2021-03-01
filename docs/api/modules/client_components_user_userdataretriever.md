@@ -33,4 +33,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/55e63f2c/client/components/user/UserDataRetriever.tsx#L33)
+Defined in: [client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/user/UserDataRetriever.tsx#L33)

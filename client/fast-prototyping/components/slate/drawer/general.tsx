@@ -2,7 +2,7 @@
  * Gives the general options for the current selected component, general options
  * depend on the rich element that is currently chosen, it also provides a delete
  * option to delete the node
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

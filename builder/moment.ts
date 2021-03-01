@@ -2,7 +2,7 @@
  * This file copies the necessary moment files that are used for data displaying
  * in all the different languages that are meant to be supported
  *
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

@@ -1,7 +1,7 @@
 /**
  * Constains the menu that is opened by the burguer icon in the navbar
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -29,7 +29,7 @@ This is the renderer context that contains the renderer context
 value, by default is null, it must be provided or itemize
 will crash any time when rendering
 
-Defined in: [client/providers/renderer.tsx:162](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/renderer.tsx#L162)
+Defined in: [client/providers/renderer.tsx:162](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/renderer.tsx#L162)
 
 ## Functions
 
@@ -52,4 +52,4 @@ Name | Type | Description |
 
 a react element
 
-Defined in: [client/providers/renderer.tsx:180](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/renderer.tsx#L180)
+Defined in: [client/providers/renderer.tsx:180](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/renderer.tsx#L180)

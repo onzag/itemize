@@ -1,6 +1,6 @@
 /**
  * Contains the interfaces for generating SEO
- * @packageDocumentation
+ * @module
  */
 
 import { ItemizeRawDB } from "../../server/raw-db";

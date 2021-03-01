@@ -3,7 +3,7 @@
  * Includes that exist within item definitions, it doesn't contain
  * the conversion function sql.ts does
  *
- * @packageDocumentation
+ * @module
  */
 
 import { PREFIXED_CONCAT } from "../../../../../constants";

@@ -1,6 +1,6 @@
 /**
  * This provides the rest endpoints for the itemize app
- * @packageDocumentation
+ * @module
  */
 
 import { IAppDataType, logger } from ".";

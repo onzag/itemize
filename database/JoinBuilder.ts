@@ -1,7 +1,7 @@
 /**
  * Contains the join query builder and join rule builder that allows to create JOIN statments
  * joins are a combination of a simple specification on how to join with the rules
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder, ConditionalBuilder, ConditionalBuilderFn } from "./base";

@@ -4,7 +4,7 @@
  * preferred over this file unless you need to access either the pathname or absolute pathname
  * as strings
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

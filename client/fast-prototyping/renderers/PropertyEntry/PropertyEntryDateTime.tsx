@@ -1,7 +1,7 @@
 /**
  * The property entry date time for fast prototyping
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React, { useState, useEffect } from "react";

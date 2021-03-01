@@ -1,6 +1,6 @@
 /**
  * Provides the returning builder that allows to create RETURNING statments
- * @packageDocumentation
+ * @module
  */
 
 import { QueryBuilder } from "./base";

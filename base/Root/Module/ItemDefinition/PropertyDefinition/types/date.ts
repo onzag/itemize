@@ -1,7 +1,7 @@
 /**
  * Contains the date type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";

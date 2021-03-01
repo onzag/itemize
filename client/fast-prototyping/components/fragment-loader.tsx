@@ -2,7 +2,7 @@
  * Utilities for loading fragments
  * TODO
  * 
- * @packageDocumentation
+ * @module
  */
 
 import View from "../../components/property/View";

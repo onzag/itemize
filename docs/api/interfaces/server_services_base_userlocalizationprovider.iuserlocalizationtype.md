@@ -18,7 +18,7 @@
 
 • **country**: *string*
 
-Defined in: [server/services/base/UserLocalizationProvider.ts:4](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/UserLocalizationProvider.ts#L4)
+Defined in: [server/services/base/UserLocalizationProvider.ts:4](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/UserLocalizationProvider.ts#L4)
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **currency**: *string*
 
-Defined in: [server/services/base/UserLocalizationProvider.ts:5](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/UserLocalizationProvider.ts#L5)
+Defined in: [server/services/base/UserLocalizationProvider.ts:5](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/UserLocalizationProvider.ts#L5)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **language**: *string*
 
-Defined in: [server/services/base/UserLocalizationProvider.ts:6](https://github.com/onzag/itemize/blob/55e63f2c/server/services/base/UserLocalizationProvider.ts#L6)
+Defined in: [server/services/base/UserLocalizationProvider.ts:6](https://github.com/onzag/itemize/blob/5fcde7cf/server/services/base/UserLocalizationProvider.ts#L6)

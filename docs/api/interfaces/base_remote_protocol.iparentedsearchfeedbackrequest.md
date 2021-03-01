@@ -34,7 +34,7 @@ This is the database id field
 since they come in order it's easy to know if
 something has been added
 
-Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L456)
+Defined in: [base/remote-protocol.ts:456](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L456)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **parentId**: *string*
 
-Defined in: [base/remote-protocol.ts:499](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L499)
+Defined in: [base/remote-protocol.ts:499](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L499)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **parentType**: *string*
 
-Defined in: [base/remote-protocol.ts:498](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L498)
+Defined in: [base/remote-protocol.ts:498](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L498)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **parentVersion**: *string*
 
-Defined in: [base/remote-protocol.ts:500](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L500)
+Defined in: [base/remote-protocol.ts:500](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L500)
 
 ___
 
@@ -69,4 +69,4 @@ ___
 The qualified path name either by module
 or item definition
 
-Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/55e63f2c/base/remote-protocol.ts#L450)
+Defined in: [base/remote-protocol.ts:450](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L450)

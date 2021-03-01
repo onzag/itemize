@@ -1,7 +1,7 @@
 /**
  * This file contains the part of the drawer that contains the action
  * modifiers that allows to set things like on-click on-focus etc...
- * @packageDocumentation
+ * @module
  */
 
 import { RichElement } from "../../../../internal/text/serializer";

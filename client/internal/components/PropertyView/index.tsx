@@ -1,7 +1,7 @@
 /**
  * Contains the property view main handler that handles all
  * the property view variants and setups the renderers
- * @packageDocumentation
+ * @module
  */
 
 import PropertyDefinition, {

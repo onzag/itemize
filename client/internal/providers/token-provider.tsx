@@ -1,6 +1,6 @@
 /**
  * The token provider component
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

@@ -4,7 +4,7 @@
  *
  * related files are index.ts and checkers.ts
  *
- * @packageDocumentation
+ * @module
  */
 
 /**

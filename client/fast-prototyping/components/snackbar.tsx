@@ -1,7 +1,7 @@
 /**
  * Contains the snackbar component to display success and error messages
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

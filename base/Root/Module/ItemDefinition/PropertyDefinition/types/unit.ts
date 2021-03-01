@@ -1,7 +1,7 @@
 /**
  * Contains the unit type description
  *
- * @packageDocumentation
+ * @module
  */
 
 import {

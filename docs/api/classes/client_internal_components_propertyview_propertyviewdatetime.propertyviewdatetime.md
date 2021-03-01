@@ -58,7 +58,7 @@ Name | Type |
 
 **Returns:** [*PropertyViewDateTime*](client_internal_components_propertyview_propertyviewdatetime.propertyviewdatetime.md)
 
-Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:40](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L40)
+Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:40](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L40)
 
 ## Properties
 
@@ -429,7 +429,7 @@ ___
 
 **Returns:** *Element*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:58](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L58)
+Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:58](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L58)
 
 ___
 
@@ -468,4 +468,4 @@ Name | Type |
 
 **Returns:** *boolean*
 
-Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:44](https://github.com/onzag/itemize/blob/55e63f2c/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L44)
+Defined in: [client/internal/components/PropertyView/PropertyViewDateTime.tsx:44](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L44)

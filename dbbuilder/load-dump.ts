@@ -1,7 +1,7 @@
 /**
  * Performs the loading of the dumps that are presents in the dump folder
  * 
- * @packageDocumentation
+ * @module
  */
 
 import fs from "fs";

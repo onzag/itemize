@@ -1,6 +1,6 @@
 /**
  * Contains the internal initialization function for initializing itemize app
- * @packageDocumentation
+ * @module
  */
 
 // contains some base styles as well as leaflet and quill scss

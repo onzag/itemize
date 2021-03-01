@@ -48,7 +48,7 @@
 
 cleans the search results
 
-Defined in: [client/providers/item.tsx:208](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L208)
+Defined in: [client/providers/item.tsx:208](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L208)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 cleans the search results
 
-Defined in: [client/providers/item.tsx:212](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L212)
+Defined in: [client/providers/item.tsx:212](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L212)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 cleans the search results
 
-Defined in: [client/providers/item.tsx:204](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L204)
+Defined in: [client/providers/item.tsx:204](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L204)
 
 ___
 
@@ -83,7 +83,7 @@ always use propertiesToRestoreOn* in order to strip critical
 data (eg. passwords) clean state is used for a memory relief
 and itemize might decide that it's better not to provide it
 
-Defined in: [client/providers/item.tsx:254](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L254)
+Defined in: [client/providers/item.tsx:254](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L254)
 
 ___
 
@@ -98,7 +98,7 @@ always use propertiesToRestoreOn* in order to strip critical
 data (eg. passwords) clean state is used for a memory relief
 and itemize might decide that it's better not to provide it
 
-Defined in: [client/providers/item.tsx:245](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L245)
+Defined in: [client/providers/item.tsx:245](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L245)
 
 ___
 
@@ -113,7 +113,7 @@ always use propertiesToRestoreOn* in order to strip critical
 data (eg. passwords) clean state is used for a memory relief
 and itemize might decide that it's better not to provide it
 
-Defined in: [client/providers/item.tsx:236](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L236)
+Defined in: [client/providers/item.tsx:236](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L236)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 Restores the value of an include back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:183](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L183)
+Defined in: [client/providers/item.tsx:183](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L183)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 Restores the value of an include back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L188)
+Defined in: [client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L188)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 Restores the value of an include back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:178](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L178)
+Defined in: [client/providers/item.tsx:178](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L178)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 Cleans the value of a policy back to null
 
-Defined in: [client/providers/item.tsx:154](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L154)
+Defined in: [client/providers/item.tsx:154](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L154)
 
 ___
 
@@ -166,7 +166,7 @@ ___
 
 Cleans the value of a policy back to null
 
-Defined in: [client/providers/item.tsx:158](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L158)
+Defined in: [client/providers/item.tsx:158](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L158)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 Cleans the value of a policy back to null
 
-Defined in: [client/providers/item.tsx:150](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L150)
+Defined in: [client/providers/item.tsx:150](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L150)
 
 ___
 
@@ -187,7 +187,7 @@ ___
 Restores the value of a property back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L168)
+Defined in: [client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L168)
 
 ___
 
@@ -198,7 +198,7 @@ ___
 Restores the value of a property back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:173](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L173)
+Defined in: [client/providers/item.tsx:173](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L173)
 
 ___
 
@@ -209,7 +209,7 @@ ___
 Restores the value of a property back to its applied value
 or null if it doesn't have such
 
-Defined in: [client/providers/item.tsx:163](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L163)
+Defined in: [client/providers/item.tsx:163](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L163)
 
 ___
 
@@ -220,7 +220,7 @@ ___
 Restores the state on success back to its applied value
 this will be a clean if no applied value exists
 
-Defined in: [client/providers/item.tsx:222](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L222)
+Defined in: [client/providers/item.tsx:222](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L222)
 
 ___
 
@@ -231,7 +231,7 @@ ___
 Restores the state on success back to its applied value
 this will be a clean if no applied value exists
 
-Defined in: [client/providers/item.tsx:227](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L227)
+Defined in: [client/providers/item.tsx:227](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L227)
 
 ___
 
@@ -242,7 +242,7 @@ ___
 Restores the state on success back to its applied value
 this will be a clean if no applied value exists
 
-Defined in: [client/providers/item.tsx:217](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L217)
+Defined in: [client/providers/item.tsx:217](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L217)
 
 ___
 
@@ -252,7 +252,7 @@ ___
 
 Makes all properties unpoked (invalid won't show)
 
-Defined in: [client/providers/item.tsx:196](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L196)
+Defined in: [client/providers/item.tsx:196](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L196)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 Makes all properties unpoked (invalid won't show)
 
-Defined in: [client/providers/item.tsx:200](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L200)
+Defined in: [client/providers/item.tsx:200](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L200)
 
 ___
 
@@ -272,4 +272,4 @@ ___
 
 Makes all properties unpoked (invalid won't show)
 
-Defined in: [client/providers/item.tsx:192](https://github.com/onzag/itemize/blob/55e63f2c/client/providers/item.tsx#L192)
+Defined in: [client/providers/item.tsx:192](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/item.tsx#L192)

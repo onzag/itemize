@@ -1,6 +1,6 @@
 /**
  * Setups the tslint with the default itemize configuration
- * @packageDocumentation
+ * @module
  */
 
 export default {

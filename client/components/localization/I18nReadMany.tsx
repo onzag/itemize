@@ -2,7 +2,7 @@
  * Allows to read many errors and standard information at the same time (parallel)
  * in an efficient way
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

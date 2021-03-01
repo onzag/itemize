@@ -1,6 +1,6 @@
 /**
  * Allows to set up a standard configuration information
- * @packageDocumentation
+ * @module
  */
 
 import { IConfigRawJSONDataType } from "../../config";

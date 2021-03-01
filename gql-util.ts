@@ -2,7 +2,7 @@
  * Contains graphql utlity functions that are used everywhere accross
  * the itemize app
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { IGQLRequestFields, IGQLValue } from "./gql-querier";

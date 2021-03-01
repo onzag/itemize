@@ -1,7 +1,7 @@
 /**
  * This file contains the location search provider base class that specifies
  * how to complete locations for itemize location type
- * @packageDocumentation
+ * @module
  */
 
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";

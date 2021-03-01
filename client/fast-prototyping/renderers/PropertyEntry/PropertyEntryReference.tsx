@@ -2,7 +2,7 @@
  * This file provides a fast prototyping renderer for the reference type, which is basically
  * an integer but acts differently
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";

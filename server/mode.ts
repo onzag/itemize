@@ -3,7 +3,7 @@
  * the client is expecting, development builds or production; what does the user want
  * normally both NODE_ENV should match with what the server is running but this
  * might not be the case when a devkey is used
- * @packageDocumentation
+ * @module
  */
 
 import express from "express";

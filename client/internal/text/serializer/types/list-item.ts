@@ -4,7 +4,7 @@
  * 
  * The list item represents both li components inside ol and ul lists
  * 
- * @packageDocumentation
+ * @module
  */
 
 import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";

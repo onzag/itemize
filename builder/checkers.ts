@@ -4,7 +4,7 @@
  * ajv schema checker (because not everything can be setup as a json schema)
  * eg. interactions, imports, etc...
  *
- * @packageDocumentation
+ * @module
  */
 
 import Root, { IRootRawJSONDataType } from "../base/Root";

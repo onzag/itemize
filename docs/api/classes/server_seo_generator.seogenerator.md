@@ -83,7 +83,7 @@ Name | Type | Description |
 
 **Returns:** [*SEOGenerator*](server_seo_generator.seogenerator.md)
 
-Defined in: [server/seo/generator.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L77)
+Defined in: [server/seo/generator.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L77)
 
 ## Properties
 
@@ -91,7 +91,7 @@ Defined in: [server/seo/generator.ts:77](https://github.com/onzag/itemize/blob/5
 
 • `Private` **hostname**: *string*
 
-Defined in: [server/seo/generator.ts:72](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L72)
+Defined in: [server/seo/generator.ts:72](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L72)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 • `Private` **mainIndex**: [*ISitemapJSONType*](../interfaces/server_seo_sitemaps.isitemapjsontype.md)= null
 
-Defined in: [server/seo/generator.ts:76](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L76)
+Defined in: [server/seo/generator.ts:76](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L76)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 • `Private` **pingGoogle**: *boolean*
 
-Defined in: [server/seo/generator.ts:73](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L73)
+Defined in: [server/seo/generator.ts:73](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L73)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 • `Private` **primaryIndex**: [*ISitemapJSONType*](../interfaces/server_seo_sitemaps.isitemapjsontype.md)= null
 
-Defined in: [server/seo/generator.ts:75](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L75)
+Defined in: [server/seo/generator.ts:75](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L75)
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 • `Private` **rawDB**: [*ItemizeRawDB*](server_raw_db.itemizerawdb.md)
 
-Defined in: [server/seo/generator.ts:68](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L68)
+Defined in: [server/seo/generator.ts:68](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L68)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 • `Private` **root**: [*default*](base_root.default.md)
 
-Defined in: [server/seo/generator.ts:67](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L67)
+Defined in: [server/seo/generator.ts:67](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L67)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 • `Private` **rules**: [*ISEORuleSet*](../interfaces/server_seo.iseoruleset.md)
 
-Defined in: [server/seo/generator.ts:70](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L70)
+Defined in: [server/seo/generator.ts:70](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L70)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 #### Type declaration:
 
-Defined in: [server/seo/generator.ts:77](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L77)
+Defined in: [server/seo/generator.ts:77](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L77)
 
 ___
 
@@ -157,7 +157,7 @@ ___
 
 • `Private` **storageClient**: [*default*](server_services_base_storageprovider.default.md)<any\>
 
-Defined in: [server/seo/generator.ts:69](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L69)
+Defined in: [server/seo/generator.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L69)
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 • `Private` **supportedLanguages**: *string*[]
 
-Defined in: [server/seo/generator.ts:71](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L71)
+Defined in: [server/seo/generator.ts:71](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L71)
 
 ## Methods
 
@@ -181,7 +181,7 @@ Name | Type |
 
 **Returns:** *Promise*<boolean\>
 
-Defined in: [server/seo/generator.ts:320](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L320)
+Defined in: [server/seo/generator.ts:320](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L320)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/seo/generator.ts:359](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L359)
+Defined in: [server/seo/generator.ts:359](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L359)
 
 ___
 
@@ -211,7 +211,7 @@ Name | Type | Description |
 
 **Returns:** [*ISEOParametrizer*](../interfaces/server_seo.iseoparametrizer.md)[]
 
-Defined in: [server/seo/generator.ts:598](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L598)
+Defined in: [server/seo/generator.ts:598](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L598)
 
 ___
 
@@ -223,7 +223,7 @@ Run the seo generator mechanism, usually run once a day
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/seo/generator.ts:120](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L120)
+Defined in: [server/seo/generator.ts:120](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L120)
 
 ___
 
@@ -242,7 +242,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<ISEOPreResult\>
 
-Defined in: [server/seo/generator.ts:444](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L444)
+Defined in: [server/seo/generator.ts:444](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L444)
 
 ___
 
@@ -261,7 +261,7 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/seo/generator.ts:329](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L329)
+Defined in: [server/seo/generator.ts:329](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L329)
 
 ___
 
@@ -282,4 +282,4 @@ Name | Type | Description |
 
 **Returns:** *Promise*<void\>
 
-Defined in: [server/seo/generator.ts:348](https://github.com/onzag/itemize/blob/55e63f2c/server/seo/generator.ts#L348)
+Defined in: [server/seo/generator.ts:348](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/generator.ts#L348)

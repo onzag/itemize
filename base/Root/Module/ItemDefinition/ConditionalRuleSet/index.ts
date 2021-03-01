@@ -4,7 +4,7 @@
  *
  * Related files are schema.ts and checkers.ts for the build process
  *
- * @packageDocumentation
+ * @module
  */
 
 import { PropertyDefinitionSupportedType } from "../PropertyDefinition/types";

@@ -1,7 +1,7 @@
 /**
  * Simply provides the current country of the application context
  * 
- * @packageDocumentation
+ * @module
  */
 
 import React from "react";
