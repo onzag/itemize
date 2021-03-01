@@ -2,9 +2,10 @@
  * Contains a protocol to be used with remote realtime communication in order
  * to supply realtime updates between the server and the client
  *
- * This is just a bunch of types that specifies a protocol
+ * This is just a bunch of types that specifies a protocol this is the protocol
+ * that is implemented by the remote listener
  *
- * @packageDocumentation
+ * @module remote-protocol
  */
 
 import { IGQLSearchRecord } from "../gql-querier";

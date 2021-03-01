@@ -1,8 +1,9 @@
 /**
  * This file contains a json schema for the unprocessed form
- * of the root leaf
+ * of the root, this root schema is meant to be used in order to check
+ * root json files
  *
- * @packageDocumentation
+ * @module schema
  */
 
 /**
