@@ -72,7 +72,9 @@ export function currencySQLIn(arg: ISQLInInfo) {
 export function currencySQLOut(arg: ISQLOutInfo) {
   // so our results depends on the row we are getting
   const result: IPropertyDefinitionSupportedCurrencyType = {
-    value: arg.row[arg.prefix + arg.id + "_VALUE"],
+    // we need to use parse float here because numeric gives string
+    // in output, which is wrong
+    value: parseFloat(arg.row[arg.prefix + arg.id + "_VALUE"]),
     currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
   };
   // if our value happens to be null
