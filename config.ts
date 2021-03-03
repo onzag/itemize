@@ -427,6 +427,9 @@ export const dumpConfigSchema = {
                 type: "boolean",
               },
               {
+                enum: ["all", "only-unversioned"],
+              },
+              {
                 type: "array",
                 items: {
                   type: "number",
@@ -453,6 +456,9 @@ export const dumpConfigSchema = {
                   anyOf: [
                     {
                       type: "boolean",
+                    },
+                    {
+                      enum: ["all", "only-unversioned"],
                     },
                     {
                       type: "array",

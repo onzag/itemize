@@ -286,8 +286,9 @@ export default async function build(version: string, buildID: string, services: 
       "-v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
       " -e INSTANCE_MODE=BUILD_DATABASE app:latest" +
       "\nalso if you need to load dumps remember to run:" +
-      "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" "
-      "-v $PWD/config:/home/node/app/config -v $PWD/dump:/home/node/app/dump -e NODE_ENV=" + version +
+      "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" " +
+      "-v $PWD/config:/home/node/app/config -v $PWD/dump:/home/node/app/dump " +
+      "-v $PWD/uploads:/home/node/app/uploads -e NODE_ENV=" + version +
       " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest" +
       "\nstop the database by doing" +
       "\ndocker-compose down";

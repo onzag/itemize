@@ -263,13 +263,77 @@ And you got it, an incredibly aggressive SEO mechanism that will sitemap every s
 
 You might realize that our fragments are right now in the database and once you want to deploy this application they will not come in our environment, they exist in our development environment alone and nowhere else.
 
-## Docker
+For that we might want to dump the database bits that are relevant, and in the case of our app these are the fragments which we wish to dump, we would first want to check the dump file in order to see what is to be dumped, at `config/dump.json` and we find:
 
-Itemize by default creates a docker build of the project you are working on by creating a so called "deployable"
+```json
+{
+  "save": {
+    "cms": {
+      "fragment": true
+    }
+  },
+  "load": {
+    "primaryContainerId": "MAIN"
+  }
+}
+```
+
+Now we notice that there are two options, how to dump, and how to load dumped content, we have to remember that there are multiple containers that can be had when we are loading in our CDN that will store the files, which is why it's important to specify how we are loading, we can map versions to container as well as map containers to container, but for now we will leave it as it is.
+
+Let's give it a try to this dump configuration that already contains the fragments and see what happens, via `npm run build-database development dump`
+
+We will notice that there's now a folder named `dump` in our project and it contains a file named `dump.json` and a folder named `MOD_cms` which contains the file structure for the images that you used in your fragments.
+
+If you open the `dump.json` file you might notice that our spanish and english versions are there in the dump itself, and let's say we don't want that, we don't want the localized versions, only the raw versions so the designers can work on the specific localized versions, we want to modify how we are writting our dump.
+
+```json
+{
+  "save": {
+    "cms": {
+      "fragment": "only-unversioned"
+    }
+  },
+  "load": {
+    "primaryContainerId": "MAIN"
+  }
+}
+```
+
+And now we have a dump, and we are ready to generate our first cluster.
+
+## Deployable
+
+Itemize by default creates a docker build of the project you are working on by creating a so called "deployable", there is a build script that will create a deployable of your file using the production environment; at the time of writting this tutorial, the default uses docker compose, that while some people prefer technologies such as swarm, or kubernetes; this is simply enough and what is available at this time, you can feel free to adapt the deployable for a more complex infraestructure.
+
+At its core it is simply a group of docker elements, usually when you want to get a cluster you will use a standard cluster, and have your global manager, a standalone centralized fully managed postgresql database as the main source of truth and a redis managed database for the events and the server data, we also would have several servers for storing our file data according to the container logic, all scattered around the countries you want to serve, and you will create all these standard clusters and clone them using GeoDNS to connect the users to these.
+
+But this is how itemize is supposed to scale, we are a broke startup and we have a 2GB ram desktop from 2006 that we want to run our server on, we cannot afford this, we cannot make a CDN, we cannot get a fully managed database; no problem, just build a full deployable that will run on its own, store files on the hard drive and just make it work.
+
+In order to be able to build our deployable we need a npm token, this is because if you are using private packages this is necessary, and it was setup that way to require a npm token anyway, check `https://docs.npmjs.com/creating-and-viewing-access-tokens` and create a readonly npm token for your account, or your business account, and put it at a file named `.npm-token` which while odd of a name, it is because the dockerfile uses it as that name, and it's not meant to be used by your current project in development mode.
+
+So in order to get our cheap first cluster we can run `npm run get-deployable production MAIN full` where `MAIN` is just the name of our deployable.
+
+You will be requested your password several times, building the deployable is actually rather slow because the cache is disabled (during testing there were problems with the docker cache), anyway making a deployable is not something you do often.
 
 ## Local Test Run
 
+Now we have a deployable, at `deployments/MAIN` let's check what we got, first we have `app.tar.gz` a file that represents your app docker image is around 250MB because it contains your app and `node_modules` which as we all know takes a lot of space, then we have `config` which contains your configuration for that version only, then you have two docker compose files, the normal one and another one that contains only the database, this file is based on your root level `docker-compose.yml` file, then you should have your dump folder, a logs folder, `nginx.conf` and `nginx-ssl.conf` which represent both your normal and SSL configuration for starting your app, `nginx-logs` and `pgsqlpostgis.tar.gz` which is a docker image for the postgreSQL database since this is a full build, a README file, and a couple of scripts.
+
+The first thing we want to do is to stop our dev environment via `npm run stop-dev-environment development` at the root level of our project, and then let's check what the `README` has to say.
+
+So we first do `docker load -i app.tar.gz` and that should go fine, and now let's do `docker-compose -f docker-compose-only-db.yml up -d` because we want to setup our dump and our database, and then run `dir=${PWD##*/}; docker run -it --network "${dir,,}_default" -v $PWD/config:/home/node/app/config -e NODE_ENV=production -e INSTANCE_MODE=BUILD_DATABASE app:latest` to setup the database and `dir=${PWD##*/}; docker run -it --network "${dir,,}_default" -v $PWD/config:/home/node/app/config -v $PWD/dump:/home/node/app/dump -v $PWD/uploads:/home/node/app/uploads -e NODE_ENV=production -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest` to load the database dump.
+
+In an optimal scenario where our database is managed we would run these commands from our development environment using `npm run build-database production` and `npm run build-database production load-dump` which would do the exact same, but these are dockerized environemnt so we use cheat scripts, but that's the equivalent procedure.
+
+Now we can stop our docker compose detached instance given that it's ready with `docker-compose down`
+
+And it's time to start an instance because we have no ssl and we will be running in localhost, we will use `bash start.sh 3` you might need sudo, the number 3 is the number of extended nodes that make up your cluster.
+
+Now go to `localhost` without the port, and that is it; that is our app, running in production mode in one cluster mode, blazingly fast.
+
 ## Nginx and SSL
+
+Yes this has no SSL
 
 ## A deployable represents a cluster
 
