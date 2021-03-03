@@ -341,7 +341,7 @@ You might notice that these are production builds, if we check our sources they 
 
 There's a way to access our full blown development build while losing SSR functionality and image loading capacities since the domain resolving is going to fail as it will try to resolve to the development domain (if you need the image loading to still work you should modify the development hostname from `dev.catbnb.com` to the production `catbnb.com` in your cluster config so it can resolve at the same domain), SSR also only works in one mode so it cannot function in both production and development at the same time, and it is functioning in production mode (so you cannot debug SSR issues like this) but anything else should work as usual, this is via the `devKey`, check your dev key in your config, it should look something like `okQoqIj6MhrFfRmB` and we will go to our developent console in our website and use it via `SET_DEV_MODE("development", "okQoqIj6MhrFfRmB");` this will setup a cookie.
 
-In order to turn back to the production mode, either clear the cookies or 
+In order to turn back to the production mode, either clear the cookies or call `SET_DEV_MODE("production", "okQoqIj6MhrFfRmB");` in your console.
 
 ## Find your admin user
 
@@ -355,10 +355,28 @@ Look for a line like:
 
 And that's your password for the default admin user.
 
-## A deployable represents a cluster
-
 ## Singlecluster builds and its relation to file management
 
-## Clusters can communicate
+Note that singlecluster builds like this are the only ones that can work with the local storage `uploads` as a file mechanism, for anything that goes beyond 1 cluster it is necessary to use a standalone solution, Itemize for example supports openstack for this, you can have many openstack instances and relate them to containers, and relate these containers to countries; that way you have an automatic CDN.
 
 ## GeoDNS
+
+Clusters communicate automatically using redis and postgreSQL as their source of truth so in multi cluster builds, they will keep each other syncronized; however each cluster should have their own IP address, and you will use GeoDNS in order to add and remove servers to these list, according to the user location you will send them to one specific cluster.
+
+This way a user in USA for example will be answered with a DNS answer for the USA cluster, where one in say, Finland, will be answered with the Finnish cluster.
+
+File containers on the other hand are unrelated to this, users have to access them directly from the container they are located at, so files that are used by say, your German customer base, are might be located at a EU level container, while the cluster is in Austria; while your Indian userbase can have a cluster and a file container at the same place; the GeoDNS configuration applies only for the clusters, as all clusters are meant to be equal.
+
+What you need to ensure, all the time is that clusters run based on the same build numbers, otherwise the experience can be odd, clusters are meant to run on the same logic, otherwise the data can be conflicting, and they might try to write stuff that makes no sense to the database.
+
+Itemize scales primairly horizontally, just make more clusters, and they don't care where they run at; you can also scale vertically by adapting the scale of each cluster, GeoDNS should be able to spot if a cluster is down, and choose a valid cluster, so you keep resilliance since clusters are independent.
+
+## What you achieved
+
+ 1. Enabled SSR support on the website.
+ 2. Perfomed Search Engine Optimization.
+ 3. Created a docker cluster and ran it.
+
+## Next
+
+[Next](./10-beyond.md)
