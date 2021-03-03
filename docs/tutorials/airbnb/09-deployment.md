@@ -333,7 +333,27 @@ Now go to `localhost` without the port, and that is it; that is our app, running
 
 ## Nginx and SSL
 
-Yes this has no SSL
+Our cluster uses Nginx as a reverse proxy load balancer by default, in order to enable SSL you need to setup your `key.pem` and your `cert.pem` and start with `start-ssl.sh`
+
+## Debugging in production
+
+You might notice that these are production builds, if we check our sources they are all compressed gibberish, usually you might setup sourcemaps, but maybe you would rather use the full blown development mode, with all the toolkit that a development build contains; but this is production, and our code is seriously obfuscated via the minification mechanism.
+
+There's a way to access our full blown development build while losing SSR functionality and image loading capacities since the domain resolving is going to fail as it will try to resolve to the development domain (if you need the image loading to still work you should modify the development hostname from `dev.catbnb.com` to the production `catbnb.com` in your cluster config so it can resolve at the same domain), SSR also only works in one mode so it cannot function in both production and development at the same time, and it is functioning in production mode (so you cannot debug SSR issues like this) but anything else should work as usual, this is via the `devKey`, check your dev key in your config, it should look something like `okQoqIj6MhrFfRmB` and we will go to our developent console in our website and use it via `SET_DEV_MODE("development", "okQoqIj6MhrFfRmB");` this will setup a cookie.
+
+In order to turn back to the production mode, either clear the cookies or 
+
+## Find your admin user
+
+You don't have an admin user yet, so let's find it, check your logs for the global manager such as `
+
+Look for a line like:
+
+```json
+{"username":"admin","password":"69b27c40c9e941cabcbd5fff21a522df","level":"info","message":"GlobalManager.addAdminUserIfMissing: Sucessfully added admin user","timestamp":"2021-03-03T20:01:17.335Z"}
+```
+
+And that's your password for the default admin user.
 
 ## A deployable represents a cluster
 

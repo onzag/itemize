@@ -117,7 +117,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
 
           // now we check the session id to see if it has been cancelled
-          if ((resultUser.session_id || 0) !== decoded.sessionId) {
+          if (!resultUser || (resultUser.session_id || 0) !== decoded.sessionId) {
             throw new EndpointError({
               message: "Session has been cancelled",
               code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
