@@ -238,7 +238,7 @@ However nothing really happens, we still get all the properties even those that 
 }
 ```
 
-What we have just done is rather advanced and has the potential to wreck itemize is you made a query that contradicts what it wants to do, and changed the output of the main query, itemize server is going to modify that query to match what the user is requesting, so your modifications must take care not to destroy the query.
+What we have just done is rather advanced and has the potential to wreck itemize if you made a query that contradicts what it wants to do, and changed the output of the main query, itemize server is going to modify that query to match what the user is requesting, so your modifications must take care not to destroy the query.
 
 Now if you rebuild and reset the server you will find out that it is indeed doing some filtering right now, and you can even see it in the debug console.
 
@@ -252,7 +252,7 @@ Note however that these search customization attributes are not compatible with 
 
 We have just added the planned check in and out in our main search, which is indeed optional, but now when we click to book we realize that they are not prefilled and we have to fill them again, for that we need to pass these dates there, and to do such we will use a reader at our frontpage and pass it via the url query string.
 
-For that we are going to change our `search.tsx` code where we create the link with the following:
+For that we are going to change our `search.tsx` code where we create the link by replacing where `<div className={props.classes.container}>` is with the following:
 
 ```tsx
 <Reader id="planned_check_in">
@@ -406,7 +406,7 @@ And if you open your client and inspect your network you will realize the inform
 
 ![Currency Factors Network](./images/currency-factors-network.png)
 
-Now we should take use of ti and add the following to our unit schema:
+Now we should take use of it and add the following to our unit schema:
 
 ```json
 {
@@ -417,6 +417,40 @@ Now we should take use of ti and add the following to our unit schema:
         "preventZero": true
     }
 }
+```
+
+And add the specific properties to the schema for language:
+
+```properties
+properties.price.label = price
+properties.price.placeholder = price
+properties.price.search.range.from.label = min price
+properties.price.search.range.from.placeholder = min price
+properties.price.search.range.to.label = max price
+properties.price.search.range.to.placeholder = max price
+properties.price.error.TOO_LARGE = price is too much
+properties.price.error.TOO_SMALL = price cannot be 0
+properties.price.error.INVALID_VALUE = invalid price value
+properties.price.error.TOO_MANY_DECIMALS = too many decimals
+properties.price.error.FROM_LARGER_THAN_TO = min price is greater than max
+properties.price.error.TO_SMALLER_THAN_FROM = max price is smaller than min
+```
+
+And in spanish
+
+```properties
+properties.price.label = precio
+properties.price.placeholder = precio
+properties.price.search.range.from.label = precio mínimo
+properties.price.search.range.from.placeholder =  precio mínimo
+properties.price.search.range.to.label =  precio máximo
+properties.price.search.range.to.placeholder = precio máximo
+properties.price.error.TOO_LARGE = el precio es demasiado grande
+properties.price.error.TOO_SMALL = el precio no puede ser 0
+properties.price.error.INVALID_VALUE = valor inválido
+properties.price.error.TOO_MANY_DECIMALS = demasiados decimales
+properties.price.error.FROM_LARGER_THAN_TO = el precio mínimo es mayor que el máximo
+properties.price.error.TO_SMALLER_THAN_FROM = el precio máximo es menor que el mínimo
 ```
 
 And set the database to build, because we are accepting null as a valid price, this would mean that the database update should go swiftly, for null pricing we would consider that the unit is free of any pricing, couchsurfing style.
@@ -448,6 +482,8 @@ Now we do need to add a place to edit the price, as well as to visualize those p
 {/* We add the entry for the price */}
 <Entry id="price" />
 ```
+
+And in the properties to submit in the `SubmitButton`
 
 ```tsx
 [
@@ -526,7 +562,7 @@ And in the search by properties and requested properties we need to add the pric
 }
 ```
 
-And in the text property that displays the title, let's just hack the price right in there:
+And in the text property that displays the title at the `ListItemText`, let's just hack the price right in there where `<View id="title" />` used to be alone:
 
 ```tsx
 <>

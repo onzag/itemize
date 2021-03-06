@@ -31,8 +31,8 @@ const fsAsync = fs.promises;
  * @param question the question to ask
  * @returns a boolean on the answer
  */
-export function yesno(question: string) {
-  return new Promise((resolve, reject) => {
+export function yesno(question: string): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
     read({
       prompt: question,
       default: "y",

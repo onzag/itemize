@@ -14,7 +14,7 @@ You have shown your application to some prospect investors and it shows to have 
 
 Design meetings arise and many designs come to mind, ideas about A-B testing to measure engagement, and multiple views.
 
-The implementation of the design falls on you the programmer, many time with hurries and deadlines; quite an inefficient process given that a lot of these views are first implemented in some form of image editor, discussed and then attempted implementation, rather than in app; it also requires programmer input and output where nothing should be required because this is a design criterian.
+The implementation of the design falls on you the programmer, many time with hurries and deadlines; quite an inefficient process given that a lot of these views are first implemented in some form of image editor, discussed and then attempted implementation, rather than in app; it also requires programmer input and output where nothing should be required because this is a design criteria.
 
 ## Fragments to the Rescue
 
@@ -1111,6 +1111,12 @@ export function ReserveHostingSearch() {
 ```
 
 As you can notice we have a lot of `Mutating` in the args, because these args are not quite static and represent many contextual values and they need to be injected in the template, which is something most templating engines don't allow to do; and it can be rather tricky to understand how it goes, because but basically we are putting these contexts in between our rendering.
+
+We need to add the route for the search at `app.tsx`
+
+```tsx
+<Route path="/reserve" component={ReserveHostingSearch} exact={true} />
+```
 
 Now if we go to the page we will have no issues whatsoever performing a search using this mechanism, it works:
 
