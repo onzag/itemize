@@ -8,8 +8,6 @@
 import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
-// @ts-nocheck
-import Confirm from "prompt-confirm";
 
 import Root from "../base/Root";
 import { buildTables } from "./build-tables";
@@ -22,6 +20,7 @@ import dump from "./dump";
 import loadDump from "./load-dump";
 import { postprocessIdTriggers, prepareIdTrigger } from "./id";
 import { DatabaseConnection } from "../database";
+import read from "read";
 
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 
@@ -33,7 +32,18 @@ const fsAsync = fs.promises;
  * @returns a boolean on the answer
  */
 export function yesno(question: string) {
-  return (new Confirm(question)).run();
+  return new Promise((resolve, reject) => {
+    read({
+      prompt: question,
+      default: "y",
+    }, (error, result, isDefault) => {
+      if (error) {
+        return yesno(question);
+      } else {
+        resolve(result.toLowerCase() === "y");
+      }
+    });
+  });
 }
 
 /**

@@ -46,6 +46,12 @@ const unitListStyles = createStyles({
 });
 ```
 
+We should now inject the styles into the `UnitList` component by changing how it is written from a simple function to:
+
+```tsx
+export const UnitList = withStyles(unitListStyles)((props: WithStyles<typeof unitListStyles>) => {
+```
+
 And then we have to modify the display where the `SearchLoaderWithPagination` is encountered and change to something like this:
 
 ```tsx
@@ -217,6 +223,21 @@ export function NewEditHosting(props: NewEditHostingProps) {
         </ItemProvider>
     );
 }
+```
+
+And of course we need to show that in our routes that should now be invalid:
+
+```tsx
+<Route
+    path="/hosting/new"
+    exact={true}
+    component={NewEditHosting}
+/>
+<Route
+    path="/hosting/edit/:id"
+    exact={true}
+    component={NewEditHosting}
+/>
 ```
 
 Note the changes, we have introduced a success fast prototyping snackbar, added both `edit` and `edit_success` i18n attributes that will be required and we need to go back into the properties file to add them.

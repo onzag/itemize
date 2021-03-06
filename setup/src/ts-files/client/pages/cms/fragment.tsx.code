@@ -19,7 +19,7 @@ import {
 } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ITemplateArgsRootContext } from "@onzag/itemize/client/fast-prototyping/components/slate";
+import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate";
 import Route from "@onzag/itemize/client/components/navigation/Route";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
@@ -32,7 +32,7 @@ import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/component
  * in cms/index.propext.json you can find out the content property and what it
  * supports
  */
-const FRAGMENTS: { [key: string]: ITemplateArgsRootContext } = {
+const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
 	/**
 	 * In this example you can see the header, the header uses a custom ID
 	 * and is loaded in the frontpage by passing it as ID for the fragment

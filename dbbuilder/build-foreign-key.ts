@@ -87,7 +87,7 @@ export async function buildForeignKeys(
       const currentColumnSchema = currentTableSchema[columnName];
 
       // if the current has an index specified
-      if (currentColumnSchema.foreignKey) {
+      if (currentColumnSchema && currentColumnSchema.foreignKey) {
         // we need to check if we have one index with the same id, if we don't
         if (!currentTableForeignKeys[currentColumnSchema.foreignKey.id]) {
           // we create this new index with only that column

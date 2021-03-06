@@ -286,14 +286,16 @@ And in spanish
 properties.address.error.NEEDS_AN_ADDRESS = debe proveer una dirección
 ```
 
-At this point everything should work normally, however just for testing go to our `hosting/index.tsx` file and search for the search functionality that builds up the list and comment out the `createdBy` line, this should cause search not to work anymore due to the newly introduced security policy.
+At this point everything should work normally.
+
+However just for testing and to display one of the features of itemize go to our `hosting/index.tsx` file and search for the search functionality that builds up the list of our own properties that we do own which uses the same search functionality and comment out the `createdBy` line, this should cause search not to work anymore due to the newly introduced security policy where we do need to specify a creator.
 
 ```tsx
 // we specify that the creator must be us
 // createdBy: userData.id,
 ```
 
-However if you refresh the page you will notice that it works just fine still, well rember `storeResultsInNavigation: "unit-search"` this line? it is picking your search results from the navigation, you will need to open a new page (remember to keep devtools open not to hit the service worker), and load the page, and you should be met with the security policy
+However if you refresh the page you will notice that it works just fine still, well this is due to `storeResultsInNavigation: "unit-search"`, it is picking your search results from the navigation, you will need to open a new page (remember to keep devtools open not to hit the service worker), and load the page, and you should be met with the error.
 
 ![Search Error](./images/search-error.png)
 

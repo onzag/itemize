@@ -7,8 +7,6 @@
 
 import read from "read";
 import colors from "colors";
-// @ts-nocheck
-import Confirm from "prompt-confirm";
 
 /**
  * Simple function to ask for a question
@@ -16,7 +14,18 @@ import Confirm from "prompt-confirm";
  * @returns a boolean on the answer
  */
 export function yesno(question: string) {
-  return (new Confirm(question)).run();
+  return new Promise((resolve, reject) => {
+    read({
+      prompt: question,
+      default: "y",
+    }, (error, result, isDefault) => {
+      if (error) {
+        return yesno(question);
+      } else {
+        resolve(result.toLowerCase() === "y");
+      }
+    });
+  });
 }
 
 /**
@@ -401,5 +410,16 @@ export async function configRequest<T>(
  * @returns a promise for a boolean
  */
 export function confirm(question: string): Promise<boolean> {
-  return (new Confirm(question)).run();
+  return new Promise((resolve, reject) => {
+    read({
+      prompt: question,
+      default: "y",
+    }, (error, result, isDefault) => {
+      if (error) {
+        return yesno(question);
+      } else {
+        resolve(result.toLowerCase() === "y");
+      }
+    });
+  });
 }

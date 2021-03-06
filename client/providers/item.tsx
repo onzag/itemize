@@ -2200,7 +2200,7 @@ export class ActualItemProvider extends
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
-    property.setSuperEnforced(givenForId || null, givenForVersion || null, value);
+    property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
     this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     if (!internal) {
       this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
@@ -2213,7 +2213,7 @@ export class ActualItemProvider extends
     internal?: boolean,
   ) {
     // same but removes the enforcement
-    property.clearSuperEnforced(givenForId || null, givenForVersion || null);
+    property.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
     this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
     if (!internal) {
       this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
@@ -2243,6 +2243,7 @@ export class ActualItemProvider extends
     this.isUnmounted = true;
     this.releaseCleanupBlock();
     this.unSetupListeners();
+    this.removeSetters();
     this.runDismountOn();
 
     if (window.TESTING && process.env.NODE_ENV === "development") {
@@ -2853,7 +2854,9 @@ export class ActualItemProvider extends
         this.props.forId || null,
         this.props.forVersion || null,
       );
-      const originalContainerIdOfContent = appliedValue.rawValue.container_id as string;
+      const originalContainerIdOfContent = appliedValue &&
+        appliedValue.rawValue &&
+        appliedValue.rawValue.container_id as string;
 
       // so if we have an applied value we have stored content about
       if (originalContainerIdOfContent) {

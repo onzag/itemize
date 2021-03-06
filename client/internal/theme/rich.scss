@@ -5,6 +5,7 @@ $quote-text-color: #455a64;
 $template-item-color: #1a237e;
 $template-item-highlight-color: #880e4f;
 $general-highlight-color: #0d47a1;
+$template-highlight-color: #0d47a1;
 $superblock-highlight-color: #33691e;
 
 .rich-text {
@@ -27,11 +28,17 @@ $superblock-highlight-color: #33691e;
     }
   }
 
-  .template:hover {
-    box-shadow: 0 0 0 1px $template-item-color;
-
+  .template {
     &.selected {
-      box-shadow: 0 0 0 1px $template-item-highlight-color;
+      box-shadow: 0 0 0 1px $template-highlight-color;
+    }
+
+    &:hover {
+      box-shadow: 0 0 0 1px $template-item-color;
+  
+      &.selected {
+        box-shadow: 0 0 0 1px $template-item-highlight-color;
+      }
     }
   }
 

@@ -92,6 +92,19 @@ First we want to create the request schema, that will be used to define the item
 }
 ```
 
+Remembering to add it to the `hosting/index.json` module as a children
+
+```json
+{
+    "type": "module",
+    "children": [
+        "unit",
+        "request"
+    ],
+    "searchable": true
+}
+```
+
 You will notice a couple of things, both the date of check in and check out hold custom errors as they should be kept into a reasonable range and not a date in the past, they are using the conditional rule sets, which allows for schemas to hold some cross referenced shape; the "date" method allows for comparing dates, and "today" is an special value that refers to this same day.
 
 The request limiter means that no search can be requested without the attributes specified in there, in this case, we are demanding for a parenting rule to be defined, this means no global searches without attributes can be taken.
@@ -260,7 +273,7 @@ properties.status.search.null_value = cualquiera
 properties.status.error.NOT_NULLABLE = debe especificar un estado
 ```
 
-And now we have just made the schema and endpoints we are required in order to create these reservations and requests; in order to see this in action remember to run `npm run build-data` `npm run build-database development` and restart your server.
+And now we have just made the schema and endpoints we are required in order to create these reservations and requests; in order to see this in action remember to run `npm run build-data` `npm run build-database development` and `npm run install` to rebuild the server and then restart your server.
 
 ## Building the reservation request page
 
@@ -393,7 +406,7 @@ Go find your property in the search and then click on it and you should be able 
 
 ![Catbnb Reserve](./images/catbnb-reserve.png)
 
-You might realise that once you click the button to make a reservation, what occurs is that all the fields get cleared out and the url changes on sight, this is because the reservation was made and as specified with `restoreStateOnSuccess: true` the state was restored to the original state, which was nothing, as a result it clears up.
+You might realise that once you click the button to make a reservation, what occurs is that all the fields get cleared out and the url changes on sight, this is because the reservation was made and as specified with `restoreStateOnSuccess: true` the state was restored to the original state, which was nothing, as a result it clears up; it has not failed despite that seeming to be the case, just that clearing up the fields means they are invalid as that's why they show red, we should have changed location once we changed the url, but since we stick in place, they have no option than show that they are now in an invalid state.
 
 ## Sending email notifications
 
@@ -416,14 +429,14 @@ In order to send emails we again need to go back to the server side, and create 
                         const requesterUser = await arg.appData.cache.requestValue(
                             "users/user",
                             // this is the request, the arg.value
-                            arg.value.created_by as string,
+                            arg.newValue.created_by as string,
                             null,
                         );
                         // the unit that was to be hosted, that of course, relates to the parent
                         const hostingUnit = await arg.appData.cache.requestValue(
                             "hosting/unit",
-                            arg.value.parent_id as string,
-                            arg.value.parent_version as string,
+                            arg.newValue.parent_id as string,
+                            arg.newValue.parent_version as string,
                         );
                         // and the user that is the hosting person
                         const targetUser = await arg.appData.cache.requestValue(
@@ -484,7 +497,7 @@ In order to send emails we again need to go back to the server side, and create 
 }
 ```
 
-However we have added new information for our language info that we pick from the schema
+However we have added new information for our language info that we pick from the schema at `request.properties`
 
 ```properties
 custom.request_notification_email_handle = requests
@@ -758,7 +771,7 @@ And once you have made a booking it should look as
 
 ![Reserve View](./images/reserve-view.png)
 
-The next thing to do is that we want to show a list since while this shows on creation we also need to be able to display the same thing as all the requests that a potential client has done, and for that we will need a new menu entry to the list.
+The next thing to do is that we want to show a list since while this shows on creation we also need to be able to display the same thing as all the requests that a potential client has done, and for that we will need a new menu entry to the list at `app.tsx`
 
 ```tsx
 {
@@ -797,6 +810,7 @@ import { ModuleProvider } from "@onzag/itemize/client/providers/module";
 import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import View from "@onzag/itemize/client/components/property/View";
+import Entry from "@onzag/itemize/client/components/property/Entry";
 import { createStyles, List, ListItem, ListItemText, Typography, withStyles, WithStyles } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
@@ -1105,7 +1119,16 @@ We will now use our second user and make a new request, make many, and then you 
 
 ![Manage Units Badge](./images/manage-units-badge.png)
 
-Now we want to be able to see the same thing but in our hosting view itself, for that we need to add `pending_requests_count` to the `requestedProperties` in the automatic search.
+Now we want to be able to see the same thing but in our hosting view itself, for that we need to add `pending_requests_count` to the `requestedProperties` in the automatic search at `hosting/index.tsx` in the component for `UnitList`:
+
+```tsx
+[
+    "title",
+    "address",
+    "image",
+    "pending_requests_count",
+]
+```
 
 And then replace the rendering function of each item that is in the list with the following code:
 
@@ -1541,7 +1564,7 @@ We got to run `npm run build-data` due to the changes in the schema and `npm run
 
 ![Request Status Page](./images/request-status-page.png)
 
-Now we can use the buttons to change the status, and then we get this error:
+Now we can use the buttons to change the status, however in some certain scenarios, say if you made a request and you approve it after the today's date, as in you approve the request when the date has ellapsed and it has begun already to be timed we can get this error:
 
 ![Request Status Page Error](./images/request-status-page-error.png)
 
@@ -1681,7 +1704,7 @@ We will use the check out property to search for any request that is approved th
 
 Take a note that itemize does not have a compounded viewer for date ranges, you would have to create your own, or use another one from a thrid party; technically you could still choose an invalid date range with this method, as we are only disabling the days that can't be picked for check in or check out but we could still take a date range that picks on those dates by covering them in the range; however this is a non issue since our server will catch those when trying to insert.
 
-Update your `reserve/index.tsx` with the following code from the item definition
+Update your `reserve/index.tsx` with the following code from the item definition that appears right after the `<hr />`
 
 ```tsx
 <ItemProvider
@@ -1746,6 +1769,9 @@ Update your `reserve/index.tsx` with the following code from the item definition
                         item: "hosting/unit",
                         id: idToReserve,
                     },
+                }}
+                cleanOnDismount={{
+                    cleanSearchResultsOnAny: true,
                 }}
             >
                 <SearchLoader
@@ -1855,6 +1881,15 @@ Update your `reserve/index.tsx` with the following code from the item definition
             null
     }
 </ItemProvider>
+```
+
+Grab these imports in case they couldn't be automatically figured out:
+
+```
+import SearchLoader from "@onzag/itemize/client/components/search/SearchLoader";
+import { getToday, parseDate } from "@onzag/itemize/util";
+import SetVar from "@onzag/itemize/client/components/util/SetVar";
+import ReadVar from "@onzag/itemize/client/components/util/ReadVar";
 ```
 
 And now after rebuilding and refreshing your view should reflect the approved requests.
@@ -1985,7 +2020,7 @@ You might notice how we have right now new fragments named `APPROVAL_EMAIL`, `DE
 }
 ```
 
-And now we do need to add the schema translation lines
+And now we do need to add the schema translation lines at `request.properties`
 
 ```properties
 custom.request_approved_notification_email_subject = reservation approved at {0}

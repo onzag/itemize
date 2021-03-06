@@ -834,7 +834,10 @@ export default class PropertyDefinition {
    * the user interaction, values are enforced
    */
   private stateSuperEnforcedValue: {
-    [slotId: string]: PropertyDefinitionSupportedType,
+    [slotId: string]: {
+      value: PropertyDefinitionSupportedType,
+      owner: any,
+    },
   };
   /**
    * refers to whether the value in the state value
@@ -992,7 +995,7 @@ export default class PropertyDefinition {
           // if the global super enforced value failed, we check for
           // the slotted value
           typeof this.stateSuperEnforcedValue[mergedID] !== "undefined" ?
-            this.stateSuperEnforcedValue[mergedID] :
+            this.stateSuperEnforcedValue[mergedID].value :
 
             // otherwise in other cases we check the enforced value
             // which has priority
@@ -1450,11 +1453,14 @@ export default class PropertyDefinition {
    * @param id the slot id
    * @param version the slot version
    * @param value the value that has tobe super enforced
+   * @param owner an owner parameter, if specified it can only be removed by
+   * the same owner
    */
   public setSuperEnforced(
     id: string,
     version: string,
     value: PropertyDefinitionSupportedType,
+    owner?: any,
   ) {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
@@ -1472,7 +1478,10 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
-    this.stateSuperEnforcedValue[mergedID] = actualValue;
+    this.stateSuperEnforcedValue[mergedID] = {
+      value,
+      owner,
+    };
 
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";
@@ -1492,13 +1501,23 @@ export default class PropertyDefinition {
    * Clears a super enforced value set in a slot id
    * @param id the slot id
    * @param version the slot version
+   * @param owner an optional owner parameter it can only be removed
+   * if the owner is the same as the original
    */
   public clearSuperEnforced(
     id: string,
     version: string,
+    owner?: any,
   ) {
     const mergedID = id + "." + (version || "");
     const deletedValue = this.stateSuperEnforcedValue[mergedID];
+
+    // owner is specified and it's not equal so
+    // it is not removed
+    if (owner && deletedValue.owner !== owner) {
+      return;
+    }
+
     delete this.stateSuperEnforcedValue[mergedID];
 
     // clean cached values
@@ -1508,7 +1527,7 @@ export default class PropertyDefinition {
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
 
-    if (this.stateValue[mergedID] !== deletedValue) {
+    if (deletedValue && this.stateValue[mergedID] !== deletedValue.value) {
       this.listeners.forEach((listener) => {
         listener(id || null, version || null, this.stateValue[mergedID]);
       });
