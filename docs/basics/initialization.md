@@ -31,8 +31,6 @@ Install itemize
 
 `npm install --save @onzag/itemize`
 
-You need to have the right permissions in order to be able to access this npm module given that it is private
-
 ### Things to Consider
 
 Please ensure docker is installed and running
