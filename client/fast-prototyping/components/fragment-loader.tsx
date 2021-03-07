@@ -7,7 +7,7 @@
 
 import View from "../../components/property/View";
 import Entry from "../../components/property/Entry";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { withStyles, WithStyles, createStyles, IconButton, EditIcon, CloseIcon, SaveIcon } from "../mui-core";
 import UserDataRetriever from "../../components/user/UserDataRetriever";
 import SubmitActioner from "../../components/item/SubmitActioner";
@@ -64,6 +64,13 @@ interface FragmentLoaderProps extends WithStyles<typeof fragmentLoaderStyles> {
 export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentLoaderProps) => {
   const [editMode, setEditMode] = useState(false);
 
+  const mountState = useRef(true)
+  useEffect(() => {
+    return () => {
+      mountState.current = false
+    }
+  }, []);
+
   let buttonsToUse: React.ReactNode = null;
 
   if (!editMode) {
@@ -110,7 +117,7 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
 
                   const effect = await actioner.submit(options);
 
-                  if (!effect.error) {
+                  if (!effect.error && mountState.current) {
                     setEditMode(false);
                   }
                 }

@@ -312,6 +312,11 @@ export async function reprocessFileArgumentForAdd(
     return await Promise.all((files as any).map((f: any) => reprocessFileArgumentForAdd(f, options)));
   }
 
+  // if the value is null or undefined
+  if (!files) {
+    return files;
+  }
+
   // if we have a source, it's good as it is
   if (files.src) {
     return files;

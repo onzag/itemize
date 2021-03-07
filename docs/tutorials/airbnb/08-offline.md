@@ -36,7 +36,7 @@ If you get an error in the console such as `DOMException: The requested version 
 
 Now after you refresh your page, it should look like this:
 
-![Catbnb Service Workers Enabled](./catbnb-service-workers-enabled.png)
+![Catbnb Service Workers Enabled](./images/catbnb-service-workers-enabled.png)
 
 But something is wrong, there's a placeholder where there should be an image, what happened? didn't we just cache our element, yes we did, we cached the url, and the image source and sourceset is actually pointing to the right URL, but it can't be loaded because the service worker has determined that it is offline.
 
