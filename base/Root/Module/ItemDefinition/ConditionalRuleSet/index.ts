@@ -81,7 +81,8 @@ export interface IConditionalRuleSetRawJSONDataPropertyType
    */
   value: PropertyDefinitionValueType;
   /**
-   * the attribute of the value, if any
+   * the attribute of the value, if any that is used to compare against
+   * with the comparator, rather than the value of itself
    */
   valueAttribute?: string;
 }

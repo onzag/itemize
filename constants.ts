@@ -516,6 +516,20 @@ export const LOCALE_I18N = [
   "unsaved_changes",
   "save",
   "discard",
+
+  // payments, based on paymentStatusesArr and paymentTypesArr but not imported to prevent
+  // giving dependencies to constants.ts
+  "payment.wait",
+  "payment.paid",
+  "payment.disputed",
+  "payment.refunded",
+  "payment.inactive",
+  "payment.active",
+  "payment.invoice",
+  "payment.refund",
+  "payment.subscription_monthly",
+  "payment.subscription_daily",
+  "payment.subscription_yearly",
 ].concat(
   // we add all the endpoint errors
   Object.keys(ENDPOINT_ERRORS).map(((ee) => `error.${ee}`)),

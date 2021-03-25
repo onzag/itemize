@@ -24,7 +24,7 @@ import {
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
-import Root, { ICustomRoleManager, IRequestLimitersType } from "..";
+import Root, { ICustomRoleManager, Ii18NType, IRequestLimitersType } from "..";
 import { EndpointError } from "../../errors";
 import { IGQLRequestFields } from "../../../gql-querier";
 
@@ -234,12 +234,14 @@ export default class Module {
    * this gives a module that is the search module
    * of the given module
    * @param rawData the raw data of the module in json
+   * @param rootI18nData the root i18n data
    * @returns a raw json for the search module
    */
   public static buildSearchMode(
     rawData: IModuleRawJSONDataType,
+    rootI18nData: Ii18NType,
   ): IModuleRawJSONDataType {
-    return buildSearchModeModule(rawData);
+    return buildSearchModeModule(rawData, rootI18nData);
   }
 
   /**
@@ -382,7 +384,12 @@ export default class Module {
       // with our current raw data, null as parent module because search
       // modules are detached from their parents, and we disable
       // the generation of a search module of this same module
-      this.searchModeModule = new Module(Module.buildSearchMode(this.rawData), this.parentRoot, this, true);
+      this.searchModeModule = new Module(
+        Module.buildSearchMode(this.rawData, this.parentRoot.getI18nData()),
+        this.parentRoot,
+        this,
+        true,
+      );
     }
 
     // if we have prop extensions in the raw data we were provided
@@ -948,9 +955,11 @@ export default class Module {
    * the english build and the i18n data for the russian build, that way
    * the state is not lost
    * @param mod the raw module that is merging
+   * @param rootI18nData the i18n data of the root
    */
   public mergeWithI18n(
     mod: IModuleRawJSONDataType,
+    rootI18nData: Ii18NType,
   ) {
     this.rawData.i18nData = {
       ...this.rawData.i18nData,
@@ -962,7 +971,7 @@ export default class Module {
       const mergeModuleRaw: IModuleRawJSONDataType = mod.children &&
         mod.children.find((m) => m.type === "module" && m.name === nameOfMergeModule) as IModuleRawJSONDataType;
       if (mergeModuleRaw) {
-        cMod.mergeWithI18n(mergeModuleRaw);
+        cMod.mergeWithI18n(mergeModuleRaw, rootI18nData);
       }
     });
 
@@ -981,8 +990,8 @@ export default class Module {
     });
 
     if (this.searchModeModule) {
-      const searchModeRaw = Module.buildSearchMode(mod);
-      this.searchModeModule.mergeWithI18n(searchModeRaw);
+      const searchModeRaw = Module.buildSearchMode(mod, rootI18nData);
+      this.searchModeModule.mergeWithI18n(searchModeRaw, rootI18nData);
     }
   }
 }

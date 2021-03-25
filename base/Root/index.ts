@@ -393,7 +393,7 @@ export default class Root {
     this.childModules.forEach((mod) => {
       const mergeModuleRaw = Root.getModuleRawFor(root, [mod.getName()]);
       if (mergeModuleRaw) {
-        mod.mergeWithI18n(mergeModuleRaw);
+        mod.mergeWithI18n(mergeModuleRaw, root.i18nData);
       }
     });
   }

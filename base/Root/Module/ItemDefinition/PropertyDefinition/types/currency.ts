@@ -127,8 +127,8 @@ const typeValue: IPropertyDefinitionSupportedType = {
 
     if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
       conditions.push(
-        propertyValue.currency === usefulArgs[fromName].currency &&
-        propertyValue.value <= usefulArgs[fromName].value
+        propertyValue.currency === usefulArgs[toName].currency &&
+        propertyValue.value <= usefulArgs[toName].value
       );
     }
 

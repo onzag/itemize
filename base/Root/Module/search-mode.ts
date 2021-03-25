@@ -9,14 +9,17 @@ import { IModuleRawJSONDataType } from ".";
 import { buildSearchModeItemDefinition } from "./ItemDefinition/search-mode";
 import { buildSearchModePropertyDefinitions } from "./ItemDefinition/PropertyDefinition/search-mode";
 import { SEARCH_MODE_MODULE_PREFIX, MAX_SEARCH_FIELD_LENGTH } from "../../../constants";
+import { Ii18NType } from "..";
 
 /**
  * Builds the module based on its raw data
  * @param rawData the raw data for the module
+ * @param rootI18nData the root i18n data
  * @returns a raw module
  */
 export function buildSearchModeModule(
   rawData: IModuleRawJSONDataType,
+  rootI18nData: Ii18NType,
 ): IModuleRawJSONDataType {
   // cloning the module
   const newModule = {...rawData};
@@ -38,7 +41,7 @@ export function buildSearchModeModule(
     // property definitions for one in search mode, specifically in range and
     // location
     newModule.propExtensions = newModule.propExtensions
-      .map((pe) => buildSearchModePropertyDefinitions(pe, knownPropExtMap))
+      .map((pe) => buildSearchModePropertyDefinitions(pe, knownPropExtMap, rootI18nData))
       .reduce((arr, peArr) => [...arr, ...peArr]);
   }
 
@@ -95,7 +98,7 @@ export function buildSearchModeModule(
         return null;
       } else {
         // and we do item definitions
-        return buildSearchModeItemDefinition(m, knownPropExtMap, rawData);
+        return buildSearchModeItemDefinition(m, knownPropExtMap, rawData, rootI18nData);
       }
     }).filter((s) => !!s);
   }

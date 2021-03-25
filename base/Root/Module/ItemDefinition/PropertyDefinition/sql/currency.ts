@@ -70,18 +70,22 @@ export function currencySQLIn(arg: ISQLInInfo) {
  * @returns a property definition supported currency type (or null)
  */
 export function currencySQLOut(arg: ISQLOutInfo) {
+  const value = arg.row[arg.prefix + arg.id + "_VALUE"];
+
+  // if our value happens to be null
+  if (value === null) {
+    // return whole null as it should
+    return null;
+  }
+
   // so our results depends on the row we are getting
   const result: IPropertyDefinitionSupportedCurrencyType = {
     // we need to use parse float here because numeric gives string
     // in output, which is wrong
-    value: parseFloat(arg.row[arg.prefix + arg.id + "_VALUE"]),
+    value: parseFloat(value),
     currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
   };
-  // if our value happens to be null
-  if (result.value === null) {
-    // return whole null as it should
-    return null;
-  }
+
   // otherwise return the result itself, note how normalized
   // isn't included as the currency doesn't include the normalized
   return result;
@@ -107,6 +111,7 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     // we just match it as it is
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
+    searchedByIt = true;
   }
 
   // if we have a from search

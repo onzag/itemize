@@ -305,9 +305,6 @@ const handlerRegistry:
     renderer: "PropertyViewCurrency",
     handler: PropertyViewCurrency,
   },
-
-  // TODO
-  unit: null,
   password: {
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
@@ -337,8 +334,11 @@ const handlerRegistry:
     handler: PropertyViewFile,
     includeConfig: true,
   },
+
   // TODO
   files: null,
+  unit: null,
+  payment: null,
 };
 
 /**

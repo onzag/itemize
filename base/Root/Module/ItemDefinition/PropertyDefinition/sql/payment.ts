@@ -1,0 +1,192 @@
+/**
+ * Contains the sql and server side specific functions for the payment type
+ *
+ * @module
+ */
+
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";
+import { IPropertyDefinitionSupportedPaymentType } from "../types/payment";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
+import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
+
+/**
+ * the sql function that setups the fields for the payment element
+ * @param arg the sql argumnent
+ * @returns a partial row definition
+ */
+export function paymentSQL(arg: ISQLArgInfo) {
+  return {
+    [arg.prefix + arg.id + "_TYPE"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_UUID"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_AMOUNT"]: { type: "NUMERIC" },
+    [arg.prefix + arg.id + "_CURRENCY"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_STATUS"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_METADATA"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_HIDDEN_METADATA"]: { type: "TEXT" },
+  };
+}
+
+/**
+ * The selection for the payment in searches
+ * @param arg 
+ */
+export function paymentSQLSelect(arg: ISQLArgInfo) {
+  return [
+    arg.prefix + arg.id + "_TYPE",
+    arg.prefix + arg.id + "_UUID",
+    arg.prefix + arg.id + "_AMOUNT",
+    arg.prefix + arg.id + "_CURRENCY",
+    arg.prefix + arg.id + "_STATUS",
+    arg.prefix + arg.id + "_METADATA",
+  ];
+}
+
+/**
+ * The sql in function for the payment
+ * @param arg the sql in info argument
+ * @returns a partial row
+ */
+export function paymentSQLIn(arg: ISQLInInfo) {
+  // so we get our value we are trying to input in the row for the arg
+  const value: IPropertyDefinitionSupportedPaymentType = arg.value as IPropertyDefinitionSupportedPaymentType;
+  // if this value is null
+  if (arg.value === null) {
+    return {
+      [arg.prefix + arg.id + "_TYPE"]: null,
+      [arg.prefix + arg.id + "_UUID"]: null,
+      [arg.prefix + arg.id + "_AMOUNT"]: null,
+      [arg.prefix + arg.id + "_CURRENCY"]: null,
+      [arg.prefix + arg.id + "_STATUS"]: null,
+      [arg.prefix + arg.id + "_METADATA"]: null,
+    };
+  }
+
+  return {
+    [arg.prefix + arg.id + "_TYPE"]: value.type,
+    [arg.prefix + arg.id + "_UUID"]: value.uuid,
+    [arg.prefix + arg.id + "_AMOUNT"]: value.amount,
+    [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
+    [arg.prefix + arg.id + "_STATUS"]: value.status,
+    [arg.prefix + arg.id + "_METADATA"]: value.metadata || null,
+  };
+}
+
+/**
+ * The sql out function
+ * @param arg the argument out info
+ * @returns a property definition supported payment type (or null)
+ */
+export function paymentSQLOut(arg: ISQLOutInfo) {
+  const amount = arg.row[arg.prefix + arg.id + "_AMOUNT"];
+  if (amount === null) {
+    return null;
+  }
+
+  // so our results depends on the row we are getting
+  const result: IPropertyDefinitionSupportedPaymentType = {
+    type: arg.row[arg.prefix + arg.id + "_TYPE"],
+    uuid: arg.row[arg.prefix + arg.id + "_UUID"],
+    // we need to use parse float here because numeric gives string
+    // in output, which is wrong
+    amount: parseFloat(amount),
+    currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
+    status: arg.row[arg.prefix + arg.id + "_STATUS"],
+    metadata: arg.row[arg.prefix + arg.id + "_METADATA"] || null,
+  };
+
+  return result;
+}
+
+/**
+ * Searching for payment values
+ * @param arg the argument search info
+ * @returns a boolean on whether it's searched by it or not
+ */
+export function paymentSQLSearch(arg: ISQLSearchInfo) {
+  const argPrefixPlusId = arg.prefix + arg.id;
+
+  // first we need to get the arguments
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + argPrefixPlusId;
+  const paymentUUIDName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + argPrefixPlusId;
+  const paymentTypeName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + argPrefixPlusId;
+  const paymentStatusName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + argPrefixPlusId;
+
+  // now if we are searching by it
+  let searchedByIt = false;
+
+  // if we have an exact search
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    const exactArg = arg.args[exactName] as any as IPropertyDefinitionSupportedCurrencyType;
+    // we just match it as it is
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", exactArg.currency);
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", exactArg.value);
+  }
+
+  // if we have a from search
+  if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
+    const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", ">=", fromArg.value);
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId+ "_CURRENCY", fromArg.currency);
+    searchedByIt = true;
+  }
+
+  // same here as we did with from, but with the to
+  if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+    const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", "<=", toArg.value);
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", toArg.currency);
+    searchedByIt = true;
+  }
+
+  // same for the uuid and others
+  if (typeof arg.args[paymentUUIDName] !== "undefined" && arg.args[paymentUUIDName] !== null) {
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_UUID", arg.args[paymentUUIDName] as string);
+    searchedByIt = true;
+  }
+
+  if (typeof arg.args[paymentTypeName] !== "undefined" && arg.args[paymentTypeName] !== null) {
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_TYPE", arg.args[paymentTypeName] as string);
+    searchedByIt = true;
+  }
+
+  if (typeof arg.args[paymentStatusName] !== "undefined" && arg.args[paymentStatusName] !== null) {
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_STATUS", arg.args[paymentStatusName] as string);
+    searchedByIt = true;
+  }
+
+  // now we return if we have been searched by it at the end
+  return searchedByIt;
+}
+
+/**
+ * The btree indexable used in searches
+ * @param arg the arg for the btree indexable options
+ * @returns the columns to index
+ */
+export function paymentSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
+  // we index the currency column and the value column
+  return [arg.prefix + arg.id + "_CURRENCY", arg.prefix + arg.id + "_AMOUNT"];
+}
+
+/**
+ * How to consider equality with a value
+ * @param arg the argument to check equality against
+ * @returns a partial row match
+ */
+export function paymentSQLEqual(arg: ISQLEqualInfo) {
+  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_UUID", (arg.value as IPropertyDefinitionSupportedPaymentType).uuid);
+}
+
+/**
+ * How to check equality with a value using the cache
+ * @param arg the argument to check against
+ * @returns a boolean
+ */
+export function paymentSQLSSCacheEqual(arg: ISQLSSCacheEqualInfo) {
+  if (arg.value === null) {
+    return arg.row[arg.prefix + arg.id + "_AMOUNT"] === null;
+  }
+  return arg.row[arg.prefix + arg.id + "_UUID"] === (arg.value as IPropertyDefinitionSupportedPaymentType).uuid;
+}

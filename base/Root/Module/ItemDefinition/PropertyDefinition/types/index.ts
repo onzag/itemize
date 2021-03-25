@@ -24,6 +24,7 @@ import time, { PropertyDefinitionSupportedTimeType } from "./time";
 import location, { IPropertyDefinitionSupportedLocationType } from "./location";
 import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
+import payment, { IPropertyDefinitionSupportedPaymentType } from "./payment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import file, { PropertyDefinitionSupportedFileType } from "./file";
@@ -54,8 +55,9 @@ export type PropertyDefinitionSupportedTypeName =
   "location" |        // Represented as an object, non comparable, stored
                       // as two values
   "file" |            // Represents a single url
-  "files";            // Represented as a list of urls, non comparable,
+  "files" |           // Represented as a list of urls, non comparable,
                       // stored as a list of urls
+  "payment";
 
 export interface IArgInfo {
   id: string;
@@ -377,6 +379,7 @@ const supportedTypesStandard: PropertyDefinitionSupportedTypesStandardType = {
   location,
   file,
   files,
+  payment,
 };
 
 // Checking that the property descriptions are right
@@ -422,6 +425,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedYearType |
   IPropertyDefinitionSupportedLocationType |
   PropertyDefinitionSupportedFileType |
-  PropertyDefinitionSupportedFilesType;
+  PropertyDefinitionSupportedFilesType |
+  IPropertyDefinitionSupportedPaymentType;
 
 export default supportedTypesStandard;

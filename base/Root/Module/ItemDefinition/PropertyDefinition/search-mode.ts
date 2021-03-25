@@ -13,6 +13,8 @@ import {
 } from "./search-interfaces";
 import { buildSearchModeConditionalRuleSet } from "../ConditionalRuleSet/search-mode";
 import { IConditionalRuleSetRawJSONDataPropertyType } from "../ConditionalRuleSet";
+import { paymentStatusesArr, paymentTypesArr } from "./types/payment";
+import { Ii18NType } from "../../../../Root";
 
 /**
  * Provides all the ids that a property would be referred to in search mode
@@ -73,19 +75,169 @@ export function getConversionIds(
       PropertyDefinitionSearchInterfacesPrefixes.LOCATION + rawData.id,
       PropertyDefinitionSearchInterfacesPrefixes.RADIUS + rawData.id,
     ];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.PAYMENT
+  ) {
+    if (rawData.disableRangedSearch) {
+      ids = [
+        PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id
+      ];
+    } else {
+      ids = [
+        PropertyDefinitionSearchInterfacesPrefixes.FROM + rawData.id,
+        PropertyDefinitionSearchInterfacesPrefixes.TO + rawData.id,
+      ];
+    }
+
+    ids = ids.concat([
+      PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + rawData.id,
+      PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + rawData.id,
+      PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + rawData.id,
+    ]);
   }
   return ids;
+}
+
+export function buildSearchModePaymentProperty(
+  newPropDef: IPropertyDefinitionRawJSONDataType,
+  rootI8nData: Ii18NType,
+): IPropertyDefinitionRawJSONDataType[] {
+  newPropDef.type = "currency";
+
+  // can't use the default because it was made for payment
+  delete newPropDef.default;
+  delete newPropDef.defaultIf;
+
+  // can't use enforced value nor values because they were made for
+  // the payment
+  delete newPropDef.enforcedValue;
+  delete newPropDef.enforcedValues;
+  delete newPropDef.hiddenIfEnforced;
+
+  // just in case
+  delete newPropDef.max;
+  delete newPropDef.min;
+
+  const newPropDefPaymentStatus: IPropertyDefinitionRawJSONDataType = {
+    ...newPropDef,
+    id: PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + newPropDef.id,
+    type: "string",
+    values: paymentStatusesArr,
+  };
+  if (newPropDefPaymentStatus.i18nData) {
+    newPropDefPaymentStatus.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "status"]);
+
+    displaceAndStoreI18NRootFieldsData(rootI8nData, ["any"], newPropDefPaymentStatus.i18nData, ["null_value"]);
+    paymentStatusesArr.forEach((t) => {
+      displaceAndStoreI18NRootFieldsData(rootI8nData, ["payment", t], newPropDefPaymentStatus.i18nData, ["values", t]);
+    });
+  }
+
+  const newPropDefPaymentType: IPropertyDefinitionRawJSONDataType = {
+    ...newPropDef,
+    id: PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + newPropDef.id,
+    type: "string",
+    values: paymentTypesArr,
+  };
+  if (newPropDefPaymentType.i18nData) {
+    newPropDefPaymentType.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "type"]);
+  
+    displaceAndStoreI18NRootFieldsData(rootI8nData, ["any"], newPropDefPaymentType.i18nData, ["null_value"]);
+    paymentTypesArr.forEach((t) => {
+      displaceAndStoreI18NRootFieldsData(rootI8nData, ["payment", t], newPropDefPaymentType.i18nData, ["values", t]);
+    });
+  }
+
+  const newPropDefPaymentUUID: IPropertyDefinitionRawJSONDataType = {
+    ...newPropDef,
+    id: PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + newPropDef.id,
+    type: "string",
+  };
+
+  // this is created for the TO value when we are using a range
+  // by default
+  let newPropDef2: IPropertyDefinitionRawJSONDataType = null;
+
+  if (newPropDef.disableRangedSearch) {
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.EXACT + newPropDef.id;
+    if (newPropDef.i18nData) {
+      newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "exact"]);
+    }
+  
+  // Otherwise we need the secondary, for the range
+  } else {
+    // we make a copy of the original
+    newPropDef2 = {...newPropDef};
+
+    // set the ids, as FROM and TO
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.FROM + newPropDef.id;
+    newPropDef2.id = PropertyDefinitionSearchInterfacesPrefixes.TO + newPropDef2.id;
+
+    // the condition goes if the FROM is greater than the TO
+    const newPropDefInvalidIfRule: IConditionalRuleSetRawJSONDataPropertyType = {
+      property: "&this",
+      comparator: "greater-than",
+      value: {
+        property: newPropDef2.id,
+      },
+    };
+
+    // because we are using a currency type, the attribute that we use for comparison
+    // is the value
+    newPropDefInvalidIfRule.attribute = "value";
+    newPropDefInvalidIfRule.valueAttribute = "value";
+
+    // we need some invalid conditions we are adding to the invalid if set
+    newPropDef.invalidIf = newPropDef.invalidIf || [];
+    newPropDef.invalidIf.push({
+      error: PropertyInvalidReason.FROM_LARGER_THAN_TO,
+      if: newPropDefInvalidIfRule,
+    });
+
+    // now we do the same but in reverse, this time for the second
+    newPropDef2.invalidIf = newPropDef2.invalidIf || [];
+    const newPropDef2InvalidIfRule: IConditionalRuleSetRawJSONDataPropertyType = {
+      property: "&this",
+      comparator: "less-than",
+      value: {
+        property: newPropDef.id,
+      },
+    };
+  
+    newPropDef2InvalidIfRule.attribute = "value";
+    newPropDef2InvalidIfRule.valueAttribute = "value";
+
+    newPropDef2.invalidIf.push({
+      error: PropertyInvalidReason.TO_SMALLER_THAN_FROM,
+      if: newPropDef2InvalidIfRule,
+    });
+
+    // now we displace the i18ndata from the search.payment.from
+    if (newPropDef.i18nData) {
+      newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "from"]);
+    }
+
+    // and the search.payment.to
+    if (newPropDef2.i18nData) {
+      newPropDef2.i18nData = displaceI18NData(newPropDef2.i18nData, ["search", "payment", "to"]);
+    }
+  }
+
+  return null;
 }
 
 /**
  * Builds a property definition to its search mode
  * @param rawData the raw property definition source
  * @param otherKnownProperties the object with the other known properties that this one can see
+ * @param rootI8nData the root i18n data
  * @returns an array of property definitions
  */
 export function buildSearchModePropertyDefinitions(
   rawData: IPropertyDefinitionRawJSONDataType,
   otherKnownProperties: {[id: string]: IPropertyDefinitionRawJSONDataType},
+  rootI8nData: Ii18NType,
 ): IPropertyDefinitionRawJSONDataType[] {
   // so we need the description from the standard
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
@@ -120,10 +272,12 @@ export function buildSearchModePropertyDefinitions(
     newPropDef.coerceNullsIntoDefault = false;
   }
 
+  // full text changes to a simple string tex tfield
   if (newPropDef.type === "text") {
     newPropDef.type = "string";
   }
 
+  // use the search default instead of the standard default
   if (typeof newPropDef.searchDefault !== "undefined") {
     newPropDef.default = newPropDef.searchDefault;
   }
@@ -357,7 +511,7 @@ export function buildSearchModePropertyDefinitions(
           },
         };
       }),
-    };
+    }
 
     if (newPropDef.hidden) {
       newPropDef2.hidden = true;
@@ -377,10 +531,50 @@ export function buildSearchModePropertyDefinitions(
   // we return both if we have both
   if (newPropDef2) {
     return [newPropDef, newPropDef2];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.PAYMENT
+  ) {
+    // The payment property can be rather complex in what it becomes
+    // so we will use a separate function 
+    return buildSearchModePaymentProperty(newPropDef, rootI8nData);
   }
 
   // or only one
   return [newPropDef];
+}
+
+/**
+ * An utility to displace data from the i18n object, any
+ * @param i18n the i18n root object
+ * @param path the path we want to get the data from
+ * @param storageI18n the target we want to store at
+ * @param storagePath where we want it to be stored
+ */
+function displaceAndStoreI18NRootFieldsData(i18n: any, path: string[], storageI18n: any, storagePath: string[]) {
+  // for each language we are supporting there
+  Object.keys(i18n).forEach((language) => {
+    if (!storageI18n[language]) {
+      storageI18n[language] = {};
+    }
+
+    // now we loop inside the path
+    let itemInQuestion = i18n[language];
+    path.forEach((pbit) => {
+      itemInQuestion = itemInQuestion[pbit];
+    });
+
+    if (itemInQuestion) {
+      let storageInQuestion = storageI18n[language];
+      storagePath.forEach((p, index) => {
+        if (index === storagePath.length - 1) {
+          storageInQuestion[p] = itemInQuestion;
+        } else if (!storageInQuestion[p]) {
+          storageInQuestion[p] = {};
+        }
+      });
+    }
+  });
 }
 
 /**

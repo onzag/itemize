@@ -29,12 +29,17 @@ export enum PropertyDefinitionSearchInterfacesType {
    * uses location and radius for searching
    */
   LOCATION_RADIUS,
+  /**
+   * payment search interface
+   */
+  PAYMENT,
 }
 
 /**
  * The prefixes for every location search interface
  */
 export const PropertyDefinitionSearchInterfacesPrefixes = {
+  // REUSABLE
   /**
    * Used to prefix the exact searches when using the exact or exact and range protocol
    */
@@ -51,6 +56,9 @@ export const PropertyDefinitionSearchInterfacesPrefixes = {
    * Used to prefix FTS queries
    */
   SEARCH: PREFIX_BUILD("SEARCH"),
+
+  // LOCATION SPECIFIC
+
   /**
    * Used to prefix the location when using location radius
    */
@@ -59,6 +67,21 @@ export const PropertyDefinitionSearchInterfacesPrefixes = {
    * Used to prefix the radius when using location radius
    */
   RADIUS: PREFIX_BUILD("RADIUS"),
+
+  // PAYMENT SPECIFIC
+
+  /**
+   * Used for payment status request
+   */
+  PAYMENT_TYPE: PREFIX_BUILD("PAYMENT_TYPE"),
+  /**
+   * Used for payment status request
+   */
+  PAYMENT_STATUS: PREFIX_BUILD("PAYMENT_STATUS"),
+  /**
+   * Used for payment specific UUID
+   */
+  PAYMENT_UUID: PREFIX_BUILD("PAYMENT_UUID"),
 };
 
 /**
@@ -82,4 +105,12 @@ export const PropertyDefinitionSearchInterfacesPrefixesList = [
     PropertyDefinitionSearchInterfacesPrefixes.LOCATION,
     PropertyDefinitionSearchInterfacesPrefixes.RADIUS,
   ],
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.EXACT,
+    PropertyDefinitionSearchInterfacesPrefixes.FROM,
+    PropertyDefinitionSearchInterfacesPrefixes.TO,
+    PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE,
+    PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS,
+    PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID,
+  ]
 ];

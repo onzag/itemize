@@ -11,6 +11,7 @@ import { IModuleRawJSONDataType } from "..";
 import { getConversionRulesetId, buildSearchModeConditionalRuleSet } from "./ConditionalRuleSet/search-mode";
 import { getConversionIds, buildSearchModePropertyDefinitions } from "./PropertyDefinition/search-mode";
 import { MAX_SEARCH_FIELD_LENGTH } from "../../../../constants";
+import { Ii18NType } from "../..";
 
 /**
  * This builds item definitions
@@ -23,6 +24,7 @@ export function buildSearchModeItemDefinition(
   rawData: IItemDefinitionRawJSONDataType,
   modulePropExtensions: {[id: string]: IPropertyDefinitionRawJSONDataType},
   originalModule: IModuleRawJSONDataType,
+  rootI18nData: Ii18NType,
 ): IItemDefinitionRawJSONDataType {
   // copy that
   const newItemDef = {...rawData};
@@ -40,7 +42,7 @@ export function buildSearchModeItemDefinition(
       });
       // now we build such properties
       newItemDef.properties = newItemDef.properties
-        .map((p) => buildSearchModePropertyDefinitions(p, knownPropMap))
+        .map((p) => buildSearchModePropertyDefinitions(p, knownPropMap, rootI18nData))
         // filter properties that returned nothing because they are not searchable
         // even when by default they return an empty array, but just in case
         .filter((p) => !!p)
@@ -173,7 +175,7 @@ export function buildSearchModeItemDefinition(
   if (newItemDef.childDefinitions) {
     // we loop and work on those the same way
     newItemDef.childDefinitions = newItemDef.childDefinitions.map((cd) => {
-      return buildSearchModeItemDefinition(cd, modulePropExtensions, originalModule);
+      return buildSearchModeItemDefinition(cd, modulePropExtensions, originalModule, rootI18nData);
     });
   }
   return newItemDef;

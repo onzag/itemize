@@ -559,6 +559,7 @@ const handlerRegistry:
 
   // TODO
   files: null,
+  payment: null,
 };
 
 /**
