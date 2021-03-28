@@ -17,7 +17,6 @@ import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
 export function paymentSQL(arg: ISQLArgInfo) {
   return {
     [arg.prefix + arg.id + "_TYPE"]: { type: "TEXT" },
-    [arg.prefix + arg.id + "_UUID"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_AMOUNT"]: { type: "NUMERIC" },
     [arg.prefix + arg.id + "_CURRENCY"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_STATUS"]: { type: "TEXT" },
@@ -33,12 +32,21 @@ export function paymentSQL(arg: ISQLArgInfo) {
 export function paymentSQLSelect(arg: ISQLArgInfo) {
   return [
     arg.prefix + arg.id + "_TYPE",
-    arg.prefix + arg.id + "_UUID",
     arg.prefix + arg.id + "_AMOUNT",
     arg.prefix + arg.id + "_CURRENCY",
     arg.prefix + arg.id + "_STATUS",
     arg.prefix + arg.id + "_METADATA",
   ];
+}
+
+/**
+ * The selection for the payment hidden metadata, only truly used
+ * by the provider
+ * @param prefix
+ * @param id property id
+ */
+export function paymentSQLHiddenMetadataRow(prefix: string, id: string) {
+  return prefix + id + "_HIDDEN_METADATA";
 }
 
 /**
@@ -53,7 +61,6 @@ export function paymentSQLIn(arg: ISQLInInfo) {
   if (arg.value === null) {
     return {
       [arg.prefix + arg.id + "_TYPE"]: null,
-      [arg.prefix + arg.id + "_UUID"]: null,
       [arg.prefix + arg.id + "_AMOUNT"]: null,
       [arg.prefix + arg.id + "_CURRENCY"]: null,
       [arg.prefix + arg.id + "_STATUS"]: null,
@@ -63,7 +70,6 @@ export function paymentSQLIn(arg: ISQLInInfo) {
 
   return {
     [arg.prefix + arg.id + "_TYPE"]: value.type,
-    [arg.prefix + arg.id + "_UUID"]: value.uuid,
     [arg.prefix + arg.id + "_AMOUNT"]: value.amount,
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_STATUS"]: value.status,
@@ -85,7 +91,6 @@ export function paymentSQLOut(arg: ISQLOutInfo) {
   // so our results depends on the row we are getting
   const result: IPropertyDefinitionSupportedPaymentType = {
     type: arg.row[arg.prefix + arg.id + "_TYPE"],
-    uuid: arg.row[arg.prefix + arg.id + "_UUID"],
     // we need to use parse float here because numeric gives string
     // in output, which is wrong
     amount: parseFloat(amount),
@@ -109,7 +114,6 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + argPrefixPlusId;
-  const paymentUUIDName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + argPrefixPlusId;
   const paymentTypeName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + argPrefixPlusId;
   const paymentStatusName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + argPrefixPlusId;
 
@@ -140,12 +144,6 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
     searchedByIt = true;
   }
 
-  // same for the uuid and others
-  if (typeof arg.args[paymentUUIDName] !== "undefined" && arg.args[paymentUUIDName] !== null) {
-    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_UUID", arg.args[paymentUUIDName] as string);
-    searchedByIt = true;
-  }
-
   if (typeof arg.args[paymentTypeName] !== "undefined" && arg.args[paymentTypeName] !== null) {
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_TYPE", arg.args[paymentTypeName] as string);
     searchedByIt = true;
@@ -173,10 +171,15 @@ export function paymentSQLBtreeIndexable(arg: ISQLBtreeIndexableInfo) {
 /**
  * How to consider equality with a value
  * @param arg the argument to check equality against
- * @returns a partial row match
  */
 export function paymentSQLEqual(arg: ISQLEqualInfo) {
-  arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_UUID", (arg.value as IPropertyDefinitionSupportedPaymentType).uuid);
+  // can't be done, every payment is unique on its own, only nulls can be checked
+  // payment objects can't be compared
+  if (!arg.value) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id + "_AMOUNT");
+  } else {
+    arg.whereBuilder.andWhere("FALSE");
+  }
 }
 
 /**
@@ -188,5 +191,5 @@ export function paymentSQLSSCacheEqual(arg: ISQLSSCacheEqualInfo) {
   if (arg.value === null) {
     return arg.row[arg.prefix + arg.id + "_AMOUNT"] === null;
   }
-  return arg.row[arg.prefix + arg.id + "_UUID"] === (arg.value as IPropertyDefinitionSupportedPaymentType).uuid;
+  return false;
 }

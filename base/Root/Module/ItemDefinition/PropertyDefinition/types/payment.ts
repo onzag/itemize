@@ -41,7 +41,6 @@ export const paymentTypesArr = ["invoice", "refund", "subscription-monthly", "su
  */
 export interface IPropertyDefinitionSupportedPaymentType {
   type: "invoice" | "refund" | "subscription-monthly" | "subscription-daily" | "subscription-yearly";
-  uuid: string;
   amount: number;
   currency: string;
   status: PaymentStatusType;
@@ -58,9 +57,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
   // are conditional due to the fact this goes to the client side as well
   gqlFields: {
     type: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    uuid: {
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
     amount: {
@@ -112,7 +108,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
     const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
     const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + argPrefixPlusId;
-    const paymentUUIDName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + argPrefixPlusId;
     const paymentTypeName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + argPrefixPlusId;
     const paymentStatusName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + argPrefixPlusId;
 
@@ -150,12 +145,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
       );
     }
 
-    if (typeof usefulArgs[paymentUUIDName] !== "undefined" && usefulArgs[paymentUUIDName] !== null) {
-      conditions.push(
-        propertyValue.uuid === usefulArgs[paymentUUIDName].uuid
-      );
-    }
-
     if (typeof usefulArgs[paymentTypeName] !== "undefined" && usefulArgs[paymentTypeName] !== null) {
       conditions.push(
         propertyValue.type === usefulArgs[paymentTypeName].type
@@ -175,16 +164,11 @@ const typeValue: IPropertyDefinitionSupportedType = {
     }
   },
   localEqual: (arg) => {
-    const a = arg.a as IPropertyDefinitionSupportedPaymentType;
-    const b = arg.b as IPropertyDefinitionSupportedPaymentType;
-
-    if (a === b) {
+    if (arg.a === null && arg.b === null) {
       return true;
-    } else if (a === null || b === null) {
-      return false;
     }
 
-    return a.uuid === b.uuid;
+    return false;
   },
   validate: (l: IPropertyDefinitionSupportedPaymentType, p) => {
     if (
@@ -192,7 +176,6 @@ const typeValue: IPropertyDefinitionSupportedType = {
       typeof l.currency !== "string" ||
       !paymentStatusesArr.includes(l.status) ||
       !paymentTypesArr.includes(l.type) ||
-      typeof l.uuid !== "string" ||
       (typeof l.metadata !== "string" && l.metadata !== null)
     ) {
       return PropertyInvalidReason.INVALID_VALUE;

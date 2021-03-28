@@ -78,10 +78,6 @@ export const PropertyDefinitionSearchInterfacesPrefixes = {
    * Used for payment status request
    */
   PAYMENT_STATUS: PREFIX_BUILD("PAYMENT_STATUS"),
-  /**
-   * Used for payment specific UUID
-   */
-  PAYMENT_UUID: PREFIX_BUILD("PAYMENT_UUID"),
 };
 
 /**

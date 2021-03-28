@@ -574,7 +574,7 @@ export class Cache {
     update: IGQLArgs,
     dictionary: string,
     currentRawValueSQL?: ISQLTableRowValue,
-  ) {
+  ): Promise<ISQLTableRowValue> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
       item;
@@ -585,7 +585,7 @@ export class Cache {
       itemDefinition,
       currentValue,
     );
-    await this.requestUpdate(
+    return await this.requestUpdate(
       itemDefinition,
       id,
       version,

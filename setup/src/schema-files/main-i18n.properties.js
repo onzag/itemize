@@ -149,6 +149,18 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
+payment.wait = waiting
+payment.paid = paid
+payment.disputed = disputed
+payment.refunded = refunded
+payment.active = active
+payment.inactive = inactive
+payment.invoice = invoice
+payment.refund = refund
+payment.subscription_monthly = monthly subscription
+payment.subscription_daily = daily subscription
+payment.subscription_yearly = yearly subscription
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -316,6 +328,18 @@ generic_info = info
 unsaved_changes = you have unsaved changes
 save = save
 discard = discard
+
+payment.wait = waiting
+payment.paid = paid
+payment.disputed = disputed
+payment.refunded = refunded
+payment.active = active
+payment.inactive = inactive
+payment.invoice = invoice
+payment.refund = refund
+payment.subscription_monthly = monthly subscription
+payment.subscription_daily = daily subscription
+payment.subscription_yearly = yearly subscription
 
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
@@ -485,6 +509,18 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
+payment.wait = waiting
+payment.paid = paid
+payment.disputed = disputed
+payment.refunded = refunded
+payment.active = active
+payment.inactive = inactive
+payment.invoice = invoice
+payment.refund = refund
+payment.subscription_monthly = monthly subscription
+payment.subscription_daily = daily subscription
+payment.subscription_yearly = yearly subscription
+
 error.INVALID_CREDENTIALS = invalid user or password
 error.BLOCKED = the item has been blocked
 error.NOT_FOUND = the item cannot be found
@@ -652,6 +688,18 @@ generic_info = info
 unsaved_changes = you have unsaved changes
 save = save
 discard = discard
+
+payment.wait = waiting
+payment.paid = paid
+payment.disputed = disputed
+payment.refunded = refunded
+payment.active = active
+payment.inactive = inactive
+payment.invoice = invoice
+payment.refund = refund
+payment.subscription_monthly = monthly subscription
+payment.subscription_daily = daily subscription
+payment.subscription_yearly = yearly subscription
 
 error.INVALID_CREDENTIALS = ungültiger Benutzer oder Password
 error.BLOCKED = der Artikel ist gesperrt
@@ -821,6 +869,18 @@ unsaved_changes = sus cambios no han sido guardados
 save = guardar
 discard = descartar
 
+payment.wait = en espera
+payment.paid = pagado
+payment.disputed = en dis
+payment.refunded = reembolsado
+payment.active = activo
+payment.inactive = inactivo
+payment.invoice = factura
+payment.refund = reembolso
+payment.subscription_monthly = subscripción mensual
+payment.subscription_daily = subscripción diaria
+payment.subscription_yearly = subscripción anual
+
 error.INVALID_CREDENTIALS = contraseña o usuario inválido
 error.BLOCKED = el item ha sido bloqueado
 error.NOT_FOUND = el item no existe
@@ -988,6 +1048,18 @@ generic_info = info
 unsaved_changes = you have unsaved changes
 save = save
 discard = discard
+
+payment.wait = waiting
+payment.paid = paid
+payment.disputed = disputed
+payment.refunded = refunded
+payment.active = active
+payment.inactive = inactive
+payment.invoice = invoice
+payment.refund = refund
+payment.subscription_monthly = monthly subscription
+payment.subscription_daily = daily subscription
+payment.subscription_yearly = yearly subscription
 
 error.INVALID_CREDENTIALS = مستخدم او كلمة سر غير صحيحة
 error.BLOCKED = المادة تم حظرها

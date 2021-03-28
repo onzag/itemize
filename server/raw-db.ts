@@ -455,6 +455,10 @@ export class ItemizeRawDB {
       // you only want to use set in these
       moduleTableUpdater?: (arg: SetBuilder) => void;
       itemTableUpdater?: (arg: SetBuilder) => void;
+      // does not inform for updates to other clusters
+      // or caches or anything at all, mantains last modified
+      // value
+      dangerousUseSilentMode?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -477,7 +481,9 @@ export class ItemizeRawDB {
     const moduleUpdateQuery = new UpdateBuilder();
     moduleUpdateQuery.table(moduleTable);
     // here we will update our last modified
-    moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    if (!updater.dangerousUseSilentMode) {
+      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    }
     if (updater.moduleTableUpdate) {
       moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
     }
@@ -534,10 +540,11 @@ export class ItemizeRawDB {
     // we got to get all rows, first we create a pseudo table
     // for our module
     const allRows = await this.databaseConnection.queryRows(withQuery);
-
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
-    await this.informRowsHaveBeenModified(result, true);
+    if (!updater.dangerousUseSilentMode) {
+      await this.informRowsHaveBeenModified(result, true);
+    }
 
     return result;
   }
@@ -561,6 +568,10 @@ export class ItemizeRawDB {
       // you only want to use set in these, not select not anything
       moduleTableUpdater?: (arg: SetBuilder) => void;
       itemTableUpdater?: (arg: SetBuilder) => void;
+      // does not inform for updates to other clusters
+      // or caches or anything at all, mantains last modified
+      // value
+      dangerousUseSilentMode?: boolean;
     }
   ): Promise<ISQLTableRowValue> {
     if (
@@ -583,7 +594,9 @@ export class ItemizeRawDB {
     const moduleUpdateQuery = new UpdateBuilder();
     moduleUpdateQuery.table(moduleTable);
     // here we will update our last modified
-    moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    if (!updater.dangerousUseSilentMode) {
+      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    }
     if (updater.moduleTableUpdate) {
       moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
     }
@@ -640,7 +653,9 @@ export class ItemizeRawDB {
       await this.databaseConnection.queryFirst(withQuery),
     );
 
-    await this.informRowsHaveBeenModified([sqlValue], true);
+    if (!updater.dangerousUseSilentMode) {
+      await this.informRowsHaveBeenModified([sqlValue], true);
+    }
 
     return sqlValue;
   }
