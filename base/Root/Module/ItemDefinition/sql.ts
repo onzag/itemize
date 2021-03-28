@@ -440,7 +440,7 @@ export function buildSQLQueryForItemDefinition(
         });
       });
 
-      //TODO add includes in the search
+      // TODO add includes in the search
     });
   }
 

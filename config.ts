@@ -215,9 +215,13 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   currencyFactors: any;
   /**
-   * The here maps api key, can be null, address search won't work
+   * The mapping search api key, can be null, address search won't work
    */
   locationSearch: any;
+  /**
+   * The payment configuration
+   */
+  payment: any;
   /**
    * The mail service information, api key what not
    */
@@ -340,6 +344,10 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
+    payment: {
+      type: ["object", "null"],
+      additionalProperties: {},
+    },
     mail: {
       type: ["object", "null"],
       additionalProperties: {},
@@ -397,6 +405,7 @@ export const rawSensitiveConfigSchema = {
     "userLocalization",
     "currencyFactors",
     "locationSearch",
+    "payment",
     "mail",
     "mailDomain",
     "mailStorage",

@@ -51,6 +51,7 @@ import { ICustomRoleType } from "./resolvers/roles";
 import { ItemizeRawDB } from "./raw-db";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { DatabaseConnection } from "../database";
+import PaymentProvider from "./services/base/PaymentProvider";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -160,6 +161,7 @@ export interface IAppDataType {
   customUserTokenQuery: any;
   logger: winston.Logger;
   mailService: MailProvider<any>;
+  paymentService: PaymentProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
   registry: RegistryService;
@@ -186,6 +188,7 @@ export interface IServiceCustomizationType {
   userLocalizationProvider?: IServiceProviderClassType<any>;
   currencyFactorsProvider?: IServiceProviderClassType<any>;
   locationSearchProvider?: IServiceProviderClassType<any>;
+  paymentProvider?: IServiceProviderClassType<any>;
   customServices?: {
     [name: string]: IServiceProviderClassType<any>,
   };
@@ -804,6 +807,20 @@ export async function initializeServer(
     const locationSearchService: LocationSearchProvider<any> = (sensitiveConfig.locationSearch ?
       new LocationSearchClass(sensitiveConfig.locationSearch, registry, config, sensitiveConfig) : null) as any;
 
+    if (sensitiveConfig.payment) {
+      logger.info(
+        "initializeServer: initializing payment service",
+      );
+    }
+
+    // TODOPAYMENT default stripe, use fake?
+    const PaymentClass = (serviceCustom && serviceCustom.paymentProvider) || null;
+    if (PaymentClass.getType() !== ServiceProviderType.LOCAL) {
+      throw new Error("The payment service class is not a local type, and that's not allowed");
+    }
+    const paymentService: PaymentProvider<any> = (sensitiveConfig.payment ?
+      new PaymentProvider(sensitiveConfig.payment, registry, config, sensitiveConfig) : null) as any;
+
     const customServices: {
       [name: string]: ServiceProvider<any>,
     } = {};
@@ -843,6 +860,8 @@ export async function initializeServer(
     const mailServiceClassTrigger = mailService && await MailServiceClass.getTriggerRegistry();
     const locationSearchServiceInstanceTrigger = locationSearchService && await locationSearchService.getTriggerRegistry();
     const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
+    const paymentServiceInstanceTrigger = paymentService && await paymentService.getTriggerRegistry();
+    const paymentServiceClassTrigger = paymentService && await PaymentClass.getTriggerRegistry();
     const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
     const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
     const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
@@ -858,6 +877,8 @@ export async function initializeServer(
       mailServiceClassTrigger,
       locationSearchServiceInstanceTrigger,
       locationSearchServiceClassTrigger,
+      paymentServiceInstanceTrigger,
+      paymentServiceClassTrigger,
     ].filter((r) => !!r);
 
     const appData: IAppDataType = {
@@ -887,6 +908,7 @@ export async function initializeServer(
       ),
       userLocalizationService,
       locationSearchService,
+      paymentService,
       mailService,
       storage: storageClients.cloudClients,
       logger,
@@ -911,6 +933,7 @@ export async function initializeServer(
     userLocalizationService && userLocalizationService.setupLocalResources(appData);
     mailService && mailService.setupLocalResources(appData);
     locationSearchService && locationSearchService.setupLocalResources(appData);
+    paymentService && paymentService.setupLocalResources(appData);
     storageClients.instancesUsed.forEach((i) => i.setupLocalResources(appData));
     customServicesInstances.forEach((i) => i.setupLocalResources(appData));
 
@@ -920,6 +943,7 @@ export async function initializeServer(
     userLocalizationService && await userLocalizationService.initialize();
     mailService && await mailService.initialize();
     locationSearchService && await locationSearchService.initialize();
+    paymentService && await paymentService.initialize();
     // the storage clients are a none type and initialize immediately
     await Promise.all(customServicesInstances.map((i) => i.initialize()));
 
@@ -929,6 +953,7 @@ export async function initializeServer(
     userLocalizationService && userLocalizationService.execute();
     mailService && mailService.execute();
     locationSearchService && locationSearchService.execute();
+    paymentService && paymentService.execute();
     storageClients.instancesUsed.forEach((i) => i.execute());
     customServicesInstances.forEach((i) => i.execute());
 
@@ -941,6 +966,8 @@ export async function initializeServer(
     const mailServiceClassRouter = mailService && await MailServiceClass.getRouter(appData);
     const locationSearchServiceInstanceRouter = locationSearchService && await locationSearchService.getRouter(appData);
     const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
+    const paymentServiceInstanceRouter = paymentService && await paymentService.getRouter(appData);
+    const paymentServiceClassRouter = paymentService && await PaymentClass.getRouter(appData);
     const instanceRouters = await Promise.all(storageClients.instancesUsed.map((i) => i.getRouter(appData)));
     const classRouters = await Promise.all(storageClients.classesUsed.map((c) => c.getRouter(appData)));
     const instaceRoutersCustom = await Promise.all(customServicesInstances.map((i) => i.getRouter(appData)));
@@ -956,6 +983,8 @@ export async function initializeServer(
       mailServiceClassRouter,
       locationSearchServiceInstanceRouter,
       locationSearchServiceClassRouter,
+      paymentServiceInstanceRouter,
+      paymentServiceClassRouter,
     ].filter((r) => !!r);
 
     logger.info(

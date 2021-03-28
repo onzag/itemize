@@ -109,6 +109,24 @@ export async function sensitiveConfigSetup(
         preferUnfilled: true,
         cantRerun: true,
       },
+      // TODOPAYMENT what do we need here
+      {
+        variableName: "payment",
+        message: "The API configuration used to process payments",
+        type: "config",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "apiKey",
+            message: "The api key given",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
       {
         variableName: "mail",
         message: "The configuration used by the email service provider by default itemize will use the " +
