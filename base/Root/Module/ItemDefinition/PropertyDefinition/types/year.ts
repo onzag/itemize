@@ -41,7 +41,7 @@ export type PropertyDefinitionSupportedYearType = number;
 /**
  * The type describes how the year type behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYearType> = {
   gql: GraphQLInt,
   // years can be set as a number
   json: "number",

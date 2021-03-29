@@ -40,7 +40,7 @@ export interface IPropertyDefinitionSupportedUnitType {
 /**
  * The description of the unit type as it behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUnitType> = {
   gql: "PROPERTY_TYPE__Unit",
   gqlFields: {
     value: {

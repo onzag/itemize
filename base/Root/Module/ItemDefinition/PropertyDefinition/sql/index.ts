@@ -120,7 +120,7 @@ export function stardardSQLInWithJSONStringifyFn(arg: ISQLInInfo): ISQLTableRowV
  * @param arg the out arg info
  * @returns the property value out
  */
-export function standardSQLOutFn(arg: ISQLOutInfo): PropertyDefinitionSupportedType {
+export function standardSQLOutFn(arg: ISQLOutInfo): any {
   return arg.row[arg.prefix + arg.id];
 }
 
@@ -130,7 +130,7 @@ export function standardSQLOutFn(arg: ISQLOutInfo): PropertyDefinitionSupportedT
  * @param arg the sql out info arg
  * @returns the supported type json parsed
  */
-export function standardSQLOutWithJSONParseFn(arg: ISQLOutInfo): PropertyDefinitionSupportedType {
+export function standardSQLOutWithJSONParseFn(arg: ISQLOutInfo): any {
   if (arg.row[arg.prefix + arg.id] === null) {
     return null;
   }

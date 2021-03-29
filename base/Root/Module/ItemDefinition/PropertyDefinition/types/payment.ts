@@ -21,7 +21,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual } from "../sql/payment";
+import { paymentGQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual } from "../sql/payment";
 import { currencies } from "../../../../../../imported-resources";
 
 export enum PaymentStatusType {
@@ -50,7 +50,7 @@ export interface IPropertyDefinitionSupportedPaymentType {
 /**
  * The type of a curreny type specifies how it behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPaymentType> = {
   // the graphql is a new type
   gql: "PROPERTY_TYPE__Payment",
   // it contains the following fields, note how they
@@ -90,6 +90,7 @@ const typeValue: IPropertyDefinitionSupportedType = {
   sqlMantenience: null,
   sqlEqual: paymentSQLEqual,
   sqlSSCacheEqual: paymentSQLSSCacheEqual,
+  gqlSideEffect: paymentGQLSideEffect,
 
   // local order by used in the cached searches
   localOrderBy: null,

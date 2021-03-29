@@ -81,7 +81,7 @@ export interface IPaymentUniqueLocation {
 
 type PaymentListeners = Record<PaymentEvent, PaymentEventListener[]>;
 
-const statusToEvents: Record<PaymentStatusType, PaymentEvent> = {
+export const statusToEvents: Record<PaymentStatusType, PaymentEvent> = {
   [PaymentStatusType.ACTIVE]: PaymentEvent.ACTIVE,
   [PaymentStatusType.INACTIVE]: PaymentEvent.INACTIVE,
   [PaymentStatusType.DISPUTED]: PaymentEvent.DISPUTED,

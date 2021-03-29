@@ -31,7 +31,7 @@ export type PropertyDefinitionSupportedTextType = string;
 /**
  * The type describes how the text type behaves in the app, this includes rich text
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTextType> = {
   gql: GraphQLString,
   nullableDefault: "",
   supportedSubtypes: ["html", "plain"],

@@ -42,7 +42,7 @@ export type PropertyDefinitionSupportedDateTimeType = string;
 /**
  * The behaviour of a datetime as how it behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDateTimeType> = {
   gql: GraphQLString,
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,

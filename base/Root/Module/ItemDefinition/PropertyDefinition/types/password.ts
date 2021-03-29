@@ -19,7 +19,7 @@ export type PropertyDefinitionSupportedPasswordType = string;
 /**
  * The behaviour of passwords is specified by this type
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPasswordType> = {
   gql: GraphQLString,
   nullableDefault: "",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", "pgcrypto"),

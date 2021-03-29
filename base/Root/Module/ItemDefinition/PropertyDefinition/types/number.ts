@@ -42,7 +42,7 @@ export type PropertyDefinitionSupportedNumberType = number;
 /**
  * The type of the number describe how numbers behave in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedNumberType> = {
   // a number is just a number can be integer or decimal
   json: "number",
   gql: GraphQLFloat,

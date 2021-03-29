@@ -40,7 +40,7 @@ export type PropertyDefinitionSupportedIntegerType = number;
 /**
  * The type defines the behaviour of integers in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedIntegerType> = {
   // an integer is represented as a number
   json: "number",
   gql: GraphQLInt,

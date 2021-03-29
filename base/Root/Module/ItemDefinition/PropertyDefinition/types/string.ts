@@ -70,7 +70,7 @@ export const exactStringSearchSubtypes = [
 /**
  * The behaviour of strings is described by this type
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStringType> = {
   gql: GraphQLString,
   // a string is a string
   json: "string",

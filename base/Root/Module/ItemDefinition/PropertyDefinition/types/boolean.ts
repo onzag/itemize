@@ -30,7 +30,7 @@ export type PropertyDefinitionSupportedBooleanType = boolean;
 /**
  * The that specifies how a boolean behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBooleanType> = {
   // a boolean type can be written as a boolean
   json: "boolean",
   gql: GraphQLBoolean,

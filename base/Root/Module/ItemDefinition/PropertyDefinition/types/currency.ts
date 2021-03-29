@@ -35,7 +35,7 @@ export interface IPropertyDefinitionSupportedCurrencyType {
 /**
  * The type of a curreny type specifies how it behaves in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCurrencyType> = {
   // the graphql is a new type
   gql: "PROPERTY_TYPE__Currency",
   // it contains the following fields, note how they

@@ -10,7 +10,6 @@ import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { IPropertyDefinitionSupportedUnitType } from "./unit";
 import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual, locationSQLBtreeIndexable, locationSQLSelect } from "../sql/location";
 
 /**
@@ -64,7 +63,7 @@ export interface IPropertyDefinitionSupportedLocationType {
 /**
  * The type describes the behaviour of the location in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLocationType> = {
   gql: "PROPERTY_TYPE__Location",
   gqlFields: {
     lng: {

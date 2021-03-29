@@ -4,10 +4,11 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";
-import { IPropertyDefinitionSupportedPaymentType } from "../types/payment";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, IGQLSideEffectType } from "../types";
+import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
+import { IPaymentUniqueLocation, PaymentEvent, statusToEvents } from "../../../../../../server/services/base/PaymentProvider";
 
 /**
  * the sql function that setups the fields for the payment element
@@ -73,7 +74,7 @@ export function paymentSQLIn(arg: ISQLInInfo) {
     [arg.prefix + arg.id + "_AMOUNT"]: value.amount,
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_STATUS"]: value.status,
-    [arg.prefix + arg.id + "_METADATA"]: value.metadata || null,
+    [arg.prefix + arg.id + "_METADATA"]: value.metadata || null,
   };
 }
 
@@ -132,7 +133,7 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
     const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", ">=", fromArg.value);
-    arg.whereBuilder.andWhereColumn(argPrefixPlusId+ "_CURRENCY", fromArg.currency);
+    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", fromArg.currency);
     searchedByIt = true;
   }
 
@@ -192,4 +193,81 @@ export function paymentSQLSSCacheEqual(arg: ISQLSSCacheEqualInfo) {
     return arg.row[arg.prefix + arg.id + "_AMOUNT"] === null;
   }
   return false;
+}
+
+/**
+ * Provides a side effect that triggers once a payment status changes, it's created, destroyed
+ * or comes into existance, this is the standard type server side effect that occurs when
+ * graphql does things to it, and this will trigger what is necessary to  it
+ * @param arg 
+ */
+export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
+  // we only care if the value is different on its own
+  // this is a cheap check
+  if (arg.originalValue !== arg.newValue) {
+
+    // now let's build these fields
+    let ev: PaymentEvent;
+    let originalStatus: PaymentStatusType;
+    let newStatus: PaymentStatusType;
+
+    // we have a new value but no original (aka it was created)
+    // this could be by many things, either the endpoint add was used
+    // or it was created on its own
+    if (arg.newValue && !arg.originalValue) {
+      ev = PaymentEvent.CREATED;
+      originalStatus = null;
+      newStatus = arg.newValue.status;
+
+    // we have no payment object now but there used to be
+    // one originally aka it was destroyed, either by a modification
+    // or by a delete action
+    } else if (arg.originalValue && !arg.newValue) {
+      ev = PaymentEvent.DESTROYED;
+      originalStatus = arg.originalValue.status;
+      newStatus = null;
+
+    // the status differ from each other
+    } else if (arg.newValue.status !== arg.originalValue.status) {
+      ev = statusToEvents[arg.newValue.status];
+      originalStatus = arg.originalValue.status;
+      newStatus = arg.newValue.status;
+    } else {
+      // something odd, maybe other changes, the value, etc...
+      return;
+    }
+
+    // let's grab the hidden metadata based on the new row value
+    const hiddenMetadataRow = paymentSQLHiddenMetadataRow(arg.prefix, arg.id);
+    const hiddenMetadataValue = arg.newRowValue[hiddenMetadataRow] as string;
+
+    // our module
+    const mod = arg.itemDefinition.getParentModule();
+    // now we can trigger the event
+    arg.appData.paymentService.triggerEvent(
+      ev,
+      arg.newValue,
+      hiddenMetadataValue,
+
+      // we need to build all this complex object for the event
+      {
+        item: arg.itemDefinition,
+        module: mod,
+        originalMetadata: arg.originalValue && arg.originalValue.metadata,
+        originalSQLData: arg.originalRowValue,
+        originalStatus,
+        property: arg.property,
+        uuid: arg.appData.paymentService.getUUIDFor({
+          version: arg.rowVersion,
+          id: arg.rowId,
+          item: arg.itemDefinition,
+          module: mod,
+          property: arg.property,
+          include: arg.include,
+        } as IPaymentUniqueLocation),
+        version: arg.rowVersion,
+        id: arg.rowId,
+      }
+    );
+  }
 }

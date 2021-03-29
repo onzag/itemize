@@ -42,7 +42,7 @@ export type PropertyDefinitionSupportedTimeType = string;
 /**
  * The behaviour of the time is described by this type
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTimeType> = {
   gql: GraphQLString,
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,

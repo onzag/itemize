@@ -1214,7 +1214,7 @@ export default class ItemDefinition {
     version: string,
     emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
-    onlyIncludeIncludes?: {[include: string]: string[]},
+    onlyIncludeIncludes?: { [include: string]: string[] },
     excludePolicies?: boolean,
   ): IItemStateType {
     const properties = onlyIncludeProperties ?
@@ -1284,7 +1284,7 @@ export default class ItemDefinition {
     id: string,
     version: string,
     onlyIncludeProperties?: string[],
-    onlyIncludeIncludes?: {[include: string]: string[]},
+    onlyIncludeIncludes?: { [include: string]: string[] },
     excludePolicies?: boolean,
   ): Promise<IItemStateType> {
     const properties = await Promise.all(onlyIncludeProperties ?
@@ -2477,5 +2477,30 @@ export default class ItemDefinition {
    */
   public isOwnerObjectId() {
     return this.rawData.ownerIsObjectId || false;
+  }
+
+  /**
+   * Provides all the properties that hold a side effect into them
+   */
+  public getAllSideEffectedProperties(): Array<{ property: PropertyDefinition, include: Include }> {
+    let result: Array<{ property: PropertyDefinition, include: Include }> = this.getAllPropertyDefinitionsAndExtensions().filter((d) => {
+      return d.getPropertyDefinitionDescription().gqlSideEffect;
+    }).map((r) => ({
+      property: r,
+      include: null,
+    }));
+
+    this.getAllIncludes().forEach((i) => {
+      result = result.concat(
+        i.getSinkingProperties().filter((d) => {
+          return d.getPropertyDefinitionDescription().gqlSideEffect;
+        }).map((r) => ({
+          property: r,
+          include: i,
+        }))
+      );
+    });
+
+    return result;
   }
 }

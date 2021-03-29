@@ -24,7 +24,7 @@ export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedS
 /**
  * The type value represents the behaviour of files in the app
  */
-const typeValue: IPropertyDefinitionSupportedType = {
+const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFilesType> = {
   gql: "PROPERTY_TYPE__Files",
   gqlFields: {},
   gqlAddFileToFields: true,

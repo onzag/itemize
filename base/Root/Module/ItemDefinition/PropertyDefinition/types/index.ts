@@ -31,6 +31,7 @@ import file, { PropertyDefinitionSupportedFileType } from "./file";
 import ItemDefinition from "../..";
 import Include from "../../Include";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
+import type { IAppDataType } from "../../../../../../server";
 
 /**
  * All the supported property types
@@ -125,16 +126,16 @@ export interface ILocalStrSearchInfo extends IArgInfo {
   gqlValue: IGQLValue;
 }
 
-export interface ILocalEqualInfo extends IArgInfo {
-  a: PropertyDefinitionSupportedType;
-  b: PropertyDefinitionSupportedType;
+export interface ILocalEqualInfo<T> extends IArgInfo {
+  a: T;
+  b: T;
 }
 
-export interface ILocalOrderByInfo extends IArgInfo {
+export interface ILocalOrderByInfo<T> extends IArgInfo {
   direction: "asc" | "desc";
   nulls: "first" | "last";
-  a: PropertyDefinitionSupportedType;
-  b: PropertyDefinitionSupportedType;
+  a: T;
+  b: T;
 }
 
 export interface ISQLMantenienceType {
@@ -146,10 +147,20 @@ export interface ISQLMantenienceType {
   updateConditionRaw: [string, any[]],
 }
 
+export interface IGQLSideEffectType<T> extends IArgInfo {
+  appData: IAppDataType;
+  originalValue: T;
+  newValue: T;
+  rowId: string;
+  rowVersion: string;
+  newRowValue: ISQLTableRowValue;
+  originalRowValue: ISQLTableRowValue;
+}
+
 /**
  * How every supported type behaviour should be described
  */
-export interface IPropertyDefinitionSupportedType {
+export interface IPropertyDefinitionSupportedType<T> {
   /**
    * json represents how the element is represented in json form
    * objects are not allowed only boolean numbers and strings are
@@ -212,7 +223,7 @@ export interface IPropertyDefinitionSupportedType {
    * retrieval of that data; by default this function takes the table and does
    * data[property_id]
    */
-  sqlOut: (arg: ISQLOutInfo) => PropertyDefinitionSupportedType;
+  sqlOut: (arg: ISQLOutInfo) => T;
   /**
    * Represents a search for an item
    * data is the graphql value obtained from the search query mode item definition
@@ -263,7 +274,7 @@ export interface IPropertyDefinitionSupportedType {
    * is used for differing properties so it might differ
    * from the sql behaviour
    */
-  localEqual: (arg: ILocalEqualInfo) => boolean;
+  localEqual: (arg: ILocalEqualInfo<T>) => boolean;
   /**
    * The SQL order by function that tells the database how to order
    * by certain criteria, make it null to specify that this item can't
@@ -276,7 +287,7 @@ export interface IPropertyDefinitionSupportedType {
    * work locally, except a direction is specified, make it null to specify
    * the item can't be sorted by
    */
-  localOrderBy: (arg: ILocalOrderByInfo) => number,
+  localOrderBy: (arg: ILocalOrderByInfo<T>) => number,
   /**
    * SQL Row mantenience which runs every so often as defined
    * by the mantenience protocol where row is the entire row
@@ -284,6 +295,12 @@ export interface IPropertyDefinitionSupportedType {
    * for fields without mantenience
    */
   sqlMantenience: (arg: ISQLArgInfo) => ISQLMantenienceType;
+
+  /**
+   * Allows to specify side effects that occur on the server side
+   * once the type has been modified via the graphql endpoints
+   */
+  gqlSideEffect?: (arg: IGQLSideEffectType<T>) => void;
 
   /**
    * represents an item that would mark for null
@@ -295,7 +312,7 @@ export interface IPropertyDefinitionSupportedType {
    * this is a validation function that checks whether the value
    * is valid,
    */
-  validate?: (value: PropertyDefinitionSupportedType, p: IPropertyDefinitionRawJSONDataType) => PropertyInvalidReason;
+  validate?: (value: T, p: IPropertyDefinitionRawJSONDataType) => PropertyInvalidReason;
   /**
    * whether it is searchable or not
    */
@@ -358,7 +375,7 @@ export interface IPropertyDefinitionSupportedType {
  * how they are supposed to be managed
  */
 export type PropertyDefinitionSupportedTypesStandardType =
-Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType>;
+Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType<PropertyDefinitionSupportedType>>;
 
 /**
  * The standard definition and registry of all types in itemize
@@ -385,7 +402,7 @@ const supportedTypesStandard: PropertyDefinitionSupportedTypesStandardType = {
 // Checking that the property descriptions are right
 Object.keys(supportedTypesStandard).forEach((propDefKey) => {
   // we loop over each one of them
-  const propDef: IPropertyDefinitionSupportedType = supportedTypesStandard[propDefKey];
+  const propDef: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedType> = supportedTypesStandard[propDefKey];
   // if it's not searchable, but we provide requests for search i18n data
   if (!propDef.searchable &&
     (propDef.i18n.searchBase || propDef.i18n.searchOptional ||

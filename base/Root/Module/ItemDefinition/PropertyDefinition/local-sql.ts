@@ -8,7 +8,7 @@
  * @module
  */
 
-import { ISQLSSCacheEqualInfo, ILocalEqualInfo } from "./types";
+import { ISQLSSCacheEqualInfo, ILocalEqualInfo, PropertyDefinitionSupportedType } from "./types";
 import equals from "deep-equal";
 
 /**
@@ -29,6 +29,6 @@ export function standardSQLSSCacheEqualFn(arg: ISQLSSCacheEqualInfo): boolean {
  * @param arg the local information
  * @returns a boolean on whether it equals or not
  */
-export function standardLocalEqual(arg: ILocalEqualInfo): boolean {
+export function standardLocalEqual(arg: ILocalEqualInfo<PropertyDefinitionSupportedType>): boolean {
   return equals(arg.a, arg.b);
 }
