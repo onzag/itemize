@@ -3,7 +3,8 @@
  * @module
  */
 
-import { IAppDataType, logger } from ".";
+import { IAppDataType } from ".";
+import { logger } from "./logger";
 import express from "express";
 import path from "path";
 import Module from "../base/Root/Module";

@@ -16,7 +16,7 @@ import { runImageConversions } from "./image-conversions";
 import { IGQLFile } from "../../../../../../gql-querier";
 import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
-import { logger } from "../../../../../../server";
+import { logger } from "../../../../../../server/logger";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 

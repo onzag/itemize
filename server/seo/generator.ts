@@ -6,7 +6,7 @@
 
 import { ISEORuleSet, ISEORule, ISEOCollectedResult, ISEOCollectedData, ISEOParametrizer } from ".";
 import https from "https";
-import { logger } from "../index";
+import { logger } from "../logger";
 import { ISitemapJSONType, ISitemapLastQueryType, toXML } from "./sitemaps";
 import Root from "../../base/Root";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";

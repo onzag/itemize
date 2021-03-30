@@ -1,14 +1,16 @@
-import { IAppDataType, logger } from "..";
-import express from "express";
-import { ITriggerRegistry } from "../resolvers/triggers";
-import { RegistryService } from "./registry";
-import { ItemizeRedisClient } from "../redis";
-import Root from "../../base/Root";
+import type { ITriggerRegistry } from "../resolvers/triggers";
+import type { RegistryService } from "./registry";
+import type { ItemizeRedisClient } from "../redis";
+import type MailProvider from "./base/MailProvider";
+import type Root from "../../base/Root";
+import type { DatabaseConnection } from "../../database";
+
 import { ItemizeRawDB } from "../raw-db";
-import MailProvider from "./base/MailProvider";
+import { IAppDataType } from "..";
+import { logger } from "../logger";
+import express from "express";
 import { IConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
-import { DatabaseConnection } from "../../database";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");

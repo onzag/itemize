@@ -1,4 +1,5 @@
-import { IAppDataType, logger } from "..";
+import { IAppDataType } from "..";
+import { logger } from "../logger";
 import { Router } from "express";
 import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";

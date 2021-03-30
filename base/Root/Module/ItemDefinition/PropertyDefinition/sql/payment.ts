@@ -8,7 +8,18 @@ import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexabl
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
-import { IPaymentUniqueLocation, PaymentEvent, statusToEvents } from "../../../../../../server/services/base/PaymentProvider";
+
+// based on the payment provider status to event
+// need to clone it because of circular dependencies
+// as usual
+const statusToEvents = {
+  "active": "ACTIVE",
+  "inactive": "INACTIVE",
+  "disputed": "DISPUTED",
+  "paid": "PAID",
+  "refunded": "REFUNDED",
+  "wait": "WAIT",
+}
 
 /**
  * the sql function that setups the fields for the payment element
@@ -207,7 +218,7 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
   if (arg.originalValue !== arg.newValue) {
 
     // now let's build these fields
-    let ev: PaymentEvent;
+    let ev: any;
     let originalStatus: PaymentStatusType;
     let newStatus: PaymentStatusType;
 
@@ -215,7 +226,7 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
     // this could be by many things, either the endpoint add was used
     // or it was created on its own
     if (arg.newValue && !arg.originalValue) {
-      ev = PaymentEvent.CREATED;
+      ev = "CREATED";
       originalStatus = null;
       newStatus = arg.newValue.status;
 
@@ -223,7 +234,7 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
     // one originally aka it was destroyed, either by a modification
     // or by a delete action
     } else if (arg.originalValue && !arg.newValue) {
-      ev = PaymentEvent.DESTROYED;
+      ev = "DESTROYED";
       originalStatus = arg.originalValue.status;
       newStatus = null;
 
@@ -264,7 +275,7 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
           module: mod,
           property: arg.property,
           include: arg.include,
-        } as IPaymentUniqueLocation),
+        } as any),
         version: arg.rowVersion,
         id: arg.rowId,
       }

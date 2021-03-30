@@ -1,4 +1,5 @@
-import { IAppDataType, logger } from "../../../server";
+import { IAppDataType } from "../../../server";
+import { logger } from "../../logger";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Module from "../../../base/Root/Module";
 import {

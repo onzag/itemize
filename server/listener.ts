@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { Cache } from "./cache";
 import { Server } from "http";
-import Root, { ICustomRoleManager } from "../base/Root";
+import Root from "../base/Root";
 import ioMain from "socket.io";
 import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
@@ -53,7 +53,7 @@ import {
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
-import { logger } from ".";
+import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
   UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER

@@ -2,7 +2,7 @@ import { ITriggerRegistry, IOTriggerActions } from "../resolvers/triggers";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, ENDPOINT_ERRORS, PROTECTED_USERNAMES } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { logger } from "../";
+import { logger } from "../logger";
 
 export const customUserTriggers: ITriggerRegistry = {
   item: {

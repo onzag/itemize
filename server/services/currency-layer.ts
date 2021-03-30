@@ -1,7 +1,7 @@
 import http from "http";
 import https from "https";
 import { ServiceProviderType } from ".";
-import { logger } from "../";
+import { logger } from "../logger";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
 import CurrencyFactorsProvider, { ICurrencyFactors } from "./base/CurrencyFactorsProvider";
 

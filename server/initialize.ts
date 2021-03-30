@@ -5,7 +5,8 @@
  * @module
  */
 
-import { IAppDataType, IServerCustomizationDataType, logger, app } from ".";
+import { IAppDataType, IServerCustomizationDataType, app } from ".";
+import { logger } from "./logger";
 import express from "express";
 import graphqlHTTP from "express-graphql";
 import path from "path";

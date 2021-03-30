@@ -1,7 +1,8 @@
 import Root from "../base/Root";
 import Module from "../base/Root/Module";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
-import { logger, IServerDataType } from ".";
+import { IServerDataType } from ".";
+import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_DATA_MIN_UPDATE_TIME, CURRENCY_FACTORS_IDENTIFIER,
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, UNSPECIFIED_OWNER, SERVER_MAPPING_TIME

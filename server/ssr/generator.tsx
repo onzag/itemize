@@ -4,7 +4,8 @@
  * @module
  */
 
-import { IAppDataType, logger } from "..";
+import { IAppDataType } from "..";
+import { logger } from "../logger";
 import React from "react";
 import express from "express";
 import { ISSRRule } from ".";

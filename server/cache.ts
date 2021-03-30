@@ -23,7 +23,8 @@ import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefi
 import { IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
-import { logger, IServerDataType, IAppDataType } from ".";
+import { IServerDataType, IAppDataType } from ".";
+import { logger } from "./logger";
 import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";

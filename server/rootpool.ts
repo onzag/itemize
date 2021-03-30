@@ -7,7 +7,7 @@
 
 import { Pool } from "tarn";
 import Root, { IRootRawJSONDataType } from "../base/Root";
-import { logger } from ".";
+import { logger } from "./logger";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display

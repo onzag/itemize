@@ -20,9 +20,8 @@ import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
+import type winston from "winston";
 
-import winston from "winston";
-import "winston-daily-rotate-file";
 import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
 import { IRendererContext } from "../client/providers/renderer";
@@ -52,6 +51,7 @@ import { ItemizeRawDB } from "./raw-db";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { DatabaseConnection } from "../database";
 import PaymentProvider from "./services/base/PaymentProvider";
+import { logger } from "./logger";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -68,37 +68,11 @@ try {
 
 // get the environment in order to be able to set it up
 const NODE_ENV = process.env.NODE_ENV;
-const LOG_LEVEL = process.env.LOG_LEVEL;
 const PORT = process.env.PORT || 8000;
 const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
 const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
-
-// building the logger
-export const logger: winston.Logger = (
-  INSTANCE_MODE === "BUILD_DATABASE" ||
-  INSTANCE_MODE === "LOAD_DATABASE_DUMP"
-) ? null : winston.createLogger({
-  level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
-  transports: [
-    new winston.transports.DailyRotateFile({ filename: `logs/error.${INSTANCE_MODE}.log`, level: "error" }),
-    new winston.transports.DailyRotateFile({ filename: `logs/info.${INSTANCE_MODE}.log`, level: "info" })
-  ]
-});
-
-// if not production add a console.log
-if (NODE_ENV !== "production" && logger) {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple()
-    })
-  );
-}
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data but we don't want it

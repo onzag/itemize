@@ -13,7 +13,8 @@ import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefin
 import Module from "../../base/Root/Module";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
-import { IAppDataType, logger } from "..";
+import { IAppDataType } from "..";
+import { logger } from "../logger";
 import equals from "deep-equal";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { jwtVerify } from "../token";

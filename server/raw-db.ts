@@ -10,7 +10,7 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
-import { logger } from ".";
+import { logger } from "./logger";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";

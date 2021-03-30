@@ -1,4 +1,5 @@
-import { IAppDataType, logger } from "..";
+import { IAppDataType } from "..";
+import { logger } from "../logger";
 import { IGQLQueryFieldsDefinitionType } from "../../base/Root/gql";
 import { GraphQLString, GraphQLNonNull } from "graphql";
 import {

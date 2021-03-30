@@ -4,7 +4,8 @@
  * @module
  */
 
-import { IAppDataType, logger } from "../../";
+import { IAppDataType } from "../../";
+import { logger } from "../../logger";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import {

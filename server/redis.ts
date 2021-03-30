@@ -6,7 +6,7 @@
 
 import { ISingleRedisConfigRawJSONDataType } from "../config";
 import redis, { RedisClient } from "redis";
-import { logger } from "."
+import { logger } from "./logger";
 import { promisify } from "util";
 
 /**

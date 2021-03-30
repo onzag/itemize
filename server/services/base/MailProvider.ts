@@ -7,7 +7,7 @@
  * @module
  */
 
-import { logger } from "../..";
+import { logger } from "../../logger";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";

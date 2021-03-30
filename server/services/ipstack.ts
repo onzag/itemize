@@ -1,7 +1,7 @@
 import http from "http";
 import https from "https";
 import { countries } from "../../imported-resources";
-import { logger } from "../";
+import { logger } from "../logger";
 import UserLocalizationProvider, { IUserLocalizationType } from "./base/UserLocalizationProvider";
 import { ServiceProviderType } from ".";
 

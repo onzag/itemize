@@ -1,4 +1,4 @@
-import { IGQLValue, IGQLArgs } from "../../gql-querier";
+import { IGQLValue } from "../../gql-querier";
 import Module from "../../base/Root/Module";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
