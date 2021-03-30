@@ -38,7 +38,6 @@ import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
-import { convertSQLValueToGQLValueForProperty } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -540,47 +539,6 @@ export async function addItemDefinition(
 
   pooledRoot.cleanState();
   appData.rootPool.release(pooledRoot);
-
-  // Execute side effects of modification according
-  // to the given side effected types
-  (async () => {
-    // let's find all of them
-    const sideEffected = itemDefinition.getAllSideEffectedProperties();
-    // looop into them
-    sideEffected.forEach((sideEffectedProperty) => {
-      const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
-      const sideEffectFn = description.gqlSideEffect;
-
-      // now we can get this new value
-      const newValue = convertSQLValueToGQLValueForProperty(
-        appData.cache.getServerData(),
-        itemDefinition,
-        sideEffectedProperty.include,
-        sideEffectedProperty.property,
-        value,
-      ) as any;
-
-      // and try to execute
-      try {
-        sideEffectFn({
-          appData,
-          id: sideEffectedProperty.property.getId(),
-          itemDefinition,
-          newRowValue: value,
-          originalValue: null,
-          originalRowValue: null,
-          prefix: sideEffectedProperty.include ? sideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
-          property: sideEffectedProperty.property,
-          newValue,
-          rowId: value.id,
-          rowVersion: value.version,
-          include: sideEffectedProperty.include,
-        });
-      } catch (err) {
-        // TODOPAYMENT log error from side effect
-      }
-    });
-  })();
 
   // items that have just been added cannot be blocked or deleted, hence we just return
   // right away without checking

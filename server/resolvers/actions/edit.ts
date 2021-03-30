@@ -342,6 +342,7 @@ export async function editItemDefinition(
     resolverArgs.args.id,
     resolverArgs.args.version || null,
     gqlValueToConvert,
+    wholeSqlStoredValue,
     currentWholeValueAsGQL,
     tokenData.id,
     dictionary,

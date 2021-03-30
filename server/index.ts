@@ -920,6 +920,9 @@ export async function initializeServer(
       customUserTokenQuery: null,
     };
 
+    // inform the cache about this app data
+    cache.setAppData(appData);
+
     // we setup the index checker now that we have the server data
     PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, appData);
 

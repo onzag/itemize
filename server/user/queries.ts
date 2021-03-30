@@ -788,17 +788,13 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         try {
-          await appData.cache.requestUpdate(
+          await appData.cache.requestUpdateSimple(
             userIdef,
             decoded.resetPasswordUserId,
             null,
             {
               password: args.new_password,
             },
-            null,
-            null,
-            null,
-            null,
             null,
           );
         } catch (err) {

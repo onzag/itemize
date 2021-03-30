@@ -111,17 +111,13 @@ export function userRestServices(appData: IAppDataType) {
     }
 
     try {
-      await appData.cache.requestUpdate(
+      await appData.cache.requestUpdateSimple(
         userIdef,
         decoded.validateUserId,
         null,
         {
           e_validated: true,
         },
-        null,
-        null,
-        null,
-        null,
         null,
       );
     } catch (err) {
@@ -356,17 +352,13 @@ export function userRestServices(appData: IAppDataType) {
 
     // now we are going to toggle the property
     try {
-      await appData.cache.requestUpdate(
+      await appData.cache.requestUpdateSimple(
         userIdef,
         tokenData.unsubscribeUserId,
         null,
         {
           [tokenData.unsubscribeProperty]: false,
         },
-        null,
-        null,
-        null,
-        null,
         null,
       );
     } catch (err) {

@@ -23,7 +23,7 @@ import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefi
 import { IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
-import { logger, IServerDataType } from ".";
+import { logger, IServerDataType, IAppDataType } from ".";
 import { jwtSign } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
@@ -34,6 +34,7 @@ import { IManyValueType } from "../database/base";
 import { WithBuilder } from "../database/WithBuilder";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
+import { convertSQLValueToGQLValueForProperty } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -64,6 +65,7 @@ export class Cache {
       value: ISQLTableRowValue
     };
   } = {};
+  private appData: IAppDataType;
 
   /**
    * Builds a new cache instance, before the cache is ready
@@ -555,6 +557,57 @@ export class Cache {
       );
     })();
 
+    // Execute side effects of modification according
+    // to the given side effected types
+    (async () => {
+      // let's find all of them
+      const sideEffected = itemDefinition.getAllSideEffectedProperties();
+      // looop into them
+      sideEffected.forEach((sideEffectedProperty) => {
+        const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
+        const sideEffectFn = description.gqlSideEffect;
+
+        // now we can get this new value
+        const newValue = convertSQLValueToGQLValueForProperty(
+          this.getServerData(),
+          itemDefinition,
+          sideEffectedProperty.include,
+          sideEffectedProperty.property,
+          sqlValue,
+        ) as any;
+
+        // and try to execute
+        try {
+          sideEffectFn({
+            appData: this.appData,
+            id: sideEffectedProperty.property.getId(),
+            itemDefinition,
+            newRowValue: sqlValue,
+            originalValue: null,
+            originalRowValue: null,
+            prefix: sideEffectedProperty.include ? sideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
+            property: sideEffectedProperty.property,
+            newValue,
+            rowId: sqlValue.id,
+            rowVersion: sqlValue.version,
+            include: sideEffectedProperty.include,
+          });
+        } catch (err) {
+          logger.error(
+            "Cache.requestCreation (detached) [SERIOUS]: could not execute side effect function",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              selfTable,
+              moduleTable,
+              forId,
+              version,
+            }
+          );
+        }
+      });
+    })();
+
     return sqlValue;
   }
 
@@ -590,6 +643,7 @@ export class Cache {
       id,
       version,
       update,
+      currentValue,
       currentValueAsGQL,
       null,
       dictionary,
@@ -605,6 +659,7 @@ export class Cache {
    * @param id the id to update
    * @param version the version of that id to update
    * @param update the update in question (partial values are allowed)
+   * @param currentSQLValue the same value but as the raw row
    * @param currentValue a current value as graphql, the current value can be requested from the
    * cache itself, and then converted into graphql, but this is expensive, while for the edit process
    * this is done anyway because of checks, if you are running this manually you might not need to pass these
@@ -630,6 +685,7 @@ export class Cache {
     id: string,
     version: string,
     update: IGQLArgs,
+    currentSQLValue: ISQLTableRowValue,
     currentValue: IGQLValue,
     editedBy: string,
     dictionary: string,
@@ -813,7 +869,7 @@ export class Cache {
       await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
+        "Cache.requestUpdate [SERIOUS]: could not consume item definition streams, data is corrupted",
         {
           errMessage: err.message,
           errStack: err.stack,
@@ -828,7 +884,7 @@ export class Cache {
       await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
+        "Cache.requestUpdate [SERIOUS]: could not consume module streams, data is corrupted",
         {
           errMessage: err.message,
           errStack: err.stack,
@@ -883,6 +939,66 @@ export class Cache {
         searchRecord,
         "modified",
       );
+    })();
+
+    // Execute side effects of modification according
+    // to the given side effected types
+    (async () => {
+      // let's find all of them
+      const sideEffected = itemDefinition.getAllSideEffectedProperties();
+      // looop into them
+      sideEffected.forEach((sideEffectedProperty) => {
+        const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
+        const sideEffectFn = description.gqlSideEffect;
+
+        // now we can get this new value
+        const newValue = convertSQLValueToGQLValueForProperty(
+          this.getServerData(),
+          itemDefinition,
+          sideEffectedProperty.include,
+          sideEffectedProperty.property,
+          sqlValue,
+        ) as any;
+
+        // get the original value
+        const originalValue = convertSQLValueToGQLValueForProperty(
+          this.getServerData(),
+          itemDefinition,
+          sideEffectedProperty.include,
+          sideEffectedProperty.property,
+          currentSQLValue,
+        ) as any;
+
+        // and try to execute
+        try {
+          sideEffectFn({
+            appData: this.appData,
+            id: sideEffectedProperty.property.getId(),
+            itemDefinition,
+            newRowValue: sqlValue,
+            originalValue: originalValue,
+            originalRowValue: currentSQLValue,
+            prefix: sideEffectedProperty.include ? sideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
+            property: sideEffectedProperty.property,
+            newValue,
+            rowId: sqlValue.id,
+            rowVersion: sqlValue.version,
+            include: sideEffectedProperty.include,
+          });
+        } catch (err) {
+          logger.error(
+            "Cache.requestUpdate (detached) [SERIOUS]: could not execute side effect",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              selfTable,
+              moduleTable,
+              id: sqlValue.id,
+              version: sqlValue.version,
+            }
+          );
+        }
+      });
     })();
 
     return sqlValue;
@@ -1177,19 +1293,33 @@ export class Cache {
 
     // now time to do this and actually do the dropping
     try {
+      let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
+
+      const sideEffectedProperties = itemDefinition.getAllSideEffectedProperties();
+      const needSideEffects = sideEffectedProperties.length !== 0;
+      const returningElements = needSideEffects ? "*" : `"version", "parent_id", "parent_type", "parent_version", "created_by"`;
+
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
+        const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING ${returningElements}`;
+        const deleteQuery = needSideEffects ?
+          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)} WHERE "id" = $1), "MTABLE" AS (${deleteQueryBase}) ` +
+          `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
+          `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
+          deleteQueryBase;
+
+
         // for that we run a transaction
         const allVersionsDropped: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // and we delete based on id and type
           const allVersionsDroppedInternal: ISQLTableRowValue[] = await transactingDatabase.queryRows(
-            `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING "version", "parent_id", ` +
-            `"parent_type", "parent_version", "created_by"`,
+            deleteQuery,
             [
               id,
               selfTable,
             ]
           );
+          rowsToPerformDeleteSideEffects = needSideEffects ? allVersionsDroppedInternal : null;
           // but yet we return the version to see what we dropped, and well parenting and creator
 
           // and now we need to store the fact we have lost these records in the deleted registry
@@ -1256,19 +1386,28 @@ export class Cache {
           performProperDeleteOf(record, parent, createdBy);
         });
       } else {
+        const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
+          `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElements}`;
+        const deleteQuery = needSideEffects ?
+          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)} WHERE "id" = $1 AND "version" = $2), "MTABLE" AS (${deleteQueryBase}) ` +
+          `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
+          `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
+          deleteQueryBase;
+
         // otherwise if we are deleting a specific version
         const row = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // we run this
           // because the index in the item definition cascades
           const interalDroppedRow: ISQLTableRowValue = await transactingDatabase.queryFirst(
-            `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" = $2 AND "type" = $3 RETURNING "version", "parent_id", ` +
-            `"parent_type", "parent_version", "created_by"`,
+            deleteQueryBase,
             [
               id,
               version || "",
               selfTable,
             ]
           );
+
+          rowsToPerformDeleteSideEffects = needSideEffects ? [interalDroppedRow] : null;
 
           const insertQueryBuilder = transactingDatabase.getInsertBuilder();
           insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
@@ -1316,6 +1455,60 @@ export class Cache {
         const createdBy = row.created_by;
         // we don't want to await any of this
         performProperDeleteOf(record, parent, createdBy);
+      }
+
+      if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {
+        // Execute side effects of modification according
+        // to the given side effected types
+        (async () => {
+          // looop into them
+          sideEffectedProperties.forEach((sideEffectedProperty) => {
+            const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
+            const sideEffectFn = description.gqlSideEffect;
+
+            rowsToPerformDeleteSideEffects.forEach((sqlValue) => {
+              // now we can get this new value
+              const originalValue = convertSQLValueToGQLValueForProperty(
+                this.getServerData(),
+                itemDefinition,
+                sideEffectedProperty.include,
+                sideEffectedProperty.property,
+                sqlValue,
+              ) as any;
+
+              // and try to execute
+              try {
+                sideEffectFn({
+                  appData: this.appData,
+                  id: sideEffectedProperty.property.getId(),
+                  itemDefinition,
+                  newRowValue: null,
+                  originalValue,
+                  originalRowValue: sqlValue,
+                  prefix: sideEffectedProperty.include ? sideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
+                  property: sideEffectedProperty.property,
+                  newValue: null,
+                  rowId: sqlValue.id,
+                  rowVersion: sqlValue.version,
+                  include: sideEffectedProperty.include,
+                });
+              } catch (err) {
+                logger.error(
+                  "Cache.requestDelete (detached) [SERIOUS]: could not execute side effect function",
+                  {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                    selfTable,
+                    moduleTable,
+                    id: sqlValue.id,
+                    version: sqlValue.version,
+                    dropAllVersions,
+                  }
+                );
+              }
+            });
+          });
+        })();
       }
     } catch (err) {
       logger.error(
@@ -1432,7 +1625,7 @@ export class Cache {
           `LIMIT 1`,
           [
             id,
-            version || "",
+            version || "",
           ],
         ),
       );
@@ -1567,7 +1760,24 @@ export class Cache {
     }
   }
 
+  /**
+   * When a change has been informed from the cluster that other cluster has made
+   * but it provides no data about what has changed and it needs to be
+   * manually fetched
+   * @param itemDefinition 
+   * @param id 
+   * @param version 
+   */
   public async onChangeInformedNoData(itemDefinition: string, id: string, version: string) {
     await this.onChangeInformed(itemDefinition, id, version, undefined);
+  }
+
+  /**
+   * Allows to set the app data in the server side
+   * where this app is contained
+   * @param appData the app data
+   */
+  public setAppData(appData: IAppDataType) {
+    this.appData = appData;
   }
 }
