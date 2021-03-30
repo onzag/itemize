@@ -107,6 +107,5 @@ export const PropertyDefinitionSearchInterfacesPrefixesList = [
     PropertyDefinitionSearchInterfacesPrefixes.TO,
     PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE,
     PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS,
-    PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID,
   ]
 ];

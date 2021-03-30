@@ -93,7 +93,6 @@ export function getConversionIds(
     ids = ids.concat([
       PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + rawData.id,
       PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + rawData.id,
-      PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + rawData.id,
     ]);
   }
   return ids;
@@ -148,12 +147,6 @@ export function buildSearchModePaymentProperty(
       displaceAndStoreI18NRootFieldsData(rootI8nData, ["payment", t], newPropDefPaymentType.i18nData, ["values", t]);
     });
   }
-
-  const newPropDefPaymentUUID: IPropertyDefinitionRawJSONDataType = {
-    ...newPropDef,
-    id: PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_UUID + newPropDef.id,
-    type: "string",
-  };
 
   // this is created for the TO value when we are using a range
   // by default
