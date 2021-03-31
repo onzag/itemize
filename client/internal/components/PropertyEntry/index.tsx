@@ -110,7 +110,7 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
 
   /**
    * Allows for the display of user set error statuses, normally you
-   * will call this function when your frield has been blurred so that
+   * will call this function when your field has been blurred so that
    * currentInvalidReason gets populated even if the field is not poked
    */
   enableUserSetErrors: () => void;
@@ -556,10 +556,13 @@ const handlerRegistry:
     handler: PropertyEntryFile,
     includeConfig: true,
   },
+  payment: {
+    renderer: "PropertyEntryPayment",
+    handler: null,
+  },
 
   // TODO
   files: null,
-  payment: null,
 };
 
 /**

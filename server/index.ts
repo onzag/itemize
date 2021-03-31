@@ -52,6 +52,7 @@ import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { DatabaseConnection } from "../database";
 import PaymentProvider from "./services/base/PaymentProvider";
 import { logger } from "./logger";
+import { ManualPaymentService } from "./services/manual-payment";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -787,9 +788,11 @@ export async function initializeServer(
       );
     }
 
-    // TODOPAYMENT default stripe, use fake?
-    const PaymentClass = (serviceCustom && serviceCustom.paymentProvider) || null;
-    if (PaymentClass && PaymentClass.getType() !== ServiceProviderType.LOCAL) {
+    // TODOPAYMENT put the default stripe instead of manual
+    const PaymentClass = (serviceCustom && serviceCustom.paymentProvider) || (
+      sensitiveConfig.payment ? null : ManualPaymentService
+    );
+    if (PaymentClass.getType() !== ServiceProviderType.LOCAL) {
       throw new Error("The payment service class is not a local type, and that's not allowed");
     }
     const paymentService: PaymentProvider<any> = (sensitiveConfig.payment ?

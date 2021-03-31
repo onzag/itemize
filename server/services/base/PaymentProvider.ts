@@ -69,7 +69,7 @@ export interface IPaymentEventObject extends IPaymentProviderPaymentExtraInfoWit
   payment: IPropertyDefinitionSupportedPaymentType;
 }
 
-export type PaymentEventListener = (evObj: IPaymentEventObject) => Promise<void>;
+export type PaymentEventListener = (evObj: IPaymentEventObject) => Promise<void> | void;
 
 export interface IPaymentUniqueLocation {
   id: string;
@@ -290,6 +290,48 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
 
     // and now we can actually set and update the hidden metadata
     this.processSettingOfHiddenMetadataAt(info.uuid);
+  }
+
+  /**
+   * Basically the same as changePaymentStatus but
+   * changes it to status inactive
+   * @param uuidOrLocation 
+   * @param extras 
+   * @returns a void promise
+   */
+  public async cancelSubscription(
+    uuidOrLocation: string | IPaymentUniqueLocation,
+    extras: {
+      knownValue?: ISQLTableRowValue;
+      metadata?: string;
+    } = {},
+  ) {
+    return this.changePaymentStatus(
+      PaymentStatusType.INACTIVE,
+      uuidOrLocation,
+      extras,
+    );
+  }
+
+  /**
+   * Basically the same as changePaymentStatus but
+   * changes it to status active
+   * @param uuidOrLocation 
+   * @param extras 
+   * @returns a void promise
+   */
+  public async activateSubscription(
+    uuidOrLocation: string | IPaymentUniqueLocation,
+    extras: {
+      knownValue?: ISQLTableRowValue;
+      metadata?: string;
+    } = {},
+  ) {
+    return this.changePaymentStatus(
+      PaymentStatusType.ACTIVE,
+      uuidOrLocation,
+      extras,
+    );
   }
 
   /**
