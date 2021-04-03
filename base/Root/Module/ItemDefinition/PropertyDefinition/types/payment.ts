@@ -92,6 +92,8 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   sqlSSCacheEqual: paymentSQLSSCacheEqual,
   gqlSideEffect: paymentGQLSideEffect,
 
+  supportedSubtypes: paymentTypesArr.concat(["subscription"]),
+
   // local order by used in the cached searches
   localOrderBy: null,
   localSearch: (arg) => {
@@ -179,6 +181,10 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
       !paymentTypesArr.includes(l.type) ||
       (typeof l.metadata !== "string" && l.metadata !== null)
     ) {
+      return PropertyInvalidReason.INVALID_VALUE;
+    }
+
+    if (p.subtype && p.subtype.indexOf(l.type) !== 0) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 

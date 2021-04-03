@@ -10,7 +10,7 @@ import type ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type Include from "../../../base/Root/Module/ItemDefinition/Include";
 import type PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type { ISQLTableRowValue } from "../../../base/Root/sql";
-import type { IGQLArgs } from "../../../gql-querier";
+import type { IGQLArgs, IGQLValue } from "../../../gql-querier";
 
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import { ServiceProvider, ServiceProviderType } from "..";
@@ -61,7 +61,7 @@ export interface IPaymentProviderPaymentExtraInfoWithHiddenMetadata extends IPay
   getHiddenMetadata: () => string;
   setHiddenMetadata: (hiddenMetadata: string) => void;
   getHiddenMetadataAsJSON: (attr?: string) => any;
-  setHiddenMetadataAsJSON: SetHiddenMetadataAsJSONType | SetHiddenMetadataAsJSONType2;
+  setHiddenMetadataAsJSON: SetHiddenMetadataAsJSONType | SetHiddenMetadataAsJSONType2;
 }
 
 export interface IPaymentEventObject extends IPaymentProviderPaymentExtraInfoWithHiddenMetadata {
@@ -168,7 +168,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       location.version,
       {
         dangerousUseSilentMode: true,
-        itemTableUpdate: {
+        itemTableUpdate: {
           [hiddenMetadataRow]: storedValue,
         },
       }
@@ -334,24 +334,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     );
   }
 
-  /**
-   * Allows to pick and find a payment object in the database and change its status
-   * from one to another, the change is realtime and affects the client side
-   * as well as whatever listeners are around
-   * 
-   * @param status the new status to assign to the payment
-   * @param uuidOrLocation the uuid of the payment or the unwrapped unique location
-   * @param extras.knownValue if the value of the row is already known provide it, it will help speed up
-   * @param extras.metadata change the metadata during this event
-   */
-  public async changePaymentStatus(
-    status: PaymentStatusType,
-    uuidOrLocation: string | IPaymentUniqueLocation,
-    extras: {
-      knownValue?: ISQLTableRowValue;
-      metadata?: string;
-    } = {}
-  ) {
+  public async retrievePaymentObject(uuidOrLocation: string | IPaymentUniqueLocation, knownValue?: ISQLTableRowValue) {
     // first let's convert the location if we need it
     const location: IPaymentUniqueLocation = typeof uuidOrLocation === "string" ?
       this.unwrapUUIDFor(uuidOrLocation) : uuidOrLocation;
@@ -371,11 +354,11 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     const prefix: string = include ? include.getPrefixedQualifiedIdentifier() : "";
 
     // now we can get the hidden metadata row
-    const hiddenMetadataRow = paymentSQLHiddenMetadataRow(prefix, propDef.getId());
+    const hiddenMetadata = paymentSQLHiddenMetadataRow(prefix, propDef.getId());
 
     // and let's get the sql value of the row
-    const value: ISQLTableRowValue = typeof extras.knownValue !== "undefined" ?
-      extras.knownValue : await this.localAppData.cache.requestValue(location.item, location.id, location.version);
+    const value: ISQLTableRowValue = typeof knownValue !== "undefined" ?
+      knownValue : await this.localAppData.cache.requestValue(location.item, location.id, location.version);
 
     // so we can extract these two
     const currentValue: IPropertyDefinitionSupportedPaymentType = paymentSQLOut({
@@ -387,6 +370,42 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       serverData: this.localAppData.cache.getServerData(),
       include,
     });
+
+    return {
+      value: currentValue,
+      hiddenMetadata,
+      item: itemDef,
+      include,
+      property: propDef,
+      location,
+      rowValue: value,
+    };
+  }
+
+  /**
+   * Allows to pick and find a payment object in the database and change its status
+   * from one to another, the change is realtime and affects the client side
+   * as well as whatever listeners are around
+   * 
+   * @param status the new status to assign to the payment
+   * @param uuidOrLocation the uuid of the payment or the unwrapped unique location
+   * @param extras.knownValue if the value of the row is already known provide it, it will help speed up
+   * @param extras.metadata change the metadata during this event
+   */
+  public async changePaymentStatus(
+    status: PaymentStatusType,
+    uuidOrLocation: string | IPaymentUniqueLocation,
+    extras: {
+      knownValue?: ISQLTableRowValue | IGQLValue;
+      metadata?: string;
+    } = {}
+  ) {
+    const paymentObject = await this.retrievePaymentObject(uuidOrLocation, extras.knownValue);;
+    const currentValue = paymentObject.value;
+
+    if (!currentValue) {
+      return;
+    }
 
     // denied due to equality so it can't change status
     if (currentValue.status === status) {
@@ -403,38 +422,37 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     }
 
     const update: IGQLArgs = {
-      [propDef.getId()]: newValue as any,
+      [paymentObject.property.getId()]: newValue as any,
     };
 
     // now we can trigger an update via the cache
     const newValueFromSQLUpdate = await this.localAppData.cache.requestUpdateSimple(
-      itemDef,
-      location.id,
-      location.version,
-      include ? {
-        [include.getQualifiedIdentifier()]: update,
+      paymentObject.item,
+      paymentObject.location.id,
+      paymentObject.location.version,
+      paymentObject.include ? {
+        [paymentObject.include.getQualifiedIdentifier()]: update,
       } : update,
       null,
-      value,
+      paymentObject.rowValue,
     );
-    const currentHiddenMetadata = newValueFromSQLUpdate[hiddenMetadataRow];
 
     const uuid = typeof uuidOrLocation === "string" ? uuidOrLocation : this.getUUIDFor(uuidOrLocation);
 
     this.triggerEvent(
       statusToEvents[status],
       newValue,
-      currentHiddenMetadata,
+      paymentObject.hiddenMetadata,
       {
-        id: location.id,
-        version: location.version,
-        item: itemDef,
-        module: itemDef.getParentModule(),
+        id: paymentObject.location.id,
+        version: paymentObject.location.version,
+        item: paymentObject.item,
+        module: paymentObject.item.getParentModule(),
         originalStatus: currentValue.status,
         originalMetadata: currentValue.metadata,
         originalSQLData: newValueFromSQLUpdate,
-        property: propDef,
-        include,
+        property: paymentObject.property,
+        include: paymentObject.include,
         uuid,
       }
     );
@@ -461,5 +479,21 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     if (index !== -1) {
       this.listeners[ev].splice(index, 1);
     }
+  }
+
+  /**
+   * When defining a payment you should specify how to issue a refund based on this event
+   * this allows the developer to issue a refund based
+   * @override
+   */
+  public executeRefund(
+    invoicePaymentUUID: string,
+    refundPaymentUUID: string,
+    extras: {
+      knownInvoicePaymentRowValue?: ISQLTableRowValue;
+      knownRefundPaymentRowValue?: ISQLTableRowValue;
+    } = {}
+  ) {
+
   }
 }

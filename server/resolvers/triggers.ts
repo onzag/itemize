@@ -3,6 +3,7 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
 import { WhereBuilder } from "../../database/WhereBuilder";
+import { ISQLTableRowValue } from "../../base/Root/sql";
 
 export enum IOTriggerActions {
   CREATE,
@@ -24,10 +25,18 @@ export interface IOTriggerArgType {
    */
   originalValue: IGQLValue;
   /**
+   * The original value in sql form
+   */
+  originalValueSQL: ISQLTableRowValue;
+  /**
    * the new value that it is hosting usually only available
    * on done requests
    */
   newValue: IGQLValue;
+  /**
+   * The new value when sql is done
+   */
+  newValueSQL: ISQLTableRowValue;
   /**
    * A partial arg based update for the value, remember this is a partial
    * value
