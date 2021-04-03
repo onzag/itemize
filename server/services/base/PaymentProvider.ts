@@ -398,6 +398,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     extras: {
       knownValue?: ISQLTableRowValue | IGQLValue;
       metadata?: string;
+      rometadata?: string;
     } = {}
   ) {
     const paymentObject = await this.retrievePaymentObject(uuidOrLocation, extras.knownValue);;
@@ -421,12 +422,21 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       newValue.metadata = extras.metadata;
     }
 
+    if (typeof extras.rometadata !== "undefined") {
+      newValue.rometadata = extras.rometadata;
+    }
+
     const update: IGQLArgs = {
       [paymentObject.property.getId()]: newValue as any,
     };
 
     // now we can trigger an update via the cache
-    const newValueFromSQLUpdate = await this.localAppData.cache.requestUpdateSimple(
+    // this will automatically trigger the event back
+    // because this is a side effect
+    // we are however ignoring the pre side effects
+    // because we want to allow to modify the read only
+    // rometadata field
+    await this.localAppData.cache.requestUpdateSimple(
       paymentObject.item,
       paymentObject.location.id,
       paymentObject.location.version,
@@ -435,27 +445,30 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       } : update,
       null,
       paymentObject.rowValue,
-    );
-
-    const uuid = typeof uuidOrLocation === "string" ? uuidOrLocation : this.getUUIDFor(uuidOrLocation);
-
-    this.triggerEvent(
-      statusToEvents[status],
-      newValue,
-      paymentObject.hiddenMetadata,
       {
-        id: paymentObject.location.id,
-        version: paymentObject.location.version,
-        item: paymentObject.item,
-        module: paymentObject.item.getParentModule(),
-        originalStatus: currentValue.status,
-        originalMetadata: currentValue.metadata,
-        originalSQLData: newValueFromSQLUpdate,
-        property: paymentObject.property,
-        include: paymentObject.include,
-        uuid,
+        ignorePreSideEffects: true,
       }
     );
+
+    // const uuid = typeof uuidOrLocation === "string" ? uuidOrLocation : this.getUUIDFor(uuidOrLocation);
+
+    // this.triggerEvent(
+    //   statusToEvents[status],
+    //   newValue,
+    //   paymentObject.hiddenMetadata,
+    //   {
+    //     id: paymentObject.location.id,
+    //     version: paymentObject.location.version,
+    //     item: paymentObject.item,
+    //     module: paymentObject.item.getParentModule(),
+    //     originalStatus: currentValue.status,
+    //     originalMetadata: currentValue.metadata,
+    //     originalSQLData: newValueFromSQLUpdate,
+    //     property: paymentObject.property,
+    //     include: paymentObject.include,
+    //     uuid,
+    //   }
+    // );
   }
 
   /**

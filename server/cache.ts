@@ -231,7 +231,7 @@ export class Cache {
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation (detached): built and triggering search result and event for active searches (item definition)",
+      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
       itemDefinitionBasedOwnedEvent,
     );
     this.listener.triggerOwnedSearchListeners(
@@ -245,7 +245,7 @@ export class Cache {
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation (detached): built and triggering search result and event for active searches (module)",
+      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
       moduleBasedOwnedEvent,
     );
     this.listener.triggerOwnedSearchListeners(
@@ -265,7 +265,7 @@ export class Cache {
         newLastModified: record.last_modified,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (item definition)",
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (item definition)",
         itemDefinitionBasedParentedEvent,
       );
       this.listener.triggerParentedSearchListeners(
@@ -278,7 +278,7 @@ export class Cache {
         qualifiedPathName: modQualifiedPathName,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering search result and event for parented active searches (module)",
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (module)",
         moduleBasedParentedEvent,
       );
       this.listener.triggerParentedSearchListeners(
@@ -320,6 +320,10 @@ export class Cache {
       type: string,
     },
     listenerUUID: string,
+    options: {
+      ignorePreSideEffects?: boolean;
+      ignoreSideEffects?: boolean;
+    } = {},
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
@@ -328,6 +332,48 @@ export class Cache {
       "Cache.requestCreation: requesting creation for " + selfTable + " at module " +
       moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
+
+    if (!options.ignorePreSideEffects) {
+      const preSideEffected = itemDefinition.getAllSideEffectedProperties(true);
+      // looop into them
+      await Promise.all(preSideEffected.map(async (preSideEffectedProperty) => {
+        const description = preSideEffectedProperty.property.getPropertyDefinitionDescription();
+        const preSideEffectFn = description.sqlPreSideEffect;
+  
+        // now we can get this new value
+        let newValue: any;
+        if (preSideEffectedProperty.include) {
+          const includeValue = value[preSideEffectedProperty.include.getQualifiedIdentifier()];
+          newValue = includeValue && includeValue[preSideEffectedProperty.property.getId()];
+        } else {
+          newValue = value[preSideEffectedProperty.property.getId()];
+        }
+  
+        if (typeof newValue !== "undefined") {
+          const value = await preSideEffectFn({
+            appData: this.appData,
+            id: preSideEffectedProperty.property.getId(),
+            itemDefinition,
+            newRowValue: null,
+            originalValue: null,
+            originalRowValue: null,
+            prefix: preSideEffectedProperty.include ? preSideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
+            property: preSideEffectedProperty.property,
+            newValue,
+            rowId: forId,
+            rowVersion: version,
+            include: preSideEffectedProperty.include,
+          });
+  
+          if (value) {
+            throw new EndpointError({
+              message: typeof value === "string" ? value : "The pre side effect function has forbid this action",
+              code: ENDPOINT_ERRORS.FORBIDDEN,
+            });
+          }
+        }
+      }));
+    }
 
     const containerExists = containerId && this.storageClients[containerId];
 
@@ -560,13 +606,13 @@ export class Cache {
 
     // Execute side effects of modification according
     // to the given side effected types
-    (async () => {
+    !options.ignoreSideEffects ? (async () => {
       // let's find all of them
       const sideEffected = itemDefinition.getAllSideEffectedProperties();
       // looop into them
       sideEffected.forEach((sideEffectedProperty) => {
         const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
-        const sideEffectFn = description.gqlSideEffect;
+        const sideEffectFn = description.sqlSideEffect;
 
         // now we can get this new value
         const newValue = convertSQLValueToGQLValueForProperty(
@@ -607,7 +653,7 @@ export class Cache {
           );
         }
       });
-    })();
+    })() : null;
 
     return sqlValue;
   }
@@ -628,6 +674,10 @@ export class Cache {
     update: IGQLArgs,
     dictionary: string,
     currentRawValueSQL?: ISQLTableRowValue,
+    options?: {
+      ignorePreSideEffects?: boolean;
+      ignoreSideEffects?: boolean;
+    },
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
@@ -650,6 +700,7 @@ export class Cache {
       dictionary,
       currentValue.container_id,
       null,
+      options,
     );
   }
 
@@ -692,6 +743,10 @@ export class Cache {
     dictionary: string,
     containerId: string,
     listenerUUID: string,
+    options: {
+      ignorePreSideEffects?: boolean;
+      ignoreSideEffects?: boolean;
+    } = {},
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
 
@@ -703,6 +758,56 @@ export class Cache {
       moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
       "container id " + containerId,
     );
+
+    if (!options.ignorePreSideEffects) {
+      const preSideEffected = itemDefinition.getAllSideEffectedProperties(true);
+      // looop into them
+      await Promise.all(preSideEffected.map(async (preSideEffectedProperty) => {
+        const description = preSideEffectedProperty.property.getPropertyDefinitionDescription();
+        const preSideEffectFn = description.sqlPreSideEffect;
+  
+        // now we can get this new value
+        let newValue: any;
+        if (preSideEffectedProperty.include) {
+          const includeValue = update[preSideEffectedProperty.include.getQualifiedIdentifier()];
+          newValue = includeValue && includeValue[preSideEffectedProperty.property.getId()];
+        } else {
+          newValue = update[preSideEffectedProperty.property.getId()];
+        }
+  
+        const originalValue = convertSQLValueToGQLValueForProperty(
+          this.getServerData(),
+          itemDefinition,
+          preSideEffectedProperty.include,
+          preSideEffectedProperty.property,
+          currentSQLValue,
+        ) as any;
+  
+        if (typeof newValue !== "undefined") {
+          const value = await preSideEffectFn({
+            appData: this.appData,
+            id: preSideEffectedProperty.property.getId(),
+            itemDefinition,
+            newRowValue: null,
+            originalValue: originalValue,
+            originalRowValue: currentSQLValue,
+            prefix: preSideEffectedProperty.include ? preSideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
+            property: preSideEffectedProperty.property,
+            newValue,
+            rowId: id,
+            rowVersion: version,
+            include: preSideEffectedProperty.include,
+          });
+  
+          if (value) {
+            throw new EndpointError({
+              message: typeof value === "string" ? value : "The pre side effect function has forbid this action",
+              code: ENDPOINT_ERRORS.FORBIDDEN,
+            });
+          }
+        }
+      }));
+    }
 
     // We get only the fields that we expect to be updated
     // in the definition
@@ -944,13 +1049,13 @@ export class Cache {
 
     // Execute side effects of modification according
     // to the given side effected types
-    (async () => {
+    !options.ignoreSideEffects ? (async () => {
       // let's find all of them
       const sideEffected = itemDefinition.getAllSideEffectedProperties();
       // looop into them
       sideEffected.forEach((sideEffectedProperty) => {
         const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
-        const sideEffectFn = description.gqlSideEffect;
+        const sideEffectFn = description.sqlSideEffect;
 
         // now we can get this new value
         const newValue = convertSQLValueToGQLValueForProperty(
@@ -1000,7 +1105,7 @@ export class Cache {
           );
         }
       });
-    })();
+    })() : null;
 
     return sqlValue;
   }
@@ -1158,6 +1263,9 @@ export class Cache {
     dropAllVersions: boolean,
     containerId: string,
     listenerUUID: string,
+    options: {
+      ignoreSideEffects?: boolean,
+    } = {},
   ): Promise<void> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
@@ -1461,11 +1569,11 @@ export class Cache {
       if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {
         // Execute side effects of modification according
         // to the given side effected types
-        (async () => {
+        !options.ignoreSideEffects ? (async () => {
           // looop into them
           sideEffectedProperties.forEach((sideEffectedProperty) => {
             const description = sideEffectedProperty.property.getPropertyDefinitionDescription();
-            const sideEffectFn = description.gqlSideEffect;
+            const sideEffectFn = description.sqlSideEffect;
 
             rowsToPerformDeleteSideEffects.forEach((sqlValue) => {
               // now we can get this new value
@@ -1509,7 +1617,7 @@ export class Cache {
               }
             });
           });
-        })();
+        })() : null;
       }
     } catch (err) {
       logger.error(

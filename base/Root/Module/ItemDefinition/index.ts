@@ -2482,9 +2482,10 @@ export default class ItemDefinition {
   /**
    * Provides all the properties that hold a side effect into them
    */
-  public getAllSideEffectedProperties(): Array<{ property: PropertyDefinition, include: Include }> {
+  public getAllSideEffectedProperties(pre?: boolean): Array<{ property: PropertyDefinition, include: Include }> {
     let result: Array<{ property: PropertyDefinition, include: Include }> = this.getAllPropertyDefinitionsAndExtensions().filter((d) => {
-      return d.getPropertyDefinitionDescription().gqlSideEffect;
+      const descr = d.getPropertyDefinitionDescription();
+      return pre ? descr.sqlPreSideEffect : descr.sqlSideEffect;
     }).map((r) => ({
       property: r,
       include: null,
@@ -2493,7 +2494,8 @@ export default class ItemDefinition {
     this.getAllIncludes().forEach((i) => {
       result = result.concat(
         i.getSinkingProperties().filter((d) => {
-          return d.getPropertyDefinitionDescription().gqlSideEffect;
+          const descr = d.getPropertyDefinitionDescription();
+          return pre ? descr.sqlPreSideEffect : descr.sqlSideEffect;
         }).map((r) => ({
           property: r,
           include: i,

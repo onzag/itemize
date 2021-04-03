@@ -21,7 +21,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { paymentGQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual } from "../sql/payment";
+import { paymentSQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual, paymentSQLPreSideEffect } from "../sql/payment";
 import { currencies } from "../../../../../../imported-resources";
 
 export enum PaymentStatusType {
@@ -45,6 +45,7 @@ export interface IPropertyDefinitionSupportedPaymentType {
   currency: string;
   status: PaymentStatusType;
   metadata?: string;
+  rometadata?: string;
 }
 
 /**
@@ -71,6 +72,9 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
     metadata: {
       type: GraphQLString,
     },
+    rometadata: {
+      type: GraphQLString,
+    },
     target: {
       type: GraphQLString,
     },
@@ -90,7 +94,8 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   sqlMantenience: null,
   sqlEqual: paymentSQLEqual,
   sqlSSCacheEqual: paymentSQLSSCacheEqual,
-  gqlSideEffect: paymentGQLSideEffect,
+  sqlSideEffect: paymentSQLSideEffect,
+  sqlPreSideEffect: paymentSQLPreSideEffect,
 
   supportedSubtypes: paymentTypesArr.concat(["subscription"]),
 
@@ -179,7 +184,8 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
       typeof l.currency !== "string" ||
       !paymentStatusesArr.includes(l.status) ||
       !paymentTypesArr.includes(l.type) ||
-      (typeof l.metadata !== "string" && l.metadata !== null)
+      (typeof l.metadata !== "string" && l.metadata !== null) ||
+      (typeof l.rometadata !== "string" && l.metadata !== null)
     ) {
       return PropertyInvalidReason.INVALID_VALUE;
     }

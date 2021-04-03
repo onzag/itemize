@@ -147,12 +147,15 @@ export interface ISQLMantenienceType {
   updateConditionRaw: [string, any[]],
 }
 
-export interface IGQLSideEffectType<T> extends IArgInfo {
+export interface ISQLSideEffectType<T> extends IArgInfo {
   appData: IAppDataType;
   originalValue: T;
   newValue: T;
   rowId: string;
   rowVersion: string;
+  /**
+   * This field is unknown on a pre-side effect event
+   */
   newRowValue: ISQLTableRowValue;
   originalRowValue: ISQLTableRowValue;
 }
@@ -298,9 +301,22 @@ export interface IPropertyDefinitionSupportedType<T> {
 
   /**
    * Allows to specify side effects that occur on the server side
-   * once the type has been modified via the graphql endpoints
+   * once the type has been modified
    */
-  gqlSideEffect?: (arg: IGQLSideEffectType<T>) => void;
+  sqlSideEffect?: (arg: ISQLSideEffectType<T>) => void;
+
+  /**
+   * Allows to specify side effects that occur on the server side
+   * before the type has been modified
+   * 
+   * The main function is to prevent unwanted modifications or setup
+   * fields that have certain rules to them, for example a XML only field
+   * in a type, or a JSON specific one, etc...
+   * 
+   * Because of the nature of the pre side effecct it is unable to run
+   * on delete as it's too expensive because of deletition cascading
+   */
+   sqlPreSideEffect?: (arg: ISQLSideEffectType<T>) => boolean | string | Promise<boolean | string>;
 
   /**
    * represents an item that would mark for null

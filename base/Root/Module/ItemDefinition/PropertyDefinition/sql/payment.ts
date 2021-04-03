@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, IGQLSideEffectType } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType } from "../types";
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
@@ -33,6 +33,7 @@ export function paymentSQL(arg: ISQLArgInfo) {
     [arg.prefix + arg.id + "_CURRENCY"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_STATUS"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_METADATA"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_RO_METADATA"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_HIDDEN_METADATA"]: { type: "TEXT" },
   };
 }
@@ -48,6 +49,7 @@ export function paymentSQLSelect(arg: ISQLArgInfo) {
     arg.prefix + arg.id + "_CURRENCY",
     arg.prefix + arg.id + "_STATUS",
     arg.prefix + arg.id + "_METADATA",
+    arg.prefix + arg.id + "_RO_METADATA",
   ];
 }
 
@@ -77,6 +79,7 @@ export function paymentSQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id + "_CURRENCY"]: null,
       [arg.prefix + arg.id + "_STATUS"]: null,
       [arg.prefix + arg.id + "_METADATA"]: null,
+      [arg.prefix + arg.id + "_RO_METADATA"]: null,
     };
   }
 
@@ -86,6 +89,7 @@ export function paymentSQLIn(arg: ISQLInInfo) {
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_STATUS"]: value.status,
     [arg.prefix + arg.id + "_METADATA"]: value.metadata || null,
+    [arg.prefix + arg.id + "_RO_METADATA"]: value.rometadata || null,
   };
 }
 
@@ -109,6 +113,7 @@ export function paymentSQLOut(arg: ISQLOutInfo) {
     currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
     status: arg.row[arg.prefix + arg.id + "_STATUS"],
     metadata: arg.row[arg.prefix + arg.id + "_METADATA"] || null,
+    rometadata: arg.row[arg.prefix + arg.id + "_RO_METADATA"] || null,
   };
 
   return result;
@@ -212,7 +217,7 @@ export function paymentSQLSSCacheEqual(arg: ISQLSSCacheEqualInfo) {
  * graphql does things to it, and this will trigger what is necessary to  it
  * @param arg 
  */
-export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
+export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
   // we only care if the value is different on its own
   // this is a cheap check
   if (arg.originalValue !== arg.newValue) {
@@ -220,7 +225,6 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
     // now let's build these fields
     let ev: any;
     let originalStatus: PaymentStatusType;
-    let newStatus: PaymentStatusType;
 
     // we have a new value but no original (aka it was created)
     // this could be by many things, either the endpoint add was used
@@ -228,7 +232,6 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
     if (arg.newValue && !arg.originalValue) {
       ev = "CREATED";
       originalStatus = null;
-      newStatus = arg.newValue.status;
 
     // we have no payment object now but there used to be
     // one originally aka it was destroyed, either by a modification
@@ -236,13 +239,10 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
     } else if (arg.originalValue && !arg.newValue) {
       ev = "DESTROYED";
       originalStatus = arg.originalValue.status;
-      newStatus = null;
-
     // the status differ from each other
     } else if (arg.newValue.status !== arg.originalValue.status) {
       ev = statusToEvents[arg.newValue.status];
       originalStatus = arg.originalValue.status;
-      newStatus = arg.newValue.status;
     } else {
       // something odd, maybe other changes, the value, etc...
       return;
@@ -280,5 +280,25 @@ export function paymentGQLSideEffect(arg: IGQLSideEffectType<IPropertyDefinition
         id: arg.rowId,
       }
     );
+  }
+}
+
+/**
+ * Provides a side effect that triggers once a payment status changes, it's created, destroyed
+ * or comes into existance, this is the standard type server side effect that occurs when
+ * graphql does things to it, and this will trigger what is necessary to  it
+ * @param arg 
+ */
+ export function paymentSQLPreSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
+  if (!arg.originalValue) {
+    if (arg.newValue.rometadata) {
+      return "Setting up read only metadata is not allowed";
+    }
+
+    return;
+  }
+
+  if (arg.originalValue.rometadata !== arg.newValue.rometadata) {
+    return "Modifying read only metadata is not allowed";
   }
 }
