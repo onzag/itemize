@@ -5,8 +5,21 @@
 
 import React from "react";
 import { IPropertyEntryRendererProps, IPropertyEntryHandlerProps } from ".";
-import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
+import { IPropertyDefinitionSupportedPaymentType, paymentAllowedStatuses, PaymentStatusType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import equals from "deep-equal";
+import { escapeStringRegexp } from "../../../../util";
+import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
+
+/**
+ * Contains the currency i18n data, usually to build
+ * a dialog or menu of sorts
+ */
+interface ICurrencyI18nType {
+  /**
+   * The title of such structure
+   */
+  title: string;
+}
 
 /**
  * Props that every boolean renderer is going to get
@@ -32,6 +45,12 @@ export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRender
     subscriptionDaily: string;
     subscriptionYearly: string;
   };
+  currentTextualValueOfAmount: string;
+  currency: ICurrencyType;
+  currencyFormat: "$N" | "N$",
+  currencyAvailable: ICurrencyType[],
+  currencyI18n: ICurrencyI18nType;
+  onAmountChangeByTextualValue: (newAmount: string) => void;
   onToggleNullStatus: () => void;
   onStatusChange: (newStatus: string) => void;
   onAmountChange: (newAmount: number) => void;
@@ -63,6 +82,7 @@ export default class PropertyEntryPayment extends React.Component<
     this.onCurrencyChange = this.onCurrencyChange.bind(this);
     this.onMetadataChange = this.onMetadataChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
+    this.onAmountChangeByTextualValue = this.onAmountChangeByTextualValue.bind(this);
 
     this.state = {
       showUserSetErrors: false,
@@ -85,11 +105,11 @@ export default class PropertyEntryPayment extends React.Component<
         valueToRestoreAgainst.type = "subscription-monthly";
       }
 
-      this.props.onChange(valueToRestoreAgainst, null);
+      this.props.onChange(valueToRestoreAgainst, this.props.state.internalValue);
     } else {
       this.previouslyStoredValueBeforeTogglingNull = this.props.state.value as any;
 
-      this.props.onChange(null, null);
+      this.props.onChange(null, this.props.state.internalValue);
     }
   }
 
@@ -101,7 +121,26 @@ export default class PropertyEntryPayment extends React.Component<
     this.props.onChange({
       ...(this.props.state.value as any),
       amount: newAmount,
-    } as any, null);
+    } as any, this.props.state.internalValue);
+  }
+
+  public onAmountChangeByTextualValue(newAmount: string) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    const escapedNumberSeparator = escapeStringRegexp(
+      this.props.i18n[this.props.language].number_decimal_separator,
+    );
+    const normalizedTextualValueAsString = newAmount.replace(
+      new RegExp(escapedNumberSeparator, "g"), ".");
+
+    const numericValue = parseFloat(normalizedTextualValueAsString);
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      amount: (isNaN(numericValue) || isNaN(normalizedTextualValueAsString as any)) ? NaN : numericValue,
+    } as any, newAmount);
   }
 
   public onCurrencyChange(newCurrency: string) {
@@ -112,7 +151,7 @@ export default class PropertyEntryPayment extends React.Component<
     this.props.onChange({
       ...(this.props.state.value as any),
       currency: newCurrency,
-    } as any, null);
+    } as any, this.props.state.internalValue);
   }
 
   public onTypeChange(newType: string) {
@@ -120,10 +159,20 @@ export default class PropertyEntryPayment extends React.Component<
       return;
     }
 
+    const typeRef = newType.split("-")[0];
+    const validStatuses = paymentAllowedStatuses[typeRef];
+    const currentValue: IPropertyDefinitionSupportedPaymentType = this.props.state.value as any;
+
+    let newStatus: any = currentValue.status;
+    if (!validStatuses.includes(newStatus)) {
+      newStatus = validStatuses[0];
+    }
+
     this.props.onChange({
-      ...(this.props.state.value as any),
+      ...currentValue,
       type: newType,
-    } as any, null);
+      status: newStatus,
+    } as any, this.props.state.internalValue);
   }
 
   public onMetadataChange(newMetadata: string) {
@@ -134,7 +183,7 @@ export default class PropertyEntryPayment extends React.Component<
     this.props.onChange({
       ...(this.props.state.value as any),
       metadata: newMetadata,
-    } as any, null);
+    } as any, this.props.state.internalValue);
   }
 
   public onStatusChange(newStatus: string) {
@@ -145,7 +194,7 @@ export default class PropertyEntryPayment extends React.Component<
     this.props.onChange({
       ...(this.props.state.value as any),
       status: newStatus,
-    } as any, null);
+    } as any, this.props.state.internalValue);
   }
 
   public shouldComponentUpdate(
@@ -195,6 +244,28 @@ export default class PropertyEntryPayment extends React.Component<
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
+    const currentTextualValueOfAmount = this.props.state.value ?
+      (
+        this.props.state.internalValue ||
+        (this.props.state.value as IPropertyDefinitionSupportedPaymentType)
+          .amount.toString().replace(/\./g, this.props.i18n[this.props.language].number_decimal_separator)
+      ) :
+      null;
+
+    const currencyAvailable = arrCurrencies;
+
+    const countrySelectedCurrency = this.props.currency.code;
+    const currentCurrency = (
+      this.props.state.value ?
+      (this.props.state.value as IPropertyDefinitionSupportedPaymentType).currency :
+      countrySelectedCurrency
+    );
+    const currencyFormat = this.props.i18n[this.props.language].currency_format;
+    const currencyI18n = {
+      title: this.props.i18n[this.props.language].currency_dialog_title,
+    };
+    const currency = currencies[currentCurrency];
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryPaymentRendererProps = {
       propertyId: this.props.property.getId(),
@@ -227,9 +298,15 @@ export default class PropertyEntryPayment extends React.Component<
         subscriptionYearly: i18nInLanguage.payment.subscription_yearly,
       },
 
+      currency,
+      currencyFormat,
+      currencyI18n,
+      currencyAvailable,
+
       currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedPaymentType,
       currentValue: this.props.state.value as IPropertyDefinitionSupportedPaymentType,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentTextualValueOfAmount,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
       canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
@@ -240,6 +317,7 @@ export default class PropertyEntryPayment extends React.Component<
       onRestore: this.props.onRestore,
       enableUserSetErrors: this.enableUserSetErrors,
       onAmountChange: this.onAmountChange,
+      onAmountChangeByTextualValue: this.onAmountChangeByTextualValue,
       onCurrencyChange: this.onCurrencyChange,
       onMetadataChange: this.onMetadataChange,
       onStatusChange: this.onStatusChange,

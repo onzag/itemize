@@ -31,6 +31,23 @@ export enum PaymentStatusType {
 
 export const paymentStatusesArr = ["pending", "paid", "disputed", "refunded", "inactive", "active"];
 export const paymentTypesArr = ["invoice", "refund", "subscription-monthly", "subscription-daily", "subscription-yearly"];
+export const paymentAllowedStatuses = {
+  invoice: [
+    PaymentStatusType.PENDING,
+    PaymentStatusType.PAID,
+    PaymentStatusType.DISPUTED,
+    PaymentStatusType.REFUNDED,
+  ],
+  refund: [
+    PaymentStatusType.PENDING,
+    PaymentStatusType.PAID,
+  ],
+  subscription: [
+    PaymentStatusType.PENDING,
+    PaymentStatusType.ACTIVE,
+    PaymentStatusType.INACTIVE,
+  ],
+}
 
 /**
  * The currency definition is described by an object
@@ -187,6 +204,13 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
     }
 
     if (p.subtype && p.subtype.indexOf(l.type) !== 0) {
+      return PropertyInvalidReason.INVALID_VALUE;
+    }
+
+    const typeRef = l.type.split("-")[0];
+    const allowedStatuses = paymentAllowedStatuses[typeRef];
+
+    if (!allowedStatuses.includes(l.status)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
