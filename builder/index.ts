@@ -1142,6 +1142,12 @@ async function getI18nPropertyData(
     .concat((disableRangedSearch || searchIsDisabled ?
         [] : definition.i18n.searchRangeOptional || [])
       .map((b) => ({key: b, required: false})))
+    .concat((disableRangedSearch && !searchIsDisabled ?
+        definition.i18n.searchRangeDisabled || [] : [])
+      .map((b) => ({key: b, required: true})))
+    .concat((disableRangedSearch && !searchIsDisabled ?
+        definition.i18n.searchRangeDisabledOptional || [] : [])
+      .map((b) => ({key: b, required: false})))
     // concat to search properties only if necessary
     .concat((searchIsDisabled || (
       definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&

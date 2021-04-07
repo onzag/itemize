@@ -13,7 +13,7 @@ import equals from "deep-equal";
  */
 export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRendererProps<IPropertyDefinitionSupportedPaymentType> {
   i18nPayment: {
-    wait: string;
+    open: string;
     paid: string;
     disputed: string;
     refunded: string;
@@ -103,7 +103,7 @@ export default class PropertyEntryPayment extends React.Component<
       icon: this.props.icon,
 
       i18nPayment: {
-        wait: i18nInLanguage.payment.wait,
+        open: i18nInLanguage.payment.open,
         paid: i18nInLanguage.payment.paid,
         disputed: i18nInLanguage.payment.disputed,
         refunded: i18nInLanguage.payment.refunded,

@@ -149,7 +149,7 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
-payment.wait = waiting
+payment.open = open
 payment.paid = paid
 payment.disputed = disputed
 payment.refunded = refunded
@@ -329,7 +329,7 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
-payment.wait = waiting
+payment.open = open
 payment.paid = paid
 payment.disputed = disputed
 payment.refunded = refunded
@@ -509,7 +509,7 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
-payment.wait = waiting
+payment.open = open
 payment.paid = paid
 payment.disputed = disputed
 payment.refunded = refunded
@@ -689,7 +689,7 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
-payment.wait = waiting
+payment.open = open
 payment.paid = paid
 payment.disputed = disputed
 payment.refunded = refunded
@@ -869,7 +869,7 @@ unsaved_changes = sus cambios no han sido guardados
 save = guardar
 discard = descartar
 
-payment.wait = en espera
+payment.open = en espera
 payment.paid = pagado
 payment.disputed = en dis
 payment.refunded = reembolsado
@@ -1049,7 +1049,7 @@ unsaved_changes = you have unsaved changes
 save = save
 discard = discard
 
-payment.wait = waiting
+payment.open = open
 payment.paid = paid
 payment.disputed = disputed
 payment.refunded = refunded

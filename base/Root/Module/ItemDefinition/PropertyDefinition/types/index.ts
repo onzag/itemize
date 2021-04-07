@@ -375,6 +375,9 @@ export interface IPropertyDefinitionSupportedType<T> {
     // nor if its not searchable
     searchRange?: string[],
     searchRangeOptional?: string[],
+    // this will get requested if the range attributes are not requested
+    searchRangeDisabled?: string[],
+    searchRangeDisabledOptional?: string[],
     // not requested if the searchable is disabled
     searchBase?: string[],
     searchOptional?: string[],

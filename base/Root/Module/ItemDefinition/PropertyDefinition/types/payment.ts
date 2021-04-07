@@ -14,10 +14,6 @@ import {
   MAX_SUPPORTED_REAL,
   CLASSIC_BASE_I18N,
   CLASSIC_OPTIONAL_I18N,
-  CLASSIC_SEARCH_BASE_I18N,
-  CLASSIC_SEARCH_OPTIONAL_I18N,
-  CLASSIC_SEARCH_RANGED_I18N,
-  CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
@@ -25,7 +21,7 @@ import { paymentSQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLE
 import { currencies } from "../../../../../../imported-resources";
 
 export enum PaymentStatusType {
-  WAIT = "wait",
+  OPEN = "open",
   PAID = "paid",
   DISPUTED = "disputed",
   REFUNDED = "refunded",
@@ -33,7 +29,7 @@ export enum PaymentStatusType {
   ACTIVE = "active",
 }
 
-export const paymentStatusesArr = ["wait", "paid", "disputed", "refunded", "inactive", "active"];
+export const paymentStatusesArr = ["open", "paid", "disputed", "refunded", "inactive", "active"];
 export const paymentTypesArr = ["invoice", "refund", "subscription-monthly", "subscription-daily", "subscription-yearly"];
 
 /**
@@ -233,10 +229,33 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,
-    searchBase: CLASSIC_SEARCH_BASE_I18N,
-    searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    searchRange: CLASSIC_SEARCH_RANGED_I18N,
-    searchRangeOptional: CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
+    searchBase: [
+      "search.payment.status.label",
+      "search.payment.status.placeholder",
+      "search.payment.type.label",
+      "search.payment.type.placeholder",
+    ],
+    searchOptional: [
+      "search.payment.status.description",
+      "search.payment.type.description",
+    ],
+    searchRange: [
+      "search.payment.from.label",
+      "search.payment.to.label",
+      "search.payment.from.placeholder",
+      "search.payment.to.placeholder",
+    ],
+    searchRangeOptional: [
+      "search.payment.from.description",
+      "search.payment.to.description",
+    ],
+    searchRangeDisabled: [
+      "search.payment.exact.label",
+      "search.payment.exact.placeholder",
+    ],
+    searchRangeDisabledOptional: [
+      "search.payment.exact.description",
+    ],
     tooLargeErrorInclude: true,
     tooSmallErrorInclude: true,
     tooManyDecimalsErrorInclude: true,
