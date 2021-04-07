@@ -519,7 +519,14 @@ export const LOCALE_I18N = [
 
   // payments, based on paymentStatusesArr and paymentTypesArr but not imported to prevent
   // giving dependencies to constants.ts
-  "payment.open",
+  "payment.type",
+  "payment.status",
+  "payment.amount",
+  "payment.currency",
+  "payment.metadata",
+  "payment.create",
+  "payment.destroy",
+  "payment.pending",
   "payment.paid",
   "payment.disputed",
   "payment.refunded",

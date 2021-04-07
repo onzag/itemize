@@ -7,7 +7,7 @@
 import PropertyDefinition, {
   IPropertyDefinitionState,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import React, { useEffect } from "react";
+import React from "react";
 import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
@@ -16,6 +16,7 @@ import PropertyEntryReference from "./PropertyEntryReference";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
+import PropertyEntryPayment from "./PropertyEntryPayment";
 import { LocaleContext } from "../../providers/locale-provider";
 import { Ii18NType } from "../../../../base/Root";
 import {
@@ -558,7 +559,7 @@ const handlerRegistry:
   },
   payment: {
     renderer: "PropertyEntryPayment",
-    handler: null,
+    handler: PropertyEntryPayment,
   },
 
   // TODO

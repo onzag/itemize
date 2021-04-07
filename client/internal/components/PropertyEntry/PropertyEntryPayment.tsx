@@ -5,7 +5,7 @@
 
 import React from "react";
 import { IPropertyEntryRendererProps, IPropertyEntryHandlerProps } from ".";
-import { IPropertyDefinitionSupportedPaymentType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
+import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import equals from "deep-equal";
 
 /**
@@ -13,7 +13,14 @@ import equals from "deep-equal";
  */
 export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRendererProps<IPropertyDefinitionSupportedPaymentType> {
   i18nPayment: {
-    open: string;
+    type: string;
+    status: string;
+    metadata: string;
+    amount: string;
+    currency: string;
+    create: string;
+    destroy: string;
+    pending: string;
     paid: string;
     disputed: string;
     refunded: string;
@@ -24,7 +31,13 @@ export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRender
     subscriptionMonthly: string;
     subscriptionDaily: string;
     subscriptionYearly: string;
-  }
+  };
+  onToggleNullStatus: () => void;
+  onStatusChange: (newStatus: string) => void;
+  onAmountChange: (newAmount: number) => void;
+  onCurrencyChange: (newCurrency: string) => void;
+  onMetadataChange: (newMetadata: string) => void;
+  onTypeChange: (newType: string) => void;
 }
 
 interface IPropertyEntryPaymentState {
@@ -38,20 +51,111 @@ export default class PropertyEntryPayment extends React.Component<
   IPropertyEntryHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyEntryPaymentRendererProps>,
   IPropertyEntryPaymentState
 > {
+  private previouslyStoredValueBeforeTogglingNull: IPropertyDefinitionSupportedPaymentType = null;
+
   constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyEntryPaymentRendererProps>) {
     super(props);
 
     this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+    this.onToggleNullStatus = this.onToggleNullStatus.bind(this);
+    this.onStatusChange = this.onStatusChange.bind(this);
+    this.onAmountChange = this.onAmountChange.bind(this);
+    this.onCurrencyChange = this.onCurrencyChange.bind(this);
+    this.onMetadataChange = this.onMetadataChange.bind(this);
+    this.onTypeChange = this.onTypeChange.bind(this);
 
-    this.state = {
+    this.state = {
       showUserSetErrors: false,
     }
+  }
+
+  public onToggleNullStatus() {
+    if (this.props.state.value === null) {
+      const valueToRestoreAgainst: IPropertyDefinitionSupportedPaymentType =
+        this.previouslyStoredValueBeforeTogglingNull ||
+        this.props.state.stateAppliedValue as any ||
+        {
+          amount: 0,
+          currency: this.props.currency.code,
+          status: PaymentStatusType.PENDING,
+          type: (this.props.property.getSubtype() as any) || "invoice",
+        };
+
+      if ((valueToRestoreAgainst as any).type === "subscription") {
+        valueToRestoreAgainst.type = "subscription-monthly";
+      }
+
+      this.props.onChange(valueToRestoreAgainst, null);
+    } else {
+      this.previouslyStoredValueBeforeTogglingNull = this.props.state.value as any;
+
+      this.props.onChange(null, null);
+    }
+  }
+
+  public onAmountChange(newAmount: number) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      amount: newAmount,
+    } as any, null);
+  }
+
+  public onCurrencyChange(newCurrency: string) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      currency: newCurrency,
+    } as any, null);
+  }
+
+  public onTypeChange(newType: string) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      type: newType,
+    } as any, null);
+  }
+
+  public onMetadataChange(newMetadata: string) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      metadata: newMetadata,
+    } as any, null);
+  }
+
+  public onStatusChange(newStatus: string) {
+    if (this.props.state.value === null) {
+      return;
+    }
+
+    this.props.onChange({
+      ...(this.props.state.value as any),
+      status: newStatus,
+    } as any, null);
   }
 
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyEntryPaymentRendererProps>,
     nextState: IPropertyEntryPaymentState,
   ) {
+    if (nextProps.property !== this.props.property) {
+      this.previouslyStoredValueBeforeTogglingNull = null;
+    }
+
     return nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       nextProps.property !== this.props.property ||
       !equals(this.props.state, nextProps.state) ||
@@ -94,7 +198,7 @@ export default class PropertyEntryPayment extends React.Component<
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryPaymentRendererProps = {
       propertyId: this.props.property.getId(),
-  
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,
@@ -103,7 +207,14 @@ export default class PropertyEntryPayment extends React.Component<
       icon: this.props.icon,
 
       i18nPayment: {
-        open: i18nInLanguage.payment.open,
+        type: i18nInLanguage.payment.type,
+        status: i18nInLanguage.payment.status,
+        amount: i18nInLanguage.payment.amount,
+        currency: i18nInLanguage.payment.currency,
+        metadata: i18nInLanguage.payment.metadata,
+        create: i18nInLanguage.payment.create,
+        destroy: i18nInLanguage.payment.destroy,
+        pending: i18nInLanguage.payment.pending,
         paid: i18nInLanguage.payment.paid,
         disputed: i18nInLanguage.payment.disputed,
         refunded: i18nInLanguage.payment.refunded,
@@ -128,6 +239,12 @@ export default class PropertyEntryPayment extends React.Component<
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
       enableUserSetErrors: this.enableUserSetErrors,
+      onAmountChange: this.onAmountChange,
+      onCurrencyChange: this.onCurrencyChange,
+      onMetadataChange: this.onMetadataChange,
+      onStatusChange: this.onStatusChange,
+      onTypeChange: this.onTypeChange,
+      onToggleNullStatus: this.onToggleNullStatus,
     };
 
     return <RendererElement {...rendererArgs} />;

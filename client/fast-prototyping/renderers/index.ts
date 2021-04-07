@@ -13,6 +13,7 @@ import PropertyEntryLocationRenderer from "./PropertyEntry/PropertyEntryLocation
 import PropertyEntrySelectRenderer from "./PropertyEntry/PropertyEntrySelect";
 import PropertyEntryTextRenderer from "./PropertyEntry/PropertyEntryText";
 import PropertyEntryDateTimeRenderer from "./PropertyEntry/PropertyEntryDateTime";
+import PropertyEntryPaymentRenderer from "./PropertyEntry/PropertyEntryPayment";
 
 import PropertyViewBooleanRenderer from "./PropertyView/PropertyViewBoolean";
 import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
@@ -32,6 +33,7 @@ export const rendererContext: IRendererContext = {
   PropertyEntrySelect: PropertyEntrySelectRenderer,
   PropertyEntryText: PropertyEntryTextRenderer,
   PropertyEntryDateTime: PropertyEntryDateTimeRenderer,
+  PropertyEntryPayment: PropertyEntryPaymentRenderer,
 
   PropertyViewBoolean: PropertyViewBooleanRenderer,
   PropertyViewSimple: PropertyViewSimpleRenderer,

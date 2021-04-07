@@ -18,7 +18,7 @@ const statusToEvents = {
   "disputed": "DISPUTED",
   "paid": "PAID",
   "refunded": "REFUNDED",
-  "open": "OPEN",
+  "pending": "PENDING",
 }
 
 /**

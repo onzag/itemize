@@ -21,6 +21,7 @@ import { IPropertyViewDateTimeRendererProps } from "../internal/components/Prope
 import { IPropertyViewLocationRendererProps } from "../internal/components/PropertyView/PropertyViewLocation";
 import { IPropertyViewCurrencyRendererProps } from "../internal/components/PropertyView/PropertyViewCurrency";
 import { IPropertyEntryReferenceRendererProps } from "../internal/components/PropertyEntry/PropertyEntryReference";
+import { IPropertyEntryPaymentRendererProps } from "../internal/components/PropertyEntry/PropertyEntryPayment";
 
 /**
  * The renderer context we do expect for defining how are things to be renderered,
@@ -113,6 +114,14 @@ export interface IRendererContext {
    * the given format
    */
   PropertyEntryDateTime?: React.ComponentType<IPropertyEntryDateTimeRendererProps>;
+  /**
+   * The payment renderer which is used for rendering the payment entry, do not confuse
+   * this with the payment processor related object, this is for manually editing payments
+   * and what they are all about; basically to process cash payments by yourself, this allows
+   * to set invoices to change status to paid, change the amount that has to be billed and
+   * so forth
+   */
+  PropertyEntryPayment?: React.ComponentType<IPropertyEntryPaymentRendererProps>;
 
   /**
    * The boolean renderer used to render, well, booleans; since booleans are either

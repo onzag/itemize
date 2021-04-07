@@ -33,7 +33,7 @@ export enum PaymentEvent {
    * made it go null, or a delete event rid of the row
    */
   DESTROYED = "DESTROYED",
-  OPEN = "OPEN",
+  PENDING = "PENDING",
   PAID = "PAID",
   DISPUTED = "DISPUTED",
   REFUNDED = "REFUNDED",
@@ -87,7 +87,7 @@ export const statusToEvents: Record<PaymentStatusType, PaymentEvent> = {
   [PaymentStatusType.DISPUTED]: PaymentEvent.DISPUTED,
   [PaymentStatusType.PAID]: PaymentEvent.PAID,
   [PaymentStatusType.REFUNDED]: PaymentEvent.REFUNDED,
-  [PaymentStatusType.OPEN]: PaymentEvent.OPEN,
+  [PaymentStatusType.PENDING]: PaymentEvent.PENDING,
 }
 
 export default class PaymentProvider<T> extends ServiceProvider<T> {
@@ -98,7 +98,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
   private listeners: PaymentListeners = {
     CREATED: [],
     DESTROYED: [],
-    OPEN: [],
+    PENDING: [],
     PAID: [],
     DISPUTED: [],
     REFUNDED: [],

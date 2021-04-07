@@ -21,7 +21,7 @@ import { paymentSQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLE
 import { currencies } from "../../../../../../imported-resources";
 
 export enum PaymentStatusType {
-  OPEN = "open",
+  PENDING = "pending",
   PAID = "paid",
   DISPUTED = "disputed",
   REFUNDED = "refunded",
@@ -29,7 +29,7 @@ export enum PaymentStatusType {
   ACTIVE = "active",
 }
 
-export const paymentStatusesArr = ["open", "paid", "disputed", "refunded", "inactive", "active"];
+export const paymentStatusesArr = ["pending", "paid", "disputed", "refunded", "inactive", "active"];
 export const paymentTypesArr = ["invoice", "refund", "subscription-monthly", "subscription-daily", "subscription-yearly"];
 
 /**
