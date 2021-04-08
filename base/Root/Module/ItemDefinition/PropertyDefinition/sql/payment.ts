@@ -224,6 +224,7 @@ export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinition
 
     // now let's build these fields
     let ev: any;
+    let ev2: any;
     let originalStatus: PaymentStatusType;
 
     // we have a new value but no original (aka it was created)
@@ -231,15 +232,16 @@ export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinition
     // or it was created on its own
     if (arg.newValue && !arg.originalValue) {
       ev = "CREATED";
+      ev2 = statusToEvents[arg.newValue.status];
       originalStatus = null;
 
-    // we have no payment object now but there used to be
-    // one originally aka it was destroyed, either by a modification
-    // or by a delete action
+      // we have no payment object now but there used to be
+      // one originally aka it was destroyed, either by a modification
+      // or by a delete action
     } else if (arg.originalValue && !arg.newValue) {
       ev = "DESTROYED";
       originalStatus = arg.originalValue.status;
-    // the status differ from each other
+      // the status differ from each other
     } else if (arg.newValue.status !== arg.originalValue.status) {
       ev = statusToEvents[arg.newValue.status];
       originalStatus = arg.originalValue.status;
@@ -254,32 +256,47 @@ export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinition
 
     // our module
     const mod = arg.itemDefinition.getParentModule();
-    // now we can trigger the event
-    arg.appData.paymentService.triggerEvent(
-      ev,
-      arg.newValue,
-      hiddenMetadataValue,
-
-      // we need to build all this complex object for the event
-      {
-        item: arg.itemDefinition,
-        module: mod,
-        originalMetadata: arg.originalValue && arg.originalValue.metadata,
-        originalSQLData: arg.originalRowValue,
-        originalStatus,
-        property: arg.property,
-        uuid: arg.appData.paymentService.getUUIDFor({
-          version: arg.rowVersion,
-          id: arg.rowId,
-          item: arg.itemDefinition,
-          module: mod,
-          property: arg.property,
-          include: arg.include,
-        } as any),
+    const eventArg = {
+      item: arg.itemDefinition,
+      module: mod,
+      originalMetadata: arg.originalValue && arg.originalValue.metadata,
+      originalSQLData: arg.originalRowValue,
+      originalStatus,
+      property: arg.property,
+      uuid: arg.appData.paymentService.getUUIDFor({
         version: arg.rowVersion,
         id: arg.rowId,
+        item: arg.itemDefinition,
+        module: mod,
+        property: arg.property,
+        include: arg.include,
+      } as any),
+      version: arg.rowVersion,
+      id: arg.rowId,
+    };
+
+    (async () => {
+      // now we can trigger the event
+      const newHiddenMetadataValue = await arg.appData.paymentService.triggerEvent(
+        ev,
+        arg.newValue,
+        hiddenMetadataValue,
+
+        // we need to build all this complex object for the event
+        eventArg,
+      );
+
+      if (ev2) {
+        arg.appData.paymentService.triggerEvent(
+          ev2,
+          arg.newValue,
+          newHiddenMetadataValue,
+
+          // we need to build all this complex object for the event
+          eventArg,
+        );
       }
-    );
+    })();
   }
 }
 
@@ -289,7 +306,7 @@ export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinition
  * graphql does things to it, and this will trigger what is necessary to  it
  * @param arg 
  */
- export function paymentSQLPreSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
+export function paymentSQLPreSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
   if (!arg.originalValue) {
     if (arg.newValue.rometadata) {
       return "Setting up read only metadata is not allowed";

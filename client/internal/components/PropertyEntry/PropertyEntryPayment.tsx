@@ -5,7 +5,7 @@
 
 import React from "react";
 import { IPropertyEntryRendererProps, IPropertyEntryHandlerProps } from ".";
-import { IPropertyDefinitionSupportedPaymentType, paymentAllowedStatuses, PaymentStatusType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
+import { IPropertyDefinitionSupportedPaymentType, paymentAllowedStatuses, PaymentStatusType, paymentTypesArr } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../util";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
@@ -19,6 +19,16 @@ interface ICurrencyI18nType {
    * The title of such structure
    */
   title: string;
+}
+
+interface IPaymentAllowedStatus {
+  value: PaymentStatusType;
+  i18nValue: string;
+}
+
+interface IPaymentAllowedType {
+  value: string;
+  i18nValue: string;
 }
 
 /**
@@ -47,8 +57,8 @@ export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRender
   };
   currentTextualValueOfAmount: string;
   currency: ICurrencyType;
-  currencyFormat: "$N" | "N$",
-  currencyAvailable: ICurrencyType[],
+  currencyFormat: "$N" | "N$";
+  currencyAvailable: ICurrencyType[];
   currencyI18n: ICurrencyI18nType;
   onAmountChangeByTextualValue: (newAmount: string) => void;
   onToggleNullStatus: () => void;
@@ -57,6 +67,9 @@ export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRender
   onCurrencyChange: (newCurrency: string) => void;
   onMetadataChange: (newMetadata: string) => void;
   onTypeChange: (newType: string) => void;
+  allowedStatuses: IPaymentAllowedStatus[];
+  allowedTypes: IPaymentAllowedType[];
+  isAllowedToToggleNullStatus: boolean;
 }
 
 interface IPropertyEntryPaymentState {
@@ -99,6 +112,8 @@ export default class PropertyEntryPayment extends React.Component<
           currency: this.props.currency.code,
           status: PaymentStatusType.PENDING,
           type: (this.props.property.getSubtype() as any) || "invoice",
+          metadata: null,
+          rometadata: null,
         };
 
       if ((valueToRestoreAgainst as any).type === "subscription") {
@@ -246,7 +261,8 @@ export default class PropertyEntryPayment extends React.Component<
 
     const currentTextualValueOfAmount = this.props.state.value ?
       (
-        this.props.state.internalValue ||
+        typeof this.props.state.internalValue === "string" ?
+        this.props.state.internalValue :
         (this.props.state.value as IPropertyDefinitionSupportedPaymentType)
           .amount.toString().replace(/\./g, this.props.i18n[this.props.language].number_decimal_separator)
       ) :
@@ -265,6 +281,29 @@ export default class PropertyEntryPayment extends React.Component<
       title: this.props.i18n[this.props.language].currency_dialog_title,
     };
     const currency = currencies[currentCurrency];
+
+    const subtype = this.props.property.getSubtype();
+
+    const allowedTypes = paymentTypesArr.filter((type) => {
+      return !subtype || type.startsWith(subtype);
+    }).map((type) => {
+      return {
+        i18nValue: i18nInLanguage.payment[type.replace("-", "_")],
+        value: type,
+      }
+    });
+
+    const validStatuses = this.props.state.value ? paymentAllowedStatuses[(this.props.state.value as any).type] : [];
+    const allowedStatuses = validStatuses.map((status: string) => {
+      return {
+        i18nValue: i18nInLanguage.payment[status],
+        value: status,
+      }
+    });
+
+    // if the current value is null then it's always allowed to prevent non nullable fields
+    // from sticking to null and being in an invalid state with no hope to change
+    const isAllowedToToggleNullStatus = !this.props.state.value ? true : this.props.property.isNullable();
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryPaymentRendererProps = {
@@ -293,7 +332,7 @@ export default class PropertyEntryPayment extends React.Component<
         inactive: i18nInLanguage.payment.inactive,
         refund: i18nInLanguage.payment.refund,
         invoice: i18nInLanguage.payment.invoice,
-        subscriptionMonthly: i18nInLanguage.payment.monthly,
+        subscriptionMonthly: i18nInLanguage.payment.subscription_monthly,
         subscriptionDaily: i18nInLanguage.payment.subscription_daily,
         subscriptionYearly: i18nInLanguage.payment.subscription_yearly,
       },
@@ -323,6 +362,10 @@ export default class PropertyEntryPayment extends React.Component<
       onStatusChange: this.onStatusChange,
       onTypeChange: this.onTypeChange,
       onToggleNullStatus: this.onToggleNullStatus,
+
+      allowedTypes,
+      allowedStatuses,
+      isAllowedToToggleNullStatus,
     };
 
     return <RendererElement {...rendererArgs} />;

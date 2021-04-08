@@ -143,6 +143,8 @@ import GpsFixedIcon from '@material-ui/icons/GpsFixed';
 import EditIcon from '@material-ui/icons/Edit';
 import CropSquareIcon from '@material-ui/icons/CropSquare';
 import SaveIcon from '@material-ui/icons/Save';
+import QueueIcon from '@material-ui/icons/Queue';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 export {
   Grid,
@@ -283,4 +285,6 @@ export {
   TextFieldsIcon,
   ExtensionIcon,
   SaveIcon,
+  QueueIcon,
+  HighlightOffIcon,
 }

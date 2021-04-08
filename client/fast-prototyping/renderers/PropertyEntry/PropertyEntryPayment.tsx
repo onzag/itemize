@@ -8,14 +8,14 @@
 import { IPropertyEntryPaymentRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryPayment";
 import React from "react";
 import {
-  Alert, FormControl, FormControlLabel, Switch,
-  Typography, Radio, RadioGroup, FormLabel, IconButton,
-  createStyles, WithStyles, withStyles, RestoreIcon, InputLabel
+  Alert, Typography, IconButton,
+  createStyles, WithStyles, withStyles, RestoreIcon, InputLabel,
+  QueueIcon, HighlightOffIcon,
 } from "../../mui-core";
 import { capitalize } from "../../../components/localization";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
-import { paymentTypesArr, paymentAllowedStatuses } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import PropertyEntryFieldRenderer from "./PropertyEntryField";
+
 
 /**
  * A simple helper function that says when it should show invalid
@@ -105,177 +105,132 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
     </IconButton>
   ) : null;
 
-  const typesValue = paymentTypesArr.map((type) => {
-    return {
-      i18nValue: props.i18nPayment[cheapCamelCase[type] || type],
-      value: type,
-    }
-  });
-
-  const typePaymentSelector = (
-    <PropertyEntrySelectRenderer
-      values={typesValue}
-      canRestore={false}
-      currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.type}
-      currentI18nValue={props.currentValue && props.i18nPayment[cheapCamelCase[props.currentValue.type] || props.currentValue.type]}
-      currentValid={props.currentValid}
-      currentValue={props.currentValue && props.currentValue.type}
-      currentInternalValue={props.currentValue && props.currentValue.type}
-      currentInvalidReason={null}
-      rtl={props.rtl}
-      propertyId={props.propertyId + "-type"}
-      placeholder={props.i18nPayment.type}
-      args={null}
-      label={props.i18nPayment.type}
-      icon={null}
-      disabled={props.disabled}
-      autoFocus={props.autoFocus}
-      onChange={props.onTypeChange}
-      enableUserSetErrors={props.enableUserSetErrors}
-      onRestore={props.onRestore}
-      nullValue={null}
-      isNullable={false}
-      isNumeric={false}
-    />
-  );
-
-  const validStatuses = props.currentValue ? paymentAllowedStatuses[props.currentValue.type] : [];
-
-  const statusValue = validStatuses.map((status: string) => {
-    return {
-      i18nValue: props.i18nPayment[status],
-      value: status,
-    }
-  });
-
-  const statusPaymentSelector = (
-    <PropertyEntrySelectRenderer
-      values={statusValue}
-      canRestore={false}
-      currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.status}
-      currentI18nValue={props.currentValue && props.i18nPayment[cheapCamelCase[props.currentValue.status] || props.currentValue.status]}
-      currentValid={props.currentValid}
-      currentValue={props.currentValue && props.currentValue.status}
-      currentInternalValue={props.currentValue && props.currentValue.status}
-      currentInvalidReason={null}
-      rtl={props.rtl}
-      propertyId={props.propertyId + "-status"}
-      placeholder={props.i18nPayment.status}
-      args={null}
-      label={props.i18nPayment.status}
-      icon={null}
-      disabled={props.disabled}
-      autoFocus={props.autoFocus}
-      onChange={props.onStatusChange}
-      enableUserSetErrors={props.enableUserSetErrors}
-      onRestore={props.onRestore}
-      nullValue={null}
-      isNullable={false}
-      isNumeric={false}
-    />
-  );
-
-  const amountEntry = (
-    <PropertyEntryFieldRenderer
-      args={null}
-      autoFocus={props.autoFocus}
-      canRestore={false}
-      currentAppliedValue={props.currentAppliedValue && {
-        value: props.currentAppliedValue.amount,
-        currency: props.currentAppliedValue.currency,
-      }}
-      currentTextualValue={props.currentTextualValueOfAmount}
-      currentValid={props.currentValid}
-      currentValue={props.currentValue && {
-        value: props.currentValue.amount,
-        currency: props.currentValue.currency,
-      }}
-      disabled={props.disabled}
-      enableUserSetErrors={props.enableUserSetErrors}
-      isNumericType={true}
-      onChange={props.onAmountChange}
-      onChangeByTextualValue={props.onAmountChangeByTextualValue}
-      onRestore={null}
-      propertyId={props.propertyId + "-amount"}
-      rtl={props.rtl}
-      type="currency"
-      currency={props.currency}
-      currencyAvailable={props.currencyAvailable}
-      currencyFormat={props.currencyFormat}
-      currencyI18n={props.currencyI18n}
-      onChangeCurrency={props.onCurrencyChange}
-    />
-  )
+  const secondIconComponent = props.isAllowedToToggleNullStatus ? (
+    <IconButton
+      onClick={props.onToggleNullStatus}
+      className={props.classes.icon}
+      tabIndex={-1}
+      aria-label={
+        props.currentValue === null ?
+          props.i18nPayment.create :
+          props.i18nPayment.destroy
+      }
+      title={
+        props.currentValue === null ?
+          props.i18nPayment.create :
+          props.i18nPayment.destroy
+      }
+    >
+      {
+        props.currentValue === null ?
+          (
+            <QueueIcon />
+          ) :
+          (
+            <HighlightOffIcon />
+          )
+      }
+    </IconButton>
+  ) : null;
 
   let internalContent: React.ReactNode = null;
-  // if (props.isTernary) {
-  //   const values = [{
-  //     value: "true",
-  //     label: capitalize(props.trueLabel),
-  //   }, {
-  //     value: "false",
-  //     label: capitalize(props.falseLabel),
-  //   }, {
-  //     value: "null",
-  //     label: capitalize(props.nullLabel),
-  //   }];
-  //   internalContent = (
-  //     <FormControl
-  //       component={"fieldset" as any}
-  //       className={props.classes.entry}
-  //     >
-  //       <FormLabel
-  //         aria-label={props.label}
-  //         component={"legend" as any}
-  //         classes={{
-  //           root: props.classes.label + " " + props.classes.labelSingleLine,
-  //           focused: "focused",
-  //         }}
-  //       >
-  //         {props.label}{icon ? <IconButton
-  //           tabIndex={-1}
-  //           className={props.classes.icon}
-  //           onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
-  //         >{icon}</IconButton> : null}
-  //       </FormLabel>
-  //       <RadioGroup
-  //         value={JSON.stringify(props.currentValue)}
-  //         onChange={handleOnChange.bind(this, props)}
-  //       >
-  //         {values.map((v) => <FormControlLabel
-  //           key={v.value}
-  //           classes={{
-  //             label: props.classes.label
-  //           }}
-  //           value={v.value}
-  //           control={<Radio/>}
-  //           label={v.label}
-  //           disabled={props.disabled}
-  //         />)}
-  //       </RadioGroup>
-  //     </FormControl>
-  //   )
-  // } else {
-  //   internalContent = (
-  //     <FormControl className={props.classes.entry}>
-  //       <FormControlLabel
-  //         aria-label={props.label}
-  //         classes={{
-  //           label: props.classes.label,
-  //         }}
-  //         control={
-  //           <Switch
-  //             checked={props.currentValue}
-  //             onChange={props.onChange.bind(null, !props.currentValue, null)}
-  //             disabled={props.disabled}
-  //           />
-  //         }
-  //         label={props.label}
-  //       />
-  //       {icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
-  //     </FormControl>
-  //   )
-  // }
+  if (props.currentValue !== null) {
+    const typePaymentSelector = props.allowedTypes.length !== 1 ? (
+      <PropertyEntrySelectRenderer
+        values={props.allowedTypes}
+        canRestore={false}
+        currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.type}
+        currentI18nValue={props.currentValue && props.i18nPayment[cheapCamelCase[props.currentValue.type] || props.currentValue.type]}
+        currentValid={props.currentValid}
+        currentValue={props.currentValue && props.currentValue.type}
+        currentInternalValue={props.currentValue && props.currentValue.type}
+        currentInvalidReason={null}
+        rtl={props.rtl}
+        propertyId={props.propertyId + "-type"}
+        placeholder={props.i18nPayment.type}
+        args={{}}
+        label={props.i18nPayment.type}
+        icon={null}
+        disabled={props.disabled}
+        autoFocus={props.autoFocus}
+        onChange={props.onTypeChange}
+        enableUserSetErrors={props.enableUserSetErrors}
+        onRestore={props.onRestore}
+        nullValue={null}
+        isNullable={false}
+        isNumeric={false}
+      />
+    ) : null;
+
+    const statusPaymentSelector = props.allowedStatuses.length ? (
+      <PropertyEntrySelectRenderer
+        values={props.allowedStatuses}
+        canRestore={false}
+        currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.status}
+        currentI18nValue={props.currentValue && props.i18nPayment[cheapCamelCase[props.currentValue.status] || props.currentValue.status]}
+        currentValid={props.currentValid}
+        currentValue={props.currentValue && props.currentValue.status}
+        currentInternalValue={props.currentValue && props.currentValue.status}
+        currentInvalidReason={null}
+        rtl={props.rtl}
+        propertyId={props.propertyId + "-status"}
+        placeholder={props.i18nPayment.status}
+        args={{}}
+        label={props.i18nPayment.status}
+        icon={null}
+        disabled={props.disabled}
+        autoFocus={props.autoFocus}
+        onChange={props.onStatusChange}
+        enableUserSetErrors={props.enableUserSetErrors}
+        onRestore={props.onRestore}
+        nullValue={null}
+        isNullable={false}
+        isNumeric={false}
+      />
+    ) : null;
+
+    const amountEntry = (
+      <PropertyEntryFieldRenderer
+        label={props.i18nPayment.amount}
+        placeholder={props.i18nPayment.amount}
+        args={{}}
+        autoFocus={props.autoFocus}
+        canRestore={false}
+        currentAppliedValue={props.currentAppliedValue && {
+          value: props.currentAppliedValue.amount,
+          currency: props.currentAppliedValue.currency,
+        }}
+        currentTextualValue={props.currentTextualValueOfAmount}
+        currentValid={props.currentValid}
+        currentValue={props.currentValue && {
+          value: props.currentValue.amount,
+          currency: props.currentValue.currency,
+        }}
+        disabled={props.disabled}
+        enableUserSetErrors={props.enableUserSetErrors}
+        isNumericType={true}
+        onChange={props.onAmountChange}
+        onChangeByTextualValue={props.onAmountChangeByTextualValue}
+        onRestore={null}
+        propertyId={props.propertyId + "-amount"}
+        rtl={props.rtl}
+        type="currency"
+        currency={props.currency}
+        currencyAvailable={props.currencyAvailable}
+        currencyFormat={props.currencyFormat}
+        currencyI18n={props.currencyI18n}
+        onChangeCurrency={props.onCurrencyChange}
+      />
+    );
+
+    internalContent = (
+      <>
+        {typePaymentSelector}
+        {statusPaymentSelector}
+        {amountEntry}
+      </>
+    );
+  }
 
   return (
     <div className={props.classes.container}>
@@ -294,13 +249,13 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
           null
       }
       <div>
-        <InputLabel
-          classes={{
-            root: props.classes.label,
-          }}
+        <div
+          className={props.classes.label}
         >
-          {capitalize(props.label)}{iconComponent}
-        </InputLabel>
+          {secondIconComponent}
+          {capitalize(props.label)}
+          {iconComponent}
+        </div>
         {internalContent}
       </div>
       <div className={props.classes.errorMessage}>

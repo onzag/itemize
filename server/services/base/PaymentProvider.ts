@@ -142,12 +142,12 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     return typeof attr !== "undefined" && attr !== null ? parsed[attr] : parsed;
   }
 
-  private processSettingOfHiddenMetadataAt(uuid: string, compareAgainst?: string) {
+  private async processSettingOfHiddenMetadataAt(uuid: string, originalValueToCompareAgainst?: string) {
     const storedValue = this.hiddenMetadataProcessing[uuid];
     delete this.hiddenMetadataProcessing[uuid];
 
-    if (typeof compareAgainst !== "undefined" && compareAgainst === storedValue) {
-      return;
+    if (typeof originalValueToCompareAgainst !== "undefined" && originalValueToCompareAgainst === storedValue) {
+      return originalValueToCompareAgainst;
     }
 
     const location = this.unwrapUUIDFor(uuid);
@@ -162,7 +162,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     // update of the row, this means it doesn't need to be informed
     // this makes it an efficient update that does not
     // bother other clusters
-    this.localAppData.rawDB.performRawDBUpdate(
+    await this.localAppData.rawDB.performRawDBUpdate(
       location.item,
       location.id,
       location.version,
@@ -173,6 +173,8 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
         },
       }
     );
+
+    return storedValue;
   }
 
   public setHiddenMetadataAt(uuid: string, hiddenMetadata: string) {
@@ -257,6 +259,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
    * @param payment the payment object in question
    * @param hiddenMetadata the hidden metadata of the element
    * @param info the extra information for the event
+   * @returns the end value of the hidden metadata row as stored
    */
   public async triggerEvent(
     ev: PaymentEvent,
@@ -289,7 +292,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     await Promise.all(this.listeners[ev].map((l) => l(arg)));
 
     // and now we can actually set and update the hidden metadata
-    this.processSettingOfHiddenMetadataAt(info.uuid);
+    return this.processSettingOfHiddenMetadataAt(info.uuid, hiddenMetadata);
   }
 
   /**

@@ -1231,6 +1231,7 @@ async function getI18nPropertyData(
       property.type === "integer" ||
       property.type === "year" ||
       property.type === "unit" ||
+      property.type === "payment" ||
       property.pattern
     ) && !property.values
   ) {

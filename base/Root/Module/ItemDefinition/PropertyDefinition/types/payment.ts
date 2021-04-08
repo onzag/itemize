@@ -47,7 +47,7 @@ export const paymentAllowedStatuses = {
     PaymentStatusType.ACTIVE,
     PaymentStatusType.INACTIVE,
   ],
-}
+};
 
 /**
  * The currency definition is described by an object
