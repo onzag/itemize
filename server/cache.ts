@@ -621,7 +621,7 @@ export class Cache {
           sideEffectedProperty.include,
           sideEffectedProperty.property,
           sqlValue,
-        ) as any;
+        )[sideEffectedProperty.property.getId()] as any;
 
         // and try to execute
         try {
@@ -781,7 +781,7 @@ export class Cache {
           preSideEffectedProperty.include,
           preSideEffectedProperty.property,
           currentSQLValue,
-        ) as any;
+        )[preSideEffectedProperty.property.getId()] as any;
   
         if (typeof newValue !== "undefined") {
           const value = await preSideEffectFn({
@@ -1064,7 +1064,7 @@ export class Cache {
           sideEffectedProperty.include,
           sideEffectedProperty.property,
           sqlValue,
-        ) as any;
+        )[sideEffectedProperty.property.getId()] as any;
 
         // get the original value
         const originalValue = convertSQLValueToGQLValueForProperty(
@@ -1073,7 +1073,7 @@ export class Cache {
           sideEffectedProperty.include,
           sideEffectedProperty.property,
           currentSQLValue,
-        ) as any;
+        )[sideEffectedProperty.property.getId()] as any;
 
         // and try to execute
         try {
@@ -1583,7 +1583,7 @@ export class Cache {
                 sideEffectedProperty.include,
                 sideEffectedProperty.property,
                 sqlValue,
-              ) as any;
+              )[sideEffectedProperty.property.getId()] as any;
 
               // and try to execute
               try {

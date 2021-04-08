@@ -795,8 +795,7 @@ export async function initializeServer(
     if (PaymentClass.getType() !== ServiceProviderType.LOCAL) {
       throw new Error("The payment service class is not a local type, and that's not allowed");
     }
-    const paymentService: PaymentProvider<any> = (sensitiveConfig.payment ?
-      new PaymentProvider(sensitiveConfig.payment, registry, config, sensitiveConfig) : null) as any;
+    const paymentService: PaymentProvider<any> = new PaymentClass(sensitiveConfig.payment, registry, config, sensitiveConfig) as any;
 
     const customServices: {
       [name: string]: ServiceProvider<any>,

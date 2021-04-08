@@ -315,7 +315,7 @@ export function paymentSQLPreSideEffect(arg: ISQLSideEffectType<IPropertyDefinit
     return;
   }
 
-  if (arg.originalValue.rometadata !== arg.newValue.rometadata) {
+  if (arg.newValue && arg.originalValue.rometadata !== arg.newValue.rometadata) {
     return "Modifying read only metadata is not allowed";
   }
 }

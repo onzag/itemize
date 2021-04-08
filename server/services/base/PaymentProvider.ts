@@ -108,7 +108,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
 
   private hiddenMetadataProcessing: {
     [uuid: string]: string;
-  };
+  } = {};
 
   private setHiddenMetadataAtWithoutProcessing(uuid: string, hiddenMetadata: string) {
     this.hiddenMetadataProcessing[uuid] = hiddenMetadata;
