@@ -177,6 +177,7 @@ export interface IServerCustomizationDataType {
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
   customRoles?: ICustomRoleType[];
+  callback?: (appData: IAppDataType) => void | Promise<void>;
 }
 
 export async function getStorageProviders(
@@ -965,6 +966,14 @@ export async function initializeServer(
       paymentServiceInstanceRouter,
       paymentServiceClassRouter,
     ].filter((r) => !!r);
+
+    if (custom.callback) {
+      logger.info(
+        "initializeServer: calling callback",
+      );
+
+      await custom.callback(appData);
+    }
 
     logger.info(
       "initializeServer: setting up endpoints",
