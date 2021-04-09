@@ -128,7 +128,11 @@ export function getGQLFieldsDefinitionForProperty(
       }
     }
     gqlResult = PROPERTY_TYPE_GQL_POOL[defName];
-  } else {
+  } else if (propertyDescription.gqlList) {
+    gqlResult = GraphQLList(
+      GraphQLNonNull(gqlDef),
+    );
+  } else {
     gqlResult = gqlDef;
   }
 
