@@ -13,7 +13,7 @@ import equals from "deep-equal";
  * 
  * The select handler and renderer is one of the simplest of its kind
  */
-export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendererProps<string | number> {
+export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendererProps<string | number | string[] | number[]> {
   /**
    * The values we are working with, an array that contains
    * how they are going to be displayed in the user's language and the actual value
@@ -38,6 +38,10 @@ export interface IPropertyEntrySelectRendererProps extends IPropertyEntryRendere
    * Whether it represents a numeric value
    */
   isNumeric: boolean;
+  /**
+   * Whether it represents a list of values
+   */
+  isList: boolean;
   /**
    * The current value in its localized form
    */
@@ -113,11 +117,11 @@ export default class PropertyEntrySelect
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const values = this.props.property.getSpecificValidValues().map((v: string | number) => ({
+    const values = this.props.property.getSpecificValidValues().map((v: any) => ({
       i18nValue: i18nData.values[v] || v,
       value: v,
     }));
-    const currentValue = this.props.state.value as string | number;
+    const currentValue = this.props.state.value as any;
     const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
 
     const type = this.props.property.getType();
@@ -145,9 +149,10 @@ export default class PropertyEntrySelect
       values,
       isNullable,
       isNumeric,
+      isList: this.props.property.isList(),
       nullValue,
 
-      currentAppliedValue: this.props.state.stateAppliedValue as string | number,
+      currentAppliedValue: this.props.state.stateAppliedValue as any,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,

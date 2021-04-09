@@ -883,6 +883,14 @@ export function checkPropertyDefinition(
       "Cannot set a maxLength value",
       traceback.newTraceToBit("maxLength"),
     );
+  } else if (
+    propertyDefintionTypeStandard.requiresValues &&
+    (!rawData.values || rawData.values.length === 0)
+  ) {
+    throw new CheckUpError(
+      "Values are required with this type",
+      traceback,
+    );
   }
 
   if (
@@ -996,12 +1004,12 @@ export function checkPropertyDefinition(
     rawData.values.forEach((value, index) => {
       const invalidreason = PropertyDefinition.isValidValue(
         rawData,
-        value,
+        (propertyDefintionTypeStandard.gqlList ? [value] : value) as any,
         false,
       );
       if (invalidreason) {
         throw new CheckUpError(
-          "Invalid value for item: (" + JSON.stringify(value) + ")" + invalidreason,
+          "Invalid value for item: (" + JSON.stringify(value) + ") " + invalidreason,
           valuesTraceback.newTraceToBit(index),
         );
       }
@@ -1042,7 +1050,7 @@ export function checkPropertyDefinition(
       );
       if (invalidReason) {
         throw new CheckUpError(
-          "Invalid value for default if definition: (" + JSON.stringify(rule.value) + ")" + invalidReason,
+          "Invalid value for default if definition: (" + JSON.stringify(rule.value) + ") " + invalidReason,
           defaultIfTraceback.newTraceToBit(index).newTraceToBit("value"),
         );
       }
@@ -1057,7 +1065,7 @@ export function checkPropertyDefinition(
     );
     if (invalidReason) {
       throw new CheckUpError(
-        "Invalid value for enforced value definition: (" + JSON.stringify(rawData.enforcedValue) + ")" + invalidReason,
+        "Invalid value for enforced value definition: (" + JSON.stringify(rawData.enforcedValue) + ") " + invalidReason,
         traceback.newTraceToBit("enforcedValue"),
       );
     }

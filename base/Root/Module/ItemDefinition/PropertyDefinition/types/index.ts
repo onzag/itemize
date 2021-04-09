@@ -25,6 +25,7 @@ import location, { IPropertyDefinitionSupportedLocationType } from "./location";
 import files, { PropertyDefinitionSupportedFilesType } from "./files";
 import year, { PropertyDefinitionSupportedYearType } from "./year";
 import payment, { IPropertyDefinitionSupportedPaymentType } from "./payment";
+import taglist, { PropertyDefinitionSupportedTagListType } from "./taglist";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
 import file, { PropertyDefinitionSupportedFileType } from "./file";
@@ -58,7 +59,8 @@ export type PropertyDefinitionSupportedTypeName =
   "file" |            // Represents a single url
   "files" |           // Represented as a list of urls, non comparable,
                       // stored as a list of urls
-  "payment";
+  "payment" |
+  "taglist";
 
 export interface IArgInfo {
   id: string;
@@ -362,6 +364,10 @@ export interface IPropertyDefinitionSupportedType<T> {
    */
   allowsMinMaxLengthDefined?: boolean;
   /**
+   * This field is required to have specified specific values
+   */
+  requiresValues?: boolean;
+  /**
    * i18n supported and expected attributes
    * they won't be requested at all for hidden and not searchable items
    * if the item has a range it should be specified too
@@ -416,6 +422,7 @@ const supportedTypesStandard: PropertyDefinitionSupportedTypesStandardType = {
   file,
   files,
   payment,
+  taglist,
 };
 
 // Checking that the property descriptions are right
@@ -462,6 +469,7 @@ export type PropertyDefinitionSupportedType =
   IPropertyDefinitionSupportedLocationType |
   PropertyDefinitionSupportedFileType |
   PropertyDefinitionSupportedFilesType |
-  IPropertyDefinitionSupportedPaymentType;
+  IPropertyDefinitionSupportedPaymentType |
+  PropertyDefinitionSupportedTagListType;
 
 export default supportedTypesStandard;

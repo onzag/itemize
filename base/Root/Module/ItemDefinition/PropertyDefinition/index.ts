@@ -28,6 +28,7 @@ import equals from "deep-equal";
 import { IGQLFile } from "../../../../../gql-querier";
 import Include from "../Include";
 import { ICustomRoleManager } from "../../../../Root";
+import { PropertyDefinitionSupportedFilesType } from "./types/files";
 
 /**
  * These are the main errors a property is able to give
@@ -490,6 +491,30 @@ export default class PropertyDefinition {
   }
 
   /**
+   * Performs a check agains the json definition value for a property definition
+   * @param properyDefinitionRaw 
+   * @param v 
+   * @returns 
+   */
+  public static checkAgainstJSONDefinition(properyDefinitionRaw: IPropertyDefinitionRawJSONDataType, v: PropertyDefinitionSupportedType) {
+    if (v === null) {
+      return true;
+    }
+
+    const definition = supportedTypesStandard[properyDefinitionRaw.type];
+
+    if (definition.json) {
+      if (definition.gqlList) {
+        return Array.isArray(v) && (v as any[]).every((sb) => typeof sb === definition.json);
+      }
+
+      return typeof v === definition.json;
+    }
+
+    return true;
+  }
+
+  /**
    * Checks whether a value is valid or not using
    * the raw data.
    *
@@ -520,18 +545,27 @@ export default class PropertyDefinition {
     } else if (!propertyDefinitionRaw.nullable && value === null) {
       return PropertyInvalidReason.NOT_NULLABLE;
     }
-    // Check against the values if allowed
-    if (
-      propertyDefinitionRaw.values &&
-      checkAgainstValues &&
-      !propertyDefinitionRaw.values.includes(value)
-    ) {
-      return PropertyInvalidReason.INVALID_VALUE;
-    }
+
     // we get the definition and run basic checks
     const definition = supportedTypesStandard[propertyDefinitionRaw.type];
+
+    if (checkAgainstValues && propertyDefinitionRaw.values) {
+      // Check against the values if allowed
+      if (
+        !definition.gqlList &&
+        !propertyDefinitionRaw.values.includes(value)
+      ) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      } else if (
+        definition.gqlList &&
+        !(value as any[]).every((v) => propertyDefinitionRaw.values.includes(v))
+      ) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+    }
+
     // These basic checks are the most important
-    if (definition.json && typeof value !== definition.json) {
+    if (!PropertyDefinition.checkAgainstJSONDefinition(propertyDefinitionRaw, value)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
@@ -546,7 +580,7 @@ export default class PropertyDefinition {
       // if this is specified as a file content array data
       if (definition.gqlAddFileToFields) {
         // we have to do this madness for every file
-        if (!value.every((v: IGQLFile) => {
+        if (!(value as PropertyDefinitionSupportedFilesType).every((v: IGQLFile) => {
           // check that all the types match
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
@@ -667,7 +701,7 @@ export default class PropertyDefinition {
       // TO_SMALL check again but lenght based
     } else if (
       typeof propertyDefinitionRaw.minLength !== "undefined" &&
-      (valueToCheck as string).length < propertyDefinitionRaw.minLength
+      (valueToCheck as any).length < propertyDefinitionRaw.minLength
     ) {
       return PropertyInvalidReason.TOO_SMALL;
       // Now time to count decimals
@@ -1415,6 +1449,10 @@ export default class PropertyDefinition {
     return stateValue;
   }
 
+  public checkAgainstJSONDefinition(v: PropertyDefinitionSupportedType) {
+    return PropertyDefinition.checkAgainstJSONDefinition(this.rawData, v);
+  }
+
   /**
    * Sets a super enforced value that superseeds any enforced value or
    * values and makes the field enforced, the value might
@@ -1435,7 +1473,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (definition.json && typeof actualValue !== definition.json) {
+      if (!this.checkAgainstJSONDefinition(actualValue)) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
       }
     }
@@ -1472,7 +1510,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (definition.json && typeof actualValue !== definition.json) {
+      if (!this.checkAgainstJSONDefinition(actualValue)) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
       }
     }
@@ -1553,7 +1591,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (definition.json && typeof actualValue !== definition.json) {
+      if (!this.checkAgainstJSONDefinition(actualValue)) {
         throw new Error("Invalid super default " + JSON.stringify(actualValue));
       }
     }
@@ -1594,7 +1632,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (definition.json && typeof newActualValue !== definition.json) {
+      if (!this.checkAgainstJSONDefinition(newActualValue)) {
         throw new Error("Invalid value " + JSON.stringify(newActualValue));
       }
     }
@@ -1946,6 +1984,14 @@ export default class PropertyDefinition {
    */
   public hasSpecificValidValues() {
     return !!this.rawData.values;
+  }
+
+  /**
+   * Specifies whether it represents a list form
+   * @returns a boolean
+   */
+  public isList() {
+    return !!this.getPropertyDefinitionDescription().gqlList;
   }
 
   /**

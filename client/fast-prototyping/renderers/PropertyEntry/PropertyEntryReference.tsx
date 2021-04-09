@@ -607,6 +607,7 @@ class ActualPropertyEntryReferenceRenderer
         nullValue={nullValue}
         isNullable={this.props.isNullable}
         isNumeric={false}
+        isList={false}
       />
     );
   }

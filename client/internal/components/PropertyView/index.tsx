@@ -339,6 +339,7 @@ const handlerRegistry:
   files: null,
   unit: null,
   payment: null,
+  taglist: null,
 };
 
 /**

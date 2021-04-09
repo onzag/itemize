@@ -6,7 +6,7 @@
  */
 
 import {
-  PropertyDefinitionSupportedType, ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
+  ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
   ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo
 } from "../types";
 import PropertyDefinition from "../../PropertyDefinition";

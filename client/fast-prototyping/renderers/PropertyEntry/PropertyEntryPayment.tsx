@@ -159,6 +159,7 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
         nullValue={null}
         isNullable={false}
         isNumeric={false}
+        isList={false}
       />
     ) : null;
 
@@ -186,6 +187,7 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
         nullValue={null}
         isNullable={false}
         isNumeric={false}
+        isList={false}
       />
     ) : null;
 

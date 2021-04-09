@@ -325,8 +325,8 @@ async function buildChildrenItemDefinitionsOrModules(
     const fileContent = await fsAsync.readFile(actualLocation, "utf8");
     // and the data parsed
     let fileData: {
-      data: IFileModuleDataRawUntreatedJSONDataType |
-        IFileItemDefinitionUntreatedRawJSONDataType,
+      data: IFileModuleDataRawUntreatedJSONDataType |
+      IFileItemDefinitionUntreatedRawJSONDataType,
       pointers: any,
     };
 
@@ -348,7 +348,7 @@ async function buildChildrenItemDefinitionsOrModules(
     if (childrenMustBeOfType && childrenMustBeOfType !== fileData.data.type) {
       throw new CheckUpError(
         "Invalid type to be a children of '" +
-          fileData.data.type + "' expected '" + childrenMustBeOfType,
+        fileData.data.type + "' expected '" + childrenMustBeOfType,
         externalSpecificIncludeTraceback,
       );
     }
@@ -499,7 +499,7 @@ async function buildModule(
           });
         }
       }
-  
+
       finalValue.children.forEach((c) => {
         if (c.type === "item") {
           checkAtLeastOneIsSearchable(c);
@@ -605,8 +605,8 @@ async function buildItemDefinition(
   await Promise.all(
     (actualEvaledFileData.imports || []).map((imp, index) => {
       return getActualFileLocation(
-         [lastModuleDirectory, imp],
-         traceback.newTraceToBit("imports").newTraceToBit(index),
+        [lastModuleDirectory, imp],
+        traceback.newTraceToBit("imports").newTraceToBit(index),
       );
     }),
   );
@@ -1004,11 +1004,11 @@ async function getI18nIncludeData(
     traceback.newTraceToBit("id").newTraceToLocation(languageFileLocation);
 
   const expectedProperties = ITEM_OPTIONAL_I18N
-    .map((b) => ({key: b, required: false}))
+    .map((b) => ({ key: b, required: false }))
     .concat((include.canUserExclude || include.canUserExcludeIf ? ITEM_CAN_BE_EXCLUDED_I18N : [])
-      .map((b) => ({key: b, required: true})))
+      .map((b) => ({ key: b, required: true })))
     .concat((include.exclusionIsCallout ? ITEM_CALLOUT_EXCLUDED_I18N : [])
-      .map((b) => ({key: b, required: true})));
+      .map((b) => ({ key: b, required: true })));
 
   const localeDataIsRequired = expectedProperties.filter((p) => p.required).length >= 1;
 
@@ -1036,7 +1036,7 @@ async function getI18nIncludeData(
       if (localeDataIsRequired) {
         throw new CheckUpError(
           "Does not include 'includes' data for '" + locale + "' in '" +
-            include.id + "'",
+          include.id + "'",
           localeFileTraceback,
         );
       }
@@ -1126,41 +1126,41 @@ async function getI18nPropertyData(
     property.searchOnlyProperty;
 
   const disableRangedSearch =
-    property.disableRangedSearch || 
+    property.disableRangedSearch ||
     (property.type === "integer" && property.subtype === "reference") ||
     searchIsDisabled;
 
   let expectedProperties = definition.i18n.base
-    .map((b) => ({key: b, required: true}))
+    .map((b) => ({ key: b, required: true }))
     // concat to optional properties
     .concat((definition.i18n.optional || [])
-      .map((b) => ({key: b, required: false})))
+      .map((b) => ({ key: b, required: false })))
     // concat to search range properties only if necessary
     .concat((disableRangedSearch || searchIsDisabled ?
-        [] : definition.i18n.searchRange || [])
-      .map((b) => ({key: b, required: true})))
+      [] : definition.i18n.searchRange || [])
+      .map((b) => ({ key: b, required: true })))
     .concat((disableRangedSearch || searchIsDisabled ?
-        [] : definition.i18n.searchRangeOptional || [])
-      .map((b) => ({key: b, required: false})))
+      [] : definition.i18n.searchRangeOptional || [])
+      .map((b) => ({ key: b, required: false })))
     .concat((disableRangedSearch && !searchIsDisabled ?
-        definition.i18n.searchRangeDisabled || [] : [])
-      .map((b) => ({key: b, required: true})))
+      definition.i18n.searchRangeDisabled || [] : [])
+      .map((b) => ({ key: b, required: true })))
     .concat((disableRangedSearch && !searchIsDisabled ?
-        definition.i18n.searchRangeDisabledOptional || [] : [])
-      .map((b) => ({key: b, required: false})))
+      definition.i18n.searchRangeDisabledOptional || [] : [])
+      .map((b) => ({ key: b, required: false })))
     // concat to search properties only if necessary
     .concat((searchIsDisabled || (
       definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
       !disableRangedSearch
     ) ?
-        [] : definition.i18n.searchBase || [])
-      .map((b) => ({key: b, required: true})))
+      [] : definition.i18n.searchBase || [])
+      .map((b) => ({ key: b, required: true })))
     .concat((searchIsDisabled || (
       definition.searchInterface === PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE &&
       !disableRangedSearch
     ) ?
-        [] : definition.i18n.searchOptional || [])
-      .map((b) => ({key: b, required: false})))
+      [] : definition.i18n.searchOptional || [])
+      .map((b) => ({ key: b, required: false })))
     // request for the values if supported
     .concat((property.values || [])
       .map((b) => ({
@@ -1169,9 +1169,9 @@ async function getI18nPropertyData(
         actualFinalKeyValue: b.toString(),
       })))
     .concat((property.values ? ["null_value"] : [])
-      .map((b) => ({key: b, required: true})))
+      .map((b) => ({ key: b, required: true })))
     .concat((!searchIsDisabled && property.values ? ["search.null_value"] : [])
-      .map((b) => ({key: b, required: true})))
+      .map((b) => ({ key: b, required: true })))
     .concat(
       (property.specialProperties && property.specialProperties["mediaProperty"] && !property.hidden) ? [{
         key: "error.MEDIA_PROPERTY_TOO_LARGE",
@@ -1179,9 +1179,9 @@ async function getI18nPropertyData(
       }] : []
     )
     .concat((property.invalidIf && !property.hidden ? property.invalidIf.map((ii) => ii.error) : [])
-      .map((b) => ({key: "error." + b, required: true})))
+      .map((b) => ({ key: "error." + b, required: true })))
     .concat((property.searchInvalidIf && !property.hidden ? property.searchInvalidIf.map((ii) => ii.error) : [])
-      .map((b) => ({key: "error." + b, required: true})));;
+      .map((b) => ({ key: "error." + b, required: true })));;
 
   const errorRequiredProperties = [];
   if (!property.nullable && property.type !== "boolean") {
@@ -1193,8 +1193,14 @@ async function getI18nPropertyData(
   }
 
   if (
-    definition.i18n.tooLargeErrorInclude &&
-    !property.values
+    (
+      definition.i18n.tooLargeErrorInclude &&
+      !property.values
+    ) ||
+    (
+      definition.i18n.tooLargeErrorInclude &&
+      definition.gqlList
+    )
   ) {
     if (Array.isArray(definition.i18n.tooLargeErrorInclude)) {
       const subtype = property.subtype || null;
@@ -1261,7 +1267,10 @@ async function getI18nPropertyData(
       typeof property.minLength !== "undefined" ||
       definition.i18n.tooSmallErrorInclude
     ) &&
-    !property.values
+    (
+      !property.values ||
+      definition.gqlList
+    )
   ) {
     if (
       typeof property.minLength === "undefined" &&
@@ -1278,7 +1287,10 @@ async function getI18nPropertyData(
 
   if (
     definition.i18n.tooManyDecimalsErrorInclude &&
-    !property.values
+    (
+      !property.values ||
+      definition.gqlList
+    )
   ) {
     if (Array.isArray(definition.i18n.tooManyDecimalsErrorInclude)) {
       const subtype = property.subtype || null;
@@ -1290,7 +1302,11 @@ async function getI18nPropertyData(
     }
   }
 
-  if (typeof property.minDecimalCount !== "undefined" && !property.values) {
+  if (
+    typeof property.minDecimalCount !== "undefined" && (
+      !property.values ||
+      definition.gqlList
+    )) {
     errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
   }
 
@@ -1318,7 +1334,7 @@ async function getI18nPropertyData(
   }
 
   expectedProperties = expectedProperties.concat(errorRequiredProperties
-    .map((b) => ({key: b, required: true})));
+    .map((b) => ({ key: b, required: true })));
 
   // and start to loop
   rawDataConfig.standard.supportedLanguages.forEach((locale) => {
@@ -1336,7 +1352,7 @@ async function getI18nPropertyData(
     } else if (!properties[locale].properties[property.id]) {
       throw new CheckUpError(
         "Does not include 'properties' data for '" + locale + "' in '" +
-          property.id + "'",
+        property.id + "'",
         localeFileTraceback,
       );
     }

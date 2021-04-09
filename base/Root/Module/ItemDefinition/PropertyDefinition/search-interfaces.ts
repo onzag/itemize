@@ -33,6 +33,10 @@ export enum PropertyDefinitionSearchInterfacesType {
    * payment search interface
    */
   PAYMENT,
+  /**
+   * tags search interface
+   */
+  TAGS,
 }
 
 /**

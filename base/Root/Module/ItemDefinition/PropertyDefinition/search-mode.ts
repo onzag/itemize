@@ -439,7 +439,9 @@ export function buildSearchModePropertyDefinitions(
   // Full text search is similar to the exact mode, except it uses SEARCH as the handle
   } else if (
     propertyDefinitionDescription.searchInterface ===
-    PropertyDefinitionSearchInterfacesType.TEXT
+    PropertyDefinitionSearchInterfacesType.TEXT ||
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TAGS
   ) {
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + newPropDef.id;
     if (newPropDef.i18nData) {

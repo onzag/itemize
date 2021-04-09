@@ -450,7 +450,7 @@ interface IRendererWholeHandlerType extends IRendererHandlerType {
  */
 const selectHandler: IRendererHandlerType = {
   renderer: "PropertyEntrySelect",
-  handler: PropertyEntrySelect,
+  handler: PropertyEntrySelect as any,
 }
 
 /**
@@ -561,6 +561,10 @@ const handlerRegistry:
     renderer: "PropertyEntryPayment",
     handler: PropertyEntryPayment,
   },
+  // unecessary to specify as the property entry select
+  // will automatically handle the taglist because
+  // it always has values into it
+  taglist: null,
 
   // TODO
   files: null,
