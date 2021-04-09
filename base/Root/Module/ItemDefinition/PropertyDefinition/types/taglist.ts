@@ -11,12 +11,8 @@ import {
   getStandardSQLFnFor,
   standardSQLSelect,
 } from "../sql";
-import {
-  standardSQLSSCacheEqualFn, standardLocalEqual,
-} from "../local-sql";
 import { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import {
-  MAX_STRING_LENGTH,
   CLASSIC_BASE_I18N,
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
@@ -25,8 +21,6 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { countries, currencies } from "../../../../../../imported-resources";
-import { stringSQLStrSearch } from "../sql/string";
 import { taglistSQLEqualFn, taglistSQLIn, taglistSQLSearch, taglistSQLSSCacheEqualFn } from "../sql/taglist";
 
 /**
@@ -97,22 +91,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
 
     return valueA.every((v) => valueB.includes(v)) && valueB.every((v) => valueA.includes(v));
   },
-
-  nullableDefault: "",
-  supportedSubtypes: [
-    "email",
-    "identifier",
-    "exact-identifier",
-    "locale",
-    "comprehensive-locale",
-    "language",
-    "country",
-    "currency",
-    "role",
-    "exact-value",
-    "reference",
-  ],
-
+  nullableDefault: [],
   validate: (s: PropertyDefinitionSupportedTagListType, p: IPropertyDefinitionRawJSONDataType) => {
     if (!s.every((v) => {
       return (

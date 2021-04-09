@@ -23,6 +23,7 @@ import {
   createStyles,
   Alert,
   RestoreIcon,
+  Chip,
 } from "../../mui-core";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
 
@@ -39,6 +40,13 @@ function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
  * The styles for the select
  */
 export const style = createStyles({
+  chips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: 2,
+  },
   entry: {
     width: "100%",
     display: "flex",
@@ -114,7 +122,7 @@ interface IPropertyEntrySelectRendererWithStylesProps extends IPropertyEntrySele
 class ActualPropertyEntrySelectRenderer
   extends React.Component<IPropertyEntrySelectRendererWithStylesProps> {
 
-  constructor(props: IPropertyEntrySelectRendererWithStylesProps) {
+  constructor(props: IPropertyEntrySelectRendererWithStylesProps) {
     super(props);
 
     this.onChange = this.onChange.bind(this);
@@ -123,16 +131,25 @@ class ActualPropertyEntrySelectRenderer
   public onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
-    const textualValue = e.target.value;
-    // because the value can't be null, we need to set it like this
-    if (this.props.isNumeric) {
-      if (!textualValue) {
+    if (this.props.isList) {
+      const arrValue = e.target.value;
+      if (!arrValue.length) {
         this.props.onChange(null, null);
       } else {
-        this.props.onChange(parseFloat(textualValue) || null, null);
+        this.props.onChange(arrValue, null);
       }
     } else {
-      this.props.onChange(textualValue || null, null);
+      const textualValue = e.target.value;
+      // because the value can't be null, we need to set it like this
+      if (this.props.isNumeric) {
+        if (!textualValue) {
+          this.props.onChange(null, null);
+        } else {
+          this.props.onChange(parseFloat(textualValue) || null, null);
+        }
+      } else {
+        this.props.onChange(textualValue || null, null);
+      }
     }
   }
 
@@ -159,22 +176,109 @@ class ActualPropertyEntrySelectRenderer
       </InputAdornment>
     ) : null;
 
+    let selectElement: React.ReactNode = null;
+    if (this.props.isList) {
+      selectElement = (
+        <Select
+          classes={{
+            icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
+          }}
+          multiple={true}
+          value={this.props.currentValue || []}
+          onChange={this.onChange}
+          input={<FilledInput />}
+          renderValue={(selected: any[]) => {
+            return (
+              <div className={this.props.classes.chips}>
+                {selected.map((selectedValue) => {
+                  const gatheredResult = this.props.values.find((v) => v.value === selectedValue);
+                  return (
+                    <Chip
+                      key={selectedValue}
+                      label={(gatheredResult && gatheredResult.i18nValue) || selectedValue}
+                      className={this.props.classes.chip} color="primary"
+                    />
+                  );
+                })}
+              </div>
+            );
+          }}
+        >
+          {
+            // render the valid values that we display and choose
+            this.props.values.map((vv) => {
+              // the i18n value from the i18n data
+              return <MenuItem key={vv.value} value={vv.value}>{
+                vv.i18nValue
+              }</MenuItem>;
+            })
+          }
+        </Select>
+      );
+    } else {
+      selectElement = (
+        <Select
+          value={this.props.currentValue || ""}
+          onChange={this.onChange}
+          onBlur={this.props.enableUserSetErrors}
+          displayEmpty={true}
+          disabled={this.props.disabled}
+          variant="filled"
+          classes={{
+            icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
+          }}
+          input={
+            <FilledInput
+              id={this.props.propertyId}
+              placeholder={this.props.placeholder}
+              endAdornment={addornment}
+              classes={{
+                root: this.props.classes.fieldInput,
+                focused: "focused",
+              }}
+            />
+          }
+        >
+          <MenuItem
+            selected={false}
+            role="none"
+            disabled={true}
+          >
+            <em>{this.props.placeholder}</em>
+          </MenuItem>
+          <Divider />
+          {this.props.isNullable ? <MenuItem value="">
+            <em>{this.props.nullValue.i18nValue}</em>
+          </MenuItem> : null}
+          {
+            // render the valid values that we display and choose
+            this.props.values.map((vv) => {
+              // the i18n value from the i18n data
+              return <MenuItem key={vv.value} value={vv.value}>{
+                vv.i18nValue
+              }</MenuItem>;
+            })
+          }
+        </Select>
+      );
+    }
+
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     return (
       <div className={this.props.classes.container}>
         {
           this.props.description && descriptionAsAlert ?
-          <Alert severity="info" className={this.props.classes.description}>
-            {this.props.description}
-          </Alert> :
-          null
+            <Alert severity="info" className={this.props.classes.description}>
+              {this.props.description}
+            </Alert> :
+            null
         }
         {
           this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={this.props.classes.description}>
-            {this.props.description}
-          </Typography> :
-          null
+            <Typography variant="caption" className={this.props.classes.description}>
+              {this.props.description}
+            </Typography> :
+            null
         }
         <FormControl
           variant="filled"
@@ -190,49 +294,7 @@ class ActualPropertyEntrySelectRenderer
           >
             {this.props.label}
           </InputLabel>
-          <Select
-            value={this.props.currentValue || ""}
-            onChange={this.onChange}
-            onBlur={this.props.enableUserSetErrors}
-            displayEmpty={true}
-            disabled={this.props.disabled}
-            variant="filled"
-            classes={{
-              icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-            }}
-            input={
-              <FilledInput
-                id={this.props.propertyId}
-                placeholder={this.props.placeholder}
-                endAdornment={addornment}
-                classes={{
-                  root: this.props.classes.fieldInput,
-                  focused: "focused",
-                }}
-              />
-            }
-          >
-            <MenuItem
-              selected={false}
-              role="none"
-              disabled={true}
-            >
-              <em>{this.props.placeholder}</em>
-            </MenuItem>
-            <Divider/>
-            {this.props.isNullable ? <MenuItem value="">
-              <em>{this.props.nullValue.i18nValue}</em>
-            </MenuItem> : null}
-            {
-              // render the valid values that we display and choose
-              this.props.values.map((vv) => {
-                // the i18n value from the i18n data
-                return <MenuItem key={vv.value} value={vv.value}>{
-                  vv.i18nValue
-                }</MenuItem>;
-              })
-            }
-          </Select>
+          {selectElement}
         </FormControl>
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}

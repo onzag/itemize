@@ -7,7 +7,7 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { MaterialUISlateWrapperWithStyles } from "../wrapper";
-import { FormControl, InputLabel, Select, Input, Chip, MenuItem, TextField, FilledInput } from "@material-ui/core";
+import { FormControl, InputLabel, Select, Chip, MenuItem, TextField, FilledInput } from "../../../mui-core";
 import { Path } from "slate";
 import equals from "deep-equal";
 

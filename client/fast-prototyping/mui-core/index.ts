@@ -86,6 +86,7 @@ import FilledInput from "@material-ui/core/FilledInput";
 import Tooltip from "@material-ui/core/Tooltip";
 import Grid from "@material-ui/core/Grid";
 import NativeSelect from '@material-ui/core/NativeSelect';
+import Chip from "@material-ui/core/Chip";
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -287,4 +288,5 @@ export {
   SaveIcon,
   QueueIcon,
   HighlightOffIcon,
+  Chip,
 }

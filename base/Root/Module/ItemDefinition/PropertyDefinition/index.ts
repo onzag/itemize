@@ -1466,7 +1466,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = definition.nullableDefault === value ?
+    const actualValue = equals(definition.nullableDefault, value) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1503,7 +1503,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = definition.nullableDefault === value ?
+    const actualValue = equals(definition.nullableDefault, value) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1584,7 +1584,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = definition.nullableDefault === value ?
+    const actualValue = equals(definition.nullableDefault, value) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
