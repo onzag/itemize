@@ -46,7 +46,7 @@ export interface IPropertyEntryPaymentRendererProps extends IPropertyEntryRender
     pending: string;
     paid: string;
     disputed: string;
-    refunded: string;
+    reversed: string;
     inactive: string;
     active: string;
     invoice: string;
@@ -327,7 +327,7 @@ export default class PropertyEntryPayment extends React.Component<
         pending: i18nInLanguage.payment.pending,
         paid: i18nInLanguage.payment.paid,
         disputed: i18nInLanguage.payment.disputed,
-        refunded: i18nInLanguage.payment.refunded,
+        reversed: i18nInLanguage.payment.reversed,
         active: i18nInLanguage.payment.active,
         inactive: i18nInLanguage.payment.inactive,
         refund: i18nInLanguage.payment.refund,

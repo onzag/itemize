@@ -17,7 +17,7 @@ const statusToEvents = {
   "inactive": "INACTIVE",
   "disputed": "DISPUTED",
   "paid": "PAID",
-  "refunded": "REFUNDED",
+  "reversed": "REVERSED",
   "pending": "PENDING",
 }
 

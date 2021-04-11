@@ -33,123 +33,336 @@ export enum PaymentEvent {
    * made it go null, or a delete event rid of the row
    */
   DESTROYED = "DESTROYED",
+  /**
+   * A payment popped up (was created) or changed and is in a pending state
+   */
   PENDING = "PENDING",
+  /**
+   * A payment popped up (was created) or changed and is in a paid state
+   * note that this state is for when refunds are paid as well
+   */
   PAID = "PAID",
+  /**
+   * A payment popped up (was created) or changed and is in a disputed state
+   * use this state for
+   */
   DISPUTED = "DISPUTED",
-  REFUNDED = "REFUNDED",
+  /**
+   * A payment popped up (was created) or changed and is in a reversed state
+   * A payment has been reversed from its disputed state
+   */
+  REVERSED = "REVERSED",
+  /**
+   * A subscription has popped up (was created) or changed and it's in a inactive state
+   */
   INACTIVE = "INACTIVE",
+  /**
+   * A subscription has popped up (was created) or changed and it's in a active state
+   */
   ACTIVE = "ACTIVE",
 }
 
+/**
+ * The extra info that comes from a payment event
+ */
 export interface IPaymentProviderPaymentExtraInfo {
+  /**
+   * The module where this payment is contained at
+   */
   module: Module;
+  /**
+   * The item that contains this payment
+   */
   item: ItemDefinition;
+  /**
+   * If the payment is part of a include, which include is it
+   */
   include?: Include,
+  /**
+   * The payment property itself
+   */
   property: PropertyDefinition;
+  /**
+   * The id of the row where the payment is contained
+   */
   id: string;
+  /**
+   * The version of the row where the payment is contained
+   */
   version: string;
+  /**
+   * The original status of the payment before the new data
+   * had come into effect
+   * this will be null if it was created
+   */
   originalStatus: PaymentStatusType;
+  /**
+   * The original metadata of the payment before the new metadata
+   * had come into effect
+   * this will be null if it was created
+   */
   originalMetadata: string;
+  /**
+   * The original SQL data of the payment row where it was contained
+   * before the changes of status had come into effect
+   * this will be null if it was created
+   */
   originalSQLData: ISQLTableRowValue;
+  /**
+   * The unique identifier of this payment regarding its location to
+   * the database
+   */
   uuid: string;
 }
 
+/**
+ * @ignore
+ * 1 way to set the hidden metadata
+ */
 type SetHiddenMetadataAsJSONType = (attr: string, value: any) => void;
+/**
+ * @ignore
+ * 2 way to set the hidden metadata
+ */
 type SetHiddenMetadataAsJSONType2 = (value: any) => void;
+
+/**
+ * This interface extends the original extra info, but allows for the setting
+ * of the hidden metadata and contains the hidden metadata within itself
+ */
 export interface IPaymentProviderPaymentExtraInfoWithHiddenMetadata extends IPaymentProviderPaymentExtraInfo {
+  /**
+   * The original hidden metadata that was contained before the event
+   * had occurred
+   */
   originalHiddenMetadata: string;
+  /**
+   * Provides the current up to date hidden metadata
+   */
   getHiddenMetadata: () => string;
+  /**
+   * Sets the hidden metadata value
+   */
   setHiddenMetadata: (hiddenMetadata: string) => void;
+  /**
+   * This function treats the hidden metadata as
+   * JSON, and provides the value, note that it will
+   * crash if it's invalid json
+   */
   getHiddenMetadataAsJSON: (attr?: string) => any;
+  /**
+   * This function treats the hidden metadata as JSON
+   * and sets the value of a given attribute or the whole
+   * thing
+   */
   setHiddenMetadataAsJSON: SetHiddenMetadataAsJSONType | SetHiddenMetadataAsJSONType2;
 }
 
+/**
+ * This is the whole event object of the payment and contains everything regarding
+ * the hidden metadata and original data as well as the event information and payment
+ * object itself that is into action
+ */
 export interface IPaymentEventObject extends IPaymentProviderPaymentExtraInfoWithHiddenMetadata {
+  /**
+   * This is the event type that was triggered
+   */
   event: PaymentEvent;
+  /**
+   * And this is the new payment object as it is right now
+   */
   payment: IPropertyDefinitionSupportedPaymentType;
 }
 
+/**
+ * Represents a payment event listener that is added to the payment provider
+ * in the addEventListener interaction
+ * 
+ * Note that you can return a promise and this will affect the way hidden metadata is handled
+ * you cannot process hidden metadata asynchroniously unless you return a promise, node
+ * needs to know when the event is done to perform cleanup functions
+ */
 export type PaymentEventListener = (evObj: IPaymentEventObject) => Promise<void> | void;
 
+/**
+ * Represents the break down of an UUID to realize
+ * where in the database the payment is located
+ */
 export interface IPaymentUniqueLocation {
+  /**
+   * The id of the row where it is located
+   */
   id: string;
+  /**
+   * The version of the row where it is located
+   */
   version: string;
+  /**
+   * The item where it is located at
+   */
   item: ItemDefinition | string;
+  /**
+   * The include where it is located at that item
+   */
   include?: Include | string;
+  /**
+   * And the property itself
+   */
   property: PropertyDefinition | string;
 };
 
+/**
+ * Represents all the listeners for all the events
+ * @ignore
+ */
 type PaymentListeners = Record<PaymentEvent, PaymentEventListener[]>;
 
+/**
+ * Provides a conversion between a status change or status creation
+ * to an event type, it's pretty much a 1 to 1, there are of course
+ * the events CREATED and DESTROYED, but those are not status changes
+ */
 export const statusToEvents: Record<PaymentStatusType, PaymentEvent> = {
   [PaymentStatusType.ACTIVE]: PaymentEvent.ACTIVE,
   [PaymentStatusType.INACTIVE]: PaymentEvent.INACTIVE,
   [PaymentStatusType.DISPUTED]: PaymentEvent.DISPUTED,
   [PaymentStatusType.PAID]: PaymentEvent.PAID,
-  [PaymentStatusType.REFUNDED]: PaymentEvent.REFUNDED,
+  [PaymentStatusType.REVERSED]: PaymentEvent.REVERSED,
   [PaymentStatusType.PENDING]: PaymentEvent.PENDING,
 }
 
+/**
+ * Represents the base payment provider and every payment provider
+ * to be implemented should extend this one to ensure compatibility
+ * with whatever code is generated
+ */
 export default class PaymentProvider<T> extends ServiceProvider<T> {
+
+  /**
+   * Provides the type of the service provider, for the payment
+   * provider this is a local type as it runs locally in every
+   * cluster
+   * @returns LOCAL
+   */
   public static getType() {
     return ServiceProviderType.LOCAL;
   }
 
+  /**
+   * Represents the list of listeners that were
+   * appended to the provider
+   */
   private listeners: PaymentListeners = {
     CREATED: [],
     DESTROYED: [],
     PENDING: [],
     PAID: [],
     DISPUTED: [],
-    REFUNDED: [],
+    REVERSED: [],
     INACTIVE: [],
     ACTIVE: [],
   };
 
+  /**
+   * Represents a current state for the processing of the hidden
+   * metadata, the hidden metadata can be of use for the payment
+   * events in order to change whatever data is stored in it
+   */
   private hiddenMetadataProcessing: {
     [uuid: string]: string;
   } = {};
 
+  /**
+   * Sets the hidden metadata without processing it into the database
+   * and storing it as a value
+   * @param uuid the uuid to set the hidden metadata for
+   * @param hiddenMetadata the hidden metadata itself
+   */
   private setHiddenMetadataAtWithoutProcessing(uuid: string, hiddenMetadata: string) {
     this.hiddenMetadataProcessing[uuid] = hiddenMetadata;
   }
 
+  /**
+   * Sets the hidden metadata without processing it into the database
+   * but it uses a JSON mechanism instead
+   * @param uuid the uuid to set the hidden metadata for
+   * @param valueOrAttr the value or the attribute to se tthe thing for
+   * @param value the value itself, if not present then the previous will
+   * be considered the whole value
+   */
   private setHiddenMetadataAtWithoutProcessingJSON(uuid: string, valueOrAttr: any, value?: any) {
+    // if the value is not undefined
     if (typeof value !== "undefined") {
+      // then we need to consider this the attribute
       const attr = valueOrAttr.toString() as string;
+      // now we can get the whole stored value current
       const newValue = this.getHiddenMetadataInBetweenProcessingJSON(uuid) || {};
+      // and set that attribute
       newValue[attr] = value;
+      // and now we can set the hidden metadata
       this.setHiddenMetadataAtWithoutProcessingJSON(uuid, newValue);
       return;
     }
 
+    // however if we don't have a value and we are setting the whole
+    // if the value is null then
     if (valueOrAttr === null) {
+      // set the whole thing to null
       this.setHiddenMetadataAtWithoutProcessing(uuid, null);
     } else {
+      // otherwise JSON stringify it
       this.setHiddenMetadataAtWithoutProcessing(uuid, JSON.stringify(valueOrAttr));
     }
   }
 
+  /**
+   * Provides the hidden metadata in between the processing of it
+   * for a given uuid
+   * @param uuid the uuid to get the hidden metadata for
+   * @returns a string that represents the hidden metadata
+   */
   private getHiddenMetadataInBetweenProcessing(uuid: string) {
     return this.hiddenMetadataProcessing[uuid];
   }
 
+  /**
+   * Provides the hidden metadata in between the processing of it
+   * for a given uuid and it parses it into JSON
+   * @param uuid the uuid to get the hidden metadata for
+   * @param attr an optional attribute to only get for
+   * @returns a string that represents the hidden metadata
+   */
   private getHiddenMetadataInBetweenProcessingJSON(uuid: string, attr?: string) {
-    if (this.hiddenMetadataProcessing[uuid] === null) {
-      return null;
+    // if we have no hidden metadata
+    const hiddenMetadataValue = this.hiddenMetadataProcessing[uuid];
+    if (hiddenMetadataValue === null || typeof hiddenMetadataValue === "undefined") {
+      // we give undefined back
+      return;
     }
-    const parsed = JSON.parse(this.hiddenMetadataProcessing[uuid]);
+    // otherwise we are going to parse such a thing
+    const parsed = JSON.parse(hiddenMetadataValue);
+    // and if we have an attribute we give it as the final
     return typeof attr !== "undefined" && attr !== null ? parsed[attr] : parsed;
   }
 
+  /**
+   * Processes the hidden metadata into the database and returns the stored value
+   * @param uuid the uuid to process the hidden metadata for
+   * @param originalValueToCompareAgainst the original value to compare against if equal
+   * it will not attempt any changes
+   * @returns the stored value
+   */
   private async processSettingOfHiddenMetadataAt(uuid: string, originalValueToCompareAgainst?: string) {
+    // let's get the stored value we got
     const storedValue = this.hiddenMetadataProcessing[uuid];
     delete this.hiddenMetadataProcessing[uuid];
 
+    // if we have a value to compare against let's use it
     if (typeof originalValueToCompareAgainst !== "undefined" && originalValueToCompareAgainst === storedValue) {
       return originalValueToCompareAgainst;
     }
 
+    // now we can get the real location for the uuid
     const location = this.unwrapUUIDFor(uuid);
 
     // gather the prefix
@@ -177,9 +390,15 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     return storedValue;
   }
 
-  public setHiddenMetadataAt(uuid: string, hiddenMetadata: string) {
+  /**
+   * Sets the hidden metadata at a given payment uuid
+   * @param uuid the uuid to store the hidden metadata at
+   * @param hiddenMetadata the new hidden metadata value
+   * @returns the hidden metadata value that was stored
+   */
+  public async setHiddenMetadataAt(uuid: string, hiddenMetadata: string) {
     this.setHiddenMetadataAtWithoutProcessing(uuid, hiddenMetadata);
-    this.processSettingOfHiddenMetadataAt(uuid);
+    return this.processSettingOfHiddenMetadataAt(uuid);
   }
 
   /**
@@ -189,6 +408,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
    * @param info 
    */
   public getUUIDFor(info: IPaymentProviderPaymentExtraInfo | IPaymentUniqueLocation) {
+    // let's unwrap these values into proper instances
     const itemDef = typeof info.item === "string" ?
       this.localAppData.root.registry[info.item] as ItemDefinition : info.item;
     const include = info.include ? (
@@ -199,6 +419,12 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       include ? include.getSinkingPropertyFor(info.property) : itemDef.getPropertyDefinitionFor(info.property, true)
     ) : info.property;
 
+    // now we can build the UUID into its form
+    // the row id +
+    // the version
+    // the property defintion id
+    // the include if (if any)
+    // and the item definition table
     return info.id + "." +
       (info.version || "") + "." +
       propDef.getId() +
@@ -213,18 +439,24 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
    * @returns the payment object location
    */
   public unwrapUUIDFor(uuid: string): IPaymentUniqueLocation {
+    // first we split the whole thing into its
+    // dots
     const splitted = uuid.split(".");
+
+    // now we need to get these
     let id: string;
     let version: string;
     let propertyId: string;
     let includeId: string;
     let itemQualifiedName: string;
+    // for the ones with 5 this means it has a include
     if (splitted.length === 5) {
       id = splitted[0];
       version = splitted[1] || null;
       propertyId = splitted[2];
       includeId = splitted[3];
       itemQualifiedName = splitted[4];
+    // the ones with 4 don't have a include
     } else if (splitted.length === 4) {
       id = splitted[0];
       version = splitted[1] || null;
@@ -234,6 +466,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       throw new Error("Invalid uuid " + uuid);
     }
 
+    // now we can get these
     const item = this.localAppData.root.registry[itemQualifiedName] as ItemDefinition;
     const include = includeId ? item.getIncludeFor(includeId) : null;
     const property = include ? include.getSinkingPropertyFor(propertyId) : item.getPropertyDefinitionFor(propertyId, true);
@@ -452,26 +685,6 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
         ignorePreSideEffects: true,
       }
     );
-
-    // const uuid = typeof uuidOrLocation === "string" ? uuidOrLocation : this.getUUIDFor(uuidOrLocation);
-
-    // this.triggerEvent(
-    //   statusToEvents[status],
-    //   newValue,
-    //   paymentObject.hiddenMetadata,
-    //   {
-    //     id: paymentObject.location.id,
-    //     version: paymentObject.location.version,
-    //     item: paymentObject.item,
-    //     module: paymentObject.item.getParentModule(),
-    //     originalStatus: currentValue.status,
-    //     originalMetadata: currentValue.metadata,
-    //     originalSQLData: newValueFromSQLUpdate,
-    //     property: paymentObject.property,
-    //     include: paymentObject.include,
-    //     uuid,
-    //   }
-    // );
   }
 
   /**
@@ -499,7 +712,16 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
 
   /**
    * When defining a payment you should specify how to issue a refund based on this event
-   * this allows the developer to issue a refund based
+   * this allows the developer to issue a refund based on an invoice payment and a refund
+   * payment
+   * 
+   * @param invoicePaymentUUID required the invoice payment that needs to be reverted into
+   * a refund
+   * @param refundPaymentUUID an optional (null allowed) refund payment type that represents
+   * the reversal of the action
+   * @param extras extra information to aid into the refund process
+   * @param extras.knownInvoicePaymentRowValue if you know the row value of the invoice add it here
+   * @param extras.knownRefundPaymentRowValue if you know the row value of the refund add it here
    * @override
    */
   public executeRefund(
@@ -508,8 +730,22 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     extras: {
       knownInvoicePaymentRowValue?: ISQLTableRowValue;
       knownRefundPaymentRowValue?: ISQLTableRowValue;
+      [key: string]: any;
     } = {}
   ) {
 
+  }
+
+  /**
+   * A simple function for custom functionality
+   * @param fn the function to execute
+   * @param arg the argument to pass at it
+   * @override
+   */
+  public custom(
+    fn: string,
+    arg: any,
+  ) {
+    
   }
 }

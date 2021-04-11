@@ -24,19 +24,19 @@ export enum PaymentStatusType {
   PENDING = "pending",
   PAID = "paid",
   DISPUTED = "disputed",
-  REFUNDED = "refunded",
+  REVERSED = "reversed",
   INACTIVE = "inactive",
   ACTIVE = "active",
 }
 
-export const paymentStatusesArr = ["pending", "paid", "disputed", "refunded", "inactive", "active"];
+export const paymentStatusesArr = ["pending", "paid", "disputed", "reversed", "inactive", "active"];
 export const paymentTypesArr = ["invoice", "refund", "subscription-monthly", "subscription-daily", "subscription-yearly"];
 export const paymentAllowedStatuses = {
   invoice: [
     PaymentStatusType.PENDING,
     PaymentStatusType.PAID,
     PaymentStatusType.DISPUTED,
-    PaymentStatusType.REFUNDED,
+    PaymentStatusType.REVERSED,
   ],
   refund: [
     PaymentStatusType.PENDING,

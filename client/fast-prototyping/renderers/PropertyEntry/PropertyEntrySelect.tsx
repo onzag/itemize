@@ -186,7 +186,7 @@ class ActualPropertyEntrySelectRenderer
           multiple={true}
           value={this.props.currentValue || []}
           onChange={this.onChange}
-          input={<FilledInput />}
+          input={<FilledInput fullWidth={true}/>}
           renderValue={(selected: any[]) => {
             return (
               <div className={this.props.classes.chips}>
@@ -232,6 +232,7 @@ class ActualPropertyEntrySelectRenderer
               id={this.props.propertyId}
               placeholder={this.props.placeholder}
               endAdornment={addornment}
+              fullWidth={true}
               classes={{
                 root: this.props.classes.fieldInput,
                 focused: "focused",

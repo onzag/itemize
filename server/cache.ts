@@ -1508,7 +1508,7 @@ export class Cache {
           // we run this
           // because the index in the item definition cascades
           const interalDroppedRow: ISQLTableRowValue = await transactingDatabase.queryFirst(
-            deleteQueryBase,
+            deleteQuery,
             [
               id,
               version || "",

@@ -419,7 +419,7 @@ export class ItemizeRawDB {
       itemDefinitionOrModule;
 
     const builder = new SelectBuilder();
-    
+
     if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
       const moduleInQuestion = itemDefinitionOrModuleInstance.getParentModule();
       builder.fromBuilder.from(moduleInQuestion.getQualifiedPathName());
@@ -430,7 +430,7 @@ export class ItemizeRawDB {
     } else {
       builder.fromBuilder.from(itemDefinitionOrModuleInstance.getQualifiedPathName());
     }
- 
+
     selecter(builder);
 
     return await this.databaseConnection.queryRows(builder);
@@ -477,26 +477,41 @@ export class ItemizeRawDB {
     const selfTable = itemDefinition.getQualifiedPathName();
 
     const withQuery = new WithBuilder();
-  
-    const moduleUpdateQuery = new UpdateBuilder();
-    moduleUpdateQuery.table(moduleTable);
-    // here we will update our last modified
-    if (!updater.dangerousUseSilentMode) {
-      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
-    }
-    if (updater.moduleTableUpdate) {
-      moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
-    }
-    // and join it on id and version match
-    moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
-    moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
-    // now we pass the where criteria selector for further filtering
-    updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
-    moduleUpdateQuery.fromBuilder.from(selfTable);
-    // returning only the module table information
-    moduleUpdateQuery.returningBuilder.returningAll(moduleTable);
 
-    withQuery.with("MTABLE", moduleUpdateQuery);
+    if (
+      updater.dangerousUseSilentMode &&
+      (!updater.moduleTableUpdate || Object.keys(updater.moduleTableUpdate).length === 0) &&
+      !updater.moduleTableUpdater
+    ) {
+      const moduleSelectQuery = new SelectBuilder();
+      moduleSelectQuery.selectAll().fromBuilder.from(moduleTable);
+      moduleSelectQuery.joinBuilder.join(selfTable, (builder) => {
+        builder.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+        builder.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+      })
+      updater.whereCriteriaSelector(moduleSelectQuery.whereBuilder);
+      withQuery.with("MTABLE", moduleSelectQuery);
+    } else {
+      const moduleUpdateQuery = new UpdateBuilder();
+      moduleUpdateQuery.table(moduleTable);
+      // here we will update our last modified
+      if (!updater.dangerousUseSilentMode) {
+        moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+      }
+      if (updater.moduleTableUpdate) {
+        moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
+      }
+
+      // and join it on id and version match
+      moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+      moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+      // now we pass the where criteria selector for further filtering
+      updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
+      moduleUpdateQuery.fromBuilder.from(selfTable);
+      // returning only the module table information
+      moduleUpdateQuery.returningBuilder.returningAll(moduleTable);
+      withQuery.with("MTABLE", moduleUpdateQuery);
+    }
 
     if (updater.itemTableUpdater || updater.itemTableUpdate) {
       const itemUpdateQuery = new UpdateBuilder();
@@ -590,24 +605,37 @@ export class ItemizeRawDB {
     const selfTable = itemDefinition.getQualifiedPathName();
 
     const withQuery = new WithBuilder();
-    
-    const moduleUpdateQuery = new UpdateBuilder();
-    moduleUpdateQuery.table(moduleTable);
-    // here we will update our last modified
-    if (!updater.dangerousUseSilentMode) {
-      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
-    }
-    if (updater.moduleTableUpdate) {
-      moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
-    }
-    // and join it on id and version match
-    moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
-    moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
 
-    // returning only the module table information
-    moduleUpdateQuery.returningBuilder.returningAll();
+    if (
+      updater.dangerousUseSilentMode &&
+      (!updater.moduleTableUpdate || Object.keys(updater.moduleTableUpdate).length === 0) &&
+      !updater.moduleTableUpdater
+    ) {
+      const moduleSelectQuery = new SelectBuilder();
+      moduleSelectQuery.selectAll().fromBuilder.from(moduleTable);
+      moduleSelectQuery.whereBuilder.andWhereColumn("id", id);
+      moduleSelectQuery.whereBuilder.andWhereColumn("version", version || "");
+      withQuery.with("MTABLE", moduleSelectQuery);
+    } else {
+      const moduleUpdateQuery = new UpdateBuilder();
+      moduleUpdateQuery.table(moduleTable);
 
-    withQuery.with("MTABLE", moduleUpdateQuery)
+      // here we will update our last modified
+      if (!updater.dangerousUseSilentMode) {
+        moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+      }
+      if (updater.moduleTableUpdate) {
+        moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
+      }
+      // and join it on id and version match
+      moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
+      moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
+
+      // returning only the module table information
+      moduleUpdateQuery.returningBuilder.returningAll();
+
+      withQuery.with("MTABLE", moduleUpdateQuery);
+    }
 
     if (updater.itemTableUpdater || updater.itemTableUpdate) {
       const itemUpdateQuery = new UpdateBuilder();

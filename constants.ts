@@ -529,7 +529,7 @@ export const LOCALE_I18N = [
   "payment.pending",
   "payment.paid",
   "payment.disputed",
-  "payment.refunded",
+  "payment.reversed",
   "payment.inactive",
   "payment.active",
   "payment.invoice",

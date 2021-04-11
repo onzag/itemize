@@ -23,7 +23,7 @@ export class ManualPaymentService extends PaymentProvider<null> {
     this.addEventListener(PaymentEvent.DESTROYED, this.onPayment);
     this.addEventListener(PaymentEvent.PENDING, this.onPayment);
     this.addEventListener(PaymentEvent.PAID, this.onPayment);
-    this.addEventListener(PaymentEvent.REFUNDED, this.onPayment);
+    this.addEventListener(PaymentEvent.REVERSED, this.onPayment);
     this.addEventListener(PaymentEvent.DISPUTED, this.onPayment);
     this.addEventListener(PaymentEvent.ACTIVE, this.onPayment);
     this.addEventListener(PaymentEvent.INACTIVE, this.onPayment);
