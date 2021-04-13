@@ -40,7 +40,9 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     const tagCompareCheck = arg.args[searchName] as string[];
 
-    // and we check it...
+    // and we check it... we are using the includes containment
+    // where we ensure that all the provided tags are included
+    // into this search
     arg.whereBuilder.andWhere(
       JSON.stringify(arg.prefix + arg.id) + " @> ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]",
       tagCompareCheck,

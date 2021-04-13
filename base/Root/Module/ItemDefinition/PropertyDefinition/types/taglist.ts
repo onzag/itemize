@@ -1,5 +1,7 @@
 /**
- * Contains the string type description
+ * Contains the taglist type description
+ * the taglist represents an array of string of defined
+ * types that allows for tagging
  *
  * @module
  */
