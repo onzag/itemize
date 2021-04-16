@@ -366,7 +366,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   /**
    * This field is required to have specified specific values
    */
-  requiresValues?: boolean;
+  requiresValues?: boolean | string[];
   /**
    * i18n supported and expected attributes
    * they won't be requested at all for hidden and not searchable items

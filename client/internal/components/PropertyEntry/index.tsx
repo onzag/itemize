@@ -564,6 +564,8 @@ const handlerRegistry:
   // unecessary to specify as the property entry select
   // will automatically handle the taglist because
   // it always has values into it
+  // TODO now it is necessary as the arbitrary tags is now
+  // into play
   taglist: null,
 
   // TODO

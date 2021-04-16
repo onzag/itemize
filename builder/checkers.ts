@@ -885,6 +885,10 @@ export function checkPropertyDefinition(
     );
   } else if (
     propertyDefintionTypeStandard.requiresValues &&
+    (
+      typeof propertyDefintionTypeStandard.requiresValues === "boolean" ||
+      propertyDefintionTypeStandard.requiresValues.includes(rawData.subtype || null)
+    ) &&
     (!rawData.values || rawData.values.length === 0)
   ) {
     throw new CheckUpError(

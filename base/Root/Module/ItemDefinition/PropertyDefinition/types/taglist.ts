@@ -56,6 +56,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   localStrSearch: null,
   sqlOrderBy: null,
   localOrderBy: null,
+  supportedSubtypes: ["arbitrary-tags"],
 
   localSearch: (arg) => {
     // item is deleted
@@ -95,17 +96,25 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   },
   nullableDefault: [],
   validate: (s: PropertyDefinitionSupportedTagListType, p: IPropertyDefinitionRawJSONDataType) => {
-    if (!s.every((v) => {
-      return (
-        typeof v === "string" &&
-        p.values.includes(v)
-      );
-    })) {
-      return PropertyInvalidReason.INVALID_VALUE;
-    }
-
-    if (s.length > p.values.length) {
-      return PropertyInvalidReason.TOO_LARGE;
+    if (p.subtype !== "arbitrary-tags") {
+      if (!s.every((v) => {
+        return (
+          typeof v === "string" &&
+          p.values.includes(v)
+        );
+      })) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
+  
+      if (s.length > p.values.length) {
+        return PropertyInvalidReason.TOO_LARGE;
+      }
+    } else {
+      if (!s.every((v) => {
+        return (typeof v === "string");
+      })) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
     }
 
     return null;
@@ -114,7 +123,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.TAGS,
   allowsMinMaxLengthDefined: true,
-  requiresValues: true,
+  requiresValues: [null],
 
   // i18n attributes required
   i18n: {
