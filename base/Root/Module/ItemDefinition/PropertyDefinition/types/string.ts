@@ -267,7 +267,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     optional: CLASSIC_OPTIONAL_I18N,
     searchBase: CLASSIC_SEARCH_BASE_I18N,
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    tooLargeErrorInclude: [null, "email", "identifier", "exact-identifier"],
+    tooLargeErrorInclude: [null, "email", "identifier", "exact-identifier", "exact-value"],
     invalidSubtypeErrorInclude: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
   },
 };

@@ -806,6 +806,10 @@ export class ActualItemProvider extends
 
   private automaticSearchTimeout: NodeJS.Timer = null;
 
+  // repair certain edge cases of data corruption due to event
+  // timing
+  private repairCorruptionTimeout: NodeJS.Timeout = null;
+
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
   // the state between the item and the expected state will
@@ -1666,6 +1670,16 @@ export class ActualItemProvider extends
     }
 
     let isNotFound = false;
+    // edge case, in some scenarios the data might come from the cache very fast
+    // and the information in the fields might not contain and has forgotten this field
+    // because it has been retrieved for the cache
+    // 1. item provider 1 loads partial data from the cache which is outdated data
+    // 2. item provider 2 loads some other fields from the endpoint, the applied value union hasn't triggered
+    // when the request occurs, so the fields are not aware of each other
+    // 3. item provider 1 requests feedback
+    // 4. item provider 2 applies value and due to signature mismatch deletes item provider 1 outdated data and clears it up
+    // 5. feedback arrives and listener considers that the signature matches, data has been deleted for the other provider
+    let dataIsCorrupted = false;
     if (this.props.forId) {
       const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         this.props.forId || null,
@@ -1673,7 +1687,27 @@ export class ActualItemProvider extends
       );
       if (appliedValue) {
         isNotFound = appliedValue.rawValue === null;
+
+        const { requestFields } = getFieldsAndArgs({
+          includeArgs: false,
+          includeFields: true,
+          includes: this.props.includes || {},
+          properties: this.props.properties || [],
+          includeModeration: this.props.loadModerationFields,
+          itemDefinitionInstance: this.props.itemDefinitionInstance,
+          forId: this.props.forId,
+          forVersion: this.props.forVersion || null,
+        });
+
+        if (!requestFieldsAreContained(requestFields, appliedValue.requestFields)) {
+          dataIsCorrupted = true;
+        }
       }
+    }
+
+    if (dataIsCorrupted) {
+      clearTimeout(this.repairCorruptionTimeout);
+      this.repairCorruptionTimeout = setTimeout(this.reloadListener, 70);
     }
 
     // we basically just upgrade the state

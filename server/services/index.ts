@@ -38,6 +38,7 @@ export class ServiceProvider<T> {
 
   public globalDatabaseConnection: DatabaseConnection;
   public globalRedisPub: ItemizeRedisClient;
+  public globalRedisSub: ItemizeRedisClient;
   public globalRedis: ItemizeRedisClient;
   public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
@@ -116,6 +117,7 @@ export class ServiceProvider<T> {
     globalDatabaseConnection: DatabaseConnection,
     globalClient: ItemizeRedisClient,
     globalPub: ItemizeRedisClient,
+    globalSub: ItemizeRedisClient,
     globalMailProvider: MailProvider<any>,
     globalCustomServices: {
       [name: string]: ServiceProvider<any>,
@@ -126,6 +128,7 @@ export class ServiceProvider<T> {
     this.globalDatabaseConnection = globalDatabaseConnection;
     this.globalRedis = globalClient;
     this.globalRedisPub = globalPub;
+    this.globalRedisSub = globalSub;
     this.globalRoot = root;
     this.globalRawDB = new ItemizeRawDB(globalPub, this.globalDatabaseConnection, this.globalRoot);
     this.globalCustomServices = globalCustomServices;

@@ -381,7 +381,7 @@ export async function initializeServer(
         "initializeServer: initializing redis global pub/sub client",
     );
     const redisPub: ItemizeRedisClient = await setupRedisClient("pub", redisConfig.pubSub);
-    const redisSub: ItemizeRedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : await setupRedisClient("sub", redisConfig.pubSub);
+    const redisSub: ItemizeRedisClient = await setupRedisClient("sub", redisConfig.pubSub);
 
     // so every other instance mode will end up setting up a local pub/sub for the local cache, however not the global manager
     // because it only talks to the global redis by publishing server data, and it shouldn't have anything to do with
@@ -561,6 +561,7 @@ export async function initializeServer(
         databaseConnection,
         redisGlobalClient,
         redisPub,
+        redisSub,
         config,
         sensitiveConfig,
         currencyFactorsService,
