@@ -23,6 +23,8 @@ import { SelectBuilder } from "../database/SelectBuilder";
 import { WhereBuilder } from "../database/WhereBuilder";
 import { SetBuilder } from "../database/SetBuilder";
 import { WithBuilder } from "../database/WithBuilder";
+import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
+import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 
 /**
  * The required properties that every row should have
@@ -51,6 +53,62 @@ export class ItemizeRawDB {
     this.redisPub = redisPub;
     this.databaseConnection = databaseConnection;
     this.root = root;
+  }
+
+  /**
+   * Will convert a graphql style value into a full row SQL value in order to execute many value
+   * types functionality and directly insert values in a safer way
+   * 
+   * Note that this method is incapable of passing the required data for consuming stream which means
+   * that if you set a value for a file and are working with files this will inevitably fail because
+   * its incapable to access the storage provider and unable to consume streams
+   * 
+   * Raw writes on the database are after all dangerous
+   *
+   * @param item the item definition that you want to convert a value for
+   * @param value the vale you want to convert
+   * @param serverData server data, required for doing things like currency conversion, you might use null otherwise but it should
+   * be readily available in the global environment as well as local, you should never use raw db in local nevertheless
+   * @param dictionary the dictionary to use
+   * @param partialFields by default it will populate the entire row information that is necessary to fill each one of the required
+   * properties (not including the base) so with partial fields you can get partial values which are useful for updates, these
+   * are the same as graphql fields
+   * 
+   * @returns an object which contains the total or partial values of the row to be inserted or updated
+   */
+  public processGQLValue(item: ItemDefinition | string, value: any, serverData: any, dictionary: string, partialFields?: any): {
+    modSQL: ISQLTableRowValue
+    itemSQL: ISQLTableRowValue
+  } {
+    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+    const mod = itemDefinition.getParentModule();
+
+    const modSQL = convertGQLValueToSQLValueForModule(
+      serverData,
+      mod,
+      value,
+      null,
+      null,
+      null,
+      dictionary,
+      partialFields,
+    ).value;
+
+    const itemSQL = convertGQLValueToSQLValueForItemDefinition(
+      serverData,
+      itemDefinition,
+      value,
+      null,
+      null,
+      null,
+      dictionary,
+      partialFields,
+    );
+
+    return {
+      modSQL,
+      itemSQL,
+    };
   }
 
   /**
@@ -400,6 +458,112 @@ export class ItemizeRawDB {
    */
   public async informRowsHaveBeenAdded(rows: ISQLTableRowValue[], rowDataIsComplete?: boolean) {
     return await this.informChangeOnRows(rows, "created", rowDataIsComplete);
+  }
+
+  public async performRawDBDelete(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    deleter: (builder: SelectBuilder) => void,
+    preventJoin?: boolean,
+  ) {
+    // TODO there is no delete builder, must be similar to the select builder anyway
+    const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
+      this.root.registry[itemDefinitionOrModule] :
+      itemDefinitionOrModule;
+  }
+
+  /**
+   * Performs a raw db insert where the values of the database rows
+   * are manually inserted value by value in a raw insert event
+   * 
+   * It is a rather advanced method to use as every row value to be inserted
+   * has to be specified and it is easy to mess up
+   * 
+   * refer to processGQLValue in order to aid yourself a little when doing a raw db
+   * insert
+   * 
+   * @param item 
+   * @param inserter 
+   * @returns 
+   */
+  public async performRawDBInsert(
+    item: ItemDefinition | string,
+    inserter: {
+      values: Array<
+        {
+          moduleTableInsert: IManyValueType;
+          itemTableInsert: IManyValueType;
+        }
+      >;
+      // does not inform for updates to other clusters
+      // or caches or anything at all, mantains last modified
+      // value
+      dangerousUseSilentMode?: boolean;
+    }
+  ) {
+    inserter.values.forEach((v) => {
+      if (!v.moduleTableInsert.container_id) {
+        throw new Error("moduleTableInsert is missing container id");
+      }
+    });
+
+    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+    const mod = itemDefinition.getParentModule();
+
+    const moduleTable = mod.getQualifiedPathName();
+    const selfTable = itemDefinition.getQualifiedPathName();
+
+    const allInsertedRows: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
+      return await Promise.all(inserter.values.map(async (value) => {
+        const insertQuery = transactingDatabase.getInsertBuilder().table(moduleTable);
+
+        const modValue = {
+          ...value.moduleTableInsert,
+        };
+
+        modValue.type = itemDefinition.getQualifiedPathName();
+        modValue.created_at = [
+          "NOW()",
+          [],
+        ];
+        modValue.last_modified = [
+          "NOW()",
+          [],
+        ];
+        modValue.created_by = modValue.created_by || UNSPECIFIED_OWNER;
+        modValue.version = modValue.version || "";
+
+        insertQuery.insert(modValue).returningBuilder.returningAll();
+
+        const insertQueryValueMod = await transactingDatabase.queryFirst(insertQuery);
+
+        const idefValue = {
+          ...value.itemTableInsert
+        };
+
+        idefValue[CONNECTOR_SQL_COLUMN_ID_FK_NAME] = insertQueryValueMod.id;
+        idefValue[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] = insertQueryValueMod.version;
+
+        // so now we create the insert query
+        const insertQueryIdef = transactingDatabase.getInsertBuilder().table(selfTable);
+        insertQueryIdef.insert(idefValue).returningBuilder.returningAll();
+        // so we call the qery
+        const insertQueryValueIdef = await transactingDatabase.queryFirst(insertQueryIdef);
+
+        // and we return the joined result
+        return {
+          ...insertQueryValueMod,
+          ...insertQueryValueIdef,
+        };
+      }));
+    });
+
+    const result = allInsertedRows.map(convertVersionsIntoNullsWhenNecessary);
+
+    if (!inserter.dangerousUseSilentMode) {
+      await this.informRowsHaveBeenAdded(result, true);
+    }
+
+    return result;
   }
 
   /**
