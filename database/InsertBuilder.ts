@@ -5,6 +5,8 @@
 
 import { IManyValueType, QueryBuilder } from "./base";
 import { ReturningBuilder } from "./ReturningBuilder";
+import { SetBuilder } from "./SetBuilder";
+import { WhereBuilder } from "./WhereBuilder";
 
 /**
  * the insert query builder that allows to create INSERT queries
@@ -27,6 +29,16 @@ export class InsertBuilder extends QueryBuilder {
    * as a string itself
    */
   private columnSignature: string = null;
+
+  /**
+   * The set builder for an upsert
+   */
+  private upsertSetBuilder: SetBuilder = null;
+
+  /**
+   * The where builder for an upsert
+   */
+  private upsertWhereBuilder: WhereBuilder = null;
 
   /**
    * The returning builder to specify the returning condition
@@ -166,10 +178,30 @@ export class InsertBuilder extends QueryBuilder {
   /**
    * sets the on conflict rule for the insert
    * @param doWhat what to do NOTHING or UPDATE
+   * @param fn a function to specify the set and where builder that is given on update
    * @returns itself
    */
-  public onConflict(doWhat: "NOTHING" | "UPDATE") {
+  public onConflict(doWhat: "NOTHING" | "UPDATE", fn?: (setBuilder: SetBuilder, whereBuilder: WhereBuilder) => void) {
     this.doOnConflict = doWhat;
+    
+    if (this.upsertWhereBuilder && doWhat === "NOTHING") {
+      this.popBindingSource();
+    }
+    if (this.upsertSetBuilder && doWhat === "NOTHING") {
+      this.popBindingSource();
+    }
+    if (!this.upsertSetBuilder && doWhat === "UPDATE") {
+      this.upsertSetBuilder = new SetBuilder();
+      this.addBindingSource(this.upsertSetBuilder);
+    }
+    if (!this.upsertWhereBuilder && doWhat === "UPDATE") {
+      this.upsertWhereBuilder = new WhereBuilder();
+      this.addBindingSource(this.upsertWhereBuilder);
+    }
+
+    if (doWhat === "UPDATE") {
+      fn(this.upsertSetBuilder, this.upsertWhereBuilder);
+    }
     return this;
   }
 
@@ -188,6 +220,8 @@ export class InsertBuilder extends QueryBuilder {
       " (" + this.columnSignature + ") VALUES (" +
       this.valuesToInsert.join("), (") + ") " +
       (this.doOnConflict ? "ON CONFLICT DO " + this.doOnConflict : "") +
+      (this.upsertSetBuilder ? " " + this.upsertSetBuilder.compile() : "") +
+      (this.upsertWhereBuilder ? " " + this.upsertWhereBuilder.compile() : "") +
       (returningRule ? " " + returningRule : "");
   }
 }

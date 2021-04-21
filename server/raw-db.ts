@@ -25,6 +25,14 @@ import { SetBuilder } from "../database/SetBuilder";
 import { WithBuilder } from "../database/WithBuilder";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import uuid from "uuid";
+import uuidv5 from "uuid/v5";
+import { DeleteBuilder } from "../database/DeleteBuilder";
+
+const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
+export function makeIdOutOf(str: string) {
+  return uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
 
 /**
  * The required properties that every row should have
@@ -41,6 +49,9 @@ export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
   private root: Root;
 
+  private transacting: boolean;
+  private transactingQueue: Function[] = [];
+
   public databaseConnection: DatabaseConnection;
 
   /**
@@ -53,6 +64,44 @@ export class ItemizeRawDB {
     this.redisPub = redisPub;
     this.databaseConnection = databaseConnection;
     this.root = root;
+  }
+
+  /**
+   * Starts a new instance of raw db but in transaction mode
+   * @param fn the transactional function
+   * @returns whatever is returned in the transactional function
+   */
+  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>): Promise<T> {
+    return this.databaseConnection.startTransaction(async (transactingClient) => {
+      const newRawDB = new ItemizeRawDB(this.redisPub, transactingClient, this.root);
+      newRawDB.transacting = true;
+
+      const resolvedPromiseToReturn = await fn(newRawDB);
+      this.transactingQueue.forEach((q) => q());
+      return resolvedPromiseToReturn;
+    });
+  }
+
+  /**
+   * When using raw db you might be able to specify your own ids
+   * by using these so you know them ahead of time
+   * 
+   * It's a simple v4 uuid
+   * 
+   * @returns a url safe v4 uuid
+   */
+  public provideRandomV4Id() {
+    return uuid.v4().replace(/-/g, "");
+  }
+
+  /**
+   * Provides a hashable v5 uuid that will ensure the same id
+   * provided the same input
+   * 
+   * @returns a url safe v5 uuid
+   */
+  public provideHashableV5Id(input: string) {
+    return makeIdOutOf(input);
   }
 
   /**
@@ -103,7 +152,7 @@ export class ItemizeRawDB {
       null,
       dictionary,
       partialFields,
-    );
+    ).value;
 
     return {
       modSQL,
@@ -183,7 +232,7 @@ export class ItemizeRawDB {
       id: row.id,
       itemDefinition: row.type,
       type: action === "deleted" ? "not_found" : action,
-      version: row.verion,
+      version: row.version || null,
     }
 
     // and the merged index identifier that the caches use for this event
@@ -462,8 +511,25 @@ export class ItemizeRawDB {
 
   public async performRawDBDelete(
     itemDefinitionOrModule: ItemDefinition | Module | string,
-    deleter: (builder: SelectBuilder) => void,
-    preventJoin?: boolean,
+    id: string,
+    version: string,
+    deleter: {
+      dangerousUseSilentMode?: boolean;
+    },
+  ) {
+    // TODO must be similar to the select builder anyway
+    const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
+      this.root.registry[itemDefinitionOrModule] :
+      itemDefinitionOrModule;
+  }
+
+  public async performBatchRawDBDelete(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    deleter: {
+      select: (builder: SelectBuilder) => void;
+      preventJoin?: boolean;
+      dangerousUseSilentMode?: boolean;
+    },
   ) {
     // TODO there is no delete builder, must be similar to the select builder anyway
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
@@ -481,6 +547,8 @@ export class ItemizeRawDB {
    * refer to processGQLValue in order to aid yourself a little when doing a raw db
    * insert
    * 
+   * TODO returning builder access in order to modify what to return
+   * 
    * @param item 
    * @param inserter 
    * @returns 
@@ -494,6 +562,7 @@ export class ItemizeRawDB {
           itemTableInsert: IManyValueType;
         }
       >;
+
       // does not inform for updates to other clusters
       // or caches or anything at all, mantains last modified
       // value
@@ -512,7 +581,7 @@ export class ItemizeRawDB {
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
 
-    const allInsertedRows: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
+    const transactionFn = async (transactingDatabase: DatabaseConnection) => {
       return await Promise.all(inserter.values.map(async (value) => {
         const insertQuery = transactingDatabase.getInsertBuilder().table(moduleTable);
 
@@ -534,7 +603,8 @@ export class ItemizeRawDB {
 
         insertQuery.insert(modValue).returningBuilder.returningAll();
 
-        const insertQueryValueMod = await transactingDatabase.queryFirst(insertQuery);
+        const insertQueryValueModRes = await transactingDatabase.query(insertQuery);
+        const insertQueryValueMod = insertQueryValueModRes.rows[0];
 
         const idefValue = {
           ...value.itemTableInsert
@@ -555,12 +625,20 @@ export class ItemizeRawDB {
           ...insertQueryValueIdef,
         };
       }));
-    });
+    };
+
+    const allInsertedRows: ISQLTableRowValue[] = this.transacting ?
+      await transactionFn(this.databaseConnection) :
+      await this.databaseConnection.startTransaction(transactionFn);
 
     const result = allInsertedRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!inserter.dangerousUseSilentMode) {
-      await this.informRowsHaveBeenAdded(result, true);
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenAdded.bind(this, result, true));
+      } else {
+        await this.informRowsHaveBeenAdded(result, true); 
+      }
     }
 
     return result;
@@ -604,6 +682,8 @@ export class ItemizeRawDB {
    * Performs a raw db update for many rows
    * in the database this is a very powerful and quite
    * advanced method
+   * 
+   * TODO returning builder somehow
    * 
    * @param item 
    * @param updater 
@@ -665,6 +745,7 @@ export class ItemizeRawDB {
       if (updater.moduleTableUpdate) {
         moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
       }
+      updater.moduleTableUpdater && updater.moduleTableUpdater(moduleUpdateQuery.setBuilder);
 
       // and join it on id and version match
       moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
@@ -722,7 +803,11 @@ export class ItemizeRawDB {
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!updater.dangerousUseSilentMode) {
-      await this.informRowsHaveBeenModified(result, true);
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, true));
+      } else {
+        await this.informRowsHaveBeenModified(result, true); 
+      }
     }
 
     return result;
@@ -731,6 +816,8 @@ export class ItemizeRawDB {
   /**
    * Performs a raw database update, use this method in order to update critical data that could
    * lead to race conditions, otherwise stay by updating through the cache
+   * 
+   * TODO returning builder access
    *
    * @param item 
    * @param id 
@@ -846,7 +933,11 @@ export class ItemizeRawDB {
     );
 
     if (!updater.dangerousUseSilentMode) {
-      await this.informRowsHaveBeenModified([sqlValue], true);
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, [sqlValue], true));
+      } else {
+        await this.informRowsHaveBeenModified([sqlValue], true); 
+      }
     }
 
     return sqlValue;

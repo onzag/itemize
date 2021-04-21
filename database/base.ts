@@ -75,6 +75,9 @@ export class QueryBuilder {
    * @param values the binding sources to add
    */
   public addBindingSources(values: ExtendedBindingType[]) {
+    if (!Array.isArray(values)) {
+      throw new Error("Added binding sources that were not array " + typeof values);
+    }
     this.bindingSources = this.bindingSources.concat(values);
   }
 
