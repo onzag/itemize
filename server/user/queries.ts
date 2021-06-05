@@ -174,7 +174,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               (internalOrQueryBuilder) => {
                 internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
                   emailPropertyDescription.sqlEqual({
-                    id: usernameProperty.getId(),
+                    id: emailProperty.getId(),
                     prefix: "",
                     ignoreCase: true,
                     serverData: appData.cache.getServerData(),
@@ -717,7 +717,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         if (
-          typeof decoded.resetPasswordUserId !== "number" ||
+          typeof decoded.resetPasswordUserId !== "string" ||
           typeof decoded.resetPasswordTempTokenCode !== "number"
         ) {
           throw new EndpointError({

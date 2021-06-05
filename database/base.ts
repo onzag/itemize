@@ -300,7 +300,9 @@ export class ConditionalBuilder extends QueryBuilder {
     if (typeof rule === "string") {
       // it's simple, we just add it
       condition = rule;
-      this.addBindingSources(bindings);
+      if (bindings) {
+        this.addBindingSources(bindings);
+      }
     } else if (!(rule instanceof QueryBuilder)) {
       // otherwise we make a new builder itself
       const builder = this.subcondition();

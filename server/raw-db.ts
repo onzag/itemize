@@ -198,7 +198,7 @@ export class ItemizeRawDB {
    */
   private async informChangeOnRow(row: ISQLTableRowValue, action: "created" | "deleted" | "modified", dataIsComplete: boolean) {
     // first let's check whether the row is valid for the bare minimum
-    const isRowValid = requiredProperties.every((p) => {
+    const isRowValid = row && Array.isArray(row) && requiredProperties.every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
           "ItemizeRawDB.informChangeOnRow: row data is invalid as it misses property " + p,

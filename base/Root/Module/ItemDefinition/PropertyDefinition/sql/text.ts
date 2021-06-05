@@ -98,7 +98,7 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
     // TODO improve, this only matches exact words
     // maybe https://github.com/zombodb/zombodb
     arg.whereBuilder.andWhere(
-      JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
+      JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ plainto_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
       [
         arg.args[searchName] as string,
       ],
@@ -107,7 +107,7 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
     if (arg.isOrderedByIt) {
       return [
         "ts_rank(" + JSON.stringify(arg.prefix + arg.id + "_VECTOR") +
-        ", to_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)) AS " +
+        ", plainto_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)) AS " +
         JSON.stringify(arg.prefix + arg.id + "_RANK"),
         [
           arg.args[searchName] as string,
