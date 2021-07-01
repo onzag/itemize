@@ -4170,21 +4170,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const nodeAtPath = at ? Node.get(this.editor, at as Path) : this.state.currentSelectedElement;
       const pathOfNode = at || this.state.currentSelectedElementAnchor;
 
-      if (nodeAtPath.type === "title" && nodeAtPath.subtype === type) {
-        // then we wrap back into a paragraph to normalize the title back into a paragraph
+      if (nodeAtPath.type === "list" && nodeAtPath.listType === type) {
+        // then we wrap back into a paragraph to normalize the list back into a paragraph
         Transforms.wrapNodes(
           this.editor,
           {
             ...copyElementBase(nodeAtPath as any),
-            type: "list",
-            listType: type,
-            containment: "list-superblock",
+            type: "paragraph",
+            containment: "block",
             children: [],
           },
           { at: pathOfNode },
         );
       } else {
-        // otherwise we wrap into the new title
+        // otherwise we wrap into the new list
         Transforms.wrapNodes(
           this.editor,
           {
