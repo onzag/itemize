@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect} from "react";
-import { ThemeProvider as MuiThemeProvider, MuiPickersUtilsProvider, createMuiTheme, CssBaseline } from "./mui-core";
+import { ThemeProvider as MuiThemeProvider, MuiPickersUtilsProvider, createTheme, CssBaseline } from "./mui-core";
 import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
 import MomentUtils from "@date-io/moment";
@@ -41,7 +41,7 @@ function SSRSheetsRemover(props: {children: React.ReactNode}) {
  */
 export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataType) {
   // we create the material ui theme
-  const theme = createMuiTheme({
+  const theme = createTheme({
     typography: {
       fontFamily: "'" + config.fontName + "', sans-serif",
       fontWeightLight: 300,

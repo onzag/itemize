@@ -4,6 +4,7 @@ import { DataContext } from "../internal/providers/appdata-provider";
 import Root from "../../base/Root";
 import { RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
+import { ItemContext } from "./item";
 
 export interface IModuleContextType {
   mod: Module;
@@ -91,20 +92,22 @@ class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {
 
 export function ModuleProvider(props: IModuleProviderProps) {
   return (
-    <DataContext.Consumer>
-      {
-        (data) => {
-          return (
-            <ActualModuleProvider
-              root={data.value}
-              mod={props.module}
-              remoteListener={data.remoteListener}
-            >
-              {props.children}
-            </ActualModuleProvider>
-          );
+    <ItemContext.Provider value={null}>
+      <DataContext.Consumer>
+        {
+          (data) => {
+            return (
+              <ActualModuleProvider
+                root={data.value}
+                mod={props.module}
+                remoteListener={data.remoteListener}
+              >
+                {props.children}
+              </ActualModuleProvider>
+            );
+          }
         }
-      }
-    </DataContext.Consumer>
+      </DataContext.Consumer>
+    </ItemContext.Provider>
   );
 }

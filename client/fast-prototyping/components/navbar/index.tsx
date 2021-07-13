@@ -67,16 +67,16 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
   /**
    * The Login dialog component, required, after all that's what all this navbar is for, check login-dialog.tsx for a default
    */
-  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>,
+  LoginDialog: React.ComponentType<{ open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void }>,
   /**
    * The Signup dialog component, required, after all that's what all this navbar is for, check signup-dialog.tsx dialog for a default
    * if not given a signup dialog then no signup will be available
    */
-  SignupDialog?: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  SignupDialog?: React.ComponentType<{ open: boolean, onClose: () => void, onLoginRequest: () => void }>,
   /**
    * The Recover dialog component, required, after all that's what all this navbar is for, check recover-dialog.tsx for a default
    */
-  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>,
+  RecoverDialog: React.ComponentType<{ open: boolean, onClose: () => void, onLoginRequest: () => void }>,
   /**
    * the menu admin entries that appear on top by a divider,
    * it uses the MenuEntry form array for it, by default it includes only the CMS for ADMIN role
@@ -115,65 +115,65 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   return (
-    <>
-      <AppBar>
-        <Toolbar>
-          <I18nRead id="menu">
-            {
-              (value: string) => (
-                <IconButton edge="start" color="inherit" aria-label={value} onClick={setMenuOpen.bind(this, true)}>
-                  <MenuIcon />
-                </IconButton>
-              )
-            }
-          </I18nRead>
-          <div className={props.classes.title}>
-            <Typography variant="body1" className={props.classes.titleTypography}>
-              <span className={props.classes.titleMargin}>
-                <TitleReader />
-              </span>
-              <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)}/>
-            </Typography>
-          </div>
-          <div className={props.classes.container}>
-            <UserDataRetriever>
-              {(user) => <ModuleProvider module="users">
-                <ItemProvider
-                  itemDefinition="user"
-                  forId={user.id}
-                  disableExternalChecks={true}
-                  properties={props.avatarContextProperties}
-                  longTermCaching={true}
-                  markForDestructionOnLogout={true}
-                >
-                  <Buttons
-                    excludeLanguagePicker={props.excludeLanguagePicker}
-                    LoginDialog={props.LoginDialog}
-                    SignupDialog={props.SignupDialog}
-                    RecoverDialog={props.RecoverDialog}
-                    AvatarComponent={props.AvatarComponent}
-                    avatarProps={props.avatarProps}
-                  />
-                  <ExternalDialogs/>
-                </ItemProvider>
-              </ModuleProvider>}
-            </UserDataRetriever>
-          </div>
-        </Toolbar>
-      </AppBar>
-      <div className={props.classes.appBarSpacer} />
-      <BlockingBackdrop exclude={props.excludeBlockingBackdrop}/>
-      <OutdatedDialog
-        isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}
-        onClose={setIsOutdatedDialogAllowedToBeOpen.bind(this, false)}
-      />
-      <Menu
-        isOpen={isMenuOpen}
-        onClose={setMenuOpen.bind(this, false)}
-        onOpen={setMenuOpen.bind(this, true)}
-        adminEntries={props.menuAdminEntries}
-        entries={props.menuEntries}
-      />
-    </>
+    <UserDataRetriever>
+      {(user) => <ModuleProvider module="users">
+        <ItemProvider
+          itemDefinition="user"
+          forId={user.id}
+          disableExternalChecks={true}
+          properties={props.avatarContextProperties}
+          longTermCaching={true}
+          markForDestructionOnLogout={true}
+        >
+          <AppBar>
+            <Toolbar>
+              <I18nRead id="menu">
+                {
+                  (value: string) => (
+                    <IconButton edge="start" color="inherit" aria-label={value} onClick={setMenuOpen.bind(this, true)}>
+                      <MenuIcon />
+                    </IconButton>
+                  )
+                }
+              </I18nRead>
+              <div className={props.classes.title}>
+                <Typography variant="body1" className={props.classes.titleTypography}>
+                  <span className={props.classes.titleMargin}>
+                    <TitleReader />
+                  </span>
+                  <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)} />
+                </Typography>
+              </div>
+              <div className={props.classes.container}>
+
+                <Buttons
+                  excludeLanguagePicker={props.excludeLanguagePicker}
+                  LoginDialog={props.LoginDialog}
+                  SignupDialog={props.SignupDialog}
+                  RecoverDialog={props.RecoverDialog}
+                  AvatarComponent={props.AvatarComponent}
+                  avatarProps={props.avatarProps}
+                />
+                <ExternalDialogs />
+
+              </div>
+            </Toolbar>
+          </AppBar>
+          <div className={props.classes.appBarSpacer} />
+          <BlockingBackdrop exclude={props.excludeBlockingBackdrop} />
+          <OutdatedDialog
+            isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}
+            onClose={setIsOutdatedDialogAllowedToBeOpen.bind(this, false)}
+          />
+          <Menu
+            isOpen={isMenuOpen}
+            onClose={setMenuOpen.bind(this, false)}
+            onOpen={setMenuOpen.bind(this, true)}
+            adminEntries={props.menuAdminEntries}
+            entries={props.menuEntries}
+          />
+        </ItemProvider>
+      </ModuleProvider>}
+    </UserDataRetriever>
   );
 });

@@ -76,7 +76,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,
-    tooLargeErrorInclude: true,
   },
 };
 export default typeValue;

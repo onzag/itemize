@@ -19,7 +19,8 @@ import {
   ListItemText,
   ListSubheader,
   Divider,
-  withMobileDialog,
+  useTheme,
+  useMediaQuery,
   ClearIcon,
   RestoreIcon,
   IconVisibility,
@@ -181,7 +182,7 @@ interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererWithStylesPr
   /**
    * Whether it's full screen
    */
-  fullScreen: boolean;
+  fullScreen?: boolean;
 }
 
 /**
@@ -197,9 +198,6 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
   }
   return (
     <Dialog
-      classes={{
-        paper: "props.dialogClassName",
-      }}
       open={props.open}
       onClose={props.onClose}
       aria-labelledby="unit-dialog-title"
@@ -269,7 +267,12 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
 /**
  * The select unit dialog, but responsive
  */
-const SelectUnitDialogResponsive = withMobileDialog<ISelectUnitDialogProps>()(SelectUnitDialog);
+const SelectUnitDialogResponsive = function(props: ISelectCurrencyDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return <SelectUnitDialog {...props} fullScreen={fullScreen}/>;
+}
 
 /**
  * The select currency dialog props
@@ -286,7 +289,7 @@ interface ISelectCurrencyDialogProps extends IPropertyEntryFieldRendererWithStyl
   /**
    * Whether the dialog is in fullscreen mode
    */
-  fullScreen: boolean;
+  fullScreen?: boolean;
 }
 
 /**
@@ -301,9 +304,6 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
   }
   return (
     <Dialog
-      classes={{
-        paper: "props.dialogClassName",
-      }}
       open={props.open}
       onClose={props.onClose}
       aria-labelledby="currency-dialog-title"
@@ -331,7 +331,12 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
 /**
  * The select currency dialog, but responsive
  */
-const SelectCurrencyDialogResponsive = withMobileDialog<ISelectCurrencyDialogProps>()(SelectCurrencyDialog);
+const SelectCurrencyDialogResponsive = function(props: ISelectCurrencyDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return <SelectCurrencyDialog {...props} fullScreen={fullScreen}/>;
+}
 
 /**
  * The actual entry field renderer, as a class, because it's fairly complicated, this renderer handles basic

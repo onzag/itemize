@@ -80,6 +80,10 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    */
   extension: string;
   /**
+   * The extra metadata that is provided
+   */
+  extraMetadata: string;
+  /**
    * Once you have got hold of a file use this function and pass it so
    * properties can be calculated, do not use onChange, use this function
    * instead
@@ -87,7 +91,11 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    * If the property is image uploader type, or if the file is on itself
    * an image it will ensure to give it metadata
    */
-  onSetFile: (file: File) => void;
+  onSetFile: (file: File, extraMetadata?: string) => void;
+  /**
+   * Allows to update and set the extra metadata that is contained within the file
+   */
+  onUpdateExtraMetadata: (extraMetadata: string) => void;
   /**
    * A function to clear the file
    */
@@ -155,6 +163,7 @@ export default class PropertyEntryFile
     this.onRemoveFile = this.onRemoveFile.bind(this);
     this.openFile = this.openFile.bind(this);
     this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+    this.onUpdateExtraMetadata = this.onUpdateExtraMetadata.bind(this);
   }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
@@ -229,7 +238,25 @@ export default class PropertyEntryFile
     window.open(value.url, value.name);
   }
 
-  public onSetFile(file: File) {
+  public onUpdateExtraMetadata(extraMetadata: string) {
+    const currentValue = this.props.state.value as PropertyDefinitionSupportedFileType;
+    if (!currentValue || !currentValue.metadata) {
+      return;
+    }
+
+    const updatedValue = {
+      ...currentValue,
+    };
+
+    const metadataCreated = updatedValue.metadata.split(";");
+    const wxh = metadataCreated[0];
+    const sizes = metadataCreated[1];
+    updatedValue.metadata = wxh + ";" + sizes + ";" + extraMetadata;
+
+    this.props.onChange(updatedValue, null);
+  }
+
+  public onSetFile(file: File, extraMetadata?: string) {
     // when a drop is accepted, let's check, if it's a single file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
     const objectURL = URL.createObjectURL(file);
@@ -282,6 +309,11 @@ export default class PropertyEntryFile
         const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
         const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
         value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
+
+        if (extraMetadata) {
+          value.metadata += ";" + extraMetadata;
+        }
+
         this.props.onChange(
           value,
           null,
@@ -366,6 +398,9 @@ export default class PropertyEntryFile
     const prettySize = currentValue && prettyBytes(currentValue.size);
     const extension = currentValue && mimeTypeToExtension(currentValue.type);
 
+    const stateValue = (this.props.state.value as PropertyDefinitionSupportedFileType);
+    const extraMetadata: string = (stateValue && stateValue.metadata && stateValue.metadata.split(";")[3]) || null;
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFileRendererProps = {
       propertyId: this.props.property.getId(),
@@ -392,12 +427,14 @@ export default class PropertyEntryFile
       onSetFile: this.onSetFile,
       onRemoveFile: this.onRemoveFile,
       openFile: this.openFile,
+      onUpdateExtraMetadata: this.onUpdateExtraMetadata,
 
       accept,
       isExpectingImages,
       genericActivePlaceholder,
       genericDeleteLabel,
       genericSelectLabel,
+      extraMetadata,
 
       rejected: !!this.state.rejectedReason,
       rejectedReason: this.state.rejectedReason,

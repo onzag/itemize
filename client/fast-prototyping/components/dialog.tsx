@@ -7,7 +7,8 @@
 import React from "react";
 import {
   Typography,
-  withMobileDialog,
+  useTheme,
+  useMediaQuery,
   Dialog as MDialog,
   AppBar,
   Toolbar,
@@ -50,7 +51,7 @@ const dialogStyles = createStyles({
  * The dialog props that need to be passed in order to build a generic
  * dialog
  */
-interface IDialogProps extends WithStyles<typeof dialogStyles> {
+interface IDialogProps {
   /**
    * whether the dialog is currently open
    */
@@ -89,10 +90,13 @@ interface IDialogProps extends WithStyles<typeof dialogStyles> {
   className?: string;
 }
 
+interface IDialogPropsWithStyles extends IDialogProps, WithStyles<typeof dialogStyles> {
+}
+
 /**
  * The dialog itself, non-responsive and rather generic
  */
-const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
+const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
   return (
     <MDialog
       classes={{
@@ -101,9 +105,11 @@ const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
       open={props.open}
       onClose={props.onClose}
       fullScreen={props.fullScreen}
-      onEntered={props.onOpen}
-      onEntering={props.onOpening}
       scroll="paper"
+      TransitionProps={{
+        onEntered: props.onOpen,
+        onEntering: props.onOpening,
+      }}
     >
       <AppBar className={props.classes.appbar}>
         <Toolbar>
@@ -134,9 +140,12 @@ const Dialog = withStyles(dialogStyles)((props: IDialogProps) => {
  * it's able to go in fullscreen mode automatically
  * takes all the other props
  */
-const DialogResponsive = withMobileDialog<IDialogProps>({
-  breakpoint: "xs",
-})(Dialog);
+const DialogResponsive = function(props: IDialogProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+
+  return <Dialog {...props} fullScreen={fullScreen}/>
+}
 
 // both are exported
 export { DialogResponsive, Dialog };

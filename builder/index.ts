@@ -1168,6 +1168,12 @@ async function getI18nPropertyData(
         required: true,
         actualFinalKeyValue: b.toString(),
       })))
+    .concat((property.values || [])
+      .map((b) => ({
+        key: "search.values." + b.toString().replace(/\./g, "_dot_").replace("/\s/g", "_"),
+        required: false,
+        actualFinalKeyValue: b.toString(),
+      })))
     .concat((property.values ? ["null_value"] : [])
       .map((b) => ({ key: b, required: true })))
     .concat((!searchIsDisabled && property.values ? ["search.null_value"] : [])

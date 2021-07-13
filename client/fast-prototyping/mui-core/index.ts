@@ -55,13 +55,12 @@ import {
   Theme,
   ServerStyleSheets,
   ThemeProvider,
-  createMuiTheme,
+  createTheme,
 } from "@material-ui/core/styles";
-import withMobileDialog from "@material-ui/core/withMobileDialog";
 import Pagination from "@material-ui/lab/Pagination";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { PropTypes, Color } from "@material-ui/core";
+import { PropTypes, Color, useTheme, useMediaQuery } from "@material-ui/core";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import AppBar from "@material-ui/core/AppBar";
@@ -87,6 +86,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Grid from "@material-ui/core/Grid";
 import NativeSelect from '@material-ui/core/NativeSelect';
 import Chip from "@material-ui/core/Chip";
+import Fab from "@material-ui/core/Fab";
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -176,13 +176,14 @@ export {
   ListItem,
   ListItemText,
   ListSubheader,
-  withMobileDialog,
+  useTheme,
+  useMediaQuery,
   Divider,
   Pagination,
   ServerStyleSheets,
   ThemeProvider,
   MuiPickersUtilsProvider,
-  createMuiTheme,
+  createTheme,
   CssBaseline,
   SearchIcon,
   Card,
@@ -289,4 +290,5 @@ export {
   QueueIcon,
   HighlightOffIcon,
   Chip,
+  Fab,
 }

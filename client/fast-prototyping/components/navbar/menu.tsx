@@ -51,24 +51,28 @@ export interface IMenuEntry {
   /**
    * The module to load in the module provider (optional)
    */
-  module?: string,
+  module?: string;
   /**
    * The item definition to load in the item definition provider (optional)
    * will need the module specified if this one specified
    */
-  idef?: string,
+  idef?: string;
   /**
    * The arguments to pass to the i18nRead element in order to display some text
    */
-  i18nProps: II18nReadProps,
+  i18nProps: II18nReadProps;
   /**
    * The role that has access to this
    */
-  role?: string,
+  role?: string;
   /**
    * Many roles, a list of roles, role (Single) has priority over this
    */
-  roles?: string[],
+  roles?: string[];
+  /**
+   * A wrapper to wrap the content
+   */
+   wrapper?: (entry: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -154,8 +158,7 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
       icon = <ListItemIcon><Badge color="primary" badgeContent={entry.badgeContent}>{entry.icon}</Badge></ListItemIcon>
     }
 
-    // now we can return this
-    return (
+    const element = (
       <Link to={entry.path} className={className} propagateClicks={true} key={entry.path}>
         <LocationReader>
           {(arg) => (
@@ -169,6 +172,17 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
         </LocationReader>
       </Link>
     );
+
+    if (entry.wrapper) {
+      return (
+        <React.Fragment key={entry.path}>
+          {entry.wrapper(element)}
+        </React.Fragment>
+      );
+    }
+
+    // now we can return this
+    return element;
   })
 }
 
