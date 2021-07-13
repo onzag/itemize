@@ -9,6 +9,7 @@ import { capitalize } from "../../components/localization";
 import { Button, Menu, MenuItem, TranslateIcon } from "../mui-core";
 import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 import { LocaleContext } from "../../internal/providers/locale-provider";
+import { arrLanguages } from "../../../imported-resources";
 
 /**
  * The props of the language picker, a bit different from other pickers
@@ -42,6 +43,10 @@ interface ILanguagePickerProps {
    * default
    */
   currentCode?: string;
+  /**
+   * Use all the codes rather than only the available
+   */
+  allLanguages?: boolean;
   /**
    * whether to use a display that is able to shrink, one contains the
    * standard native name, and the other contains only the language code
@@ -117,7 +122,7 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
       return (
         <LocaleContext.Consumer>
           {(localeContext) => (
-            <LanguagePicker {...this.props} unspecifiedLabel={localeContext.i18n[localeContext.language].unspecified}/>
+            <LanguagePicker {...this.props} unspecifiedLabel={localeContext.i18n[localeContext.language].unspecified} />
           )}
         </LocaleContext.Consumer>
       );
@@ -128,7 +133,17 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
         {(languageData) => {
           let currentLanguage = languageData.currentLanguage;
           if (typeof this.props.currentCode !== "undefined") {
-            currentLanguage = languageData.availableLanguages.find((l) => l.code === this.props.currentCode) || null;
+            if (this.props.allLanguages) {
+              const currAllLanguage = arrLanguages.find((l) => l.code === this.props.currentCode) || null;
+              if (currAllLanguage) {
+                currentLanguage = {
+                  code: currAllLanguage.code,
+                  name: currAllLanguage.native,
+                };
+              }
+            } else {
+              currentLanguage = languageData.availableLanguages.find((l) => l.code === this.props.currentCode) || null;
+            }
           }
           if (currentLanguage === null) {
             currentLanguage = {
@@ -153,15 +168,18 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
                 </MenuItem>
                 : null
             }
-            {languageData.availableLanguages.map((al) => (
-              <MenuItem
-                key={al.code}
-                selected={al.code === currentLanguage.code}
-                onClick={this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code)}
-              >
-                {capitalize(al.name)}
-              </MenuItem>
-            ))}
+            {(this.props.allLanguages ? arrLanguages : languageData.availableLanguages).map((al) => {
+              const usedName = (al as any).native || al.name;
+              return (
+                <MenuItem
+                  key={al.code}
+                  selected={al.code === currentLanguage.code}
+                  onClick={this.handleLanguageChange.bind(this, languageData.changeLanguageTo, al.code)}
+                >
+                  {capitalize(usedName)}
+                </MenuItem>
+              );
+            })}
           </Menu> : null;
           return (
             <React.Fragment>
