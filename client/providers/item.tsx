@@ -2218,7 +2218,6 @@ export class ActualItemProvider extends
       "change",
       givenForId || null,
       givenForVersion || null,
-      this.changeListener,
     );
     if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isCMounted) {
       this.search(this.props.automaticSearch);

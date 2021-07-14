@@ -48,6 +48,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SettingsIcon from '@material-ui/icons/Settings';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import ExtensionIcon from '@material-ui/icons/Extension';
+import Stepper from "@material-ui/core/Stepper";
+import Step from "@material-ui/core/Step";
+import StepLabel from "@material-ui/core/StepLabel";
 import {
   createStyles,
   withStyles,
@@ -291,4 +294,7 @@ export {
   HighlightOffIcon,
   Chip,
   Fab,
+  Stepper,
+  Step,
+  StepLabel,
 }

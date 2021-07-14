@@ -276,7 +276,7 @@ export default class PropertyEntryField
   }
 
   public componentDidMount() {
-    // we take the initial prefill, which only truly exists for the unit type
+    // we take the initial prefill, which only truly exists for the unit and currency type
     const initialPrefill = this.props.property.getSpecialProperty("initialPrefill") as number;
     // and if we have one
     if (

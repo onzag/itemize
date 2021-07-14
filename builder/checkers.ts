@@ -131,6 +131,7 @@ export function checkConditionalRuleSet(
       // that can be used instead
     } else if (
       valueToCheckAgainst &&
+      !rawDataAsProperty.attribute &&
       typeof (valueToCheckAgainst as IPropertyDefinitionExactPropertyValue).exactValue !== "undefined"
     ) {
       // so now we extract what that exact value is supposed to be

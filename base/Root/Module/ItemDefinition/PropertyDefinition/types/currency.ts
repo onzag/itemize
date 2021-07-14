@@ -218,6 +218,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
       type: "boolean",
       required: false,
     },
+    {
+      name: "initialPrefill",
+      type: "number",
+      required: false,
+    }
   ],
 
   // i18n attributes required
