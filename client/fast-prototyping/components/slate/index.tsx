@@ -1011,6 +1011,29 @@ export interface ISlateEditorStateType {
   currentSelectedElementAnchor: Path;
 }
 
+export type SlateEditorWrapperCustomToolbarIdentifiedElement =
+"bold" |
+"italic" |
+"underline" |
+"link" |
+"title" |
+"bulleted-list" |
+"numbered-list" |
+"image" |
+"video" |
+"file" |
+"quote" |
+"container" |
+"template-text" |
+"template-html" |
+"extras" |
+"none" |
+"divider";
+
+export type SlateEditorWrapperCustomToolbarElement =
+  IToolbarPrescenseElement |
+  SlateEditorWrapperCustomToolbarIdentifiedElement;
+
 /**
  * The base props that every wrapper is going to get
  * based on the standard that is passed by the component
@@ -1063,6 +1086,10 @@ export interface ISlateEditorWrapperBaseProps {
    * to be used either by ui handled components and whatnot
    */
   toolbarExtras?: IToolbarPrescenseElement[];
+  /**
+   * Function to be used to specify a whole custom toolbar down to the very basics
+   */
+  customToolbar?: SlateEditorWrapperCustomToolbarElement[];
   /**
    * Drawer extras for the ui handled types
    */
@@ -1223,6 +1250,10 @@ interface ISlateEditorProps {
    * is considered to be the null document
    */
   placeholder?: string;
+  /**
+   * Whether to auto focus on mount
+   */
+  autoFocus?: boolean;
 }
 
 /**
@@ -3117,14 +3148,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if (typeof toDisplay === "string") {
           customProps.children = (
             <>
-              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} style={{display: "contents"}}/>
+              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} style={{ display: "contents" }} />
               {children}
             </>
           );
         } else {
           customProps.children = (
             <>
-              <div contentEditable={false} style={{display: "contents"}}>
+              <div contentEditable={false} style={{ display: "contents" }}>
                 {toDisplay}
               </div>
               {children}
@@ -4841,6 +4872,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allCustom: ALL_CUSTOM,
       allRichClasses: ALL_RICH_CLASSES,
     });
+
+    if (this.props.autoFocus) {
+      ReactEditor.focus(this.editor);
+    }
   }
 
   /**

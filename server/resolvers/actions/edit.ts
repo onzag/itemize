@@ -13,6 +13,7 @@ import {
   splitArgsInGraphqlQuery,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
+  validateParentingRules,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -166,6 +167,17 @@ export async function editItemDefinition(
       version: wholeSqlStoredValue.parent_version,
     } : null,
   });
+
+  await validateParentingRules(
+    appData,
+    resolverArgs.args.parent_id,
+    resolverArgs.args.parent_version || null,
+    resolverArgs.args.parent_type,
+    itemDefinition,
+    tokenData.id,
+    tokenData.role,
+    rolesManager,
+  );
 
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
@@ -341,6 +353,10 @@ export async function editItemDefinition(
     }
   }
 
+  const isReparenting = !!(
+    resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
+  );
+
   const dictionary = getDictionary(appData, resolverArgs.args);
   const sqlValue = await appData.cache.requestUpdate(
     itemDefinition,
@@ -353,6 +369,11 @@ export async function editItemDefinition(
     dictionary,
     containerId,
     resolverArgs.args.listener_uuid || null,
+    isReparenting ? {
+      id: resolverArgs.args.parent_id as string,
+      version: resolverArgs.args.parent_version as string,
+      type: resolverArgs.args.parent_type as string,
+    } : null,
   );
 
   CAN_LOG_DEBUG && logger.debug(

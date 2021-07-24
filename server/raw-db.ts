@@ -28,6 +28,12 @@ import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/
 import uuid from "uuid";
 import uuidv5 from "uuid/v5";
 import { DeleteBuilder } from "../database/DeleteBuilder";
+import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
+import type Include from "../base/Root/Module/ItemDefinition/Include";
+
+type RedoDictionariesFnPropertyBased = (dictionary: string, property: string) => void;
+type RedoDictionariesFnPropertyIncludeBased = (dictionary: string, include: string, property: string) => void;
+type RedoDictionariesFn = RedoDictionariesFnPropertyBased | RedoDictionariesFnPropertyIncludeBased;
 
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
@@ -509,6 +515,63 @@ export class ItemizeRawDB {
     return await this.informChangeOnRows(rows, "created", rowDataIsComplete);
   }
 
+  /**
+   * A private helper function to use a item definition
+   * and a set builder in order to update the dictionaries
+   * of given properties
+   * 
+   * @param itemDefinition 
+   * @param setBuilder 
+   * @param dictionary 
+   * @param propertyOrInclude 
+   * @param property 
+   * @returns 
+   */
+  private redoDictionariesFn(
+    itemDefinitionOrModule: ItemDefinition | Module,
+    setBuilder: SetBuilder,
+    dictionary: string,
+    propertyOrInclude: string,
+    property: string,
+  ) {
+    const actualProperty = property || propertyOrInclude;
+    const actualInclude = property ? null : propertyOrInclude;
+
+    if (!actualProperty) {
+      return;
+    }
+
+    let prefix: string = "";
+    let propertyObj: PropertyDefinition;
+    let includeObj: Include = null;
+    if (actualInclude) {
+      includeObj = (itemDefinitionOrModule as ItemDefinition).getIncludeFor(actualInclude);
+      prefix = includeObj.getPrefixedQualifiedIdentifier();
+      propertyObj = includeObj.getSinkingPropertyFor(property);
+    } else {
+      if (itemDefinitionOrModule instanceof ItemDefinition) {
+        propertyObj = itemDefinitionOrModule.getPropertyDefinitionFor(property, true);
+      } else {
+        propertyObj = itemDefinitionOrModule.getPropExtensionFor(property);
+      }
+    }
+
+    if (propertyObj.getPropertyDefinitionDescription().sqlRedoDictionaryIndex) {
+      const redoIndexSetter = propertyObj.getPropertyDefinitionDescription().sqlRedoDictionaryIndex({
+        id: property,
+        itemDefinition: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+        newDictionary: dictionary,
+        prefix,
+        property: propertyObj,
+        include: includeObj,
+      });
+
+      if (redoIndexSetter) {
+        setBuilder.setMany(redoIndexSetter);
+      }
+    }
+  }
+
   public async performRawDBDelete(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     id: string,
@@ -637,7 +700,7 @@ export class ItemizeRawDB {
       if (this.transacting) {
         this.transactingQueue.push(this.informRowsHaveBeenAdded.bind(this, result, true));
       } else {
-        await this.informRowsHaveBeenAdded(result, true); 
+        await this.informRowsHaveBeenAdded(result, true);
       }
     }
 
@@ -684,6 +747,7 @@ export class ItemizeRawDB {
    * advanced method
    * 
    * TODO returning builder somehow
+   * TODO allow for optimizations
    * 
    * @param item 
    * @param updater 
@@ -697,8 +761,8 @@ export class ItemizeRawDB {
       moduleTableUpdate?: IManyValueType;
       itemTableUpdate?: IManyValueType;
       // you only want to use set in these
-      moduleTableUpdater?: (arg: SetBuilder) => void;
-      itemTableUpdater?: (arg: SetBuilder) => void;
+      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
+      itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
       // does not inform for updates to other clusters
       // or caches or anything at all, mantains last modified
       // value
@@ -745,7 +809,11 @@ export class ItemizeRawDB {
       if (updater.moduleTableUpdate) {
         moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
       }
-      updater.moduleTableUpdater && updater.moduleTableUpdater(moduleUpdateQuery.setBuilder);
+      updater.moduleTableUpdater &&
+        updater.moduleTableUpdater(
+          moduleUpdateQuery.setBuilder,
+          this.redoDictionariesFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder)
+        );
 
       // and join it on id and version match
       moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
@@ -771,7 +839,11 @@ export class ItemizeRawDB {
       if (updater.itemTableUpdate) {
         itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
       }
-      updater.itemTableUpdater && updater.itemTableUpdater(itemUpdateQuery.setBuilder);
+      updater.itemTableUpdater &&
+        updater.itemTableUpdater(
+          itemUpdateQuery.setBuilder,
+          this.redoDictionariesFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
+        );
 
       withQuery.with("ITABLE", itemUpdateQuery);
     } else {
@@ -806,7 +878,82 @@ export class ItemizeRawDB {
       if (this.transacting) {
         this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, true));
       } else {
-        await this.informRowsHaveBeenModified(result, true); 
+        await this.informRowsHaveBeenModified(result, true);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Performs a raw db update for many rows
+   * in the database this is a very powerful and quite
+   * advanced method
+   * 
+   * TODO returning builder somehow
+   * TODO allow for optimizations
+   * 
+   * @param moduleToUpdate 
+   * @param updater 
+   */
+  public async performModuleBatchRawDBUpdate(
+    moduleToUpdate: Module | string,
+    updater: {
+      // you only want to use where in here
+      whereCriteriaSelector: (arg: WhereBuilder) => void;
+
+      moduleTableUpdate?: IManyValueType;
+      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFnPropertyBased) => void;
+      // does not inform for updates to other clusters
+      // or caches or anything at all, mantains last modified
+      // value
+      dangerousUseSilentMode?: boolean;
+    },
+  ): Promise<ISQLTableRowValue[]> {
+    if (
+      !updater.moduleTableUpdate &&
+      !updater.moduleTableUpdater
+    ) {
+      throw new Error("no module update was specified into the updater");
+    }
+
+    const mod = moduleToUpdate instanceof Module ? moduleToUpdate : this.root.registry[moduleToUpdate] as Module;
+    const moduleTable = mod.getQualifiedPathName();
+
+    const moduleUpdateQuery = new UpdateBuilder();
+    moduleUpdateQuery.table(moduleTable);
+    // here we will update our last modified
+    if (!updater.dangerousUseSilentMode) {
+      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    }
+    if (updater.moduleTableUpdate) {
+      moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
+    }
+
+    updater.moduleTableUpdater && updater.moduleTableUpdater(
+      moduleUpdateQuery.setBuilder,
+      this.redoDictionariesFn.bind(this, mod, moduleUpdateQuery.setBuilder),
+    );
+    updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
+    moduleUpdateQuery.returningBuilder.returningColumn("id");
+    moduleUpdateQuery.returningBuilder.returningColumn("version");
+    moduleUpdateQuery.returningBuilder.returningColumn("type");
+    moduleUpdateQuery.returningBuilder.returningColumn("created_by");
+    moduleUpdateQuery.returningBuilder.returningColumn("parent_id");
+    moduleUpdateQuery.returningBuilder.returningColumn("parent_type");
+    moduleUpdateQuery.returningBuilder.returningColumn("parent_version");
+    moduleUpdateQuery.returningBuilder.returningColumn("last_modified");
+
+    // we got to get all rows, first we create a pseudo table
+    // for our module
+    const allRows = await this.databaseConnection.queryRows(moduleUpdateQuery);
+    const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
+
+    if (!updater.dangerousUseSilentMode) {
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, true));
+      } else {
+        await this.informRowsHaveBeenModified(result, true);
       }
     }
 
@@ -832,8 +979,8 @@ export class ItemizeRawDB {
       moduleTableUpdate?: IManyValueType;
       itemTableUpdate?: IManyValueType;
       // you only want to use set in these, not select not anything
-      moduleTableUpdater?: (arg: SetBuilder) => void;
-      itemTableUpdater?: (arg: SetBuilder) => void;
+      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
+      itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
       // does not inform for updates to other clusters
       // or caches or anything at all, mantains last modified
       // value
@@ -878,6 +1025,9 @@ export class ItemizeRawDB {
       if (updater.moduleTableUpdate) {
         moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
       }
+      updater.moduleTableUpdater && updater.moduleTableUpdater(
+        moduleUpdateQuery.setBuilder, this.redoDictionariesFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder),
+      );
       // and join it on id and version match
       moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
       moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
@@ -900,7 +1050,9 @@ export class ItemizeRawDB {
       if (updater.itemTableUpdate) {
         itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
       }
-      updater.itemTableUpdater && updater.itemTableUpdater(itemUpdateQuery.setBuilder);
+      updater.itemTableUpdater && updater.itemTableUpdater(
+        itemUpdateQuery.setBuilder, this.redoDictionariesFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
+      );
 
       withQuery.with("ITABLE", itemUpdateQuery);
     } else {
@@ -936,7 +1088,7 @@ export class ItemizeRawDB {
       if (this.transacting) {
         this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, [sqlValue], true));
       } else {
-        await this.informRowsHaveBeenModified([sqlValue], true); 
+        await this.informRowsHaveBeenModified([sqlValue], true);
       }
     }
 

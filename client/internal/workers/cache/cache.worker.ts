@@ -646,6 +646,10 @@ export default class CacheWorker {
       // there might not be a current value, eg. if for some reason cache policy was set to none and yet
       // there was a listen policy for it, or if otherwise the data got somehow corrupted
       if (currentValue) {
+        // this list will fill when a row is modified but it was actually reparented
+        // so it registers as modified but it is now in our current list of values
+        const recordsThatRequestedModificationButArentInTheList: IGQLSearchRecord[] = [];
+
         let newValue = currentValue.value.map((r) => {
           const matchingLostRecord = lostRecords.find((lr) => lr.id === r.id && lr.version === r.version);
           if (matchingLostRecord) {
@@ -666,6 +670,8 @@ export default class CacheWorker {
 
             // otherwise we return the newer patch
             return matchingUpdatedRecord;
+          } else {
+            recordsThatRequestedModificationButArentInTheList.push(r);
           }
 
           return r;
@@ -679,7 +685,7 @@ export default class CacheWorker {
         });
 
         // and now we can concat them
-        newValue = newValue.concat(newRecordsFiltered);
+        newValue = newValue.concat(newRecordsFiltered).concat(recordsThatRequestedModificationButArentInTheList);
 
         await this.db.put(SEARCHES_TABLE_NAME, {
           ...currentValue,

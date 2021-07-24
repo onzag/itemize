@@ -163,17 +163,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     }
 
     // basic functions
-    this.focusIfNecessary = this.focusIfNecessary.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
-  }
-  public componentDidMount() {
-    this.focusIfNecessary();
-  }
-  public focusIfNecessary() {
-    if (this.props.autoFocus) {
-      // TODO
-    }
   }
   public onFocus() {
     this.setState({
@@ -213,8 +204,9 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const editor =
       <SlateEditor
         id={this.props.propertyId}
-        features={this.props.features}
+        features={this.props.args.features ? {...this.props.features, ...this.props.args.features} : this.props.features}
         value={this.props.currentValue}
+        autoFocus={this.props.autoFocus}
         internalValue={this.props.currentInternalValue}
         onChange={this.props.onChange}
         onInsertFile={this.props.onInsertFile}

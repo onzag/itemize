@@ -100,6 +100,10 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
    * avatar props
    */
   avatarProps: any;
+  /**
+   * An extra node to setup in the app bar
+   */
+  toolbarExtraNode?: React.ReactNode;
 }
 
 /**
@@ -157,6 +161,7 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                 <ExternalDialogs />
 
               </div>
+              {props.toolbarExtraNode}
             </Toolbar>
           </AppBar>
           <div className={props.classes.appBarSpacer} />

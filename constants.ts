@@ -1261,6 +1261,18 @@ export const RESERVED_CHANGE_PROPERTIES = {
     type: GraphQLString,
     description: "An uuid to identify the creator of this action",
   },
+  parent_id: {
+    type: GraphQLString,
+    description: "A new parent to move this node to (the id)",
+  },
+  parent_version: {
+    type: GraphQLString,
+    description: "A new parent to move this node to (the version)",
+  },
+  parent_type: {
+    type: GraphQLString,
+    description: "A new parent to move this node to (the type)",
+  },
 };
 
 /**

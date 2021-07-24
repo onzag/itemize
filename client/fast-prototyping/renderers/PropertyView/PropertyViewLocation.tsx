@@ -131,7 +131,10 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
     ) : null;
 
     let textHeader: React.ReactNode = null;
-    if (this.props.currentValue === null && this.props.args.NullComponent) {
+
+    if (this.props.currentValue === null && this.props.args.nullNode) {
+      textHeader = this.props.args.nullNode;
+    } else if (this.props.currentValue === null && this.props.args.NullComponent) {
       const NullComponent = this.props.args.NullComponent;
       const nullArgs = this.props.args.nullComponentArgs;
       textHeader = <NullComponent {...nullArgs}/>;

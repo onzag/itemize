@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
 
@@ -16,6 +16,9 @@ import { DOMWindow, DOMPurify } from "../../../../../../util";
 export function textSQL(arg: ISQLArgInfo) {
   return {
     [arg.prefix + arg.id]: {
+      type: "TEXT",
+    },
+    [arg.prefix + arg.id + "_PLAIN"]: {
       type: "TEXT",
     },
     [arg.prefix + arg.id + "_DICTIONARY"]: {
@@ -32,6 +35,18 @@ export function textSQL(arg: ISQLArgInfo) {
   };
 }
 
+function fakeInnerText(ele: Node): string {
+  if (ele.nodeType === 3) {
+    return ele.textContent.trim();
+  }
+
+  if (!ele.childNodes) {
+    return "";
+  }
+
+  return Array.from(ele.childNodes).map(fakeInnerText).filter((v) => v !== "").join(" ");
+}
+
 /**
  * Provides the sql in functionality for the text type
  * @param arg the sql in arg info
@@ -42,6 +57,7 @@ export function textSQLIn(arg: ISQLInInfo) {
   if (arg.value === null) {
     return {
       [arg.prefix + arg.id]: null,
+      [arg.prefix + arg.id + "_PLAIN"]: null,
       [arg.prefix + arg.id + "_VECTOR"]: null,
       [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
     };
@@ -56,7 +72,7 @@ export function textSQLIn(arg: ISQLInInfo) {
     const dummyElement = DOMWindow.document.createElement("div");
     dummyElement.innerHTML = arg.value.toString();
     // the escaped text is used to build the FTS index and as such is necessary
-    escapedText = dummyElement.textContent;
+    escapedText = fakeInnerText(dummyElement);
 
     // and we escape it, and now 
     purifiedText = DOMPurify.sanitize(arg.value.toString(), {
@@ -72,9 +88,23 @@ export function textSQLIn(arg: ISQLInInfo) {
     });
   }
 
+  console.log("WTF", {
+    [arg.prefix + arg.id]: purifiedText,
+    [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
+    [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
+    [arg.prefix + arg.id + "_VECTOR"]: [
+      "to_tsvector(?, ?)",
+      [
+        arg.dictionary,
+        escapedText,
+      ],
+    ],
+  });
+
   // now we set the value
   return {
     [arg.prefix + arg.id]: purifiedText,
+    [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
     [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
     [arg.prefix + arg.id + "_VECTOR"]: [
       "to_tsvector(?, ?)",
@@ -84,6 +114,24 @@ export function textSQLIn(arg: ISQLInInfo) {
       ],
     ],
   };
+}
+
+/**
+ * Provides the sql in functionality for redoing sql based indexes
+ * @param arg the sql in arg info
+ * @returns a partial row value
+ */
+export function textSqlRedoDictionaryIndex(arg: ISQLRedoDictionaryBasedIndex) {
+  const plainLocation = arg.property.isRichText() ? arg.prefix + arg.id + "_PLAIN" : arg.prefix + arg.id;
+  return {
+    [arg.prefix + arg.id + "_DICTIONARY"]: arg.newDictionary,
+    [arg.prefix + arg.id + "_VECTOR"]: [
+      "to_tsvector(?, " + JSON.stringify(plainLocation) + ")",
+      [
+        arg.newDictionary,
+      ],
+    ],
+  }
 }
 
 /**

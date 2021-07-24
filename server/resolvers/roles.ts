@@ -16,7 +16,7 @@ export enum CustomRoleGranterEnvironment {
   REMOVAL = "REMOVAL",
 }
 
-interface ICustomRoleGranterArg {
+export interface ICustomRoleGranterArg {
   tokenData: IServerSideTokenDataType;
   cache: Cache;
   databaseConnection: DatabaseConnection;

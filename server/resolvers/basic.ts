@@ -514,7 +514,7 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
  * @param args the whole args of the graphql request
  */
 export function getDictionary(appData: IAppDataType, args: any): string {
-  const dictionary = appData.config.dictionaries[args.language];
+  const dictionary = appData.config.dictionaries[args.language] || appData.config.dictionaries["*"];
   CAN_LOG_SILLY && logger.silly(
     "getDictionary: got dictionary " + dictionary,
   );

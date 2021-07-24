@@ -14,6 +14,7 @@ import React from "react";
  * supported args:
  * - NullComponent: a react component to render instead of the default when the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * 
  * @param props the property view boolean renderer props given by the handler
  * @returns a react element
@@ -21,7 +22,9 @@ import React from "react";
 export default function PropertyViewBooleanRenderer(props: IPropertyViewBooleanRendererProps) {
   let i18nLabel: string = null;
   if (props.currentValue === null) {
-    if (props.args.NullComponent) {
+    if (props.args.nullNode) {
+      return props.args.nullNode;
+    } else if (props.args.NullComponent) {
       const NullComponent = props.args.NullComponent;
       const nullArgs = props.args.nullComponentArgs;
       return <NullComponent {...nullArgs}/>;

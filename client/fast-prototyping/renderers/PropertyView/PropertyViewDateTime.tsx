@@ -14,6 +14,7 @@ import React from "react";
  * supported args:
  * - NullComponent: a react component to render instead of the default when the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * - dateFormat: a momentjs date string format to use instead of the default (keep localization in mind)
  * 
  * @param props the property view date time renderer props given by the handler
@@ -27,7 +28,9 @@ export default function PropertyViewDateTimeRenderer(props: IPropertyViewDateTim
     value = props.defaultFormattedValue;
   }
 
-  if (value === null && props.args.NullComponent) {
+  if (value === null && props.args.nullNode) {
+    value = props.args.nullNode;
+  } else if (value === null && props.args.NullComponent) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     value = <NullComponent {...nullArgs}/>;

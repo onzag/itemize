@@ -70,6 +70,10 @@ export interface IArgInfo {
   include?: Include;
 }
 
+export interface ISQLRedoDictionaryBasedIndex extends IArgInfo {
+  newDictionary: string;
+}
+
 export interface ISQLArgInfo extends IArgInfo {
   serverData: any;
 }
@@ -300,6 +304,11 @@ export interface IPropertyDefinitionSupportedType<T> {
    * for fields without mantenience
    */
   sqlMantenience: (arg: ISQLArgInfo) => ISQLMantenienceType;
+
+  /**
+   * SQL to redo the dictionary based index
+   */
+  sqlRedoDictionaryIndex?: (arg: ISQLRedoDictionaryBasedIndex) => ISQLTableRowValue;
 
   /**
    * Allows to specify side effects that occur on the server side

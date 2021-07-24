@@ -221,37 +221,40 @@ export class Cache {
     const newRecordArr = [record];
     const idefQualifiedPathName = itemDefinition.getQualifiedPathName();
     const modQualifiedPathName = itemDefinition.getParentModule().getQualifiedPathName();
-    const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsEvent = {
-      qualifiedPathName: idefQualifiedPathName,
-      createdBy: itemDefinition.isOwnerObjectId() ? record.id : createdBy,
-      newRecords: location === "new" ? newRecordArr : [],
-      lostRecords: location === "lost" ? newRecordArr : [],
-      modifiedRecords: location === "modified" ? newRecordArr : [],
-      newLastModified: record.last_modified,
-    };
 
-    CAN_LOG_DEBUG && logger.debug(
-      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
-      itemDefinitionBasedOwnedEvent,
-    );
-    this.listener.triggerOwnedSearchListeners(
-      itemDefinitionBasedOwnedEvent,
-      null, // TODO add the listener uuid, maybe?
-    );
-
-    const moduleBasedOwnedEvent: IOwnedSearchRecordsEvent = {
-      ...itemDefinitionBasedOwnedEvent,
-      qualifiedPathName: modQualifiedPathName,
-    };
-
-    CAN_LOG_DEBUG && logger.debug(
-      "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
-      moduleBasedOwnedEvent,
-    );
-    this.listener.triggerOwnedSearchListeners(
-      moduleBasedOwnedEvent,
-      null, // TODO add the listener uuid, maybe?
-    );
+    if (createdBy) {
+      const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsEvent = {
+        qualifiedPathName: idefQualifiedPathName,
+        createdBy: itemDefinition.isOwnerObjectId() ? record.id : createdBy,
+        newRecords: location === "new" ? newRecordArr : [],
+        lostRecords: location === "lost" ? newRecordArr : [],
+        modifiedRecords: location === "modified" ? newRecordArr : [],
+        newLastModified: record.last_modified,
+      };
+  
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
+        itemDefinitionBasedOwnedEvent,
+      );
+      this.listener.triggerOwnedSearchListeners(
+        itemDefinitionBasedOwnedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+  
+      const moduleBasedOwnedEvent: IOwnedSearchRecordsEvent = {
+        ...itemDefinitionBasedOwnedEvent,
+        qualifiedPathName: modQualifiedPathName,
+      };
+  
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
+        moduleBasedOwnedEvent,
+      );
+      this.listener.triggerOwnedSearchListeners(
+        moduleBasedOwnedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+    }
 
     if (parent) {
       const itemDefinitionBasedParentedEvent: IParentedSearchRecordsEvent = {
@@ -700,6 +703,7 @@ export class Cache {
       dictionary,
       currentValue.container_id,
       null,
+      null,
       options,
     );
   }
@@ -743,6 +747,11 @@ export class Cache {
     dictionary: string,
     containerId: string,
     listenerUUID: string,
+    reparent: {
+      id: string,
+      version: string,
+      type: string,
+    },
     options: {
       ignorePreSideEffects?: boolean;
       ignoreSideEffects?: boolean;
@@ -853,6 +862,17 @@ export class Cache {
     );
     const sqlModData: IManyValueType = sqlModDataComposed.value;
     const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
+
+    if (reparent) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.requestUpdate: re-parent specified is id " + reparent.id + " with version " + reparent.version + " and type " + reparent.type,
+      );
+      sqlModData.parent_id = reparent.id;
+      // the version can never be null, so we must cast it into the invalid
+      // empty string value
+      sqlModData.parent_version = reparent.version || "";
+      sqlModData.parent_type = reparent.type;
+    }
 
     // now we check if we are updating anything at all
     if (
@@ -1032,19 +1052,53 @@ export class Cache {
         last_modified: sqlValue.last_modified,
       };
 
-      this.triggerSearchListenersFor(
-        itemDefinition,
-        sqlValue.created_by || null,
-        (
-          sqlValue.parent_id ? {
+      if (!reparent) {
+        this.triggerSearchListenersFor(
+          itemDefinition,
+          sqlValue.created_by || null,
+          (
+            sqlValue.parent_id ? {
+              id: sqlValue.parent_id,
+              version: sqlValue.parent_version || null,
+              type: sqlValue.parent_type,
+            } : null
+          ),
+          searchRecord,
+          "modified",
+        );
+      } else {
+        this.triggerSearchListenersFor(
+          itemDefinition,
+          sqlValue.created_by,
+          null,
+          searchRecord,
+          "modified",
+        );
+        this.triggerSearchListenersFor(
+          itemDefinition,
+          null,
+          {
             id: sqlValue.parent_id,
             version: sqlValue.parent_version || null,
             type: sqlValue.parent_type,
-          } : null
-        ),
-        searchRecord,
-        "modified",
-      );
+          },
+          searchRecord,
+          "new"
+        );
+        if (currentSQLValue.parent_id) {
+          this.triggerSearchListenersFor(
+            itemDefinition,
+            null,
+            {
+              id: currentSQLValue.parent_id,
+              version: currentSQLValue.parent_version || null,
+              type: currentSQLValue.parent_type,
+            },
+            searchRecord,
+            "lost"
+          );
+        }
+      }
     })();
 
     // Execute side effects of modification according

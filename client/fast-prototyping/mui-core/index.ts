@@ -90,6 +90,8 @@ import Grid from "@material-ui/core/Grid";
 import NativeSelect from '@material-ui/core/NativeSelect';
 import Chip from "@material-ui/core/Chip";
 import Fab from "@material-ui/core/Fab";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -297,4 +299,6 @@ export {
   Stepper,
   Step,
   StepLabel,
+  ListItemAvatar,
+  ListItemSecondaryAction,
 }

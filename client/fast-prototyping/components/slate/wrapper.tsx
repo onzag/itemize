@@ -10,7 +10,7 @@
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React, { useEffect, useState } from "react";
-import { ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
+import { ISlateEditorStateType, ISlateEditorWrapperBaseProps, IToolbarPrescenseElement, SlateEditorWrapperCustomToolbarElement, SlateEditorWrapperCustomToolbarIdentifiedElement } from ".";
 import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
@@ -191,7 +191,7 @@ const style = (theme: Theme) => createStyles({
     };
   },
   toolbar: {
-    overflow: "auto",
+    flexWrap: "wrap",
   },
   divider: {
     border: "solid 1px #ccc",
@@ -312,26 +312,270 @@ interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   requestTemplateHTML: () => void;
 }
 
-/**
- * This is the function component that represents the toolbar for the wrapper
- * @param props the entire rich text editor toolbar props with all the added functions
- */
-function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
-  // issues with the badge and SSR
-  const [isReady, makeReady] = useState(false);
-  useEffect(() => {
-    makeReady(true);
-  }, []);
+interface RichTextEditorToolbarState {
+  isReady: boolean;
+}
 
-  // no rich text
-  if (!props.state.isRichText) {
-    // no toolbar
+interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps { };
+
+function Bold(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatBoldLabel}
+      disabled={!props.state.currentSelectedText}
+      color={props.state.currentSelectedText && props.state.currentSelectedText.bold ? "primary" : "default"}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+      onClick={props.helpers.formatToggleBold}
+    >
+      <FormatBoldIcon />
+    </IconButton>
+  );
+}
+
+function Italic(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatItalicLabel}
+      disabled={!props.state.currentSelectedText}
+      color={props.state.currentSelectedText && props.state.currentSelectedText.italic ? "primary" : "default"}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+      onClick={props.helpers.formatToggleItalic}
+    >
+      <FormatItalicIcon />
+    </IconButton>
+  );
+}
+
+function Underline(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatUnderlineLabel}
+      disabled={!props.state.currentSelectedText}
+      color={props.state.currentSelectedText && props.state.currentSelectedText.underline ? "primary" : "default"}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+      onClick={props.helpers.formatToggleUnderline}
+    >
+      <FormatUnderlinedIcon />
+    </IconButton>
+  );
+}
+
+function VDivider(props: RichTextEditorToolbarElementProps) {
+  return (
+    <Divider orientation="vertical" className={props.classes.divider} />
+  );
+}
+
+function Link(props: RichTextEditorToolbarElementProps) {
+  let templateLinkAmount = 0;
+
+  if (props.featureSupport.supportsTemplating && props.state.currentSelectedElementContext) {
+    Object.keys(props.state.currentSelectedElementContext.properties).forEach((key) => {
+      const property = props.state.currentSelectedElementContext.properties[key];
+
+      // but they must be the given element type
+      if (property.type === "link") {
+        templateLinkAmount++;
+      }
+    });
+  }
+
+  if (
+    props.featureSupport.supportsTemplating &&
+    props.state.currentRootContext &&
+    props.state.currentRootContext !== props.state.currentSelectedElementContext
+  ) {
+    Object.keys(props.state.currentRootContext.properties).forEach((key) => {
+      const property = props.state.currentRootContext.properties[key];
+      if ((property as any).nonRootInheritable) {
+        return;
+      }
+
+      // but they must be the given element type
+      if (property.type === "link") {
+        templateLinkAmount++;
+      }
+    });
+  }
+
+  let linkBaseComponent = (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatLinkLabel}
+      color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "link" ? "primary" : "default"}
+      disabled={!props.featureSupport.canInsertLink}
+      onClick={props.requestLink}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <LinkIcon />
+    </IconButton>
+  );
+
+  if (props.featureSupport.supportsLinks && templateLinkAmount && props.isReady) {
+    linkBaseComponent = <Badge
+      badgeContent={templateLinkAmount}
+      color="secondary"
+      classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
+    >{linkBaseComponent}</Badge>
+  }
+
+  return linkBaseComponent;
+}
+
+function Title(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatTitleLabel}
+      color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "title" ? "primary" : "default"}
+      disabled={!props.featureSupport.canInsertTitle}
+      onClick={props.helpers.toggleTitle.bind(null, "h1", null)}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <TitleIcon />
+    </IconButton>
+  );
+}
+
+function Quote(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatQuoteLabel}
+      color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "quote" ? "primary" : "default"}
+      disabled={!props.featureSupport.canInsertQuote}
+      onClick={props.helpers.toggleQuote.bind(null, null)}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <FormatQuoteIcon />
+    </IconButton>
+  );
+}
+
+
+function NumberedList(props: RichTextEditorToolbarElementProps) {
+  let currentSuperBlockElement = props.state.currentSuperBlockElement;
+  if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
+    currentSuperBlockElement = props.state.currentSelectedElement;
+  }
+
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatListNumberedLabel}
+      color={
+        currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
+          currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
+      }
+      disabled={!props.featureSupport.canInsertList}
+      onClick={props.helpers.toggleList.bind(null, "numbered", null)}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <FormatListNumberedIcon />
+    </IconButton>
+  );
+}
+
+function BulletedList(props: RichTextEditorToolbarElementProps) {
+  let currentSuperBlockElement = props.state.currentSuperBlockElement;
+  if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
+    currentSuperBlockElement = props.state.currentSelectedElement;
+  }
+
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatListBulletedLabel}
+      color={
+        currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
+          currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
+      }
+      disabled={!props.featureSupport.canInsertList}
+      onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <FormatListBulletedIcon />
+    </IconButton>
+  );
+}
+
+function Image(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddImageLabel}
+      disabled={!props.featureSupport.canInsertImage}
+      onClick={props.requestImage}
+      onMouseDown={props.helpers.blockBlur}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <InsertPhotoIcon />
+    </IconButton>
+  );
+}
+
+function Video(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddVideoLabel}
+      disabled={!props.featureSupport.canInsertVideo}
+      onMouseDown={props.helpers.blockBlur}
+      onClick={props.requestVideo}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <VideoLibraryIcon />
+    </IconButton>
+  );
+}
+
+function File(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddFileLabel}
+      disabled={!props.featureSupport.canInsertFile}
+      onMouseDown={props.helpers.blockBlur}
+      onClick={props.requestFile}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <AttachFileIcon />
+    </IconButton>
+  );
+}
+
+function Container(props: RichTextEditorToolbarElementProps) {
+  return (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddContainerLabel}
+      disabled={!props.featureSupport.canInsertContainer}
+      onMouseDown={props.helpers.blockBlur}
+      onClick={props.insertContainer}
+      onMouseUp={props.helpers.releaseBlur}
+    >
+      <CheckBoxOutlineBlankIcon />
+    </IconButton>
+  );
+}
+
+function TemplateText(props: RichTextEditorToolbarElementProps) {
+  if (!props.isReady) {
     return null;
   }
 
   let templateTextAmount = 0;
-  let templateHTMLAmount = 0;
-  let templateLinkAmount = 0;
 
   if (props.featureSupport.supportsTemplating && props.state.currentSelectedElementContext) {
     Object.keys(props.state.currentSelectedElementContext.properties).forEach((key) => {
@@ -340,10 +584,6 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
       // but they must be the given element type
       if (property.type === "text") {
         templateTextAmount++;
-      } else if (property.type === "html") {
-        templateHTMLAmount++;
-      } else if (property.type === "link") {
-        templateLinkAmount++;
       }
     });
   }
@@ -362,40 +602,12 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
       // but they must be the given element type
       if (property.type === "text") {
         templateTextAmount++;
-      } else if (property.type === "html") {
-        templateHTMLAmount++;
-      } else if (property.type === "link") {
-        templateLinkAmount++;
       }
     });
   }
 
-  let linkBaseComponent = props.featureSupport.supportsLinks ? (
-    <IconButton
-      tabIndex={-1}
-      title={props.i18nRichInfo.formatLinkLabel}
-      color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "link" ? "primary" : "default"}
-      disabled={!props.featureSupport.canInsertLink}
-      onClick={props.requestLink}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
-    >
-      <LinkIcon />
-    </IconButton>
-  ) : null;
-
-  if (props.featureSupport.supportsLinks && templateLinkAmount && isReady) {
-    linkBaseComponent = <Badge
-      badgeContent={templateLinkAmount}
-      color="secondary"
-      classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
-    >{linkBaseComponent}</Badge>
-  }
-
-  let templateTextBaseComponent: React.ReactNode = null;
-
-  if (templateTextAmount && isReady) {
-    templateTextBaseComponent = <Badge
+  return (
+    <Badge
       badgeContent={templateTextAmount}
       color="secondary"
       classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
@@ -411,12 +623,50 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         <TextFieldsIcon />
       </IconButton>
     </Badge>
+  );
+}
+
+function TemplateHTML(props: RichTextEditorToolbarElementProps) {
+  if (!props.isReady) {
+    return null;
   }
 
-  let templateHTMLBaseComponent: React.ReactNode = null;
+  let templateHTMLAmount = 0;
 
-  if (templateHTMLAmount && isReady) {
-    templateHTMLBaseComponent = <Badge
+  if (
+    props.featureSupport.supportsTemplating &&
+    props.state.currentSelectedElementContext
+  ) {
+    Object.keys(props.state.currentSelectedElementContext.properties).forEach((key) => {
+      const property = props.state.currentSelectedElementContext.properties[key];
+
+      // but they must be the given element type
+      if (property.type === "html") {
+        templateHTMLAmount++;
+      }
+    });
+  }
+
+  if (
+    props.featureSupport.supportsTemplating &&
+    props.state.currentRootContext &&
+    props.state.currentRootContext !== props.state.currentSelectedElementContext
+  ) {
+    Object.keys(props.state.currentRootContext.properties).forEach((key) => {
+      const property = props.state.currentRootContext.properties[key];
+      if ((property as any).nonRootInheritable) {
+        return;
+      }
+
+      // but they must be the given element type
+      if (property.type === "html") {
+        templateHTMLAmount++;
+      }
+    });
+  }
+
+  return (
+    <Badge
       badgeContent={templateHTMLAmount}
       color="secondary"
       classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
@@ -432,269 +682,250 @@ function RichTextEditorToolbar(props: RichTextEditorToolbarProps) {
         <CodeIcon />
       </IconButton>
     </Badge>
+  );
+}
+
+interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
+  extra: IToolbarPrescenseElement;
+}
+
+function ToolbarExtra(props: IToolbarExtraProps) {
+  const basicProps = {
+    tabIndex: -1,
+    disabled: !props.featureSupport.canInsertAnyElement,
+    onMouseDown: props.helpers.blockBlur,
+    onMouseUp: props.helpers.releaseBlur,
+    onClick: props.helpers.insertElement.bind(null, props.extra.element, null),
+  }
+  if (typeof props.extra.title === "string" || !props.extra.title) {
+    return (
+      <IconButton
+        {...basicProps}
+        title={props.extra.title as string}
+      >
+        {props.extra.icon}
+      </IconButton>
+    );
+  } else {
+    const element: React.ReactElement = props.extra.title as any;
+    const elementCloned = React.cloneElement(element, {
+      children: (i18nTitle: string) => (
+        <IconButton
+          {...basicProps}
+          title={i18nTitle}
+        >
+          {props.extra.icon}
+        </IconButton>
+      )
+    });
+
+    return elementCloned;
+  }
+}
+
+function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
+  if (props.toolbarExtras && props.toolbarExtras.length) {
+    const toolbarExtras = props.toolbarExtras.map((x, index) => {
+      return (
+        <ToolbarExtra {...props} extra={x} key={index}/>
+      );
+    });
+
+    return (
+      <>
+        {toolbarExtras}
+      </>
+    );
   }
 
-  let toolbarExtras: React.ReactNode[] = null;
-  if (props.toolbarExtras && props.toolbarExtras.length) {
-    toolbarExtras = props.toolbarExtras.map((x, index) => {
-      const basicProps = {
-        key: index,
-        tabIndex: -1,
-        disabled: !props.featureSupport.canInsertAnyElement,
-        onMouseDown: props.helpers.blockBlur,
-        onMouseUp: props.helpers.releaseBlur,
-        onClick: props.helpers.insertElement.bind(null, x.element, null),
-      }
-      if (typeof x.title === "string" || !x.title) {
-        return (
-          <IconButton
-            {...basicProps}
-            title={x.title as string}
-          >
-            {x.icon}
-          </IconButton>
-        );
-      } else {
-        const element: React.ReactElement = x.title as any;
-        const elementCloned = React.cloneElement(element, {
-          children: (i18nTitle: string) => (
-            <IconButton
-              {...basicProps}
-              title={i18nTitle}
-            >
-              {x.icon}
-            </IconButton>
-          )
-        });
+  return null;
+}
 
-        return elementCloned;
-      }
+function None(): any {
+  return null;
+}
+
+const toolbarRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, React.ElementType<RichTextEditorToolbarElementProps>> = {
+  none: None,
+  italic: Italic,
+  bold: Bold,
+  underline: Underline,
+  "bulleted-list": BulletedList,
+  "numbered-list": NumberedList,
+  "template-html": TemplateHTML,
+  "template-text": TemplateText,
+  title: Title,
+  container: Container,
+  divider: VDivider,
+  extras: ToolbarExtras,
+  file: File,
+  image: Image,
+  link: Link,
+  quote: Quote,
+  video: Video,
+}
+
+/**
+ * This is the function component that represents the toolbar for the wrapper
+ * @param props the entire rich text editor toolbar props with all the added functions
+ */
+class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, RichTextEditorToolbarState> {
+
+  private appBarHeader: HTMLElement;
+
+  constructor(props: RichTextEditorToolbarProps) {
+    super(props);
+    // issues with the badge and SSR
+    this.state = {
+      isReady: false,
+    }
+  }
+
+  componentDidMount() {
+    this.setState({
+      isReady: true,
     });
   }
 
-  let currentSuperBlockElement = props.state.currentSuperBlockElement;
-  if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
-    currentSuperBlockElement = props.state.currentSelectedElement;
+  public getHeight() {
+    return this.appBarHeader && this.appBarHeader.offsetHeight;
   }
 
-  // now we can create the component itself
-  // there is not much to say on how this all works
-  const toReturn = (
-    <AppBar
-      position={props.disjointedMode ? "fixed" : "relative"}
-      variant="outlined"
-      color="default"
-      className={
-        props.disjointedMode ? props.classes.appbarFixed : props.classes.appbar
-      }
-      data-unblur="true"
-    >
-      <Toolbar className={props.classes.toolbar}>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18nRichInfo.formatBoldLabel}
-          disabled={!props.state.currentSelectedText}
-          color={props.state.currentSelectedText && props.state.currentSelectedText.bold ? "primary" : "default"}
-          onMouseDown={props.helpers.blockBlur}
-          onMouseUp={props.helpers.releaseBlur}
-          onClick={props.helpers.formatToggleBold}
-        >
-          <FormatBoldIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18nRichInfo.formatItalicLabel}
-          disabled={!props.state.currentSelectedText}
-          color={props.state.currentSelectedText && props.state.currentSelectedText.italic ? "primary" : "default"}
-          onMouseDown={props.helpers.blockBlur}
-          onMouseUp={props.helpers.releaseBlur}
-          onClick={props.helpers.formatToggleItalic}
-        >
-          <FormatItalicIcon />
-        </IconButton>
-        <IconButton
-          tabIndex={-1}
-          title={props.i18nRichInfo.formatUnderlineLabel}
-          disabled={!props.state.currentSelectedText}
-          color={props.state.currentSelectedText && props.state.currentSelectedText.underline ? "primary" : "default"}
-          onMouseDown={props.helpers.blockBlur}
-          onMouseUp={props.helpers.releaseBlur}
-          onClick={props.helpers.formatToggleUnderline}
-        >
-          <FormatUnderlinedIcon />
-        </IconButton>
-        {
-          (
-            props.featureSupport.supportsTitle ||
-            props.featureSupport.supportsQuote ||
-            props.featureSupport.supportsLinks ||
-            props.featureSupport.supportsLists
-          ) ?
-            <Divider orientation="vertical" className={props.classes.divider} /> :
-            null
-        }
-        {linkBaseComponent}
-        {
-          props.featureSupport.supportsTitle ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatTitleLabel}
-              color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "title" ? "primary" : "default"}
-              disabled={!props.featureSupport.canInsertTitle}
-              onClick={props.helpers.toggleTitle.bind(null, "h1", null)}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <TitleIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsQuote ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatQuoteLabel}
-              color={props.state.currentSelectedElement && props.state.currentSelectedElement.type === "quote" ? "primary" : "default"}
-              disabled={!props.featureSupport.canInsertQuote}
-              onClick={props.helpers.toggleQuote.bind(null, null)}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <FormatQuoteIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsLists ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatListNumberedLabel}
-              color={
-                currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-                  currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
-              }
-              disabled={!props.featureSupport.canInsertList}
-              onClick={props.helpers.toggleList.bind(null, "numbered", null)}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <FormatListNumberedIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsLists ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatListBulletedLabel}
-              color={
-                currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-                  currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
-              }
-              disabled={!props.featureSupport.canInsertList}
-              onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <FormatListBulletedIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsImages || props.featureSupport.supportsFiles || props.featureSupport.supportsVideos ?
-            <Divider orientation="vertical" className={props.classes.divider} /> :
-            null
-        }
-        {
-          props.featureSupport.supportsImages ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddImageLabel}
-              disabled={!props.featureSupport.canInsertImage}
-              onClick={props.requestImage}
-              onMouseDown={props.helpers.blockBlur}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <InsertPhotoIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsFiles ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddVideoLabel}
-              disabled={!props.featureSupport.canInsertVideo}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.requestVideo}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <VideoLibraryIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsFiles ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddFileLabel}
-              disabled={!props.featureSupport.canInsertFile}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.requestFile}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <AttachFileIcon />
-            </IconButton> :
-            null
-        }
-        {
-          props.featureSupport.supportsContainers ||
-            toolbarExtras ||
-            templateTextBaseComponent ||
-            templateHTMLBaseComponent ?
-            <Divider orientation="vertical" className={props.classes.divider} /> :
-            null
-        }
-        {
-          props.featureSupport.supportsContainers ?
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddContainerLabel}
-              disabled={!props.featureSupport.canInsertContainer}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.insertContainer}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              <CheckBoxOutlineBlankIcon />
-            </IconButton> :
-            null
-        }
-        {templateTextBaseComponent}
-        {templateHTMLBaseComponent}
-        {toolbarExtras}
-        <div className={props.classes.moreOptionsSpacer} />
-        {
-          props.shouldHaveDrawer() ?
-            <IconButton
-              tabIndex={-1}
-              onMouseDown={props.helpers.blockBlur}
-              onClick={props.toggleDrawer}
-              onMouseUp={props.helpers.releaseBlur}
-            >
-              {props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
-            </IconButton> :
-            null
-        }
-      </Toolbar>
-    </AppBar>
-  );
+  public render() {
+    // no rich text
+    if (!this.props.state.isRichText) {
+      // no toolbar
+      return null;
+    }
 
-  if (props.disjointedMode && isReady) {
-    return ReactDOM.createPortal(toReturn, document.body);
-  } else if (props.disjointedMode) {
-    return null;
-  } else {
-    return toReturn;
+    let templateTextAmount = 0;
+    let templateHTMLAmount = 0;
+
+    if (
+      !this.props.customToolbar &&
+      this.props.featureSupport.supportsTemplating &&
+      this.props.state.currentSelectedElementContext
+    ) {
+      Object.keys(this.props.state.currentSelectedElementContext.properties).forEach((key) => {
+        const property = this.props.state.currentSelectedElementContext.properties[key];
+
+        // but they must be the given element type
+        if (property.type === "text") {
+          templateTextAmount++;
+        } else if (property.type === "html") {
+          templateHTMLAmount++;
+        }
+      });
+    }
+
+    if (
+      !this.props.customToolbar &&
+      this.props.featureSupport.supportsTemplating &&
+      this.props.state.currentRootContext &&
+      this.props.state.currentRootContext !== this.props.state.currentSelectedElementContext
+    ) {
+      Object.keys(this.props.state.currentRootContext.properties).forEach((key) => {
+        const property = this.props.state.currentRootContext.properties[key];
+        if ((property as any).nonRootInheritable) {
+          return;
+        }
+
+        // but they must be the given element type
+        if (property.type === "text") {
+          templateTextAmount++;
+        } else if (property.type === "html") {
+          templateHTMLAmount++;
+        }
+      });
+    }
+
+    const toolbarForm: SlateEditorWrapperCustomToolbarElement[] = this.props.customToolbar || [
+      "bold",
+      "italic",
+      "underline",
+      (
+        this.props.featureSupport.supportsTitle ||
+        this.props.featureSupport.supportsQuote ||
+        this.props.featureSupport.supportsLinks ||
+        this.props.featureSupport.supportsLists
+      ) ? "divider" : "none",
+      this.props.featureSupport.supportsLinks ? "link" : "none",
+      this.props.featureSupport.supportsTitle ? "title" : "none",
+      this.props.featureSupport.supportsQuote ? "quote" : "none",
+      this.props.featureSupport.supportsLists ? "bulleted-list" : "none",
+      this.props.featureSupport.supportsLists ? "numbered-list" : "none",
+      (
+        this.props.featureSupport.supportsImages ||
+        this.props.featureSupport.supportsFiles ||
+        this.props.featureSupport.supportsVideos
+      ) ? "divider" : "none",
+      this.props.featureSupport.supportsImages ? "image" : "none",
+      this.props.featureSupport.supportsFiles ? "file" : "none",
+      this.props.featureSupport.supportsVideos ? "video" : "none",
+      (
+        this.props.featureSupport.supportsContainers ||
+        (this.props.toolbarExtras && this.props.toolbarExtras.length) ||
+        templateTextAmount ||
+        templateHTMLAmount
+      ) ? "divider" : "none",
+      this.props.featureSupport.supportsContainers ? "container" : "none",
+      templateTextAmount ? "template-text" : "none",
+      templateHTMLAmount ? "template-html" : "none",
+      this.props.toolbarExtras && this.props.toolbarExtras.length ? "extras" : "none",
+    ];
+
+    // now we can create the component itself
+    // there is not much to say on how this all works
+    const toReturn = (
+      <AppBar
+        position={this.props.disjointedMode ? "fixed" : "relative"}
+        variant="outlined"
+        color="default"
+        className={
+          this.props.disjointedMode ? this.props.classes.appbarFixed : this.props.classes.appbar
+        }
+        data-unblur="true"
+        ref={(obj) => {
+          this.appBarHeader = obj as any;
+        }}
+      >
+        <Toolbar className={this.props.classes.toolbar}>
+          {toolbarForm.map((ele, index) => {
+            if (typeof ele === "string") {
+              const Element = toolbarRegistry[ele];
+              return (
+                <Element {...this.props} isReady={this.state.isReady} key={index}/>
+              );
+            } else {
+              return (
+                <ToolbarExtra {...this.props} isReady={this.state.isReady} key={index} extra={ele}/>
+              );
+            }
+          })}
+          <div className={this.props.classes.moreOptionsSpacer} />
+          {
+            this.props.shouldHaveDrawer() ?
+              <IconButton
+                tabIndex={-1}
+                onMouseDown={this.props.helpers.blockBlur}
+                onClick={this.props.toggleDrawer}
+                onMouseUp={this.props.helpers.releaseBlur}
+              >
+                {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
+              </IconButton> :
+              null
+          }
+        </Toolbar>
+      </AppBar>
+    );
+
+    if (this.props.disjointedMode && this.state.isReady) {
+      return ReactDOM.createPortal(toReturn, document.body);
+    } else if (this.props.disjointedMode) {
+      return null;
+    } else {
+      return toReturn;
+    }
   }
 }
 
@@ -730,6 +961,12 @@ export interface MaterialUISlateWrapperState {
   drawerOpen: boolean;
 
   /**
+   * Specifies the height of the toolbar for use
+   * when the drawer is open in disjointed mode
+   */
+  toolbarHeight: number;
+
+  /**
    * The drawer being open or closed is stored in local storage, which is not available in the server
    * side, and the drawer animates when it's opened and closed, so this variable is always false at the
    * start, the drawer is always closed at the start, however, if we need to open the drawer at the start
@@ -761,6 +998,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * The ref object for the input object for any file input
    */
   private inputFileRef: React.RefObject<HTMLInputElement>;
+
+  /**
+   * Ref for the toolbar of the wrapper
+   */
+  private toolbarRef: React.RefObject<RichTextEditorToolbar>;
 
   /**
    * This is the range that was in place before losing focus, it is used because
@@ -802,12 +1044,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       // keep SSR compatibility by keeping the drawer closed at the start
       // as we cannot read local storage in the server side
       drawerOpen: false,
+      toolbarHeight: 0,
       noAnimate: true,
     }
 
     // create the refs
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
+    this.toolbarRef = React.createRef();
 
     // bind all the functions
     this.onImageLoad = this.onImageLoad.bind(this);
@@ -1327,6 +1571,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
+        ref={this.toolbarRef}
         requestImage={this.requestImage}
         requestFile={this.requestFile}
         requestVideo={this.requestVideo}
@@ -1347,7 +1592,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           <div className="rich-text">
             {this.props.children}
           </div>
-          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} />
+          <WrapperContainer
+            {...this.props}
+            drawerOpen={this.state.drawerOpen}
+            noAnimate={this.state.noAnimate}
+            toolbarRef={this.toolbarRef}
+          />
           {fileLoadErrorDialog}
           {videoDialog}
           {linkDialog}
@@ -1367,7 +1617,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           <div className={"rich-text " + this.props.classes.editor + (this.props.state.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
-          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} />
+          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} toolbarRef={null} />
         </div>
         {fileLoadErrorDialog}
         {videoDialog}
@@ -1383,6 +1633,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
 
 interface WrapperContainerProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
+  toolbarRef: React.RefObject<RichTextEditorToolbar>;
   noAnimate: boolean;
 }
 
@@ -1402,7 +1653,11 @@ function WrapperContainer(props: WrapperContainerProps) {
         (props.noAnimate ? " " + props.classes.editorDrawerNoAnimate : "")
       }
     >
-      {props.disjointedMode ? <div className={props.classes.editorDrawerAppbarSpacer}/> : null}
+      {
+        props.disjointedMode && props.drawerOpen ?
+          <div className={props.classes.editorDrawerAppbarSpacer} style={{ height: props.toolbarRef.current.getHeight() }} /> :
+          null
+      }
       <div className={props.classes.editorDrawerBody}>
         {props.drawerOpen ? <WrapperDrawer {...props} /> : null}
       </div>

@@ -28,6 +28,7 @@ interface IPropertyViewFileRendererState {
  * supported args:
  * - NullComponent: a react component to use rather than the default if the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * - imageClassName: the image class name for the img tag when an image is available
  * - imageSizes: the image sizes for the sizes attribute for the image, default 70vw
  * - lazyLoad: whether to use lazyloading for images alone
@@ -182,7 +183,9 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
   }
   public render() {
     if (!this.props.currentValue) {
-      if (this.props.args.NullComponent) {
+      if (this.props.args.nullNode) {
+        return this.props.args.nullNode;
+      } else if (this.props.args.NullComponent) {
         const NullComponent = this.props.args.NullComponent;
         const nullArgs = this.props.args.nullComponentArgs;
         return <NullComponent {...nullArgs} />;

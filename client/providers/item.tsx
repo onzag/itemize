@@ -275,6 +275,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   inBehalfOf?: string;
   propertyOverrides?: IPropertyOverride[];
   includeOverrides?: IIncludeOverride[];
+  languageOverride?: string;
   waitAndMerge?: boolean;
 }
 
@@ -2855,7 +2856,7 @@ export class ActualItemProvider extends
         fields: requestFields,
         itemDefinition: this.props.itemDefinitionInstance,
         token: this.props.tokenData.token,
-        language: this.props.localeData.language,
+        language: options.languageOverride || this.props.localeData.language,
         id: submitForId || null,
         version: submitForVersion || null,
         listenerUUID: this.props.remoteListener.getUUID(),
@@ -2934,7 +2935,7 @@ export class ActualItemProvider extends
         fields: requestFields,
         itemDefinition: this.props.itemDefinitionInstance,
         token: this.props.tokenData.token,
-        language: this.props.localeData.language,
+        language: options.languageOverride || this.props.localeData.language,
         listenerUUID: this.props.remoteListener.getUUID(),
         cacheStore: this.props.longTermCaching,
         forId: submitForId || null,

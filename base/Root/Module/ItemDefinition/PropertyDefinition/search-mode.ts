@@ -64,7 +64,9 @@ export function getConversionIds(
     }
   } else if (
     propertyDefinitionDescription.searchInterface ===
-    PropertyDefinitionSearchInterfacesType.TEXT
+    PropertyDefinitionSearchInterfacesType.TEXT ||
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TAGS
   ) {
     ids = [PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id];
   } else if (

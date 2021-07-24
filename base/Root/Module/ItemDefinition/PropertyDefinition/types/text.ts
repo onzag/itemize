@@ -21,7 +21,8 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { textSQL, textSQLIn, textSQLSearch, textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy } from "../sql/text";
+import { textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
+  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy } from "../sql/text";
 
 /**
  * The text is described by a string
@@ -122,6 +123,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   sql: textSQL,
   sqlSelect: standardSQLSelect,
   sqlIn: textSQLIn,
+  sqlRedoDictionaryIndex: textSqlRedoDictionaryIndex,
   sqlOut: standardSQLOutFn,
   sqlSearch: textSQLSearch,
   sqlStrSearch: textSQLStrSearch,

@@ -13,6 +13,7 @@ import React from "react";
  * supported args:
  * - NullComponent: a react component to render instead of the default when the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * - className: the class name for the root span container
  * - valueClassName: the class name for the actual value
  * - symbolClassName: the class name for the symbol that value has
@@ -30,7 +31,13 @@ export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrenc
   const originalValueClassName = props.args.originalValueClassName || null;
   const originalSymbolClassName = props.args.originalSymbolClassName || null;
 
-  if (props.currentValue === null && props.args.NullComponent) {
+  if (props.currentValue === null && props.args.nullNode) {
+    return (
+      <span className={rootClassName}>
+        {props.args.nullNode}
+      </span>
+    );
+  } else if (props.currentValue === null && props.args.NullComponent) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     return (

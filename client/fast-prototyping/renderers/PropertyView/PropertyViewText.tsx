@@ -360,12 +360,15 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
  * supported args:
  * - NullComponent: a react component to use rather than the default if the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * 
  * @param props the props passed by the handler
  * @returns a react element
  */
 export default function PropertyViewTextRenderer(props: IPropertyViewTextRendererProps) {
-  if (props.args.NullComponent && props.currentValue === null) {
+  if (props.args.nullNode && props.currentValue === null) {
+    return props.args.nullNode;
+  } else if (props.args.NullComponent && props.currentValue === null) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     return <NullComponent {...nullArgs} />;

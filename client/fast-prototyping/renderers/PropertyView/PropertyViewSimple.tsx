@@ -16,6 +16,7 @@ import moment from "moment";
  * supported args:
  * - NullComponent: a react component to use rather than the default if the value is null
  * - nullComponentArgs: an object to pass as props to the null component
+ * - nullNode: a react node to render instead of the default when the value is null
  * - dateFormat: a string, if specified will use that with moment to format the string like that
  * 
  * @param props the props for the simple renderer passed by the handler
@@ -29,7 +30,9 @@ export default function PropertyViewSimpleRenderer(props: IPropertyViewSimpleRen
     value = props.capitalize ? capitalize(props.currentValue) : props.currentValue;
   }
 
-  if (value === null && props.args.NullComponent) {
+  if (value === null && props.args.nullNode) {
+    value = props.args.nullNode;
+  } else if (value === null && props.args.NullComponent) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     value = <NullComponent {...nullArgs}/>;
