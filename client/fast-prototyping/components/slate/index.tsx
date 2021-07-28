@@ -30,6 +30,7 @@ import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import { ICustom } from "../../../internal/text/serializer/types/custom";
 import { IInline } from "../../../internal/text/serializer/types/inline";
+
 /**
  * Combine both interfaces
  */
@@ -181,7 +182,11 @@ export interface IToolbarPrescenseElement {
   /**
    * The element to be added
    */
-  element: RichElement;
+  element?: RichElement;
+  /**
+   * Alternatively an action
+   */
+  onClick?: () => void;
 }
 
 /**
@@ -1045,9 +1050,16 @@ export type SlateEditorWrapperCustomToolbarIdentifiedElement =
 "none" |
 "divider";
 
-export type SlateEditorWrapperCustomToolbarElement =
+export type SlateEditorWrapperCustomToolbarElementBaseForm =
   IToolbarPrescenseElement |
   SlateEditorWrapperCustomToolbarIdentifiedElement;
+
+export type SlateEditorWrapperCustomToolbarElementFnForm = (toolbarProps: any) =>
+  SlateEditorWrapperCustomToolbarElementBaseForm;
+
+export type SlateEditorWrapperCustomToolbarElement =
+  SlateEditorWrapperCustomToolbarElementBaseForm |
+  SlateEditorWrapperCustomToolbarElementFnForm;
 
 /**
  * The base props that every wrapper is going to get

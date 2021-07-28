@@ -252,7 +252,7 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
  * that the entire wrapper does, but adding these functions and flags taken from
  * the state of the wrapper or other functions
  */
-interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
+export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
   /**
    * Whether the drawer is open, the drawer is the side drawer that contains
    * a lot of functionality to edit the currently selected element
@@ -727,7 +727,7 @@ function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
   if (props.toolbarExtras && props.toolbarExtras.length) {
     const toolbarExtras = props.toolbarExtras.map((x, index) => {
       return (
-        <ToolbarExtra {...props} extra={x} key={index}/>
+        <ToolbarExtra {...props} extra={x} key={index} />
       );
     });
 
@@ -839,40 +839,48 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       });
     }
 
-    const toolbarForm: SlateEditorWrapperCustomToolbarElement[] = this.props.customToolbar || [
-      "bold",
-      "italic",
-      "underline",
-      (
-        this.props.featureSupport.supportsTitle ||
-        this.props.featureSupport.supportsQuote ||
-        this.props.featureSupport.supportsLinks ||
-        this.props.featureSupport.supportsLists
-      ) ? "divider" : "none",
-      this.props.featureSupport.supportsLinks ? "link" : "none",
-      this.props.featureSupport.supportsTitle ? "title" : "none",
-      this.props.featureSupport.supportsQuote ? "quote" : "none",
-      this.props.featureSupport.supportsLists ? "bulleted-list" : "none",
-      this.props.featureSupport.supportsLists ? "numbered-list" : "none",
-      (
-        this.props.featureSupport.supportsImages ||
-        this.props.featureSupport.supportsFiles ||
-        this.props.featureSupport.supportsVideos
-      ) ? "divider" : "none",
-      this.props.featureSupport.supportsImages ? "image" : "none",
-      this.props.featureSupport.supportsFiles ? "file" : "none",
-      this.props.featureSupport.supportsVideos ? "video" : "none",
-      (
-        this.props.featureSupport.supportsContainers ||
-        (this.props.toolbarExtras && this.props.toolbarExtras.length) ||
-        templateTextAmount ||
-        templateHTMLAmount
-      ) ? "divider" : "none",
-      this.props.featureSupport.supportsContainers ? "container" : "none",
-      templateTextAmount ? "template-text" : "none",
-      templateHTMLAmount ? "template-html" : "none",
-      this.props.toolbarExtras && this.props.toolbarExtras.length ? "extras" : "none",
-    ];
+    const toolbarForm: SlateEditorWrapperCustomToolbarElement[] = (
+      this.props.customToolbar || [
+        "bold",
+        "italic",
+        "underline",
+        (
+          this.props.featureSupport.supportsTitle ||
+          this.props.featureSupport.supportsQuote ||
+          this.props.featureSupport.supportsLinks ||
+          this.props.featureSupport.supportsLists
+        ) ? "divider" : "none",
+        this.props.featureSupport.supportsLinks ? "link" : "none",
+        this.props.featureSupport.supportsTitle ? "title" : "none",
+        this.props.featureSupport.supportsQuote ? "quote" : "none",
+        this.props.featureSupport.supportsLists ? "bulleted-list" : "none",
+        this.props.featureSupport.supportsLists ? "numbered-list" : "none",
+        (
+          this.props.featureSupport.supportsImages ||
+          this.props.featureSupport.supportsFiles ||
+          this.props.featureSupport.supportsVideos
+        ) ? "divider" : "none",
+        this.props.featureSupport.supportsImages ? "image" : "none",
+        this.props.featureSupport.supportsFiles ? "file" : "none",
+        this.props.featureSupport.supportsVideos ? "video" : "none",
+        (
+          this.props.featureSupport.supportsContainers ||
+          (this.props.toolbarExtras && this.props.toolbarExtras.length) ||
+          templateTextAmount ||
+          templateHTMLAmount
+        ) ? "divider" : "none",
+        this.props.featureSupport.supportsContainers ? "container" : "none",
+        templateTextAmount ? "template-text" : "none",
+        templateHTMLAmount ? "template-html" : "none",
+        this.props.toolbarExtras && this.props.toolbarExtras.length ? "extras" : "none",
+      ]
+    ).map((v) => {
+      if (typeof(v) === "function") {
+        return v(this.props);
+      }
+
+      return v;
+    });
 
     // now we can create the component itself
     // there is not much to say on how this all works
@@ -894,11 +902,12 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
             if (typeof ele === "string") {
               const Element = toolbarRegistry[ele];
               return (
-                <Element {...this.props} isReady={this.state.isReady} key={index}/>
+                <Element {...this.props} isReady={this.state.isReady} key={index} />
               );
             } else {
+              const extraValue = typeof ele === "function" ? ele(this.props) : ele;
               return (
-                <ToolbarExtra {...this.props} isReady={this.state.isReady} key={index} extra={ele}/>
+                <ToolbarExtra {...this.props} isReady={this.state.isReady} key={index} extra={extraValue as IToolbarPrescenseElement} />
               );
             }
           })}
