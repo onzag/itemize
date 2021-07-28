@@ -6,10 +6,9 @@
  * @module
  */
 
-import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";
-import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "../..";
+import { IReactifyArg, ISerializationRegistryType, deserializeElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
-import { IText } from "./text";
+import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the inline in the given
@@ -51,12 +50,14 @@ export function registerInline(registry: ISerializationRegistryType) {
     // first we take the base
     const base = deserializeElementBase(node);
 
+    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as IText[];
+
     // now we can build the inline itself
     const inline: IInline = {
       ...base,
       type: "inline",
       containment: "inline",
-      children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as IText[],
+      children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
     // return it

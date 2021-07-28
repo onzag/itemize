@@ -30,6 +30,7 @@ import { IImage } from "../../../internal/text/serializer/types/image";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import { ICustom } from "../../../internal/text/serializer/types/custom";
 import { IInline } from "../../../internal/text/serializer/types/inline";
+import { CurrentElementProvider, CurrentElementRetriever } from "./current-element";
 
 /**
  * Combine both interfaces
@@ -1032,23 +1033,23 @@ export interface ISlateEditorStateType {
 }
 
 export type SlateEditorWrapperCustomToolbarIdentifiedElement =
-"bold" |
-"italic" |
-"underline" |
-"link" |
-"title" |
-"bulleted-list" |
-"numbered-list" |
-"image" |
-"video" |
-"file" |
-"quote" |
-"container" |
-"template-text" |
-"template-html" |
-"extras" |
-"none" |
-"divider";
+  "bold" |
+  "italic" |
+  "underline" |
+  "link" |
+  "title" |
+  "bulleted-list" |
+  "numbered-list" |
+  "image" |
+  "video" |
+  "file" |
+  "quote" |
+  "container" |
+  "template-text" |
+  "template-html" |
+  "extras" |
+  "none" |
+  "divider";
 
 export type SlateEditorWrapperCustomToolbarElementBaseForm =
   IToolbarPrescenseElement |
@@ -1652,6 +1653,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
     this.setValue = this.setValue.bind(this);
     this.renderElement = this.renderElement.bind(this);
+    this.actuallyRenderElement = this.actuallyRenderElement.bind(this);
     this.onChange = this.onChange.bind(this);
     this.renderText = this.renderText.bind(this);
     this.onFocusedChange = this.onFocusedChange.bind(this);
@@ -1876,89 +1878,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
-    // during the update the selected node that was previous might remain selected
-    // because the internal value didn't change state
-    if (prevState.currentSelectedElement && !equals(this.state.currentSelectedElementAnchor, prevState.currentSelectedElementAnchor, { strict: true })) {
-      // so we have to find it in the current
-      let pathOfPreviousSelectedNode: Path;
-      try {
-        pathOfPreviousSelectedNode = ReactEditor.findPath(this.editor, prevState.currentSelectedElement as any);
-      } catch {
-        // it failed for whatever reason
-      }
-      // and if there's a match
-      if (pathOfPreviousSelectedNode) {
-        // we are going to invalidate its state
-        const newInternalValue = { ...this.state.internalValue };
-        newInternalValue.children = [...newInternalValue.children];
-
-        let finalSelectedNode: any = this.state.currentSelectedElement;
-        let finalCurrentBlock: any = this.state.currentBlockElement;
-        let finalCurrentElement: any = this.state.currentElement;
-        let finalCurrentSuperBlock: any = this.state.currentSuperBlockElement;
-
-        let finalNode: any = newInternalValue;
-        let notFound = false;
-        pathOfPreviousSelectedNode.forEach((v) => {
-          // sometimes it's just not there
-          if (notFound || !finalNode.children[v]) {
-            notFound = true;
-            return;
-          }
-
-          // now we grab the node
-          const nodeInPath = finalNode.children[v];
-
-          // same as it's not there
-          if (Text.isText(nodeInPath)) {
-            return;
-          }
-
-          // when changing from say selecting a child from selecting a parent
-          // the parent node will not be equal anymore to the current selected node
-          // because they have indeed changed so we need to keep it consistent
-          // and update the parent for that we got to know if this node
-          // we will be changing is the selected
-          const isCurrentlySelectedNode = finalSelectedNode === nodeInPath;
-          const isCurrentlyCurrentBlock = finalCurrentBlock === nodeInPath;
-          const isCurrentlyCurrentElement = finalCurrentElement === nodeInPath;
-          const isCurrentlyCurrentSuperBlock = finalCurrentSuperBlock === nodeInPath;
-
-          // now we do the basics of copying
-          const newFinalNode = { ...nodeInPath };
-          newFinalNode.children = [...newFinalNode.children];
-          finalNode.children[v] = newFinalNode;
-          finalNode = newFinalNode;
-
-          // and if it was the selected
-          if (isCurrentlySelectedNode) {
-            // got to update it
-            finalSelectedNode = newFinalNode;
-          }
-          if (isCurrentlyCurrentBlock) {
-            finalCurrentBlock = newFinalNode;
-          }
-          if (isCurrentlyCurrentElement) {
-            finalCurrentElement = newFinalNode;
-          }
-          if (isCurrentlyCurrentSuperBlock) {
-            finalCurrentSuperBlock = newFinalNode;
-          }
-        });
-
-        if (notFound) {
-          return;
-        }
-
-        this.setState({
-          internalValue: newInternalValue,
-          currentSelectedElement: finalSelectedNode,
-          currentBlockElement: finalCurrentBlock,
-          currentElement: finalCurrentElement,
-          currentSuperBlockElement: finalCurrentSuperBlock,
-        });
-      }
-    }
+    
   }
 
   /**
@@ -3064,18 +2984,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return currentContext;
   }
 
+  public renderElement(props: RenderElementProps) {
+    return (
+      <CurrentElementRetriever
+        passProps={props}
+        fn={this.actuallyRenderElement}
+      />
+    )
+  }
+
   /**
    * the render element function to be used in slate editor
    * @param props the properties that slate provides to render the component
    */
-  public renderElement(props: RenderElementProps) {
+  public actuallyRenderElement(props: RenderElementProps, currentElement: RichElement) {
     // first we extract all these stuffs
     const { attributes, children, element } = props;
 
     // now we check if we are in a selected elelement
     // because the component is immutable, we can do this
     const isSelected = (
-      (element as any) === this.state.currentSelectedElement
+      (element as any) === currentElement
     );
 
     // let's check for a ui handler
@@ -3372,14 +3301,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public selectPath(p: Path) {
     // first we need to find the actual node that is referred to that path
-    const newInternalValue = { ...this.state.internalValue };
-    newInternalValue.children = [...newInternalValue.children];
-    let finalNode: any = newInternalValue;
+    let finalNode: any = this.state.internalValue;
     p.forEach((v) => {
-      const newFinalNode = { ...finalNode.children[v] };
-      newFinalNode.children = [...newFinalNode.children];
-      finalNode.children[v] = newFinalNode;
-      finalNode = newFinalNode;
+      finalNode = finalNode.children[v];
     });
 
     let currentSelectedText: IText = null;
@@ -3400,11 +3324,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we can update the state
     this.setState({
-      ...this.calculateAnchorsAndContext(this.state.currentSelectedElementAnchor, newInternalValue.children as any, p),
+      ...this.calculateAnchorsAndContext(this.state.currentSelectedElementAnchor, this.state.internalValue.children as any, p),
 
       currentSelectedElementAnchor: p,
       currentSelectedElement: finalNode,
-      internalValue: newInternalValue,
       currentSelectedText,
     });
   }
@@ -5044,14 +4967,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public render() {
     // make the editable
     let children: React.ReactNode = (
-      <Editable
-        id={this.props.id}
-        onKeyDown={this.onKeyDown}
-        onBlur={this.onNativeBlur}
-        renderElement={this.renderElement}
-        renderLeaf={this.renderText}
-        placeholder={this.props.placeholder}
-      />
+      <CurrentElementProvider element={this.state.currentSelectedElement}>
+        <Editable
+          id={this.props.id}
+          onKeyDown={this.onKeyDown}
+          onBlur={this.onNativeBlur}
+          renderElement={this.renderElement}
+          renderLeaf={this.renderText}
+          placeholder={this.props.placeholder}
+        />
+      </CurrentElementProvider>
     );
 
     // and pick on the wrapper, hopefully we have one
