@@ -82,7 +82,7 @@ export default class PropertySetter extends React.Component<IPropertySetterBaseP
     // new value does not match
     if (
       idHasChanged ||
-      !equals(prevProps.value, this.props.value)
+      !equals(prevProps.value, this.props.value, { strict: true })
     ) {
       // we set the enforcement
       this.props.onEnforce(this.props.property, this.props.value, this.props.forId, this.props.forVersion);

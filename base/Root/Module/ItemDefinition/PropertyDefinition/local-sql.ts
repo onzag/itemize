@@ -30,5 +30,5 @@ export function standardSQLSSCacheEqualFn(arg: ISQLSSCacheEqualInfo): boolean {
  * @returns a boolean on whether it equals or not
  */
 export function standardLocalEqual(arg: ILocalEqualInfo<PropertyDefinitionSupportedType>): boolean {
-  return equals(arg.a, arg.b);
+  return equals(arg.a, arg.b, { strict: true });
 }

@@ -205,7 +205,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
       const newFactors: { [code: string]: number } = await fetch(`/rest/currency-factors`).then((r) => r.json());
       const currentFactors = this.state.specifiedCurrencyFactors;
       // and if they don't equal to the current we set the state
-      if (!equals(currentFactors, newFactors)) {
+      if (!equals(currentFactors, newFactors, { strict: true })) {
         this.setState({
           specifiedCurrencyFactors: newFactors,
         });

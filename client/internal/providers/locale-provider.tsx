@@ -97,7 +97,7 @@ export class LocaleProvider extends React.Component<ILocaleProviderProps> {
       nextProps.value.currencyFactors !== this.props.value.currencyFactors ||
       nextProps.value.rtl !==this.props.value.rtl ||
       nextProps.value.updating !== this.props.value.updating ||
-      !equals(nextProps.value.i18n, this.props.value.i18n);
+      !equals(nextProps.value.i18n, this.props.value.i18n, { strict: true });
   }
   public render() {
     return (

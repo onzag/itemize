@@ -65,7 +65,7 @@ class OptimizerDifferingIncludesRetriever extends React.Component<IOptimizerDiff
   public shouldComponentUpdate(nextProps: IOptimizerDifferingIncludesRetrieverProps) {
     // basically we only update when the final properties or the children function differ
     return nextProps.children !== this.props.children ||
-      !equals(nextProps.differingIncludes, this.props.differingIncludes);
+      !equals(nextProps.differingIncludes, this.props.differingIncludes, { strict: true });
   }
   public render() {
     return this.props.children(this.props.differingIncludes);

@@ -9,6 +9,7 @@ import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { capitalize, localeReplacer } from "../../../../util";
 import { isCenterBasicallyEquals } from "../PropertyView/PropertyViewLocation";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The viewpoer zoom sizes, implement as you wish, but these zooms
@@ -279,8 +280,8 @@ export default class PropertyEntryLocation
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.state, nextState) ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.state, nextState, { strict: true }) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
@@ -291,7 +292,7 @@ export default class PropertyEntryLocation
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public enableUserSetErrors() {
@@ -305,7 +306,7 @@ export default class PropertyEntryLocation
     const newValue = this.props.state.value as IPropertyDefinitionSupportedLocationType;
 
     // so we check our new value and check if they are not equal
-    if (newValue && !equals(newValue, oldValue)) {
+    if (newValue && !equals(newValue, oldValue, { strict: true })) {
       // and now let's see if we are centered to our old value, as in we are locked to it
       let isCenteredToOldValue = false;
 

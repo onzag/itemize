@@ -186,7 +186,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     // and we use both equals and path equals to determine a change
     // and avoid the sync issue
     if (
-      !equals(selectedNode.richClassList || [], state.value) &&
+      !equals(selectedNode.richClassList || [], state.value, { strict: true }) &&
       !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
     ) {
       return {

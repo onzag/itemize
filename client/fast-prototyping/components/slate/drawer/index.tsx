@@ -72,7 +72,7 @@ function scrollSlowly(speed: number, element: HTMLElement) {
 
   if (currentScrollSlowlyElement) {
     currentScrollSlowlyElement.change(speed);
-  } else {
+  } else {
     currentScrollSlowlyElement = new ScrollSlowly(speed, element);
   }
 }
@@ -150,6 +150,8 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   let settingsForNode: React.ReactNode = null;
   let titleForNode: string = null;
 
+  const drawerMode = props.drawerMode || "full";
+
   // and that's done based on the selected node
   if (props.state.currentSelectedElement) {
     // for that we get the info of the selected node
@@ -158,7 +160,23 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     // and we need to see in which location we are
     let actualLocation = location;
     // for text nodes there's only the main location
-    if (actualLocation !== "MAIN" && selectedNodeInfo.isText) {
+    if (
+      actualLocation !== "MAIN" &&
+      (
+        selectedNodeInfo.isText ||
+        drawerMode === "simple"
+      )
+    ) {
+      // so we override
+      actualLocation = "MAIN";
+    }
+
+    if (
+      actualLocation !== "MAIN" &&
+      actualLocation !== "STYLES" &&
+      drawerMode !== "full" &&
+      drawerMode !== "with-styles"
+    ) {
       // so we override
       actualLocation = "MAIN";
     }
@@ -193,50 +211,55 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
             (
               <>
                 <Divider className={props.classes.separator} />
-                <Tabs value={actualLocation} onChange={setLocationCallback}>
-                  <Tab
-                    className={props.classes.tab}
-                    label={<SettingsIcon />}
-                    value="MAIN"
-                    title={props.i18nRichInfo.settings}
-                  />
-                  {
-                    props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
-                      (
-                        <Tab
-                          className={props.classes.tab}
-                          label={<BorderStyleIcon />}
-                          value="STYLES"
-                          title={props.i18nRichInfo.styles}
-                        />
-                      ) :
-                      null
-                  }
-                  {
-                    props.featureSupport.supportsTemplating ?
-                      (
-                        <Tab
-                          className={props.classes.tab}
-                          label={<WebIcon />}
-                          value="TEMPLATING"
-                          title={props.i18nRichInfo.templating}
-                        />
-                      ) :
-                      null
-                  }
-                  {
-                    props.featureSupport.supportsTemplating ?
-                      (
-                        <Tab
-                          className={props.classes.tab}
-                          label={<TouchAppIcon />}
-                          value="ACTIONS"
-                          title={props.i18nRichInfo.actions}
-                        />
-                      ) :
-                      null
-                  }
-                </Tabs>
+                {
+                  drawerMode !== "simple" ? (
+                    <Tabs value={actualLocation} onChange={setLocationCallback}>
+                      <Tab
+                        className={props.classes.tab}
+                        label={<SettingsIcon />}
+                        value="MAIN"
+                        title={props.i18nRichInfo.settings}
+                      />
+                      {
+                        props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
+                          (
+                            <Tab
+                              className={props.classes.tab}
+                              label={<BorderStyleIcon />}
+                              value="STYLES"
+                              title={props.i18nRichInfo.styles}
+                            />
+                          ) :
+                          null
+                      }
+                      {
+                        (props.featureSupport.supportsTemplating && drawerMode === "full") ?
+                          (
+                            <Tab
+                              className={props.classes.tab}
+                              label={<WebIcon />}
+                              value="TEMPLATING"
+                              title={props.i18nRichInfo.templating}
+                            />
+                          ) :
+                          null
+                      }
+                      {
+                        (props.featureSupport.supportsTemplating && drawerMode === "full") ?
+                          (
+                            <Tab
+                              className={props.classes.tab}
+                              label={<TouchAppIcon />}
+                              value="ACTIONS"
+                              title={props.i18nRichInfo.actions}
+                            />
+                          ) :
+                          null
+                      }
+                    </Tabs>
+                  )
+                    : null
+                }
               </>
             ) : null
         }

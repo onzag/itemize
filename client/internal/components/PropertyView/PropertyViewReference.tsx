@@ -13,6 +13,7 @@ import { IGQLRequestFields } from "../../../../gql-querier";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { IPropertyViewSimpleRendererProps } from "./PropertyViewSimple";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view reference state
@@ -321,7 +322,7 @@ export default class PropertyViewReference
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.state, nextState) ||
+      !equals(this.state, nextState, { strict: true }) ||
       this.props.useAppliedValue !== nextProps.useAppliedValue ||
       (!this.props.useAppliedValue && this.props.state.value !== nextProps.state.value) ||
       (this.props.useAppliedValue && this.props.state.stateAppliedValue !== nextProps.state.stateAppliedValue) ||
@@ -330,7 +331,7 @@ export default class PropertyViewReference
       nextProps.i18n !== this.props.i18n ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.capitalize !== this.props.capitalize ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public render() {

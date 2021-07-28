@@ -11,6 +11,7 @@ import { imageSrcSetRetriever } from "../../../components/util";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { fileURLAbsoluter, mimeTypeToExtension } from "../../../../util";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view renderer props that every property renderer
@@ -54,14 +55,14 @@ export default class PropertyViewFile
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||
-      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
-      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
+      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value, { strict: true })) ||
+      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue, { strict: true })) ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.property !== this.props.property ||
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public openFile() {
     const value = (

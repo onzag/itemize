@@ -1467,7 +1467,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value) ?
+    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1504,7 +1504,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value) ?
+    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1585,7 +1585,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value) ?
+    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1639,7 +1639,7 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
-    const valueDiffers = this.listeners.length && !equals(this.stateValue[mergedID], newValue);
+    const valueDiffers = this.listeners.length && !equals(this.stateValue[mergedID], newValue, {strict: true});
 
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
@@ -1707,7 +1707,7 @@ export default class PropertyDefinition {
       // is most likely just the same thing so we won't mess with it
       // as it's not necessary to modify it, even when this is technically a
       // new value
-      if (equals(newValue, currentValue)) {
+      if (equals(newValue, currentValue, { strict: true })) {
         this.stateValueModified[mergedID] = modifiedState;
         this.stateValueHasBeenManuallySet[mergedID] = false;
       }
@@ -1731,7 +1731,7 @@ export default class PropertyDefinition {
     delete this.stateLastCached[mergedIDWithoutExternal2];
 
     if (this.listeners.length) {
-      const valueDiffers = !equals(this.stateValue[mergedID] || null, currentValue);
+      const valueDiffers = !equals(this.stateValue[mergedID] || null, currentValue, { strict: true });
       if (valueDiffers) {
         this.listeners.forEach((listener) => {
           listener(id || null, version || null, this.stateValue[mergedID] || null);
@@ -1829,7 +1829,7 @@ export default class PropertyDefinition {
         if (
           this.stateLastUniqueCheck[mergedID] &&
           (this.stateLastUniqueCheck[mergedID].value === value ||
-            equals(this.stateLastUniqueCheck[mergedID].value, value)) &&
+            equals(this.stateLastUniqueCheck[mergedID].value, value, { strict: true })) &&
           !this.stateLastUniqueCheck[mergedID].valid
         ) {
           // if the cache specifies that it's invalid

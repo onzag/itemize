@@ -12,6 +12,7 @@ import { MAX_DECIMAL_COUNT } from "../../../../constants";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
 import convert from "convert-units";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * An enum which is useful for numeric types
@@ -342,7 +343,7 @@ export default class PropertyEntryField
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
       nextState.showUserSetErrors !== this.state.showUserSetErrors ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
@@ -356,7 +357,7 @@ export default class PropertyEntryField
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public enableUserSetErrors() {

@@ -42,7 +42,7 @@ export default class SetVar extends React.Component<ISetVarProps> {
       SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
       this.tickle(this.props.id);
       this.tickle(nextProps.id);
-    } else if (!equals(nextProps.value, this.props.value)) {
+    } else if (!equals(nextProps.value, this.props.value, { strict: true })) {
       SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
       this.tickle(nextProps.id);
     }

@@ -122,7 +122,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     // we only truly update a render on changes of the children or the state itself
     // otherwise updates are virtually uncessary
     return nextProps.children !== this.props.children ||
-      !equals(this.state, nextState);
+      !equals(this.state, nextState, { strict: true });
   }
 
   /**

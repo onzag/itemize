@@ -233,11 +233,17 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         toolbarExtras={
           this.props.args.toolbarExtras
         }
+        customToolbar={
+          this.props.args.customToolbar
+        }
         drawerUIHandlerExtras={
           this.props.args.drawerUIHandlerExtras
         }
         hideDrawer={
           this.props.args.hideDrawer
+        }
+        drawerMode={
+          this.props.args.drawerMode
         }
         disjointedMode={
           this.props.args.disjointedMode

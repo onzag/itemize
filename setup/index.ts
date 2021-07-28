@@ -203,7 +203,7 @@ export async function readConfigFile(fileName: string) {
  * @param original the original data, to check it against for differences
  */
 export async function writeConfigFile(fileName: string, data: any, original: any) {
-  if (!equals(data, original)) {
+  if (!equals(data, original, {strict: true})) {
     console.log("emiting " + colors.green(path.join("config", fileName)));
     await fsAsync.writeFile(path.join("config", fileName), JSON.stringify(data, null, 2));
   }

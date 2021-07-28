@@ -48,12 +48,12 @@ export class RedisTest extends Test {
   public describe() {
     const getGlobalPromisified = promisify(this.redisGlobalClient.get).bind(this.redisGlobalClient);
 
-    if (equals(this.testingInfo.redisConfig.cache, this.testingInfo.redisConfig.global)) {
+    if (equals(this.testingInfo.redisConfig.cache, this.testingInfo.redisConfig.global, { strict: true })) {
       this.warn("Your local and your global redis servers are the same, this is not recommended for multicluster builds");
     }
 
     if (
-      equals(this.testingInfo.redisConfig.pubSub, this.testingInfo.redisConfig.cache)
+      equals(this.testingInfo.redisConfig.pubSub, this.testingInfo.redisConfig.cache, { strict: true })
     ) {
       this.warn("Your pubsub and your local redis are the same, this is not recommended for multicluster builds");
     }

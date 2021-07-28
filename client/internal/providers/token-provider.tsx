@@ -220,7 +220,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
   public shouldComponentUpdate(nextProps: IActualTokenProviderProps, nextState: IActualTokenProviderState) {
     // we only want to upate if these two differ, the ssrContext is static anyway
-    return !equals(this.state, nextState) ||
+    return !equals(this.state, nextState, { strict: true }) ||
       nextProps.localeContext !== this.props.localeContext;
   }
 

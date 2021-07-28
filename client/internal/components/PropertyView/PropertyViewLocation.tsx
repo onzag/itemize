@@ -8,6 +8,7 @@ import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IViewport, IViewportZoomEnumType } from "../PropertyEntry/PropertyEntryLocation";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view location renderer props
@@ -150,14 +151,14 @@ export class PropertyViewLocation extends React.Component<
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||
-      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value)) ||
-      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue)) ||
-      !equals(this.state, nextState) ||
+      (!this.props.useAppliedValue && !equals(this.props.state.value, nextProps.state.value, { strict: true })) ||
+      (this.props.useAppliedValue && !equals(this.props.state.stateAppliedValue, nextProps.state.stateAppliedValue, { strict: true })) ||
+      !equals(this.state, nextState, { strict: true }) ||
       nextProps.property !== this.props.property ||
       nextProps.renderer !== this.props.renderer ||
       nextProps.country !== this.props.country ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     const value = (

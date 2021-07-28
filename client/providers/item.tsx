@@ -1106,7 +1106,7 @@ export class ActualItemProvider extends
     } else {
       if (
         !(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
-        .find((m: [string, string | [string, string, string]]) => m[0] === type && equals(m[1], arg))
+        .find((m: [string, string | [string, string, string]]) => m[0] === type && equals(m[1], arg, { strict: true }))
       ) {
         changed = true;
         (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([type, arg]);
@@ -1337,7 +1337,7 @@ export class ActualItemProvider extends
     // all of it if it differs does, the optimization flags
     // children, locale data, and ownership assumption
     return updatedIntoSomethingThatInvalidatesTheState ||
-      !equals(this.state, nextState) ||
+      !equals(this.state, nextState, { strict: true }) ||
       (nextProps.forId || null) !== (this.props.forId || null) ||
       !!nextProps.loadModerationFields !== !!this.props.loadModerationFields ||
       nextProps.children !== this.props.children ||
@@ -1345,15 +1345,15 @@ export class ActualItemProvider extends
       nextProps.tokenData.id !== this.props.tokenData.id ||
       nextProps.tokenData.role !== this.props.tokenData.role ||
       nextProps.remoteListener !== this.props.remoteListener ||
-      !equals(nextProps.properties || [], this.props.properties || []) ||
-      !equals(nextProps.includes || [], this.props.includes || []) ||
+      !equals(nextProps.properties || [], this.props.properties || [], { strict: true }) ||
+      !equals(nextProps.includes || [], this.props.includes || [], { strict: true }) ||
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
       !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
-      !equals(nextProps.automaticSearch, this.props.automaticSearch) ||
-      !equals(nextProps.setters, this.props.setters) ||
+      !equals(nextProps.automaticSearch, this.props.automaticSearch, { strict: true }) ||
+      !equals(nextProps.setters, this.props.setters, { strict: true }) ||
       nextProps.location !== this.props.location ||
-      !equals(nextProps.injectedParentContext, this.props.injectedParentContext);
+      !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true });
   }
   public async componentDidUpdate(
     prevProps: IActualItemProviderProps,
@@ -1383,11 +1383,11 @@ export class ActualItemProvider extends
     const uniqueIDChanged = (prevProps.forId || null) !== (this.props.forId || null) ||
       (prevProps.forVersion || null) !== (this.props.forVersion || null);
     const didSomethingThatInvalidatedSetters =
-      !equals(this.props.setters, prevProps.setters) ||
+      !equals(this.props.setters, prevProps.setters, { strict: true }) ||
       uniqueIDChanged ||
       itemDefinitionWasUpdated;
     const didSomethingThatInvalidatedPrefills =
-      !equals(this.props.prefills, prevProps.prefills) ||
+      !equals(this.props.prefills, prevProps.prefills, { strict: true }) ||
       uniqueIDChanged ||
       itemDefinitionWasUpdated;
 
@@ -1428,8 +1428,8 @@ export class ActualItemProvider extends
       uniqueIDChanged ||
       didSomethingThatInvalidatedSetters ||
       didSomethingThatInvalidatedPrefills ||
-      !equals(prevProps.properties || [], this.props.properties || []) ||
-      !equals(prevProps.includes || [], this.props.includes || []) ||
+      !equals(prevProps.properties || [], this.props.properties || [], { strict: true }) ||
+      !equals(prevProps.includes || [], this.props.includes || [], { strict: true }) ||
       !!prevProps.static !== !!this.props.static ||
       !!prevProps.includePolicies !== !!this.props.includePolicies
     ) {
@@ -1565,7 +1565,7 @@ export class ActualItemProvider extends
         (
           prevProps.automaticSearch &&
           (
-            !equals(this.props.automaticSearch, prevProps.automaticSearch) ||
+            !equals(this.props.automaticSearch, prevProps.automaticSearch, { strict: true }) ||
             // these two would cause search results to be dismissed because
             // the fact the token is a key part of the search itself so we would
             // dismiss the search in such a case as the token is different
@@ -1600,7 +1600,7 @@ export class ActualItemProvider extends
     }
 
     // expensive but necessary
-    if (this.props.onStateChange && !equals(this.state.itemState, prevState.itemState)) {
+    if (this.props.onStateChange && !equals(this.state.itemState, prevState.itemState, { strict: true })) {
       this.props.onStateChange(this.state.itemState);
     }
   }
@@ -2337,6 +2337,7 @@ export class ActualItemProvider extends
           const doesNotDifferFromAppliedValue = equals(
             currentAppliedValue.flattenedValue[p.propertyId],
             p.value,
+            { strict: true },
           );
           // if it does not differ, then it's false as it won't be included
           if (doesNotDifferFromAppliedValue) {
@@ -2388,6 +2389,7 @@ export class ActualItemProvider extends
               const doesNotDifferFromAppliedValue = equals(
                 includeAppliedValue[p.propertyId],
                 p.value,
+                { strict: true },
               );
               // so if it does differ from applied value
               if (!doesNotDifferFromAppliedValue) {
@@ -3157,7 +3159,7 @@ export class ActualItemProvider extends
       }
     } else if (options.cachePolicy === "by-parent") {
       // we basically do the exact same here, same logic
-      if (!equals(searchParent, this.state.searchParent)) {
+      if (!equals(searchParent, this.state.searchParent, { strict: true })) {
         // this search listener is bad because the search
         // parent has changed, and the previously registered listener
         // if any does not match the owner

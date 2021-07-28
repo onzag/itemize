@@ -246,8 +246,8 @@ class ActualPropertyEntryReferenceRenderer
 
   public componentDidUpdate(prevProps: IPropertyEntryReferenceRendererWithStylesProps) {
     if (
-      !equals(prevProps.args.preventIds, this.props.args.preventIds) ||
-      !equals(this.props.args.preventEqualityWithProperties, this.props.args.preventEqualityWithProperties)
+      !equals(prevProps.args.preventIds, this.props.args.preventIds, { strict: true }) ||
+      !equals(this.props.args.preventEqualityWithProperties, this.props.args.preventEqualityWithProperties, { strict: true })
     ) {
       this.props.refilterPossibleValues(
         this.props.args.preventIds,

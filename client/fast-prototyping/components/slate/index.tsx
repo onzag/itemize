@@ -422,16 +422,31 @@ function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
       }
 
       // now we take the class name
-      const className = s.substr(1);
+      let className = s.substr(1);
+      if (className.includes(":")) {
+        className = className.split(":")[0];
+      }
+      if (className.endsWith(",")) {
+        className = className.substr(0, className.length - 1);
+      }
 
       // and we check whether it matches any of our prefixes that
       // make it a valid class of the given type
       if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
-        ALL_CONTAINERS.push(className.substr(CONTAINER_CLASS_PREFIX.length))
+        const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
+        if (!ALL_CONTAINERS.includes(toPush)) {
+          ALL_CONTAINERS.push(toPush);
+        }
       } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
-        ALL_CUSTOM.push(className.substr(CUSTOM_CLASS_PREFIX.length))
+        const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
+        if (!ALL_CUSTOM.includes(toPush)) {
+          ALL_CUSTOM.push(toPush);
+        }
       } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
-        ALL_RICH_CLASSES.push(className.substr(RICH_TEXT_CLASS_PREFIX.length))
+        const toPush = className.substr(RICH_TEXT_CLASS_PREFIX.length);
+        if (!ALL_RICH_CLASSES.includes(toPush)) {
+          ALL_RICH_CLASSES.push(toPush);
+        }
       }
     });
   });
@@ -1099,6 +1114,10 @@ export interface ISlateEditorWrapperBaseProps {
    */
   hideDrawer?: boolean;
   /**
+   * Drawer mode
+   */
+  drawerMode?: "full" | "with-styles" | "simple";
+  /**
    * The disjointed mode
    */
   disjointedMode?: boolean;
@@ -1231,6 +1250,10 @@ interface ISlateEditorProps {
    */
   toolbarExtras?: IToolbarPrescenseElement[];
   /**
+   * To define a custom toolbar
+   */
+  customToolbar?: SlateEditorWrapperCustomToolbarElement[];
+  /**
    * Allows to specify extras for the ui handler element types
    * for being provided configuration within the general settings
    */
@@ -1239,6 +1262,10 @@ interface ISlateEditorProps {
    * Whether to hide the drawer
    */
   hideDrawer?: boolean;
+  /**
+   * Drawer mode
+   */
+  drawerMode?: "full" | "with-styles" | "simple",
   /**
    * A mode where the drawer and the toolbar are separated and fixed
    * from the rich text output, which allows to be more like a WYSIWYG editor
@@ -1839,7 +1866,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
     // during the update the selected node that was previous might remain selected
     // because the internal value didn't change state
-    if (prevState.currentSelectedElement && !equals(this.state.currentSelectedElementAnchor, prevState.currentSelectedElementAnchor)) {
+    if (prevState.currentSelectedElement && !equals(this.state.currentSelectedElementAnchor, prevState.currentSelectedElementAnchor, { strict: true })) {
       // so we have to find it in the current
       let pathOfPreviousSelectedNode: Path;
       try {
@@ -1940,7 +1967,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
 
       // so we check for equality
-      return equals(n1[key], n2[key]);
+      return equals(n1[key], n2[key], { strict: true });
     });
   }
 
@@ -2006,7 +2033,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             // empty text node
             current.text === "" &&
             // that is not our current anchor path or we have set it to ignore the current
-            (!equals(curPath, currentTextAnchorPath) || this.ignoreCurrentLocationToRemoveEmpty) &&
+            (!equals(curPath, currentTextAnchorPath, { strict: true }) || this.ignoreCurrentLocationToRemoveEmpty) &&
             // and total nodes in the entire thing is not just that one node (there's more)
             totalNodes !== 1 &&
             // is not the ending of an inline element, as there should be an empty text node after
@@ -2897,13 +2924,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.currentLoadError !== this.props.currentLoadError ||
       nextProps.drawerUIHandlerExtras !== this.props.drawerUIHandlerExtras ||
       nextProps.toolbarExtras !== this.props.toolbarExtras ||
+      nextProps.customToolbar !== this.props.customToolbar ||
       nextProps.hideDrawer !== this.props.hideDrawer ||
+      nextProps.drawerMode !== this.props.drawerMode ||
       nextProps.disjointedMode !== this.props.disjointedMode ||
-      !equals(this.state.allContainers, nextState.allContainers) ||
-      !equals(this.state.allCustom, nextState.allCustom) ||
-      !equals(this.state.allRichClasses, nextState.allRichClasses) ||
-      !equals(nextProps.wrapperArgs, this.props.wrapperArgs) ||
-      !equals(nextProps.features, this.props.features)
+      !equals(this.state.allContainers, nextState.allContainers, { strict: true }) ||
+      !equals(this.state.allCustom, nextState.allCustom, { strict: true }) ||
+      !equals(this.state.allRichClasses, nextState.allRichClasses, { strict: true }) ||
+      !equals(nextProps.wrapperArgs, this.props.wrapperArgs, { strict: true }) ||
+      !equals(nextProps.features, this.props.features, { strict: true })
     )
 
     // if it's a standard update match
@@ -3050,7 +3079,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we try to get the ui handler from the context itself
       // either the root or the one in the property itself
       let propertiesFromContext: ITemplateArg =
-        (handlerContext && handlerContext.properties && handlerContext.properties)[uiHandler] as ITemplateArg;
+        (handlerContext && handlerContext.properties && handlerContext.properties[uiHandler]) as ITemplateArg;
 
       if (!propertiesFromContext) {
         propertiesFromContext = (this.props.rootContext && this.props.rootContext.properties[uiHandler]) as ITemplateArg;
@@ -5055,8 +5084,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
           toolbarExtras={this.props.toolbarExtras}
+          customToolbar={this.props.customToolbar}
           drawerUIHandlerExtras={this.props.drawerUIHandlerExtras}
           hideDrawer={this.props.hideDrawer}
+          drawerMode={this.props.drawerMode}
           disjointedMode={this.props.disjointedMode}
         >
           {children}

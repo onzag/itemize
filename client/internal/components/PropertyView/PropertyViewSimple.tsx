@@ -7,6 +7,7 @@ import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { getNumericType, NumericType } from "../PropertyEntry/PropertyEntryField";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view simple renderer props
@@ -41,7 +42,7 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       nextProps.capitalize !== this.props.capitalize ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     let i18nData: any = null;

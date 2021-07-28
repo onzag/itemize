@@ -301,7 +301,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // if it doesn't equal what we currently have loaded
     if (
-      !equals(this.state.currentSearchRecords, currentSearchRecords)
+      !equals(this.state.currentSearchRecords, currentSearchRecords, { strict: true })
     ) {
       // then we load the values
       this.loadValues(currentSearchRecords);
@@ -654,7 +654,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // note here as well, we only really do reprocess the search and the
       // arguments of the search if we receive a different search id
       nextProps.searchId !== this.props.searchId ||
-      !equals(this.state, nextState);
+      !equals(this.state, nextState, { strict: true });
   }
   public render() {
     // the accessible count is just the length of the search records

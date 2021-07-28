@@ -342,7 +342,7 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   public shouldComponentUpdate(nextProps: ITemplatedPropertyViewRichTextRendererProps) {
     return (
       nextProps.children !== this.props.children ||
-      !equals(nextProps.templateArgs, this.props.templateArgs)
+      !equals(nextProps.templateArgs, this.props.templateArgs, { strict: true })
     );
   }
   public render() {

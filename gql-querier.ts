@@ -239,7 +239,7 @@ export class GQLQuery {
   }
 
   private isNameMergableWith(ourValue: IGQLQueryObj, theirValue: IGQLQueryObj) {
-    if (!equals(ourValue.args, theirValue.args)) {
+    if (!equals(ourValue.args, theirValue.args, {strict: true})) {
       return false;
     }
 

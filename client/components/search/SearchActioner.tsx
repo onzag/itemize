@@ -76,7 +76,7 @@ class ActualSearchActioner extends React.Component<IActualSearchActionerProps, {
     return nextProps.children !== this.props.children ||
       nextProps.itemContext.searchError !== this.props.itemContext.searchError ||
       nextProps.itemContext.searching !== this.props.itemContext.searching ||
-      !equals(nextProps.itemContext.searchRecords, this.props.itemContext.searchRecords);
+      !equals(nextProps.itemContext.searchRecords, this.props.itemContext.searchRecords, { strict: true });
   }
   public render() {
     // and we pass it as the actioner

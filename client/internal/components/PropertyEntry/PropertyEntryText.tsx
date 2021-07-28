@@ -13,6 +13,7 @@ import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/Prop
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * Information about the file that has just been inserted
@@ -753,8 +754,8 @@ export default class PropertyEntryText
     }
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.state, nextState) ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.state, nextState, { strict: true }) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.forId !== nextProps.forId ||
@@ -768,7 +769,7 @@ export default class PropertyEntryText
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public render() {

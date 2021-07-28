@@ -112,8 +112,8 @@ class OptimizerPokeActioner extends React.Component<IOptimizerPokeActionerProps>
       this.props.hasInvalidToPokeInclude !== nextProps.hasInvalidToPokeInclude ||
       this.props.hasInvalidToPokePolicy !== nextProps.hasInvalidToPokePolicy ||
       this.props.hasInvalidToPokeProperty !== nextProps.hasInvalidToPokeProperty ||
-      !equals(this.props.pokedElements, nextProps.pokedElements) ||
-      !equals(this.props.elementsToPoke, nextProps.elementsToPoke);
+      !equals(this.props.pokedElements, nextProps.pokedElements, { strict: true }) ||
+      !equals(this.props.elementsToPoke, nextProps.elementsToPoke, { strict: true });
   }
   public render() {
     return this.props.children({
@@ -137,8 +137,8 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
   public shouldComponentUpdate(nextProps: IActualPokeActionerProps) {
     // it only updates when these changes, as all the other information is virtually unecessary
     return nextProps.children !== this.props.children ||
-      !equals(nextProps.itemContext.pokedElements, this.props.itemContext.pokedElements) ||
-      !equals(nextProps.itemContext.state, this.props.itemContext.state)
+      !equals(nextProps.itemContext.pokedElements, this.props.itemContext.pokedElements, { strict: true }) ||
+      !equals(nextProps.itemContext.state, this.props.itemContext.state, { strict: true })
   }
   public render() {
     // first we check all the properties from the elements to poke

@@ -64,7 +64,7 @@ class ActualIncludeCalloutHandlerWarning extends React.Component<IActualIncludeC
       nextProps.locale.rtl !== this.props.locale.rtl ||
       nextProps.include !== this.props.include ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(nextProps.rendererArgs, this.props.rendererArgs) ||
+      !equals(nextProps.rendererArgs, this.props.rendererArgs, { strict: true }) ||
       nextProps.state.exclusionState !== this.props.state.exclusionState;
   }
   public render() {

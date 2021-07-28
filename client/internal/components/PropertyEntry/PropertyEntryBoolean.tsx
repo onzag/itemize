@@ -7,6 +7,7 @@ import React from "react";
 import { IPropertyEntryRendererProps, IPropertyEntryHandlerProps } from ".";
 import { PropertyDefinitionSupportedBooleanType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean";
 import equals from "deep-equal";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * Props that every boolean renderer is going to get
@@ -75,7 +76,7 @@ export default class PropertyEntryBoolean extends React.Component<
   ) {
     return nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       nextProps.property !== this.props.property ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
@@ -86,7 +87,7 @@ export default class PropertyEntryBoolean extends React.Component<
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public enableUserSetErrors() {
     this.setState({

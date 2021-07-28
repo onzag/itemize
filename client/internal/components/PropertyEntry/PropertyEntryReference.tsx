@@ -7,6 +7,7 @@ import { IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { PropertyDefinitionValueType, IPropertyDefinitionExactPropertyValue, IPropertyDefinitionReferredPropertyValue } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { getConversionIds } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 export interface IPropertyEntryReferenceOption {
   id: string;
@@ -348,7 +349,7 @@ export default class PropertyEntryReference
     if (this.lastSearchId === searchId) {
       this.lastCachedSearch = options;
       this.lastCachedSearchPreventedIds = this.lastSearchArgumentPreventIds;
-      if (!equals(this.lastCachedSearchPreventedPropertiesIds, this.lastSearchArgumentPreventEqualityWithProperties)) {
+      if (!equals(this.lastCachedSearchPreventedPropertiesIds, this.lastSearchArgumentPreventEqualityWithProperties, { strict: true })) {
         this.lastCachedSearchPreventedProperties &&
           this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
         this.lastCachedSearchPreventedProperties = (this.lastSearchArgumentPreventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
@@ -584,7 +585,7 @@ export default class PropertyEntryReference
     }
 
     this.lastCachedSearchPreventedIds = preventIds;
-    if (!equals(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties)) {
+    if (!equals(this.lastCachedSearchPreventedPropertiesIds, preventEqualityWithProperties, { strict: true })) {
       this.lastCachedSearchPreventedProperties &&
         this.removePreventEqualityWithPropertiesListener(this.lastCachedSearchPreventedProperties);
       this.lastCachedSearchPreventedProperties = (preventEqualityWithProperties || []).map((p) => stdSelfIdef.getPropertyDefinitionFor(p, true));
@@ -597,7 +598,7 @@ export default class PropertyEntryReference
         return !actualPreventIds.includes(v.id);
       });
 
-      if (!equals(this.state.currentOptions, newCurrentOptions)) {
+      if (!equals(this.state.currentOptions, newCurrentOptions, { strict: true })) {
         this.setState({
           currentOptions: newCurrentOptions,
         });
@@ -696,8 +697,8 @@ export default class PropertyEntryReference
   ) {
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.state, nextState) ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.state, nextState, { strict: true }) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.rtl !== !!nextProps.rtl ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
@@ -709,7 +710,7 @@ export default class PropertyEntryReference
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public render() {

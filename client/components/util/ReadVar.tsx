@@ -29,7 +29,7 @@ export default class ReadVar extends React.PureComponent<IReadVarProps> {
     // eg. SetVar mounts and calls the mount and tickles
     // then this ReadVar mounts and adds the listener for tickling
     // it will miss such tickle
-    if (!equals(this.lastRenderRoundValue, SetVar.VAR_REGISTRY[this.props.id])) {
+    if (!equals(this.lastRenderRoundValue, SetVar.VAR_REGISTRY[this.props.id], { strict: true })) {
       // assume a tickle event occured and was missed
       this.onTickled();
     }

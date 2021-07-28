@@ -5,8 +5,8 @@
 
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
-import equals from "deep-equal";
 import { capitalize } from "../../../../util";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * The renderer props for the boolean type which also include
@@ -45,7 +45,7 @@ export class PropertyViewBoolean extends React.Component<IPropertyViewHandlerPro
       nextProps.renderer !== this.props.renderer ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     const i18nYes = capitalize(this.props.i18n[this.props.language].yes);

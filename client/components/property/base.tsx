@@ -392,7 +392,7 @@ export function EntryViewReadSet(
                             property.getCurrentValue(itemContextualValue.forId, itemContextualValue.forVersion);
                         }
                         itemContextualValue.onPropertyChange(property, newValue, internalValue);
-                        if (props.onEntryDrivenChange && !equals(valueBeforeUpdate, newValue)) {
+                        if (props.onEntryDrivenChange && !equals(valueBeforeUpdate, newValue, { strict: true })) {
                           props.onEntryDrivenChange(newValue);
                         }
                       };
@@ -408,7 +408,7 @@ export function EntryViewReadSet(
                         if (props.onEntryDrivenChange) {
                           const value =
                             property.getCurrentValue(itemContextualValue.forId, itemContextualValue.forVersion);
-                          if (!equals(valueBeforeUpdate, value)) {
+                          if (!equals(valueBeforeUpdate, value, { strict: true })) {
                             props.onEntryDrivenChange(value);
                           }
                         }

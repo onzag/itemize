@@ -12,6 +12,7 @@ import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Modul
 import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * This is the entry file renderer props that every renderer for a files type will recieve.
@@ -172,7 +173,7 @@ export default class PropertyEntryFile
     // This is optimized to only update for the thing it uses
     // This is optimized to only update for the thing it uses
     return nextProps.property !== this.props.property ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
@@ -185,8 +186,8 @@ export default class PropertyEntryFile
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.state, nextState) ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !equals(this.state, nextState, { strict: true }) ||
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public componentWillUnmount() {
     // revoke urls on unmount
@@ -422,7 +423,7 @@ export default class PropertyEntryFile
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
-      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue),
+      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, {strict: true}),
 
       onSetFile: this.onSetFile,
       onRemoveFile: this.onRemoveFile,

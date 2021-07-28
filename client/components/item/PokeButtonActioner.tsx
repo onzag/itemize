@@ -70,7 +70,7 @@ export default function PokeButtonActioner(props: IPokeButtonActionerProps) {
           // so as you can see if it's invalid and our poked elements are
           // not what we are expected to poke, as in, it might be unpoked
           // and our poke actioner hasn't kicked in
-          if (isInvalid && !equals(props.elementsToPoke, arg.pokedElements)) {
+          if (isInvalid && !equals(props.elementsToPoke, arg.pokedElements, { strict: true })) {
             // we run the poke function
             arg.poke(props.elementsToPoke);
             // call on poke

@@ -26,7 +26,7 @@ class ActualIncludeProvider extends React.Component<IActualIncludeProviderProps,
   public shouldComponentUpdate(nextProps: IActualIncludeProviderProps) {
     return nextProps.include !== this.props.include ||
       nextProps.children !== this.props.children ||
-      !equals(this.props.state, nextProps.state);
+      !equals(this.props.state, nextProps.state, { strict: true });
   }
   public render() {
     return (

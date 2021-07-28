@@ -9,6 +9,7 @@ import { IPropertyDefinitionSupportedPaymentType, paymentAllowedStatuses, Paymen
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../util";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
+import { shallowDeepRendererArgsComparer } from "../general-fn";
 
 /**
  * Contains the currency i18n data, usually to build
@@ -222,7 +223,7 @@ export default class PropertyEntryPayment extends React.Component<
 
     return nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       nextProps.property !== this.props.property ||
-      !equals(this.props.state, nextProps.state) ||
+      !equals(this.props.state, nextProps.state, {strict: true}) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
@@ -233,7 +234,7 @@ export default class PropertyEntryPayment extends React.Component<
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !equals(this.props.rendererArgs, nextProps.rendererArgs);
+      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public enableUserSetErrors() {
     this.setState({
