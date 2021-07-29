@@ -145,7 +145,7 @@ const style = (theme: Theme) => createStyles({
     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
     backgroundColor: "#f5f5f5",
     padding: "1rem",
-    overflow: "hidden",
+    overflow: "auto",
     display: "flex",
     flexDirection: "column",
   },
@@ -197,6 +197,15 @@ const style = (theme: Theme) => createStyles({
     border: "solid 1px #ccc",
     height: "2rem",
     margin: "0 0.5rem",
+  },
+  hdivider: {
+    border: "solid 1px #ccc",
+    margin: "0.25rem 0.5rem",
+    width: "100%",
+  },
+  hdividerspacer: {
+    flex: "1 0 auto",
+    width: "100%",
   },
   appbar: {
     zIndex: 1,
@@ -310,6 +319,10 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    * Call to insert a template html bit from the context, opens a dialog so requires a state
    */
   requestTemplateHTML: () => void;
+  /**
+   * Called when the height changes
+   */
+  onHeightChange: (newHeight: number) => void;
 }
 
 interface RichTextEditorToolbarState {
@@ -369,6 +382,15 @@ function Underline(props: RichTextEditorToolbarElementProps) {
 function VDivider(props: RichTextEditorToolbarElementProps) {
   return (
     <Divider orientation="vertical" className={props.classes.divider} />
+  );
+}
+
+function HDivider(props: RichTextEditorToolbarElementProps) {
+  return (
+    <>
+      <div className={props.classes.hdividerspacer}/>
+      <Divider orientation="horizontal" className={props.classes.hdivider} />
+    </>
   );
 }
 
@@ -690,12 +712,17 @@ interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
 }
 
 function ToolbarExtra(props: IToolbarExtraProps) {
+  const defaultAction = props.helpers.insertElement.bind(null, props.extra.element, null);
   const basicProps = {
     tabIndex: -1,
-    disabled: !props.featureSupport.canInsertAnyElement,
+    disabled: (
+      typeof props.extra.disabled !== "undefined" ?
+      props.extra.disabled :
+      !props.featureSupport.canInsertAnyElement
+    ),
     onMouseDown: props.helpers.blockBlur,
     onMouseUp: props.helpers.releaseBlur,
-    onClick: props.helpers.insertElement.bind(null, props.extra.element, null),
+    onClick: props.extra.onClick ? props.extra.onClick.bind(null, defaultAction) : defaultAction,
   }
   if (typeof props.extra.title === "string" || !props.extra.title) {
     return (
@@ -757,6 +784,7 @@ const toolbarRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, 
   title: Title,
   container: Container,
   divider: VDivider,
+  hdivider: HDivider,
   extras: ToolbarExtras,
   file: File,
   image: Image,
@@ -785,6 +813,12 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
     this.setState({
       isReady: true,
     });
+
+    this.props.onHeightChange(this.getHeight());
+  }
+
+  componentDidUpdate() {
+    this.props.onHeightChange(this.getHeight());
   }
 
   public getHeight() {
@@ -1009,11 +1043,6 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   private inputFileRef: React.RefObject<HTMLInputElement>;
 
   /**
-   * Ref for the toolbar of the wrapper
-   */
-  private toolbarRef: React.RefObject<RichTextEditorToolbar>;
-
-  /**
    * This is the range that was in place before losing focus, it is used because
    * when opening some dialog, the insertion or change needs to happen at a given
    * selection range, but that is lost when losing focus, so we need to remember it
@@ -1060,9 +1089,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // create the refs
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
-    this.toolbarRef = React.createRef();
 
     // bind all the functions
+    this.onHeightChange = this.onHeightChange.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
     this.requestImage = this.requestImage.bind(this);
@@ -1085,6 +1114,14 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.closeDialogTemplateHTML = this.closeDialogTemplateHTML.bind(this);
     this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
+  }
+
+  public onHeightChange(newHeight: number) {
+    if (this.state.toolbarHeight !== newHeight) {
+      this.setState({
+        toolbarHeight: newHeight,
+      });
+    }
   }
 
   /**
@@ -1580,7 +1617,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
-        ref={this.toolbarRef}
+        onHeightChange={this.onHeightChange}
         requestImage={this.requestImage}
         requestFile={this.requestFile}
         requestVideo={this.requestVideo}
@@ -1605,7 +1642,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
             {...this.props}
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
-            toolbarRef={this.toolbarRef}
+            toolbarHeight={this.state.toolbarHeight}
           />
           {fileLoadErrorDialog}
           {videoDialog}
@@ -1626,7 +1663,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           <div className={"rich-text " + this.props.classes.editor + (this.props.state.isFocused ? " focused" : "")}>
             {this.props.children}
           </div>
-          <WrapperContainer {...this.props} drawerOpen={this.state.drawerOpen} noAnimate={this.state.noAnimate} toolbarRef={null} />
+          <WrapperContainer
+            {...this.props}
+            drawerOpen={this.state.drawerOpen}
+            noAnimate={this.state.noAnimate}
+            toolbarHeight={this.state.toolbarHeight}
+          />
         </div>
         {fileLoadErrorDialog}
         {videoDialog}
@@ -1642,7 +1684,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
 
 interface WrapperContainerProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
-  toolbarRef: React.RefObject<RichTextEditorToolbar>;
+  toolbarHeight: number;
   noAnimate: boolean;
 }
 
@@ -1664,7 +1706,10 @@ function WrapperContainer(props: WrapperContainerProps) {
     >
       {
         props.disjointedMode && props.drawerOpen ?
-          <div className={props.classes.editorDrawerAppbarSpacer} style={{ height: props.toolbarRef.current.getHeight() }} /> :
+          <div
+            className={props.classes.editorDrawerAppbarSpacer}
+            style={{ height: props.toolbarHeight, flex: "0 0 " + props.toolbarHeight + "px" }}
+          /> :
           null
       }
       <div className={props.classes.editorDrawerBody}>

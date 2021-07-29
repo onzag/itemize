@@ -7,7 +7,7 @@ import { IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { PropertyDefinitionValueType, IPropertyDefinitionExactPropertyValue, IPropertyDefinitionReferredPropertyValue } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { getConversionIds } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 export interface IPropertyEntryReferenceOption {
   id: string;
@@ -710,7 +710,7 @@ export default class PropertyEntryReference
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public render() {

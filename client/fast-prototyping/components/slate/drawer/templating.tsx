@@ -76,6 +76,7 @@ interface ISingleTemplatingElementState {
    * value is the right value
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -92,7 +93,14 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    if ((props.value || "") !== state.value && !Path.equals(props.anchor, state.valueForAnchor)) {
+    const time = (new Date()).getTime();
+    if (
+      (props.value || "") !== state.value &&
+      (
+        !Path.equals(props.anchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
+    ) {
       // so we update
       return {
         value: props.value || "",
@@ -118,6 +126,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
     this.state = {
       value: props.value || "",
       valueForAnchor: props.anchor,
+      valueLastTimeRequestedUpdate: 0,
     }
   }
 
@@ -134,6 +143,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
     this.setState({
       value: newValue || "",
       valueForAnchor: this.props.anchor,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
     });
 
     // and set the state

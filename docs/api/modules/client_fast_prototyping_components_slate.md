@@ -15,7 +15,7 @@ even if it can also be used in a standalone way
 ### Interfaces
 
 - [IAccessibleFeatureSupportOptions](../interfaces/client_fast_prototyping_components_slate.iaccessiblefeaturesupportoptions.md)
-- [IDrawerUIHandlerConfiguratorElement](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md)
+- [DrawerConfiguratorElement](../interfaces/client_fast_prototyping_components_slate.DrawerConfiguratorElement.md)
 - [IDrawerUIHandlerElementConfigCustom](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfigcustom.md)
 - [IDrawerUIHandlerElementConfigCustomProps](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfigcustomprops.md)
 - [IDrawerUIHandlerElementConfigInput](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfiginput.md)

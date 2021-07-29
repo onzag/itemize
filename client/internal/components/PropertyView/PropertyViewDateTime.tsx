@@ -9,7 +9,7 @@ import equals from "deep-equal";
 import Moment from "moment";
 import { getLocalizedDateFormat, getLocalizedDateTimeFormat, getLocalizedTimeFormat } from "../../../../util";
 import { DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT } from "../../../../constants";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view date renderer
@@ -54,7 +54,7 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
       nextProps.capitalize !== this.props.capitalize ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     const type = this.props.property.getType();

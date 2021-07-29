@@ -9,7 +9,7 @@ import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { capitalize, localeReplacer } from "../../../../util";
 import { isCenterBasicallyEquals } from "../PropertyView/PropertyViewLocation";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The viewpoer zoom sizes, implement as you wish, but these zooms
@@ -292,7 +292,7 @@ export default class PropertyEntryLocation
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public enableUserSetErrors() {

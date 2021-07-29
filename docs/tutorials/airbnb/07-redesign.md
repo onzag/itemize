@@ -322,7 +322,7 @@ This is where UI handlers come into play they are defined in text specs to provi
 Luckily our fragments are already templates, so we just need to define an ui handler, so let's create a file in `components/ui-handlers.tsx` and add a new ui handler there.
 
 ```tsx
-import { IDrawerUIHandlerConfiguratorElement, ISlateTemplateUIHandlerProps, IToolbarPrescenseElement } from "@onzag/itemize/client/fast-prototyping/components/slate";
+import { DrawerConfiguratorElement, ISlateTemplateUIHandlerProps, IToolbarPrescenseElement } from "@onzag/itemize/client/fast-prototyping/components/slate";
 import { Button, ExtensionIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import React from "react";
 
@@ -398,7 +398,7 @@ export const buttonToolbarPrescence: IToolbarPrescenseElement = {
  * these args, if you use other editor other than the fast prototyping this might differ, however
  * we encourage other editors to still support these basic options
  */
-export const buttonOptions: IDrawerUIHandlerConfiguratorElement[] = [
+export const buttonOptions: DrawerConfiguratorElement[] = [
     {
         uiHandler: "button",
         arg: "type",
@@ -483,7 +483,7 @@ And if we compile this it will work just fine, with the exception that we cannot
         toolbarExtras: [
             buttonToolbarPrescence,
         ],
-        drawerUIHandlerExtras: [
+        drawerExtras: [
             ...buttonOptions,
         ],
     }}
@@ -1186,7 +1186,7 @@ And now we can use the fragment loader in the place of our `View` component.
         toolbarExtras: [
             buttonToolbarPrescence,
         ],
-        drawerUIHandlerExtras: [
+        drawerExtras: [
             ...buttonOptions,
         ],
         // the disjointed mode so that the toolbars and wrappers are fixed

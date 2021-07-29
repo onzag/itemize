@@ -125,7 +125,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
 
   // but for that to be set we need to have something selected
   // in the rich text editor state
-  const treeData = <Tree
+  const treeData = props.hideTree ? null : <Tree
     currentRichElement={{
       children: props.state.currentValue
     } as any}
@@ -164,7 +164,8 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
       actualLocation !== "MAIN" &&
       (
         selectedNodeInfo.isText ||
-        drawerMode === "simple"
+        drawerMode === "simple" ||
+        drawerMode === "barebones"
       )
     ) {
       // so we override
@@ -210,9 +211,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
           !selectedNodeInfo.isText ?
             (
               <>
-                <Divider className={props.classes.separator} />
+                {props.hideTree ? null : <Divider className={props.classes.separator} />}
                 {
-                  drawerMode !== "simple" ? (
+                  drawerMode !== "simple" && drawerMode !== "barebones" ? (
                     <Tabs value={actualLocation} onChange={setLocationCallback}>
                       <Tab
                         className={props.classes.tab}
@@ -263,9 +264,9 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
               </>
             ) : null
         }
-        <Paper className={props.classes.drawerSettingsForNodePaper}>
+        {drawerMode === "barebones" ? infoPanel : <Paper className={props.classes.drawerSettingsForNodePaper}>
           {infoPanel}
-        </Paper>
+        </Paper>}
       </>
     );
   }
@@ -273,11 +274,13 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // now we return
   return (
     <>
-      <Typography className={props.classes.elementTitle} variant="h6">{titleForNode}</Typography>
-      <Divider className={props.classes.separator} />
-      <div className={props.classes.treeDataBox} ref={scrollRef}>
-        {treeData}
-      </div>
+      {props.hideTree ? null : <>
+        <Typography className={props.classes.elementTitle} variant="h6">{titleForNode}</Typography>
+        <Divider className={props.classes.separator} />
+        <div className={props.classes.treeDataBox} ref={scrollRef}>
+          {treeData}
+        </div>
+      </>}
       {settingsForNode}
     </>
   );

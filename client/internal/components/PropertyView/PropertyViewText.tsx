@@ -10,7 +10,7 @@ import equals from "deep-equal";
 import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { sanitize } from "../../../internal/text";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view renderer props as it requires the properties
@@ -47,7 +47,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     let currentValue = (

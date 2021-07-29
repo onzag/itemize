@@ -165,6 +165,7 @@ interface IClassesOptionSelectorState {
    * value is the right value
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -185,9 +186,13 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
 
     // and we use both equals and path equals to determine a change
     // and avoid the sync issue
+    const time = (new Date()).getTime();
     if (
       !equals(selectedNode.richClassList || [], state.value, { strict: true }) &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
         value: selectedNode.richClassList || [],
@@ -210,6 +215,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     this.state = {
       value: selectedNode.richClassList || [],
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     };
 
     this.onRichClassListChange = this.onRichClassListChange.bind(this);
@@ -227,16 +233,17 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
     this.setState({
       value: newValue,
       valueForAnchor: this.props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      // if we have nothing, the new value is null
+      // for the primary component
+      if (newValue.length === 0) {
+        newValue = null;
+      }
+
+      // so we set such
+      this.props.helpers.setRichClasses(newValue, this.props.state.currentSelectedElementAnchor);
     });
-
-    // if we have nothing, the new value is null
-    // for the primary component
-    if (newValue.length === 0) {
-      newValue = null;
-    }
-
-    // so we set such
-    this.props.helpers.setRichClasses(newValue, this.props.state.currentSelectedElementAnchor);
   }
 
   public unblur() {

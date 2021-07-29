@@ -28,7 +28,7 @@ when the editor is created with the wrapper itself
 - [currentLoadError](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#currentloaderror)
 - [disjointedMode](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#disjointedmode)
 - [dismissCurrentLoadError](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#dismisscurrentloaderror)
-- [drawerUIHandlerExtras](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#draweruihandlerextras)
+- [drawerExtras](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#drawerExtras)
 - [featureSupport](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#featuresupport)
 - [helpers](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#helpers)
 - [hideDrawer](client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md#hidedrawer)
@@ -112,13 +112,13 @@ Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://gi
 
 ___
 
-### drawerUIHandlerExtras
+### drawerExtras
 
-• `Optional` **drawerUIHandlerExtras**: [*IDrawerUIHandlerConfiguratorElement*](client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md)[]
+• `Optional` **drawerExtras**: [*DrawerConfiguratorElement*](client_fast_prototyping_components_slate.DrawerConfiguratorElement.md)[]
 
 Drawer extras for the ui handled types
 
-Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[drawerUIHandlerExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#draweruihandlerextras)
+Inherited from: [ISlateEditorWrapperBaseProps](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md).[drawerExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#drawerExtras)
 
 Defined in: [client/fast-prototyping/components/slate/index.tsx:1069](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/index.tsx#L1069)
 

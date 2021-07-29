@@ -11,7 +11,7 @@ import { imageSrcSetRetriever } from "../../../components/util";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { fileURLAbsoluter, mimeTypeToExtension } from "../../../../util";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view renderer props that every property renderer
@@ -62,7 +62,7 @@ export default class PropertyViewFile
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public openFile() {
     const value = (

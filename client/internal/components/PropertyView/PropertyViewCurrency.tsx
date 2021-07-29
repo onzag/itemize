@@ -8,7 +8,7 @@ import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { ICurrencyType, currencies } from "../../../../imported-resources";
 import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view currency renderer props
@@ -72,7 +72,7 @@ export class PropertyViewCurrency extends React.Component<IPropertyViewHandlerPr
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
       this.props.currency !== nextProps.currency ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     // we get the value that we will be using

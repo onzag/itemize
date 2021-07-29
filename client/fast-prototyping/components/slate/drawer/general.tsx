@@ -18,13 +18,15 @@ import {
   TextField,
   FormControlLabel,
   Switch,
+  Typography,
+  Paper,
 } from "../../../mui-core";
 import { IContainer } from "../../../../internal/text/serializer/types/container";
 import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
 import { Path, Text } from "slate";
 import type { RichElement } from "../../../../internal/text/serializer";
-import { IDrawerUIHandlerElementConfigCustomProps } from "..";
+import { DrawerConfiguratorElement, IDrawerConfiguratorElementBase, IDrawerConfiguratorElementSection, IDrawerUIHandlerElementConfigCustomProps } from "..";
 
 /**
  * The state of the general option selector for the given item
@@ -44,6 +46,7 @@ interface IGeneralOptionsState {
    * value is the right value
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -63,9 +66,13 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
     const selectedNode: IContainer = props.state.currentSelectedElement as any;
+    const time = (new Date()).getTime()
     if (
       (selectedNode.containerType || "") !== state.value &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
         value: selectedNode.containerType || "",
@@ -88,6 +95,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     this.state = {
       value: selectedNode.containerType || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -103,14 +111,15 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 
     this.setState({
       value: newValue,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      // we use the helper set for the container type
+      // which does an arbitrary partial value update at the selected
+      // anchor
+      this.props.helpers.set({
+        containerType: newValue,
+      }, this.props.state.currentSelectedElementAnchor);
     });
-
-    // we use the helper set for the container type
-    // which does an arbitrary partial value update at the selected
-    // anchor
-    this.props.helpers.set({
-      containerType: newValue,
-    }, this.props.state.currentSelectedElementAnchor);
   }
 
   public unblur() {
@@ -186,9 +195,13 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
     const selectedNode: ITitle = props.state.currentSelectedElement as any;
+    const time = (new Date()).getTime()
     if (
       (selectedNode.subtype || "") !== state.value &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
         value: selectedNode.subtype || "",
@@ -211,6 +224,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
     this.state = {
       value: selectedNode.subtype || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -226,14 +240,15 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
     this.setState({
       value: newValue,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      // we use the helper set for the title subtype
+      // which does an arbitrary partial value update at the selected
+      // anchor
+      this.props.helpers.set({
+        subtype: newValue,
+      }, this.props.state.currentSelectedElementAnchor);
     });
-
-    // we use the helper set for the title subtype
-    // which does an arbitrary partial value update at the selected
-    // anchor
-    this.props.helpers.set({
-      subtype: newValue,
-    }, this.props.state.currentSelectedElementAnchor);
   }
 
   public unblur() {
@@ -310,6 +325,7 @@ interface IGeneralImageOptionsState {
    * pattern as the other editor
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -337,13 +353,17 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
     const selectedNode: IImage = props.state.currentSelectedElement as any;
+    const time = (new Date()).getTime()
     if (
       (
         (selectedNode.alt || "") !== state.altValue ||
         (selectedNode.sizes || "") !== state.sizes ||
         selectedNode.standalone !== state.standalone
       ) &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
         altValue: selectedNode.alt || "",
@@ -370,6 +390,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
       standalone: selectedNode.standalone,
       sizes: selectedNode.sizes || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     }
 
     this.updateAlt = this.updateAlt.bind(this);
@@ -499,13 +520,25 @@ interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles 
 
 class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOptionProps, IGeneralOptionsState> {
   static getDerivedStateFromProps(props: IGeneralUIHandlerOptionProps, state: IGeneralOptionsState) {
+    if (!props.arg) {
+      return {
+        value: null,
+        valueForAnchor: props.state.currentSelectedElementAnchor,
+      }
+    }
+
     const selectedNode: RichElement = props.state.currentSelectedElement as any;
+    const currentValueItHolds = ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "");
+    const time = (new Date()).getTime()
     if (
-      ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") !== state.value &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      currentValueItHolds !== state.value &&
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
-        value: (selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "",
+        value: currentValueItHolds,
         valueForAnchor: props.state.currentSelectedElementAnchor,
       }
     }
@@ -525,8 +558,9 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     const selectedNode: RichElement = props.state.currentSelectedElement as any;
 
     this.state = {
-      value: (selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "",
+      value: props.arg ? ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") : null,
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     }
 
     this.onUpdateBySelect = this.onUpdateBySelect.bind(this);
@@ -540,6 +574,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     // update the state
     this.setState({
       value: v || "",
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
     });
 
     // now we clear a possibly existant previous timeout
@@ -551,12 +586,13 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
   public onImmediateUpdate(v: string) {
     this.setState({
       value: v || "",
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      // we use the helper set for the title subtype
+      // which does an arbitrary partial value update at the selected
+      // anchor
+      this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state.currentSelectedElementAnchor);
     });
-
-    // we use the helper set for the title subtype
-    // which does an arbitrary partial value update at the selected
-    // anchor
-    this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state.currentSelectedElementAnchor);
   }
 
   /**
@@ -585,7 +621,11 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
    * state and when the timer has finally ellapsed
    */
   public actuallyUpdate() {
-    this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state.currentSelectedElementAnchor);
+    this.setState({
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state.currentSelectedElementAnchor);
+    });
   }
 
   public unblur() {
@@ -607,6 +647,8 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
           value={this.state.value}
           onChange={this.onImmediateUpdate}
           onDelayedChange={this.onDelayedUpdate}
+          helpers={this.props.helpers}
+          state={this.props.state}
         />
       );
     }
@@ -698,6 +740,7 @@ interface IGeneralElementOptionsState {
    * pattern as the other editor
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -722,11 +765,15 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
     const selectedNode: IImage = props.state.currentSelectedElement as any;
+    const time = (new Date()).getTime()
     if (
       (
         (selectedNode.givenName || "") !== state.name
       ) &&
-      !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor)
+      (
+        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
     ) {
       return {
         name: selectedNode.givenName || "",
@@ -749,6 +796,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
     this.state = {
       name: selectedNode.givenName || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueLastTimeRequestedUpdate: 0,
     }
 
     this.updateName = this.updateName.bind(this);
@@ -760,11 +808,15 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
    * state and when the timer has finally ellapsed
    */
   public actuallyUpdateName() {
-    // here we use the arbitrary partial value set function
-    // to update the node at the given anchor
-    this.props.helpers.set({
-      givenName: this.state.name,
-    }, this.props.state.currentSelectedElementAnchor);
+    this.setState({
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
+    }, () => {
+      // here we use the arbitrary partial value set function
+      // to update the node at the given anchor
+      this.props.helpers.set({
+        givenName: this.state.name,
+      }, this.props.state.currentSelectedElementAnchor);
+    })
   }
 
   /**
@@ -778,6 +830,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
     // update the state
     this.setState({
       name: e.target.value,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
     });
 
     // now we clear a possibly existant previous timeout
@@ -805,6 +858,70 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
   }
 }
 
+function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: MaterialUISlateWrapperWithStyles, index: number) {
+  return (
+    <GeneralUIHandlerOption
+      {...props}
+      arg={x.arg}
+      label={(x.input as any).label}
+      placeholder={(x.input as any).placeholder}
+      isSelect={x.input.type === "select"}
+      isCustom={x.input.type === "custom"}
+      CustomComponent={x.input.type === "custom" && x.input.component}
+      options={x.input.type === "select" && x.input.options}
+      key={x.arg || index}
+    />
+  );
+}
+
+function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], props: MaterialUISlateWrapperWithStyles) {
+  return (
+    <div className={props.classes.box}>
+      {elems.filter((x) =>
+        typeof x.uiHandler !== "undefined" ?
+          (
+            x.uiHandler === null ?
+              !props.state.currentSelectedElement.uiHandler :
+              x.uiHandler === props.state.currentSelectedElement.uiHandler
+          ) :
+          true
+      ).map((x, index) => {
+        return processDrawerElementBase(x, props, index);
+      })}
+    </div>
+  );
+}
+
+function processDrawerElements(elems: DrawerConfiguratorElement[], props: MaterialUISlateWrapperWithStyles) {
+  return (
+    elems.map((x, index) => {
+      const asBase: IDrawerConfiguratorElementBase = x as any;
+      const asSection: IDrawerConfiguratorElementSection = x as any;
+
+      if (asBase.input) {
+        return (
+          <div className={props.classes.box} key={asBase.arg || index}>
+            {processDrawerElementBase(asBase, props, index)}
+          </div>
+        );
+      } else {
+        const extraProps: any = {};
+        if (asSection.unblur) {
+          extraProps["data-unblur"] = "true";
+        }
+        return (
+          <React.Fragment key={index}>
+            <Typography>{asSection.title}</Typography>
+            <Paper {...extraProps}>
+              {processDrawerElementsBase(asSection.elements, props)}
+            </Paper>
+          </React.Fragment>
+        );
+      }
+    })
+  );
+}
+
 /**
  * Provides the drawer section with all the general options of a given component
  * these general options are the specific options for the generic components
@@ -828,40 +945,36 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
         specificNodeOptions = <GeneralImageOptions {...props} />
         break;
     }
-  } else {
-    const extrasApplied = props.drawerUIHandlerExtras && props.drawerUIHandlerExtras
-      .filter((x) => x.uiHandler === props.state.currentSelectedElement.uiHandler);
-    if (extrasApplied && extrasApplied.length) {
-      specificNodeOptions = <div className={props.classes.box}>
-        {extrasApplied.map((x) => (
-          <GeneralUIHandlerOption
-            {...props}
-            arg={x.arg}
-            label={(x.input as any).label}
-            placeholder={(x.input as any).placeholder}
-            isSelect={x.input.type === "select"}
-            isCustom={x.input.type === "custom"}
-            CustomComponent={x.input.type === "custom" && x.input.component}
-            options={x.input.type === "select" && x.input.options}
-            key={x.arg}
-          />
-        ))}
-      </div>
-    }
+  }
+
+  let extraNodeOptions: React.ReactNode = null;
+  const extrasApplied = props.drawerExtras && props.drawerExtras
+    .filter((x) =>
+      typeof x.uiHandler !== "undefined" ?
+        (
+          x.uiHandler === null ?
+            !props.state.currentSelectedElement.uiHandler :
+            x.uiHandler === props.state.currentSelectedElement.uiHandler
+        ) :
+        true
+    );
+  if (extrasApplied && extrasApplied.length) {
+    extraNodeOptions = processDrawerElements(extrasApplied, props);
   }
 
   // and return
   return (
     <>
       {
-        Text.isText((props.state.currentSelectedElement as any)) ?
+        Text.isText((props.state.currentSelectedElement as any)) || props.drawerMode === "barebones" ?
           null :
           <GeneralElementOptions {...props} />
       }
       {specificNodeOptions}
-      <IconButton onClick={props.helpers.deleteSelectedNode}>
+      {extraNodeOptions}
+      {props.drawerMode === "barebones" ? null : <IconButton onClick={props.helpers.deleteSelectedNode}>
         <DeleteIcon />
-      </IconButton>
+      </IconButton>}
     </>
   );
 }

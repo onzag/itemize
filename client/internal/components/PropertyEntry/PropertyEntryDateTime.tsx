@@ -7,7 +7,7 @@ import {
 import { DATETIME_FORMAT, DATE_FORMAT, TIME_FORMAT } from "../../../../constants";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import { getLocalizedDateFormat, getLocalizedTimeFormat, getLocalizedDateTimeFormat } from "../../../../util";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * Provides the current value of the date given the
@@ -94,7 +94,7 @@ export default class PropertyEntryDateTime extends
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public enableUserSetErrors() {
     this.setState({

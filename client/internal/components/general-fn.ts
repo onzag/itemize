@@ -4,40 +4,73 @@
  * @module
  */
 
-import equals from "deep-equal";
-
 /**
  * Compares renderer args
  * @param a 
  * @param b 
  * @returns 
  */
-export function shallowDeepRendererArgsComparer(a: any, b: any) {
+export function deepRendererArgsComparer(a: any, b: any): boolean {
     if (a === b) {
       return true;
     }
-  
-    const hasAllAKeys = Object.keys(a).every((k) => {
-      return typeof b[k] !== "undefined";
-    });
-  
-    if (!hasAllAKeys) {
+
+    // TYPE CHECK
+    const typeofA = typeof a;
+    const typeofB = typeof b;
+
+    if (typeofA !== typeofB) {
       return false;
     }
-  
-    const hasAllBKeys = Object.keys(b).every((k) => {
-      return typeof a[k] !== "undefined";
-    });
-  
-    if (!hasAllBKeys) {
+
+    // ARRAY CHECK
+    const aIsArray = Array.isArray(a);
+    const bIsArray = Array.isArray(b);
+    if (aIsArray !== bIsArray) {
       return false;
     }
-  
-    return Object.keys(a).every((k) => {
-      if (a[k].$$typeof) {
-        return a[k] === b[k];
+
+    if (aIsArray) {
+      if (a.length === b.length) {
+        return false;
       }
+
+      return a.every((v: any, index: number) => {
+        return deepRendererArgsComparer(v, b[index]);
+      });
+    }
   
-      return equals(a[k], b[k], {strict: true});
-    });
+    // REACT NODE CHECK
+    if (a.$$typeof) {
+      return a === b;
+    }
+
+    // OBJECT CHECK
+    if (typeofA === "object") {
+      const hasAllAKeys = Object.keys(a).every((k) => {
+        return typeof b[k] !== "undefined";
+      });
+    
+      if (!hasAllAKeys) {
+        return false;
+      }
+    
+      const hasAllBKeys = Object.keys(b).every((k) => {
+        return typeof a[k] !== "undefined";
+      });
+    
+      if (!hasAllBKeys) {
+        return false;
+      }
+    
+      return Object.keys(a).every((k) => {
+        if (a[k].$$typeof) {
+          return a[k] === b[k];
+        }
+    
+        return deepRendererArgsComparer(a[k], b[k]);
+      });
+    }
+
+    return a === b;
   }

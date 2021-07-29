@@ -12,7 +12,7 @@ import { MAX_DECIMAL_COUNT } from "../../../../constants";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
 import convert from "convert-units";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * An enum which is useful for numeric types
@@ -357,7 +357,7 @@ export default class PropertyEntryField
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public enableUserSetErrors() {

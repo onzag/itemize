@@ -9,7 +9,7 @@ import { IPropertyDefinitionSupportedPaymentType, paymentAllowedStatuses, Paymen
 import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../util";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * Contains the currency i18n data, usually to build
@@ -234,7 +234,7 @@ export default class PropertyEntryPayment extends React.Component<
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public enableUserSetErrors() {
     this.setState({

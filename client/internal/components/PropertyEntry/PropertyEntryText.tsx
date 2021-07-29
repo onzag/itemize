@@ -13,7 +13,7 @@ import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/Prop
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * Information about the file that has just been inserted
@@ -769,7 +769,7 @@ export default class PropertyEntryText
       nextProps.i18n !== this.props.i18n ||
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
 
   public render() {

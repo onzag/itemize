@@ -187,7 +187,14 @@ export interface IToolbarPrescenseElement {
   /**
    * Alternatively an action
    */
-  onClick?: () => void;
+  onClick?: (defaultAction: () => void) => void;
+  /**
+   * Manually specify whether it's disabled
+   * if not specified it will check whether an element
+   * can be inserted as it assumes it's about the insertion
+   * of the element
+   */
+  disabled?: boolean;
 }
 
 /**
@@ -229,6 +236,8 @@ export interface IDrawerUIHandlerElementConfigCustomProps {
   value: string;
   onChange: (value: string) => void;
   onDelayedChange: (value: string) => void;
+  helpers: IHelperFunctions;
+  state: ISlateEditorStateType;
 }
 
 export interface IDrawerUIHandlerElementConfigCustom {
@@ -240,20 +249,34 @@ export interface IDrawerUIHandlerElementConfigCustom {
  * Specifies a configurator to be added to the UI handled element
  * that is created to be chosen in the drawer
  */
-export interface IDrawerUIHandlerConfiguratorElement {
+export interface IDrawerConfiguratorElementBase {
   /**
    * The ui handler in question
    */
-  uiHandler: string;
+  uiHandler?: string;
   /**
    * The relevant argument of the ui handler
+   * if not provided value will be null and change functions wont
+   * work
    */
-  arg: string;
+  arg?: string;
   /**
    * The way for the input to be specified
    */
   input: IDrawerUIHandlerElementConfigSelect | IDrawerUIHandlerElementConfigInput | IDrawerUIHandlerElementConfigCustom;
 }
+
+export interface IDrawerConfiguratorElementSection {
+  /**
+   * The ui handler in question
+   */
+   uiHandler?: string;
+   unblur?: boolean;
+   title: string | React.ReactNode;
+   elements: IDrawerConfiguratorElementBase[];
+}
+
+export type DrawerConfiguratorElement = IDrawerConfiguratorElementBase | IDrawerConfiguratorElementSection;
 
 
 /**
@@ -1049,7 +1072,8 @@ export type SlateEditorWrapperCustomToolbarIdentifiedElement =
   "template-html" |
   "extras" |
   "none" |
-  "divider";
+  "divider" |
+  "hdivider";
 
 export type SlateEditorWrapperCustomToolbarElementBaseForm =
   IToolbarPrescenseElement |
@@ -1121,15 +1145,19 @@ export interface ISlateEditorWrapperBaseProps {
   /**
    * Drawer extras for the ui handled types
    */
-  drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
+  drawerExtras?: DrawerConfiguratorElement[];
   /**
    * Whether to hide the drawer
    */
   hideDrawer?: boolean;
   /**
+   * Whether to hide the tree
+   */
+  hideTree?: boolean;
+  /**
    * Drawer mode
    */
-  drawerMode?: "full" | "with-styles" | "simple";
+  drawerMode?: "full" | "with-styles" | "simple" | "barebones";
   /**
    * The disjointed mode
    */
@@ -1270,7 +1298,7 @@ interface ISlateEditorProps {
    * Allows to specify extras for the ui handler element types
    * for being provided configuration within the general settings
    */
-  drawerUIHandlerExtras?: IDrawerUIHandlerConfiguratorElement[];
+  drawerExtras?: DrawerConfiguratorElement[];
   /**
    * Whether to hide the drawer
    */
@@ -1278,7 +1306,11 @@ interface ISlateEditorProps {
   /**
    * Drawer mode
    */
-  drawerMode?: "full" | "with-styles" | "simple",
+  drawerMode?: "full" | "with-styles" | "simple" | "barebones",
+  /**
+   * Whether to hide the tree stucture
+   */
+  hideTree?: boolean;
   /**
    * A mode where the drawer and the toolbar are separated and fixed
    * from the rich text output, which allows to be more like a WYSIWYG editor
@@ -2854,10 +2886,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextState.currentSelectedElementEachSelectContext !== this.state.currentSelectedElementEachSelectContext ||
       nextState.currentSelectedElementContextSelectContext !== this.state.currentSelectedElementContextSelectContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
-      nextProps.drawerUIHandlerExtras !== this.props.drawerUIHandlerExtras ||
+      nextProps.drawerExtras !== this.props.drawerExtras ||
       nextProps.toolbarExtras !== this.props.toolbarExtras ||
       nextProps.customToolbar !== this.props.customToolbar ||
       nextProps.hideDrawer !== this.props.hideDrawer ||
+      nextProps.hideTree !== this.props.hideTree ||
       nextProps.drawerMode !== this.props.drawerMode ||
       nextProps.disjointedMode !== this.props.disjointedMode ||
       !equals(this.state.allContainers, nextState.allContainers, { strict: true }) ||
@@ -5022,8 +5055,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
           toolbarExtras={this.props.toolbarExtras}
           customToolbar={this.props.customToolbar}
-          drawerUIHandlerExtras={this.props.drawerUIHandlerExtras}
+          drawerExtras={this.props.drawerExtras}
           hideDrawer={this.props.hideDrawer}
+          hideTree={this.props.hideTree}
           drawerMode={this.props.drawerMode}
           disjointedMode={this.props.disjointedMode}
         >

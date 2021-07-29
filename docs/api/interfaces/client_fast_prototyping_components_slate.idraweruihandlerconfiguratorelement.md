@@ -1,8 +1,8 @@
-[](../README.md) / [Exports](../modules.md) / [client/fast-prototyping/components/slate](../modules/client_fast_prototyping_components_slate.md) / IDrawerUIHandlerConfiguratorElement
+[](../README.md) / [Exports](../modules.md) / [client/fast-prototyping/components/slate](../modules/client_fast_prototyping_components_slate.md) / DrawerConfiguratorElement
 
-# Interface: IDrawerUIHandlerConfiguratorElement
+# Interface: DrawerConfiguratorElement
 
-[client/fast-prototyping/components/slate](../modules/client_fast_prototyping_components_slate.md).IDrawerUIHandlerConfiguratorElement
+[client/fast-prototyping/components/slate](../modules/client_fast_prototyping_components_slate.md).DrawerConfiguratorElement
 
 Specifies a configurator to be added to the UI handled element
 that is created to be chosen in the drawer
@@ -11,9 +11,9 @@ that is created to be chosen in the drawer
 
 ### Properties
 
-- [arg](client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md#arg)
-- [input](client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md#input)
-- [uiHandler](client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md#uihandler)
+- [arg](client_fast_prototyping_components_slate.DrawerConfiguratorElement.md#arg)
+- [input](client_fast_prototyping_components_slate.DrawerConfiguratorElement.md#input)
+- [uiHandler](client_fast_prototyping_components_slate.DrawerConfiguratorElement.md#uihandler)
 
 ## Properties
 

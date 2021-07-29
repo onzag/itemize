@@ -8,7 +8,7 @@ import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IViewport, IViewportZoomEnumType } from "../PropertyEntry/PropertyEntryLocation";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * The property view location renderer props
@@ -158,7 +158,7 @@ export class PropertyViewLocation extends React.Component<
       nextProps.renderer !== this.props.renderer ||
       nextProps.country !== this.props.country ||
       !!this.props.rtl !== !!nextProps.rtl ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
     const value = (

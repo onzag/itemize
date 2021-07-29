@@ -26,7 +26,7 @@ the main component which will pass them to the wrapper
 - [currentLoadError](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#currentloaderror)
 - [disjointedMode](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#disjointedmode)
 - [dismissCurrentLoadError](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#dismisscurrentloaderror)
-- [drawerUIHandlerExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#draweruihandlerextras)
+- [drawerExtras](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#drawerExtras)
 - [featureSupport](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#featuresupport)
 - [helpers](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#helpers)
 - [hideDrawer](client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md#hidedrawer)
@@ -91,9 +91,9 @@ Defined in: [client/fast-prototyping/components/slate/index.tsx:1060](https://gi
 
 ___
 
-### drawerUIHandlerExtras
+### drawerExtras
 
-• `Optional` **drawerUIHandlerExtras**: [*IDrawerUIHandlerConfiguratorElement*](client_fast_prototyping_components_slate.idraweruihandlerconfiguratorelement.md)[]
+• `Optional` **drawerExtras**: [*DrawerConfiguratorElement*](client_fast_prototyping_components_slate.DrawerConfiguratorElement.md)[]
 
 Drawer extras for the ui handled types
 

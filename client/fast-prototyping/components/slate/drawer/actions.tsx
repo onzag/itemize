@@ -110,6 +110,7 @@ interface ISingleActionState {
    * value is the right value
    */
   valueForAnchor: Path;
+  valueLastTimeRequestedUpdate: number;
 }
 
 /**
@@ -128,7 +129,14 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    if ((props.actionValue || "") !== state.value && !Path.equals(props.anchor, state.valueForAnchor)) {
+    const time = (new Date()).getTime();
+    if (
+      (props.actionValue || "") !== state.value &&
+      (
+        !Path.equals(props.anchor, state.valueForAnchor) ||
+        time - state.valueLastTimeRequestedUpdate > 300
+      )
+    ) {
       // so we update
       return {
         value: props.actionValue || "",
@@ -151,6 +159,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     this.state = {
       value: props.actionValue || "",
       valueForAnchor: props.anchor,
+      valueLastTimeRequestedUpdate: 0,
     }
   }
 
@@ -166,6 +175,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     this.setState({
       value: newValue || "",
       valueForAnchor: this.props.anchor,
+      valueLastTimeRequestedUpdate: (new Date()).getTime(),
     });
 
     // trigger on change

@@ -12,7 +12,7 @@ import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Modul
 import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
-import { shallowDeepRendererArgsComparer } from "../general-fn";
+import { deepRendererArgsComparer } from "../general-fn";
 
 /**
  * This is the entry file renderer props that every renderer for a files type will recieve.
@@ -187,7 +187,7 @@ export default class PropertyEntryFile
       nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !equals(this.state, nextState, { strict: true }) ||
-      !shallowDeepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public componentWillUnmount() {
     // revoke urls on unmount
