@@ -165,6 +165,8 @@ export interface ITemplateArg {
   handlerIsVoid?: boolean;
 }
 
+type RichElementFn = () => RichElement;
+
 /**
  * Refers to toolbar prescence elements that are added
  */
@@ -183,11 +185,11 @@ export interface IToolbarPrescenseElement {
   /**
    * The element to be added
    */
-  element?: RichElement;
+  element?: RichElement | RichElementFn;
   /**
    * Alternatively an action
    */
-  onClick?: (defaultAction: () => void) => void;
+  onClick?: (defaultAction: () => RichElement) => void;
   /**
    * Manually specify whether it's disabled
    * if not specified it will check whether an element

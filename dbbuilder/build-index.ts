@@ -164,7 +164,7 @@ export async function buildIndexes(
       if (pgIndexName.length > MAX_PG_INDEX_SIZE) {
         pgIndexName = makeIdOutOf(pgIndexName);
         console.log(colors.yellow(
-          `Index '${indexId}' of type ${currentIndex.type} is too long` +
+          `Index '${indexId}' is too long` +
           ` so it is renamed to ${pgIndexName} this is consistent and as so nothing has to be done`,
         ));
       }

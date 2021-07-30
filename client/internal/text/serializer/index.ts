@@ -242,7 +242,13 @@ export function serialize(root: IRootLevelDocument): HTMLElement[] | string {
   const lastNeedsDropping =
     lastElement.type === "paragraph" &&
     (lastElement.children[0] as IText).text === "" &&
-    lastElement.children.length === 1;
+    lastElement.children.length === 1 &&
+    !lastElement.uiHandler &&
+    !lastElement.style &&
+    !lastElement.richClassList &&
+    !lastElement.styleActive &&
+    !lastElement.styleHover;
+
   // and as such we define what children we are going to process
   const childrenToProcess = lastNeedsDropping ? [...root.children] : root.children;
 

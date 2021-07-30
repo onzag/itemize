@@ -712,7 +712,11 @@ interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
 }
 
 function ToolbarExtra(props: IToolbarExtraProps) {
-  const defaultAction = props.helpers.insertElement.bind(null, props.extra.element, null);
+  const defaultAction = () => {
+    const element = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
+    props.helpers.insertElement(element, null);
+    return element;
+  }
   const basicProps = {
     tabIndex: -1,
     disabled: (
