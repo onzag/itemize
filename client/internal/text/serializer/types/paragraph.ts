@@ -8,6 +8,7 @@
 import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
+import { IInline } from "./inline";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
@@ -104,5 +105,5 @@ export interface IParagraph extends IElementBase {
   /**
    * The paragraph children can be either text or link or file for the inlines
    */
-  children: Array<IText | ILink | IFile>;
+  children: Array<IText | ILink | IFile | IInline>;
 }

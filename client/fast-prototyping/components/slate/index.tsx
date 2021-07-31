@@ -163,6 +163,12 @@ export interface ITemplateArg {
    * have children and it's managed all within itself
    */
   handlerIsVoid?: boolean;
+  /**
+   * When breaking an ui handler on an end of line a new paragraph will
+   * be created ignoring the previous ui handler
+   * use this method to keep and use the split method
+   */
+  handlerKeepOnBreaks?: boolean;
 }
 
 type RichElementFn = () => RichElement;
@@ -255,7 +261,12 @@ export interface IDrawerConfiguratorElementBase {
   /**
    * The ui handler in question
    */
-  uiHandler?: string;
+  uiHandler?: null | string | string[];
+  /**
+   * The element it should work against, by default
+   * it is the selected one
+   */
+  basis?: "selected" | "block" | "superblock";
   /**
    * The relevant argument of the ui handler
    * if not provided value will be null and change functions wont
@@ -272,10 +283,11 @@ export interface IDrawerConfiguratorElementSection {
   /**
    * The ui handler in question
    */
-   uiHandler?: string;
-   unblur?: boolean;
-   title: string | React.ReactNode;
-   elements: IDrawerConfiguratorElementBase[];
+  uiHandler?: string;
+  basis?: "selected" | "block" | "superblock";
+  unblur?: boolean;
+  title: string | React.ReactNode;
+  elements: IDrawerConfiguratorElementBase[];
 }
 
 export type DrawerConfiguratorElement = IDrawerConfiguratorElementBase | IDrawerConfiguratorElementSection;
@@ -992,6 +1004,24 @@ export interface ISlateEditorStateType {
   currentSelectedElement: RichElement;
 
   /**
+   * The current selected node that is being worked with
+   * this is normally automatically selected to be the
+   * current element but it can also be a text node
+   * by default if a text node represents a template node
+   * then it will be selected instead
+   */
+  currentSelectedBlockElement: RichElement;
+
+  /**
+  * The current selected node that is being worked with
+  * this is normally automatically selected to be the
+  * current element but it can also be a text node
+  * by default if a text node represents a template node
+  * then it will be selected instead
+  */
+  currentSelectedSuperBlockElement: RichElement;
+
+  /**
    * Based on the current selected element or the current text
    */
   currentSelectedText: IText;
@@ -1055,6 +1085,16 @@ export interface ISlateEditorStateType {
    * Selected anchor
    */
   currentSelectedElementAnchor: Path;
+
+  /**
+   * Selected anchor
+   */
+  currentSelectedBlockElementAnchor: Path;
+
+  /**
+  * Selected anchor
+  */
+  currentSelectedSuperBlockElementAnchor: Path;
 }
 
 export type SlateEditorWrapperCustomToolbarIdentifiedElement =
@@ -1387,6 +1427,8 @@ interface ISlateEditorState {
    * The selected anchor path
    */
   currentSelectedElementAnchor: Path;
+  currentSelectedBlockElementAnchor: Path;
+  currentSelectedSuperBlockElementAnchor: Path;
   /**
    * Related to the anchor, specifies the current context
    * that is being worked with, can be null, if context is null
@@ -1413,6 +1455,14 @@ interface ISlateEditorState {
    * The selected node 
    */
   currentSelectedElement: RichElement;
+  /**
+   * The selected node 
+   */
+  currentSelectedBlockElement: RichElement;
+  /**
+  * The selected node 
+  */
+  currentSelectedSuperBlockElement: RichElement;
   /**
    * The selected text
    */
@@ -1559,6 +1609,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentElementAnchor: null,
             currentBlockElementAnchor: null,
             currentSelectedElementAnchor: null,
+            currentSelectedBlockElement: null,
+            currentSelectedBlockElementAnchor: null,
+            currentSelectedSuperBlockElement: null,
+            currentSelectedSuperBlockElementAnchor: null,
             currentContext: props.rootContext || null,
             currentElement: null,
             currentBlockElement: null,
@@ -1591,6 +1645,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentElementAnchor: null,
             currentBlockElementAnchor: null,
             currentSelectedElementAnchor: null,
+            currentSelectedBlockElement: null,
+            currentSelectedBlockElementAnchor: null,
+            currentSelectedSuperBlockElement: null,
+            currentSelectedSuperBlockElementAnchor: null,
             currentContext: props.rootContext || null,
             currentElement: null,
             currentBlockElement: null,
@@ -1631,6 +1689,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentBlockElementAnchor: null,
       currentSuperBlockElementAnchor: null,
       currentSelectedElementAnchor: null,
+      currentSelectedBlockElement: null,
+      currentSelectedBlockElementAnchor: null,
+      currentSelectedSuperBlockElement: null,
+      currentSelectedSuperBlockElementAnchor: null,
       currentContext: this.props.rootContext || null,
       currentElement: null,
       currentBlockElement: null,
@@ -1912,7 +1974,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
-    
+
   }
 
   /**
@@ -2341,16 +2403,29 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // of these 
     const finalBlockOffset = lastChild ? (lastChild as Text).text.length : null;
 
+    const isEndOfLine = (
+      end.offset === finalBlockOffset &&
+      Path.equals(finalBlockPath, end.path)
+    );
+    let shouldCreateFreshParagraph = isEndOfLine;
+
+    if (this.state.currentBlockElement.uiHandler) {
+      const uiHandler =
+        (this.state.currentContext && this.state.currentContext.properties[this.state.currentBlockElement.uiHandler]) ||
+        (this.props.rootContext && this.props.rootContext.properties[this.state.currentBlockElement.uiHandler]);
+
+      if (uiHandler.type === "ui-handler" && uiHandler.handlerKeepOnBreaks) {
+        shouldCreateFreshParagraph = false;
+      }
+    }
+
     // if the end we are dealing with is exactly
     // at this last point and offset so we are right
     // at the end of the given block
     // we do this to avoid copying template text elements
     // when we deal with text so that they don't also
     // become template text
-    if (
-      end.offset === finalBlockOffset &&
-      Path.equals(finalBlockPath, end.path)
-    ) {
+    if (shouldCreateFreshParagraph) {
       // then we want to clone the current block
       // we are dealing with and copy all its properties
       Transforms.insertNodes(this.editor, {
@@ -2695,6 +2770,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now for our selection, by default it's all null
     let currentSelectedElementAnchor: Path = null;
     let currentSelectedElement: RichElement = null;
+    let currentSelectedBlockElement: RichElement = null;
+    let currentSelectedSuperBlockElement: RichElement = null;
+    let currentSelectedBlockElementAnchor: Path = null;
+    let currentSelectedSuperBlockElementAnchor: Path = null;
     let currentSelectedText: IText = null;
     let currentSelectedElementContext: ITemplateArgsContext = null;
     let currentSelectedElementEachSelectContext: ITemplateArgsContext = null;
@@ -2708,6 +2787,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedElementAnchor = currentElementAnchor;
       // the selected node is the element just like the anchor
       currentSelectedElement = currentElement;
+      currentSelectedBlockElement = currentBlockElement;
+      currentSelectedBlockElementAnchor = currentBlockElementAnchor;
+      currentSelectedSuperBlockElement = currentSuperBlockElement;
+      currentSelectedSuperBlockElementAnchor = currentSuperBlockElementAnchor;
       currentSelectedText = currentText;
       // and the context is our current context
       currentSelectedElementContext = currentContext;
@@ -2734,6 +2817,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         // and update the node origin
         currentSelectedElement = (currentSelectedElement as any).children[n];
+
+        if (currentSelectedElement.containment === "block") {
+          currentSelectedBlockElement = currentSelectedElement;
+          currentSelectedBlockElementAnchor = currentGivenSelectedNodeAnchor.slice(0, index + 1);
+        }
+
+        if (currentSelectedElement.containment === "superblock") {
+          currentSelectedSuperBlockElement = currentSelectedElement;
+          currentSelectedSuperBlockElementAnchor = currentGivenSelectedNodeAnchor.slice(0, index + 1);
+        }
 
         // we need to fetch the context we are in for the currentSelectedElementContext
         // which might differ
@@ -2791,6 +2884,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentElementAnchor,
       currentBlockElementAnchor,
       currentSelectedElementAnchor,
+      currentSelectedBlockElement,
+      currentSelectedBlockElementAnchor,
+      currentSelectedSuperBlockElement,
+      currentSelectedSuperBlockElementAnchor,
       currentContext,
       currentElement,
       currentBlockElement,
@@ -3529,9 +3626,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // now let's see what we get
       const data = await this.props.onInsertFile(file, true);
 
+      const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+      // if we got a path let's find the node
+      let nodeAtPath: Node;
+
+      try {
+        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+      } catch (e) {
+
+      }
+
+      let childIndex: number = 0;
+      // no node then let's use its parent
+      if (pathAt && !nodeAtPath) {
+        childIndex = pathAt.pop();
+        nodeAtPath = Node.get(this.editor, pathAt);
+      }
+
       // let's refocus
       if (at) {
-        await this.focusAt(at);
+        await this.focusAt(pathAt || at);
       }
 
       if (!data) {
@@ -3562,14 +3676,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       };
 
       // and we call the insert node
-      if (Path.isPath(at)) {
-        const nodeAtPath = Node.get(this.editor, at);
+      if (pathAt) {
         let newPath: Path;
 
         if (nodeAtPath.containment === "superblock") {
-          newPath = [...at, 0];
+          newPath = [...pathAt, childIndex];
         } else {
-          newPath = [...at];
+          newPath = [...pathAt];
           newPath[newPath.length - 1]++;
         }
 
@@ -3590,11 +3703,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a void promise
    */
   public async insertTemplateText(label: string, value: string, at?: Range | Path) {
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
 
     // if we have a range to insert at
     if (at) {
       // we focus there
-      await this.focusAt(at);
+      await this.focusAt(pathAt || at);
     }
 
     // now we make the text node
@@ -3615,8 +3744,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     };
 
     // and insert right there
-    if (Path.isPath(at)) {
-      const newPath = [...at, 0];
+    if (pathAt) {
+      const newPath = [...pathAt, childIndex];
       Transforms.insertNodes(this.editor, inlineNode as any, { at: newPath });
     } else {
       this.editor.insertNode(inlineNode as any);
@@ -3633,10 +3762,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public async insertTemplateHTML(label: string, value: string, at?: Range | Path) {
 
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
+
     // if we have a range to insert at
     if (at) {
       // we focus there
-      await this.focusAt(at);
+      await this.focusAt(pathAt || at);
     }
 
     // and create a text node based on that
@@ -3660,14 +3806,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // now we can insert that node
-    if (Path.isPath(at)) {
-      const nodeAtPath = Node.get(this.editor, at);
+    if (pathAt) {
       let newPath: Path;
 
       if (nodeAtPath.containment === "superblock") {
-        newPath = [...at, 0];
+        newPath = [...pathAt, childIndex];
       } else {
-        newPath = [...at];
+        newPath = [...pathAt];
         newPath[newPath.length - 1]++;
       }
       Transforms.insertNodes(this.editor, superBlock as any, { at: newPath });
@@ -3748,9 +3893,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // now we can do this part async
     (async () => {
+      const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+      // if we got a path let's find the node
+      let nodeAtPath: Node;
+
+      try {
+        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+      } catch (e) {
+
+      }
+
+      let childIndex: number = 0;
+      // no node then let's use its parent
+      if (pathAt && !nodeAtPath) {
+        childIndex = pathAt.pop();
+        nodeAtPath = Node.get(this.editor, pathAt);
+      }
+
       // and set the focus
       if (at) {
-        await this.focusAt(at);
+        await this.focusAt(pathAt || at);
       }
 
       // and insert the video if we have been
@@ -3772,14 +3934,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         }
 
         // insert the video node
-        if (Path.isPath(at)) {
-          const nodeAtPath = Node.get(this.editor, at);
+        if (pathAt) {
           let newPath: Path;
 
           if (nodeAtPath.containment === "superblock") {
-            newPath = [...at, 0];
+            newPath = [...pathAt, childIndex];
           } else {
-            newPath = [...at];
+            newPath = [...pathAt];
             newPath[newPath.length - 1]++;
           }
 
@@ -3807,9 +3968,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we are not dealing with an image
       const data = await this.props.onInsertFile(file, false);
 
+      const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+      // if we got a path let's find the node
+      let nodeAtPath: Node;
+
+      try {
+        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+      } catch (e) {
+
+      }
+
+      let childIndex: number = 0;
+      // no node then let's use its parent
+      if (pathAt && !nodeAtPath) {
+        childIndex = pathAt.pop();
+        nodeAtPath = Node.get(this.editor, pathAt);
+      }
+
       // now we focus
       if (at) {
-        await this.focusAt(at);
+        await this.focusAt(pathAt || at);
       }
 
       if (!data) {
@@ -3838,8 +4016,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       };
 
       // and insert it
-      if (Path.isPath(at)) {
-        const newPath = [...at, 0];
+      if (pathAt) {
+        const newPath = [...pathAt, childIndex];
         Transforms.insertNodes(this.editor, fileNode as any, { at: newPath });
       } else {
         this.editor.insertNode(fileNode as any);
@@ -3854,10 +4032,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at an optional range
    */
   public async insertContainer(type?: string, at?: Range | Path) {
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
+
     // if we are provided a range
     if (at) {
       // we focus at it
-      await this.focusAt(at);
+      await this.focusAt(pathAt || at);
     }
 
     // now we can make the container
@@ -3884,15 +4079,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       containerType: type || null,
     };
 
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-
     // and wrap the thing
-    if (pathAt && !this.state.currentElement) {
+    if (pathAt) {
       const nodeAtPath = Node.get(this.editor, pathAt);
       let newPath: Path;
 
       if (nodeAtPath.containment === "superblock") {
-        newPath = [...pathAt, 0];
+        newPath = [...pathAt, childIndex];
       } else {
         newPath = [...pathAt];
         newPath[newPath.length - 1]++;
@@ -3916,10 +4109,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at an optional at range to insert the custom at
    */
   public async insertCustom(type: string, at?: Range | Path) {
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
+
     // if we are provided a range
     if (at) {
       // we focus at it
-      await this.focusAt(at);
+      await this.focusAt(pathAt || at);
     }
 
     // now we can make the custom
@@ -3946,15 +4156,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       customType: type,
     };
 
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-
     // and wrap the thing
-    if (pathAt && !this.state.currentElement) {
+    if (pathAt) {
       const nodeAtPath = Node.get(this.editor, pathAt);
       let newPath: Path;
 
       if (nodeAtPath.containment === "superblock") {
-        newPath = [...pathAt, 0];
+        newPath = [...pathAt, childIndex];
       } else {
         newPath = [...pathAt];
         newPath[newPath.length - 1]++;
@@ -4522,28 +4730,52 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at an optional position to do it at
    */
   public async insertElement(element: RichElement, at?: Range | Path) {
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
+
     // if we are provided a range
     if (at) {
       // we focus at it
-      await this.focusAt(at);
+      await this.focusAt(pathAt || at);
     }
 
     // and insert the thing
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    const nodeToInsert = element.children ? element : { ...element };
+    if (!nodeToInsert.children) {
+      nodeToInsert.children = [
+        STANDARD_TEXT_NODE(),
+      ];
+    }
 
-    const nodeToInsert = { ...element };
-    nodeToInsert.children = [
-      STANDARD_TEXT_NODE(),
-    ];
+    const shouldNotSpecifyInsertionDueToBeingInline =
+      nodeToInsert.containment === "inline" &&
+      this.state.currentSelectedElement &&
+      !at;
 
     // and wrap the thing
-    if (pathAt && !this.state.currentElement) {
-      const nodeAtPath = Node.get(this.editor, pathAt);
+    if (!shouldNotSpecifyInsertionDueToBeingInline && pathAt) {
       let newPath: Path;
 
+      // if we are in a superblock
       if (nodeAtPath.containment === "superblock") {
-        newPath = [...pathAt, 0];
+        // we append at the end
+        newPath = [...pathAt, childIndex];
       } else {
+        // otherwise we add next to it
         newPath = [...pathAt];
         newPath[newPath.length - 1]++;
       }
@@ -4568,6 +4800,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at an optional range
    */
   public async insertUIHandledContainer(type: string, value: string, args: { [key: string]: string }, at?: Range | Path) {
+    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
+    // if we got a path let's find the node
+    let nodeAtPath: Node;
+
+    try {
+      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
+    } catch (e) {
+
+    }
+
+    let childIndex: number = 0;
+    // no node then let's use its parent
+    if (pathAt && !nodeAtPath) {
+      childIndex = pathAt.pop();
+      nodeAtPath = Node.get(this.editor, pathAt);
+    }
+
     // if we are provided a range
     if (at) {
       // we focus at it
@@ -4585,15 +4834,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       givenName: type || null,
     };
 
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-
     // and wrap the thing
-    if (pathAt && !this.state.currentElement) {
+    if (pathAt) {
       const nodeAtPath = Node.get(this.editor, pathAt);
       let newPath: Path;
 
       if (nodeAtPath.containment === "superblock") {
-        newPath = [...pathAt, 0];
+        newPath = [...pathAt, childIndex];
       } else {
         newPath = [...pathAt];
         newPath[newPath.length - 1]++;
@@ -5031,6 +5278,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentElement: this.state.currentElement,
         currentText: this.state.currentText,
         currentSelectedElement: this.state.currentSelectedElement,
+        currentSelectedBlockElement: this.state.currentSelectedBlockElement,
+        currentSelectedBlockElementAnchor: this.state.currentSelectedBlockElementAnchor,
+        currentSelectedSuperBlockElement: this.state.currentSelectedSuperBlockElement,
+        currentSelectedSuperBlockElementAnchor: this.state.currentSelectedSuperBlockElementAnchor,
         isRichText: this.props.isRichText,
         currentValue: this.state.internalValue.children as any,
         textAnchor: this.state.currentAnchor,

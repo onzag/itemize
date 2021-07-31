@@ -85,6 +85,8 @@ import FormLabel from "@material-ui/core/FormLabel";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import FilledInput from "@material-ui/core/FilledInput";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import Input from "@material-ui/core/Input";
 import Tooltip from "@material-ui/core/Tooltip";
 import Grid from "@material-ui/core/Grid";
 import NativeSelect from '@material-ui/core/NativeSelect';
@@ -301,4 +303,6 @@ export {
   StepLabel,
   ListItemAvatar,
   ListItemSecondaryAction,
+  OutlinedInput,
+  Input,
 }

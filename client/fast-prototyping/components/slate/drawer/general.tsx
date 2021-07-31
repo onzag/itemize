@@ -65,18 +65,18 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
     // element anchor we are at
-    const selectedNode: IContainer = props.state.currentSelectedElement as any;
+    const selectedNode: IContainer = props.state.currentSelectedSuperBlockElement as any;
     const time = (new Date()).getTime()
     if (
       (selectedNode.containerType || "") !== state.value &&
       (
-        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        !Path.equals(props.state.currentSelectedSuperBlockElementAnchor, state.valueForAnchor) ||
         time - state.valueLastTimeRequestedUpdate > 300
       )
     ) {
       return {
         value: selectedNode.containerType || "",
-        valueForAnchor: props.state.currentSelectedElementAnchor,
+        valueForAnchor: props.state.currentSelectedSuperBlockElement,
       }
     }
 
@@ -90,11 +90,11 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
   public constructor(props: MaterialUISlateWrapperWithStyles) {
     super(props);
 
-    const selectedNode: IContainer = props.state.currentSelectedElement as any;
+    const selectedNode: IContainer = props.state.currentSelectedSuperBlockElement as any;
 
     this.state = {
       value: selectedNode.containerType || "",
-      valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueForAnchor: props.state.currentSelectedSuperBlockElementAnchor,
       valueLastTimeRequestedUpdate: 0,
     }
 
@@ -118,7 +118,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
       // anchor
       this.props.helpers.set({
         containerType: newValue,
-      }, this.props.state.currentSelectedElementAnchor);
+      }, this.props.state.currentSelectedSuperBlockElementAnchor);
     });
   }
 
@@ -510,6 +510,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
 
 interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles {
   arg: string;
+  basisState: string;
   label: string | React.ReactNode;
   placeholder: string | React.ReactNode;
   isSelect: boolean;
@@ -522,24 +523,24 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
   static getDerivedStateFromProps(props: IGeneralUIHandlerOptionProps, state: IGeneralOptionsState) {
     if (!props.arg) {
       return {
-        value: null,
-        valueForAnchor: props.state.currentSelectedElementAnchor,
+        value: null as any,
+        valueForAnchor: props.state[props.basisState + "Anchor"],
       }
     }
 
-    const selectedNode: RichElement = props.state.currentSelectedElement as any;
+    const selectedNode: RichElement = props.state[props.basisState] as any;
     const currentValueItHolds = ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "");
     const time = (new Date()).getTime()
     if (
       currentValueItHolds !== state.value &&
       (
-        !Path.equals(props.state.currentSelectedElementAnchor, state.valueForAnchor) ||
+        !Path.equals(props.state[props.basisState + "Anchor"], state.valueForAnchor) ||
         time - state.valueLastTimeRequestedUpdate > 300
       )
     ) {
       return {
         value: currentValueItHolds,
-        valueForAnchor: props.state.currentSelectedElementAnchor,
+        valueForAnchor: props.state[props.basisState + "Anchor"],
       }
     }
 
@@ -555,11 +556,11 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
   public constructor(props: IGeneralUIHandlerOptionProps) {
     super(props);
 
-    const selectedNode: RichElement = props.state.currentSelectedElement as any;
+    const selectedNode: RichElement = props.state[props.basisState] as any;
 
     this.state = {
       value: props.arg ? ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") : null,
-      valueForAnchor: props.state.currentSelectedElementAnchor,
+      valueForAnchor: props.state[props.basisState + "Anchor"],
       valueLastTimeRequestedUpdate: 0,
     }
 
@@ -591,7 +592,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
       // we use the helper set for the title subtype
       // which does an arbitrary partial value update at the selected
       // anchor
-      this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state.currentSelectedElementAnchor);
+      this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state[this.props.basisState + "Anchor"]);
     });
   }
 
@@ -624,7 +625,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     this.setState({
       valueLastTimeRequestedUpdate: (new Date()).getTime(),
     }, () => {
-      this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state.currentSelectedElementAnchor);
+      this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state[this.props.basisState + "Anchor"]);
     });
   }
 
@@ -859,9 +860,11 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
 }
 
 function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: MaterialUISlateWrapperWithStyles, index: number) {
+  const stateElem = basisToState[x.basis || "selected"];
   return (
     <GeneralUIHandlerOption
       {...props}
+      basisState={stateElem}
       arg={x.arg}
       label={(x.input as any).label}
       placeholder={(x.input as any).placeholder}
@@ -874,18 +877,35 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: Mate
   );
 }
 
+function checkUIHandlerMatches(x: IDrawerConfiguratorElementBase, value: string) {
+  return typeof x.uiHandler !== "undefined" ?
+    (
+      // for null
+      x.uiHandler === null ?
+        // there shouldn't be an ui handler
+        !value :
+        // shoudl match
+        Array.isArray(x.uiHandler) ? x.uiHandler.some((h) => {
+          return h === null ? !value : h === value;
+        }) : x.uiHandler === value
+    ) :
+    // everything passes
+    true;
+}
+
 function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], props: MaterialUISlateWrapperWithStyles) {
   return (
     <div className={props.classes.box}>
-      {elems.filter((x) =>
-        typeof x.uiHandler !== "undefined" ?
-          (
-            x.uiHandler === null ?
-              !props.state.currentSelectedElement.uiHandler :
-              x.uiHandler === props.state.currentSelectedElement.uiHandler
-          ) :
-          true
-      ).map((x, index) => {
+      {elems.filter((x) => {
+        const stateElem = basisToState[x.basis || "selected"];
+
+        if (!props.state[stateElem]) {
+          return false;
+        }
+
+        // if an ui handler is specified
+        return checkUIHandlerMatches(x, props.state[stateElem].uiHandler);
+      }).map((x, index) => {
         return processDrawerElementBase(x, props, index);
       })}
     </div>
@@ -922,6 +942,12 @@ function processDrawerElements(elems: DrawerConfiguratorElement[], props: Materi
   );
 }
 
+const basisToState = {
+  selected: "currentSelectedElement",
+  block: "currentSelectedBlockElement",
+  superblock: "currentSelectedSuperBlockElement",
+}
+
 /**
  * Provides the drawer section with all the general options of a given component
  * these general options are the specific options for the generic components
@@ -930,14 +956,12 @@ function processDrawerElements(elems: DrawerConfiguratorElement[], props: Materi
 export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   // we need to build the node and some nodes just don't
   // have any options
+  let specificSuperBlockOptions: React.ReactNode = null;
   let specificNodeOptions: React.ReactNode = null;
 
   // so we got to get in the type
   if (!props.state.currentSelectedElement.uiHandler) {
     switch ((props.state.currentSelectedElement as any).type) {
-      case "container":
-        specificNodeOptions = <GeneralContainerOptions {...props} />
-        break;
       case "title":
         specificNodeOptions = <GeneralTitleOptions {...props} />
         break;
@@ -947,17 +971,29 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
     }
   }
 
+  if (
+    props.state.currentSelectedSuperBlockElement &&
+    !props.state.currentSelectedSuperBlockElement.uiHandler
+  ) {
+    switch ((props.state.currentSelectedSuperBlockElement as any).type) {
+      case "container":
+        specificSuperBlockOptions = <GeneralContainerOptions {...props} />
+        break;
+    }
+  }
+
   let extraNodeOptions: React.ReactNode = null;
   const extrasApplied = props.drawerExtras && props.drawerExtras
-    .filter((x) =>
-      typeof x.uiHandler !== "undefined" ?
-        (
-          x.uiHandler === null ?
-            !props.state.currentSelectedElement.uiHandler :
-            x.uiHandler === props.state.currentSelectedElement.uiHandler
-        ) :
-        true
-    );
+    .filter((x) => {
+      const stateElem = basisToState[x.basis || "selected"];
+
+      if (!props.state[stateElem]) {
+        return false;
+      }
+
+      // if an ui handler is specified
+      return checkUIHandlerMatches(x as any, props.state[stateElem].uiHandler);
+    });
   if (extrasApplied && extrasApplied.length) {
     extraNodeOptions = processDrawerElements(extrasApplied, props);
   }
@@ -970,6 +1006,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
           null :
           <GeneralElementOptions {...props} />
       }
+      {specificSuperBlockOptions}
       {specificNodeOptions}
       {extraNodeOptions}
       {props.drawerMode === "barebones" ? null : <IconButton onClick={props.helpers.deleteSelectedNode}>
