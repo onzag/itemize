@@ -2504,13 +2504,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // and we are deleting a character of a word
         (
           (unit === "character" || unit === "word") &&
-          // and the current block has only one children
-          this.state.currentBlockElement.children.length === 1 &&
-          // and it is a text node inside
-          Text.isText(this.state.currentBlockElement.children[0]) &&
-          // and we have nothing left in that text, so we are deleting
-          // in a list one element
-          this.state.currentBlockElement.children[0].text === ""
+          // and we are at the start of the block
+          selection.anchor.offset === 0
         ) ||
         // or we are removing a line or block
         (
@@ -2584,6 +2579,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now if we have children in the next place that we are supposed to
     // deal with
     if (hasChildrenNext) {
+      const sliceFrom = this.state.currentBlockElementAnchor[this.state.currentBlockElementAnchor.length - 1] + 1;
       // we are inserting those nodes at the next place after the super anchor
       // that we have calculated is
       Transforms.insertNodes(
@@ -2592,10 +2588,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // we copy our super block
           ...copyElementBase(this.state.currentSuperBlockElement),
           type: "list",
-          containment: "list-item",
+          containment: "list-superblock",
           listType: (this.state.currentSuperBlockElement as any).listType,
           // and slice the children
-          children: (this.state.currentSuperBlockElement.children.slice(this.state.currentBlockElementAnchor.length) as any as Node[]),
+          children: (this.state.currentSuperBlockElement.children.slice(sliceFrom) as any as Node[]),
         },
         {
           at: nextSuperAnchor,
@@ -4381,7 +4377,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       await this.focusAt(at);
     }
 
-    if ((at && Range.isRange(at)) || (ReactEditor.isFocused(this.editor) && this.editor.selection)) {
+    if ((at && Range.isRange(at)) || this.state.currentElement) {
       // now we need to check for the collapsing information and anchor data
       const isCollapsed = Range.isCollapsed(at as Range || this.editor.selection);
       const anchorData = at ? this.calculateAnchorsAndContext((at as Range).anchor.path) : this.state;
