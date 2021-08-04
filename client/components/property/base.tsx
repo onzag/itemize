@@ -89,6 +89,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    */
   altLabel?: string;
   /**
+   * Hide the label
+   */
+  hideLabel?: boolean;
+  /**
    * An alternative placeholder
    */
   altPlaceholder?: string;
@@ -459,6 +463,7 @@ export function EntryViewReadSet(
                           hideDescription={props.hideDescription}
                           altDescription={props.altDescription}
                           altLabel={props.altLabel}
+                          hideLabel={props.hideLabel}
                           altPlaceholder={props.altPlaceholder}
                           ignoreErrors={props.ignoreErrors}
                           autoFocus={props.autoFocus}

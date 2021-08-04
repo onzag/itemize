@@ -251,13 +251,13 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
           null
       }
       <div>
-        <div
+        {props.label ? <div
           className={props.classes.label}
         >
           {secondIconComponent}
           {capitalize(props.label)}
           {iconComponent}
-        </div>
+        </div> : null}
         {internalContent}
       </div>
       <div className={props.classes.errorMessage}>

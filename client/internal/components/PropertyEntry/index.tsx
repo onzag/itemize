@@ -249,6 +249,12 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    */
   altLabel?: string;
   /**
+   * Hides the label in the renderer
+   * 
+   * Developer Provided check base.tsx
+   */
+  hideLabel?: boolean;
+  /**
    * Pass an alternative placeholder to the renderer
    * 
    * Developer Provided check base.tsx

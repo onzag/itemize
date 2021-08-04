@@ -515,6 +515,7 @@ interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles 
   placeholder: string | React.ReactNode;
   isSelect: boolean;
   isCustom: boolean;
+  isBoolean: boolean;
   CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
   options?: Array<{ label: string | React.ReactNode, value: string }>;
 }
@@ -569,6 +570,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     this.actuallyUpdate = this.actuallyUpdate.bind(this);
     this.onDelayedUpdate = this.onDelayedUpdate.bind(this);
     this.onImmediateUpdate = this.onImmediateUpdate.bind(this);
+    this.onChangeByBoolean = this.onChangeByBoolean.bind(this);
   }
 
   public onDelayedUpdate(v: string) {
@@ -637,6 +639,11 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     delete document.body.dataset.unblur;
   }
 
+  public onChangeByBoolean(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.checked ? "true" : "false";
+    this.onImmediateUpdate(newValue);
+  }
+
   /**
    * The render function
    */
@@ -651,6 +658,25 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
           helpers={this.props.helpers}
           state={this.props.state}
         />
+      );
+    }
+
+    if (this.props.isBoolean) {
+      return (
+        <FormControl
+          variant="filled"
+          fullWidth={true}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.value === "true"}
+                onChange={this.onChangeByBoolean}
+              />
+            }
+            label={this.props.label}
+          />
+        </FormControl>
       );
     }
 
@@ -869,6 +895,7 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: Mate
       label={(x.input as any).label}
       placeholder={(x.input as any).placeholder}
       isSelect={x.input.type === "select"}
+      isBoolean={x.input.type === "boolean"}
       isCustom={x.input.type === "custom"}
       CustomComponent={x.input.type === "custom" && x.input.component}
       options={x.input.type === "select" && x.input.options}

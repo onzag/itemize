@@ -285,7 +285,7 @@ class ActualPropertyEntrySelectRenderer
           variant="filled"
           className={this.props.classes.entry}
         >
-          <InputLabel
+          {this.props.label ? <InputLabel
             htmlFor={this.props.propertyId}
             classes={{
               root: this.props.classes.label,
@@ -294,7 +294,7 @@ class ActualPropertyEntrySelectRenderer
             shrink={this.props.isNullable ? true : undefined}
           >
             {this.props.label}
-          </InputLabel>
+          </InputLabel> : null}
           {selectElement}
         </FormControl>
         <div className={this.props.classes.errorMessage}>

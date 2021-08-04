@@ -224,10 +224,11 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         rootI18n={this.props.i18nRoot}
         placeholder={this.props.placeholder}
         wrapperArgs={
-          this.props.args.wrapperArgs || {
+          {
             i18nGenericError: this.props.i18nGenericError,
             i18nOk: this.props.i18nOk,
             i18nRichInfo: this.props.i18nRichInfo,
+            ...this.props.args.wrapperArgs,
           }
         }
         toolbarExtras={
@@ -275,7 +276,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             null
         }
         <div>
-          <InputLabel
+          {this.props.label ? <InputLabel
             htmlFor={this.props.propertyId}
             classes={{
               root: this.props.classes.label + " " +
@@ -285,7 +286,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             focused={this.state.focused}
           >
             {capitalize(this.props.label)}{iconComponent}
-          </InputLabel>
+          </InputLabel> : null}
           {editor}
         </div>
         <div className={this.props.classes.errorMessage}>

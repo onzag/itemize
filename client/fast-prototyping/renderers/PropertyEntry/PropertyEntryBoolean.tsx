@@ -118,7 +118,7 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
         component={"fieldset" as any}
         className={props.classes.entry}
       >
-        <FormLabel
+        {props.label ? <FormLabel
           aria-label={props.label}
           component={"legend" as any}
           classes={{
@@ -131,7 +131,7 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
             className={props.classes.icon}
             onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
           >{icon}</IconButton> : null}
-        </FormLabel>
+        </FormLabel> : null}
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
           onChange={handleOnChange.bind(this, props)}

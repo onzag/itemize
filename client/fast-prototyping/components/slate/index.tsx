@@ -240,6 +240,17 @@ export interface IDrawerUIHandlerElementConfigInput {
   placeholder: string | React.ReactNode;
 }
 
+/**
+ * Specifies a input configuration for the ui handler argument
+ * of type boolean, because all ui handlers are strings
+ * this uses the string true or false rather than actual
+ * booleans
+ */
+ export interface IDrawerUIHandlerElementConfigBoolean {
+  type: "boolean",
+  label: string | React.ReactNode;
+}
+
 export interface IDrawerUIHandlerElementConfigCustomProps {
   value: string;
   onChange: (value: string) => void;
@@ -276,7 +287,11 @@ export interface IDrawerConfiguratorElementBase {
   /**
    * The way for the input to be specified
    */
-  input: IDrawerUIHandlerElementConfigSelect | IDrawerUIHandlerElementConfigInput | IDrawerUIHandlerElementConfigCustom;
+  input:
+    IDrawerUIHandlerElementConfigSelect |
+    IDrawerUIHandlerElementConfigInput |
+    IDrawerUIHandlerElementConfigBoolean |
+    IDrawerUIHandlerElementConfigCustom;
 }
 
 export interface IDrawerConfiguratorElementSection {
@@ -686,6 +701,10 @@ export interface IHelperFunctions {
    * provided by slate
    */
   Range: typeof Range;
+  /**
+   * This is the node class itself
+   */
+  Node: typeof Node;
 
   /**
    * performs a pseudo selection at a given path
@@ -5146,6 +5165,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Range,
       ReactEditor,
       HistoryEditor,
+      Node,
 
       selectPath: this.selectPath,
       movePaths: this.movePaths,

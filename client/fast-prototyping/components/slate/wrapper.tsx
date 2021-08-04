@@ -254,6 +254,14 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    * The whole of the i18n rich information that is given by default
    */
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+  /**
+   * Add a class name to the entire wrapper
+   */
+  wrapperClassName?: string;
+  /**
+   * Add a class name to the container in the wrapper
+   */
+  wrapperTextEditorClassName?: string;
 };
 
 /**
@@ -1206,7 +1214,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       this.props.featureSupport.supportsCustomStyles ||
       this.props.featureSupport.supportsContainers ||
       this.props.featureSupport.supportedCustoms ||
-      this.props.featureSupport.supportsRichClasses
+      this.props.featureSupport.supportsRichClasses ||
+      this.props.drawerExtras
     );
   }
 
@@ -1663,8 +1672,16 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     return (
       <>
         {toolbar}
-        <div className={this.props.classes.editorContainer}>
-          <div className={"rich-text " + this.props.classes.editor + (this.props.state.isFocused ? " focused" : "")}>
+        <div className={
+          this.props.classes.editorContainer +
+          (this.props.wrapperClassName ? " " + this.props.wrapperClassName : "")
+        }>
+          <div className={
+            "rich-text " +
+            this.props.classes.editor +
+            (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
+            (this.props.state.isFocused ? " focused" : "")
+          }>
             {this.props.children}
           </div>
           <WrapperContainer

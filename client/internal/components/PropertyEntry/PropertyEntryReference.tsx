@@ -705,6 +705,7 @@ export default class PropertyEntryReference
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
+      this.props.hideLabel !== nextProps.hideLabel ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.i18n !== this.props.i18n ||
@@ -715,8 +716,8 @@ export default class PropertyEntryReference
 
   public render() {
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-    const i18nLabel = this.props.altLabel || (i18nData && i18nData.label);
-    const i18nDescription = this.props.hideDescription ? null : (this.props.altDescription || (i18nData && i18nData.description));
+    const i18nLabel = this.props.hideLabel ? null : (typeof this.props.altLabel !== "undefined" ? this.props.altLabel : (i18nData && i18nData.label));
+    const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
     const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
 
     // get the invalid reason if any

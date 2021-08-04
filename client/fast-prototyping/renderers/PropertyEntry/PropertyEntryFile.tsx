@@ -186,7 +186,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
       {props.description && !descriptionAsAlert ? <Typography variant="caption" className={props.classes.description}>
         {props.description}
       </Typography> : null}
-      <FormLabel
+      {props.label ? <FormLabel
         aria-label={props.label}
         classes={{
           root: props.classes.label,
@@ -199,7 +199,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
           className={props.classes.icon}
           onClick={props.canRestore ? props.onRestore : null}
         >{icon}</IconButton> : null}
-      </FormLabel>
+      </FormLabel> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
         onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
