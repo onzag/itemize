@@ -16,7 +16,7 @@ import {
   MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION,
   SEARCH_DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
-import { IGQLSearchRecord, IGQLValue, IGQLRequestFields } from "../../gql-querier";
+import { IGQLSearchRecord, IGQLValue, IGQLRequestFields, ProgresserFn } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
@@ -254,6 +254,8 @@ export interface IActionCleanOptions {
   cleanStateOnAny?: boolean;
 }
 
+type ActionSubmitOptionCb = (lastResponse: IActionResponseWithId) => Partial<IActionSubmitOptions>;
+
 /**
  * The options for submitting,
  * aka edit, aka add
@@ -277,11 +279,21 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   includeOverrides?: IIncludeOverride[];
   languageOverride?: string;
   waitAndMerge?: boolean;
+  progresser?: ProgresserFn;
+  /**
+   * if submitting already this will prevent throwing an error and instead
+   * will wait until the submit time is free
+   * 
+   * pass a function to return a partial for patching the submit action
+   * in case you want that behaviour
+   */
+  pileSubmit?: boolean | ActionSubmitOptionCb;
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
   policies?: PolicyPathType[];
   beforeDelete?: () => boolean | Promise<boolean>;
+  progresser?: ProgresserFn;
 }
 
 /**
@@ -328,6 +340,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   offset: number;
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
+  progresser?: ProgresserFn;
 }
 
 export interface IPokeElementsType {
@@ -866,6 +879,10 @@ export class ActualItemProvider extends
 
   // the list of submit block promises
   private submitBlockPromises: Array<Promise<any>> = [];
+
+  // the list of submit block promises
+  private activeSubmitPromise: Promise<IActionResponseWithId> = null;
+  private activeSubmitPromiseAwaiter: string = null;
 
   constructor(props: IActualItemProviderProps) {
     super(props);
@@ -2466,7 +2483,11 @@ export class ActualItemProvider extends
     }
   }
   public async delete(options: IActionDeleteOptions = {}): Promise<IBasicActionResponse> {
-    if (this.state.deleting || this.props.forId === null) {
+    if (this.state.deleting) {
+      throw new Error("Can't delete while deleting, please consider your calls")
+    }
+
+    if (this.props.forId === null) {
       return null;
     }
 
@@ -2738,7 +2759,7 @@ export class ActualItemProvider extends
     }
     return triggeredUpdate;
   }
-  public async submit(options: IActionSubmitOptions): Promise<IActionResponseWithId> {
+  public async submit(originalOptions: IActionSubmitOptions): Promise<IActionResponseWithId> {
     // the reason we might need to wait for load is because unless we have avoided
     // loading the applied value matters in order to unite the applied fields, however
     // if we are avoiding loading this doesn't really matter as it's truly loading and somehow
@@ -2751,10 +2772,40 @@ export class ActualItemProvider extends
       await this.lastLoadValuePromise;
     }
 
-    // if we are already submitting, we reject the action
-    if (this.state.submitting) {
-      return null;
+    // if we are already submitting
+    let options = originalOptions;
+    if (this.state.submitting || this.activeSubmitPromise) {
+      if (originalOptions.pileSubmit) {
+        const id = uuid.v4();
+        this.activeSubmitPromiseAwaiter = id;
+
+        const lastResponse = await this.activeSubmitPromise;
+
+        // another pile element has overtaken us
+        // we must not execute, we have been cancelled
+        if (this.activeSubmitPromiseAwaiter !== id) {
+          // cancelled
+          return null;
+        }
+
+        this.activeSubmitPromiseAwaiter = null;
+
+        // patch the submit action
+        if (typeof originalOptions.pileSubmit === "function") {
+          options = {
+            ...options,
+            ...originalOptions.pileSubmit(lastResponse),
+          }
+        }
+      } else {
+        throw new Error("Can't submit while submitting, please consider your calls");
+      }
     }
+
+    let activeSubmitPromiseResolve = null as any;
+    this.activeSubmitPromise = new Promise((resolve) => {
+      activeSubmitPromiseResolve = resolve;
+    });
 
     const isValid = this.checkItemStateValidity(options);
     const pokedElements = {
@@ -2771,8 +2822,13 @@ export class ActualItemProvider extends
         });
       }
       this.cleanWithProps(this.props, options, "fail");
+
+      const returnValue = this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;;
+      this.activeSubmitPromise = null;
+      activeSubmitPromiseResolve(returnValue);
+      
       // if it's not poked already, let's poke it
-      return this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;
+      return returnValue;
     }
 
     if (this.submitBlockPromises.length) {
@@ -2791,6 +2847,8 @@ export class ActualItemProvider extends
     if (options.beforeSubmit) {
       const result = await options.beforeSubmit();
       if (!result) {
+        this.activeSubmitPromise = null;
+        activeSubmitPromiseResolve(null);
         return null;
       }
     }
@@ -2864,6 +2922,7 @@ export class ActualItemProvider extends
         listenerUUID: this.props.remoteListener.getUUID(),
         cacheStore: this.props.longTermCaching,
         waitAndMerge: options.waitAndMerge,
+        progresser: options.progresser,
       });
 
       value = totalValues.value;
@@ -2944,6 +3003,7 @@ export class ActualItemProvider extends
         forVersion: submitForVersion || null,
         waitAndMerge: options.waitAndMerge,
         containerId,
+        progresser: options.progresser,
       });
       value = totalValues.value;
       error = totalValues.error;
@@ -3002,6 +3062,10 @@ export class ActualItemProvider extends
       error,
     };
     this.props.onSubmit && this.props.onSubmit(result);
+
+    this.activeSubmitPromise = null;
+    activeSubmitPromiseResolve(result);
+
     return result;
   }
 
@@ -3068,7 +3132,7 @@ export class ActualItemProvider extends
     this.preventSearchFeedbackOnPossibleStaleData = false;
 
     if (this.state.searching) {
-      return null;
+      throw new Error("Can't search while searching, please consider your calls");
     }
 
     if (options.searchByProperties.includes("created_by") && options.createdBy) {
@@ -3266,6 +3330,7 @@ export class ActualItemProvider extends
       offset: options.offset,
       parentedBy,
       waitAndMerge: options.waitAndMerge,
+      progresser: options.progresser,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,

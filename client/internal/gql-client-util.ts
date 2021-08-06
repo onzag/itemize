@@ -24,7 +24,7 @@ import {
   UNSPECIFIED_OWNER,
 } from "../../constants";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -501,6 +501,7 @@ export async function runGetQueryFor(
     token: string,
     cacheStore: boolean,
     waitAndMerge?: boolean,
+    progresser?: ProgresserFn,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -572,6 +573,7 @@ export async function runGetQueryFor(
   // and this function will always run using the network
   const gqlValue = await gqlQuery(query, {
     merge: arg.waitAndMerge,
+    progresser: arg.progresser,
   });
 
   // now we got to check for errors
@@ -659,6 +661,7 @@ export async function runDeleteQueryFor(
     listenerUUID: string,
     cacheStore: boolean,
     waitAndMerge?: boolean,
+    progresser?: ProgresserFn,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -687,6 +690,7 @@ export async function runDeleteQueryFor(
   // and this function will always run using the network
   const gqlValue = await gqlQuery(query, {
     merge: arg.waitAndMerge,
+    progresser: arg.progresser,
   });
 
   // now we got to check for errors
@@ -745,6 +749,7 @@ export async function runAddQueryFor(
     forVersion: string,
     containerId: string,
     waitAndMerge?: boolean,
+    progresser?: ProgresserFn,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -783,6 +788,7 @@ export async function runAddQueryFor(
   // and this function will always run using the network
   const gqlValue = await gqlQuery(query, {
     merge: arg.waitAndMerge,
+    progresser: arg.progresser,
   });
 
   // now we got to check for errors
@@ -844,6 +850,7 @@ export async function runEditQueryFor(
     listenerUUID: string,
     cacheStore: boolean,
     waitAndMerge?: boolean,
+    progresser?: ProgresserFn,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -877,6 +884,7 @@ export async function runEditQueryFor(
   // and this function will always run using the network
   const gqlValue = await gqlQuery(query, {
     merge: arg.waitAndMerge,
+    progresser: arg.progresser,
   });
 
   // now we got to check for errors
@@ -960,6 +968,7 @@ interface IRunSearchQueryArg {
   language: string,
   versionFilter?: string,
   waitAndMerge?: boolean,
+  progresser?: ProgresserFn,
 }
 
 interface IRunSearchQuerySearchOptions {
@@ -1153,6 +1162,7 @@ export async function runSearchQueryFor(
     // and this function will always run using the network
     gqlValue = await gqlQuery(query, {
       merge: arg.waitAndMerge,
+      progresser: arg.progresser,
     });
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
@@ -1176,6 +1186,7 @@ export async function runSearchQueryFor(
     // and this function will always run using the network
     gqlValue = await gqlQuery(query, {
       merge: arg.waitAndMerge,
+      progresser: arg.progresser,
     });
 
     const data = gqlValue && gqlValue.data && gqlValue.data[queryName];

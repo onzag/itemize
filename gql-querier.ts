@@ -155,6 +155,8 @@ export interface IGQLEndpointValue {
 
 type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
 
+export type ProgresserFn = (arg: IXMLHttpRequestProgressInfo) => void;
+
 /**
  * Graphql helper class in order to build proper form data
  * queries and mutations to the grapqhl api refer to
@@ -177,6 +179,10 @@ export class GQLQuery {
    * list of listeners
    */
   private listeners: IGQLQueryListenerType[] = [];
+  /**
+   * list of progress listeners
+   */
+  private progressers: ProgresserFn[] = [];
 
   /**
    * Build a graphql query
@@ -319,6 +325,14 @@ export class GQLQuery {
    */
   public informReply(reply: IGQLEndpointValue) {
     this.listeners.forEach((l) => l(reply));
+  }
+
+  public informProgress(arg: IXMLHttpRequestProgressInfo) {
+    this.progressers.forEach((p) => p(arg));
+  }
+
+  public addProgresserListener(prog: (arg: IXMLHttpRequestProgressInfo) => void) {
+    this.progressers.push(prog);
   }
 
   /**
@@ -654,18 +668,61 @@ function wait(ms: number): Promise<void> {
 
 const QUERIES_IN_WAITING: GQLQuery[] = [];
 
+export interface IXMLHttpRequestProgressInfo {
+  total: number;
+  loaded: number;
+}
+
+export async function oldXMLHttpRequest(
+  host: string,
+  body: FormData,
+  query: GQLQuery,
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", host + "/graphql");
+    request.setRequestHeader('Cache-Control', 'no-cache');
+    request.send(body);
+
+    const rejectFn = (ev: any) => {
+      reject(new Error(ev.type));
+    };
+
+    request.addEventListener("error", rejectFn);
+    request.addEventListener("timeout", rejectFn);
+    request.addEventListener("abort", rejectFn);
+    request.addEventListener("load", (ev) => {
+      try {
+        const value = JSON.parse(request.responseText);
+        resolve(value);
+      } catch (e) {
+        reject(e);
+      }
+    });
+
+    request.addEventListener("progress", (ev) => {
+      const total = ev.total;
+      const loaded = ev.loaded;
+  
+      query.informProgress({total, loaded});
+    });
+  });
+}
+
 /**
  * Executes a graphql query
  * @param query the query to run
  * @param options.host a host, required when running in NodeJS
  * @param options.merge whether to merge graphql queries in one, adds delay to the queries, might be unwanted
  * @param options.mergeMS how many ms of delay to add, default 70
+ * @param options.progresser to track progress
  * @returns a promise for a graphql endpoint value
  */
 export async function gqlQuery(query: GQLQuery, options?: {
   host?: string;
   merge?: boolean;
   mergeMS?: number;
+  progresser?: (arg: IXMLHttpRequestProgressInfo) => void;
 }): Promise<IGQLEndpointValue> {
   const host = (options && options.host) || "";
   const merge = options && options.merge;
@@ -686,6 +743,11 @@ export async function gqlQuery(query: GQLQuery, options?: {
     if (queryThatCanMergeWith) {
       // we do so
       const remapper = queryThatCanMergeWith.mergeWith(query);
+
+      if (options && options.progresser) {
+        queryThatCanMergeWith.addProgresserListener(options.progresser);
+      }
+
       // and now we are concerned in how to receive the answer
       // from that same query as a reply for this one
       return new Promise((resolve) => {
@@ -746,17 +808,25 @@ export async function gqlQuery(query: GQLQuery, options?: {
   });
 
   // the fetch we need to use
-  const fetchToUse = typeof fetch !== "undefined" ? fetch : fetchNode;
+  const fetchMethod = typeof XMLHttpRequest !== "undefined" ? "xhr" : "fetch";
+
+  if (options && options.progresser) {
+    query.addProgresserListener(options.progresser);
+  }
 
   let reply: IGQLEndpointValue;
   // now we try
   try {
-    const value = await fetchToUse(host + "/graphql", {
-      method: "POST",
-      cache: "no-cache",
-      body: formData as any,
-    });
-    reply = await value.json();
+    if (fetchMethod === "fetch") {
+      const value = await fetchNode(host + "/graphql", {
+        method: "POST",
+        cache: "no-cache",
+        body: formData as any,
+      } as any);
+      reply = await value.json();
+    } else {
+      reply = await oldXMLHttpRequest(host, formData as any, query);
+    }
   } catch (err) {
     reply = {
       data: null,
