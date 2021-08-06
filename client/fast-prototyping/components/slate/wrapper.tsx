@@ -10,7 +10,7 @@
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React, { useEffect, useState } from "react";
-import { ISlateEditorStateType, ISlateEditorWrapperBaseProps, IToolbarPrescenseElement, SlateEditorWrapperCustomToolbarElement, SlateEditorWrapperCustomToolbarIdentifiedElement } from ".";
+import { IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
 import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
@@ -26,6 +26,7 @@ import { LinkDialog } from "./dialogs/link";
 import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
 import ReactDOM from "react-dom";
+import { countSizeAndWords } from "../../../internal/text";
 
 /**
  * Defining a bunch of styles for the wrapper
@@ -233,6 +234,173 @@ const style = (theme: Theme) => createStyles({
   },
 });
 
+type RichElementFn = () => RichElement;
+
+/**
+ * Refers to toolbar prescence elements that are added
+ */
+export interface IToolbarPrescenseElement {
+  /**
+   * Given icon to use in the toolbar
+   */
+  icon: React.ReactNode;
+  /**
+   * A title to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
+   */
+  title?: string | React.ReactNode;
+  /**
+   * The element to be added
+   */
+  element?: RichElement | RichElementFn;
+  /**
+   * Alternatively an action
+   */
+  onClick?: (defaultAction: () => RichElement) => void;
+  /**
+   * Manually specify whether it's disabled
+   * if not specified it will check whether an element
+   * can be inserted as it assumes it's about the insertion
+   * of the element
+   */
+  disabled?: boolean;
+}
+
+/**
+ * Specifies a input configuration for the ui handler argument
+ * of type select
+ */
+export interface IDrawerUIHandlerElementConfigSelect {
+  type: "select",
+  label: string | React.ReactNode;
+
+  /**
+   * A placeholder to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
+   */
+  placeholder: string | React.ReactNode;
+  options: Array<{ value: string, label: string | React.ReactNode }>;
+}
+
+/**
+ * Specifies an input configuration for the ui handler argument
+ * of type input
+ */
+export interface IDrawerUIHandlerElementConfigInput {
+  type: "input";
+  label: string | React.ReactNode;
+
+  /**
+   * A placeholder to use
+   * if a react node is provided this node will be modified
+   * and added a children as (i18nValue: string) => React.Node
+   * eg. the i18nRead element
+   */
+  placeholder: string | React.ReactNode;
+}
+
+/**
+ * Specifies a input configuration for the ui handler argument
+ * of type boolean, because all ui handlers are strings
+ * this uses the string true or false rather than actual
+ * booleans
+ */
+ export interface IDrawerUIHandlerElementConfigBoolean {
+  type: "boolean",
+  label: string | React.ReactNode;
+}
+
+export interface IDrawerUIHandlerElementConfigCustomProps {
+  value: string;
+  onChange: (value: string) => void;
+  onDelayedChange: (value: string) => void;
+  helpers: IHelperFunctions;
+  state: ISlateEditorStateType;
+}
+
+export interface IDrawerUIHandlerElementConfigCustom {
+  type: "custom";
+  component: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
+}
+
+/**
+ * Specifies a configurator to be added to the UI handled element
+ * that is created to be chosen in the drawer
+ */
+export interface IDrawerConfiguratorElementBase {
+  /**
+   * The ui handler in question
+   */
+  uiHandler?: null | string | string[];
+  /**
+   * The element it should work against, by default
+   * it is the selected one
+   */
+  basis?: "selected" | "block" | "superblock";
+  /**
+   * The relevant argument of the ui handler
+   * if not provided value will be null and change functions wont
+   * work
+   */
+  arg?: string;
+  /**
+   * The way for the input to be specified
+   */
+  input:
+    IDrawerUIHandlerElementConfigSelect |
+    IDrawerUIHandlerElementConfigInput |
+    IDrawerUIHandlerElementConfigBoolean |
+    IDrawerUIHandlerElementConfigCustom;
+}
+
+export interface IDrawerConfiguratorElementSection {
+  /**
+   * The ui handler in question
+   */
+  uiHandler?: string;
+  basis?: "selected" | "block" | "superblock";
+  unblur?: boolean;
+  title: string | React.ReactNode;
+  elements: IDrawerConfiguratorElementBase[];
+}
+
+export type DrawerConfiguratorElement = IDrawerConfiguratorElementBase | IDrawerConfiguratorElementSection;
+
+export type SlateEditorWrapperCustomToolbarIdentifiedElement =
+  "bold" |
+  "italic" |
+  "underline" |
+  "link" |
+  "title" |
+  "bulleted-list" |
+  "numbered-list" |
+  "image" |
+  "video" |
+  "file" |
+  "quote" |
+  "container" |
+  "template-text" |
+  "template-html" |
+  "extras" |
+  "none" |
+  "divider" |
+  "hdivider";
+
+export type SlateEditorWrapperCustomToolbarElementBaseForm =
+  IToolbarPrescenseElement |
+  SlateEditorWrapperCustomToolbarIdentifiedElement;
+
+export type SlateEditorWrapperCustomToolbarElementFnForm = (toolbarProps: any) =>
+  SlateEditorWrapperCustomToolbarElementBaseForm;
+
+export type SlateEditorWrapperCustomToolbarElement =
+  SlateEditorWrapperCustomToolbarElementBaseForm |
+  SlateEditorWrapperCustomToolbarElementFnForm;
+
 /**
  * These are the base props that this wrapper uses, note how we extend the base wrapper props as defined
  * in the slate editor itself, and add the styles for the classes and these i18n info
@@ -255,6 +423,35 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    */
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
   /**
+   * Function that should be specified to assign extra toolbar elements
+   * to be used either by ui handled components and whatnot
+   */
+   toolbarExtras?: IToolbarPrescenseElement[];
+   /**
+    * Function to be used to specify a whole custom toolbar down to the very basics
+    */
+   customToolbar?: SlateEditorWrapperCustomToolbarElement[];
+   /**
+    * Drawer extras for the ui handled types
+    */
+   drawerExtras?: DrawerConfiguratorElement[];
+   /**
+    * Whether to hide the drawer
+    */
+   hideDrawer?: boolean;
+   /**
+    * Whether to hide the tree
+    */
+   hideTree?: boolean;
+   /**
+    * Drawer mode
+    */
+   drawerMode?: "full" | "with-styles" | "simple" | "barebones";
+   /**
+    * The disjointed mode
+    */
+   disjointedMode?: boolean;
+  /**
    * Add a class name to the entire wrapper
    */
   wrapperClassName?: string;
@@ -262,6 +459,10 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    * Add a class name to the container in the wrapper
    */
   wrapperTextEditorClassName?: string;
+  /**
+   * A function to define custom extra children
+   */
+  customExtraChildren?: (characterCount: number, wordCount: number) => React.ReactNode;
 };
 
 /**
@@ -396,7 +597,7 @@ function VDivider(props: RichTextEditorToolbarElementProps) {
 function HDivider(props: RichTextEditorToolbarElementProps) {
   return (
     <>
-      <div className={props.classes.hdividerspacer}/>
+      <div className={props.classes.hdividerspacer} />
       <Divider orientation="horizontal" className={props.classes.hdivider} />
     </>
   );
@@ -729,8 +930,8 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     tabIndex: -1,
     disabled: (
       typeof props.extra.disabled !== "undefined" ?
-      props.extra.disabled :
-      !props.featureSupport.canInsertAnyElement
+        props.extra.disabled :
+        !props.featureSupport.canInsertAnyElement
     ),
     onMouseDown: props.helpers.blockBlur,
     onMouseUp: props.helpers.releaseBlur,
@@ -844,6 +1045,10 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       return null;
     }
 
+    if (this.props.disjointedMode && !this.props.state.currentSelectedElement) {
+      return null;
+    }
+
     let templateTextAmount = 0;
     let templateHTMLAmount = 0;
 
@@ -921,7 +1126,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         this.props.toolbarExtras && this.props.toolbarExtras.length ? "extras" : "none",
       ]
     ).map((v) => {
-      if (typeof(v) === "function") {
+      if (typeof (v) === "function") {
         return v(this.props);
       }
 
@@ -1644,12 +1849,27 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       />
     );
 
+    let extraChildren: React.ReactNode = null;
+    if (this.props.customExtraChildren) {
+      const [characterCount, wordCount] = countSizeAndWords(this.props.state.currentValue);
+      extraChildren = this.props.customExtraChildren(characterCount, wordCount);
+    }
+
     if (this.props.disjointedMode) {
       return (
         <>
           {toolbar}
-          <div className="rich-text">
-            {this.props.children}
+          <div className={
+            (this.props.wrapperClassName ? " " + this.props.wrapperClassName : "")
+          }>
+            <div className={
+              "rich-text " +
+              (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
+              (this.props.state.isFocused ? " focused" : "")
+            }>
+              {this.props.children}
+            </div>
+            {extraChildren}
           </div>
           <WrapperContainer
             {...this.props}
@@ -1684,6 +1904,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           }>
             {this.props.children}
           </div>
+          {extraChildren}
           <WrapperContainer
             {...this.props}
             drawerOpen={this.state.drawerOpen}
@@ -1714,6 +1935,10 @@ function WrapperContainer(props: WrapperContainerProps) {
   useEffect(() => {
     makeReady(true);
   }, []);
+
+  if (props.disjointedMode && !props.state.currentSelectedElement) {
+    return null;
+  }
 
   const toReturn = (
     <div

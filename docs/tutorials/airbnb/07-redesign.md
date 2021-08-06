@@ -1183,15 +1183,17 @@ And now we can use the fragment loader in the place of our `View` component.
         // these are the renderer args that we use in our CMS
         // the same ones
         context: FRAGMENTS.HEADER,
-        toolbarExtras: [
-            buttonToolbarPrescence,
-        ],
-        drawerExtras: [
-            ...buttonOptions,
-        ],
-        // the disjointed mode so that the toolbars and wrappers are fixed
-        // rather than the standard mode where it flows with the page
-        disjointedMode: true,
+        wrapperArgs: {
+            toolbarExtras: [
+                buttonToolbarPrescence,
+            ],
+            drawerExtras: [
+                ...buttonOptions,
+            ],
+            // the disjointed mode so that the toolbars and wrappers are fixed
+            // rather than the standard mode where it flows with the page
+            disjointedMode: true,
+        },
     }}
     onBeforeSubmit={(action, options) => {
         // this means that the fragment loader is adding

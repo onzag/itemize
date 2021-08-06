@@ -26,7 +26,12 @@ import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
 import { Path, Text } from "slate";
 import type { RichElement } from "../../../../internal/text/serializer";
-import { DrawerConfiguratorElement, IDrawerConfiguratorElementBase, IDrawerConfiguratorElementSection, IDrawerUIHandlerElementConfigCustomProps } from "..";
+import {
+  DrawerConfiguratorElement,
+  IDrawerConfiguratorElementBase,
+  IDrawerConfiguratorElementSection,
+  IDrawerUIHandlerElementConfigCustomProps
+} from "../wrapper";
 
 /**
  * The state of the general option selector for the given item

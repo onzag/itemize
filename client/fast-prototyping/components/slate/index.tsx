@@ -171,142 +171,6 @@ export interface ITemplateArg {
   handlerKeepOnBreaks?: boolean;
 }
 
-type RichElementFn = () => RichElement;
-
-/**
- * Refers to toolbar prescence elements that are added
- */
-export interface IToolbarPrescenseElement {
-  /**
-   * Given icon to use in the toolbar
-   */
-  icon: React.ReactNode;
-  /**
-   * A title to use
-   * if a react node is provided this node will be modified
-   * and added a children as (i18nValue: string) => React.Node
-   * eg. the i18nRead element
-   */
-  title?: string | React.ReactNode;
-  /**
-   * The element to be added
-   */
-  element?: RichElement | RichElementFn;
-  /**
-   * Alternatively an action
-   */
-  onClick?: (defaultAction: () => RichElement) => void;
-  /**
-   * Manually specify whether it's disabled
-   * if not specified it will check whether an element
-   * can be inserted as it assumes it's about the insertion
-   * of the element
-   */
-  disabled?: boolean;
-}
-
-/**
- * Specifies a input configuration for the ui handler argument
- * of type select
- */
-export interface IDrawerUIHandlerElementConfigSelect {
-  type: "select",
-  label: string | React.ReactNode;
-
-  /**
-   * A placeholder to use
-   * if a react node is provided this node will be modified
-   * and added a children as (i18nValue: string) => React.Node
-   * eg. the i18nRead element
-   */
-  placeholder: string | React.ReactNode;
-  options: Array<{ value: string, label: string | React.ReactNode }>;
-}
-
-/**
- * Specifies an input configuration for the ui handler argument
- * of type input
- */
-export interface IDrawerUIHandlerElementConfigInput {
-  type: "input";
-  label: string | React.ReactNode;
-
-  /**
-   * A placeholder to use
-   * if a react node is provided this node will be modified
-   * and added a children as (i18nValue: string) => React.Node
-   * eg. the i18nRead element
-   */
-  placeholder: string | React.ReactNode;
-}
-
-/**
- * Specifies a input configuration for the ui handler argument
- * of type boolean, because all ui handlers are strings
- * this uses the string true or false rather than actual
- * booleans
- */
- export interface IDrawerUIHandlerElementConfigBoolean {
-  type: "boolean",
-  label: string | React.ReactNode;
-}
-
-export interface IDrawerUIHandlerElementConfigCustomProps {
-  value: string;
-  onChange: (value: string) => void;
-  onDelayedChange: (value: string) => void;
-  helpers: IHelperFunctions;
-  state: ISlateEditorStateType;
-}
-
-export interface IDrawerUIHandlerElementConfigCustom {
-  type: "custom";
-  component: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
-}
-
-/**
- * Specifies a configurator to be added to the UI handled element
- * that is created to be chosen in the drawer
- */
-export interface IDrawerConfiguratorElementBase {
-  /**
-   * The ui handler in question
-   */
-  uiHandler?: null | string | string[];
-  /**
-   * The element it should work against, by default
-   * it is the selected one
-   */
-  basis?: "selected" | "block" | "superblock";
-  /**
-   * The relevant argument of the ui handler
-   * if not provided value will be null and change functions wont
-   * work
-   */
-  arg?: string;
-  /**
-   * The way for the input to be specified
-   */
-  input:
-    IDrawerUIHandlerElementConfigSelect |
-    IDrawerUIHandlerElementConfigInput |
-    IDrawerUIHandlerElementConfigBoolean |
-    IDrawerUIHandlerElementConfigCustom;
-}
-
-export interface IDrawerConfiguratorElementSection {
-  /**
-   * The ui handler in question
-   */
-  uiHandler?: string;
-  basis?: "selected" | "block" | "superblock";
-  unblur?: boolean;
-  title: string | React.ReactNode;
-  elements: IDrawerConfiguratorElementBase[];
-}
-
-export type DrawerConfiguratorElement = IDrawerConfiguratorElementBase | IDrawerConfiguratorElementSection;
-
 
 /**
  * Represents the available args in the context, a context is a compound
@@ -1078,7 +942,7 @@ export interface ISlateEditorStateType {
    * The current value from the document that is used
    * in the slate rich text editor
    */
-  currentValue: Node[];
+  currentValue: IRootLevelDocument;
 
   /**
    * The current path followed, text path for the current text
@@ -1115,37 +979,6 @@ export interface ISlateEditorStateType {
   */
   currentSelectedSuperBlockElementAnchor: Path;
 }
-
-export type SlateEditorWrapperCustomToolbarIdentifiedElement =
-  "bold" |
-  "italic" |
-  "underline" |
-  "link" |
-  "title" |
-  "bulleted-list" |
-  "numbered-list" |
-  "image" |
-  "video" |
-  "file" |
-  "quote" |
-  "container" |
-  "template-text" |
-  "template-html" |
-  "extras" |
-  "none" |
-  "divider" |
-  "hdivider";
-
-export type SlateEditorWrapperCustomToolbarElementBaseForm =
-  IToolbarPrescenseElement |
-  SlateEditorWrapperCustomToolbarIdentifiedElement;
-
-export type SlateEditorWrapperCustomToolbarElementFnForm = (toolbarProps: any) =>
-  SlateEditorWrapperCustomToolbarElementBaseForm;
-
-export type SlateEditorWrapperCustomToolbarElement =
-  SlateEditorWrapperCustomToolbarElementBaseForm |
-  SlateEditorWrapperCustomToolbarElementFnForm;
 
 /**
  * The base props that every wrapper is going to get
@@ -1194,35 +1027,6 @@ export interface ISlateEditorWrapperBaseProps {
    * as the currentLoadError
    */
   dismissCurrentLoadError: () => void;
-  /**
-   * Function that should be specified to assign extra toolbar elements
-   * to be used either by ui handled components and whatnot
-   */
-  toolbarExtras?: IToolbarPrescenseElement[];
-  /**
-   * Function to be used to specify a whole custom toolbar down to the very basics
-   */
-  customToolbar?: SlateEditorWrapperCustomToolbarElement[];
-  /**
-   * Drawer extras for the ui handled types
-   */
-  drawerExtras?: DrawerConfiguratorElement[];
-  /**
-   * Whether to hide the drawer
-   */
-  hideDrawer?: boolean;
-  /**
-   * Whether to hide the tree
-   */
-  hideTree?: boolean;
-  /**
-   * Drawer mode
-   */
-  drawerMode?: "full" | "with-styles" | "simple" | "barebones";
-  /**
-   * The disjointed mode
-   */
-  disjointedMode?: boolean;
 }
 
 /**
@@ -1346,38 +1150,6 @@ interface ISlateEditorProps {
    * a file id
    */
   onRetrieveDataURI: (fileId: string) => string;
-  /**
-   * Function that should be specified to assign extra toolbar elements
-   * to be used either by ui handled components and whatnot
-   */
-  toolbarExtras?: IToolbarPrescenseElement[];
-  /**
-   * To define a custom toolbar
-   */
-  customToolbar?: SlateEditorWrapperCustomToolbarElement[];
-  /**
-   * Allows to specify extras for the ui handler element types
-   * for being provided configuration within the general settings
-   */
-  drawerExtras?: DrawerConfiguratorElement[];
-  /**
-   * Whether to hide the drawer
-   */
-  hideDrawer?: boolean;
-  /**
-   * Drawer mode
-   */
-  drawerMode?: "full" | "with-styles" | "simple" | "barebones",
-  /**
-   * Whether to hide the tree stucture
-   */
-  hideTree?: boolean;
-  /**
-   * A mode where the drawer and the toolbar are separated and fixed
-   * from the rich text output, which allows to be more like a WYSIWYG editor
-   * with responsive screen functionality and such
-   */
-  disjointedMode?: boolean;
   /**
    * A placeholder to be used to be displayed, it only displays when the value
    * is considered to be the null document
@@ -3000,13 +2772,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextState.currentSelectedElementEachSelectContext !== this.state.currentSelectedElementEachSelectContext ||
       nextState.currentSelectedElementContextSelectContext !== this.state.currentSelectedElementContextSelectContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
-      nextProps.drawerExtras !== this.props.drawerExtras ||
-      nextProps.toolbarExtras !== this.props.toolbarExtras ||
-      nextProps.customToolbar !== this.props.customToolbar ||
-      nextProps.hideDrawer !== this.props.hideDrawer ||
-      nextProps.hideTree !== this.props.hideTree ||
-      nextProps.drawerMode !== this.props.drawerMode ||
-      nextProps.disjointedMode !== this.props.disjointedMode ||
       !equals(this.state.allContainers, nextState.allContainers, { strict: true }) ||
       !equals(this.state.allCustom, nextState.allCustom, { strict: true }) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses, { strict: true }) ||
@@ -5299,7 +5064,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         currentSelectedSuperBlockElement: this.state.currentSelectedSuperBlockElement,
         currentSelectedSuperBlockElementAnchor: this.state.currentSelectedSuperBlockElementAnchor,
         isRichText: this.props.isRichText,
-        currentValue: this.state.internalValue.children as any,
+        currentValue: this.state.internalValue,
         textAnchor: this.state.currentAnchor,
         currentBlockElementAnchor: this.state.currentBlockElementAnchor,
         currentElementAnchor: this.state.currentElementAnchor,
@@ -5322,13 +5087,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
-          toolbarExtras={this.props.toolbarExtras}
-          customToolbar={this.props.customToolbar}
-          drawerExtras={this.props.drawerExtras}
-          hideDrawer={this.props.hideDrawer}
-          hideTree={this.props.hideTree}
-          drawerMode={this.props.drawerMode}
-          disjointedMode={this.props.disjointedMode}
         >
           {children}
         </Wrapper>

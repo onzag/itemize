@@ -231,27 +231,6 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
             ...this.props.args.wrapperArgs,
           }
         }
-        toolbarExtras={
-          this.props.args.toolbarExtras
-        }
-        customToolbar={
-          this.props.args.customToolbar
-        }
-        drawerExtras={
-          this.props.args.drawerExtras
-        }
-        hideDrawer={
-          this.props.args.hideDrawer
-        }
-        drawerMode={
-          this.props.args.drawerMode
-        }
-        hideTree={
-          this.props.args.hideTree
-        }
-        disjointedMode={
-          this.props.args.disjointedMode
-        }
       />
 
     if (this.props.args.disjointedMode) {

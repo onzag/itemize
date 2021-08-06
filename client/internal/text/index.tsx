@@ -539,6 +539,47 @@ export function countSize(root: IRootLevelDocument | RichElement | IText): numbe
 }
 
 /**
+ * Counts the words of the document
+ * @param root 
+ */
+ export function countWords(root: IRootLevelDocument | RichElement | IText): number {
+  if (typeof (root as IText).text === "string") {
+    return (root as IText).text.split(" ").filter((v) => v !== "").length;
+  }
+  const counts = (root as IRootLevelDocument).children.map(countWords);
+  if (counts.length === 0) {
+    return 0;
+  } else if (counts.length === 1) {
+    return counts[0];
+  }
+
+  return counts.reduce((a, b) => a + b);
+}
+
+/**
+ * Counts the size and words of the document
+ * @param root 
+ */
+ export function countSizeAndWords(root: IRootLevelDocument | RichElement | IText): [number, number] {
+  if (typeof (root as IText).text === "string") {
+    return [
+      (root as IText).text.length,
+      (root as IText).text.split(" ").filter((v) => v !== "").length,
+    ];
+  }
+  const results = (root as IRootLevelDocument).children.map(countSizeAndWords);
+  if (results.length === 0) {
+    return [0, 0];
+  } else if (results.length === 1) {
+    return results[0];
+  }
+
+  return results.reduce((a, b) => {
+    return [a[0] + b[0], a[1] + b[1]];
+  });
+}
+
+/**
  * Deserializes an HTML string or DOM element that should have been previously
  * sanitized into an internally used document itemize structure that can be used
  * for analysis or constructing rich text editors
