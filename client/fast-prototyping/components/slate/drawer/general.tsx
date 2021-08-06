@@ -992,7 +992,7 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
   let specificNodeOptions: React.ReactNode = null;
 
   // so we got to get in the type
-  if (!props.state.currentSelectedElement.uiHandler) {
+  if (!props.state.currentSelectedElement.uiHandler && props.drawerMode !== "barebones") {
     switch ((props.state.currentSelectedElement as any).type) {
       case "title":
         specificNodeOptions = <GeneralTitleOptions {...props} />
@@ -1005,7 +1005,8 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
 
   if (
     props.state.currentSelectedSuperBlockElement &&
-    !props.state.currentSelectedSuperBlockElement.uiHandler
+    !props.state.currentSelectedSuperBlockElement.uiHandler &&
+    props.drawerMode !== "barebones"
   ) {
     switch ((props.state.currentSelectedSuperBlockElement as any).type) {
       case "container":
