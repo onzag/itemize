@@ -10,6 +10,7 @@ import { IRootLevelDocument, serialize as oserialize, deserialize as odeserializ
 import { IText } from "./serializer/types/text";
 import { DOMWindow } from "../../../util";
 import { TemplateArgs } from "./serializer/template-args";
+import equals from "deep-equal";
 
 /**
  * Sanitazation standard configuraton
@@ -837,4 +838,54 @@ export function renderTemplateDynamically(
   }
 
   return toReturn;
+}
+
+
+const invalidComparables = [
+  "srcSet",
+  "src",
+  "sizes",
+];
+
+function removeInvalidComparables(elem: RichElement | IRootLevelDocument) {
+  for (let comparable of invalidComparables) {
+    if (elem[comparable]) {
+      elem[comparable] = null;
+    };
+  }
+
+  if (elem.children) {
+    elem.children.forEach(removeInvalidComparables as any);
+  }
+
+  return elem;
+}
+
+/**
+ * compares two text for equivalence
+ * @param text1 
+ * @param text2 
+ */
+ export function checkEquality(text1: string | Node[], text2: string | Node[]) {
+  if (text1 === text2) {
+    return true;
+  }
+
+  if (text1 === null || text2 === null) {
+    return text1 === text2;
+  }
+
+  const document1 = removeInvalidComparables(deserialize(text1));
+  const document2 = removeInvalidComparables(deserialize(text2));
+
+  return equals(document1.children, document2.children);
+}
+
+/**
+ * compares two plain text for equivalence
+ * @param text1 
+ * @param text2 
+ */
+ export function checkEqualityPlain(text1: string, text2: string) {
+  return text1 === text2;
 }

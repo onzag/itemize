@@ -42,6 +42,13 @@ const isDevelopment = process.env.NODE_ENV === "development";
 // TODO cache policy search destruction markers
 // destruct a whole search and its children on logout
 
+// TODO store the current state on submit into the indexed db of an object if
+// CANT_CONNECT is an error code that is given, state storage will be stored
+// for a given last_modified element, or null, if not created
+// add a loadStoredState prop, and onLoadStoredState function
+// this is going to be rather tricky because of the fact the state might contain
+// blobs and files that haven't been stored
+
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {

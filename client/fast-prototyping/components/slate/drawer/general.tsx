@@ -32,6 +32,7 @@ import {
   IDrawerConfiguratorElementSection,
   IDrawerUIHandlerElementConfigCustomProps
 } from "../wrapper";
+import type { ISlateEditorStateType } from "..";
 
 /**
  * The state of the general option selector for the given item
@@ -521,6 +522,7 @@ interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles 
   isSelect: boolean;
   isCustom: boolean;
   isBoolean: boolean;
+  condition?: (state: ISlateEditorStateType) => boolean;
   CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
   options?: Array<{ label: string | React.ReactNode, value: string }>;
 }
@@ -653,6 +655,12 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
    * The render function
    */
   public render() {
+    if (this.props.condition) {
+      if (!this.props.condition(this.props.state)) {
+        return null;
+      }
+    }
+
     if (this.props.isCustom) {
       const CustomComponent = this.props.CustomComponent;
       return (
@@ -896,6 +904,7 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: Mate
     <GeneralUIHandlerOption
       {...props}
       basisState={stateElem}
+      condition={x.condition}
       arg={x.arg}
       label={(x.input as any).label}
       placeholder={(x.input as any).placeholder}

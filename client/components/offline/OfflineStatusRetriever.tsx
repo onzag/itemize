@@ -8,11 +8,15 @@ import React from "react";
 import { DataContext } from "../../internal/providers/appdata-provider";
 import { RemoteListener } from "../../internal/app/remote-listener";
 
+type OfflineStatusCb = (offline: boolean) => React.ReactNode;
+
 /**
  * The props basically takes a children that tells if connected or not
  */
 interface IOfflineStatusRetrieverProps {
-  children: (offline: boolean) => React.ReactNode;
+  children?: React.ReactNode | OfflineStatusCb;
+  onRestoredConnection?: () => void;
+  onLostConnection?: () => void;
 }
 
 /**
@@ -55,10 +59,21 @@ class ActualOfflineStatusRetriever extends
   public shouldComponentUpdate(
     nextProps: IActualOfflineStatusRetrieverProps, nextState: IActualOfflineStatusRetrieverState,
   ) {
+    const isOffline = this.state.canAcceptConclusion ? this.state.offline : false;
+    const willBeOffline = nextState.canAcceptConclusion ? nextState.offline : false;
+
+    if (isOffline !== willBeOffline) {
+      if (willBeOffline) {
+        nextProps.onLostConnection && nextProps.onLostConnection();
+      } else {
+        nextProps.onRestoredConnection && nextProps.onRestoredConnection();
+      }
+    }
+
     // only if the children and the conclusion changes, of both the offline state and whether
     // we can accept such conclusion, we accept it
     return nextProps.children !== this.props.children ||
-      (nextState.offline && nextState.canAcceptConclusion) !== (this.state.offline && this.state.canAcceptConclusion);
+    isOffline !== willBeOffline;
   }
   /**
    * when the mount event happens
@@ -99,7 +114,11 @@ class ActualOfflineStatusRetriever extends
     });
   }
   public render() {
-    return this.props.children(this.state.offline && this.state.canAcceptConclusion);
+    if (typeof this.props.children === "function") {
+      return this.props.children(this.state.canAcceptConclusion ? this.state.offline : false);
+    }
+
+    return this.props.children || null;
   }
 }
 

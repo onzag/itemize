@@ -348,6 +348,10 @@ export interface IDrawerConfiguratorElementBase {
    */
   arg?: string;
   /**
+   * A condition that uses the args as basis on whether this would appear or not
+   */
+  condition?: (state: ISlateEditorStateType) => boolean;
+  /**
    * The way for the input to be specified
    */
   input:
