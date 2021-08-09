@@ -1,6 +1,6 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
@@ -42,13 +42,6 @@ const isDevelopment = process.env.NODE_ENV === "development";
 // TODO cache policy search destruction markers
 // destruct a whole search and its children on logout
 
-// TODO store the current state on submit into the indexed db of an object if
-// CANT_CONNECT is an error code that is given, state storage will be stored
-// for a given last_modified element, or null, if not created
-// add a loadStoredState prop, and onLoadStoredState function
-// this is going to be rather tricky because of the fact the state might contain
-// blobs and files that haven't been stored
-
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
@@ -83,7 +76,7 @@ function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: Item
  * serialized
  * @param state 
  */
-function getSerializableSearchState(state: IItemStateType): IItemStateType {
+function getSerializableState(state: IItemStateType): IItemStateType {
   const newState: IItemStateType = {
     ...state,
     properties: [
@@ -104,7 +97,7 @@ function getSerializableSearchState(state: IItemStateType): IItemStateType {
   newState.includes.forEach((i, index) => {
     newState.includes[index] = {
       ...i,
-      itemState: getSerializableSearchState(i.itemState)
+      itemState: getSerializableState(i.itemState)
     };
   });
 
@@ -295,6 +288,8 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * in case you want that behaviour
    */
   pileSubmit?: boolean | ActionSubmitOptionCb;
+  storeStateIfCantConnect?: boolean;
+  clearStoredStateIfConnected?: boolean;
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
@@ -356,10 +351,32 @@ export interface IPokeElementsType {
   policies: PolicyPathType[];
 }
 
+interface IBasicFns {
+  // to remove the poked status
+  poke: (elements: IPokeElementsType) => void;
+  unpoke: () => void;
+  // makes it so that it reloads the value, the loadValue function
+  // usually is executed on componentDidMount, pass deny cache in order to
+  // do a hard refresh and bypass the cache
+  reload: (denyCache?: boolean) => Promise<IActionResponseWithValue>;
+  // submits the current information, when there's no id, this triggers an
+  // add action, with an id however this trigger edition
+  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  // straightwforward, deletes
+  delete: () => Promise<IBasicActionResponse>;
+  // cleans performs the cleanup of properties and policies
+  clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
+  // performs a search, note that you should be in the searchMode however
+  // since all items are the same it's totally possible to launch a search
+  // in which case you'll just get a searchError you should be in search
+  // mode because there are no endpoints otherwise
+  search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
+}
+
 /**
  * The whole item definition context
  */
-export interface IItemContextType {
+export interface IItemContextType extends IBasicFns {
   // the item definition in question
   idef: ItemDefinition;
   // the state of this item definition that has
@@ -435,22 +452,6 @@ export interface IItemContextType {
   // poked makes it so that every field shows its true state
   // they are poked
   pokedElements: IPokeElementsType;
-  // makes it so that it reloads the value, the loadValue function
-  // usually is executed on componentDidMount, pass deny cache in order to
-  // do a hard refresh and bypass the cache
-  reload: (denyCache?: boolean) => Promise<IActionResponseWithValue>;
-  // submits the current information, when there's no id, this triggers an
-  // add action, with an id however this trigger edition
-  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
-  // straightwforward, deletes
-  delete: () => Promise<IBasicActionResponse>;
-  // cleans performs the cleanup of properties and policies
-  clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
-  // performs a search, note that you should be in the searchMode however
-  // since all items are the same it's totally possible to launch a search
-  // in which case you'll just get a searchError you should be in search
-  // mode because there are no endpoints otherwise
-  search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
   // this is a listener that basically takes a property, and a new value
   // and internal value, whatever is down the line is not expected to do
   // changes directly, but rather call this function, this function will
@@ -493,10 +494,6 @@ export interface IItemContextType {
   dismissDeleted: () => void;
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
-
-  // to remove the poked status
-  poke: (elements: IPokeElementsType) => void;
-  unpoke: () => void;
 
   // the remote listener
   remoteListener: RemoteListener;
@@ -648,6 +645,11 @@ export interface IItemProviderProps {
    */
   longTermCaching?: boolean;
   /**
+   * loads the state from the cache worker if a
+   * stored value is found
+   */
+  loadStateFromCache?: boolean;
+  /**
    * marks the item for destruction as the user logs out
    */
   markForDestructionOnLogout?: boolean;
@@ -686,6 +688,11 @@ export interface IItemProviderProps {
    * it makes the execution slower
    */
   onStateChange?: (state: IItemStateType) => void;
+  /**
+   * On state changes but from the store that is loaded
+   * from a cache worker
+   */
+  onStateLoadedFromStore?: (state: IItemStateType, fns: IBasicFns) => void;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -1177,7 +1184,7 @@ export class ActualItemProvider extends
     }
   }
   // so now we have mounted, what do we do at the start
-  public componentDidMount() {
+  public async componentDidMount() {
     this.isCMounted = true;
     this.mountCbFns.forEach((c) => c());
 
@@ -1217,13 +1224,16 @@ export class ActualItemProvider extends
       this.markForDestruction();
     }
 
-    // and we attempt to load the current value
-    if (!this.props.avoidLoading) {
-      this.loadValue();
-    }
-
     if (window.TESTING && process.env.NODE_ENV === "development") {
       this.mountOrUpdateIdefForTesting();
+    }
+
+    // and we attempt to load the current value
+    if (!this.props.avoidLoading) {
+      await this.loadValue();
+    }
+    if (this.props.loadStateFromCache) {
+      await this.loadStoredState();
     }
   }
 
@@ -1582,6 +1592,13 @@ export class ActualItemProvider extends
     }
 
     if (
+      uniqueIDChanged &&
+      this.props.loadStateFromCache
+    ) {
+      await this.loadStoredState();
+    }
+
+    if (
       // if the automatic search is not setup to just initial
       !this.props.automaticSearchIsOnlyInitial &&
       // if there was previously an automatic search
@@ -1819,6 +1836,47 @@ export class ActualItemProvider extends
       loading: false,
       loaded: true,
     });
+  }
+  public async loadStoredState() {
+    if (CacheWorkerInstance.isSupported) {
+      const storedState = await CacheWorkerInstance.instance.retrieveState(
+        this.props.itemDefinitionQualifiedName,
+        this.props.forId || null,
+        this.props.forVersion || null,
+      );
+
+      if (storedState) {
+        this.props.itemDefinitionInstance.applyState(
+          this.props.forId || null,
+          this.props.forVersion || null,
+          storedState,
+        );
+        this.setState({
+          itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
+            this.props.forId || null,
+            this.props.forVersion || null,
+            !this.props.disableExternalChecks,
+            this.props.itemDefinitionInstance.isInSearchMode() ?
+              getPropertyListForSearchMode(
+                this.props.properties || [],
+                this.props.itemDefinitionInstance.getStandardCounterpart()
+              ) : this.props.properties || [],
+            this.props.includes || {},
+            !this.props.includePolicies,
+          ),
+        }, () => {
+          this.props.onStateLoadedFromStore(storedState, {
+            submit: this.submit,
+            delete: this.delete,
+            reload: this.loadValue,
+            clean: this.clean,
+            poke: this.poke,
+            search: this.search,
+            unpoke: this.unpoke,
+          });
+        });
+      }
+    }
   }
   public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
     const forId = this.props.forId;
@@ -3020,6 +3078,24 @@ export class ActualItemProvider extends
     let recievedId: string = null;
     let receivedVersion: string = null;
     if (error) {
+      if (
+        options.storeStateIfCantConnect &&
+        error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
+        CacheWorkerInstance.isSupported
+      ) {
+        const state = this.props.itemDefinitionInstance.getStateNoExternalChecking(
+          this.props.forId || null,
+          this.props.forVersion || null,
+        );
+        const serializable = getSerializableState(state);
+        CacheWorkerInstance.instance.storeState(
+          this.props.itemDefinitionQualifiedName,
+          this.props.forId || null,
+          this.props.forVersion || null,
+          serializable,
+        );
+      }
+
       if (!this.isUnmounted) {
         this.setState({
           submitError: error,
@@ -3030,6 +3106,17 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "fail");
     } else if (value) {
+      if (
+        options.clearStoredStateIfConnected &&
+        CacheWorkerInstance.isSupported
+      ) {
+        CacheWorkerInstance.instance.deleteState(
+          this.props.itemDefinitionQualifiedName,
+          this.props.forId || null,
+          this.props.forVersion || null,
+        );
+      }
+
       if (!this.isUnmounted) {
         this.setState({
           submitError: null,
@@ -3430,7 +3517,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: getSerializableSearchState(stateOfSearch),
+                  searchIdefState: getSerializableState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged || isReloadSearch,
@@ -3500,7 +3587,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: getSerializableSearchState(stateOfSearch),
+                  searchIdefState: getSerializableState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged,

@@ -111,6 +111,13 @@ export interface ICacheDB extends DBSchema {
     key: string;
     value: ISearchMatchType;
   };
+  /**
+   * Contains stored states
+   */
+  states: {
+    key: string;
+    value: any;
+  };
 }
 
 // Name of the cache in the indexed db database
@@ -118,6 +125,7 @@ export const CACHE_NAME = "ITEMIZE_CACHE";
 // Name of the table
 export const QUERIES_TABLE_NAME = "queries";
 export const SEARCHES_TABLE_NAME = "searches";
+export const STATES_TABLE_NAME = "states";
 
 /**
  * This class represents a worker that works under the hood
@@ -220,12 +228,14 @@ export default class CacheWorker {
             try {
               db.deleteObjectStore(QUERIES_TABLE_NAME);
               db.deleteObjectStore(SEARCHES_TABLE_NAME);
+              db.deleteObjectStore(STATES_TABLE_NAME);
             } catch (err) {
               // No way to know if the store is there
               // so must catch the error
             }
             db.createObjectStore(QUERIES_TABLE_NAME);
             db.createObjectStore(SEARCHES_TABLE_NAME);
+            db.createObjectStore(STATES_TABLE_NAME);
           } catch (err) {
             console.warn(err);
           }
@@ -298,6 +308,95 @@ export default class CacheWorker {
     }
 
     console.log("CACHE SETUP", version);
+  }
+
+  public async storeState(
+    qualifiedName: string,
+    id: string,
+    version: string,
+    value: any,
+  ) {
+    console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return false;
+    }
+
+    // otherwise we build the index indentifier, which is simple
+    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+
+    // and try to save it in the database, notice how we setup the expirarion
+    // date
+    try {
+      await this.db.put(STATES_TABLE_NAME, value, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+
+    return true;
+  }
+
+  public async retrieveState(
+    qualifiedName: string,
+    id: string,
+    version: string,
+  ) {
+    console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return null;
+    }
+
+    // otherwise we build the index indentifier, which is simple
+    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+
+    // and try to save it in the database, notice how we setup the expirarion
+    // date
+    try {
+      return await this.db.get(STATES_TABLE_NAME, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  }
+
+  public async deleteState(
+    qualifiedName: string,
+    id: string,
+    version: string,
+  ) {
+    console.log("REQUESTED TO DELETE STATE FOR", qualifiedName, id, version);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return false;
+    }
+
+    // otherwise we build the index indentifier, which is simple
+    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+
+    // and try to save it in the database, notice how we setup the expirarion
+    // date
+    try {
+      await this.db.delete(STATES_TABLE_NAME, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+
+    return true;
   }
 
   /**

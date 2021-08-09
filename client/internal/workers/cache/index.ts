@@ -5,7 +5,7 @@
  * @module
  */
 
-import { wrap } from "comlink";
+import { wrap, transfer, proxy } from "comlink";
 import CacheWorker from "./cache.worker";
 
 // we need to know in which environemnt we are in order to load
@@ -35,7 +35,12 @@ const instance = supportsCacheWorker ? wrap<CacheWorker>(new Worker(url)) : null
 const CacheWorkerInstance = {
   isSupported: supportsCacheWorker,
   instance,
+  getProxy: (obj: unknown) => {
+    return proxy(obj);
+  },
 };
+
+if (typeof window !== "undefined"){(window as any).CACHE_WORKER = CacheWorkerInstance};
 
 // return it
 export default CacheWorkerInstance;
