@@ -682,7 +682,6 @@ export async function oldXMLHttpRequest(
     const request = new XMLHttpRequest();
     request.open("POST", host + "/graphql");
     request.setRequestHeader('Cache-Control', 'no-cache');
-    request.send(body);
 
     const rejectFn = (ev: any) => {
       reject(new Error(ev.type));
@@ -700,12 +699,14 @@ export async function oldXMLHttpRequest(
       }
     });
 
-    request.addEventListener("progress", (ev) => {
+    request.upload.addEventListener("progress", (ev) => {
       const total = ev.total;
       const loaded = ev.loaded;
   
       query.informProgress({total, loaded});
     });
+
+    request.send(body);
   });
 }
 

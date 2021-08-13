@@ -1467,7 +1467,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
+    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1504,7 +1504,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
+    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1585,7 +1585,7 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, {strict: true}) ?
+    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
       null : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
@@ -1639,7 +1639,7 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
-    const valueDiffers = this.listeners.length && !equals(this.stateValue[mergedID], newValue, {strict: true});
+    const valueDiffers = this.listeners.length && !equals(this.stateValue[mergedID], newValue, { strict: true });
 
     // note that the value is set and never check
     this.stateValue[mergedID] = newActualValue;
@@ -1700,9 +1700,15 @@ export default class PropertyDefinition {
     // two conditions apply, now we need to check if it differs
     if (
       doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
-      this.stateValueHasBeenManuallySet[mergedID]
+      this.stateValueHasBeenManuallySet[mergedID] &&
+      // the type file always gets replaced, otherwise the blob
+      // will be submitted each time, an exception done for the sake
+      // of performance
+      this.getType() !== "file" &&
+      this.getType() !== "files"
     ) {
       const newValue = value;
+
       // The two of them are equal which means the internal value
       // is most likely just the same thing so we won't mess with it
       // as it's not necessary to modify it, even when this is technically a
@@ -1712,7 +1718,29 @@ export default class PropertyDefinition {
         this.stateValueHasBeenManuallySet[mergedID] = false;
       }
     } else {
-      this.stateValue[mergedID] = value;
+      let newValue = value;
+
+      // this is the hacky exception for the files type, in the non differ mode
+      // while for the file type the whole thing is replaced, as it is, just one
+      // file, this will merge the results, keeping the server values as
+      // priority
+      if (
+        this.getType() === "files" &&
+        doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+        currentValue &&
+        newValue
+      ) {
+        newValue = (currentValue as IGQLFile[]).map((v) => {
+          const serverProvidedValue = (value as IGQLFile[]).find((v2) => v2.id === v.id);
+          if (serverProvidedValue) {
+            return serverProvidedValue;
+          }
+
+          return v;
+        });
+      }
+
+      this.stateValue[mergedID] = newValue;
       this.stateValueModified[mergedID] = modifiedState;
       this.stateInternalValue[mergedID] = null;
       this.stateValueHasBeenManuallySet[mergedID] = false;

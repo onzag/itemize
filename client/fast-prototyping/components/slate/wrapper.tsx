@@ -10,7 +10,7 @@
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React, { useEffect, useState } from "react";
-import { IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
+import { IAccessibleFeatureSupportOptions, IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
 import {
   IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
   AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
@@ -89,6 +89,12 @@ const style = (theme: Theme) => createStyles({
   },
   badge: {
     transform: "scale(1) translate(0%, 0%)",
+  },
+  badgeFastKey: {
+    transform: "scale(1) translate(0%, 0%)",
+    backgroundColor: "#fffde7",
+    color: "#212121",
+    borderColor: "#f9a825",
   },
   badgeDisabled: {
     transform: "scale(1) translate(0%, 0%)",
@@ -266,6 +272,10 @@ export interface IToolbarPrescenseElement {
    * of the element
    */
   disabled?: boolean;
+  /**
+   * The fast key value, if any
+   */
+  fastKey?: string;
 }
 
 /**
@@ -275,6 +285,7 @@ export interface IToolbarPrescenseElement {
 export interface IDrawerUIHandlerElementConfigSelect {
   type: "select",
   label: string | React.ReactNode;
+  fastKey?: string;
 
   /**
    * A placeholder to use
@@ -293,6 +304,7 @@ export interface IDrawerUIHandlerElementConfigSelect {
 export interface IDrawerUIHandlerElementConfigInput {
   type: "input";
   label: string | React.ReactNode;
+  fastKey?: string;
 
   /**
    * A placeholder to use
@@ -309,9 +321,10 @@ export interface IDrawerUIHandlerElementConfigInput {
  * this uses the string true or false rather than actual
  * booleans
  */
- export interface IDrawerUIHandlerElementConfigBoolean {
+export interface IDrawerUIHandlerElementConfigBoolean {
   type: "boolean",
   label: string | React.ReactNode;
+  fastKey?: string;
 }
 
 export interface IDrawerUIHandlerElementConfigCustomProps {
@@ -324,6 +337,7 @@ export interface IDrawerUIHandlerElementConfigCustomProps {
 
 export interface IDrawerUIHandlerElementConfigCustom {
   type: "custom";
+  fastKey?: string;
   component: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
 }
 
@@ -355,10 +369,10 @@ export interface IDrawerConfiguratorElementBase {
    * The way for the input to be specified
    */
   input:
-    IDrawerUIHandlerElementConfigSelect |
-    IDrawerUIHandlerElementConfigInput |
-    IDrawerUIHandlerElementConfigBoolean |
-    IDrawerUIHandlerElementConfigCustom;
+  IDrawerUIHandlerElementConfigSelect |
+  IDrawerUIHandlerElementConfigInput |
+  IDrawerUIHandlerElementConfigBoolean |
+  IDrawerUIHandlerElementConfigCustom;
 }
 
 export interface IDrawerConfiguratorElementSection {
@@ -430,31 +444,31 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    * Function that should be specified to assign extra toolbar elements
    * to be used either by ui handled components and whatnot
    */
-   toolbarExtras?: IToolbarPrescenseElement[];
-   /**
-    * Function to be used to specify a whole custom toolbar down to the very basics
-    */
-   customToolbar?: SlateEditorWrapperCustomToolbarElement[];
-   /**
-    * Drawer extras for the ui handled types
-    */
-   drawerExtras?: DrawerConfiguratorElement[];
-   /**
-    * Whether to hide the drawer
-    */
-   hideDrawer?: boolean;
-   /**
-    * Whether to hide the tree
-    */
-   hideTree?: boolean;
-   /**
-    * Drawer mode
-    */
-   drawerMode?: "full" | "with-styles" | "simple" | "barebones";
-   /**
-    * The disjointed mode
-    */
-   disjointedMode?: boolean;
+  toolbarExtras?: IToolbarPrescenseElement[];
+  /**
+   * Function to be used to specify a whole custom toolbar down to the very basics
+   */
+  customToolbar?: SlateEditorWrapperCustomToolbarElement[];
+  /**
+   * Drawer extras for the ui handled types
+   */
+  drawerExtras?: DrawerConfiguratorElement[];
+  /**
+   * Whether to hide the drawer
+   */
+  hideDrawer?: boolean;
+  /**
+   * Whether to hide the tree
+   */
+  hideTree?: boolean;
+  /**
+   * Drawer mode
+   */
+  drawerMode?: "full" | "with-styles" | "simple" | "barebones";
+  /**
+   * The disjointed mode
+   */
+  disjointedMode?: boolean;
   /**
    * Add a class name to the entire wrapper
    */
@@ -480,6 +494,17 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    * a lot of functionality to edit the currently selected element
    */
   drawerOpen: boolean;
+
+  /**
+   * Whether the alt key is pressed right now
+   * and it should show the effects
+   */
+  altKey: boolean;
+
+  /**
+   * Whether the shift key is pressed right now
+   */
+  shiftKey: boolean;
 
   /**
    * The current state
@@ -542,10 +567,28 @@ interface RichTextEditorToolbarState {
   isReady: boolean;
 }
 
-interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps { };
+interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps {
+  fastKey: string;
+};
+
+function elementBadgeReturn(props: RichTextEditorToolbarElementProps, element: React.ReactNode, fastKeyOverride?: string): any {
+  if (props.altKey && !props.shiftKey && (fastKeyOverride || props.fastKey)) {
+    return (
+      <Badge
+        badgeContent={fastKeyOverride || props.fastKey}
+        color="primary"
+        classes={{ badge: props.classes.badgeFastKey }}
+      >
+        {element}
+      </Badge>
+    );
+  } else {
+    return element;
+  }
+}
 
 function Bold(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatBoldLabel}
@@ -554,14 +597,17 @@ function Bold(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleBold}
+      data-fastkey={props.fastKey}
     >
       <FormatBoldIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Italic(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatItalicLabel}
@@ -570,14 +616,17 @@ function Italic(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleItalic}
+      data-fastkey={props.fastKey}
     >
       <FormatItalicIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Underline(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatUnderlineLabel}
@@ -586,10 +635,13 @@ function Underline(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleUnderline}
+      data-fastkey={props.fastKey}
     >
       <FormatUnderlinedIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
@@ -648,10 +700,15 @@ function Link(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestLink}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <LinkIcon />
     </IconButton>
   );
+
+  if (props.altKey && props.fastKey) {
+    return elementBadgeReturn(props, linkBaseComponent);
+  }
 
   if (props.featureSupport.supportsLinks && templateLinkAmount && props.isReady) {
     linkBaseComponent = <Badge
@@ -665,7 +722,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
 }
 
 function Title(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatTitleLabel}
@@ -674,14 +731,17 @@ function Title(props: RichTextEditorToolbarElementProps) {
       onClick={props.helpers.toggleTitle.bind(null, "h1", null)}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <TitleIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Quote(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatQuoteLabel}
@@ -690,10 +750,13 @@ function Quote(props: RichTextEditorToolbarElementProps) {
       onClick={props.helpers.toggleQuote.bind(null, null)}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <FormatQuoteIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 
@@ -703,7 +766,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
     currentSuperBlockElement = props.state.currentSelectedElement;
   }
 
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatListNumberedLabel}
@@ -715,10 +778,13 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
       onClick={props.helpers.toggleList.bind(null, "numbered", null)}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <FormatListNumberedIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
@@ -727,7 +793,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
     currentSuperBlockElement = props.state.currentSelectedElement;
   }
 
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatListBulletedLabel}
@@ -739,14 +805,17 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
       onClick={props.helpers.toggleList.bind(null, "bulleted", null)}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <FormatListBulletedIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Image(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddImageLabel}
@@ -754,14 +823,17 @@ function Image(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestImage}
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <InsertPhotoIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Video(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddVideoLabel}
@@ -769,14 +841,17 @@ function Video(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onClick={props.requestVideo}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <VideoLibraryIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function File(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddFileLabel}
@@ -784,14 +859,17 @@ function File(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onClick={props.requestFile}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <AttachFileIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function Container(props: RichTextEditorToolbarElementProps) {
-  return (
+  const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddContainerLabel}
@@ -799,10 +877,13 @@ function Container(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onClick={props.insertContainer}
       onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
     >
       <CheckBoxOutlineBlankIcon />
     </IconButton>
   );
+
+  return elementBadgeReturn(props, element);
 }
 
 function TemplateText(props: RichTextEditorToolbarElementProps) {
@@ -841,22 +922,31 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     });
   }
 
+  const element = (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddTemplateText}
+      disabled={!props.state.currentSelectedElement}
+      onMouseDown={props.helpers.blockBlur}
+      onClick={props.requestTemplateText}
+      onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
+    >
+      <TextFieldsIcon />
+    </IconButton>
+  );
+
+  if (props.fastKey && props.altKey) {
+    return elementBadgeReturn(props, element);
+  }
+
   return (
     <Badge
       badgeContent={templateTextAmount}
       color="secondary"
       classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
     >
-      <IconButton
-        tabIndex={-1}
-        title={props.i18nRichInfo.formatAddTemplateText}
-        disabled={!props.state.currentSelectedElement}
-        onMouseDown={props.helpers.blockBlur}
-        onClick={props.requestTemplateText}
-        onMouseUp={props.helpers.releaseBlur}
-      >
-        <TextFieldsIcon />
-      </IconButton>
+      {element}
     </Badge>
   );
 }
@@ -900,22 +990,31 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     });
   }
 
+  const element = (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddTemplateHTML}
+      disabled={!props.featureSupport.canInsertContainer}
+      onMouseDown={props.helpers.blockBlur}
+      onClick={props.requestTemplateHTML}
+      onMouseUp={props.helpers.releaseBlur}
+      data-fastkey={props.fastKey}
+    >
+      <CodeIcon />
+    </IconButton>
+  );
+
+  if (props.fastKey && props.altKey) {
+    return elementBadgeReturn(props, element);
+  }
+
   return (
     <Badge
       badgeContent={templateHTMLAmount}
       color="secondary"
       classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
     >
-      <IconButton
-        tabIndex={-1}
-        title={props.i18nRichInfo.formatAddTemplateHTML}
-        disabled={!props.featureSupport.canInsertContainer}
-        onMouseDown={props.helpers.blockBlur}
-        onClick={props.requestTemplateHTML}
-        onMouseUp={props.helpers.releaseBlur}
-      >
-        <CodeIcon />
-      </IconButton>
+      {element}
     </Badge>
   );
 }
@@ -941,11 +1040,14 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     onMouseUp: props.helpers.releaseBlur,
     onClick: props.extra.onClick ? props.extra.onClick.bind(null, defaultAction) : defaultAction,
   }
+
+  let returnNode: React.ReactNode;
   if (typeof props.extra.title === "string" || !props.extra.title) {
-    return (
+    returnNode = (
       <IconButton
         {...basicProps}
         title={props.extra.title as string}
+        data-fastkey={props.extra.fastKey}
       >
         {props.extra.icon}
       </IconButton>
@@ -957,13 +1059,20 @@ function ToolbarExtra(props: IToolbarExtraProps) {
         <IconButton
           {...basicProps}
           title={i18nTitle}
+          data-fastkey={props.extra.fastKey}
         >
           {props.extra.icon}
         </IconButton>
       )
     });
 
-    return elementCloned;
+    returnNode = elementCloned;
+  }
+
+  if (props.altKey && props.extra.fastKey) {
+    return elementBadgeReturn(props, returnNode, props.extra.fastKey);
+  } else {
+    return returnNode;
   }
 }
 
@@ -971,7 +1080,7 @@ function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
   if (props.toolbarExtras && props.toolbarExtras.length) {
     const toolbarExtras = props.toolbarExtras.map((x, index) => {
       return (
-        <ToolbarExtra {...props} extra={x} key={index} />
+        <ToolbarExtra {...props} extra={x} key={index} fastKey={null} />
       );
     });
 
@@ -1008,6 +1117,27 @@ const toolbarRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, 
   link: Link,
   quote: Quote,
   video: Video,
+}
+
+const toolbarFastKeyRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, string> = {
+  none: null,
+  italic: "i",
+  bold: "b",
+  underline: "u",
+  "bulleted-list": "d",
+  "numbered-list": "n",
+  "template-html": "h",
+  "template-text": "j",
+  title: "t",
+  container: "c",
+  file: "f",
+  image: "p",
+  link: "l",
+  quote: "q",
+  video: "v",
+  extras: null,
+  divider: null,
+  hdivider: null,
 }
 
 /**
@@ -1137,6 +1267,23 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       return v;
     });
 
+    let drawerButton = (
+      this.props.shouldHaveDrawer() ?
+        <IconButton
+          tabIndex={-1}
+          onMouseDown={this.props.helpers.blockBlur}
+          onClick={this.props.toggleDrawer}
+          onMouseUp={this.props.helpers.releaseBlur}
+        >
+          {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
+        </IconButton> :
+        null
+    );
+
+    if (this.props.altKey) {
+      drawerButton = elementBadgeReturn(this.props as any, drawerButton, this.props.drawerOpen ? "↑" : "↓");
+    }
+
     // now we can create the component itself
     // there is not much to say on how this all works
     const toReturn = (
@@ -1157,28 +1304,28 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
             if (typeof ele === "string") {
               const Element = toolbarRegistry[ele];
               return (
-                <Element {...this.props} isReady={this.state.isReady} key={index} />
+                <Element
+                  {...this.props}
+                  isReady={this.state.isReady}
+                  key={index}
+                  fastKey={toolbarFastKeyRegistry[ele]}
+                />
               );
             } else {
               const extraValue = typeof ele === "function" ? ele(this.props) : ele;
               return (
-                <ToolbarExtra {...this.props} isReady={this.state.isReady} key={index} extra={extraValue as IToolbarPrescenseElement} />
+                <ToolbarExtra
+                  {...this.props}
+                  isReady={this.state.isReady}
+                  key={index}
+                  extra={extraValue as IToolbarPrescenseElement}
+                  fastKey={null}
+                />
               );
             }
           })}
           <div className={this.props.classes.moreOptionsSpacer} />
-          {
-            this.props.shouldHaveDrawer() ?
-              <IconButton
-                tabIndex={-1}
-                onMouseDown={this.props.helpers.blockBlur}
-                onClick={this.props.toggleDrawer}
-                onMouseUp={this.props.helpers.releaseBlur}
-              >
-                {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
-              </IconButton> :
-              null
-          }
+          {drawerButton}
         </Toolbar>
       </AppBar>
     );
@@ -1246,6 +1393,12 @@ export interface MaterialUISlateWrapperState {
    * before that happened
    */
   elementThatWasCurrentBeforeLosingFocus: RichElement;
+
+  /**
+   * Whether the alt key is currently pressed
+   */
+  altKey: boolean;
+  shiftKey: boolean;
 }
 
 /**
@@ -1305,6 +1458,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       drawerOpen: false,
       toolbarHeight: 0,
       noAnimate: true,
+      altKey: false,
+      shiftKey: false,
     }
 
     // create the refs
@@ -1335,6 +1490,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.closeDialogTemplateHTML = this.closeDialogTemplateHTML.bind(this);
     this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
+    this.keyDownListener = this.keyDownListener.bind(this);
+    this.keyUpListener = this.keyUpListener.bind(this);
   }
 
   public onHeightChange(newHeight: number) {
@@ -1376,14 +1533,61 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
 
     document.body.addEventListener("mousedown", this.selectiveHardBlur);
     document.body.addEventListener("touchstart", this.selectiveHardBlur);
+    document.body.addEventListener("keyup", this.keyUpListener);
+    document.body.addEventListener("keydown", this.keyDownListener);
   }
 
   public componentWillUnmount() {
     document.body.removeEventListener("mousedown", this.selectiveHardBlur);
     document.body.removeEventListener("touchstart", this.selectiveHardBlur);
+    document.body.removeEventListener("keyup", this.keyUpListener);
+    document.body.removeEventListener("keydown", this.keyDownListener);
   }
 
-  public selectiveHardBlur(e: MouseEvent) {
+  public keyDownListener(e: KeyboardEvent) {
+    if (this.props.state.currentSelectedElement) {
+      if (e.key === "Alt") {
+        this.setState({
+          altKey: true,
+        });
+      } else if (e.key === "Shift") {
+        this.setState({
+          shiftKey: true,
+        });
+      }
+    }
+
+    if (this.state.altKey) {
+      if (
+        !this.state.shiftKey &&
+        ((e.key === "ArrowUp" && this.state.drawerOpen) ||
+        (e.key === "ArrowDown" && !this.state.drawerOpen))
+      ) {
+        this.toggleDrawer();
+      } else {
+        const fastkeySelector = (this.state.shiftKey ? "s" : "") + "fastkey";
+        const toolbarElementMatching = document.querySelector("[data-" + fastkeySelector + "=\"" + e.key + "\"]");
+        if (toolbarElementMatching instanceof HTMLElement) {
+          toolbarElementMatching.click();
+        }
+      }
+    }
+  }
+
+  public keyUpListener(e: KeyboardEvent) {
+    if (e.key === "Tab") {
+      this.selectiveHardBlur(e);
+    }
+
+    if (this.state.altKey || this.state.shiftKey) {
+      this.setState({
+        altKey: false,
+        shiftKey: false,
+      });
+    }
+  }
+
+  public selectiveHardBlur(e: MouseEvent | KeyboardEvent) {
     if (this.props.state.currentSelectedElement) {
       if ((e.target as any).parentElement) {
         if (!this.isParentedBySlateOrUnblurred(e.target as any)) {
@@ -1839,6 +2043,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
+        altKey={this.state.altKey}
+        shiftKey={this.state.shiftKey}
         onHeightChange={this.onHeightChange}
         requestImage={this.requestImage}
         requestFile={this.requestFile}

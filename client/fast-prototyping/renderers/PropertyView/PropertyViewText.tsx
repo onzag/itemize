@@ -144,6 +144,7 @@ function lazyloaderExecute(element: HTMLElement) {
  */
 interface IPropertyViewRichTextViewerProps {
   children?: string;
+  className?: string;
 }
 
 /**
@@ -320,7 +321,11 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public render() {
     return (
-      <div className="rich-text" ref={this.divref} dangerouslySetInnerHTML={{ __html: this.state.html }} />
+      <div
+        className={"rich-text"  + (this.props.className ? " " + this.props.className : "")}
+        ref={this.divref}
+        dangerouslySetInnerHTML={{ __html: this.state.html }}
+      />
     );
   }
 }
@@ -347,7 +352,7 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   }
   public render() {
     const deserializedValue = deserialize(this.props.children);
-    return <div className="rich-text">
+    return <div className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
       {renderTemplateDynamically(deserializedValue, this.props.templateArgs)}
     </div>;
   }
@@ -378,6 +383,7 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
     if (props.args.makeTemplate) {
       return (
         <TemplatedPropertyViewRichTextRenderer
+          className={props.args.className}
           templateArgs={props.args.templateArgs}
         >
           {props.currentValue}
@@ -385,14 +391,14 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
       );
     } else {
       return (
-        <PropertyViewRichTextViewer>
+        <PropertyViewRichTextViewer className={props.args.className}>
           {props.currentValue}
         </PropertyViewRichTextViewer>
       );
     }
   } else if (props.subtype === "plain") {
     return (
-      <div className="plain-text">
+      <div className={"plain-text" + (props.args.className ? " " + props.args.className : "")}>
         {props.currentValue}
       </div>
     );

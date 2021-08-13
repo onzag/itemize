@@ -127,6 +127,9 @@ export interface ILoadCompletedPayload extends IActionResponseWithValue {
 export interface IActionResponseWithId extends IBasicActionResponse {
   id: string;
   version: string;
+  storedState: boolean;
+  deletedState: boolean;
+  cancelled: boolean;
 }
 
 /**
@@ -2529,6 +2532,9 @@ export class ActualItemProvider extends
         id: null,
         version: null,
         error: emulatedError,
+        storedState: false,
+        deletedState: false,
+        cancelled: false,
       };
     } else if (withSearchResults) {
       return {
@@ -2850,7 +2856,14 @@ export class ActualItemProvider extends
         // we must not execute, we have been cancelled
         if (this.activeSubmitPromiseAwaiter !== id) {
           // cancelled
-          return null;
+          return {
+            id: originalOptions.submitForId !== "undefined" ? options.submitForId : this.props.forId,
+            version: originalOptions.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion,
+            cancelled: true,
+            deletedState: false,
+            storedState: false,
+            error: null,
+          };
         }
 
         this.activeSubmitPromiseAwaiter = null;
@@ -3077,6 +3090,8 @@ export class ActualItemProvider extends
 
     let recievedId: string = null;
     let receivedVersion: string = null;
+    let storedState: boolean = false;
+    let deletedState: boolean = false;
     if (error) {
       if (
         options.storeStateIfCantConnect &&
@@ -3088,7 +3103,7 @@ export class ActualItemProvider extends
           this.props.forVersion || null,
         );
         const serializable = getSerializableState(state);
-        CacheWorkerInstance.instance.storeState(
+        storedState = await CacheWorkerInstance.instance.storeState(
           this.props.itemDefinitionQualifiedName,
           this.props.forId || null,
           this.props.forVersion || null,
@@ -3110,7 +3125,7 @@ export class ActualItemProvider extends
         options.clearStoredStateIfConnected &&
         CacheWorkerInstance.isSupported
       ) {
-        CacheWorkerInstance.instance.deleteState(
+        deletedState = await CacheWorkerInstance.instance.deleteState(
           this.props.itemDefinitionQualifiedName,
           this.props.forId || null,
           this.props.forVersion || null,
@@ -3154,6 +3169,9 @@ export class ActualItemProvider extends
       id: recievedId,
       version: receivedVersion || null,
       error,
+      storedState,
+      deletedState,
+      cancelled: false,
     };
     this.props.onSubmit && this.props.onSubmit(result);
 

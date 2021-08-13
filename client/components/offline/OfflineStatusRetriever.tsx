@@ -42,6 +42,7 @@ const TIME_WHEN_SRC_LOADED = (new Date()).getTime();
  */
 class ActualOfflineStatusRetriever extends
   React.Component<IActualOfflineStatusRetrieverProps, IActualOfflineStatusRetrieverState> {
+  private isUnmounted: boolean = false;
   constructor(props: IActualOfflineStatusRetrieverProps) {
     super(props);
 
@@ -96,15 +97,18 @@ class ActualOfflineStatusRetriever extends
       // it is connected, and we don't want offline status retriever to show
       // when the app is online, we wait 1 second to show
       setTimeout(() => {
-        this.setState({
-          canAcceptConclusion: true,
-        });
+        if (!this.isUnmounted) {
+          this.setState({
+            canAcceptConclusion: true,
+          });
+        }
       }, 1000);
     }
     // and add the listener to listen for changes
     this.props.remoteListener.addConnectStatusListener(this.onConnectionStatusChange);
   }
   public componentWillUnmount() {
+    this.isUnmounted = true;
     // remove the listener
     this.props.remoteListener.removeConnectStatusListener(this.onConnectionStatusChange);
   }
