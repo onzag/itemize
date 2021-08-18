@@ -92,11 +92,11 @@ export class DatabaseConnection {
    * as initial argument as they will not be used
    * @returns a promise of a query result
    */
-  async query(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<QueryResult> {
+  async query(what: string | QueryBuilder, bindings?: BasicBindingType[], useHoles?: boolean): Promise<QueryResult> {
     let queryValue = typeof what === "string" ? what : what.compile();
     const queryBindings = (typeof what === "string" ? bindings : what.getBindings()) || [];
 
-    if (typeof what !== "string") {
+    if (typeof what !== "string" || useHoles) {
       const splittedValue = queryValue.split("?");
 
       let holes: number = 0;
@@ -153,8 +153,8 @@ export class DatabaseConnection {
    * as initial argument as they will not be used
    * @returns a promise of a list of rows
    */
-  async queryRows(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<any[]> {
-    return (await this.query(what, bindings)).rows;
+  async queryRows(what: string | QueryBuilder, bindings?: BasicBindingType[], useHoles?: boolean): Promise<any[]> {
+    return (await this.query(what, bindings, useHoles)).rows;
   }
 
   /**
@@ -164,8 +164,8 @@ export class DatabaseConnection {
    * as initial argument as they will not be used
    * @returns a promise of a single row
    */
-  async queryFirst(what: string | QueryBuilder, bindings?: BasicBindingType[]): Promise<any> {
-    return (await this.query(what, bindings)).rows[0] || null;
+  async queryFirst(what: string | QueryBuilder, bindings?: BasicBindingType[], useHoles?: boolean): Promise<any> {
+    return (await this.query(what, bindings, useHoles)).rows[0] || null;
   }
 
   /**

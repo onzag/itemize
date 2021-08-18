@@ -313,9 +313,16 @@ export function EntryViewReadSet(
 
                       // if we are talking a meta property
                       if (isMetaProperty) {
-                        // the grapqhl value we get
-                        let gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
-                          itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
+                        let gqlValue: any;
+                        if (actualId === "id") {
+                          gqlValue = itemContextualValue.forId;
+                        } else if (actualId === "version") {
+                          gqlValue = itemContextualValue.forVersion;
+                        } else {
+                          gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
+                           itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
+                        }
+
                         // if it's undefined we give null
                         if (typeof gqlValue === "undefined") {
                           gqlValue = null;

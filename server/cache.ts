@@ -20,7 +20,7 @@ import Root from "../base/Root";
 import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
-import { IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
+import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
 import { IServerDataType, IAppDataType } from ".";
@@ -286,6 +286,41 @@ export class Cache {
       );
       this.listener.triggerParentedSearchListeners(
         moduleBasedParentedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+    }
+
+    if (parent && createdBy) {
+      const itemDefinitionBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
+        qualifiedPathName: idefQualifiedPathName,
+        createdBy: createdBy,
+        parentId: parent.id,
+        parentVersion: parent.version || null,
+        parentType: parent.type,
+        newRecords: location === "new" ? newRecordArr : [],
+        lostRecords: location === "lost" ? newRecordArr : [],
+        modifiedRecords: location === "modified" ? newRecordArr : [],
+        newLastModified: record.last_modified,
+      };
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented and owned active searches (item definition)",
+        itemDefinitionBasedOwnedParentedEvent,
+      );
+      this.listener.triggerOwnedParentedSearchListeners(
+        itemDefinitionBasedOwnedParentedEvent,
+        null, // TODO add the listener uuid, maybe?
+      );
+
+      const moduleBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
+        ...itemDefinitionBasedOwnedParentedEvent,
+        qualifiedPathName: modQualifiedPathName,
+      };
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented and owned active searches (module)",
+        moduleBasedOwnedParentedEvent,
+      );
+      this.listener.triggerOwnedParentedSearchListeners(
+        moduleBasedOwnedParentedEvent,
         null, // TODO add the listener uuid, maybe?
       );
     }

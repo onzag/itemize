@@ -7,7 +7,7 @@
  */
 
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
+import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
@@ -301,6 +301,7 @@ export class ItemizeRawDB {
     // because we have both parented and owned events, we will start collecting them
     const collectedOwned: { [key: string]: IOwnedSearchRecordsEvent } = {};
     const collectedParented: { [key: string]: IParentedSearchRecordsEvent } = {};
+    const collectedOwnedParented: { [key: string]: IOwnedParentedSearchRecordsEvent } = {};
 
     // we will loop on the changes
     processedChanges.forEach((c) => {
@@ -391,6 +392,55 @@ export class ItemizeRawDB {
         collectedParented[parentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
         collectedParented[parentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
       }
+
+      // now for parenting, if we have a parent
+      if (c.row.parent_id && c.row.created_by !== UNSPECIFIED_OWNER) {
+        // equally we build the cache identifiers for the parented searches both by module and by item
+        const ownedParentedMergedIndexIdentifierOnItem = "OWNED_PARENTED_SEARCH." + c.itemQualifiedPathName + "." + c.row.created_by + "." +
+          c.row.parent_id + "." + c.row.parent_version + "." + c.row.parent_type;
+        const ownedParentedMergedIndexIdentifierOnModule = "OWNED_PARENTED_SEARCH." + c.moduleQualifiedPathName + "." +
+          c.row.created_by + "." + c.row.parent_type + "." + c.row.parent_id + "." + (c.row.parent_version || "");
+
+        // and equally create the collection
+        if (!collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem]) {
+          collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem] = {
+            parentId: c.row.parent_id,
+            createdBy: c.row.created_by,
+            parentType: c.row.parent_type,
+            parentVersion: c.row.parent_version || null,
+            qualifiedPathName: c.itemQualifiedPathName,
+            newRecords: [],
+            lostRecords: [],
+            modifiedRecords: [],
+            newLastModified: null,
+          }
+        }
+        if (!collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule]) {
+          collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule] = {
+            parentId: c.row.parent_id,
+            createdBy: c.row.created_by,
+            parentType: c.row.parent_type,
+            parentVersion: c.row.parent_version || null,
+            qualifiedPathName: c.moduleQualifiedPathName,
+            newRecords: [],
+            lostRecords: [],
+            modifiedRecords: [],
+            newLastModified: null,
+          }
+        }
+
+        // this is our record
+        const record = {
+          id: c.row.id,
+          last_modified: c.lastModified,
+          type: c.row.type,
+          version: c.row.version || null,
+        };
+
+        // and we add it to the parented list
+        collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
+        collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
+      }
     });
 
     // now we can start emitting these events, first with the owned ones
@@ -422,6 +472,23 @@ export class ItemizeRawDB {
         serverInstanceGroupId: null,
         source: "global",
         type: PARENTED_SEARCH_RECORDS_EVENT,
+      };
+
+      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    });
+
+    // now with the parented ones
+    Object.keys(collectedOwnedParented).forEach((mergedIndexIdentifier) => {
+      // grab the event
+      const ownedParentedEvent = collectedOwnedParented[mergedIndexIdentifier];
+      // we set our last modified date now from the records
+      ownedParentedEvent.newLastModified = findLastRecordLastModifiedDate(ownedParentedEvent.newRecords, ownedParentedEvent.modifiedRecords, ownedParentedEvent.lostRecords);
+
+      const redisEvent: IRedisEvent = {
+        event: ownedParentedEvent,
+        serverInstanceGroupId: null,
+        source: "global",
+        type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
       };
 
       this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));

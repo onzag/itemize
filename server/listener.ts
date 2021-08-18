@@ -50,6 +50,17 @@ import {
   IErrorEvent,
   KICKED_EVENT,
   IRedisEvent,
+  OwnedParentedSearchRegisterRequestSchema,
+  OwnedParentedSearchFeedbackRequestSchema,
+  OwnedParentedSearchUnregisterRequestSchema,
+  OWNED_PARENTED_SEARCH_REGISTER_REQUEST,
+  IOwnedParentedSearchRegisterRequest,
+  OWNED_PARENTED_SEARCH_FEEDBACK_REQUEST,
+  IOwnedParentedSearchUnregisterRequest,
+  IOwnedParentedSearchFeedbackRequest,
+  IOwnedParentedSearchRecordsEvent,
+  OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+  OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -84,6 +95,9 @@ const checkOwnedSearchRegisterRequest =
 const checkParentedSearchRegisterRequest =
   ajv.compile(ParentedSearchRegisterRequestSchema);
 
+const checkOwnedParentedSearchRegisterRequest =
+  ajv.compile(OwnedParentedSearchRegisterRequestSchema);
+
 const checkIdentifyRequest =
   ajv.compile(IdentifyRequestSchema);
 
@@ -96,6 +110,9 @@ const checkOwnedSearchFeedbackRequest =
 const checkParentedSearchFeedbackRequest =
   ajv.compile(ParentedSearchFeedbackRequestSchema);
 
+const checkOwnedParentedSearchFeedbackRequest =
+  ajv.compile(OwnedParentedSearchFeedbackRequestSchema);
+
 const checkUnregisterRequest =
   ajv.compile(UnregisterRequestSchema);
 
@@ -104,6 +121,9 @@ const checkOwnedSearchUnregisterRequest =
 
 const checkParentedSearchUnregisterRequest =
   ajv.compile(ParentedSearchUnregisterRequestSchema);
+
+const checkOwnedParentedSearchUnregisterRequest =
+  ajv.compile(OwnedParentedSearchUnregisterRequestSchema);
 
 interface IListenerList {
   [socketId: string]: {
@@ -232,6 +252,9 @@ export class Listener {
       socket.on(PARENTED_SEARCH_REGISTER_REQUEST, (request: IParentedSearchRegisterRequest) => {
         this.parentedSearchRegister(socket, request);
       });
+      socket.on(OWNED_PARENTED_SEARCH_REGISTER_REQUEST, (request: IOwnedParentedSearchRegisterRequest) => {
+        this.ownedParentedSearchRegister(socket, request);
+      });
       socket.on(IDENTIFY_REQUEST, (request: IIdentifyRequest) => {
         this.identify(socket, request);
       });
@@ -244,6 +267,9 @@ export class Listener {
       socket.on(PARENTED_SEARCH_FEEDBACK_REQUEST, (request: IParentedSearchFeedbackRequest) => {
         this.parentedSearchFeedback(socket, request);
       });
+      socket.on(OWNED_PARENTED_SEARCH_FEEDBACK_REQUEST, (request: IOwnedParentedSearchFeedbackRequest) => {
+        this.ownedParentedSearchFeedback(socket, request);
+      });
       socket.on(UNREGISTER_REQUEST, (request: IUnregisterRequest) => {
         this.unregister(socket, request);
       });
@@ -252,6 +278,9 @@ export class Listener {
       });
       socket.on(PARENTED_SEARCH_UNREGISTER_REQUEST, (request: IParentedSearchUnregisterRequest) => {
         this.parentedSearchUnregister(socket, request);
+      });
+      socket.on(OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST, (request: IOwnedParentedSearchUnregisterRequest) => {
+        this.ownedParentedSearchUnregister(socket, request);
       });
       socket.on("disconnect", () => {
         this.removeSocket(socket);
@@ -791,6 +820,110 @@ export class Listener {
       this.listeners[socket.id].amount++;
     }
   }
+  public async ownedParentedSearchRegister(
+    socket: Socket,
+    request: IOwnedParentedSearchRegisterRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkOwnedParentedSearchRegisterRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.parentedSearchRegister: can't register listener due to invalid request",
+        {
+          errors: checkOwnedParentedSearchRegisterRequest.errors,
+        }
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+
+    // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
+    if (this.listeners[socket.id].amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+      );
+      this.emitError(socket, "exceeded socket max listeners per socket", request);
+      return;
+    }
+
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    let hasAccess: boolean;
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    } else {
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          root: this.root,
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: request.createdBy,
+          parent: {
+            id: request.parentId,
+            type: request.parentType,
+            version: request.parentVersion,
+          },
+        }
+      );
+      try {
+        hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          request.createdBy,
+          {},
+          rolesManager,
+          false,
+        );
+      } catch (err) {
+        logger.error(
+          "Listener.parentedSearchRegister: failed to register",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+        return;
+      }
+    }
+    if (!hasAccess) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
+        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+      );
+      this.emitError(socket, "user has not access", request);
+      return;
+    }
+
+    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + request.qualifiedPathName + "." + request.createdBy + "." +
+      request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+      );
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
+      this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
+      this.listeners[socket.id].amount++;
+    }
+  }
   public async ownedSearchFeedback(
     socket: Socket,
     request: IOwnedSearchFeedbackRequest,
@@ -882,39 +1015,46 @@ export class Listener {
       const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
-            `"created_at" > $1 AS "WAS_CREATED"` :
+            `"created_at" > ? AS "WAS_CREATED"` :
             `TRUE AS "WAS_CREATED"`
         ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
           requiredType ?
-            `"type" = $2 AND ` :
+            `"type" = ? AND ` :
             ""
         ) + (
           request.lastModified ?
-            `"last_modified" > $3 AND ` :
+            `"last_modified" > ? AND ` :
             ""
-        ) + `"created_by" = $4`,
+        ) + `"created_by" = ?`,
         [
           request.lastModified || null,
           requiredType || null,
           request.lastModified || null,
           request.createdBy,
-        ],
+        ].filter((v) => v !== null),
+        true,
       )).map(convertVersionsIntoNullsWhenNecessary);
 
       const deletedQuery = this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
-        `WHERE "module" = $1 AND "created_by" = $2 AND "transaction_time" > $3` +
+        `WHERE "module" = ? AND "created_by" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
         (
           requiredType ?
-            ` AND "type" = $4` :
+            ` AND "type" = ?` :
             ""
         ),
         [
           mod.getQualifiedPathName(),
           request.createdBy,
-          request.lastModified,
-          requiredType,
-        ]
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
       );
 
       const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
@@ -1070,17 +1210,17 @@ export class Listener {
       const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
-            `"created_at" > $1 AS "WAS_CREATED"` :
+            `"created_at" > ? AS "WAS_CREATED"` :
             `TRUE AS "WAS_CREATED"`
         ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
           requiredType ?
-            `"type" = $2 AND ` :
+            `"type" = ? AND ` :
             ""
         ) + (
           request.lastModified ?
-            `"last_modified" > $3 AND ` :
+            `"last_modified" > ? AND ` :
             ""
-        ) + `"parent_id" = $4 AND "parent_version" = $5 AND "parent_type" = $6`,
+        ) + `"parent_id" = ? AND "parent_version" = ? AND "parent_type" = ?`,
         [
           request.lastModified || null,
           requiredType || null,
@@ -1088,25 +1228,32 @@ export class Listener {
           request.parentId,
           request.parentVersion || "",
           request.parentType,
-        ],
+        ].filter((v) => v !== null),
+        true,
       )).map(convertVersionsIntoNullsWhenNecessary);
 
       const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
 
       const deletedQuery = this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
-        `WHERE "module" = $1 AND "parenting_id" = $2 AND "transaction_time" > $3` +
+        `WHERE "module" = ? AND "parenting_id" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
         (
           requiredType ?
-            ` AND "type" = $4` :
+            ` AND "type" = ?` :
             ""
         ),
         [
           mod.getQualifiedPathName(),
           parentingId,
-          request.lastModified,
-          requiredType,
-        ]
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
       );
 
       const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
@@ -1161,6 +1308,210 @@ export class Listener {
     } catch (err) {
       logger.error(
         "Listener.parentedSearchFeedback: failed to provide feedback",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+        }
+      );
+    }
+  }
+  public async ownedParentedSearchFeedback(
+    socket: Socket,
+    request: IOwnedParentedSearchFeedbackRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkOwnedParentedSearchFeedbackRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.parentedSearchFeedback: can't register listener due to invalid request",
+        {
+          errors: checkParentedSearchFeedbackRequest.errors,
+        }
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+    try {
+      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+      if (!itemDefinitionOrModule) {
+        CAN_LOG_DEBUG && logger.debug(
+          "Listener.ownedParentedSearchFeedback: could not find " + request.qualifiedPathName,
+        );
+        this.emitError(socket, "could not find item definition or module", request);
+        return;
+      }
+
+      let mod: Module;
+      let requiredType: string = null;
+      if (itemDefinitionOrModule instanceof ItemDefinition) {
+        mod = itemDefinitionOrModule.getParentModule();
+        requiredType = request.qualifiedPathName;
+      } else {
+        mod = itemDefinitionOrModule;
+      }
+
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          root: this.root,
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING,
+          owner: request.createdBy,
+          parent: {
+            id: request.parentId,
+            type: request.parentType,
+            version: request.parentVersion,
+          },
+        }
+      );
+
+      try {
+        const hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          request.createdBy,
+          {},
+          rolesManager,
+          false,
+        )
+        if (!hasAccess) {
+          CAN_LOG_DEBUG && logger.debug(
+            "Listener.ownedParentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+          );
+          this.emitError(socket, "user has not access", request);
+          return;
+        }
+      } catch (err) {
+        logger.error(
+          "Listener.ownedParentedSearchFeedback: failed to provide feedback",
+          {
+            errMessage: err.message,
+            errStack: err.stack,
+          }
+        );
+        return;
+      }
+
+      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "last_modified", ` + (
+          request.lastModified ?
+            `"created_at" > ? AS "WAS_CREATED"` :
+            `TRUE AS "WAS_CREATED"`
+        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
+          requiredType ?
+            `"type" = ? AND ` :
+            ""
+        ) + (
+          request.lastModified ?
+            `"last_modified" > ? AND ` :
+            ""
+        ) + `"parent_id" = ? AND "parent_version" = ? AND "parent_type" = ? AND "created_by" = ?`,
+        [
+          request.lastModified || null,
+          requiredType || null,
+          request.lastModified || null,
+          request.parentId,
+          request.parentVersion || "",
+          request.parentType,
+          request.createdBy,
+        ].filter((v) => v !== null),
+        true,
+      )).map(convertVersionsIntoNullsWhenNecessary);
+
+      const parentingId = request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+
+      const deletedQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "module" = ? AND "created_by" = ? AND "parenting_id" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
+        (
+          requiredType ?
+            ` AND "type" = ?` :
+            ""
+        ),
+        [
+          mod.getQualifiedPathName(),
+          request.createdBy,
+          parentingId,
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
+      );
+
+      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+        .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.transaction_time,
+          }
+        ));
+
+      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+
+      if (totalDiffRecordCount) {
+        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+
+        const event: IOwnedParentedSearchRecordsEvent = {
+          parentId: request.parentId,
+          parentVersion: request.parentVersion || null,
+          parentType: request.parentType,
+          qualifiedPathName: request.qualifiedPathName,
+          createdBy: request.createdBy,
+          newRecords,
+          modifiedRecords,
+          lostRecords,
+          newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          "Listener.parentedSearchFeedback: emmitting " + OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+          event,
+        );
+        socket.emit(
+          OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+          event,
+        );
+      }
+    } catch (err) {
+      logger.error(
+        "Listener.ownedParentedSearchFeedback: failed to provide feedback",
         {
           errMessage: err.message,
           errStack: err.stack,
@@ -1427,6 +1778,34 @@ export class Listener {
       "." + request.parentId + "." + (request.parentVersion || "");
     this.removeListener(socket, mergedIndexIdentifier);
   }
+  public ownedParentedSearchUnregister(
+    socket: Socket,
+    request: IOwnedParentedSearchUnregisterRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id,
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkOwnedParentedSearchUnregisterRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Listener.ownedParentedSearchUnregister: can't unregister due to invalid request",
+        {
+          errors: checkOwnedParentedSearchUnregisterRequest.errors,
+        }
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + request.qualifiedPathName + "." + request.createdBy + "." + request.parentType +
+      "." + request.parentId + "." + (request.parentVersion || "");
+    this.removeListener(socket, mergedIndexIdentifier);
+  }
   public triggerChangedListeners(
     event: IChangedFeedbackEvent,
     data: ISQLTableRowValue,
@@ -1490,6 +1869,26 @@ export class Listener {
     }
     CAN_LOG_DEBUG && logger.debug(
       "Listener.triggerParentedSearchListeners: triggering redis event",
+      redisEvent,
+    );
+    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+  }
+  public triggerOwnedParentedSearchListeners(
+    event: IOwnedParentedSearchRecordsEvent,
+    listenerUUID: string,
+  ) {
+    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + event.qualifiedPathName + "." + event.createdBy + "." + event.parentType +
+      "." + event.parentId + "." + (event.parentVersion || "");
+    const redisEvent: IRedisEvent = {
+      event,
+      listenerUUID,
+      mergedIndexIdentifier,
+      type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "global",
+    }
+    CAN_LOG_DEBUG && logger.debug(
+      "Listener.triggerOwnedParentedSearchListeners: triggering redis event",
       redisEvent,
     );
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));

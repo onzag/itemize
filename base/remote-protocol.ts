@@ -151,6 +151,18 @@ export interface IParentedSearchRecordsEvent extends IBaseSearchRecordsEvent {
   parentVersion: string;
 }
 
+/**
+ * When they are owned parented items the parent type and id, that has been cached
+ * using those
+ */
+export const OWNED_PARENTED_SEARCH_RECORDS_EVENT = "owned-parented-search-records";
+/**
+ * The interface adds the parent type (qualified path name) and parent id (slot id)
+ * check [[IParentedSearchRegisterRequest]]
+ */
+export interface IOwnedParentedSearchRecordsEvent extends IParentedSearchRecordsEvent, IOwnedSearchRecordsEvent {
+}
+
 // REQUESTS
 
 /**
@@ -333,6 +345,13 @@ export const OwnedSearchRegisterRequestSchema = {
  * cached searches and then request for updates
  */
 export const PARENTED_SEARCH_REGISTER_REQUEST = "parented-search-register";
+
+/**
+ * this is necessary for parented searches in order to run parented by
+ * cached searches and then request for updates
+ */
+export const OWNED_PARENTED_SEARCH_REGISTER_REQUEST = "owned-parented-search-register";
+
 /**
  * The parented search register request adds the parent type and parent id
  * check [[IParentedSearchRecordsAddedEvent]]
@@ -363,6 +382,40 @@ export const ParentedSearchRegisterRequestSchema = {
     "parentType",
     "parentId",
     "parentVersion",
+  ],
+}
+
+/**
+ * The owned parented search register request adds the parent type and parent id
+ * check [[IOwnedParentedSearchRecordsAddedEvent]]
+ */
+export interface IOwnedParentedSearchRegisterRequest extends IParentedSearchRegisterRequest, IOwnedSearchRegisterRequest {
+}
+export const OwnedParentedSearchRegisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "string",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+    createdBy: {
+      type: "string",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "parentType",
+    "parentId",
+    "parentVersion",
+    "createdBy",
   ],
 }
 
@@ -434,6 +487,44 @@ export const ParentedSearchUnregisterRequestSchema = {
     "parentType",
     "parentId",
     "parentVersion",
+  ],
+}
+
+/**
+ * The unregister version of [[OWNED_PARENTED_SEARCH_REGISTER_REQUEST]]
+ */
+export const OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST = "owned-parented-search-unregister";
+/**
+ * The unregister version of [[IOwnedParentedSearchRegisterRequest]]
+ */
+export interface IOwnedParentedSearchUnregisterRequest extends IOwnedSearchUnregisterRequest, IParentedSearchUnregisterRequest {
+
+};
+export const OwnedParentedSearchUnregisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "string",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+    createdBy: {
+      type: "string",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "parentType",
+    "parentId",
+    "parentVersion",
+    "createdBy",
   ],
 }
 
@@ -524,6 +615,48 @@ export const ParentedSearchFeedbackRequestSchema = {
     "parentType",
     "parentId",
     "parentVersion",
+  ],
+}
+
+/**
+ * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
+ */
+export const OWNED_PARENTED_SEARCH_FEEDBACK_REQUEST = "owned-parented-search-feedback";
+/**
+ * The feedback version of [[IOwnedParentedSearchRegisterRequest]]
+ */
+export interface IOwnedParentedSearchFeedbackRequest extends IParentedSearchFeedbackRequest, IOwnedSearchFeedbackRequest {
+
+}
+export const OwnedParentedSearchFeedbackRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    lastModified: {
+      type: ["string", "null"],
+    },
+    parentType: {
+      type: "string",
+    },
+    parentId: {
+      type: "string",
+    },
+    parentVersion: {
+      type: ["string", "null"],
+    },
+    createdBy: {
+      type: "string",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "lastModified",
+    "parentType",
+    "parentId",
+    "parentVersion",
+    "createdBy",
   ],
 }
 

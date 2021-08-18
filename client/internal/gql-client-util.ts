@@ -9,9 +9,6 @@ import {
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   MODERATION_FIELDS,
-  ANYONE_LOGGED_METAROLE,
-  GUEST_METAROLE,
-  ANYONE_METAROLE,
   PREFIX_GET,
   PREFIX_SEARCH,
   PREFIX_DELETE,
@@ -939,15 +936,6 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
   return result;
 }
 
-type resolveRejectPromiseHandle = (resolve: (arg: IRunSearchQueryResult) => void, reject: (err: Error) => void) => void;
-
-const WAIT_AND_MERGE_CB_KEY_MAP: {
-  [key: string]: IRunSearchQueryArg;
-} = {};
-const WAIT_AND_MERGE_CB_LIST: {
-  [key: string]: Array<resolveRejectPromiseHandle>;
-} = {};
-
 interface IRunSearchQueryArg {
   args: IGQLArgs,
   fields: IGQLRequestFields,
@@ -960,7 +948,7 @@ interface IRunSearchQueryArg {
     id: string,
     version: string,
   };
-  cachePolicy: "by-owner" | "by-parent" | "none",
+  cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
   traditional: boolean,
   limit: number,
   offset: number,
@@ -1091,9 +1079,9 @@ export async function runSearchQueryFor(
       throw new Error("Cache policy is set yet search mode is traditional");
     } else if (arg.offset !== 0) {
       throw new Error("Cache policy is set yet the offset is not 0");
-    } else if (arg.cachePolicy === "by-owner" && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
+    } else if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Cache policy is by-owner yet there's no creator specified");
-    } else if (arg.cachePolicy === "by-parent" && !arg.parentedBy) {
+    } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && !arg.parentedBy) {
       throw new Error("Cache policy is by-parent yet there's no parent specified");
     }
 
@@ -1127,6 +1115,15 @@ export async function runSearchQueryFor(
           searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
             qualifiedPathName: standardCounterpartQualifiedName,
             createdBy: arg.createdBy,
+            lastModified: cacheWorkerGivenSearchValue.lastModified,
+          });
+        } else if (arg.cachePolicy === "by-owner-and-parent") {
+          searchOptions.remoteListener.requestOwnedParentedSearchFeedbackFor({
+            createdBy: arg.createdBy,
+            qualifiedPathName: standardCounterpartQualifiedName,
+            parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
+            parentId: arg.parentedBy.id,
+            parentVersion: arg.parentedBy.version || null,
             lastModified: cacheWorkerGivenSearchValue.lastModified,
           });
         } else {
@@ -1212,15 +1209,6 @@ export async function runSearchQueryFor(
     const records: IGQLSearchRecord[] = (
       data && data.records
     ) as IGQLSearchRecord[] || null;
-
-    // sometimes count is not there, this happens when using the cached search
-    // as the cached search doesn't perform any counting so it doesn't return such data
-    // check out the cache worker to see that it returns records, last_modified,
-    // limit and offset, but no count, so we collapse the count to all the given results that
-    // were provided
-    if (data && count === null) {
-      count = records.length;
-    }
 
     return {
       error,

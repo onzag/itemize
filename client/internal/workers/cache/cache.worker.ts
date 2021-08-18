@@ -91,6 +91,11 @@ export interface ISearchMatchType {
    * be larger than the limit as it might grow by events
    */
   limit: number;
+  /**
+   * the count that is set by the server when it retrieved
+   * it's tried to be kept in sync
+   */
+  count: number;
 }
 
 /**
@@ -490,12 +495,13 @@ export default class CacheWorker {
    * Deletes a cached search and all the referent values that are related to it
    * @param queryName the query name for that cached search
    * @param type the type of the search
-   * @param arg either the owner or the parent
+   * @param arg either the owner or the parent or all
    */
   public async deleteCachedSearch(
     queryName: string,
-    type: "by-parent" | "by-owner",
-    arg: string | [string, string, string],
+    type: "by-parent" | "by-owner" | "by-owner-and-parent",
+    owner: string,
+    parent: [string, string, string],
   ) {
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
@@ -508,10 +514,12 @@ export default class CacheWorker {
 
     // we get the key name where we are supposed to be
     let storeKeyName = queryName + "." + type.replace("-", "_") + ".";
-    if (!Array.isArray(arg)) {
-      storeKeyName += (arg || "");
-    } else {
-      storeKeyName += arg[0] + "." + arg[1] + "." + (arg[2] || "");
+    if (type === "by-owner") {
+      storeKeyName += (owner || "");
+    } else if (type === "by-parent") {
+      storeKeyName += parent[0] + "." + parent[1] + "." + (parent[2] || "");
+    } else if (type === "by-owner-and-parent") {
+      storeKeyName += (owner || "") + "." + parent[0] + "." + parent[1] + "." + (parent[2] || "");
     }
 
     try {
@@ -697,7 +705,7 @@ export default class CacheWorker {
     modifiedRecords: IGQLSearchRecord[],
     lostRecords: IGQLSearchRecord[],
     newLastModified: string,
-    cachePolicy: "by-owner" | "by-parent",
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
   ): Promise<boolean> {
     await this.waitForSetupPromise;
 
@@ -709,8 +717,10 @@ export default class CacheWorker {
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
       storeKeyName += (createdByIfKnown || "");
-    } else {
+    } else if (cachePolicy === "by-parent") {
       storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else {
+      storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
 
     try {
@@ -748,6 +758,12 @@ export default class CacheWorker {
         // this list will fill when a row is modified but it was actually reparented
         // so it registers as modified but it is now in our current list of values
         const recordsThatRequestedModificationButArentInTheList: IGQLSearchRecord[] = [];
+
+        let newCount = currentValue.count - lostRecords.length + newRecords.length;
+        // weird
+        if (newCount < 0) {
+          newCount = 0;
+        }
 
         let newValue = currentValue.value.map((r) => {
           const matchingLostRecord = lostRecords.find((lr) => lr.id === r.id && lr.version === r.version);
@@ -790,6 +806,7 @@ export default class CacheWorker {
           ...currentValue,
           lastModified: newLastModified,
           value: newValue,
+          count: newCount,
           allResultsPreloaded: false,
         }, storeKeyName);
       }
@@ -821,7 +838,7 @@ export default class CacheWorker {
     getListTokenArg: string,
     getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
-    cachePolicy: "by-owner" | "by-parent",
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
     maxGetListResultsAtOnce: number,
   ): Promise<ICachedSearchResult> {
     await this.waitForSetupPromise;
@@ -833,8 +850,11 @@ export default class CacheWorker {
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
       storeKeyName += searchArgs.created_by;
-    } else {
+    } else if (cachePolicy === "by-parent") {
       storeKeyName += searchArgs.parent_type + "." +
+        searchArgs.parent_id + "." + (searchArgs.parent_version || "");
+    } else {
+      storeKeyName += searchArgs.created_by + "." + searchArgs.parent_type + "." +
         searchArgs.parent_id + "." + (searchArgs.parent_version || "");
     }
 
@@ -842,6 +862,7 @@ export default class CacheWorker {
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
     let resultsToProcess: IGQLSearchRecord[];
+    let resultsCount: number;
     // this is what the fields end up being, say that there are two different
     // cached searches with different fields, we need both to be merged
     // in order to know what we have retrieved, originally it's just what
@@ -874,9 +895,12 @@ export default class CacheWorker {
           limit: searchArgs.limit,
           offset: 0,
         };
-        if (cachePolicy === "by-owner") {
+
+        if (cachePolicy === "by-owner" || cachePolicy === "by-owner-and-parent") {
           actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
-        } else {
+        }
+        
+        if (cachePolicy === "by-parent" || cachePolicy === "by-owner-and-parent") {
           actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
           actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
           actualArgsToUseInGQLSearch.parent_version = searchArgs.parent_version;
@@ -897,6 +921,7 @@ export default class CacheWorker {
             last_modified: {},
             limit: {},
             offset: {},
+            count: {},
           },
         });
 
@@ -920,6 +945,7 @@ export default class CacheWorker {
         resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
         lastModified = serverValue.data[searchQueryName].last_modified as string;
         limitToSetInDb = searchArgs.limit as number;
+        resultsCount = serverValue.data[searchQueryName].count as number;
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -928,6 +954,7 @@ export default class CacheWorker {
         lastModified = dbValue.lastModified;
         dataMightBeStale = true;
         limitToSetInDb = dbValue.limit;
+        resultsCount = dbValue.count;
 
         // if the fields are contained within what the database has loaded
         // and if all the results were preloaded then they don't need to be
@@ -950,6 +977,7 @@ export default class CacheWorker {
                   // we return the true limit, because records might grow over the limit
                   limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
                   offset: 0,
+                  count: resultsCount,
                 },
               },
             };
@@ -1002,6 +1030,7 @@ export default class CacheWorker {
       allResultsPreloaded: false,
       lastModified,
       limit: limitToSetInDb,
+      count: resultsCount,
     }, storeKeyName);
 
     // now we first got to extract what is has actually been loaded from those
@@ -1173,6 +1202,7 @@ export default class CacheWorker {
             records,
             limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
             offset: 0,
+            count: resultsCount,
           },
         },
       };
