@@ -96,6 +96,12 @@ const style = (theme: Theme) => createStyles({
     color: "#212121",
     borderColor: "#f9a825",
   },
+  badgeFastKeyShift: {
+    transform: "scale(1) translate(0%, 0%)",
+    backgroundColor: "#e3f2fd",
+    color: "#212121",
+    borderColor: "#f9a825",
+  },
   badgeDisabled: {
     transform: "scale(1) translate(0%, 0%)",
     opacity: 0.5,
@@ -155,10 +161,6 @@ const style = (theme: Theme) => createStyles({
     overflow: "auto",
     display: "flex",
     flexDirection: "column",
-  },
-  drawerSettingsForNodePaper: {
-    flex: "0 1 auto",
-    overflowY: "auto",
   },
   editor: (props: ISlateEditorWrapperBaseProps) => {
     const shouldShowInvalidEditor = !props.state.currentValid;
@@ -237,6 +239,17 @@ const style = (theme: Theme) => createStyles({
   optionPrimary: {
     fontWeight: 700,
     color: "#1b5e20",
+  },
+  treeElement: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  deleteButton: {
+    height: "1rem",
+    width: "1rem",
+  },
+  deleteIcon: {
+    fontSize: "1rem",
   },
 });
 
@@ -333,11 +346,11 @@ export interface IDrawerUIHandlerElementConfigCustomProps {
   onDelayedChange: (value: string) => void;
   helpers: IHelperFunctions;
   state: ISlateEditorStateType;
+  fastKeyActive?: boolean;
 }
 
 export interface IDrawerUIHandlerElementConfigCustom {
   type: "custom";
-  fastKey?: string;
   component: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
 }
 
@@ -571,13 +584,18 @@ interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, 
   fastKey: string;
 };
 
-function elementBadgeReturn(props: RichTextEditorToolbarElementProps, element: React.ReactNode, fastKeyOverride?: string): any {
-  if (props.altKey && !props.shiftKey && (fastKeyOverride || props.fastKey)) {
+function elementBadgeReturn(
+  props: RichTextEditorToolbarElementProps,
+  element: React.ReactNode,
+  fastKeyOverride?: string,
+  shiftKey?: boolean,
+): any {
+  if (props.altKey && (shiftKey ? props.shiftKey : !props.shiftKey) && (fastKeyOverride || props.fastKey)) {
     return (
       <Badge
         badgeContent={fastKeyOverride || props.fastKey}
         color="primary"
-        classes={{ badge: props.classes.badgeFastKey }}
+        classes={{ badge: shiftKey ? props.classes.badgeFastKeyShift : props.classes.badgeFastKey }}
       >
         {element}
       </Badge>
@@ -1172,6 +1190,10 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
     return this.appBarHeader && this.appBarHeader.offsetHeight;
   }
 
+  public getAppbarHeader() {
+    return this.appBarHeader;
+  }
+
   public render() {
     // no rich text
     if (!this.props.state.isRichText) {
@@ -1281,7 +1303,13 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
     );
 
     if (this.props.altKey) {
-      drawerButton = elementBadgeReturn(this.props as any, drawerButton, this.props.drawerOpen ? "↑" : "↓");
+      if (this.props.shiftKey) {
+        if (this.props.drawerOpen) {
+          drawerButton = elementBadgeReturn(this.props as any, drawerButton, "↑↓", true);
+        }
+      } else {
+        drawerButton = elementBadgeReturn(this.props as any, drawerButton, this.props.drawerOpen ? "↑" : "↓");
+      }
     }
 
     // now we can create the component itself
@@ -1417,6 +1445,16 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   private inputFileRef: React.RefObject<HTMLInputElement>;
 
   /**
+   * A ref to the container
+   */
+  private wrapperContainerRef: React.RefObject<WrapperContainer>;
+
+  /**
+   * A ref for the toolbar
+   */
+  private toolbarRef: React.RefObject<RichTextEditorToolbar>;
+
+  /**
    * This is the range that was in place before losing focus, it is used because
    * when opening some dialog, the insertion or change needs to happen at a given
    * selection range, but that is lost when losing focus, so we need to remember it
@@ -1435,6 +1473,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * and the change event might not even trigger
    */
   private refocusTimeout: NodeJS.Timeout;
+
+  /**
+   * The accumulated fast key combo
+   */
+  private accumulatedFastKeyCombo: string;
 
   /**
    * Constructs a new material ui based wrapper for the slate editor
@@ -1465,6 +1508,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     // create the refs
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
+    this.wrapperContainerRef = React.createRef();
+    this.toolbarRef = React.createRef();
 
     // bind all the functions
     this.onHeightChange = this.onHeightChange.bind(this);
@@ -1492,6 +1537,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
     this.keyDownListener = this.keyDownListener.bind(this);
     this.keyUpListener = this.keyUpListener.bind(this);
+    this.visibilityListener = this.visibilityListener.bind(this);
+    this.windowfocusListener = this.windowfocusListener.bind(this);
+
+    this.accumulatedFastKeyCombo = "";
   }
 
   public onHeightChange(newHeight: number) {
@@ -1535,6 +1584,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     document.body.addEventListener("touchstart", this.selectiveHardBlur);
     document.body.addEventListener("keyup", this.keyUpListener);
     document.body.addEventListener("keydown", this.keyDownListener);
+    window.addEventListener("focus", this.windowfocusListener);
+    document.addEventListener("visibilitychange", this.visibilityListener);
   }
 
   public componentWillUnmount() {
@@ -1542,6 +1593,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     document.body.removeEventListener("touchstart", this.selectiveHardBlur);
     document.body.removeEventListener("keyup", this.keyUpListener);
     document.body.removeEventListener("keydown", this.keyDownListener);
+    window.removeEventListener("focus", this.windowfocusListener);
+    document.removeEventListener("visibilitychange", this.visibilityListener);
   }
 
   public keyDownListener(e: KeyboardEvent) {
@@ -1557,18 +1610,48 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       }
     }
 
-    if (this.state.altKey) {
+    if (
+      this.state.altKey &&
+      e.key !== "Alt" &&
+      e.key !== "Shift"
+    ) {
+      e.preventDefault();
+
       if (
         !this.state.shiftKey &&
         ((e.key === "ArrowUp" && this.state.drawerOpen) ||
-        (e.key === "ArrowDown" && !this.state.drawerOpen))
+          (e.key === "ArrowDown" && !this.state.drawerOpen))
       ) {
         this.toggleDrawer();
+        this.accumulatedFastKeyCombo = "";
+      } else if (this.state.shiftKey && this.state.drawerOpen && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        this.scrollDrawer(e.key === "ArrowUp" ? "up" : "down");
+        this.accumulatedFastKeyCombo = "";
       } else {
+        let actualKeyCombo = e.key.toLowerCase();
+        if (actualKeyCombo === "arrowleft") {
+          actualKeyCombo = "←";
+        } else if (actualKeyCombo === "arrowright") {
+          actualKeyCombo = "→";
+        }
+
+        actualKeyCombo = this.accumulatedFastKeyCombo + actualKeyCombo;
+
         const fastkeySelector = (this.state.shiftKey ? "s" : "") + "fastkey";
-        const toolbarElementMatching = document.querySelector("[data-" + fastkeySelector + "=\"" + e.key + "\"]");
-        if (toolbarElementMatching instanceof HTMLElement) {
-          toolbarElementMatching.click();
+        const selector = "[data-" + fastkeySelector + "=\"" + actualKeyCombo + "\"]";
+        const toolbarElementMatching = this.toolbarRef.current &&
+          this.toolbarRef.current.getAppbarHeader().querySelector(selector);
+        const drawerElementMatching = this.wrapperContainerRef.current &&
+          this.wrapperContainerRef.current.getDrawerBody().querySelector(selector)
+        const elementMatching = toolbarElementMatching || drawerElementMatching;
+        if (elementMatching instanceof HTMLInputElement) {
+          elementMatching.focus();
+          this.accumulatedFastKeyCombo = "";
+        } else if (elementMatching instanceof HTMLElement) {
+          elementMatching.click();
+          this.accumulatedFastKeyCombo = "";
+        } else {
+          this.accumulatedFastKeyCombo = actualKeyCombo;
         }
       }
     }
@@ -1579,11 +1662,18 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       this.selectiveHardBlur(e);
     }
 
-    if (this.state.altKey || this.state.shiftKey) {
+    if (this.state.altKey && e.key === "Alt") {
       this.setState({
         altKey: false,
+      });
+      this.accumulatedFastKeyCombo = "";
+    }
+
+    if (this.state.shiftKey && e.key === "Shift") {
+      this.setState({
         shiftKey: false,
       });
+      this.accumulatedFastKeyCombo = "";
     }
   }
 
@@ -1592,11 +1682,35 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       if ((e.target as any).parentElement) {
         if (!this.isParentedBySlateOrUnblurred(e.target as any)) {
           this.props.helpers.hardBlur();
+          this.setState({
+            altKey: false,
+            shiftKey: false,
+          });
         }
       } else {
         this.props.helpers.hardBlur();
+        this.setState({
+          altKey: false,
+          shiftKey: false,
+        });
       }
     }
+  }
+
+  public visibilityListener() {
+    if (document.visibilityState === "hidden") {
+      this.setState({
+        altKey: false,
+        shiftKey: false,
+      });
+    }
+  }
+
+  public windowfocusListener() {
+    this.setState({
+      altKey: false,
+      shiftKey: false,
+    });
   }
 
   public isParentedBySlateOrUnblurred(ele: HTMLElement): boolean {
@@ -1644,6 +1758,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // trigger a click
     this.inputImageRef.current.click();
+    this.setState({
+      altKey: false,
+      shiftKey: false,
+    });
   }
 
   /**
@@ -1658,6 +1776,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     this.originalSelectionPath = this.props.state.currentSelectedElementAnchor;
     // trigger a click
     this.inputFileRef.current.click();
+    this.setState({
+      altKey: false,
+      shiftKey: false,
+    });
   }
 
   /**
@@ -1674,6 +1796,22 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
 
     // and put it in local storage
     localStorage.setItem("SLATE_DRAWER_OPEN", JSON.stringify(newState));
+  }
+
+  /**
+   * Scrolls the drawer in a given direction, used for accessibility purposes
+   * only truly valid in disjointed mode
+   * @param direction 
+   */
+  public scrollDrawer(direction: "up" | "down") {
+    const body = this.wrapperContainerRef.current && this.wrapperContainerRef.current.getDrawerBody();
+    if (body) {
+      let amount = direction === "up" ? -50 : 50;
+      body.scroll({
+        top: body.scrollTop + amount,
+        behavior: "smooth",
+      });
+    }
   }
 
   /**
@@ -2043,6 +2181,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
+        ref={this.toolbarRef}
         altKey={this.state.altKey}
         shiftKey={this.state.shiftKey}
         onHeightChange={this.onHeightChange}
@@ -2082,10 +2221,12 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
             {extraChildren}
           </div>
           <WrapperContainer
+            ref={this.wrapperContainerRef}
             {...this.props}
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
             toolbarHeight={this.state.toolbarHeight}
+            fastKeyActive={this.state.altKey && this.state.shiftKey}
           />
           {fileLoadErrorDialog}
           {videoDialog}
@@ -2117,9 +2258,11 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           {extraChildren}
           <WrapperContainer
             {...this.props}
+            ref={this.wrapperContainerRef}
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
             toolbarHeight={this.state.toolbarHeight}
+            fastKeyActive={this.state.altKey && this.state.shiftKey}
           />
         </div>
         {fileLoadErrorDialog}
@@ -2134,54 +2277,74 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
   }
 }
 
-interface WrapperContainerProps extends MaterialUISlateWrapperWithStyles {
+export interface IWrapperContainerProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
   toolbarHeight: number;
   noAnimate: boolean;
+  fastKeyActive: boolean;
 }
 
-function WrapperContainer(props: WrapperContainerProps) {
-  const [isReady, makeReady] = useState(false);
-  useEffect(() => {
-    makeReady(true);
-  }, []);
+interface IWrapperContainerState {
+  isReady: boolean;
+}
 
-  if (props.disjointedMode && !props.state.currentSelectedElement) {
-    return null;
+class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperContainerState> {
+  private editorDrawerBodyRef: React.RefObject<HTMLDivElement>;
+  constructor(props: IWrapperContainerProps) {
+    super(props);
+
+    this.state = {
+      isReady: false,
+    }
+
+    this.editorDrawerBodyRef = React.createRef();
   }
-
-  const toReturn = (
-    <div
-      data-unblur="true"
-      onClick={props.helpers.softBlur}
-      className={
-        (props.disjointedMode ? props.classes.editorDrawerFixed : props.classes.editorDrawer) +
-        (props.drawerOpen ? " open" : "") +
-        (props.noAnimate ? " " + props.classes.editorDrawerNoAnimate : "")
-      }
-    >
-      {
-        props.disjointedMode && props.drawerOpen ?
-          <div
-            className={props.classes.editorDrawerAppbarSpacer}
-            style={{ height: props.toolbarHeight, flex: "0 0 " + props.toolbarHeight + "px" }}
-          /> :
-          null
-      }
-      <div className={props.classes.editorDrawerBody}>
-        {props.drawerOpen ? <WrapperDrawer {...props} /> : null}
-      </div>
-    </div>
-  );
-
-  if (props.disjointedMode) {
-    if (isReady) {
-      return ReactDOM.createPortal(toReturn, document.body);
-    } else {
+  public componentDidMount() {
+    this.setState({
+      isReady: true,
+    });
+  }
+  public getDrawerBody() {
+    return this.editorDrawerBodyRef.current;
+  }
+  public render() {
+    if (this.props.disjointedMode && !this.props.state.currentSelectedElement) {
       return null;
     }
-  } else {
-    return toReturn;
+
+    const toReturn = (
+      <div
+        data-unblur="true"
+        onClick={this.props.helpers.softBlur}
+        className={
+          (this.props.disjointedMode ? this.props.classes.editorDrawerFixed : this.props.classes.editorDrawer) +
+          (this.props.drawerOpen ? " open" : "") +
+          (this.props.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
+        }
+      >
+        {
+          this.props.disjointedMode && this.props.drawerOpen ?
+            <div
+              className={this.props.classes.editorDrawerAppbarSpacer}
+              style={{ height: this.props.toolbarHeight, flex: "0 0 " + this.props.toolbarHeight + "px" }}
+            /> :
+            null
+        }
+        <div className={this.props.classes.editorDrawerBody} ref={this.editorDrawerBodyRef}>
+          {this.props.drawerOpen ? <WrapperDrawer {...this.props} /> : null}
+        </div>
+      </div>
+    );
+
+    if (this.props.disjointedMode) {
+      if (this.state.isReady) {
+        return ReactDOM.createPortal(toReturn, document.body);
+      } else {
+        return null;
+      }
+    } else {
+      return toReturn;
+    }
   }
 }
 

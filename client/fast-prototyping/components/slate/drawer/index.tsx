@@ -7,9 +7,9 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Divider, Typography, Tab, Tabs, BorderStyleIcon, TouchAppIcon, WebIcon, Paper, SettingsIcon
+  Divider, Typography, Tab, Tabs, BorderStyleIcon, TouchAppIcon, WebIcon, SettingsIcon
 } from "../../../mui-core";
-import { MaterialUISlateWrapperWithStyles } from "../wrapper";
+import { IWrapperContainerProps } from "../wrapper";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
@@ -81,7 +81,7 @@ function scrollSlowly(speed: number, element: HTMLElement) {
  * This is the wrapper drawer itself
  * @param props it takes the entire wrapper props with the styles
  */
-export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
+export function WrapperDrawer(props: IWrapperContainerProps) {
   // we grab this from local storage, this won't affect SSR because the drawer won't
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
@@ -126,9 +126,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
   // but for that to be set we need to have something selected
   // in the rich text editor state
   const treeData = props.hideTree ? null : <Tree
-    currentRichElement={{
-      children: props.state.currentValue
-    } as any}
+    currentRichElement={props.state.currentValue as any}
     parentRichElement={null}
     currentSelectedElement={props.state.currentSelectedElement as any}
     currentSelectedElementPath={props.state.currentSelectedElementAnchor}
@@ -140,10 +138,14 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     buttonClassName={props.classes.wrapperButton}
     childrenBoxClassName={props.classes.treeChildrenBox}
     onSelectPath={props.helpers.selectPath}
+    onDeletePath={props.helpers.deletePath}
     onBeginDrag={setDragScroll.bind(null, true)}
     onEndDrag={setDragScroll.bind(null, false)}
     moveFromTo={props.helpers.movePaths}
     scrollableAreaRef={scrollRef}
+    treeElementClassName={props.classes.treeElement}
+    deleteButtonClassName={props.classes.deleteButton}
+    deleteIconClassName={props.classes.deleteIcon}
   />
 
   // now we need to build the settings
@@ -186,16 +188,16 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
     let infoPanel: React.ReactNode = null;
     switch (actualLocation) {
       case "MAIN":
-        infoPanel = GeneralOptions(props);
+        infoPanel = <GeneralOptions {...props}/>;
         break;
       case "STYLES":
-        infoPanel = StylesOptions(props);
+        infoPanel = <StylesOptions {...props}/>;
         break;
       case "ACTIONS":
-        infoPanel = ActionsOptions(props);
+        infoPanel = <ActionsOptions {...props}/>;
         break;
       case "TEMPLATING":
-        infoPanel = TemplatingOptions(props);
+        infoPanel = <TemplatingOptions {...props}/>;
         break;
     }
 
@@ -264,9 +266,7 @@ export function WrapperDrawer(props: MaterialUISlateWrapperWithStyles) {
               </>
             ) : null
         }
-        {drawerMode === "barebones" ? infoPanel : <Paper className={props.classes.drawerSettingsForNodePaper}>
-          {infoPanel}
-        </Paper>}
+        {infoPanel}
       </>
     );
   }

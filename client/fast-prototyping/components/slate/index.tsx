@@ -585,6 +585,11 @@ export interface IHelperFunctions {
   movePaths: (from: Path, to: Path) => void;
 
   /**
+   * Deletes given a path
+   */
+  deletePath: (path: Path) => void;
+
+  /**
    * Deletes the node at the selected path
    */
   deleteSelectedNode: () => void;
@@ -1538,6 +1543,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // other functions and heler utilities
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
+    this.deletePath = this.deletePath.bind(this);
     this.setValue = this.setValue.bind(this);
     this.renderElement = this.renderElement.bind(this);
     this.actuallyRenderElement = this.actuallyRenderElement.bind(this);
@@ -3204,6 +3210,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public softBlur() {
     ReactEditor.blur(this.editor);
     Transforms.deselect(this.editor);
+  }
+
+  public deletePath(p: Path) {
+    if (
+      Path.equals(p, this.state.currentSelectedElementAnchor) ||
+      Path.isAncestor(p, this.state.currentSelectedElementAnchor)
+    ) {
+      this.lastChangeWasSelectedDelete = true;
+    }
+
+    Transforms.delete(this.editor, {
+      at: p,
+    });
+
+    // and now we can refocus
+    if (this.state.currentText) {
+      // now we need to refocus
+      ReactEditor.focus(this.editor);
+    } else {
+      ReactEditor.blur(this.editor);
+    }
   }
 
   /**
@@ -4929,6 +4956,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Node,
 
       selectPath: this.selectPath,
+      deletePath: this.deletePath,
       movePaths: this.movePaths,
 
       deleteSelectedNode: this.deleteSelectedNode,

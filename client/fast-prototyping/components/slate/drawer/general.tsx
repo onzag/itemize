@@ -6,11 +6,9 @@
  */
 
 import React from "react";
-import { MaterialUISlateWrapperWithStyles } from "../wrapper";
+import { IWrapperContainerProps } from "../wrapper";
 import {
-  DeleteIcon,
   FormControl,
-  IconButton,
   InputLabel,
   Select,
   FilledInput,
@@ -59,14 +57,14 @@ interface IGeneralOptionsState {
  * This is the component that showns when modifying the general options
  * for a container, basically allows to choose the container type from the available list
  */
-class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
+class GeneralContainerOptions extends React.PureComponent<IWrapperContainerProps, IGeneralOptionsState> {
 
   /**
    * We need the derived function in order to be able to update the value of the
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
+  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IGeneralOptionsState) {
 
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
@@ -93,7 +91,7 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
    * This is the constructor for the container options
    * @param props the entire wrapper props that are passed here
    */
-  public constructor(props: MaterialUISlateWrapperWithStyles) {
+  public constructor(props: IWrapperContainerProps) {
     super(props);
 
     const selectedNode: IContainer = props.state.currentSelectedSuperBlockElement as any;
@@ -188,14 +186,14 @@ class GeneralContainerOptions extends React.PureComponent<MaterialUISlateWrapper
 /**
  * Allows for the title element to be selected a title type, basically h1, h2, h3...
  */
-class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralOptionsState> {
+class GeneralTitleOptions extends React.PureComponent<IWrapperContainerProps, IGeneralOptionsState> {
 
   /**
    * We need the derived function in order to be able to update the value of the
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralOptionsState) {
+  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IGeneralOptionsState) {
 
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
@@ -222,7 +220,7 @@ class GeneralTitleOptions extends React.PureComponent<MaterialUISlateWrapperWith
    * This is the constructor for the title type options
    * @param props the entire wrapper props that are passed here
    */
-  public constructor(props: MaterialUISlateWrapperWithStyles) {
+  public constructor(props: IWrapperContainerProps) {
     super(props);
 
     const selectedNode: ITitle = props.state.currentSelectedElement as any;
@@ -339,7 +337,7 @@ interface IGeneralImageOptionsState {
  * as the form of the image, standalone or full, where the image is not wrapped
  * and not padded, often used by the editor in order to build into custom styles
  */
-class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralImageOptionsState> {
+class GeneralImageOptions extends React.PureComponent<IWrapperContainerProps, IGeneralImageOptionsState> {
   /**
    * We build a timer for updating the alt, because the alt is text and not a selector
    * updating the alt on each keystroke can be overkill, since we have a state anyway
@@ -353,7 +351,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralImageOptionsState) {
+  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IGeneralImageOptionsState) {
 
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
@@ -386,7 +384,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
    * This is the constructor for the image form options
    * @param props the entire wrapper props that are passed here
    */
-  constructor(props: MaterialUISlateWrapperWithStyles) {
+  constructor(props: IWrapperContainerProps) {
     super(props);
 
     const selectedNode: IImage = props.state.currentSelectedElement as any;
@@ -514,7 +512,7 @@ class GeneralImageOptions extends React.PureComponent<MaterialUISlateWrapperWith
   }
 }
 
-interface IGeneralUIHandlerOptionProps extends MaterialUISlateWrapperWithStyles {
+interface IGeneralUIHandlerOptionProps extends IWrapperContainerProps {
   arg: string;
   basisState: string;
   label: string | React.ReactNode;
@@ -670,6 +668,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
           onDelayedChange={this.onDelayedUpdate}
           helpers={this.props.helpers}
           state={this.props.state}
+          fastKeyActive={this.props.fastKeyActive}
         />
       );
     }
@@ -786,7 +785,7 @@ interface IGeneralElementOptionsState {
 /**
  * Provides options that are shared in common with all the elements
  */
-class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWithStyles, IGeneralElementOptionsState> {
+class GeneralElementOptions extends React.PureComponent<IWrapperContainerProps, IGeneralElementOptionsState> {
   /**
    * We build a timer for updating the name, because the name is text and not a selector
    * updating the name on each keystroke can be overkill, since we have a state anyway
@@ -799,7 +798,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IGeneralElementOptionsState) {
+  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IGeneralElementOptionsState) {
 
     // for that we check if the value is not the same as the one in the state, which happens
     // whenever changing, but in order to actually change it we only do so if it's a different
@@ -828,7 +827,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
    * This is the constructor for the image form options
    * @param props the entire wrapper props that are passed here
    */
-  constructor(props: MaterialUISlateWrapperWithStyles) {
+  constructor(props: IWrapperContainerProps) {
     super(props);
 
     const selectedNode: RichElement = props.state.currentSelectedElement as any;
@@ -898,7 +897,7 @@ class GeneralElementOptions extends React.PureComponent<MaterialUISlateWrapperWi
   }
 }
 
-function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: MaterialUISlateWrapperWithStyles, index: number) {
+function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: IWrapperContainerProps, index: number) {
   const stateElem = basisToState[x.basis || "selected"];
   return (
     <GeneralUIHandlerOption
@@ -934,7 +933,7 @@ function checkUIHandlerMatches(x: IDrawerConfiguratorElementBase, value: string)
     true;
 }
 
-function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], props: MaterialUISlateWrapperWithStyles) {
+function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], props: IWrapperContainerProps) {
   return (
     <div className={props.classes.box}>
       {elems.filter((x) => {
@@ -953,7 +952,7 @@ function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], prop
   );
 }
 
-function processDrawerElements(elems: DrawerConfiguratorElement[], props: MaterialUISlateWrapperWithStyles) {
+function processDrawerElements(elems: DrawerConfiguratorElement[], props: IWrapperContainerProps) {
   return (
     elems.map((x, index) => {
       const asBase: IDrawerConfiguratorElementBase = x as any;
@@ -994,7 +993,7 @@ const basisToState = {
  * these general options are the specific options for the generic components
  * @param props all the entire wrapper props
  */
-export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
+export function GeneralOptions(props: IWrapperContainerProps) {
   // we need to build the node and some nodes just don't
   // have any options
   let specificSuperBlockOptions: React.ReactNode = null;
@@ -1051,9 +1050,6 @@ export function GeneralOptions(props: MaterialUISlateWrapperWithStyles) {
       {specificSuperBlockOptions}
       {specificNodeOptions}
       {extraNodeOptions}
-      {props.drawerMode === "barebones" ? null : <IconButton onClick={props.helpers.deleteSelectedNode}>
-        <DeleteIcon />
-      </IconButton>}
     </>
   );
 }

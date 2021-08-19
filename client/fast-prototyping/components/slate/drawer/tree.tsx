@@ -4,7 +4,9 @@ import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/
 import { localeReplacer } from "../../../../../util";
 import React from "react";
 import {
-  Button
+  Button,
+  DeleteIcon,
+  IconButton,
 } from "../../../mui-core";
 import ReactDOM from "react-dom";
 
@@ -86,6 +88,10 @@ interface INodeInfo {
  * @returns the node information
  */
 export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): INodeInfo {
+  if (node.type === "document") {
+    return null;
+  }
+
   // check for whether is interactive and other options
   const isInteractive = templatedInteractiveActions.some((attr) => !!node[attr]);
   const isTemplateStyled = templatedStyledAttributes.some((attr) => !!node[attr]);
@@ -94,8 +100,11 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
 
   // now let's build the name label for the given language
-  let nameLabel: string = node.givenName ? node.givenName : (node.type ? (i18nData[node.type] || node.type) : i18nData.text);
-  if (!node.givenName) {
+  const foundCustomName = (!node.givenName && node.uiHandler) ? i18nData.richCustom[node.uiHandler.replace(/-/g,"_")] : null;
+  let nameLabel: string = node.givenName ? node.givenName : (
+    foundCustomName || (node.type ? (i18nData[node.type] || node.type) : i18nData.text)
+  );
+  if (!node.givenName && !foundCustomName) {
     if (isBasicStyled || isTemplateStyled) {
       nameLabel = localeReplacer(i18nData.styled, nameLabel);
     }
@@ -156,10 +165,14 @@ interface ITreeProps {
   currentIsLastInPath: boolean;
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
   buttonClassName: string;
+  treeElementClassName?: string;
+  deleteButtonClassName?: string;
+  deleteIconClassName?: string;
   dropPositionEnabledClassName: string;
   dropPositionDisabledClassName: string;
   childrenBoxClassName: string;
   onSelectPath: (p: Path) => void;
+  onDeletePath: (p: Path) => void;
   parentDraggingAt?: IDraggingElementInfo;
   onBeginDrag?: (element: RichElement, at: Path) => void;
   onEndDrag?: () => void;
@@ -427,17 +440,25 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     const internals = (
       <div ref={this.internalsRef}>
         {prevSpacer}
-        <Button
-          size="small"
-          variant={isSelected ? "contained" : (isSemiSelected ? "outlined" : "text")}
-          color={info.isTemplate ? "secondary" : "primary"}
-          className={this.props.buttonClassName}
-          onMouseDown={this.startDragMouse}
-          onTouchStart={this.startDragTouch}
-          ref={this.buttonRef}
-        >
-          {info.name}
-        </Button>
+        <div className={this.props.treeElementClassName}>
+          <Button
+            size="small"
+            variant={isSelected ? "contained" : (isSemiSelected ? "outlined" : "text")}
+            color={info.isTemplate ? "secondary" : "primary"}
+            className={this.props.buttonClassName}
+            onMouseDown={this.startDragMouse}
+            onTouchStart={this.startDragTouch}
+            ref={this.buttonRef}
+          >
+            {info.name}
+          </Button>
+          <IconButton
+            onClick={this.props.onDeletePath.bind(null, this.props.currentPath)}
+            className={this.props.deleteButtonClassName}
+          >
+            <DeleteIcon className={this.props.deleteIconClassName}/>
+          </IconButton>
+        </div>
         <div className={this.props.childrenBoxClassName}>
           {childTree}
         </div>

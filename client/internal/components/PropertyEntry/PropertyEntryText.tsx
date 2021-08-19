@@ -136,6 +136,10 @@ export interface IPropertyEntryI18nRichTextInfo {
     placeholder: string;
     submit: string;
   };
+
+  richCustom: {
+    [key: string]: string;
+  }
 }
 
 /**
@@ -887,6 +891,8 @@ export default class PropertyEntryText
       lastLoadedFileError = i18nInLanguage[lastLoadedFileError];
     }
 
+    const i18nRoot = this.props.i18n[this.props.language];
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryTextRendererProps = {
       propertyId: this.props.property.getId(),
@@ -909,7 +915,7 @@ export default class PropertyEntryText
 
       autoFocus: this.props.autoFocus || false,
 
-      i18nRoot: this.props.i18n[this.props.language],
+      i18nRoot,
       i18nRichInfo: isRichText ? {
         formatBoldLabel: i18nInLanguage.format_bold,
         formatItalicLabel: i18nInLanguage.format_italic,
@@ -1009,6 +1015,8 @@ export default class PropertyEntryText
           placeholder: i18nInLanguage.add_template_html_placeholder,
           submit: i18nInLanguage.add_template_html_submit,
         },
+
+        richCustom: i18nRoot.rich_custom || {},
       } : null,
 
       i18nGenericError: i18nInLanguage.generic_error,

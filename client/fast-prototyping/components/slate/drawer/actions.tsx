@@ -6,7 +6,7 @@
 
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
-import { MaterialUISlateWrapperWithStyles } from "../wrapper";
+import { IWrapperContainerProps } from "../wrapper";
 import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@material-ui/core";
 import { Path } from "slate";
 
@@ -248,7 +248,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
  * based on the context
  * @param props the whole material ui slate wrapper with styles props from the drawer itself
  */
-export function ActionsOptions(props: MaterialUISlateWrapperWithStyles) {
+export function ActionsOptions(props: IWrapperContainerProps) {
   // get the current node that we have currently selected
   const currentNode = props.state.currentSelectedElement as RichElement;
 

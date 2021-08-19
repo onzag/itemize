@@ -6,7 +6,7 @@
 
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
-import { MaterialUISlateWrapperWithStyles } from "../wrapper";
+import { IWrapperContainerProps } from "../wrapper";
 import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@material-ui/core";
 import { Path } from "slate";
 
@@ -214,7 +214,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
  * @param props the props for the templating which is literally the whole
  * options of the wrapper itself
  */
-export function TemplatingOptions(props: MaterialUISlateWrapperWithStyles) {
+export function TemplatingOptions(props: IWrapperContainerProps) {
   // we need to pick these to make the option list
   const currentNode = props.state.currentSelectedElement as RichElement;
   const allEachContexts: ISingleTemplatingElementOption[] = [];

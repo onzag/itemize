@@ -6,7 +6,7 @@
 
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
-import { MaterialUISlateWrapperWithStyles } from "../wrapper";
+import { IWrapperContainerProps } from "../wrapper";
 import { FormControl, InputLabel, Select, Chip, MenuItem, TextField, FilledInput } from "../../../mui-core";
 import { Path } from "slate";
 import equals from "deep-equal";
@@ -172,14 +172,14 @@ interface IClassesOptionSelectorState {
  * Provides a picker for rich classes in the drawer for the given element
  * basically a select field
  */
-class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWithStyles, IClassesOptionSelectorState> {
+class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, IClassesOptionSelectorState> {
 
   /**
    * We need the derived function in order to be able to update the value of the
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: MaterialUISlateWrapperWithStyles, state: IClassesOptionSelectorState) {
+  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IClassesOptionSelectorState) {
     // we do it this way because this component eats the entire wrapper props so we need to pick it right
     // from the current selected node
     const selectedNode: RichElement = props.state.currentSelectedElement as any;
@@ -207,7 +207,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
    * constructs a new class selector for rich classes
    * @param props the entire material ui slate wrapper props that the wrapper takes
    */
-  constructor(props: MaterialUISlateWrapperWithStyles) {
+  constructor(props: IWrapperContainerProps) {
     super(props);
 
     // setup the initial state
@@ -299,7 +299,7 @@ class ClassesOptionSelector extends React.PureComponent<MaterialUISlateWrapperWi
  * @param props the props for the templating which is literally the whole
  * options of the wrapper itself
  */
-export function StylesOptions(props: MaterialUISlateWrapperWithStyles) {
+export function StylesOptions(props: IWrapperContainerProps) {
   const currentNode = props.state.currentSelectedElement as RichElement;
   return (
     <div className={props.classes.box}>
