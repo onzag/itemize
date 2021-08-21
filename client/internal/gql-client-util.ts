@@ -1193,9 +1193,21 @@ export async function runSearchQueryFor(
   }
 
   const data = gqlValue.data && gqlValue.data[queryName];
-  const limit: number = (data && data.limit as number) || null;
-  const offset: number = (data && data.offset as number) || null;
-  let count: number = (data && data.count as number) || null;
+  let limit: number = (data && data.limit as number);
+  let offset: number = (data && data.offset as number);
+  let count: number = (data && data.count as number);
+
+  if (typeof limit === "undefined") {
+    limit = null;
+  }
+
+  if (typeof offset === "undefined") {
+    offset = null;
+  }
+
+  if (typeof count === "undefined") {
+    count = null;
+  }
 
   // now we got to check for errors
   let error: EndpointErrorType = null;

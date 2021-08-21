@@ -224,6 +224,7 @@ interface IActualSearchLoaderState {
  */
 class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActualSearchLoaderState> {
   private lastSearchLoadValuesTime: number;
+  private isUnmounted: boolean = false;
   constructor(props: IActualSearchLoaderProps) {
     super(props);
 
@@ -265,6 +266,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     });
   }
   public componentWillUnmount() {
+    this.isUnmounted = true;
     this.ensureCleanupOfOldSearchResults(this.props);
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
@@ -316,6 +318,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.loadValues(currentSearchRecords);
   }
   public dismissError() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       error: null,
     });
@@ -340,6 +345,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     });
   }
   public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
+    if (this.isUnmounted) {
+      return;
+    }
+
     const currentSearchLoadTime = (new Date()).getTime();
     this.lastSearchLoadValuesTime = currentSearchLoadTime;
 
@@ -459,7 +468,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }));
 
     // time has changed, a new search is incoming
-    if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+    if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {
       return;
     }
 
@@ -506,6 +515,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // now what we are left are these uncached results, these are what we are searching right now
     // is the rest and this will take some time as well
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       currentlySearching: uncachedResults,
     });
@@ -539,7 +551,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         listQuery,
       );
 
-      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {
         return;
       }
 
@@ -628,7 +640,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         });
       }
     } else {
-      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime) {
+      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {
         return;
       }
       // otherwise if there's nothing left from the uncached

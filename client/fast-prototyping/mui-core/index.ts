@@ -51,6 +51,7 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
+import Hidden from "@material-ui/core/Hidden";
 import {
   createStyles,
   withStyles,
@@ -74,6 +75,7 @@ import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import Backdrop from "@material-ui/core/Backdrop";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import Drawer from "@material-ui/core/Drawer";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import FormControl from "@material-ui/core/FormControl";
@@ -305,4 +307,6 @@ export {
   ListItemSecondaryAction,
   OutlinedInput,
   Input,
+  Hidden,
+  Drawer,
 }

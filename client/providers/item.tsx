@@ -1317,7 +1317,7 @@ export class ActualItemProvider extends
     }
 
     // second are the remote listeners, only when there's an id defined
-    if (this.props.forId) {
+    if (this.props.forId && !this.props.searchCounterpart) {
       // one is the reload, this gets called when the value of the field has differed from the one that
       // we have gotten (or have cached) this listener is very important for that reason, otherwise our app
       // will get frozen in the past
@@ -1920,7 +1920,7 @@ export class ActualItemProvider extends
     // we don't use loading here because there's one big issue
     // elements are assumed into the loading state by the constructor
     // if they have an id
-    if (!forId) {
+    if (!forId || this.props.searchCounterpart) {
       if ((this.state.loading || this.state.loaded || this.state.loadError) && !this.isUnmounted) {
         this.setState({
           loadError: null,

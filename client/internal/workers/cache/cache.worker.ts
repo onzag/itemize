@@ -755,10 +755,6 @@ export default class CacheWorker {
       // there might not be a current value, eg. if for some reason cache policy was set to none and yet
       // there was a listen policy for it, or if otherwise the data got somehow corrupted
       if (currentValue) {
-        // this list will fill when a row is modified but it was actually reparented
-        // so it registers as modified but it is now in our current list of values
-        const recordsThatRequestedModificationButArentInTheList: IGQLSearchRecord[] = [];
-
         let newCount = currentValue.count - lostRecords.length + newRecords.length;
         // weird
         if (newCount < 0) {
@@ -785,8 +781,6 @@ export default class CacheWorker {
 
             // otherwise we return the newer patch
             return matchingUpdatedRecord;
-          } else {
-            recordsThatRequestedModificationButArentInTheList.push(r);
           }
 
           return r;
@@ -800,7 +794,16 @@ export default class CacheWorker {
         });
 
         // and now we can concat them
-        newValue = newValue.concat(newRecordsFiltered).concat(recordsThatRequestedModificationButArentInTheList);
+        newValue = newValue.concat(newRecordsFiltered);
+
+        // this list will fill when a row is modified but it was actually reparented
+        // so it registers as modified but it is now in our current list of values
+        const recordsThatRequestedModificationButArentInTheList: IGQLSearchRecord[] = modifiedRecords.filter((mr) => {
+          // only not found passes
+          return newValue.findIndex((r) => r.id === mr.id && r.version === mr.version) === -1;
+        });
+
+        newValue = newValue.concat(recordsThatRequestedModificationButArentInTheList);
 
         await this.db.put(SEARCHES_TABLE_NAME, {
           ...currentValue,

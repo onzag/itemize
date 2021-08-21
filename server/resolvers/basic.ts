@@ -462,7 +462,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
   // now we check if this is one of the languages we have
   // a dictionary assigned, only languages with a dictionary
   // assigned can be used by the database
-  if (!appData.config.dictionaries[args.language]) {
+  if (!appData.config.dictionaries[args.language] && !appData.config.dictionaries["*"]) {
     throw new EndpointError({
       message: "This language is not supported, as no dictionary has been set",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
