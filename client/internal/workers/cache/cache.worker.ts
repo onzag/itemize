@@ -39,11 +39,6 @@ export interface ICacheMatchType {
    * The fields that can be requested for that value
    */
   fields: IGQLRequestFields;
-  /**
-   * The cache metadata that is passed
-   * during the reads/write event
-   */
-  metadata: any;
 }
 
 /**
@@ -65,11 +60,6 @@ export interface ICachedSearchResult {
    * When was this last search modified
    */
   lastModified: string;
-  /**
-   * The cache metadata that is passed
-   * during the search event
-   */
-  metadata: any;
 }
 
 /**
@@ -108,6 +98,13 @@ export interface ISearchMatchType {
   count: number;
 }
 
+export interface ICacheMetadataMatchType {
+  /**
+   * The value of the match
+   */
+  value: any;
+}
+
 /**
  * The cache indexed db database schema
  */
@@ -133,6 +130,13 @@ export interface ICacheDB extends DBSchema {
     key: string;
     value: any;
   };
+  /**
+   * Metadata stuff
+   */
+  metadata: {
+    key: string;
+    value: any;
+  }
 }
 
 // Name of the cache in the indexed db database
@@ -141,6 +145,7 @@ export const CACHE_NAME = "ITEMIZE_CACHE";
 export const QUERIES_TABLE_NAME = "queries";
 export const SEARCHES_TABLE_NAME = "searches";
 export const STATES_TABLE_NAME = "states";
+export const METADATA_TABLE_NAME = "metadata";
 
 /**
  * This class represents a worker that works under the hood
@@ -244,6 +249,8 @@ export default class CacheWorker {
               db.deleteObjectStore(QUERIES_TABLE_NAME);
               db.deleteObjectStore(SEARCHES_TABLE_NAME);
               db.deleteObjectStore(STATES_TABLE_NAME);
+              db.deleteObjectStore(METADATA_TABLE_NAME);
+              
             } catch (err) {
               // No way to know if the store is there
               // so must catch the error
@@ -251,6 +258,7 @@ export default class CacheWorker {
             db.createObjectStore(QUERIES_TABLE_NAME);
             db.createObjectStore(SEARCHES_TABLE_NAME);
             db.createObjectStore(STATES_TABLE_NAME);
+            db.createObjectStore(METADATA_TABLE_NAME);
           } catch (err) {
             console.warn(err);
           }
@@ -431,7 +439,6 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
-    metadata: any,
     merge?: boolean,
   ): Promise<boolean> {
     if (!merge) {
@@ -455,7 +462,6 @@ export default class CacheWorker {
       const idbNewValue = {
         value: partialValue,
         fields: partialFields,
-        metadata: metadata,
       };
       await this.db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
     } catch (err) {
@@ -495,12 +501,73 @@ export default class CacheWorker {
     // and now we try this
     try {
       await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
+      await this.db.delete(METADATA_TABLE_NAME, queryIdentifier);
     } catch (err) {
       console.warn(err);
       return false;
     }
 
     return true;
+  }
+
+  public async writeMetadata(
+    queryName: string,
+    id: string,
+    version: string,
+    metadata: any,
+  ) {
+    console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return false;
+    }
+
+    // otherwise we build the index indentifier, which is simple
+    const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
+
+    // and try to save it in the database, notice how we setup the expirarion
+    // date
+    try {
+      const idbNewValue = {
+        value: metadata,
+      };
+      await this.db.put(METADATA_TABLE_NAME, idbNewValue, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+
+    return true;
+  }
+
+  public async readMetadata(
+    queryName: string,
+    id: string,
+    version: string,
+  ): Promise<ICacheMetadataMatchType> {
+    console.log("REQUESTED TO READ METADATA FOR", queryName, id, version);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return null;
+    }
+
+    // otherwise we build the index indentifier, which is simple
+    const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
+
+    try {
+      return await this.db.get(METADATA_TABLE_NAME, queryIdentifier);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
   }
 
   /**
@@ -581,7 +648,6 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
-    metadata: any,
   ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
@@ -856,7 +922,6 @@ export default class CacheWorker {
     getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
-    cacheMetadata: any,
     maxGetListResultsAtOnce: number,
   ): Promise<ICachedSearchResult> {
     await this.waitForSetupPromise;
@@ -954,7 +1019,6 @@ export default class CacheWorker {
             gqlValue: serverValue,
             dataMightBeStale: false,
             lastModified: null,
-            metadata: null,
           };
         }
 

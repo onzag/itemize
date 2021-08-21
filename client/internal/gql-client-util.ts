@@ -20,7 +20,7 @@ import {
   ENDPOINT_ERRORS,
   UNSPECIFIED_OWNER,
 } from "../../constants";
-import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
@@ -31,7 +31,60 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { fileURLAbsoluter } from "../../util";
 import { IConfigRawJSONDataType } from "../../config";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import type { ICacheMetadataMismatchRule } from "./workers/cache/cache.worker";
+import equals from "deep-equal";
+import type { ICacheMatchType, ICacheMetadataMatchType } from "./workers/cache/cache.worker";
+
+type cacheMetadataCheckFn = (value: PropertyDefinitionSupportedType | {[property: string]: PropertyDefinitionSupportedType}) => boolean;
+
+export interface ICacheMetadataMismatchConditionRule {
+  [propertyOrInclude: string]: cacheMetadataCheckFn;
+}
+
+export interface ICacheMetadataMismatchCondition {
+  custom?: ICacheMetadataMismatchConditionRule;
+  isBlocked?: boolean;
+  isDeleted?: boolean;
+}
+
+export interface ICacheMetadataMismatchAction {
+  action: "REFETCH",
+  condition?: ICacheMetadataMismatchCondition,
+}
+
+export function checkMismatchCondition(
+  condition: ICacheMetadataMismatchCondition,
+  dbValue: ICacheMatchType,
+) {
+  if (Object.keys(condition).length === 0) {
+    return true;
+  }
+
+  const isDeleted = !dbValue.value;
+  const isBlocked = !isDeleted && !dbValue.value.DATA;
+
+  if (isDeleted && condition.isDeleted) {
+    return true;
+  }
+
+  if (isBlocked && condition.isBlocked) {
+    return true;
+  }
+
+  if (!isDeleted && condition.custom) {
+    return Object.keys(condition.custom).some((propertyOrInclude: string) => {
+      let baseValue: any;
+      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(propertyOrInclude)) {
+        baseValue = dbValue.value[propertyOrInclude];
+      } else if (!isBlocked) {
+        baseValue = dbValue.value.DATA[propertyOrInclude];
+      }
+
+      return condition.custom[propertyOrInclude](baseValue);
+    });
+  } else {
+    return false;
+  }
+}
 
 export interface IPropertyOverride {
   id: string;
@@ -405,7 +458,6 @@ function storeAndCombineStorageValuesFor(
   value: IGQLValue,
   fields: IGQLRequestFields,
   cacheStore: boolean,
-  cacheMetadata: any,
 ) {
   let mergedValue: IGQLValue = value;
   let mergedFields: IGQLRequestFields = fields;
@@ -499,8 +551,11 @@ export async function runGetQueryFor(
     language: string,
     token: string,
     cacheStore: boolean,
+    cacheStoreMetadata: any,
+    cacheStoreMetadataMismatchAction: ICacheMetadataMismatchAction,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
+    currentKnownMetadata?: ICacheMetadataMatchType,
   },
 ): Promise<{
   error: EndpointErrorType,
@@ -536,14 +591,72 @@ export async function runGetQueryFor(
     CacheWorkerInstance.isSupported &&
     arg.returnWorkerCachedValues
   ) {
-    // we ask the worker for the value
-    const workerCachedValue =
-      await CacheWorkerInstance.instance.getCachedValue(
-        queryName, arg.id, arg.version || null, arg.fields,
+
+    let currentCacheMetadata: any = null;
+    let shouldProcceedWithCache: boolean = true;
+    let shouldDestroyValue: boolean = true;
+    let metadataWasMismatch: boolean = false;
+
+    const workerCachedValue: ICacheMatchType = await CacheWorkerInstance.instance.getCachedValue(
+      queryName,
+      arg.id,
+      arg.version || null,
+      arg.fields,
+    );
+    const expectedCacheMetadata = arg.cacheStoreMetadata || null;
+
+    if (arg.cacheStoreMetadataMismatchAction && workerCachedValue) {
+      const value = arg.currentKnownMetadata || await CacheWorkerInstance.instance.readMetadata(
+        queryName,
+        arg.id,
+        arg.version || null,
       );
+      if (value && value.value) {
+        currentCacheMetadata = value.value;
+      }
+
+      metadataWasMismatch = !equals(expectedCacheMetadata, currentCacheMetadata, { strict: true });
+
+      if (metadataWasMismatch) {
+        let ruleApplies = !arg.cacheStoreMetadataMismatchAction.condition;
+        if (!ruleApplies) {
+          if (workerCachedValue) {
+            ruleApplies = checkMismatchCondition(
+              arg.cacheStoreMetadataMismatchAction.condition,
+              workerCachedValue,
+            );
+          }
+        }
+
+        if (ruleApplies) {
+          if (arg.cacheStoreMetadataMismatchAction.action === "REFETCH") {
+            shouldProcceedWithCache = false;
+            shouldDestroyValue = true;
+          }
+        }
+      }
+    }
+
+    if (shouldDestroyValue) {
+      await CacheWorkerInstance.instance.deleteCachedValue(
+        queryName,
+        arg.id,
+        arg.version || null,
+      );
+    }
+
+    if (metadataWasMismatch) {
+      await CacheWorkerInstance.instance.writeMetadata(
+        queryName,
+        arg.id,
+        arg.version || null,
+        expectedCacheMetadata,
+      );
+    }
+
     // if we have a GET request and we are allowed to return from the wroker cache and we actually
     // found something in our cache, return that
-    if (workerCachedValue) {
+    if (workerCachedValue && shouldProcceedWithCache) {
       return {
         error: null,
         value: workerCachedValue.value,
@@ -848,7 +961,6 @@ export async function runEditQueryFor(
     version: string,
     listenerUUID: string,
     cacheStore: boolean,
-    cacheStoreMetadata?: any,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },
@@ -905,7 +1017,6 @@ export async function runEditQueryFor(
       value,
       arg.fields,
       arg.cacheStore,
-      arg.cacheStoreMetadata || null,
     );
     return {
       error,
@@ -961,7 +1072,6 @@ interface IRunSearchQueryArg {
   versionFilter?: string,
   waitAndMerge?: boolean,
   progresser?: ProgresserFn,
-  cacheMetadata?: any,
 }
 
 interface IRunSearchQuerySearchOptions {
@@ -977,7 +1087,6 @@ interface IRunSearchQueryResult {
   limit: number,
   offset: number,
   lastModified: string,
-  cacheMetadata?: string,
 }
 
 /**
@@ -1069,7 +1178,6 @@ export async function runSearchQueryFor(
   let lastModified: string = null;
 
   let gqlValue: IGQLEndpointValue;
-  let cacheMetadataReturned: any = null;
   // if we are in a search with
   // a cache policy then we should be able
   // to run the search within the worker as
@@ -1105,11 +1213,8 @@ export async function runSearchQueryFor(
       arg.language.split("-")[0],
       arg.fields,
       arg.cachePolicy,
-      arg.cacheMetadata || null,
       standardCounterpartModule.getMaxSearchResults(),
     );
-
-    cacheMetadataReturned = cacheWorkerGivenSearchValue.metadata;
 
     // last record date of the given record
     // might be null, if no records
@@ -1240,7 +1345,6 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
-      cacheMetadata: cacheMetadataReturned,
     };
   } else {
     const records: IGQLSearchRecord[] = (
@@ -1260,7 +1364,6 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
-      cacheMetadata: cacheMetadataReturned,
     };
   }
 }

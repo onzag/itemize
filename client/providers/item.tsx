@@ -25,7 +25,8 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import CacheWorkerInstance from "../internal/workers/cache";
 import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
-import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride, IPropertyOverride, reprocessFileArgumentForAdd } from "../internal/gql-client-util";
+import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
+  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
@@ -33,25 +34,7 @@ import { IConfigRawJSONDataType } from "../../config";
 import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
-
-export interface ICacheMetadataMismatchCondition {
-  [propertyOrInclude: string]:
-  "IS_NULL" |
-  "IS_NOT_NULL" |
-  "IS_TRUE" |
-  "IS_FALSE" |
-  "IS_FALSIFIABLE" |
-  "IS_NOT_FALSIFIABLE" |
-  "IS_EXCLUDED" |
-  "IS_INCLUDED" |
-  ["IS_EQUAL_TO", any] |
-  ICacheMetadataMismatchCondition;
-}
-
-export interface ICacheMetadataMismatchRule {
-  action: "REFETCH",
-  condition?: ICacheMetadataMismatchCondition,
-}
+import type { ICacheMatchType, ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -161,13 +144,6 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   count: number;
   limit: number;
   offset: number;
-
-  /**
-   * This is a client side metadata
-   * that only exists when the results are loaded
-   * from a client side cache
-   */
-  cacheMetadata: any;
 }
 
 export type PolicyPathType = [string, string, string];
@@ -678,11 +654,11 @@ export interface IItemProviderProps {
   /**
    * Cache metadata to push with the long term caching
    */
-  longTermCacheMetadata?: any;
+  longTermCachingMetadata?: any;
   /**
    * Cache rules to resolve during a metadata mismatch
    */
-  longTermCacheMetadataMismatchAction?: ICacheMetadataMismatchRule;
+  longTermCacheMetadataMismatchAction?: ICacheMetadataMismatchAction;
   /**
    * loads the state from the cache worker if a
    * stored value is found
@@ -1440,6 +1416,7 @@ export class ActualItemProvider extends
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
       !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
       !equals(nextProps.automaticSearch, this.props.automaticSearch, { strict: true }) ||
+      !equals(nextProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true }) ||
       !equals(nextProps.setters, this.props.setters, { strict: true }) ||
       nextProps.location !== this.props.location ||
       !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true });
@@ -1639,7 +1616,8 @@ export class ActualItemProvider extends
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role ||
       prevProps.loadModerationFields !== this.props.loadModerationFields ||
-      itemDefinitionWasUpdated
+      itemDefinitionWasUpdated ||
+      !equals(prevProps.longTermCachingMetadata, this.props.longTermCachingMetadata, {strict: true})
     ) {
       if (!this.props.avoidLoading) {
         await this.loadValue();
@@ -1869,8 +1847,6 @@ export class ActualItemProvider extends
             forVersion || null,
             appliedGQLValue.rawValue,
             appliedGQLValue.requestFields,
-            this.props.longTermCacheMetadata,
-            this.props.longTermCacheMetadataMismatchAction,
           );
         } else {
           CacheWorkerInstance.instance.setCachedValue(
@@ -1879,8 +1855,6 @@ export class ActualItemProvider extends
             forVersion || null,
             null,
             null,
-            this.props.longTermCacheMetadata,
-            this.props.longTermCacheMetadataMismatchAction,
           );
         }
       }
@@ -1938,7 +1912,7 @@ export class ActualItemProvider extends
       }
     }
   }
-  public async loadValue(denyCache?: boolean): Promise<IActionResponseWithValue> {
+  public async loadValue(denyCaches?: boolean): Promise<IActionResponseWithValue> {
     const forId = this.props.forId;
     const forVersion = this.props.forVersion || null;
 
@@ -1998,7 +1972,7 @@ export class ActualItemProvider extends
     // when the client loads from memory, a reload is requested, but the search conxtext hasn't
     // released yet the value
     if (
-      !denyCache &&
+      !denyCaches &&
       this.props.searchContext &&
       this.props.searchContext.currentlySearching.find(
         (s) =>
@@ -2018,7 +1992,31 @@ export class ActualItemProvider extends
       return null;
     }
 
-    if (!denyCache) {
+    const qualifiedName = this.props.itemDefinitionQualifiedName;
+
+    let currentMetadata: ICacheMetadataMatchType;
+    let denyMemoryCache: boolean = false;
+    if (
+      !denyCaches &&
+      this.props.longTermCacheMetadataMismatchAction &&
+      CacheWorkerInstance.isSupported
+    ) {
+      currentMetadata = await CacheWorkerInstance.instance.readMetadata(
+        PREFIX_GET + qualifiedName,
+        forId,
+        forVersion || null,
+      );
+
+      if (!equals(this.props.longTermCachingMetadata, currentMetadata)) {
+        // we deny the memory cache because we are now unsure of whether
+        // the value held in memory is valid due to the metadata
+        // as this value might have come from the cache when it was loaded
+        // with such unmatching metadata
+        denyMemoryCache = true;
+      }
+    }
+
+    if (!denyCaches && !denyMemoryCache) {
       // Prevent loading at all if value currently available and memoryCached
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         forId, forVersion,
@@ -2052,7 +2050,6 @@ export class ActualItemProvider extends
           this.props.longTermCaching &&
           !this.props.searchContext
         ) {
-          const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
           if (appliedGQLValue.rawValue) {
             CacheWorkerInstance.instance.mergeCachedValue(
               PREFIX_GET + qualifiedName,
@@ -2060,8 +2057,6 @@ export class ActualItemProvider extends
               forVersion || null,
               appliedGQLValue.rawValue,
               appliedGQLValue.requestFields,
-              this.props.longTermCacheMetadata,
-              this.props.longTermCacheMetadataMismatchAction,
             );
           } else {
             CacheWorkerInstance.instance.setCachedValue(
@@ -2070,8 +2065,6 @@ export class ActualItemProvider extends
               forVersion || null,
               null,
               null,
-              this.props.longTermCacheMetadata,
-              this.props.longTermCacheMetadataMismatchAction,
             );
           }
         }
@@ -2112,21 +2105,21 @@ export class ActualItemProvider extends
       value,
       cached,
       getQueryFields,
-      originalMetadata,
     } = await runGetQueryFor({
       args: {},
       fields: requestFields,
       returnMemoryCachedValues: false,
-      returnWorkerCachedValues: !denyCache,
+      returnWorkerCachedValues: !denyCaches,
       itemDefinition: this.props.itemDefinitionInstance,
       id: forId,
       version: forVersion,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       cacheStore: this.props.longTermCaching,
-      cacheStoreMetadata: this.props.longTermCacheMetadata,
-      cacheStoreMismatchAction: this.props.longTermCacheMetadataMismatchAction,
+      cacheStoreMetadata: this.props.longTermCachingMetadata,
+      cacheStoreMetadataMismatchAction: this.props.longTermCacheMetadataMismatchAction,
       waitAndMerge: this.props.waitAndMerge,
+      currentKnownMetadata: currentMetadata,
     });
 
     if (!error) {
@@ -2609,7 +2602,6 @@ export class ActualItemProvider extends
         offset: null,
         count: null,
         error: emulatedError,
-        cacheMetadata: null,
       };
     } else {
       return {
@@ -3583,7 +3575,6 @@ export class ActualItemProvider extends
       offset,
       error,
       lastModified,
-      cacheMetadata,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
@@ -3606,7 +3597,6 @@ export class ActualItemProvider extends
       parentedBy,
       waitAndMerge: options.waitAndMerge,
       progresser: options.progresser,
-      cacheMetadata: options.cacheMetadata,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
@@ -3776,7 +3766,6 @@ export class ActualItemProvider extends
       limit,
       offset,
       error,
-      cacheMetadata,
     };
     this.props.onSearch && this.props.onSearch(result);
     return result;
