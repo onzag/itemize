@@ -222,6 +222,12 @@ export default {
         type: "string",
       },
     },
+    softReadRoleAccess: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     createRoleAccess: {
       type: "array",
       items: {

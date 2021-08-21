@@ -16,7 +16,7 @@ import {
   IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue
 } from "../../../../gql-querier";
-import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
+import { PREFIX_GET, ENDPOINT_ERRORS, INCLUDE_PREFIX } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
@@ -39,6 +39,11 @@ export interface ICacheMatchType {
    * The fields that can be requested for that value
    */
   fields: IGQLRequestFields;
+  /**
+   * The cache metadata that is passed
+   * during the reads/write event
+   */
+  metadata: any;
 }
 
 /**
@@ -60,6 +65,11 @@ export interface ICachedSearchResult {
    * When was this last search modified
    */
   lastModified: string;
+  /**
+   * The cache metadata that is passed
+   * during the search event
+   */
+  metadata: any;
 }
 
 /**
@@ -421,6 +431,7 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
+    metadata: any,
     merge?: boolean,
   ): Promise<boolean> {
     if (!merge) {
@@ -444,6 +455,7 @@ export default class CacheWorker {
       const idbNewValue = {
         value: partialValue,
         fields: partialFields,
+        metadata: metadata,
       };
       await this.db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
     } catch (err) {
@@ -569,6 +581,7 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
+    metadata: any,
   ): Promise<boolean> {
     console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
@@ -730,7 +743,8 @@ export default class CacheWorker {
           r.id,
           r.version,
           null,
-          null
+          null,
+          undefined,
         );
       }));
     } catch {
@@ -842,6 +856,7 @@ export default class CacheWorker {
     getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    cacheMetadata: any,
     maxGetListResultsAtOnce: number,
   ): Promise<ICachedSearchResult> {
     await this.waitForSetupPromise;
@@ -899,11 +914,11 @@ export default class CacheWorker {
           offset: 0,
         };
 
-        if (cachePolicy === "by-owner" || cachePolicy === "by-owner-and-parent") {
+        if (cachePolicy === "by-owner" || cachePolicy === "by-owner-and-parent") {
           actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
         }
-        
-        if (cachePolicy === "by-parent" || cachePolicy === "by-owner-and-parent") {
+
+        if (cachePolicy === "by-parent" || cachePolicy === "by-owner-and-parent") {
           actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
           actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
           actualArgsToUseInGQLSearch.parent_version = searchArgs.parent_version;
@@ -939,6 +954,7 @@ export default class CacheWorker {
             gqlValue: serverValue,
             dataMightBeStale: false,
             lastModified: null,
+            metadata: null,
           };
         }
 

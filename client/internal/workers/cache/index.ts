@@ -5,7 +5,7 @@
  * @module
  */
 
-import { wrap, transfer, proxy } from "comlink";
+import { wrap, proxy } from "comlink";
 import CacheWorker from "./cache.worker";
 
 // we need to know in which environemnt we are in order to load

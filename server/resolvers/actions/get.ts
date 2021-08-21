@@ -53,7 +53,6 @@ export async function getItemDefinition(
   // in the get request
   const rawFields = graphqlFields(resolverArgs.info);
   const requestedFields = flattenRawGQLValueOrFields(rawFields);
-  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // so we run the policy check for read, this item definition,
   // with the given id
@@ -95,6 +94,7 @@ export async function getItemDefinition(
     selectQueryValue,
   ) : null;
 
+  const ownerId = selectQueryValue ? (itemDefinition.isOwnerObjectId() ? selectQueryValue.id : selectQueryValue.created_by) : null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -105,13 +105,15 @@ export async function getItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.RETRIEVING,
-    owner: selectQueryValue ? (itemDefinition.isOwnerObjectId() ? selectQueryValue.id : selectQueryValue.created_by) : null,
+    owner: ownerId,
     parent: selectQueryValue && selectQueryValue.parent_id ? {
       id: selectQueryValue.parent_id,
       type: selectQueryValue.parent_type,
       version: selectQueryValue.parent_version,
     } : null,
   });
+
+  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
 
   // if we don't have any result, we cannot even check permissions
   // the thing does not exist, returning null
@@ -168,12 +170,14 @@ export async function getItemDefinition(
     selectQueryValue,
   );
 
-
-  const valueToProvide = filterAndPrepareGQLValue(
+  const valueToProvide = await filterAndPrepareGQLValue(
     appData.cache.getServerData(),
     selectQueryValue,
     requestedFields,
     tokenData.role,
+    tokenData.id,
+    userId,
+    rolesManager,
     itemDefinition,
   );
 
@@ -287,7 +291,6 @@ export async function getItemDefinitionList(
   // now we find the requested fields that are requested
   // in the get request
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
-  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -342,14 +345,6 @@ export async function getItemDefinitionList(
         });
       }
 
-      const valueToProvide = filterAndPrepareGQLValue(
-        appData.cache.getServerData(),
-        value,
-        requestedFields,
-        tokenData.role,
-        itemDefinition,
-      );
-
       const pathOfThisModule = mod.getPath().join("/");
       const pathOfThisIdef = itemDefinition.getPath().join("/");
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
@@ -363,6 +358,7 @@ export async function getItemDefinitionList(
         itemDefinition,
         value,
       );
+      const ownerId = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
       const rolesManager = new CustomRoleManager(appData.customRoles, {
         cache: appData.cache,
         databaseConnection: appData.databaseConnection,
@@ -373,13 +369,16 @@ export async function getItemDefinitionList(
         root: appData.root,
         tokenData: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
-        owner: itemDefinition.isOwnerObjectId() ? value.id : value.created_by,
+        owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,
           type: value.parent_type,
           version: value.parent_version,
         } : null,
       });
+
+      await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
+
       await itemDefinition.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,
         tokenData.role,
@@ -388,6 +387,17 @@ export async function getItemDefinitionList(
         requestedFieldsInIdef,
         rolesManager,
         true,
+      );
+
+      const valueToProvide = await filterAndPrepareGQLValue(
+        appData.cache.getServerData(),
+        value,
+        requestedFields,
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        rolesManager,
+        itemDefinition,
       );
 
       if (moduleTrigger || itemDefinitionTrigger) {
@@ -487,7 +497,6 @@ export async function getModuleList(
   // now we find the requested fields that are requested
   // in the get request
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
-  checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -524,14 +533,6 @@ export async function getModuleList(
         });
       }
 
-      const valueToProvide = filterAndPrepareGQLValue(
-        appData.cache.getServerData(),
-        value,
-        requestedFields,
-        tokenData.role,
-        mod,
-      );
-
       const itemDefinition = appData.root.registry[value.type] as ItemDefinition;
       const pathOfThisModule = mod.getPath().join("/");
       const pathOfThisIdef = itemDefinition.getPath().join("/");
@@ -547,6 +548,7 @@ export async function getModuleList(
       CAN_LOG_DEBUG && logger.debug(
         "getModuleList: checking role access for read",
       );
+      const ownerId = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
       const rolesManager = new CustomRoleManager(appData.customRoles, {
         cache: appData.cache,
         databaseConnection: appData.databaseConnection,
@@ -557,13 +559,14 @@ export async function getModuleList(
         root: appData.root,
         tokenData: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
-        owner: itemDefinition.isOwnerObjectId() ? value.id : value.created_by,
+        owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,
           type: value.parent_type,
           version: value.parent_version,
         } : null,
       });
+      await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
       await mod.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,
         tokenData.role,
@@ -572,6 +575,17 @@ export async function getModuleList(
         requestedFieldsInMod,
         rolesManager,
         true,
+      );
+
+      const valueToProvide = await filterAndPrepareGQLValue(
+        appData.cache.getServerData(),
+        value,
+        requestedFields,
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        rolesManager,
+        mod,
       );
 
       if (moduleTrigger || itemDefinitionTrigger) {

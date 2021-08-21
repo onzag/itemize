@@ -338,6 +338,36 @@ export default class Include {
   }
 
   /**
+   * For a given requested graphql value it will
+   * tell which fields need to be filtered for soft
+   * read role access
+   * @param role 
+   * @param userId 
+   * @param ownerUserId 
+   * @param rolesManager 
+   * @returns 
+   */
+   public async applySoftReadRoleAccessTo(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+    value: IGQLValue,
+  ): Promise<void> {
+    if (!value) {
+      return;
+    }
+
+    for (const requestedField of Object.keys(value || {})) {
+      const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
+      const hasSoftAccess = await propDef.checkSoftReadRoleAccessFor(role, userId, ownerUserId, rolesManager);
+      if (!hasSoftAccess) {
+        value[requestedField] = null;
+      }
+    }
+  }
+
+  /**
    * Checks the role access for a given include to be accessed given a IO action
    * @param action the action that wants to be executed
    * @param role the role of the user wanting to execute that action

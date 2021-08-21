@@ -26,7 +26,7 @@ import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
 import Root, { ICustomRoleManager, Ii18NType, IRequestLimitersType } from "..";
 import { EndpointError } from "../../errors";
-import { IGQLRequestFields } from "../../../gql-querier";
+import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
 
 /**
  * Specific locale information contained within modules and item
@@ -399,17 +399,17 @@ export default class Module {
       this.propExtensions = this.rawData.propExtensions
         .filter((p) => isInSearchMode ? true : !p.searchOnlyProperty)
         .map((propExtensionRawJSONData) => {
-        // the prop extension constructor is fed the raw json data
-        // the current module as the parent module instance
-        // no item definition as parent definition instance
-        // and true as being an extension
-        return new PropertyDefinition(
-          propExtensionRawJSONData,
-          this,
-          null,
-          true,
-        );
-      });
+          // the prop extension constructor is fed the raw json data
+          // the current module as the parent module instance
+          // no item definition as parent definition instance
+          // and true as being an extension
+          return new PropertyDefinition(
+            propExtensionRawJSONData,
+            this,
+            null,
+            true,
+          );
+        });
     } else {
       // Otherwise if we have no prop extensions, we populate it as empty
       this.propExtensions = [];
@@ -498,7 +498,7 @@ export default class Module {
     // Try to find the first path
     const finalDefinition = this.rawData.children
       .find((d) => d.type === "item" && d.name === name[0]) as
-        IItemDefinitionRawJSONDataType;
+      IItemDefinitionRawJSONDataType;
 
     // if we don't find it, it's not there
     if (!finalDefinition) {
@@ -817,8 +817,8 @@ export default class Module {
    * @retuns an array with the approved roles or the anyone metarole
    */
   public getRolesWithSearchAccess() {
-    return this.rawData.searchRoleAccess || [ANYONE_METAROLE];
-  } 
+    return this.rawData.searchRoleAccess || [ANYONE_METAROLE];
+  }
 
   /**
    * Provides the roles that have access to a given
@@ -871,6 +871,57 @@ export default class Module {
   }
 
   /**
+   * For a given requested graphql value it will
+   * tell which fields need to be filtered for soft
+   * read role access
+   * @param role 
+   * @param userId 
+   * @param ownerUserId 
+   * @param rolesManager 
+   * @returns 
+   */
+  public async applySoftReadRoleAccessTo(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+    value: IGQLValue,
+  ): Promise<void> {
+
+    if (!value) {
+      return;
+    }
+
+    // otherwise we go in the requested fields, in each one of them
+    for (const requestedField of Object.keys(value)) {
+      if (!this.hasPropExtensionFor(requestedField)) {
+        continue;
+      }
+      // also for the property
+      const propDef = this.getPropExtensionFor(requestedField);
+      const hasSoftAccess = await propDef.checkSoftReadRoleAccessFor(role, userId, ownerUserId, rolesManager);
+      if (!hasSoftAccess) {
+        value[requestedField] = null;
+      }
+    }
+  }
+
+  public async checkRoleAccessForModeration(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+  ) {
+    const rolesWithAccess = this.getRolesWithModerationAccess();
+    return rolesWithAccess.includes(ANYONE_METAROLE) ||
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+  }
+
+  /**
    * Checks the role access for an action in a module
    * @param action the IO action (for modules this can only logically be a READ action for module level searches)
    * @param role the role of the user attempting the action
@@ -904,8 +955,8 @@ export default class Module {
           ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
         if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
           errorMessage += ", this error might have been avoided if an owner had" +
-          " been specified which matched yourself as there's a self rule, if performing a search" +
-          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+            " been specified which matched yourself as there's a self rule, if performing a search" +
+            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
         }
         throw new EndpointError({
           message: errorMessage,

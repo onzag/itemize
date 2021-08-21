@@ -7,6 +7,8 @@ import {
   ENDPOINT_ERRORS,
   OWNER_METAROLE,
   RESERVED_BASE_PROPERTIES,
+  INCLUDE_PREFIX,
+  EXCLUSION_STATE_SUFFIX,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
@@ -25,6 +27,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { ICustomRoleManager } from "../../base/Root";
+import { CustomRoleManager } from "./roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -48,7 +51,7 @@ export interface IServerSideTokenDataType {
 export function defaultTriggerForbiddenFunction(message: string, customCode?: string) {
   throw new EndpointError({
     message,
-    code: customCode || ENDPOINT_ERRORS.FORBIDDEN,
+    code: customCode || ENDPOINT_ERRORS.FORBIDDEN,
   });
 }
 
@@ -195,9 +198,11 @@ export async function validateParentingRules(
  * function
  * @param requestedFields the requested fields
  */
-export function checkBasicFieldsAreAvailableForRole(
+export async function checkBasicFieldsAreAvailableForRole(
   itemDefinitionOrModule: ItemDefinition | Module,
   tokenData: IServerSideTokenDataType,
+  ownerId: string,
+  rolesManager: CustomRoleManager,
   requestedFields: any,
 ) {
   if (typeof requestedFields === "undefined" || requestedFields === null) {
@@ -210,16 +215,18 @@ export function checkBasicFieldsAreAvailableForRole(
   if (
     moderationFieldsHaveBeenRequested
   ) {
-    const rolesThatHaveAccessToModerationFields = itemDefinitionOrModule.getRolesWithModerationAccess();
-    const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
-      (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
-      rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+    const hasAccessToModerationFields = await itemDefinitionOrModule.checkRoleAccessForModeration(
+      tokenData.role,
+      tokenData.id,
+      ownerId,
+      rolesManager,
+    );
     if (!hasAccessToModerationFields) {
       CAN_LOG_SILLY && logger.silly(
         "checkBasicFieldsAreAvailableForRole: Attempted to access to moderation fields with invalid role",
         {
           role: tokenData.role,
-          rolesThatHaveAccessToModerationFields,
+          rolesThatHaveAccessToModerationFields: itemDefinitionOrModule.getRolesWithModerationAccess(),
         }
       );
       // we throw an error
@@ -379,7 +386,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
         const passedSince = limiter.since && sinceSucceed;
         const passedCreatedBy = limiter.createdBy && createdBySucceed;
         const passedParenting = limiter.parenting && parentingSucceed;
-    
+
         if (
           passedCustom ||
           passedSince ||
@@ -388,7 +395,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
         ) {
           return;
         }
-    
+
         throw new EndpointError({
           message: `None of the OR request limiting conditions from the ${isModLimiter ? "module" : "item"} passed`,
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -644,13 +651,16 @@ export interface IFilteredAndPreparedValueType {
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-export function filterAndPrepareGQLValue(
+export async function filterAndPrepareGQLValue(
   serverData: any,
   value: ISQLTableRowValue,
   requestedFields: IGQLRequestFields,
   role: string,
+  userId: string,
+  ownerUserId: string,
+  rolesManager: CustomRoleManager,
   parentModuleOrIdef: ItemDefinition | Module,
-): IFilteredAndPreparedValueType {
+): Promise<IFilteredAndPreparedValueType> {
   // we are going to get the value for the item
   let valueOfTheItem: any;
   if (parentModuleOrIdef instanceof ItemDefinition) {
@@ -671,11 +681,24 @@ export function filterAndPrepareGQLValue(
       requestedFields,
     );
   }
+
+  const valueOfTheItemForSoftReads = { ...valueOfTheItem };
+  Object.keys(valueOfTheItemForSoftReads).forEach((k) => {
+    if (k.startsWith(INCLUDE_PREFIX) && !k.endsWith(EXCLUSION_STATE_SUFFIX)) {
+      valueOfTheItemForSoftReads[k] = { ...valueOfTheItem[k] };
+    }
+  });
+
+  parentModuleOrIdef.applySoftReadRoleAccessTo(role, userId, ownerUserId, rolesManager, valueOfTheItemForSoftReads);
+
   // we add the object like this, all the non requested data, eg.
   // values inside that should be outside, and outside that will be inside
   // will be stripped
   const actualValue = {
     DATA: valueOfTheItem,
+  };
+  const actualFilteredValue = {
+    DATA: valueOfTheItemForSoftReads,
   };
   const finalRequestFields = {
     DATA: { ...requestedFields },
@@ -683,24 +706,35 @@ export function filterAndPrepareGQLValue(
 
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((property) => {
     if (typeof value[property] !== "undefined" && requestedFields[property]) {
-      actualValue[property] = value[property];
+      actualValue[property] = valueOfTheItem[property];
       delete actualValue.DATA[property];
+      actualFilteredValue[property] = valueOfTheItemForSoftReads[property];
+      delete actualFilteredValue.DATA[property];
       finalRequestFields[property] = {};
       delete finalRequestFields.DATA[property];
     }
   });
 
   const valueToProvide = {
-    toReturnToUser: actualValue,
+    toReturnToUser: actualFilteredValue,
     actualValue,
     requestFields: finalRequestFields,
-    convertedValue: valueOfTheItem,
   };
+
   if (value.blocked_at !== null) {
     const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();
-    const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
+    const hasBaseAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
       (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+      (rolesThatHaveAccessToModerationFields.includes(OWNER_METAROLE) && userId === ownerUserId)
       rolesThatHaveAccessToModerationFields.includes(role);
+
+    let hasAccessToModerationFields = hasBaseAccessToModerationFields;
+    if (!hasAccessToModerationFields) {
+      hasAccessToModerationFields = await rolesManager.checkRoleAccessFor(
+        rolesThatHaveAccessToModerationFields,
+      );
+    }
+    
     if (!hasAccessToModerationFields) {
       valueToProvide.toReturnToUser.DATA = null;
     }

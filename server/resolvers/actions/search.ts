@@ -113,6 +113,8 @@ export async function searchModule(
   CAN_LOG_DEBUG && logger.debug(
     "searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
   );
+
+  const ownerId = resolverArgs.args.created_by || null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -122,8 +124,8 @@ export async function searchModule(
     module: mod,
     root: appData.root,
     tokenData: tokenData,
-    environment: CustomRoleGranterEnvironment.SEARCHING,
-    owner: resolverArgs.args.created_by || null,
+    environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+    owner: ownerId,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
       id: resolverArgs.args.parent_id,
       type: resolverArgs.args.parent_type,
@@ -145,7 +147,7 @@ export async function searchModule(
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
-    checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
+    await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
 
     const fieldsToRequestRawValue = Object.keys(requestedFields);
 
@@ -283,11 +285,14 @@ export async function searchModule(
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
         baseResult.map(async (r) => {
-          const valueToProvide = filterAndPrepareGQLValue(
+          const valueToProvide = await filterAndPrepareGQLValue(
             appData.cache.getServerData(),
             r,
             requestedFields,
             tokenData.role,
+            tokenData.id,
+            ownerId,
+            rolesManager,
             mod,
           );
 
@@ -474,6 +479,7 @@ export async function searchItemDefinition(
     searchingFields,
   );
 
+  const ownerId = resolverArgs.args.created_by || null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -483,8 +489,8 @@ export async function searchItemDefinition(
     module: itemDefinition.getParentModule(),
     tokenData: tokenData,
     root: appData.root,
-    environment: CustomRoleGranterEnvironment.SEARCHING,
-    owner: resolverArgs.args.created_by || null,
+    environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+    owner: ownerId,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
       id: resolverArgs.args.parent_id,
       type: resolverArgs.args.parent_type,
@@ -543,7 +549,7 @@ export async function searchItemDefinition(
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
-    checkBasicFieldsAreAvailableForRole(mod, tokenData, requestedFields);
+    await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
 
     const fieldsToRequestRawValue = Object.keys(requestedFields);
     const requestedFieldsInIdef = {};
@@ -724,11 +730,14 @@ export async function searchItemDefinition(
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
         baseResult.map(async (r) => {
-          const valueToProvide = filterAndPrepareGQLValue(
+          const valueToProvide = await filterAndPrepareGQLValue(
             appData.cache.getServerData(),
             r,
             requestedFields,
             tokenData.role,
+            tokenData.id,
+            ownerId,
+            rolesManager,
             itemDefinition,
           );
 

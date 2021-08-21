@@ -94,6 +94,7 @@ export async function addItemDefinition(
     resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
   );
 
+  const ownerId = resolverArgs.args.in_behalf_of || tokenData.id;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -104,7 +105,7 @@ export async function addItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.CREATION,
-    owner: resolverArgs.args.in_behalf_of || tokenData.id,
+    owner: ownerId,
     parent: isParenting ? {
       id: resolverArgs.args.parent_id,
       type: resolverArgs.args.parent_type,
@@ -182,7 +183,7 @@ export async function addItemDefinition(
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
   // now we use the basic functions and we check if the basic fields are available,
   // basic fields are module based, like moderation fields
-  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
+  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
 
   // now we extract the fields that we are actually adding to the item
   // definition, that is what is valid for adding and nothing else
@@ -474,11 +475,6 @@ export async function addItemDefinition(
     requestedFields,
   );
 
-  const finalOutput = {
-    DATA: gqlValue,
-    ...gqlValue,
-  };
-
   if (
     moduleTrigger
   ) {
@@ -525,6 +521,19 @@ export async function addItemDefinition(
       forbid: defaultTriggerInvalidForbiddenFunction,
     });
   }
+
+  await itemDefinition.applySoftReadRoleAccessTo(
+    tokenData.role,
+    tokenData.id,
+    finalOwner,
+    rolesManager,
+    gqlValue,
+  );
+
+  const finalOutput = {
+    DATA: gqlValue,
+    ...gqlValue,
+  };
 
   if (
     !await itemDefinition.checkRoleCanReadOwner(

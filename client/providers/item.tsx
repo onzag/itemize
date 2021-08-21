@@ -34,6 +34,25 @@ import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 
+export interface ICacheMetadataMismatchCondition {
+  [propertyOrInclude: string]:
+  "IS_NULL" |
+  "IS_NOT_NULL" |
+  "IS_TRUE" |
+  "IS_FALSE" |
+  "IS_FALSIFIABLE" |
+  "IS_NOT_FALSIFIABLE" |
+  "IS_EXCLUDED" |
+  "IS_INCLUDED" |
+  ["IS_EQUAL_TO", any] |
+  ICacheMetadataMismatchCondition;
+}
+
+export interface ICacheMetadataMismatchRule {
+  action: "REFETCH",
+  condition?: ICacheMetadataMismatchCondition,
+}
+
 const isDevelopment = process.env.NODE_ENV === "development";
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
@@ -142,6 +161,13 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   count: number;
   limit: number;
   offset: number;
+
+  /**
+   * This is a client side metadata
+   * that only exists when the results are loaded
+   * from a client side cache
+   */
+  cacheMetadata: any;
 }
 
 export type PolicyPathType = [string, string, string];
@@ -346,6 +372,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
+  cacheMetadata?: any;
 }
 
 export interface IPokeElementsType {
@@ -648,6 +675,14 @@ export interface IItemProviderProps {
    * uses long term caching with the worker cache strategy
    */
   longTermCaching?: boolean;
+  /**
+   * Cache metadata to push with the long term caching
+   */
+  longTermCacheMetadata?: any;
+  /**
+   * Cache rules to resolve during a metadata mismatch
+   */
+  longTermCacheMetadataMismatchAction?: ICacheMetadataMismatchRule;
   /**
    * loads the state from the cache worker if a
    * stored value is found
@@ -1834,6 +1869,8 @@ export class ActualItemProvider extends
             forVersion || null,
             appliedGQLValue.rawValue,
             appliedGQLValue.requestFields,
+            this.props.longTermCacheMetadata,
+            this.props.longTermCacheMetadataMismatchAction,
           );
         } else {
           CacheWorkerInstance.instance.setCachedValue(
@@ -1842,6 +1879,8 @@ export class ActualItemProvider extends
             forVersion || null,
             null,
             null,
+            this.props.longTermCacheMetadata,
+            this.props.longTermCacheMetadataMismatchAction,
           );
         }
       }
@@ -2021,6 +2060,8 @@ export class ActualItemProvider extends
               forVersion || null,
               appliedGQLValue.rawValue,
               appliedGQLValue.requestFields,
+              this.props.longTermCacheMetadata,
+              this.props.longTermCacheMetadataMismatchAction,
             );
           } else {
             CacheWorkerInstance.instance.setCachedValue(
@@ -2029,6 +2070,8 @@ export class ActualItemProvider extends
               forVersion || null,
               null,
               null,
+              this.props.longTermCacheMetadata,
+              this.props.longTermCacheMetadataMismatchAction,
             );
           }
         }
@@ -2069,6 +2112,7 @@ export class ActualItemProvider extends
       value,
       cached,
       getQueryFields,
+      originalMetadata,
     } = await runGetQueryFor({
       args: {},
       fields: requestFields,
@@ -2080,6 +2124,8 @@ export class ActualItemProvider extends
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       cacheStore: this.props.longTermCaching,
+      cacheStoreMetadata: this.props.longTermCacheMetadata,
+      cacheStoreMismatchAction: this.props.longTermCacheMetadataMismatchAction,
       waitAndMerge: this.props.waitAndMerge,
     });
 
@@ -2563,6 +2609,7 @@ export class ActualItemProvider extends
         offset: null,
         count: null,
         error: emulatedError,
+        cacheMetadata: null,
       };
     } else {
       return {
@@ -3536,6 +3583,7 @@ export class ActualItemProvider extends
       offset,
       error,
       lastModified,
+      cacheMetadata,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
@@ -3558,6 +3606,7 @@ export class ActualItemProvider extends
       parentedBy,
       waitAndMerge: options.waitAndMerge,
       progresser: options.progresser,
+      cacheMetadata: options.cacheMetadata,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
@@ -3727,6 +3776,7 @@ export class ActualItemProvider extends
       limit,
       offset,
       error,
+      cacheMetadata,
     };
     this.props.onSearch && this.props.onSearch(result);
     return result;

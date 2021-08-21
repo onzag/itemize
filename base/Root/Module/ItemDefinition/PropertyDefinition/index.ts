@@ -237,6 +237,12 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   readRoleAccess?: string[];
   /**
+   * Soft Read role permissions
+   * make the property null rather than
+   * denying the entire access to the resource
+   */
+  softReadRoleAccess?: string[];
+  /**
    * create role permissions
    */
   createRoleAccess?: string[];
@@ -2255,6 +2261,35 @@ export default class PropertyDefinition {
 
     // otherwise we get the request fields
     return this.getRequestFields();
+  }
+
+  /**
+   * Checks the soft read role access to a given
+   * property
+   * @param role 
+   * @param userId 
+   * @param ownerUserId 
+   * @param rolesManager 
+   * @returns 
+   */
+  public async checkSoftReadRoleAccessFor(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+  ) {
+    const rolesWithAccess = this.rawData.softReadRoleAccess || [ANYONE_METAROLE];
+    
+    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+      rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+    ) || (
+        // or if OWNER_METAROLE is included and our user matches our owner user
+        // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
+        // because null === null in the case of eg. GUEST_METAROLE
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+
+    return hasAccess;
   }
 
   /**

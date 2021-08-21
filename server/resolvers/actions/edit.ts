@@ -78,7 +78,6 @@ export async function editItemDefinition(
 
   // now we get the requested fields, and check they are available for the given role
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // now we get the basic information
   const mod = itemDefinition.getParentModule();
@@ -150,6 +149,7 @@ export async function editItemDefinition(
     wholeSqlStoredValue,
   );
 
+  const ownerUserId = itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -160,13 +160,15 @@ export async function editItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.MODIFYING,
-    owner: itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by,
+    owner: ownerUserId,
     parent: wholeSqlStoredValue.parent_id ? {
       id: wholeSqlStoredValue.parent_id,
       type: wholeSqlStoredValue.parent_type,
       version: wholeSqlStoredValue.parent_version,
     } : null,
   });
+
+  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerUserId, rolesManager, requestedFields);
 
   await validateParentingRules(
     appData,
@@ -392,14 +394,6 @@ export async function editItemDefinition(
     requestedFields,
   );
 
-  // we don't need to check for blocked or deleted because such items cannot be edited,
-  // see before, so we return immediately, read has been checked already
-  // we use the same strategy, all extra data will be chopped anyway by graphql
-  const finalOutput = {
-    DATA: gqlValue,
-    ...gqlValue,
-  };
-
   if (moduleTrigger) {
     // we execute the trigger
     await moduleTrigger({
@@ -447,6 +441,22 @@ export async function editItemDefinition(
       forbid: defaultTriggerInvalidForbiddenFunction,
     });
   }
+
+  await itemDefinition.applySoftReadRoleAccessTo(
+    tokenData.role,
+    tokenData.id,
+    userId,
+    rolesManager,
+    gqlValue,
+  );
+
+  // we don't need to check for blocked or deleted because such items cannot be edited,
+  // see before, so we return immediately, read has been checked already
+  // we use the same strategy, all extra data will be chopped anyway by graphql
+  const finalOutput = {
+    DATA: gqlValue,
+    ...gqlValue,
+  };
 
   if (
     !await

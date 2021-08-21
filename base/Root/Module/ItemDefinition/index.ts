@@ -1713,7 +1713,7 @@ export default class ItemDefinition {
    * given its module rule
    */
   public getRolesWithModerationAccess(): string[] {
-    return this.parentModule.getRolesWithModerationAccess();
+    return this.parentModule.getRolesWithModerationAccess() || [];
   }
 
   /**
@@ -1796,6 +1796,73 @@ export default class ItemDefinition {
     }));
 
     return requestFields;
+  }
+
+  /**
+   * For a given requested graphql value it will
+   * tell which fields need to be filtered for soft
+   * read role access
+   * @param role 
+   * @param userId 
+   * @param ownerUserId 
+   * @param rolesManager 
+   * @returns 
+   */
+  public async applySoftReadRoleAccessTo(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+    value: IGQLValue,
+  ): Promise<void> {
+
+    if (!value) {
+      return;
+    }
+
+    // otherwise we go in the requested fields, in each one of them
+    for (const requestedField of Object.keys(value)) {
+      // and we check if it's an item (or a exclusion state)
+      if (requestedField.startsWith(INCLUDE_PREFIX)) {
+        if (requestedField.endsWith(EXCLUSION_STATE_SUFFIX)) {
+          continue;
+        }
+
+        // so now we extract the item name from that
+        const requestedFieldItemName = requestedField.replace(INCLUDE_PREFIX, "");
+        // request the include
+        const include = this.getIncludeFor(requestedFieldItemName);
+        // and check the role access for it
+        await include.applySoftReadRoleAccessTo(
+          role, userId, ownerUserId, rolesManager, value[requestedField] as any,
+        );
+      } else {
+        if (!this.hasPropertyDefinitionFor(requestedField, true)) {
+          continue;
+        }
+        // also for the property
+        const propDef = this.getPropertyDefinitionFor(requestedField, true);
+        const hasSoftAccess = await propDef.checkSoftReadRoleAccessFor(role, userId, ownerUserId, rolesManager);
+        if (!hasSoftAccess) {
+          value[requestedField] = null;
+        }
+      }
+    }
+  }
+
+  public async checkRoleAccessForModeration(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    rolesManager: ICustomRoleManager,
+  ) {
+    const rolesWithAccess = this.getRolesWithModerationAccess();
+    return rolesWithAccess.includes(ANYONE_METAROLE) ||
+      (
+        rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+      ) || (
+        rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
+      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
   }
 
   /**

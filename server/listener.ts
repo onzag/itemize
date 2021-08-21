@@ -671,7 +671,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: null,
         }
@@ -770,7 +770,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: null,
           parent: {
             id: request.parentId,
@@ -874,7 +874,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: {
             id: request.parentId,
@@ -978,7 +978,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: null,
         }
@@ -1168,7 +1168,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: null,
           parent: {
             id: request.parentId,
@@ -1369,7 +1369,7 @@ export class Listener {
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
-          environment: CustomRoleGranterEnvironment.SEARCHING,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: {
             id: request.parentId,

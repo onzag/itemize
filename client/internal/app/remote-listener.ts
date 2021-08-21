@@ -1577,7 +1577,7 @@ export class RemoteListener {
       this.attachOwnedParentedSearchListenerFor(this.ownedParentedSearchListeners[listenerKey].request);
 
       if (requiresFeedback) {
-        const lastModified = this.parentedSearchListeners[listenerKey].lastModified;
+        const lastModified = this.ownedParentedSearchListeners[listenerKey].lastModified;
         this.requestOwnedParentedSearchFeedbackFor({
           ...this.ownedParentedSearchListeners[listenerKey].request,
           lastModified: lastModified,

@@ -221,6 +221,7 @@ export class Collector {
       signature = rowValue.type + "." + rowValue.id + "." + (rowValue.version || "") + "." + rowValue.last_modified;
     }
 
+    const ownerId = rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : null;
     const rolesManager = new CustomRoleManager(
       this.appData.customRoles,
       {
@@ -230,7 +231,7 @@ export class Collector {
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         item: idef,
         module: idef.getParentModule(),
-        owner: rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : null,
+        owner: ownerId,
         root: this.appData.root,
         parent: rowValue && rowValue.parent_id ? {
           id: rowValue.parent_id,
@@ -251,7 +252,7 @@ export class Collector {
       ItemDefinitionIOActions.READ,
       this.appliedRule.forUser.role,
       this.appliedRule.forUser.id,
-      rowValue ? (idef.isOwnerObjectId() ? rowValue.id : rowValue.created_by) : UNSPECIFIED_OWNER,
+      ownerId || UNSPECIFIED_OWNER,
       rolesManager,
     );
 
@@ -259,8 +260,15 @@ export class Collector {
     // which is possible
     if (fields) {
       // we build the value for the given role with the given fields
-      const value = rowValue === null ? null : filterAndPrepareGQLValue(
-        this.appData.cache.getServerData(), rowValue, fields, this.appliedRule.forUser.role, idef,
+      const value = rowValue === null ? null : await filterAndPrepareGQLValue(
+        this.appData.cache.getServerData(),
+        rowValue,
+        fields,
+        this.appliedRule.forUser.role,
+        this.appliedRule.forUser.id,
+        ownerId,
+        rolesManager,
+        idef,
       );
 
       const valueToReturnToUser = value ? value.toReturnToUser : null;

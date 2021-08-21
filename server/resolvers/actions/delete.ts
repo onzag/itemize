@@ -14,7 +14,8 @@ import {
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
 import { ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
-  GUEST_METAROLE } from "../../../constants";
+  GUEST_METAROLE, 
+  OWNER_METAROLE} from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
@@ -43,10 +44,6 @@ export async function deleteItemDefinition(
 
   // for deleting we must be logged in
   await validateTokenIsntBlocked(appData.cache, tokenData);
-
-  // we flatten and get the requested fields
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, requestedFields);
 
   // now we get this basic information
   const mod = itemDefinition.getParentModule();
@@ -107,6 +104,7 @@ export async function deleteItemDefinition(
           const rolesThatHaveAccessToModerationFields = itemDefinition.getRolesWithModerationAccess();
           const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
             (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
+            (rolesThatHaveAccessToModerationFields.includes(OWNER_METAROLE) && tokenData.id === userId) ||
             rolesThatHaveAccessToModerationFields.includes(tokenData.role);
           if (!hasAccessToModerationFields) {
             CAN_LOG_DEBUG && logger.debug(
@@ -129,6 +127,7 @@ export async function deleteItemDefinition(
     wholeSqlStoredValue,
   );
 
+  const ownerUserId = wholeSqlStoredValue ? (itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by) : null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -139,14 +138,17 @@ export async function deleteItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.REMOVAL,
-    owner: wholeSqlStoredValue ?
-      (itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by) : null,
+    owner: ownerUserId,
     parent: wholeSqlStoredValue && wholeSqlStoredValue.parent_id ? {
       id: wholeSqlStoredValue.parent_id,
       type: wholeSqlStoredValue.parent_type,
       version: wholeSqlStoredValue.parent_version,
     } : null,
   });
+
+  // we flatten and get the requested fields
+  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
+  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerUserId, rolesManager, requestedFields);
 
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant

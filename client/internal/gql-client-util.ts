@@ -31,6 +31,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { fileURLAbsoluter } from "../../util";
 import { IConfigRawJSONDataType } from "../../config";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import type { ICacheMetadataMismatchRule } from "./workers/cache/cache.worker";
 
 export interface IPropertyOverride {
   id: string;
@@ -404,6 +405,7 @@ function storeAndCombineStorageValuesFor(
   value: IGQLValue,
   fields: IGQLRequestFields,
   cacheStore: boolean,
+  cacheMetadata: any,
 ) {
   let mergedValue: IGQLValue = value;
   let mergedFields: IGQLRequestFields = fields;
@@ -846,6 +848,7 @@ export async function runEditQueryFor(
     version: string,
     listenerUUID: string,
     cacheStore: boolean,
+    cacheStoreMetadata?: any,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },
@@ -902,6 +905,7 @@ export async function runEditQueryFor(
       value,
       arg.fields,
       arg.cacheStore,
+      arg.cacheStoreMetadata || null,
     );
     return {
       error,
@@ -957,6 +961,7 @@ interface IRunSearchQueryArg {
   versionFilter?: string,
   waitAndMerge?: boolean,
   progresser?: ProgresserFn,
+  cacheMetadata?: any,
 }
 
 interface IRunSearchQuerySearchOptions {
@@ -972,6 +977,7 @@ interface IRunSearchQueryResult {
   limit: number,
   offset: number,
   lastModified: string,
+  cacheMetadata?: string,
 }
 
 /**
@@ -1063,6 +1069,7 @@ export async function runSearchQueryFor(
   let lastModified: string = null;
 
   let gqlValue: IGQLEndpointValue;
+  let cacheMetadataReturned: any = null;
   // if we are in a search with
   // a cache policy then we should be able
   // to run the search within the worker as
@@ -1098,8 +1105,11 @@ export async function runSearchQueryFor(
       arg.language.split("-")[0],
       arg.fields,
       arg.cachePolicy,
+      arg.cacheMetadata || null,
       standardCounterpartModule.getMaxSearchResults(),
     );
+
+    cacheMetadataReturned = cacheWorkerGivenSearchValue.metadata;
 
     // last record date of the given record
     // might be null, if no records
@@ -1230,6 +1240,7 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
+      cacheMetadata: cacheMetadataReturned,
     };
   } else {
     const records: IGQLSearchRecord[] = (
@@ -1249,6 +1260,7 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
+      cacheMetadata: cacheMetadataReturned,
     };
   }
 }
