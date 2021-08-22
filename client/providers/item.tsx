@@ -46,6 +46,26 @@ const isDevelopment = process.env.NODE_ENV === "development";
 // TODO cache policy search destruction markers
 // destruct a whole search and its children on logout
 
+function getSearchStateOf(state: IActualItemProviderState): IActualItemProviderSearchState {
+  return {
+    searchCount: state.searchCount,
+    searchError: state.searchError,
+    searchFields: state.searchFields,
+    searchId: state.searchId,
+    searchLastModified: state.searchLastModified,
+    searchLimit: state.searchLimit,
+    searchOffset: state.searchOffset,
+    searchOwner: state.searchOwner,
+    searchParent: state.searchParent,
+    searchRecords: state.searchRecords,
+    searchRequestedIncludes: state.searchRequestedIncludes,
+    searchRequestedProperties: state.searchRequestedProperties,
+    searchResults: state.searchResults,
+    searchShouldCache: state.searchShouldCache,
+    searching: state.searching,
+  };
+}
+
 function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
   let result: string[] = [];
   properties.forEach((propertyId) => {
@@ -691,6 +711,17 @@ export interface IItemProviderProps {
    */
   onSearch?: (data: IActionResponseWithSearchResults) => void;
   /**
+   * callback triggers when new search data has been loaded into
+   * the item state, not just when a new search has been executed but
+   * also when memory data has been fetched or from location
+   */
+  onSearchStateChange?: (data: IActualItemProviderSearchState) => void;
+  /**
+   * Occurs when a search state is preloaded at mount time taken from the
+   * memory rather than a search action
+   */
+  onSearchStateLoaded?: (data: IActualItemProviderSearchState) => void;
+  /**
    * Callback triggers on submit
    */
   onSubmit?: (data: IActionResponseWithId) => void;
@@ -742,7 +773,7 @@ interface IActualItemProviderProps extends IItemProviderProps {
   location?: Location<any>;
 }
 
-interface IActualItemProviderSearchState {
+export interface IActualItemProviderSearchState {
   searchError: EndpointErrorType;
   searching: boolean;
   searchRecords: IGQLSearchRecord[];
@@ -1256,6 +1287,10 @@ export class ActualItemProvider extends
       }
     }
 
+    if (this.props.onSearchStateLoaded) {
+      this.props.onSearchStateLoaded(getSearchStateOf(this.state));
+    }
+
     if (this.props.markForDestructionOnLogout) {
       this.markForDestruction();
     }
@@ -1446,6 +1481,17 @@ export class ActualItemProvider extends
       ) || null)
     ) {
       this.loadSearch();
+    }
+
+    if (
+      this.props.onSearchStateChange
+    ) {
+      const currentState = getSearchStateOf(this.state);
+      const prevSearchState = getSearchStateOf(prevState);
+
+      if (!equals(currentState, prevSearchState, {strict: true})) {
+        this.props.onSearchStateChange(currentState);
+      }
     }
 
     // whether the item definition was updated
@@ -1701,15 +1747,6 @@ export class ActualItemProvider extends
     }
   }
   public changeSearchListener() {
-    if (this.isUnmounted) {
-      return;
-    } else if (!this.isCMounted) {
-      if (this.mountCbFns.indexOf(this.changeSearchListener) === -1) {
-        this.mountCbFns.push(this.changeSearchListener);
-      }
-      return;
-    }
-
     let searchState: IActualItemProviderSearchState = {
       searchError: null,
       searching: false,
@@ -1727,6 +1764,7 @@ export class ActualItemProvider extends
       searchRequestedIncludes: {},
       searchRequestedProperties: [],
     };
+
     const internalState = this.props.itemDefinitionInstance.getInternalState(
       this.props.forId || null, this.props.forVersion || null,
     );
@@ -1737,6 +1775,15 @@ export class ActualItemProvider extends
     this.changedSearchListenerLastCollectedSearchId = {
       id: searchState.searchId
     };
+
+    if (this.isUnmounted) {
+      return;
+    } else if (!this.isCMounted) {
+      if (this.mountCbFns.indexOf(this.changeSearchListener) === -1) {
+        this.mountCbFns.push(this.changeSearchListener);
+      }
+      return;
+    }
 
     this.setState(searchState);
   }
@@ -3346,6 +3393,8 @@ export class ActualItemProvider extends
     if (requestFeedbackToo) {
       this.searchFeedback(options, lastModified, createdBy, parentedBy);
     }
+
+    this.lastOptionsUsedForSearch = options;
   }
   private async searchFeedback(
     options: IActionSearchOptions,
