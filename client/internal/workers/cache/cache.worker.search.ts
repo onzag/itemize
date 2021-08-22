@@ -5,7 +5,7 @@
 
 import { IGQLArgs, IGQLSearchRecord } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
-import { ICacheDB, QUERIES_TABLE_NAME } from "./cache.worker";
+import { ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME } from "./cache.worker";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
 import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
@@ -68,16 +68,26 @@ export async function search(
   db: IDBPDatabase<ICacheDB>,
   searchRecords: IGQLSearchRecord[],
   searchArgs: IGQLArgs,
-): Promise<IGQLSearchRecord[]> {
+  returnSourceResults: boolean,
+): Promise<
+  {
+    filteredRecords: IGQLSearchRecord[],
+    sourceResults: ICacheMatchType[],
+  }
+> {
+
+  let sourceResults: ICacheMatchType[] = returnSourceResults ? [] : null;
 
   // so now we get the new records with a promise where we read a bunch of stuff
   let newSearchRecords: IGQLSearchRecordChecked[] = (await Promise.all(
     // for that we map our current records
-    searchRecords.map(async (result) => {
+    searchRecords.map(async (result, index) => {
       try {
         // and we need to read these values
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
+
+        if (returnSourceResults) sourceResults[index] = value;
 
         // so no value, this is odd as this is considered data corruption because before coming
         // here all search records must have been ensured
@@ -185,7 +195,10 @@ export async function search(
   });
 
   // and now we can send only the 
-  return newSearchRecords.map((r) => r.searchRecord);
+  return {
+    filteredRecords: newSearchRecords.map((r) => r.searchRecord),
+    sourceResults,
+  };
 }
 
 /**

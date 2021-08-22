@@ -265,19 +265,6 @@ export async function addItemDefinition(
     "addItemDefinition: Checking basic role access for read",
   );
 
-  // so now we check the role access for the reading of
-  // those fields, as you can see we use the userId of the user
-  // since he will be the owner as well
-  await itemDefinition.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.id,
-    finalOwner,
-    requestedFieldsThatRepresentPropertiesAndIncludes,
-    rolesManager,
-    true,
-  );
-
   // if all that has succeed we take the item definition and apply
   // the value from graphql, now you should understand how this is handled
   // the values are applied so that the whole item definition value is
@@ -522,11 +509,29 @@ export async function addItemDefinition(
     });
   }
 
+  const newRolesManagerWithKnownValue = rolesManager.subEnvironment({
+    environment: CustomRoleGranterEnvironment.RETRIEVING,
+    value: gqlValue,
+  });
+
+  // so now we check the role access for the reading of
+  // those fields, as you can see we use the userId of the user
+  // since he will be the owner as well
+  await itemDefinition.checkRoleAccessFor(
+    ItemDefinitionIOActions.READ,
+    tokenData.role,
+    tokenData.id,
+    finalOwner,
+    requestedFieldsThatRepresentPropertiesAndIncludes,
+    newRolesManagerWithKnownValue,
+    true,
+  );
+
   await itemDefinition.applySoftReadRoleAccessTo(
     tokenData.role,
     tokenData.id,
     finalOwner,
-    rolesManager,
+    newRolesManagerWithKnownValue,
     gqlValue,
   );
 
@@ -540,7 +545,7 @@ export async function addItemDefinition(
       tokenData.role,
       tokenData.id,
       (finalOutput as any).DATA.created_by,
-      rolesManager,
+      newRolesManagerWithKnownValue,
       false,
     )
   ) {

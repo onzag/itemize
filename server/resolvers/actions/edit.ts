@@ -256,16 +256,6 @@ export async function editItemDefinition(
     rolesManager,
     true,
   );
-  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for read");
-  await itemDefinition.checkRoleAccessFor(
-    ItemDefinitionIOActions.READ,
-    tokenData.role,
-    tokenData.id,
-    userId,
-    requestedFieldsInIdef,
-    rolesManager,
-    true,
-  );
 
   // now we need to setup what we want to convert, since the
   // converting functions can take the whole args with its extra
@@ -442,11 +432,27 @@ export async function editItemDefinition(
     });
   }
 
+  const newRolesManagerWithEditedValue = rolesManager.subEnvironment({
+    environment: CustomRoleGranterEnvironment.RETRIEVING,
+    value: gqlValue,
+  });
+
+  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for read");
+  await itemDefinition.checkRoleAccessFor(
+    ItemDefinitionIOActions.READ,
+    tokenData.role,
+    tokenData.id,
+    userId,
+    requestedFieldsInIdef,
+    newRolesManagerWithEditedValue,
+    true,
+  );
+
   await itemDefinition.applySoftReadRoleAccessTo(
     tokenData.role,
     tokenData.id,
     userId,
-    rolesManager,
+    newRolesManagerWithEditedValue,
     gqlValue,
   );
 
@@ -464,7 +470,7 @@ export async function editItemDefinition(
         tokenData.role,
         tokenData.id,
         (finalOutput as any).DATA.created_by,
-        rolesManager,
+        newRolesManagerWithEditedValue,
         false,
       )
   ) {

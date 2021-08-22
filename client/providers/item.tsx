@@ -27,7 +27,7 @@ import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/a
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction
+  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction
 } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -36,7 +36,7 @@ import { IConfigRawJSONDataType } from "../../config";
 import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
-import type { ICacheMatchType, ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
+import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -305,6 +305,8 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
   progresser?: ProgresserFn;
 }
 
+export type CacheMetadataGeneratorFn = (record: IGQLSearchRecord) => any;
+
 /**
  * The options for searching
  */
@@ -342,6 +344,8 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     version?: string,
   };
   cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "none";
+  cacheMetadata?: any;
+  cacheMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
   listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "none";
   markForDestructionOnLogout?: boolean;
   traditional?: boolean;
@@ -350,7 +354,6 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
-  cacheMetadata?: any;
 }
 
 export interface IPokeElementsType {
@@ -3599,6 +3602,8 @@ export class ActualItemProvider extends
       parentedBy,
       waitAndMerge: options.waitAndMerge,
       progresser: options.progresser,
+      cacheStoreMetadata: options.cacheMetadata,
+      cacheStoreMetadataMismatchAction: options.cacheMetadataMismatchAction,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
@@ -3660,6 +3665,7 @@ export class ActualItemProvider extends
             if (!searchPart.startsWith("?")) {
               searchPart = "?" + searchPart;
             }
+
             setHistoryState(
               {
                 state: this.props.location.state,
@@ -3731,6 +3737,7 @@ export class ActualItemProvider extends
             if (!searchPart.startsWith("?")) {
               searchPart = "?" + searchPart;
             }
+
             setHistoryState(
               {
                 state: this.props.location.state,

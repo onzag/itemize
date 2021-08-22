@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
+import { ItemContext, SearchItemValueContext, IItemProviderProps, CacheMetadataGeneratorFn } from "../../providers/item";
 import equals from "deep-equal";
 import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
@@ -17,6 +17,7 @@ import { LocaleContext, ILocaleContextType } from "../../internal/providers/loca
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { RemoteListener } from "../../internal/app/remote-listener";
+import { checkMismatchCondition, ICacheMetadataMismatchAction } from "../../internal/gql-client-util";
 
 /**
  * The property for the provider but with the key and no children
@@ -204,7 +205,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;
   searchRequestedProperties: string[];
-  searchRequestedIncludes: {[include: string]: string[]};
+  searchRequestedIncludes: { [include: string]: string[] };
 }
 
 /**
@@ -255,7 +256,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps) {
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
     (props.searchRecords || []).forEach((r) => {
-      const id = r.id ;
+      const id = r.id;
       const version = r.version || null;
       const itemDefintionInQuestion = root.registry[r.type as string] as ItemDefinition;
       const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
@@ -413,20 +414,22 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     const uncachedResults: IGQLSearchRecord[] = [];
 
     // first we try to request our indexeddb worker cache and memory cache, one by one
-    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchResult: IGQLSearchRecord) => {
+    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchRecord: IGQLSearchRecord) => {
       // note that our records might be different to the context we are in
       const itemDefintionInQuestion =
         this.props.itemDefinitionInstance.getParentModule()
-          .getParentRoot().registry[searchResult.type] as ItemDefinition;
+          .getParentRoot().registry[searchRecord.type] as ItemDefinition;
+
+      const itemDefinitionInQuestionQualifiedName = itemDefintionInQuestion.getQualifiedPathName();
 
       // check if it's in memory cache, in such a case the value will have already loaded
       // as the item definition would have applied it initially, as in it would have loaded
       // already and it can be pretty much ignored
-      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchResult.id, searchResult.version);
+      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
       if (
         appliedGQLValue &&
         requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
-        appliedGQLValue.flattenedValue.last_modified === searchResult.last_modified
+        appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
       ) {
         return null;
       }
@@ -434,14 +437,14 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // otherwise let's see our cache
       // if it's not supported then we push already to our uncached results
       if (!CacheWorkerInstance.isSupported) {
-        uncachedResults.push(searchResult);
+        uncachedResults.push(searchRecord);
         return null;
       } else {
         // otherwise let's try to get it
         const cachedResult = await CacheWorkerInstance.instance.getCachedValue(
-          PREFIX_GET + itemDefintionInQuestion.getQualifiedPathName(),
-          searchResult.id,
-          searchResult.version,
+          PREFIX_GET + itemDefinitionInQuestionQualifiedName,
+          searchRecord.id,
+          searchRecord.version,
           this.props.searchFields,
         );
 
@@ -451,18 +454,18 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         // these occurred because something changed and yet our cache was not updated to reflect that
         // ironically this wouldn't really happen with the cache worker as it needs to update
         // all its values before that even occurred, but anyway if this is the case
-        if (!cachedResult || cachedResult.value.last_modified !== searchResult.last_modified) {
+        if (!cachedResult || cachedResult.value.last_modified !== searchRecord.last_modified) {
           // then it's uncached
-          uncachedResults.push(searchResult);
+          uncachedResults.push(searchRecord);
           return null;
         }
 
         // otherwise let's return the full match
         return {
           cachedResult,
-          forId: searchResult.id,
-          forType: searchResult.type,
-          forVersion: searchResult.version,
+          forId: searchRecord.id,
+          forType: searchRecord.type,
+          forVersion: searchRecord.version,
         };
       }
     }));
@@ -640,7 +643,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         });
       }
     } else {
-      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {
+      if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {
         return;
       }
       // otherwise if there's nothing left from the uncached
@@ -698,7 +701,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
               // fird the search result information, if any, for the given record
               const searchResult = (this.props.searchResults && this.props.searchResults
-                .find((r) => r.id === searchRecord.id && r.version === r.version)) || null;
+                .find((r) => r.id === searchRecord.id && r.version === r.version)) || null;
 
               // and we add something called the provider props, which explains how to instantiate
               // a item definition provider so that it's in sync with this seach and loads what this search

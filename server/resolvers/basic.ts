@@ -27,7 +27,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { ICustomRoleManager } from "../../base/Root";
-import { CustomRoleManager } from "./roles";
+import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
@@ -135,7 +135,7 @@ export async function validateParentingRules(
   itemDefinition: ItemDefinition,
   userId: string,
   role: string,
-  rolesManager: ICustomRoleManager,
+  rolesManager: CustomRoleManager,
 ) {
   const isParenting = !!(parentId || parentVersion || parentType);
   if (!isParenting && itemDefinition.mustBeParented()) {
@@ -183,7 +183,23 @@ export async function validateParentingRules(
       });
     }
     const parentOwnerId = parentingItemDefinition.isOwnerObjectId() ? result.id : result.created_by;
-    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, rolesManager, true);
+    const parentingRolesManager = rolesManager.subEnvironment({
+      owner: parentOwnerId,
+      item: parentingItemDefinition,
+      environment: CustomRoleGranterEnvironment.ADDING_CHILD,
+      module: parentingItemDefinition.getParentModule(),
+      parent: {
+        id: result.parent_id,
+        version: result.parent_version || null,
+        type: result.parent_type,
+      },
+      value: convertSQLValueToGQLValueForItemDefinition(
+        appData.cache.getServerData(),
+        parentingItemDefinition,
+        result,
+      ),
+    })
+    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, parentingRolesManager, true);
   }
 
   CAN_LOG_SILLY && logger.silly(

@@ -15,6 +15,7 @@ export enum CustomRoleGranterEnvironment {
   SEARCHING_TRADITIONAL = "SEARCHING_TRADITIONAL",
   SEARCHING_RECORDS = "SEARCHING_RECORDS",
   REMOVAL = "REMOVAL",
+  ADDING_CHILD = "ADDING_CHILD",
 }
 
 export interface ICustomRoleGranterArg {
@@ -45,11 +46,14 @@ export interface ICustomRoleType {
 
 export class CustomRoleManager {
   private filteredRoles: ICustomRoleType[];
+  private allRoles: ICustomRoleType[];
   private granteds: {[role: string]: boolean};
   private argEnv: ICustomRoleGranterArg;
   constructor(allRoles: ICustomRoleType[], env: ICustomRoleGranterArg) {
     const modulePath = env.module.getPath();
     const idefPath = env.item.getPath();
+
+    this.allRoles = allRoles;
 
     this.filteredRoles = allRoles.filter((r) => {
       if (!r.module) {
@@ -85,5 +89,11 @@ export class CustomRoleManager {
     }
 
     return false;
+  }
+  public subEnvironment(newEnv: Partial<ICustomRoleGranterArg>): CustomRoleManager {
+    return new CustomRoleManager(this.allRoles, {
+      ...this.argEnv,
+      ...newEnv,
+    });
   }
 }

@@ -16,7 +16,7 @@ import {
   IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue
 } from "../../../../gql-querier";
-import { PREFIX_GET, ENDPOINT_ERRORS, INCLUDE_PREFIX } from "../../../../constants";
+import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
@@ -60,6 +60,11 @@ export interface ICachedSearchResult {
    * When was this last search modified
    */
   lastModified: string;
+  /**
+   * The source records that were used in the search
+   */
+  sourceRecords: IGQLSearchRecord[];
+  sourceResults: ICacheMatchType[];
 }
 
 /**
@@ -250,7 +255,7 @@ export default class CacheWorker {
               db.deleteObjectStore(SEARCHES_TABLE_NAME);
               db.deleteObjectStore(STATES_TABLE_NAME);
               db.deleteObjectStore(METADATA_TABLE_NAME);
-              
+
             } catch (err) {
               // No way to know if the store is there
               // so must catch the error
@@ -510,6 +515,51 @@ export default class CacheWorker {
     return true;
   }
 
+  public async writeSearchMetadata(
+    queryName: string,
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    createdByIfKnown: string,
+    parentTypeIfKnown: string,
+    parentIdIfKnown: string,
+    parentVersionIfKnown: string,
+    metadata: any,
+  ) {
+    console.log(
+      "REQUESTED TO STORE SEARCH METADATA FOR",
+      queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return false;
+    }
+
+    let storeKeyName = queryName + "." + cachePolicy.replace("-", "_") + ".";
+    if (cachePolicy === "by-owner") {
+      storeKeyName += (createdByIfKnown || "");
+    } else if (cachePolicy === "by-parent") {
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else {
+      storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    }
+
+    // and try to save it in the database, notice how we setup the expirarion
+    // date
+    try {
+      const idbNewValue = {
+        value: metadata,
+      };
+      await this.db.put(METADATA_TABLE_NAME, idbNewValue, storeKeyName);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+
+    return true;
+  }
+
   public async writeMetadata(
     queryName: string,
     id: string,
@@ -542,6 +592,43 @@ export default class CacheWorker {
     }
 
     return true;
+  }
+
+  public async readSearchMetadata(
+    queryName: string,
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    createdByIfKnown: string,
+    parentTypeIfKnown: string,
+    parentIdIfKnown: string,
+    parentVersionIfKnown: string,
+  ): Promise<ICacheMetadataMatchType> {
+    console.log(
+      "REQUESTED TO READ SEARCH METADATA FOR",
+      queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
+
+    await this.waitForSetupPromise;
+
+    // so first we await for our database
+    if (!this.db) {
+      // what gives, we return
+      return null;
+    }
+
+    let storeKeyName = queryName + "." + cachePolicy.replace("-", "_") + ".";
+    if (cachePolicy === "by-owner") {
+      storeKeyName += (createdByIfKnown || "");
+    } else if (cachePolicy === "by-parent") {
+      storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else {
+      storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    }
+
+    try {
+      return await this.db.get(METADATA_TABLE_NAME, storeKeyName);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
   }
 
   public async readMetadata(
@@ -923,6 +1010,9 @@ export default class CacheWorker {
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
     maxGetListResultsAtOnce: number,
+    returnSources: boolean,
+    redoSearch: boolean,
+    redoRecords: boolean | IGQLSearchRecord[],
   ): Promise<ICachedSearchResult> {
     await this.waitForSetupPromise;
 
@@ -956,7 +1046,7 @@ export default class CacheWorker {
 
     try {
       // now we request indexed db for a result
-      const dbValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      const dbValue: ISearchMatchType = redoSearch ? null : await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
       // if the database is not offering anything or the limit is less than
       // it is supposed to be, this means that we have grown the cache size, but yet
       // the cache remains constrained by the older size, this only truly matters if
@@ -1019,6 +1109,8 @@ export default class CacheWorker {
             gqlValue: serverValue,
             dataMightBeStale: false,
             lastModified: null,
+            sourceRecords: null,
+            sourceResults: null,
           };
         }
 
@@ -1045,13 +1137,17 @@ export default class CacheWorker {
         if (
           requestFieldsAreContained(getListRequestedFields, dbValue.fields) &&
           // all results preloaded will not be true when the listener triggers
-          dbValue.allResultsPreloaded
+          dbValue.allResultsPreloaded &&
+          // not tasked to redo the records
+          !redoRecords
         ) {
           // now we can actually start using the args to run a local filtering
           // function
 
           try {
-            const records = await search(this.rootProxy, this.db, resultsToProcess, searchArgs);
+            const searchResponse = await search(this.rootProxy, this.db, resultsToProcess, searchArgs, returnSources);
+            const records = searchResponse.filteredRecords;
+            const sourceResults = searchResponse.sourceResults;
             const gqlValue: IGQLEndpointValue = {
               data: {
                 [searchQueryName]: {
@@ -1069,6 +1165,8 @@ export default class CacheWorker {
               gqlValue,
               dataMightBeStale,
               lastModified,
+              sourceRecords: resultsToProcess,
+              sourceResults,
             };
           } catch (err) {
             // It comes here if it finds data corruption during the search and it should
@@ -1097,6 +1195,8 @@ export default class CacheWorker {
         gqlValue,
         dataMightBeStale,
         lastModified,
+        sourceRecords: null,
+        sourceResults: null,
       };
     }
 
@@ -1123,6 +1223,19 @@ export default class CacheWorker {
     const uncachedOrOutdatedResultsToProcess: IGQLSearchRecord[] = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
+      // manual set for redoing records
+      if (redoRecords === true) {
+        uncachedOrOutdatedResultsToProcess.push(resultToProcess);
+        return;
+      } else if (Array.isArray(redoRecords)) {
+        const matchFound = redoRecords.find((r) =>
+          r.id === resultToProcess.id && r.version === resultToProcess.version && r.type === resultToProcess.type);
+        if (matchFound) {
+          uncachedOrOutdatedResultsToProcess.push(resultToProcess);
+        }
+        return;
+      }
+
       // and get the cached results, considering the fields
       // we are asked to request
       const cachedResult = await this.getCachedValue(
@@ -1168,6 +1281,20 @@ export default class CacheWorker {
 
     // now we need to load all those batches into graphql queries
     const processedBatches = await Promise.all(batches.map(async (batch) => {
+      // makes no sense sending a request with nothing to fetch
+      if (batch.length === 0) {
+        return {
+          gqlValue: {
+            data: {
+              [getListQueryName]: {
+                results: [],
+              }
+            },
+          },
+          batch,
+        }
+      }
+
       const args: IGQLArgs = {
         token: getListTokenArg,
         language: getListLangArg,
@@ -1277,7 +1404,9 @@ export default class CacheWorker {
 
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
-      const records = await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs);
+      const searchResponse = await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs, returnSources);
+      const records = searchResponse.filteredRecords;
+      const sourceResults = searchResponse.sourceResults;
       const gqlValue: IGQLEndpointValue = {
         data: {
           [searchQueryName]: {
@@ -1294,6 +1423,8 @@ export default class CacheWorker {
         gqlValue,
         dataMightBeStale,
         lastModified,
+        sourceResults,
+        sourceRecords: actualCurrentSearchValue.value,
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
@@ -1310,6 +1441,8 @@ export default class CacheWorker {
         gqlValue,
         dataMightBeStale,
         lastModified,
+        sourceRecords: null,
+        sourceResults: null,
       };
     } else {
       // otherwise it must have been some sort
@@ -1331,6 +1464,8 @@ export default class CacheWorker {
         gqlValue,
         dataMightBeStale,
         lastModified,
+        sourceRecords: null,
+        sourceResults: null,
       };
     }
   }

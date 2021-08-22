@@ -54,6 +54,12 @@ export interface ICacheMetadataMismatchAction {
   condition?: ICacheMetadataMismatchCondition,
 }
 
+export interface ISearchCacheMetadataMismatchAction {
+  action: "REDO_SEARCH" | "REFETCH_RECORDS",
+  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS",
+  recordsRefetchCondition?: ICacheMetadataMismatchCondition,
+}
+
 export function checkMismatchCondition(
   condition: ICacheMetadataMismatchCondition,
   dbValue: ICacheMatchType,
@@ -1084,6 +1090,8 @@ interface IRunSearchQueryArg {
     version: string,
   };
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
+  cacheStoreMetadata?: any,
+  cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction,
   traditional: boolean,
   limit: number,
   offset: number,
@@ -1225,7 +1233,7 @@ export async function runSearchQueryFor(
       standardCounterpart.getParentModule().getQualifiedPathName() :
       standardCounterpart.getQualifiedPathName());
     const standardCounterpartModule = standardCounterpart.getParentModule();
-    const cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
+    let cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
       queryName,
       searchArgs,
       PREFIX_GET_LIST + standardCounterpartQualifiedName,
@@ -1234,7 +1242,105 @@ export async function runSearchQueryFor(
       arg.fields,
       arg.cachePolicy,
       standardCounterpartModule.getMaxSearchResults(),
+      !!arg.cacheStoreMetadataMismatchAction,
+      false,
+      false,
     );
+
+    // we are now going to check for metadata used in
+    // the search, by default there's no mismatch
+    // and metadata is not written
+    let metadataWasMismatch: boolean = false;
+    let shouldWriteMetadata: boolean = false;
+
+    // now if we have a mismatch rule
+    if (
+      arg.cacheStoreMetadataMismatchAction &&
+      !cacheWorkerGivenSearchValue.gqlValue.errors
+    ) {
+      // let's get our current metadata
+      const currentMetadata = await CacheWorkerInstance.instance.readSearchMetadata(
+        queryName,
+        arg.cachePolicy,
+        arg.createdBy,
+        arg.parentedBy.itemDefinition.getQualifiedPathName(),
+        arg.parentedBy.id,
+        arg.parentedBy.version || null,
+      );
+
+      // we can specify these actions
+      let redoSearch: boolean = false;
+      let refetchAllRecords: boolean = false;
+      let refetchSpecificRecords: IGQLSearchRecord[] = null;
+
+      // if we have a value there and it differs
+      if (currentMetadata && !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
+        metadataWasMismatch = true;
+
+        if (arg.cacheStoreMetadataMismatchAction.action === "REDO_SEARCH") {
+          redoSearch = true;
+          refetchAllRecords = true;
+        } else {
+          refetchAllRecords = false;
+          refetchSpecificRecords = cacheWorkerGivenSearchValue.sourceResults.filter((r) => {
+            return checkMismatchCondition(
+              arg.cacheStoreMetadataMismatchAction.recordsRefetchCondition,
+              r,
+              currentMetadata,
+              arg.cacheStoreMetadata,
+            );
+          }).map((r, index) => {
+            return cacheWorkerGivenSearchValue.sourceRecords[index];
+          });
+        }
+
+        if (
+          arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
+          (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
+        ) {
+          shouldWriteMetadata = true;
+        } else {
+          shouldWriteMetadata = true;
+        }
+      } else if (!currentMetadata) {
+        // it's missing so of course it doesn't match
+        metadataWasMismatch = true;
+        shouldWriteMetadata = true;
+      }
+
+      if (redoSearch || refetchAllRecords || (refetchSpecificRecords &&  refetchSpecificRecords.length)) {
+        cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
+          queryName,
+          searchArgs,
+          PREFIX_GET_LIST + standardCounterpartQualifiedName,
+          arg.token,
+          arg.language.split("-")[0],
+          arg.fields,
+          arg.cachePolicy,
+          standardCounterpartModule.getMaxSearchResults(),
+          false,
+          redoSearch,
+          refetchSpecificRecords || refetchAllRecords,
+        );
+      }
+    }
+
+    if (
+      arg.cacheStoreMetadata &&
+      !cacheWorkerGivenSearchValue.gqlValue.errors &&
+      metadataWasMismatch &&
+      shouldWriteMetadata
+    ) {
+      await CacheWorkerInstance.instance.writeSearchMetadata(
+        queryName,
+        arg.cachePolicy,
+        arg.createdBy,
+        arg.parentedBy.itemDefinition.getQualifiedPathName(),
+        arg.parentedBy.id,
+        arg.parentedBy.version || null,
+        arg.cacheStoreMetadata,
+      );
+    }
 
     // last record date of the given record
     // might be null, if no records
