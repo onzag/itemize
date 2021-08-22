@@ -34,7 +34,8 @@ import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDe
 import equals from "deep-equal";
 import type { ICacheMatchType, ICacheMetadataMatchType } from "./workers/cache/cache.worker";
 
-type cacheMetadataCheckFn = (value: PropertyDefinitionSupportedType | {[property: string]: PropertyDefinitionSupportedType}) => boolean;
+type cacheMetadataCheckFn = (value: PropertyDefinitionSupportedType | { [property: string]: PropertyDefinitionSupportedType }) => boolean;
+type cacheMetadataComparisonFn = (oldValue: any, newValue: any) => boolean;
 
 export interface ICacheMetadataMismatchConditionRule {
   [propertyOrInclude: string]: cacheMetadataCheckFn;
@@ -44,16 +45,20 @@ export interface ICacheMetadataMismatchCondition {
   custom?: ICacheMetadataMismatchConditionRule;
   isBlocked?: boolean;
   isDeleted?: boolean;
+  metadataComparison?: cacheMetadataComparisonFn;
 }
 
 export interface ICacheMetadataMismatchAction {
   action: "REFETCH",
+  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS",
   condition?: ICacheMetadataMismatchCondition,
 }
 
 export function checkMismatchCondition(
   condition: ICacheMetadataMismatchCondition,
   dbValue: ICacheMatchType,
+  oldMetadata: any,
+  newMetadata: any,
 ) {
   if (Object.keys(condition).length === 0) {
     return true;
@@ -67,6 +72,10 @@ export function checkMismatchCondition(
   }
 
   if (isBlocked && condition.isBlocked) {
+    return true;
+  }
+
+  if (condition.metadataComparison && condition.metadataComparison(oldMetadata, newMetadata)) {
     return true;
   }
 
@@ -551,8 +560,8 @@ export async function runGetQueryFor(
     language: string,
     token: string,
     cacheStore: boolean,
-    cacheStoreMetadata: any,
-    cacheStoreMetadataMismatchAction: ICacheMetadataMismatchAction,
+    cacheStoreMetadata?: any,
+    cacheStoreMetadataMismatchAction?: ICacheMetadataMismatchAction,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
     currentKnownMetadata?: ICacheMetadataMatchType,
@@ -594,8 +603,9 @@ export async function runGetQueryFor(
 
     let currentCacheMetadata: any = null;
     let shouldProcceedWithCache: boolean = true;
-    let shouldDestroyValue: boolean = true;
+    let shouldDestroyValue: boolean = false;
     let metadataWasMismatch: boolean = false;
+    let ruleApplies: boolean = false;
 
     const workerCachedValue: ICacheMatchType = await CacheWorkerInstance.instance.getCachedValue(
       queryName,
@@ -606,7 +616,7 @@ export async function runGetQueryFor(
     const expectedCacheMetadata = arg.cacheStoreMetadata || null;
 
     if (arg.cacheStoreMetadataMismatchAction && workerCachedValue) {
-      const value = arg.currentKnownMetadata || await CacheWorkerInstance.instance.readMetadata(
+      const value = arg.currentKnownMetadata || await CacheWorkerInstance.instance.readMetadata(
         queryName,
         arg.id,
         arg.version || null,
@@ -618,12 +628,14 @@ export async function runGetQueryFor(
       metadataWasMismatch = !equals(expectedCacheMetadata, currentCacheMetadata, { strict: true });
 
       if (metadataWasMismatch) {
-        let ruleApplies = !arg.cacheStoreMetadataMismatchAction.condition;
+        ruleApplies = !arg.cacheStoreMetadataMismatchAction.condition;
         if (!ruleApplies) {
           if (workerCachedValue) {
             ruleApplies = checkMismatchCondition(
               arg.cacheStoreMetadataMismatchAction.condition,
               workerCachedValue,
+              currentCacheMetadata,
+              expectedCacheMetadata,
             );
           }
         }
@@ -645,7 +657,15 @@ export async function runGetQueryFor(
       );
     }
 
-    if (metadataWasMismatch) {
+    if (
+      metadataWasMismatch &&
+      ((
+        arg.cacheStoreMetadataMismatchAction.rewrite === "ALWAYS"
+      ) || (
+          arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
+          ruleApplies
+        ))
+    ) {
       await CacheWorkerInstance.instance.writeMetadata(
         queryName,
         arg.id,

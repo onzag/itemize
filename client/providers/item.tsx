@@ -25,8 +25,10 @@ import { getConversionIds } from "../../base/Root/Module/ItemDefinition/Property
 import CacheWorkerInstance from "../internal/workers/cache";
 import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
-import { getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction } from "../internal/gql-client-util";
+import {
+  getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
+  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction
+} from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
@@ -658,7 +660,7 @@ export interface IItemProviderProps {
   /**
    * Cache rules to resolve during a metadata mismatch
    */
-  longTermCacheMetadataMismatchAction?: ICacheMetadataMismatchAction;
+  longTermCachingMetadataMismatchAction?: ICacheMetadataMismatchAction;
   /**
    * loads the state from the cache worker if a
    * stored value is found
@@ -1617,7 +1619,7 @@ export class ActualItemProvider extends
       prevProps.tokenData.role !== this.props.tokenData.role ||
       prevProps.loadModerationFields !== this.props.loadModerationFields ||
       itemDefinitionWasUpdated ||
-      !equals(prevProps.longTermCachingMetadata, this.props.longTermCachingMetadata, {strict: true})
+      !equals(prevProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true })
     ) {
       if (!this.props.avoidLoading) {
         await this.loadValue();
@@ -1998,7 +2000,7 @@ export class ActualItemProvider extends
     let denyMemoryCache: boolean = false;
     if (
       !denyCaches &&
-      this.props.longTermCacheMetadataMismatchAction &&
+      this.props.longTermCachingMetadata &&
       CacheWorkerInstance.isSupported
     ) {
       currentMetadata = await CacheWorkerInstance.instance.readMetadata(
@@ -2007,7 +2009,7 @@ export class ActualItemProvider extends
         forVersion || null,
       );
 
-      if (!equals(this.props.longTermCachingMetadata, currentMetadata)) {
+      if (!equals(this.props.longTermCachingMetadata, currentMetadata) && this.props.longTermCachingMetadataMismatchAction) {
         // we deny the memory cache because we are now unsure of whether
         // the value held in memory is valid due to the metadata
         // as this value might have come from the cache when it was loaded
@@ -2117,7 +2119,7 @@ export class ActualItemProvider extends
       language: this.props.localeData.language,
       cacheStore: this.props.longTermCaching,
       cacheStoreMetadata: this.props.longTermCachingMetadata,
-      cacheStoreMetadataMismatchAction: this.props.longTermCacheMetadataMismatchAction,
+      cacheStoreMetadataMismatchAction: this.props.longTermCachingMetadataMismatchAction,
       waitAndMerge: this.props.waitAndMerge,
       currentKnownMetadata: currentMetadata,
     });
@@ -3372,7 +3374,7 @@ export class ActualItemProvider extends
         parentVersion: parentedBy[2],
         lastModified: lastModified,
       });
-    } else if (options.cachePolicy === "by-parent" ) {
+    } else if (options.cachePolicy === "by-parent") {
       this.props.remoteListener.requestParentedSearchFeedbackFor({
         qualifiedPathName: standardCounterpartQualifiedName,
         parentType: parentedBy[0],
@@ -3603,7 +3605,7 @@ export class ActualItemProvider extends
     });
 
     if (!error && listenPolicy !== "none") {
-      this.searchListenersSetup(options, lastModified, options.createdBy || null, searchParent);
+      this.searchListenersSetup(options, lastModified, options.createdBy || null, searchParent);
     }
 
     const searchId = uuid.v4();
