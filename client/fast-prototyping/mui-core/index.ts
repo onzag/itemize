@@ -96,6 +96,8 @@ import Chip from "@material-ui/core/Chip";
 import Fab from "@material-ui/core/Fab";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -309,4 +311,6 @@ export {
   Input,
   Hidden,
   Drawer,
+  TreeView,
+  TreeItem,
 }

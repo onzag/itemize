@@ -2408,13 +2408,19 @@ export class ActualItemProvider extends
   public onPropertyEnforceOrClearFinal(
     givenForId: string,
     givenForVersion: string,
+    internal?: boolean,
   ) {
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
       givenForId || null,
       givenForVersion || null,
     );
-    if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial && this.isCMounted) {
+    if (
+      !internal &&
+      this.props.automaticSearch &&
+      !this.props.automaticSearchIsOnlyInitial &&
+      this.isCMounted
+    ) {
       this.search(this.props.automaticSearch);
     }
   }
@@ -2430,9 +2436,7 @@ export class ActualItemProvider extends
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
     this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
-    if (!internal) {
-      this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
-    }
+    this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public onPropertyClearEnforce(
     property: PropertyDefinition,
@@ -2443,9 +2447,7 @@ export class ActualItemProvider extends
     // same but removes the enforcement
     property.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
     this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
-    if (!internal) {
-      this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion);
-    }
+    this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public runDismountOn(props: IActualItemProviderProps = this.props) {
     // when unmounting we check our optimization flags to see

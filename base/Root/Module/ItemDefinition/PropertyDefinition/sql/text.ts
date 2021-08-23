@@ -88,19 +88,6 @@ export function textSQLIn(arg: ISQLInInfo) {
     });
   }
 
-  console.log("WTF", {
-    [arg.prefix + arg.id]: purifiedText,
-    [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
-    [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
-    [arg.prefix + arg.id + "_VECTOR"]: [
-      "to_tsvector(?, ?)",
-      [
-        arg.dictionary,
-        escapedText,
-      ],
-    ],
-  });
-
   // now we set the value
   return {
     [arg.prefix + arg.id]: purifiedText,

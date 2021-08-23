@@ -96,7 +96,7 @@ export interface ISearchTriggerArgType {
   forbid: (message: string, customCode?: string) => void;
 }
 
-export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue>;
+export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue> | IGQLArgs | Promise<IGQLArgs>;
 export type SearchTriggerType = (arg: ISearchTriggerArgType) => void | Promise<void>;
 
 export interface IBaseTriggerRegistry {

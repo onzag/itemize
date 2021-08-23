@@ -175,6 +175,7 @@ export async function addItemDefinition(
     tokenData.id,
     tokenData.role,
     rolesManager,
+    false,
   );
 
   // now we see which fields are being requested for the answer after adding, first

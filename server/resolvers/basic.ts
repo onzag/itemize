@@ -136,9 +136,12 @@ export async function validateParentingRules(
   userId: string,
   role: string,
   rolesManager: CustomRoleManager,
+  isEdit: boolean,
 ) {
   const isParenting = !!(parentId || parentVersion || parentType);
-  if (!isParenting && itemDefinition.mustBeParented()) {
+  if (!isParenting && itemDefinition.mustBeParented() && !isEdit) {
+    // this is only relevant during add, as it is required when adding
+    // but as modifying a parent is already set
     throw new EndpointError({
       message: "A parent is required",
       code: ENDPOINT_ERRORS.UNSPECIFIED,

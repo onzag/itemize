@@ -1523,6 +1523,13 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
+
+    if (
+      this.stateSuperEnforcedValue[mergedID]
+    ) {
+      console.warn("Setting super enforced value on top of another at " + this.getId() + " on slot " + mergedID);
+    }
+
     this.stateSuperEnforcedValue[mergedID] = {
       value,
       owner,
@@ -1556,6 +1563,13 @@ export default class PropertyDefinition {
   ) {
     const mergedID = id + "." + (version || "");
     const deletedValue = this.stateSuperEnforcedValue[mergedID];
+
+    if (
+      !deletedValue
+    ) {
+      console.warn("Attempting to clean super enforced value where it has already been cleaned at " + this.getId() + " on slot " + mergedID);
+      return;
+    }
 
     // owner is specified and it's not equal so
     // it is not removed

@@ -179,6 +179,7 @@ export async function editItemDefinition(
     tokenData.id,
     tokenData.role,
     rolesManager,
+    true,
   );
 
   // and now basically we create a new value that is the combination or both, where our new
