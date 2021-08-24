@@ -166,6 +166,7 @@ export async function editItemDefinition(
       type: wholeSqlStoredValue.parent_type,
       version: wholeSqlStoredValue.parent_version,
     } : null,
+    customId: null,
   });
 
   await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerUserId, rolesManager, requestedFields);
@@ -309,6 +310,7 @@ export async function editItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -338,6 +340,7 @@ export async function editItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {
@@ -406,6 +409,7 @@ export async function editItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
   // same with the item definition
@@ -430,6 +434,7 @@ export async function editItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
 

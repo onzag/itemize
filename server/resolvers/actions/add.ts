@@ -95,6 +95,12 @@ export async function addItemDefinition(
   );
 
   const ownerId = resolverArgs.args.in_behalf_of || tokenData.id;
+
+  const hasNoVersion = !resolverArgs.args.version;
+
+  const isCustomId: boolean = resolverArgs.args.for_id && hasNoVersion;
+  const customId = isCustomId ? resolverArgs.args.for_id : null;
+
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,
     databaseConnection: appData.databaseConnection,
@@ -111,11 +117,11 @@ export async function addItemDefinition(
       type: resolverArgs.args.parent_type,
       version: resolverArgs.args.parent_version || null,
     } : null,
+    customId,
   });
 
   // if we are specifying a for_id
   if (resolverArgs.args.for_id) {
-    const hasNoVersion = !resolverArgs.args.version;
     if (hasNoVersion) {
       await itemDefinition.checkRoleCanCustomId(tokenData.role, rolesManager, true);
     }
@@ -384,6 +390,7 @@ export async function addItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId,
       });
       // and if we have a new value
       if (newValueAccordingToModule) {
@@ -413,6 +420,7 @@ export async function addItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId,
       });
       // and make it the new value if such trigger was registered
       if (newValueAccordingToIdef) {
@@ -485,6 +493,7 @@ export async function addItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
   if (itemDefinitionTrigger) {
@@ -507,12 +516,14 @@ export async function addItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
 
   const newRolesManagerWithKnownValue = rolesManager.subEnvironment({
     environment: CustomRoleGranterEnvironment.RETRIEVING,
     value: gqlValue,
+    customId: null,
   });
 
   // so now we check the role access for the reading of

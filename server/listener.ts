@@ -575,6 +575,7 @@ export class Listener {
           type: value.parent_type,
           version: value.parent_version || null,
         } : null,
+        customId: null,
       }
     );
 
@@ -674,6 +675,7 @@ export class Listener {
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: null,
+          customId: null,
         }
       );
       try {
@@ -777,6 +779,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          customId: null,
         }
       );
       try {
@@ -881,6 +884,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          customId: null,
         }
       );
       try {
@@ -981,6 +985,7 @@ export class Listener {
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy,
           parent: null,
+          customId: null,
         }
       );
       try {
@@ -1175,6 +1180,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          customId: null,
         }
       );
 
@@ -1376,6 +1382,7 @@ export class Listener {
             type: request.parentType,
             version: request.parentVersion,
           },
+          customId: null,
         }
       );
 
@@ -1590,6 +1597,7 @@ export class Listener {
           type: value.parent_type,
           version: value.parent_version || null,
         } : null,
+        customId: null,
       }
     );
 

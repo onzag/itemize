@@ -244,6 +244,7 @@ export class Collector {
           idef,
           rowValue,
         ) : null,
+        customId: null,
       }
     );
 
@@ -307,6 +308,7 @@ export class Collector {
               queryWasForbiddenByTriggers = true;
               forbiddenSignatureReason = "[FORBIDDEN_BY_MOD_TRIGGER]";
             },
+            customId: null,
           });
         }
 
@@ -333,6 +335,7 @@ export class Collector {
               queryWasForbiddenByTriggers = true;
               forbiddenSignatureReason = "[FORBIDDEN_BY_IDEF_TRIGGER]";
             },
+            customId: null,
           });
         }
       }

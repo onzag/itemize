@@ -28,7 +28,7 @@ import {
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
 import uuid from "uuid";
-import { flattenRawGQLValueOrFields } from "../../../../gql-util";
+import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
 import { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
@@ -1367,6 +1367,9 @@ export default class ItemDefinition {
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
    * to false as it's been used applyValue on it, it's been set now by the computer
+   * @returns a boolean on whether the action was performed, sometimes the value will not be applied
+   * because there already exists a better one already stored for the same last modified value which contains
+   * more fields
    */
   public applyValue(
     id: string,
@@ -1375,10 +1378,22 @@ export default class ItemDefinition {
     excludeExtensions: boolean,
     requestFields: IGQLRequestFields,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
-  ) {
+  ): boolean {
     // first we flatten the value if necessary
     const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value);
     const mergedID = id + "." + (version || "");
+
+    // we already have a value for that
+    if (this.stateHasAppliedValueTo[mergedID]) {
+      const fieldsAlreadyGot = this.stateGQLAppliedValue[mergedID].requestFields;
+      if (
+        requestFieldsAreContained(requestFields, fieldsAlreadyGot) &&
+        this.stateGQLAppliedValue[mergedID].flattenedValue.last_modified === value.last_modified
+      ) {
+        return false;
+      }
+    }
+
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
     this.stateInternal[mergedID] = null;
@@ -1429,6 +1444,8 @@ export default class ItemDefinition {
       include.applyValue(id, version, givenValue,
         givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
     });
+
+    return true;
   }
 
   /**

@@ -77,6 +77,12 @@ export interface IOTriggerArgType {
     customData: any;
   },
   /**
+   * A custom id that might be provided during adding events
+   * this is when the user specifies their own id
+   * to use during a custom id event
+   */
+  customId: string;
+  /**
    * Causes the request to be forbidden
    */
   forbid: (message: string, customCode?: string) => void;

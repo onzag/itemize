@@ -131,6 +131,7 @@ export async function searchModule(
       type: resolverArgs.args.parent_type,
       version: resolverArgs.args.parent_version || null,
     } : null,
+    customId: null,
   });
   await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
@@ -329,6 +330,7 @@ export async function searchModule(
                   customData: tokenData.customData,
                 },
                 forbid: defaultTriggerForbiddenFunction,
+                customId: null,
               });
             }
 
@@ -352,6 +354,7 @@ export async function searchModule(
                   customData: tokenData.customData,
                 },
                 forbid: defaultTriggerForbiddenFunction,
+                customId: null,
               });
             }
           }
@@ -496,6 +499,7 @@ export async function searchItemDefinition(
       type: resolverArgs.args.parent_type,
       version: resolverArgs.args.parent_version || null,
     } : null,
+    customId: null,
   });
 
   const created_by = resolverArgs.args.created_by;
@@ -773,6 +777,7 @@ export async function searchItemDefinition(
                   customData: tokenData.customData,
                 },
                 forbid: defaultTriggerForbiddenFunction,
+                customId: null,
               });
             }
 
@@ -796,6 +801,7 @@ export async function searchItemDefinition(
                   customData: tokenData.customData,
                 },
                 forbid: defaultTriggerForbiddenFunction,
+                customId: null,
               });
             }
           }

@@ -34,6 +34,7 @@ export interface ICustomRoleGranterArg {
     type: string;
     version: string;
   };
+  customId: string;
 }
 
 export interface ICustomRoleType {

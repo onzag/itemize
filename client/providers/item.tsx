@@ -1875,6 +1875,12 @@ export class ActualItemProvider extends
     // as the search did an apply to it
     this.changeListener();
 
+    // already loaded this can happen if during a search it triggers load
+    // but there's another component around holding the same value
+    if (this.state.loaded) {
+      return;
+    }
+
     const forId = this.props.forId || null;
     const forVersion = this.props.forVersion || null;
 
@@ -4242,11 +4248,14 @@ export function NoStateItemProvider(props: INoStateItemProviderProps) {
 export function ParentItemContextProvider(props: { children: React.ReactNode }) {
   return (
     <ItemContext.Consumer>
-      {(value) => (
-        <ItemContext.Provider value={value.injectedParentContext}>
+      {(value) => {
+        if (!value.injectedParentContext) {
+          throw new Error("You need to have injected parent context in your parent item provider");
+        }
+        return (<ItemContext.Provider value={value.injectedParentContext}>
           {props.children}
-        </ItemContext.Provider>
-      )}
+        </ItemContext.Provider>);
+      }}
     </ItemContext.Consumer>
   )
 }

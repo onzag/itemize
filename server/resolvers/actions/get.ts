@@ -111,6 +111,7 @@ export async function getItemDefinition(
       type: selectQueryValue.parent_type,
       version: selectQueryValue.parent_version,
     } : null,
+    customId: null,
   });
 
   await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
@@ -212,6 +213,7 @@ export async function getItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
     }
 
@@ -235,6 +237,7 @@ export async function getItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
     }
   }
@@ -375,6 +378,7 @@ export async function getItemDefinitionList(
           type: value.parent_type,
           version: value.parent_version,
         } : null,
+        customId: null,
       });
 
       await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
@@ -421,6 +425,7 @@ export async function getItemDefinitionList(
               customData: tokenData.customData,
             },
             forbid: defaultTriggerForbiddenFunction,
+            customId: null,
           });
         }
 
@@ -444,6 +449,7 @@ export async function getItemDefinitionList(
               customData: tokenData.customData,
             },
             forbid: defaultTriggerForbiddenFunction,
+            customId: null,
           });
         }
       }
@@ -565,6 +571,7 @@ export async function getModuleList(
           type: value.parent_type,
           version: value.parent_version,
         } : null,
+        customId: null,
       });
       await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
       await mod.checkRoleAccessFor(
@@ -609,6 +616,7 @@ export async function getModuleList(
               customData: tokenData.customData,
             },
             forbid: defaultTriggerForbiddenFunction,
+            customId: null,
           });
         }
 
@@ -632,6 +640,7 @@ export async function getModuleList(
               customData: tokenData.customData,
             },
             forbid: defaultTriggerForbiddenFunction,
+            customId: null,
           });
         }
       }

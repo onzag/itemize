@@ -144,6 +144,7 @@ export async function deleteItemDefinition(
       type: wholeSqlStoredValue.parent_type,
       version: wholeSqlStoredValue.parent_version,
     } : null,
+    customId: null,
   });
 
   // we flatten and get the requested fields
@@ -198,6 +199,7 @@ export async function deleteItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
     }
     // same with the item definition
@@ -222,6 +224,7 @@ export async function deleteItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerForbiddenFunction,
+        customId: null,
       });
     }
   }
@@ -256,6 +259,7 @@ export async function deleteItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
 
@@ -281,6 +285,7 @@ export async function deleteItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
+      customId: null,
     });
   }
 
