@@ -19,6 +19,7 @@ import {
   IOrderByRuleType,
   ENDPOINT_ERRORS,
   UNSPECIFIED_OWNER,
+  INCLUDE_PREFIX,
 } from "../../constants";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn } from "../../gql-querier";
@@ -352,6 +353,61 @@ export function getFieldsAndArgs(
 }
 
 /**
+ * Given arguments that need their files reprocessed and fetched in order
+ * to specify a blob this function will do such job
+ * @param argumentsForQuery 
+ * @param argumentsFoundFilePaths 
+ * @param originalContainerIdOfContent 
+ * @param itemDefinitionInstance 
+ * @param config 
+ * @param forId 
+ * @param forVersion 
+ */
+export async function reprocessQueryArgumentsForFiles(
+  argumentsForQuery: any,
+  argumentsFoundFilePaths: Array<[string, string] | [string]>,
+  originalContainerIdOfContent: string,
+  itemDefinitionInstance: ItemDefinition,
+  config: IConfigRawJSONDataType,
+  forId: string,
+  forVersion: string,
+) {
+  // now we can start refetching all those values to get them
+  // back as files
+  await Promise.all(
+    // so we map in those file paths we found
+    argumentsFoundFilePaths.map(async (path: [string, string] | [string]) => {
+      // these are for the ones with includes
+      if (path.length === 2) {
+        // we get the include
+        const include = itemDefinitionInstance.getIncludeFor(path[0].replace(INCLUDE_PREFIX, ""));
+        // and reprocess the value
+        argumentsForQuery[path[0]][path[1]] = await reprocessFileArgument(argumentsForQuery[path[0]][path[1]], {
+          config: config,
+          containerId: originalContainerIdOfContent,
+          forId: forId || null,
+          forVersion: forVersion || null,
+          include,
+          itemDefinition: itemDefinitionInstance,
+          property: include.getSinkingPropertyFor(path[1]),
+        });
+      } else {
+        // and for standard raw properties
+        argumentsForQuery[path[0]] = await reprocessFileArgument(argumentsForQuery[path[0]], {
+          config: config,
+          containerId: originalContainerIdOfContent,
+          forId:forId || null,
+          forVersion: forVersion || null,
+          include: null,
+          itemDefinition: itemDefinitionInstance,
+          property: itemDefinitionInstance.getPropertyDefinitionFor(path[0], true),
+        });
+      }
+    })
+  );
+}
+
+/**
  * When creating a brand new item using the add action but somehow
  * we are using files and values from another item and submitting that
  * into the new ones, the new files will not have a source because they belong
@@ -361,7 +417,7 @@ export function getFieldsAndArgs(
  * @param files the file in question either an array or a file itself
  * @param options options for restoring the source
  */
-export async function reprocessFileArgumentForAdd(
+export async function reprocessFileArgument(
   files: IGQLFile | IGQLFile[],
   options: {
     config: IConfigRawJSONDataType;
@@ -375,7 +431,7 @@ export async function reprocessFileArgumentForAdd(
 ): Promise<IGQLFile | IGQLFile[]> {
   // for array we recurse as an array
   if (Array.isArray(files)) {
-    return await Promise.all((files as any).map((f: any) => reprocessFileArgumentForAdd(f, options)));
+    return await Promise.all((files as any).map((f: any) => reprocessFileArgument(f, options)));
   }
 
   // if the value is null or undefined
@@ -1296,7 +1352,7 @@ export async function runSearchQueryFor(
 
         if (
           arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
-          (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
+          (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
         ) {
           shouldWriteMetadata = true;
         } else {
@@ -1308,7 +1364,7 @@ export async function runSearchQueryFor(
         shouldWriteMetadata = true;
       }
 
-      if (redoSearch || refetchAllRecords || (refetchSpecificRecords &&  refetchSpecificRecords.length)) {
+      if (redoSearch || refetchAllRecords || (refetchSpecificRecords && refetchSpecificRecords.length)) {
         cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
           queryName,
           searchArgs,

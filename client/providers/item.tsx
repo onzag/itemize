@@ -27,7 +27,7 @@ import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/a
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, reprocessFileArgumentForAdd, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction
+  IPropertyOverride, reprocessFileArgument, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
 } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -93,6 +93,44 @@ function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: Item
     return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
   }
   return itemDefinition.getPropertyDefinitionFor(actualId, true);
+}
+
+function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
+  if (
+    searchA &&
+    searchA.cacheMetadataMismatchAction &&
+    searchA.cacheMetadataMismatchAction.recordsRefetchCondition &&
+    searchA.cacheMetadataMismatchAction.recordsRefetchCondition.custom &&
+    searchB &&
+    searchB.cacheMetadataMismatchAction &&
+    searchB.cacheMetadataMismatchAction.recordsRefetchCondition &&
+    searchB.cacheMetadataMismatchAction.recordsRefetchCondition.custom
+  ) {
+    const searchANoFn = {
+      ...searchA,
+      cacheMetadataMismatchAction: {
+        ...searchA.cacheMetadataMismatchAction,
+        recordsRefetchCondition: {
+          ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
+          custom: null as any,
+        }
+      }
+    }
+    const searchBNoFn = {
+      ...searchA,
+      cacheMetadataMismatchAction: {
+        ...searchA.cacheMetadataMismatchAction,
+        recordsRefetchCondition: {
+          ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
+          custom: null as any,
+        }
+      }
+    }
+
+    return !equals(searchANoFn, searchBNoFn);
+  }
+
+  return !equals(searchA, searchB); 
 }
 
 /**
@@ -298,9 +336,14 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     id: string,
     version?: string,
   };
-  action?: "add" | "edit",
+  action?: "add" | "edit";
   submitForId?: string;
   submitForVersion?: string;
+  /**
+   * Advanced, allows to submit for an alternate item rather than the current
+   * one
+   */
+  submitForItem?: string;
   inBehalfOf?: string;
   propertyOverrides?: IPropertyOverride[];
   includeOverrides?: IIncludeOverride[];
@@ -1489,7 +1532,7 @@ export class ActualItemProvider extends
       const currentState = getSearchStateOf(this.state);
       const prevSearchState = getSearchStateOf(prevState);
 
-      if (!equals(currentState, prevSearchState, {strict: true})) {
+      if (!equals(currentState, prevSearchState, { strict: true })) {
         this.props.onSearchStateChange(currentState);
       }
     }
@@ -1690,7 +1733,7 @@ export class ActualItemProvider extends
         (
           prevProps.automaticSearch &&
           (
-            !equals(this.props.automaticSearch, prevProps.automaticSearch, { strict: true }) ||
+            isSearchUnequal(this.props.automaticSearch, prevProps.automaticSearch) ||
             // these two would cause search results to be dismissed because
             // the fact the token is a key part of the search itself so we would
             // dismiss the search in such a case as the token is different
@@ -3048,6 +3091,14 @@ export class ActualItemProvider extends
       }
     }
 
+    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+
+    const itemDefinitionToSubmitFor = options.submitForItem ?
+      root.registry[options.submitForItem] as ItemDefinition :
+      this.props.itemDefinitionInstance;
+
+    const itemDefinitionToRetrieveDataFrom = this.props.itemDefinitionInstance;
+
     // now we are going to build our query
     // also we make a check later on for the policies
     // if necessary
@@ -3068,7 +3119,7 @@ export class ActualItemProvider extends
       includeModeration: false,
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
-      itemDefinitionInstance: this.props.itemDefinitionInstance,
+      itemDefinitionInstance: itemDefinitionToRetrieveDataFrom,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
       propertyOverrides: options.propertyOverrides,
@@ -3076,8 +3127,7 @@ export class ActualItemProvider extends
     });
 
     if (options.parentedBy) {
-      const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
-        .getParentRoot().registry[options.parentedBy.item] as ItemDefinition;
+      const itemDefinitionInQuestion = root.registry[options.parentedBy.item] as ItemDefinition;
 
       argumentsForQuery.parent_id = options.parentedBy.id;
       argumentsForQuery.parent_version = options.parentedBy.version || null;
@@ -3106,10 +3156,40 @@ export class ActualItemProvider extends
     // or if we have a submit for id that is also our current item id and it is indeed found which means that we are sure
     // there's a value for it and it is loaded so we can be guaranteed this is meant to be an edit
     if (options.action ? options.action === "edit" : (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)) {
+
+      const submitTargetIsDifferent = !!itemDefinitionToSubmitFor || submitForId !== this.props.forId;
+      if (submitTargetIsDifferent) {
+        // if we are submitting to edit to a different target to our own
+        // basically copying during an edit action we need to do the same we do
+        // in creating new values via copying
+        const appliedValue = itemDefinitionToRetrieveDataFrom.getGQLAppliedValue(
+          this.props.forId || null,
+          this.props.forVersion || null,
+        );
+        const originalContainerIdOfContent = appliedValue &&
+          appliedValue.rawValue &&
+          appliedValue.rawValue.container_id as string;
+
+        // so if we have an applied value we have stored content about
+        if (originalContainerIdOfContent) {
+          // now we can start refetching all those values to get them
+          // back as files
+          await reprocessQueryArgumentsForFiles(
+            argumentsForQuery,
+            argumentsFoundFilePaths,
+            originalContainerIdOfContent,
+            itemDefinitionToRetrieveDataFrom,
+            this.props.config,
+            this.props.forId || null,
+            this.props.forVersion || null,
+          );
+        }
+      }
+
       const totalValues = await runEditQueryFor({
         args: argumentsForQuery,
         fields: requestFields,
-        itemDefinition: this.props.itemDefinitionInstance,
+        itemDefinition: itemDefinitionToSubmitFor,
         token: this.props.tokenData.token,
         language: options.languageOverride || this.props.localeData.language,
         id: submitForId || null,
@@ -3140,7 +3220,7 @@ export class ActualItemProvider extends
       // another of another kind, either new with undefined id or
       // a different version, we need to ensure all the files
       // are going to be there nicely and copied
-      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+      const appliedValue = itemDefinitionToRetrieveDataFrom.getGQLAppliedValue(
         this.props.forId || null,
         this.props.forVersion || null,
       );
@@ -3152,36 +3232,14 @@ export class ActualItemProvider extends
       if (originalContainerIdOfContent) {
         // now we can start refetching all those values to get them
         // back as files
-        await Promise.all(
-          // so we map in those file paths we found
-          argumentsFoundFilePaths.map(async (path: [string, string] | [string]) => {
-            // these are for the ones with includes
-            if (path.length === 2) {
-              // we get the include
-              const include = this.props.itemDefinitionInstance.getIncludeFor(path[0].replace(INCLUDE_PREFIX, ""));
-              // and reprocess the value
-              argumentsForQuery[path[0]][path[1]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]][path[1]], {
-                config: this.props.config,
-                containerId: originalContainerIdOfContent,
-                forId: this.props.forId || null,
-                forVersion: this.props.forVersion || null,
-                include,
-                itemDefinition: this.props.itemDefinitionInstance,
-                property: include.getSinkingPropertyFor(path[1]),
-              });
-            } else {
-              // and for standard raw properties
-              argumentsForQuery[path[0]] = await reprocessFileArgumentForAdd(argumentsForQuery[path[0]], {
-                config: this.props.config,
-                containerId: originalContainerIdOfContent,
-                forId: this.props.forId || null,
-                forVersion: this.props.forVersion || null,
-                include: null,
-                itemDefinition: this.props.itemDefinitionInstance,
-                property: this.props.itemDefinitionInstance.getPropertyDefinitionFor(path[0], true),
-              });
-            }
-          })
+        await reprocessQueryArgumentsForFiles(
+          argumentsForQuery,
+          argumentsFoundFilePaths,
+          originalContainerIdOfContent,
+          itemDefinitionToRetrieveDataFrom,
+          this.props.config,
+          this.props.forId || null,
+          this.props.forVersion || null,
         );
       }
 
@@ -3189,7 +3247,7 @@ export class ActualItemProvider extends
       const totalValues = await runAddQueryFor({
         args: argumentsForQuery,
         fields: requestFields,
-        itemDefinition: this.props.itemDefinitionInstance,
+        itemDefinition: itemDefinitionToSubmitFor,
         token: this.props.tokenData.token,
         language: options.languageOverride || this.props.localeData.language,
         listenerUUID: this.props.remoteListener.getUUID(),
@@ -3215,12 +3273,13 @@ export class ActualItemProvider extends
         error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
         CacheWorkerInstance.isSupported
       ) {
-        const state = this.props.itemDefinitionInstance.getStateNoExternalChecking(
+        const state = itemDefinitionToRetrieveDataFrom.getStateNoExternalChecking(
           this.props.forId || null,
           this.props.forVersion || null,
         );
         const serializable = getSerializableState(state);
         storedState = await CacheWorkerInstance.instance.storeState(
+          // eh its the same as itemDefinitionToRetrieveDataFrom
           this.props.itemDefinitionQualifiedName,
           this.props.forId || null,
           this.props.forVersion || null,
@@ -3243,6 +3302,7 @@ export class ActualItemProvider extends
         CacheWorkerInstance.isSupported
       ) {
         deletedState = await CacheWorkerInstance.instance.deleteState(
+          // eh its the same itemDefinitionToRetrieveDataFrom
           this.props.itemDefinitionQualifiedName,
           this.props.forId || null,
           this.props.forVersion || null,
@@ -3260,7 +3320,7 @@ export class ActualItemProvider extends
 
       recievedId = value.id as string;
       receivedVersion = value.version as string || null;
-      this.props.itemDefinitionInstance.applyValue(
+      itemDefinitionToSubmitFor.applyValue(
         recievedId,
         receivedVersion,
         value,
@@ -3269,15 +3329,24 @@ export class ActualItemProvider extends
         true,
       );
 
-      const triggeredAnUpdate = this.cleanWithProps(this.props, options, "success");
+      const triggeredAnUpdate = this.cleanWithProps(
+        this.props,
+        options,
+        "success",
+        // we avoid triggering an update if it's not the same
+        // because it will use the this.props.itemDefinitionInstance
+        itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance,
+      );
       if (!triggeredAnUpdate) {
-        this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
+        // we ensure this comes here if the submit for is not the same
+        // but also clean with props might not have triggered an update itself
+        itemDefinitionToSubmitFor.triggerListeners("change", recievedId || null, receivedVersion || null);
 
         // clean will props may have triggered the change listeners, but if there's a difference
         // between what we have cleaned and applied we want to trigger these listeners again for the
         // received value
       } else if (this.props.forId !== recievedId && (this.props.forVersion || null) !== (receivedVersion || null)) {
-        this.props.itemDefinitionInstance.triggerListeners("change", recievedId || null, receivedVersion || null);
+        itemDefinitionToSubmitFor.triggerListeners("change", recievedId || null, receivedVersion || null);
       }
     }
 
