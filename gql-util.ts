@@ -19,7 +19,7 @@ export function requestFieldsAreContained(
   requestFieldsOrValueMain: IGQLRequestFields | IGQLValue,
 ): boolean {
   // if it's null, it's contained
-  if (requestFieldsOrValueMain === null) {
+  if (requestFieldsOrValueMain === null || requestFieldsSubset === null) {
     return true;
   }
 

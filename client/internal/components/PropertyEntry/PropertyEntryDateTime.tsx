@@ -207,7 +207,7 @@ export default class PropertyEntryDateTime extends
       type,
       dateTimeFormat,
 
-      disabled: this.props.state.enforced,
+      disabled: this.props.state.enforced || this.props.disabled,
 
       autoFocus: this.props.autoFocus || false,
 

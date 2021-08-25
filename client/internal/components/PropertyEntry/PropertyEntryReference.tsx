@@ -773,7 +773,7 @@ export default class PropertyEntryReference
       dismissSearchError: this.dismissSearchError,
       dismissFindError: this.dismissFindError,
 
-      disabled: this.props.state.enforced,
+      disabled: this.props.state.enforced || this.props.disabled,
 
       autoFocus: this.props.autoFocus || false,
 

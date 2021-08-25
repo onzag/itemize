@@ -57,6 +57,11 @@ function i18nReadErrorInternal(
   // and the error is now FREE
   const freeError = props.error as any;
 
+  //
+  if (!freeError) {
+    return props.children ? props.children("MISSING ERROR VALUE") : "MISSING ERROR VALUE";
+  }
+
   // now we check if it has a module path, if it doesn't it's not an error
   // in an module, item, include, etc... context, it's an average error
   if (!freeError.modulePath) {
@@ -213,6 +218,11 @@ export default function I18nReadError(props: II18nReadErrorProps) {
         (localeData) => {
           // this is where we display the error
           const freeError = props.error as any;
+
+          if (!freeError) {
+            return props.children ? props.children("MISSING ERROR VALUE") : "MISSING ERROR VALUE";
+          }
+
           if (isDevelopment && freeError.message) {
             console.warn(freeError.message);
           }

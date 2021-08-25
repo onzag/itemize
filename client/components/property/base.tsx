@@ -120,6 +120,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * whether to cache files when running the url absoluter
    */
   cacheFiles?: boolean;
+  /**
+   * force to be disabled
+   */
+  disabled?: boolean;
 }
 
 /**
@@ -477,6 +481,7 @@ export function EntryViewReadSet(
                           prefillWith={props.prefillWith}
                           referenceFilteringSet={props.referenceFilteringSet}
                           cacheFiles={props.cacheFiles}
+                          disabled={props.disabled}
                         />
                       );
                     } else {

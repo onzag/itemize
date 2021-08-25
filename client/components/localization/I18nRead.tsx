@@ -318,6 +318,10 @@ interface I18nReadInternalOptimizedProps extends II18nReadProps {
  */
 export class I18nReadInternalOptimized extends React.PureComponent<I18nReadInternalOptimizedProps> {
   public render() {
+    if (!this.props.id) {
+      return this.props.children ? this.props.children("MISSING ID") : "MISSING ID";
+    }
+
     return i18nReadInternal(
       this.props.localeContext,
       this.props.mod,

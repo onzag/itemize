@@ -1164,6 +1164,10 @@ interface ISlateEditorProps {
    * Whether to auto focus on mount
    */
   autoFocus?: boolean;
+  /**
+   * Whether the field is disabled
+   */
+  disabled?: boolean;
 }
 
 /**
@@ -5066,6 +5070,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           renderElement={this.renderElement}
           renderLeaf={this.renderText}
           placeholder={this.props.placeholder}
+          readOnly={this.props.disabled}
+          disabled={this.props.disabled}
         />
       </CurrentElementProvider>
     );

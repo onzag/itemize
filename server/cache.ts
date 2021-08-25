@@ -1942,6 +1942,31 @@ export class Cache {
   }
 
   /**
+   * TODO creates a zip backup of a given item and their children
+   * @param item 
+   * @param id 
+   * @param version 
+   * @param includeChildren 
+   */
+   public async createBackup(
+    item: ItemDefinition | string,
+    id: string,
+    version: string,
+    includeChildren: boolean,
+  ) {
+
+  }
+
+  /**
+   * TODO loads a backup for a given zip file and its children
+   * saveAtId
+   * randomIds
+   */
+  public async loadBackup() {
+
+  }
+
+  /**
    * wipes the cache, usually executed on edge cases during connectivity issues
    * with clusters and nodes, once the connection is restablished with redis
    * the cache is wiped by the cluster manager which handles the cache

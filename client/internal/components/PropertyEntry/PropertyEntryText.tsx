@@ -911,7 +911,7 @@ export default class PropertyEntryText
       currentInternalValue: this.props.state.internalValue,
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
-      disabled: this.props.state.enforced,
+      disabled: this.props.state.enforced || this.props.disabled,
 
       autoFocus: this.props.autoFocus || false,
 

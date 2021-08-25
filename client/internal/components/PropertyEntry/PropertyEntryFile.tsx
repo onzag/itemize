@@ -420,7 +420,7 @@ export default class PropertyEntryFile
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
 
-      disabled: this.props.state.enforced,
+      disabled: this.props.state.enforced || this.props.disabled,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,

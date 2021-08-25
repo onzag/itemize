@@ -1385,10 +1385,22 @@ export default class ItemDefinition {
 
     // we already have a value for that
     if (this.stateHasAppliedValueTo[mergedID]) {
+      if (this.stateGQLAppliedValue[mergedID].flattenedValue === null && value === null) {
+        return false;
+      }
+
       const fieldsAlreadyGot = this.stateGQLAppliedValue[mergedID].requestFields;
       if (
         requestFieldsAreContained(requestFields, fieldsAlreadyGot) &&
-        this.stateGQLAppliedValue[mergedID].flattenedValue.last_modified === value.last_modified
+        (
+          (
+            this.stateGQLAppliedValue[mergedID].flattenedValue &&
+            value &&
+            this.stateGQLAppliedValue[mergedID].flattenedValue.last_modified === value.last_modified
+          ) || (
+            this.stateGQLAppliedValue[mergedID].rawValue === value
+          )
+        )
       ) {
         return false;
       }

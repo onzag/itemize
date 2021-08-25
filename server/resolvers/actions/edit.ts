@@ -385,7 +385,6 @@ export async function editItemDefinition(
     appData.cache.getServerData(),
     itemDefinition,
     sqlValue,
-    requestedFields,
   );
 
   if (moduleTrigger) {

@@ -468,7 +468,6 @@ export async function addItemDefinition(
     appData.cache.getServerData(),
     itemDefinition,
     value,
-    requestedFields,
   );
 
   if (

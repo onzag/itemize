@@ -223,6 +223,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         rootI18n={this.props.i18nRoot}
         placeholder={this.props.placeholder}
+        disabled={this.props.disabled}
         wrapperArgs={
           {
             i18nGenericError: this.props.i18nGenericError,

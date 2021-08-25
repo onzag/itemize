@@ -315,6 +315,10 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    * via the url
    */
   cacheFiles: boolean;
+  /**
+   * Developer provider check base.tsx
+   */
+  disabled: boolean;
 }
 
 /**

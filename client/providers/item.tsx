@@ -2798,6 +2798,14 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "success");
     } else {
+      this.props.itemDefinitionInstance.applyValue(
+        this.props.forId || null,
+        this.props.forVersion || null,
+        null,
+        false,
+        null,
+        true,
+      );
       this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
       if (!this.isUnmounted) {
         this.setState({
