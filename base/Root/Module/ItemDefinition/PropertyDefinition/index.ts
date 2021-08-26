@@ -1527,7 +1527,12 @@ export default class PropertyDefinition {
     if (
       this.stateSuperEnforcedValue[mergedID]
     ) {
-      console.warn("Setting super enforced value on top of another at " + this.getId() + " on slot " + mergedID);
+      console.warn(
+        "Setting super enforced value at " +
+        JSON.stringify(value) +
+        " on top of another " +
+        JSON.stringify(this.stateSuperEnforcedValue[mergedID].value) +
+        " at " + this.getId() + " on slot " + mergedID);
     }
 
     this.stateSuperEnforcedValue[mergedID] = {
@@ -2293,7 +2298,7 @@ export default class PropertyDefinition {
     rolesManager: ICustomRoleManager,
   ) {
     const rolesWithAccess = this.rawData.softReadRoleAccess || [ANYONE_METAROLE];
-    
+
     const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
       rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
     ) || (
