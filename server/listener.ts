@@ -61,6 +61,10 @@ import {
   IOwnedParentedSearchRecordsEvent,
   OWNED_PARENTED_SEARCH_RECORDS_EVENT,
   OWNED_PARENTED_SEARCH_UNREGISTER_REQUEST,
+  generateBasicMergedIndexIdentifier,
+  generateOwnedSearchMergedIndexIdentifier,
+  generateParentedSearchMergedIndexIdentifier,
+  generateOwnedParentedSearchMergedIndexIdentifier,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -322,6 +326,7 @@ export class Listener {
         userId,
       },
       source: "global",
+      mergedIndexIdentifier: null,
     };
     this.redisGlobalPub.redisClient.publish(SERVER_USER_KICK_IDENTIFIER, JSON.stringify(redisEvent));
   }
@@ -461,7 +466,11 @@ export class Listener {
   public registerSS(
     request: IRegisterRequest,
   ) {
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    const mergedIndexIdentifier = generateBasicMergedIndexIdentifier(
+      request.itemDefinition,
+      request.id,
+      request.version,
+    );
     CAN_LOG_DEBUG && logger.debug(
       "Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier,
     );
@@ -482,6 +491,7 @@ export class Listener {
         request,
         serverInstanceGroupId: INSTANCE_GROUP_ID,
         source: "local",
+        mergedIndexIdentifier: null,
       }
       this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(redisEvent));
     } else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
@@ -608,7 +618,11 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    const mergedIndexIdentifier = generateBasicMergedIndexIdentifier(
+      request.itemDefinition,
+      request.id,
+      request.version,
+    );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
@@ -708,7 +722,11 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
+    const mergedIndexIdentifier = generateOwnedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.createdBy,
+    );
+    
     if (!listenerData.listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
@@ -812,8 +830,12 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." +
-      request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+    const mergedIndexIdentifier = generateParentedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.parentType,
+      request.parentId,
+      request.parentVersion,
+    );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
@@ -917,8 +939,12 @@ export class Listener {
       return;
     }
 
-    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + request.qualifiedPathName + "." + request.createdBy + "." +
-      request.parentType + "." + request.parentId + "." + (request.parentVersion || "");
+    const mergedIndexIdentifier = generateOwnedParentedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.createdBy,
+      request.parentType,request.parentId,
+      request.parentVersion,
+    );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         "Listener.ownedParentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
@@ -1698,7 +1724,11 @@ export class Listener {
   public unregisterSS(
     request: IUnregisterRequest,
   ) {
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    const mergedIndexIdentifier = generateBasicMergedIndexIdentifier(
+      request.itemDefinition,
+      request.id,
+      request.version,
+    );
     if (this.listensSS[mergedIndexIdentifier]) {
       delete this.listensSS[mergedIndexIdentifier];
       this.removeListenerFinal(mergedIndexIdentifier);
@@ -1728,7 +1758,11 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    const mergedIndexIdentifier = request.itemDefinition + "." + request.id + "." + (request.version || "");
+    const mergedIndexIdentifier = generateBasicMergedIndexIdentifier(
+      request.itemDefinition,
+      request.id,
+      request.version,
+    );
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public ownedSearchUnregister(
@@ -1755,7 +1789,10 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    const mergedIndexIdentifier = "OWNED_SEARCH." + request.qualifiedPathName + "." + request.createdBy;
+    const mergedIndexIdentifier = generateOwnedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.createdBy,
+    );
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public parentedSearchUnregister(
@@ -1782,8 +1819,12 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    const mergedIndexIdentifier = "PARENTED_SEARCH." + request.qualifiedPathName + "." + request.parentType +
-      "." + request.parentId + "." + (request.parentVersion || "");
+    const mergedIndexIdentifier = generateParentedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.parentType,
+      request.parentId,
+      request.parentVersion,
+    );
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public ownedParentedSearchUnregister(
@@ -1810,8 +1851,13 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + request.qualifiedPathName + "." + request.createdBy + "." + request.parentType +
-      "." + request.parentId + "." + (request.parentVersion || "");
+    const mergedIndexIdentifier = generateOwnedParentedSearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.createdBy,
+      request.parentType,
+      request.parentId,
+      request.parentVersion,
+    );
     this.removeListener(socket, mergedIndexIdentifier);
   }
   public triggerChangedListeners(
@@ -1846,7 +1892,10 @@ export class Listener {
     event: IOwnedSearchRecordsEvent,
     listenerUUID: string,
   ) {
-    const mergedIndexIdentifier = "OWNED_SEARCH." + event.qualifiedPathName + "." + event.createdBy;
+    const mergedIndexIdentifier = generateOwnedSearchMergedIndexIdentifier(
+      event.qualifiedPathName,
+      event.createdBy,
+    );
     const redisEvent: IRedisEvent = {
       type: OWNED_SEARCH_RECORDS_EVENT,
       event,
@@ -1865,8 +1914,12 @@ export class Listener {
     event: IParentedSearchRecordsEvent,
     listenerUUID: string,
   ) {
-    const mergedIndexIdentifier = "PARENTED_SEARCH." + event.qualifiedPathName + "." + event.parentType +
-      "." + event.parentId + "." + (event.parentVersion || "");
+    const mergedIndexIdentifier = generateParentedSearchMergedIndexIdentifier(
+      event.qualifiedPathName,
+      event.parentType,
+      event.parentId,
+      event.parentVersion,
+    );
     const redisEvent: IRedisEvent = {
       event,
       listenerUUID,
@@ -1885,8 +1938,13 @@ export class Listener {
     event: IOwnedParentedSearchRecordsEvent,
     listenerUUID: string,
   ) {
-    const mergedIndexIdentifier = "OWNED_PARENTED_SEARCH." + event.qualifiedPathName + "." + event.createdBy + "." + event.parentType +
-      "." + event.parentId + "." + (event.parentVersion || "");
+    const mergedIndexIdentifier = generateOwnedParentedSearchMergedIndexIdentifier(
+      event.qualifiedPathName,
+      event.createdBy,
+      event.parentType,
+      event.parentId,
+      event.parentVersion,
+    );
     const redisEvent: IRedisEvent = {
       event,
       listenerUUID,
@@ -1907,7 +1965,7 @@ export class Listener {
   ) {
     const redisEvent: IRedisEvent = JSON.parse(message);
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.globalRedisListener: received redis event",
+      "Listener.globalRedisListener: received redis event " + channel,
       redisEvent,
     );
 
@@ -1931,7 +1989,7 @@ export class Listener {
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
       if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
+          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + ", ignoring event",
         );
       } else if (redisEvent.data && redisEvent.data.userId === "number") {
         this.onReceiveKickEvent(redisEvent.data.userId);
@@ -1943,7 +2001,7 @@ export class Listener {
     // as these are the remote listening functions
     if (redisEvent.mergedIndexIdentifier && this.listensSS[redisEvent.mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.globalRedisListener: our own server is expecting it",
+        "Listener.globalRedisListener: our own server is expecting " + channel,
       );
 
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
@@ -1951,7 +2009,7 @@ export class Listener {
         // when we were the originators, our local cache is expected
         // to have been updated, as such, we literally don't care
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter, ignoring event",
+          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + ", ignoring event",
         );
       } else {
         const event: IChangedFeedbackEvent = redisEvent.event;
@@ -1983,11 +2041,11 @@ export class Listener {
           ) {
             if (this.listeners[socketKey].uuid === redisEvent.listenerUUID) {
               CAN_LOG_DEBUG && logger.debug(
-                "Listener.globalRedisListener: socket " + socketKey + " is listening, but was also the initial emitter, ignoring",
+                "Listener.globalRedisListener: socket " + socketKey + " is listening, but was also the initial emitter of " + channel + ", ignoring",
               );
             } else {
               CAN_LOG_DEBUG && logger.debug(
-                "Listener.globalRedisListener: socket " + socketKey + " was expecting it, emitting",
+                "Listener.globalRedisListener: socket " + socketKey + " was expecting " + channel + ", emitting",
               );
               this.listeners[socketKey].socket.emit(
                 redisEvent.type,
@@ -2085,6 +2143,7 @@ export class Listener {
       type: CLUSTER_MANAGER_RESET,
       serverInstanceGroupId: INSTANCE_GROUP_ID,
       source: "local",
+      mergedIndexIdentifier: null,
     }
     this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_RESET, JSON.stringify(redisEvent));
   }

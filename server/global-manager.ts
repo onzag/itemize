@@ -796,6 +796,7 @@ export class GlobalManager {
       type: SERVER_DATA_IDENTIFIER,
       serverInstanceGroupId: null,
       data: this.serverData,
+      mergedIndexIdentifier: null,
     };
 
     // publishing new server data

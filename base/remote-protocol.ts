@@ -667,6 +667,40 @@ export interface IRedisEvent {
   listenerUUID?: string;
   source: "local" | "global";
   serverInstanceGroupId: string;
-  mergedIndexIdentifier?: string;
+  mergedIndexIdentifier: string;
   data?: any;
+}
+
+export function generateBasicMergedIndexIdentifier(
+  idefOrMod: string,
+  id: string,
+  version: string,
+) {
+  return idefOrMod + "." + id + "." + (version || "")
+}
+
+export function generateOwnedSearchMergedIndexIdentifier(
+  idefOrModSearchIsAgainst: string,
+  createdBy: string,
+) {
+  return "OWNED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy
+}
+
+export function generateParentedSearchMergedIndexIdentifier(
+  idefOrModSearchIsAgainst: string,
+  parentType: string,
+  parentId: string,
+  parentVersion: string,
+) {
+  return "PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + parentType + "." + parentId + "." + (parentVersion || "");
+}
+
+export function generateOwnedParentedSearchMergedIndexIdentifier(
+  idefOrModSearchIsAgainst: string,
+  createdBy: string,
+  parentType: string,
+  parentId: string,
+  parentVersion: string,
+) {
+  return "OWNED_PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy + "." + parentType + "." + parentId + "." + (parentVersion || "");
 }

@@ -7,7 +7,7 @@
  */
 
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { CHANGED_FEEEDBACK_EVENT, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
+import { CHANGED_FEEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
@@ -308,8 +308,14 @@ export class ItemizeRawDB {
       // for the creator one
       if (c.row.created_by !== UNSPECIFIED_OWNER) {
         // these are the cache index identifiers for the module and item based search
-        const ownedMergedIndexIdentifierOnItem = "OWNED_SEARCH." + c.itemQualifiedPathName + "." + c.row.created_by;
-        const ownedMergedIndexIdentifierOnModule = "OWNED_SEARCH." + c.moduleQualifiedPathName + "." + c.row.created_by;
+        const ownedMergedIndexIdentifierOnItem = generateOwnedSearchMergedIndexIdentifier(
+          c.itemQualifiedPathName,
+          c.row.created_by,
+        );
+        const ownedMergedIndexIdentifierOnModule = generateOwnedSearchMergedIndexIdentifier(
+          c.moduleQualifiedPathName,
+          c.row.created_by,
+        );
 
         // if we don't have an event for these, we create them
         if (!collectedOwned[ownedMergedIndexIdentifierOnItem]) {
@@ -349,10 +355,18 @@ export class ItemizeRawDB {
       // now for parenting, if we have a parent
       if (c.row.parent_id) {
         // equally we build the cache identifiers for the parented searches both by module and by item
-        const parentedMergedIndexIdentifierOnItem = "PARENTED_SEARCH." + c.itemQualifiedPathName + "." + c.row.parent_id + "." +
-          c.row.parent_version + "." + c.row.parent_type;
-        const parentedMergedIndexIdentifierOnModule = "PARENTED_SEARCH." + c.moduleQualifiedPathName + "." + c.row.parent_type + "." +
-          c.row.parent_id + "." + (c.row.parent_version || "");
+        const parentedMergedIndexIdentifierOnItem = generateParentedSearchMergedIndexIdentifier(
+          c.itemQualifiedPathName,
+          c.row.parent_type,
+          c.row.parent_id,
+          c.row.parent_version,
+        );
+        const parentedMergedIndexIdentifierOnModule = generateParentedSearchMergedIndexIdentifier(
+          c.moduleQualifiedPathName,
+          c.row.parent_type,
+          c.row.parent_id,
+          c.row.parent_version,
+        );
 
         // and equally create the collection
         if (!collectedParented[parentedMergedIndexIdentifierOnItem]) {
@@ -396,10 +410,20 @@ export class ItemizeRawDB {
       // now for parenting, if we have a parent
       if (c.row.parent_id && c.row.created_by !== UNSPECIFIED_OWNER) {
         // equally we build the cache identifiers for the parented searches both by module and by item
-        const ownedParentedMergedIndexIdentifierOnItem = "OWNED_PARENTED_SEARCH." + c.itemQualifiedPathName + "." + c.row.created_by + "." +
-          c.row.parent_id + "." + c.row.parent_version + "." + c.row.parent_type;
-        const ownedParentedMergedIndexIdentifierOnModule = "OWNED_PARENTED_SEARCH." + c.moduleQualifiedPathName + "." +
-          c.row.created_by + "." + c.row.parent_type + "." + c.row.parent_id + "." + (c.row.parent_version || "");
+        const ownedParentedMergedIndexIdentifierOnItem = generateOwnedParentedSearchMergedIndexIdentifier(
+          c.itemQualifiedPathName,
+          c.row.created_by,
+          c.row.parent_type,
+          c.row.parent_id,
+          c.row.parent_version,
+        );
+        const ownedParentedMergedIndexIdentifierOnModule = generateOwnedParentedSearchMergedIndexIdentifier(
+          c.moduleQualifiedPathName,
+          c.row.created_by,
+          c.row.parent_type,
+          c.row.parent_id,
+          c.row.parent_version,
+        );
 
         // and equally create the collection
         if (!collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem]) {
@@ -455,6 +479,7 @@ export class ItemizeRawDB {
         serverInstanceGroupId: null,
         source: "global",
         type: OWNED_SEARCH_RECORDS_EVENT,
+        mergedIndexIdentifier,
       };
 
       this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
@@ -472,6 +497,7 @@ export class ItemizeRawDB {
         serverInstanceGroupId: null,
         source: "global",
         type: PARENTED_SEARCH_RECORDS_EVENT,
+        mergedIndexIdentifier,
       };
 
       this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
@@ -489,6 +515,7 @@ export class ItemizeRawDB {
         serverInstanceGroupId: null,
         source: "global",
         type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+        mergedIndexIdentifier,
       };
 
       this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
