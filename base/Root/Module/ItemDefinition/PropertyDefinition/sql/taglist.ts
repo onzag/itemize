@@ -21,7 +21,7 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   // as simple as this
   return {
     [arg.prefix + arg.id]: [
-      "ARRAY[" + valueArray + "]",
+      "ARRAY[" + valueArray + "]::TEXT[]",
       arg.value,
     ],
   };
@@ -44,7 +44,7 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
     // where we ensure that all the provided tags are included
     // into this search
     arg.whereBuilder.andWhere(
-      JSON.stringify(arg.prefix + arg.id) + " @> ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]",
+      JSON.stringify(arg.prefix + arg.id) + " @> ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[]",
       tagCompareCheck,
     );
 
@@ -69,10 +69,10 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   } else {
     const tagCompareCheck = arg.value as any as string[];
     arg.whereBuilder.andWhere(
-      JSON.stringify(arg.prefix + arg.id) + " @> ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]",
+      JSON.stringify(arg.prefix + arg.id) + " @> ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT",
       tagCompareCheck,
     ).andWhere(
-      JSON.stringify(arg.prefix + arg.id) + " <@ ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]",
+      JSON.stringify(arg.prefix + arg.id) + " <@ ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT",
       tagCompareCheck,
     );
   }

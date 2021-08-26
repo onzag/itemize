@@ -209,6 +209,10 @@ export function mimeTypeToExtension(str: string) {
  * Replaces a string to another for locale usage
  * eg. `"hello {0} world {1}"` with `["foo", "bar"]` become
  * `"hello foo world bar"`
+ * 
+ * TODO build cache here this is way too expensive to be running
+ * all the time
+ * 
  * @param str the string
  * @param args the args to pass
  * @returns a string
@@ -229,6 +233,10 @@ export function localeReplacer(str: string, ...args: any[]): string {
  * for locale usage
  * eg. `"hello {0} world {1}"` with `[<span>foo</span>, <span>bar</span>]` become
  * `["hello ",<span>foo</span>," world ",<span>bar</span>]`
+ * 
+ * TODO build cache here this is way too expensive to be running
+ * all the time
+ * 
  * @param str the string
  * @param args the args to pass
  * @returns a an array

@@ -51,6 +51,7 @@ interface IGeneralOptionsState {
    */
   valueForAnchor: Path;
   valueLastTimeRequestedUpdate: number;
+  invalid: boolean;
 }
 
 /**
@@ -81,6 +82,7 @@ class GeneralContainerOptions extends React.PureComponent<IWrapperContainerProps
       return {
         value: selectedNode.containerType || "",
         valueForAnchor: props.state.currentSelectedSuperBlockElement,
+        invalid: false,
       }
     }
 
@@ -100,6 +102,7 @@ class GeneralContainerOptions extends React.PureComponent<IWrapperContainerProps
       value: selectedNode.containerType || "",
       valueForAnchor: props.state.currentSelectedSuperBlockElementAnchor,
       valueLastTimeRequestedUpdate: 0,
+      invalid: false,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -229,6 +232,7 @@ class GeneralTitleOptions extends React.PureComponent<IWrapperContainerProps, IG
       value: selectedNode.subtype || "",
       valueForAnchor: props.state.currentSelectedElementAnchor,
       valueLastTimeRequestedUpdate: 0,
+      invalid: false,
     }
 
     this.onUpdate = this.onUpdate.bind(this);
@@ -520,6 +524,8 @@ interface IGeneralUIHandlerOptionProps extends IWrapperContainerProps {
   isSelect: boolean;
   isCustom: boolean;
   isBoolean: boolean;
+  pattern?: string;
+  subtype?: "text" | "number";
   condition?: (state: ISlateEditorStateType) => boolean;
   CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
   options?: Array<{ label: string | React.ReactNode, value: string }>;
@@ -545,7 +551,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
       )
     ) {
       return {
-        value: currentValueItHolds,
+        value: state.invalid ? state.value : currentValueItHolds,
         valueForAnchor: props.state[props.basisState + "Anchor"],
       }
     }
@@ -568,6 +574,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
       value: props.arg ? ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") : null,
       valueForAnchor: props.state[props.basisState + "Anchor"],
       valueLastTimeRequestedUpdate: 0,
+      invalid: false,
     }
 
     this.onUpdateBySelect = this.onUpdateBySelect.bind(this);
@@ -621,6 +628,25 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
    * @param e the change event in the input
    */
   public updateByInput(e: React.ChangeEvent<HTMLInputElement>) {
+    if (this.props.pattern) {
+      const patternRegex = new RegExp(this.props.pattern, "g");
+      const isValid = patternRegex.test(e.target.value);
+      if (!isValid) {
+        this.setState({
+          value: e.target.value || "",
+          invalid: true,
+        });
+        return;
+      } else if (this.state.invalid) {
+        this.setState({
+          invalid: false,
+        });
+      }
+    } else if (this.state.invalid) {
+      this.setState({
+        invalid: false,
+      });
+    }
     this.onDelayedUpdate(e.target.value);
   }
 
@@ -629,11 +655,13 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
    * state and when the timer has finally ellapsed
    */
   public actuallyUpdate() {
-    this.setState({
-      valueLastTimeRequestedUpdate: (new Date()).getTime(),
-    }, () => {
-      this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state[this.props.basisState + "Anchor"]);
-    });
+    if (!this.state.invalid) {
+      this.setState({
+        valueLastTimeRequestedUpdate: (new Date()).getTime(),
+      }, () => {
+        this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state[this.props.basisState + "Anchor"]);
+      });
+    }
   }
 
   public unblur() {
@@ -693,12 +721,16 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     }
 
     if (!this.props.isSelect) {
-      const textFieldProps = {
+      const textFieldProps: any = {
         value: this.state.value,
         label: this.props.label,
         variant: "filled" as "filled",
         onChange: this.updateByInput,
         fullWidth: true,
+        type: this.props.subtype ? this.props.subtype : "text",
+      }
+      if (this.state.invalid) {
+        textFieldProps.color = "secondary";
       }
       if (typeof this.props.placeholder === "string") {
         return (
@@ -907,6 +939,8 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: IWra
       arg={x.arg}
       label={(x.input as any).label}
       placeholder={(x.input as any).placeholder}
+      pattern={(x.input as any).pattern}
+      subtype={(x.input as any).subtype}
       isSelect={x.input.type === "select"}
       isBoolean={x.input.type === "boolean"}
       isCustom={x.input.type === "custom"}

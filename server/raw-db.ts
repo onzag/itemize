@@ -204,7 +204,7 @@ export class ItemizeRawDB {
    */
   private async informChangeOnRow(row: ISQLTableRowValue, action: "created" | "deleted" | "modified", dataIsComplete: boolean) {
     // first let's check whether the row is valid for the bare minimum
-    const isRowValid = row && Array.isArray(row) && requiredProperties.every((p) => {
+    const isRowValid = row && requiredProperties.every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
           "ItemizeRawDB.informChangeOnRow: row data is invalid as it misses property " + p,
@@ -224,7 +224,7 @@ export class ItemizeRawDB {
     }
 
     // now let's grab the module qualified name
-    const moduleName = this.root.registry[row.type].getQualifiedPathName();
+    const moduleName = this.root.registry[row.type].getParentModule().getQualifiedPathName();
 
     // and set into the deleted registry if we don't have it
     let lastModified = row.last_modified;
@@ -1018,9 +1018,11 @@ export class ItemizeRawDB {
 
     if (!updater.dangerousUseSilentMode) {
       if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, true));
+        // row data is not complete so we pass false
+        // otherwise we would corrupt the cache
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, false));
       } else {
-        await this.informRowsHaveBeenModified(result, true);
+        await this.informRowsHaveBeenModified(result, false);
       }
     }
 

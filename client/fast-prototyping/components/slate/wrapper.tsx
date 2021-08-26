@@ -317,6 +317,8 @@ export interface IDrawerUIHandlerElementConfigSelect {
 export interface IDrawerUIHandlerElementConfigInput {
   type: "input";
   label: string | React.ReactNode;
+  pattern?: string;
+  subtype?: "text" | "number";
   fastKey?: string;
 
   /**
