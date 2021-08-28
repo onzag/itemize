@@ -89,6 +89,8 @@ export default function App()<0>{
 					[
 						"username",
 						"app_country",
+						"phone",
+						"p_validated",
 						"email",
 						"e_validated",
 						"role",

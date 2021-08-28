@@ -227,6 +227,10 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   mail: any;
   /**
+   * The phone service information, api key what not
+   */
+  phone: any;
+  /**
    * The mail domain that is used when sending emails from
    */
   mailDomain: string;

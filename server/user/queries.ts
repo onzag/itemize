@@ -15,9 +15,16 @@ import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize } from "../../util";
 
+const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function generateRandomId(size: number) {
+  var result = '';
+  for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
+}
+
 interface RecoverPasswordTokenType {
   resetPasswordUserId: string;
-  resetPasswordTempTokenCode: number;
+  resetPasswordRandomId: string;
 };
 
 const RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME = 600;
@@ -34,14 +41,20 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
   const usernameProperty = userIdef.getPropertyDefinitionFor("username", false);
   const emailProperty = userIdef.hasPropertyDefinitionFor("email", false) &&
     userIdef.getPropertyDefinitionFor("email", false);
+  const phoneProperty = userIdef.hasPropertyDefinitionFor("phone", false) &&
+    userIdef.getPropertyDefinitionFor("phone", false);
   const eValidatedProperty = userIdef.hasPropertyDefinitionFor("e_validated", false) &&
     userIdef.getPropertyDefinitionFor("e_validated", false);
+  const pValidatedProperty = userIdef.hasPropertyDefinitionFor("p_validated", false) &&
+    userIdef.getPropertyDefinitionFor("p_validated", false);
   const passwordProperty = userIdef.getPropertyDefinitionFor("password", false);
 
   const userNamePropertyDescription = usernameProperty.getPropertyDefinitionDescription();
   const passwordPropertyDescription = passwordProperty.getPropertyDefinitionDescription();
   const emailPropertyDescription = emailProperty && emailProperty.getPropertyDefinitionDescription();
   const eValidatedPropertyDescription = eValidatedProperty && eValidatedProperty.getPropertyDefinitionDescription();
+  const phonePropertyDescription = phoneProperty && phoneProperty.getPropertyDefinitionDescription();
+  const pValidatedPropertyDescription = pValidatedProperty && pValidatedProperty.getPropertyDefinitionDescription();
 
   return {
     token: {
@@ -118,7 +131,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
 
           // now we check the session id to see if it has been cancelled
-          if (!resultUser || (resultUser.session_id || 0) !== decoded.sessionId) {
+          if (!resultUser || (resultUser.session_id || 0) !== decoded.sessionId) {
             throw new EndpointError({
               message: "Session has been cancelled",
               code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
@@ -161,44 +174,77 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             );
 
             // cannot search by email if these properties are missing
-            if (!emailProperty || !eValidatedProperty) {
-              return;
+            if (emailProperty && eValidatedProperty) {
+              // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
+              // another invalidated email that other user has and has a chance to login as them
+              // you might wonder why not avoid them to set the
+              // email as that user to start with, well this is to avoid a DDOS attack similar to one that was present at github
+              // where you would set an invalidated email, and that user won't be able to claim its own email
+              subqueryBuilder.orWhere(
+                (internalOrQueryBuilder) => {
+                  internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
+                    emailPropertyDescription.sqlEqual({
+                      id: emailProperty.getId(),
+                      prefix: "",
+                      ignoreCase: true,
+                      serverData: appData.cache.getServerData(),
+                      itemDefinition: userIdef,
+                      include: null,
+                      value: args.username as string,
+                      property: usernameProperty,
+                      whereBuilder: internalUsernameWhereBuilder,
+                    });
+                  }).andWhere((internalEvalidatedWhereBuilder) => {
+                    eValidatedPropertyDescription.sqlEqual({
+                      id: eValidatedProperty.getId(),
+                      prefix: "",
+                      ignoreCase: true,
+                      serverData: appData.cache.getServerData(),
+                      itemDefinition: userIdef,
+                      include: null,
+                      value: true,
+                      property: eValidatedProperty,
+                      whereBuilder: internalEvalidatedWhereBuilder,
+                    });
+                  })
+                }
+              )
             }
 
-            // only emails that have been validated are valid, the reason is simple, otherwise this would allow any user to use
-            // another invalidated email that other user has and has a chance to login as them
-            // you might wonder why not avoid them to set the
-            // email as that user to start with, well this is to avoid a DDOS attack similar to one that was present at github
-            // where you would set an invalidated email, and that user won't be able to claim its own email
-            subqueryBuilder.orWhere(
-              (internalOrQueryBuilder) => {
-                internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
-                  emailPropertyDescription.sqlEqual({
-                    id: emailProperty.getId(),
-                    prefix: "",
-                    ignoreCase: true,
-                    serverData: appData.cache.getServerData(),
-                    itemDefinition: userIdef,
-                    include: null,
-                    value: args.username as string,
-                    property: usernameProperty,
-                    whereBuilder: internalUsernameWhereBuilder,
-                  });
-                }).andWhere((internalEvalidatedWhereBuilder) => {
-                  eValidatedPropertyDescription.sqlEqual({
-                    id: eValidatedProperty.getId(),
-                    prefix: "",
-                    ignoreCase: true,
-                    serverData: appData.cache.getServerData(),
-                    itemDefinition: userIdef,
-                    include: null,
-                    value: true,
-                    property: eValidatedProperty,
-                    whereBuilder: internalEvalidatedWhereBuilder,
-                  });
-                })
-              }
-            )
+            // cannot search by phone if these properties are missing
+            if (phoneProperty && pValidatedProperty) {
+              subqueryBuilder.orWhere(
+                (internalOrQueryBuilder) => {
+                  internalOrQueryBuilder.andWhere((internalUsernameWhereBuilder) => {
+                    phonePropertyDescription.sqlEqual({
+                      id: phoneProperty.getId(),
+                      prefix: "",
+                      ignoreCase: true,
+                      serverData: appData.cache.getServerData(),
+                      itemDefinition: userIdef,
+                      include: null,
+                      value: args.username as string,
+                      property: phoneProperty,
+                      whereBuilder: internalUsernameWhereBuilder,
+                    });
+                  }).andWhere((internalPvalidatedWhereBuilder) => {
+                    pValidatedPropertyDescription.sqlEqual({
+                      id: pValidatedProperty.getId(),
+                      prefix: "",
+                      ignoreCase: true,
+                      serverData: appData.cache.getServerData(),
+                      itemDefinition: userIdef,
+                      include: null,
+                      value: true,
+                      property: pValidatedProperty,
+                      whereBuilder: internalPvalidatedWhereBuilder,
+                    });
+                  })
+                }
+              )
+            }
+
+
           }).andWhere((internalPasswordWhereBuilder) => {
             passwordPropertyDescription.sqlEqual({
               id: passwordProperty.getId(),
@@ -506,10 +552,20 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
       type: STANDARD_REPLY,
       args: {
         email: {
-          type: GraphQLNonNull(GraphQLString),
+          type: GraphQLString,
+        },
+        phone: {
+          type: GraphQLString,
         }
       },
       async resolve(source: any, args: any, context: any, info: any) {
+        if (!args.email && !args.phone) {
+          throw new EndpointError({
+            message: "You must specify either email or phone",
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+          });
+        }
+
         if (!appData.mailService) {
           throw new EndpointError({
             message: "Mail service is not available",
@@ -530,41 +586,69 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let resultUser: ISQLTableRowValue;
 
         const selectQuery = appData.databaseConnection.getSelectBuilder();
-        selectQuery.select(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "email", "username", "app_language");
+        selectQuery.select(CONNECTOR_SQL_COLUMN_ID_FK_NAME, args.email ? "email" : "phone", "username", "app_language");
         selectQuery.fromBuilder.from(userTable);
         selectQuery.limit(1);
 
-        selectQuery.whereBuilder.andWhere((emailWhereBuilder) => {
-          emailPropertyDescription.sqlEqual({
-            id: emailProperty.getId(),
-            prefix: "",
-            ignoreCase: true,
-            whereBuilder: emailWhereBuilder,
-            serverData: appData.cache.getServerData(),
-            itemDefinition: userIdef,
-            include: null,
-            value: args.email,
-            property: eValidatedProperty,
-          })
-        }).andWhere((evalidatedWhereBuilder) => {
-          eValidatedPropertyDescription.sqlEqual({
-            id: eValidatedProperty.getId(),
-            prefix: "",
-            ignoreCase: true,
-            whereBuilder: evalidatedWhereBuilder,
-            serverData: appData.cache.getServerData(),
-            itemDefinition: userIdef,
-            include: null,
-            value: true,
-            property: eValidatedProperty,
-          })
-        });
+        if (args.email) {
+          selectQuery.whereBuilder.andWhere((emailWhereBuilder) => {
+            emailPropertyDescription.sqlEqual({
+              id: emailProperty.getId(),
+              prefix: "",
+              ignoreCase: true,
+              whereBuilder: emailWhereBuilder,
+              serverData: appData.cache.getServerData(),
+              itemDefinition: userIdef,
+              include: null,
+              value: args.email,
+              property: emailProperty,
+            })
+          }).andWhere((evalidatedWhereBuilder) => {
+            eValidatedPropertyDescription.sqlEqual({
+              id: eValidatedProperty.getId(),
+              prefix: "",
+              ignoreCase: true,
+              whereBuilder: evalidatedWhereBuilder,
+              serverData: appData.cache.getServerData(),
+              itemDefinition: userIdef,
+              include: null,
+              value: true,
+              property: eValidatedProperty,
+            })
+          });
+        } else {
+          selectQuery.whereBuilder.andWhere((phoneWhereBuilder) => {
+            phonePropertyDescription.sqlEqual({
+              id: phoneProperty.getId(),
+              prefix: "",
+              ignoreCase: true,
+              whereBuilder: phoneWhereBuilder,
+              serverData: appData.cache.getServerData(),
+              itemDefinition: userIdef,
+              include: null,
+              value: args.phone,
+              property: phoneProperty,
+            })
+          }).andWhere((pvalidatedWhereBuilder) => {
+            pValidatedPropertyDescription.sqlEqual({
+              id: pValidatedProperty.getId(),
+              prefix: "",
+              ignoreCase: true,
+              whereBuilder: pvalidatedWhereBuilder,
+              serverData: appData.cache.getServerData(),
+              itemDefinition: userIdef,
+              include: null,
+              value: true,
+              property: pValidatedProperty,
+            })
+          });
+        }
 
         try {
           resultUser = await appData.databaseConnection.queryFirst(selectQuery);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email",
+            "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email/phone",
             {
               errMessage: err.message,
               errStack: err.stack,
@@ -576,7 +660,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         if (!resultUser) {
           throw new EndpointError({
-            message: "User with that email does not exist",
+            message: "User with that email/phone does not exist",
             code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
@@ -592,8 +676,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         const userId = resultUser[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
 
         try {
-          const avoidSendingEmail = !!(await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
-          if (avoidSendingEmail) {
+          const avoidSendingEmailOrSMS = !!(await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString()));
+          if (avoidSendingEmailOrSMS) {
             return {
               status: "OK",
             };
@@ -611,32 +695,13 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           throw err;
         }
 
-        const randomId = Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER));
-
-        try {
-          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), userId.toString());
-          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId.toString(), RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
-          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), userId.toString());
-          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId.toString(), RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
-        } catch (err) {
-          logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: failed to set flags into global redis instance to avoid sending " +
-            "which caused to be unable to send the email at all",
-            {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
-              randomId,
-            },
-          );
-          throw err;
-        }
+        const randomId = generateRandomId(6);
 
         let resetToken: string;
         try {
           resetToken = await jwtSign({
             resetPasswordUserId: userId,
-            resetPasswordTempTokenCode: randomId,
+            resetPasswordRandomId: randomId,
           }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
@@ -651,16 +716,28 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           throw err;
         }
 
-        const resetPasswordLink = (
-          process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
-        ) +
-          i18nData.custom.forgot_password_link_target + "?token=" +
-          encodeURIComponent(resetToken) + "&id=" +
-          encodeURIComponent(userId);
+        try {
+          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId, resetToken);
+          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId, RESET_PASSWORD_TOKEN_VALID_SECONDS_TIME);
+          await appData.redisGlobal.set("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId, userId);
+          await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId, RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
+        } catch (err) {
+          logger.error(
+            "customUserQueries.send_reset_password [SERIOUS]: failed to set flags into global redis instance to avoid sending " +
+            "which caused to be unable to send the email at all",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              resultUser,
+              randomId,
+            },
+          );
+          throw err;
+        }
 
-        const templateIdToUse = i18nData.custom.forgot_password_fragment_id;
-        const subject = capitalize(i18nData.custom.forgot_password_title);
+        const templateIdToUse = args.email ? i18nData.custom.forgot_password_fragment_id : i18nData.custom.forgot_password_phone_fragment_id;
 
+        const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
         const extractedProperties: any = {};
         Object.keys(resultUser).forEach((p) => {
           if (typeof resultUser[p] === "string" || typeof resultUser[p] === "number") {
@@ -668,26 +745,50 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
         });
 
-        const fragmentIdef = appData.root.getModuleFor(["cms"]).getItemDefinitionFor(["fragment"]);
+        if (args.email) {
+          const subject = capitalize(i18nData.custom.forgot_password_title);
 
-        await appData.mailService.sendTemplateEmail({
-          fromUsername: i18nData.custom.validate_account_user,
-          fromEmailHandle: i18nData.custom.validate_account_email_user,
-          id: templateIdToUse,
-          version: languageToUse,
-          itemDefinition: fragmentIdef,
-          args: {
-            ...extractedProperties,
-            forgot_password_link: resetPasswordLink,
-          },
-          property: fragmentIdef.getPropertyDefinitionFor("content", true),
-          subject,
-          to: resultUser,
-          canUnsubscribe: false,
-          ignoreUnsubscribe: true,
-          subscribeProperty: null,
-          emailProperty: "email",
-        });
+          const resetPasswordLink = (
+            process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
+          ) +
+            i18nData.custom.forgot_password_link_target + "?token=" +
+            encodeURIComponent(resetToken) + "&id=" +
+            encodeURIComponent(userId);
+
+          await appData.mailService.sendTemplateEmail({
+            fromUsername: i18nData.custom.validate_account_user,
+            fromEmailHandle: i18nData.custom.validate_account_email_user,
+            id: templateIdToUse,
+            version: languageToUse,
+            itemDefinition: fragmentIdef,
+            args: {
+              ...extractedProperties,
+              forgot_password_link: resetPasswordLink,
+            },
+            property: fragmentIdef.getPropertyDefinitionFor("content", true),
+            subject,
+            to: resultUser,
+            canUnsubscribe: false,
+            ignoreUnsubscribe: true,
+            subscribeProperty: null,
+            emailProperty: "email",
+          });
+        } else {
+          await appData.phoneService.sendTemplateSMS({
+            id: templateIdToUse,
+            version: languageToUse,
+            itemDefinition: fragmentIdef,
+            args: {
+              ...extractedProperties,
+              forgot_password_random_id: randomId,
+            },
+            property: fragmentIdef.getPropertyDefinitionFor("content", true),
+            to: resultUser,
+            ignoreUnsubscribe: true,
+            subscribeProperty: null,
+            phoneProperty: "phone",
+          });
+        }
 
         return {
           status: "OK",
@@ -697,45 +798,171 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
     reset_password: {
       type: STANDARD_REPLY,
       args: {
+        random_id: {
+          type: GraphQLString,
+        },
+        email: {
+          type: GraphQLString,
+        },
+        phone: {
+          type: GraphQLString,
+        },
         token: {
-          type: GraphQLNonNull(GraphQLString),
+          type: GraphQLString,
         },
         new_password: {
           type: GraphQLNonNull(GraphQLString),
         },
       },
       async resolve(source: any, args: any, context: any, info: any) {
-        let decoded: RecoverPasswordTokenType = null;
-        try {
-          // we attempt to decode it
-          decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.secondaryJwtKey);
-        } catch (err) {
+        const useTokenMethod = args.token;
+        const usePhoneMethod = args.phone && args.random_id;
+        const useEmailMethod = args.email && args.random_id;
+
+        if (!usePhoneMethod && !useTokenMethod && !useEmailMethod) {
           throw new EndpointError({
-            message: "Reset token is invalid",
-            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            message: "You need to specify either a token, or a random_id + email or random_id + phone",
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         }
 
-        if (
-          typeof decoded.resetPasswordUserId !== "string" ||
-          typeof decoded.resetPasswordTempTokenCode !== "number"
-        ) {
+        let randomId: string;
+        let codeWasSent: string;
+        let resultUser: ISQLTableRowValue;
+
+        if (useTokenMethod) {
+          let decoded: RecoverPasswordTokenType = null;
+          try {
+            // we attempt to decode it
+            decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.secondaryJwtKey);
+          } catch (err) {
+            throw new EndpointError({
+              message: "Reset token is invalid",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+          }
+
+          if (
+            typeof decoded.resetPasswordUserId !== "string" ||
+            typeof decoded.resetPasswordRandomId !== "string"
+          ) {
+            throw new EndpointError({
+              message: "Reset token is invalid due to wrong shape",
+              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            });
+          }
+
+          randomId = decoded.resetPasswordRandomId;
+
+          try {
+            resultUser = await appData.cache.requestValue(
+              userIdef,
+              decoded.resetPasswordUserId,
+              null,
+            );
+          } catch (err) {
+            logger.error(
+              "customUserQueries.reset_password [SERIOUS]: failed to retrieve user",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                decoded,
+              },
+            );
+            throw err;
+          }
+
+        } else {
+          const selectQuery = appData.databaseConnection.getSelectBuilder();
+          selectQuery.select(CONNECTOR_SQL_COLUMN_ID_FK_NAME, args.email ? "email" : "phone", "username", "app_language");
+          selectQuery.fromBuilder.from(userTable);
+          selectQuery.limit(1);
+
+          if (args.email) {
+            selectQuery.whereBuilder.andWhere((emailWhereBuilder) => {
+              emailPropertyDescription.sqlEqual({
+                id: emailProperty.getId(),
+                prefix: "",
+                ignoreCase: true,
+                whereBuilder: emailWhereBuilder,
+                serverData: appData.cache.getServerData(),
+                itemDefinition: userIdef,
+                include: null,
+                value: args.email,
+                property: emailProperty,
+              })
+            }).andWhere((evalidatedWhereBuilder) => {
+              eValidatedPropertyDescription.sqlEqual({
+                id: eValidatedProperty.getId(),
+                prefix: "",
+                ignoreCase: true,
+                whereBuilder: evalidatedWhereBuilder,
+                serverData: appData.cache.getServerData(),
+                itemDefinition: userIdef,
+                include: null,
+                value: true,
+                property: eValidatedProperty,
+              })
+            });
+          } else {
+            selectQuery.whereBuilder.andWhere((phoneWhereBuilder) => {
+              phonePropertyDescription.sqlEqual({
+                id: phoneProperty.getId(),
+                prefix: "",
+                ignoreCase: true,
+                whereBuilder: phoneWhereBuilder,
+                serverData: appData.cache.getServerData(),
+                itemDefinition: userIdef,
+                include: null,
+                value: args.phone,
+                property: phoneProperty,
+              })
+            }).andWhere((pvalidatedWhereBuilder) => {
+              pValidatedPropertyDescription.sqlEqual({
+                id: pValidatedProperty.getId(),
+                prefix: "",
+                ignoreCase: true,
+                whereBuilder: pvalidatedWhereBuilder,
+                serverData: appData.cache.getServerData(),
+                itemDefinition: userIdef,
+                include: null,
+                value: true,
+                property: pValidatedProperty,
+              })
+            });
+          }
+
+          try {
+            resultUser = await appData.databaseConnection.queryFirst(selectQuery);
+          } catch (err) {
+            logger.error(
+              "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email/phone",
+              {
+                errMessage: err.message,
+                errStack: err.stack,
+                email: args.email,
+                phone: args.phone,
+              },
+            );
+            throw err;
+          }
+        }
+
+        if (!resultUser) {
           throw new EndpointError({
-            message: "Reset token is invalid due to wrong shape",
-            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+            message: "User does not exist",
+            code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
 
-        let codeWasSent: any;
         try {
-          codeWasSent = await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+          codeWasSent = await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId);
         } catch (err) {
           logger.error(
             "customUserQueries.reset_password [SERIOUS]: failed to check the token code that was sent",
             {
               errMessage: err.message,
               errStack: err.stack,
-              decoded,
             },
           );
           throw err;
@@ -743,13 +970,13 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         if (!codeWasSent) {
           throw new EndpointError({
-            message: "Reset token is invalid due to expiration",
+            message: "Reset token/random id is invalid due to expiration",
             code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
 
         const invalidReason =
-          passwordProperty.isValidValueNoExternalChecking(decoded.resetPasswordUserId, null, args.new_password);
+          passwordProperty.isValidValueNoExternalChecking(resultUser.id, null, args.new_password);
         if (invalidReason) {
           throw new EndpointError({
             message: "Password is invalid",
@@ -761,37 +988,10 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           });
         }
 
-        let resultUser: ISQLTableRowValue;
-
-        try {
-          resultUser = await appData.cache.requestValue(
-            userIdef,
-            decoded.resetPasswordUserId,
-            null,
-          );
-        } catch (err) {
-          logger.error(
-            "customUserQueries.reset_password [SERIOUS]: failed to retrieve user",
-            {
-              errMessage: err.message,
-              errStack: err.stack,
-              decoded,
-            },
-          );
-          throw err;
-        }
-
-        if (!resultUser) {
-          throw new EndpointError({
-            message: "User does not exist",
-            code: ENDPOINT_ERRORS.NOT_FOUND,
-          });
-        }
-
         try {
           await appData.cache.requestUpdateSimple(
             userIdef,
-            decoded.resetPasswordUserId,
+            resultUser.id,
             null,
             {
               password: args.new_password,
@@ -804,7 +1004,6 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             {
               errMessage: err.message,
               errStack: err.stack,
-              decoded,
             },
           );
           throw err;
@@ -812,14 +1011,13 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
 
         (async () => {
           try {
-            await appData.redisGlobal.del("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + decoded.resetPasswordTempTokenCode.toString());
+            await appData.redisGlobal.del("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + randomId);
           } catch (err) {
             logger.error(
               "customUserQueries.reset_password (detached): failed to remove temporary token code for password reset",
               {
                 errMessage: err.message,
                 errStack: err.stack,
-                decoded,
               },
             );
           }

@@ -31,6 +31,35 @@
             "searchable": false
         },
         {
+            "id": "phone",
+            "type": "string",
+            "subtype": "phone",
+            "searchable": false,
+            "nullable": true,
+            "readRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}",
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}"
+        },
+        {
+            "id": "p_validated",
+            "type": "boolean",
+            "nullable": true,
+            "default": false,
+            "searchable": false,
+            "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN']}else{return []}",
+            "coerceNullsIntoDefault": true
+        },
+        {
+            "id": "p_notifications",
+            "type": "boolean",
+            "default": true,
+            "nullable": true,
+            "searchable": false,
+            "readRoleAccess": ["&OWNER"],
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
+            "coerceNullsIntoDefault": true
+        },
+        {
             "id": "email",
             "type": "string",
             "subtype": "email",

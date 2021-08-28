@@ -1,0 +1,15 @@
+import React from "react";
+import App from "./app";
+import { initializeItemizeApp } from "@onzag/itemize/client";
+import { rendererContext } from "@onzag/itemize/client/fast-prototyping/renderers-ussd";
+
+initializeItemizeApp(
+	// the renderer context specifies how property components (viewers and editors) are
+	// rendered, by default itemize contains its own fast prototyping USSD specific renderers
+	// and while not all entries would work, for example files since they are unsupported by this standard
+	// the fast prototyping model will do its best for it to work
+	rendererContext,
+
+	// This is the main app, by default the USSD app is empty and provides no content
+	<App/>,
+);

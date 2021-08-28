@@ -543,7 +543,7 @@ export function countSize(root: IRootLevelDocument | RichElement | IText): numbe
  * Counts the words of the document
  * @param root 
  */
- export function countWords(root: IRootLevelDocument | RichElement | IText): number {
+export function countWords(root: IRootLevelDocument | RichElement | IText): number {
   if (typeof (root as IText).text === "string") {
     return (root as IText).text.split(" ").filter((v) => v !== "").length;
   }
@@ -561,7 +561,7 @@ export function countSize(root: IRootLevelDocument | RichElement | IText): numbe
  * Counts the size and words of the document
  * @param root 
  */
- export function countSizeAndWords(root: IRootLevelDocument | RichElement | IText): [number, number] {
+export function countSizeAndWords(root: IRootLevelDocument | RichElement | IText): [number, number] {
   if (typeof (root as IText).text === "string") {
     return [
       (root as IText).text.length,
@@ -757,6 +757,30 @@ function processTemplateInitialization(
 }
 
 /**
+ * Same as render template but will provide
+ * the div as a raw HTML result
+ * 
+ * @param template the template in question
+ * @param args the arguments
+ */
+export function renderTemplateAsNode(
+  template: string,
+  args: any,
+): HTMLDivElement {
+  const cheapdiv = DOMWindow.document.createElement("div");
+  cheapdiv.innerHTML = template;
+
+  processTemplateInitialization(
+    cheapdiv,
+    args,
+    args,
+  );
+
+  return cheapdiv;
+}
+
+
+/**
  * Performs a simple template rendering
  * from a string based HTML template based on the text specs
  * 
@@ -781,16 +805,7 @@ export function renderTemplate(
   template: string,
   args: any,
 ): string {
-  const cheapdiv = DOMWindow.document.createElement("div");
-  cheapdiv.innerHTML = template;
-
-  processTemplateInitialization(
-    cheapdiv,
-    args,
-    args,
-  );
-
-  return cheapdiv.innerHTML;
+  return renderTemplateAsNode(template, args).innerHTML;
 }
 
 /**
@@ -866,7 +881,7 @@ function removeInvalidComparables(elem: RichElement | IRootLevelDocument) {
  * @param text1 
  * @param text2 
  */
- export function checkEquality(text1: string | Node[], text2: string | Node[]) {
+export function checkEquality(text1: string | Node[], text2: string | Node[]) {
   if (text1 === text2) {
     return true;
   }
@@ -886,6 +901,51 @@ function removeInvalidComparables(elem: RichElement | IRootLevelDocument) {
  * @param text1 
  * @param text2 
  */
- export function checkEqualityPlain(text1: string, text2: string) {
+export function checkEqualityPlain(text1: string, text2: string) {
   return text1 === text2;
+}
+
+// bit overkill but so be it
+const nodesThatRepresentLines = [
+  "address",
+  "blockquote",
+  "body",
+  "center",
+  "div",
+  "dir",
+  "dl",
+  "fieldset",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "table",
+  "dd",
+  "frameset",
+  "li",
+  "tbody",
+  "tfoot",
+  "thead",
+  "tr",
+  "html",
+]
+export function convertNodeToText(node: Node): string {
+  if (!node.childNodes) {
+    return "";
+  }
+  return Array.from(node.childNodes).map((cnode) => {
+    if (cnode.nodeType !== Node.TEXT_NODE) {
+      // we consider it an html element
+      const childNodeASHTMLElement = cnode as HTMLElement;
+      if (childNodeASHTMLElement.tagName && nodesThatRepresentLines.includes(childNodeASHTMLElement.tagName.toLowerCase())) {
+        return convertNodeToText(cnode) + "\n";
+      }
+      return convertNodeToText(cnode);
+    } else {
+      cnode.textContent;
+    }
+  }).join("");
 }

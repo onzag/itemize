@@ -1,0 +1,19 @@
+import React from "react";
+
+// In this APP you can use all the default components but rememeber that in order for the APP
+// to be text only it relies on server side rendering, you may use HTML components but they will
+// be transformed into plain text
+
+// Routes work, however things like the submit actioner and events are useless in this mode; you must
+// use USSD specific action creators from the components file
+
+// Item providers, search providers, localization info they all will do their job just as in the standard
+// react app
+
+export default function App()<0>{
+	return (
+		<>
+			<div>NOT IMPLEMENTED</div>
+		</>
+	);
+}

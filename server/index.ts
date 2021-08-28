@@ -42,6 +42,7 @@ import { FakeMailService } from "./services/fake-mail";
 import { ServiceProvider, IServiceProviderClassType, ServiceProviderType } from "./services";
 import LocationSearchProvider from "./services/base/LocationSearchProvider";
 import MailProvider from "./services/base/MailProvider";
+import PhoneProvider from "./services/base/PhoneProvider";
 import StorageProvider, { IStorageProvidersObject } from "./services/base/StorageProvider";
 import UserLocalizationProvider from "./services/base/UserLocalizationProvider";
 import { RegistryService } from "./services/registry";
@@ -53,6 +54,8 @@ import { DatabaseConnection } from "../database";
 import PaymentProvider from "./services/base/PaymentProvider";
 import { logger } from "./logger";
 import { ManualPaymentService } from "./services/manual-payment";
+import { TwilioService } from "./services/twilio";
+import { FakeSMSService } from "./services/fake-sms";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -100,11 +103,18 @@ export const app =
  * Specifies the SSR configuration for the multiple pages
  */
 export interface ISSRConfig {
-  rendererContext: IRendererContext,
-  mainComponent: React.ReactElement,
+  rendererContext: IRendererContext;
+  mainComponent: React.ReactElement;
   appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
   mainWrapper?: (mainComponet: React.ReactElement, config: IConfigRawJSONDataType, localeContext: ILocaleContextType) => React.ReactElement;
   collector?: ICollectorType;
+  ussdConfig?: {
+    rendererContext: IRendererContext;
+    mainComponent: React.ReactElement;
+    appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
+    mainWrapper?: (mainComponet: React.ReactElement, config: IConfigRawJSONDataType, localeContext: ILocaleContextType) => React.ReactElement;
+    collector?: ICollectorType;
+  },
 }
 
 export interface ISEOConfig {
@@ -136,6 +146,7 @@ export interface IAppDataType {
   customUserTokenQuery: any;
   logger: winston.Logger;
   mailService: MailProvider<any>;
+  phoneService: PhoneProvider<any>;
   paymentService: PaymentProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
@@ -160,6 +171,7 @@ export interface IStorageProviders {
 export interface IServiceCustomizationType {
   storageServiceProviders?: IStorageProviders;
   mailServiceProvider?: IServiceProviderClassType<any>;
+  phoneServiceProvider?: IServiceProviderClassType<any>;
   userLocalizationProvider?: IServiceProviderClassType<any>;
   currencyFactorsProvider?: IServiceProviderClassType<any>;
   locationSearchProvider?: IServiceProviderClassType<any>;
@@ -556,6 +568,28 @@ export async function initializeServer(
           sensitiveConfig,
         ) : null) as any;
 
+      let PhoneServiceClass = (serviceCustom && serviceCustom.phoneServiceProvider) || TwilioService;
+      if (PhoneServiceClass.getType() !== ServiceProviderType.HYBRID) {
+        throw new Error("The phone service class is not a hybrid type, and that's not allowed");
+      }
+
+      const usesFakeSMS = process.env.FAKE_SMS === "true";
+      if (usesFakeSMS) {
+        logger.info(
+          "initializeServer: using fake sms service",
+        );
+        // typescript messes the types again
+        PhoneServiceClass = FakeSMSService as any;
+      }
+
+      const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || usesFakeMail) ?
+        new PhoneServiceClass(
+          sensitiveConfig.phone,
+          registry,
+          config,
+          sensitiveConfig,
+        ) : null) as any;
+
       const manager: GlobalManager = new GlobalManager(
         root,
         databaseConnection,
@@ -566,6 +600,7 @@ export async function initializeServer(
         sensitiveConfig,
         currencyFactorsService,
         mailService,
+        phoneService,
         registry,
       );
 
@@ -772,6 +807,27 @@ export async function initializeServer(
         sensitiveConfig,
       ) : null) as any;
 
+    let PhoneServiceClass = (serviceCustom && serviceCustom.phoneServiceProvider) || TwilioService;
+    if (PhoneServiceClass.getType() !== ServiceProviderType.HYBRID) {
+      throw new Error("The phone service class is not a hybrid type, and that's not allowed");
+    }
+
+    const usesFakeSMS = process.env.FAKE_SMS === "true";
+    if (usesFakeSMS) {
+      logger.info(
+        "initializeServer: using fake sms service",
+      );
+      // typescript messes the types again
+      PhoneServiceClass = FakeSMSService as any;
+    }
+    const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || usesFakeSMS) ?
+      new PhoneServiceClass(
+        sensitiveConfig.phone,
+        registry,
+        config,
+        sensitiveConfig,
+      ) : null) as any;
+
     if (sensitiveConfig.locationSearch) {
       logger.info(
         "initializeServer: initializing location search service",
@@ -888,6 +944,7 @@ export async function initializeServer(
       locationSearchService,
       paymentService,
       mailService,
+      phoneService,
       storage: storageClients.cloudClients,
       logger,
       customServices,
@@ -913,6 +970,7 @@ export async function initializeServer(
     );
     userLocalizationService && userLocalizationService.setupLocalResources(appData);
     mailService && mailService.setupLocalResources(appData);
+    phoneService && phoneService.setupLocalResources(appData);
     locationSearchService && locationSearchService.setupLocalResources(appData);
     paymentService && paymentService.setupLocalResources(appData);
     storageClients.instancesUsed.forEach((i) => i.setupLocalResources(appData));
@@ -923,6 +981,7 @@ export async function initializeServer(
     );
     userLocalizationService && await userLocalizationService.initialize();
     mailService && await mailService.initialize();
+    phoneService && await phoneService.initialize();
     locationSearchService && await locationSearchService.initialize();
     paymentService && await paymentService.initialize();
     // the storage clients are a none type and initialize immediately
@@ -933,6 +992,7 @@ export async function initializeServer(
     );
     userLocalizationService && userLocalizationService.execute();
     mailService && mailService.execute();
+    phoneService && phoneService.execute();
     locationSearchService && locationSearchService.execute();
     paymentService && paymentService.execute();
     storageClients.instancesUsed.forEach((i) => i.execute());
@@ -945,6 +1005,8 @@ export async function initializeServer(
     const userLocalizationClassRouter = userLocalizationService && await UserLocalizationServiceClass.getRouter(appData);
     const mailServiceInstanceRouter = mailService && await mailService.getRouter(appData);
     const mailServiceClassRouter = mailService && await MailServiceClass.getRouter(appData);
+    const phoneServiceInstanceRouter = phoneService && await phoneService.getRouter(appData);
+    const phoneServiceClassRouter = phoneService && await PhoneServiceClass.getRouter(appData);
     const locationSearchServiceInstanceRouter = locationSearchService && await locationSearchService.getRouter(appData);
     const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
     const paymentServiceInstanceRouter = paymentService && await paymentService.getRouter(appData);
@@ -962,6 +1024,8 @@ export async function initializeServer(
       userLocalizationClassRouter,
       mailServiceInstanceRouter,
       mailServiceClassRouter,
+      phoneServiceInstanceRouter,
+      phoneServiceClassRouter,
       locationSearchServiceInstanceRouter,
       locationSearchServiceClassRouter,
       paymentServiceInstanceRouter,

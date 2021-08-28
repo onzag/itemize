@@ -159,6 +159,35 @@ export async function sensitiveConfigSetup(
         cantRerun: true,
       },
       {
+        variableName: "phone",
+        message: "The configuration used by the phone service provider by default itemize will use twilio",
+        type: "config",
+        defaultValue: null,
+        extractData: [
+          {
+            variableName: "accountId",
+            message: "The account id to be used when sending SMS",
+            defaultValue: "",
+            hidden: true,
+            nullifyFalseValues: true,
+          },
+          {
+            variableName: "accountToken",
+            message: "Your own domain used in order to send emails",
+            defaultValue: "mail.mysite.com",
+            nullifyFalseValues: true,
+          },
+          {
+            variableName: "phoneNumbers",
+            type: "strarray",
+            message: "The available phone numbers that your account can make use of, the first number will be considered the default",
+            defaultValue: [],
+          },
+        ],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
         variableName: "mailDomain",
         message: "This is the domain that the template generator uses as domain, so when the users receive an email they see user@mail.mysite.com " +
         "this has nothing to do with the configuration, it is simply what goes in the subject line when sending emails",

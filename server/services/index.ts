@@ -11,6 +11,7 @@ import { logger } from "../logger";
 import express from "express";
 import { IConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
+import PhoneProvider from "./base/PhoneProvider";
 
 const LOG_LEVEL = process.env.LOG_LEVEL;
 const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
@@ -43,6 +44,7 @@ export class ServiceProvider<T> {
   public globalRawDB: ItemizeRawDB;
   public globalRoot: Root;
   public globalMailProvider: MailProvider<any>;
+  public globalPhoneProvider: PhoneProvider<any>;
   public globalCustomServices: {
     [name: string]: ServiceProvider<any>,
   };
@@ -119,6 +121,7 @@ export class ServiceProvider<T> {
     globalPub: ItemizeRedisClient,
     globalSub: ItemizeRedisClient,
     globalMailProvider: MailProvider<any>,
+    globalPhoneProvider: PhoneProvider<any>,
     globalCustomServices: {
       [name: string]: ServiceProvider<any>,
     },
@@ -133,6 +136,7 @@ export class ServiceProvider<T> {
     this.globalRawDB = new ItemizeRawDB(globalPub, this.globalDatabaseConnection, this.globalRoot);
     this.globalCustomServices = globalCustomServices;
     this.globalMailProvider = globalMailProvider;
+    this.globalPhoneProvider = globalPhoneProvider;
   }
 
   public setupLocalResources(appData: IAppDataType) {

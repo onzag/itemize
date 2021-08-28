@@ -47,10 +47,19 @@ custom.change_password_success = password updated!
 custom.delete_account = delete account
 custom.delete_account_warning = Warning! this will delete your account and all associated data, this action cannot be reversed, do you wish to proceed?
 
+custom.recover_account_with = select how to recover your account
+custom.recover_account_with_email = email
+custom.recover_account_with_phone = SMS
+
 custom.recover_account = account recovery
 custom.recover_account_message = Note that your email needs to be set and validated in order for the recover account to function
 custom.recover_account_action = send email with instructions
 custom.recover_account_action_success = sucessfully sent email
+
+custom.recover_account_phone = account recovery
+custom.recover_account_message_phone = Note that your phone number needs to be set and validated in order for the recover account to function
+custom.recover_account_action_phone = send sms with instructions
+custom.recover_account_action_success_phone = sucessfully sent sms
 
 custom.reset_password = reset password
 custom.reset_password_message = Use a strong password with alphanumeric characters and symbols
@@ -60,8 +69,8 @@ custom.reset_password_field_alt_placeholder = new password
 custom.reset_password_action = update password
 
 custom.validate_account_fragment_id = ACCOUNT_VALIDATION_EMAIL
+custom.validate_account_phone_fragment_id = ACCOUNT_VALIDATION_SMS
 custom.validate_account = activate your account
-custom.validate_account_template_name =
 custom.validate_account_email_user = validate
 custom.validate_account_user = $APPNAME
 custom.validate_account_success = your account has been successfully activated
@@ -71,6 +80,7 @@ custom.unsubscribe_success = you have been unsubscribed
 custom.unsubscribe_success_title = success
 
 custom.forgot_password_fragment_id = ACCOUNT_RECOVERY_EMAIL
+custom.forgot_password_phone_fragment_id = ACCOUNT_RECOVERY_SMS
 custom.forgot_password = forgot password
 custom.forgot_password_template_name =
 custom.forgot_password_email_user = recovery
@@ -86,6 +96,18 @@ properties.username.error.NOT_NULLABLE = missing username
 properties.username.error.TOO_LARGE = username is too long
 properties.username.error.NOT_UNIQUE = username is taken
 properties.username.error.INVALID_SUBTYPE_VALUE = special characters and spaces are not allowed
+
+properties.phone.label = phone number
+properties.phone.placeholder = your phone number
+properties.phone.description = Your phone number will not be shared with anyone, it is kept private to all other users
+properties.phone.error.TOO_LARGE = phone number is too long
+properties.phone.error.INVALID_SUBTYPE_VALUE = phone number is invalid
+
+properties.p_validated.label = phone number is validated
+properties.p_validated.description = Refers to whether the phone number is validated or not
+
+properties.p_notifications.label = SMS notifications
+properties.p_notifications.description = Receive important notifications via SMS
 
 properties.email.label = email
 properties.email.placeholder = your email address
@@ -185,10 +207,19 @@ custom.change_password_success = ¡contraseña actualizada!
 custom.delete_account = eliminar la cuenta
 custom.delete_account_warning = ¡Atención! esto eliminará su cuenta y todos los datos asociados, la acción no se puede revertir ¿Seguro desea continuar?
 
+custom.recover_account_with = seleccione el medio de recuperación
+custom.recover_account_with_email = email
+custom.recover_account_with_phone = SMS
+
 custom.recover_account = recuperar acceso
 custom.recover_account_message = ¡Atención! su email debe estar validado para poder ser capáz de recuperar su cuenta
 custom.recover_account_action = enviar email con instrucciones
 custom.recover_account_action_success = ¡Correo enviado exitosamente!
+
+custom.recover_account_phone = recuperar acceso
+custom.recover_account_message_phone = ¡Atención! su número telefónico debe estar validado para poder ser capáz de recuperar su cuenta
+custom.recover_account_action_phone = enviar sms con instrucciones
+custom.recover_account_action_success_phone = ¡SMS enviado exitosamente!
 
 custom.reset_password = recuperar contraseña
 custom.reset_password_message = Use una contraseña con caracteres alfanuméricos y símbolos
@@ -198,8 +229,8 @@ custom.reset_password_field_alt_placeholder = nueva contraseña
 custom.reset_password_action = actualize la contraseña
 
 custom.validate_account_fragment_id = ACCOUNT_VALIDATION_EMAIL
+custom.validate_account_phone_fragment_id = ACCOUNT_VALIDATION_SMS
 custom.validate_account = active su cuenta
-custom.validate_account_template_name =
 custom.validate_account_email_user = activar
 custom.validate_account_user = $APPNAME
 custom.validate_account_success = su cuenta ha sido activada satisfactoriamente
@@ -209,6 +240,7 @@ custom.unsubscribe_success = usted ya no está suscrito
 custom.unsubscribe_success_title = ¡acción exitosa!
 
 custom.forgot_password_fragment_id = ACCOUNT_RECOVERY_EMAIL
+custom.forgot_password_phone_fragment_id = ACCOUNT_RECOVERY_SMS
 custom.forgot_password = He olvidado mi contraseña
 custom.forgot_password_template_name =
 custom.forgot_password_email_user = recuperar
@@ -224,6 +256,18 @@ properties.username.error.NOT_NULLABLE = falta el nombre del usuario
 properties.username.error.TOO_LARGE = el nombre de usuario es demasiado largo
 properties.username.error.NOT_UNIQUE = el nombre de usuario ya ha sido tomado
 properties.username.error.INVALID_SUBTYPE_VALUE = los caractéres especiales y espacios no se permiten
+
+properties.phone.label = número telefónico
+properties.phone.placeholder = número telefónico
+properties.phone.description = Tu número no será compartido con nadie, se mantendrá privado para otros usuarios
+properties.phone.error.TOO_LARGE = El número es muy largo
+properties.phone.error.INVALID_SUBTYPE_VALUE = El número es inválido
+
+properties.p_validated.label = el número de teléfono ha sido confirmado
+properties.p_validated.description = indica si el número telefónico ha sido confirmado por el usuario
+
+properties.p_notifications.label = notificaciones por sms
+properties.p_notifications.description = Reciva notificationes importantes a través de SMS
 
 properties.email.label = email
 properties.email.placeholder = dirección de correo electrónico

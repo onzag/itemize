@@ -29,6 +29,7 @@ import { ISQLTableRowValue } from "../base/Root/sql";
 import MailProvider from "./services/base/MailProvider";
 import { DatabaseConnection } from "../database";
 import { IManyValueType } from "../database/base";
+import PhoneProvider from "./services/base/PhoneProvider";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -62,6 +63,7 @@ export class GlobalManager {
     [name: string]: ServiceProvider<any>;
   };
   private registry: RegistryService;
+  private phoneProvider: PhoneProvider<any>;
 
   constructor(
     root: Root,
@@ -73,6 +75,7 @@ export class GlobalManager {
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
     mailProvider: MailProvider<any>,
+    phoneProvider: PhoneProvider<any>,
     registry: RegistryService
   ) {
     this.root = root;
@@ -87,6 +90,7 @@ export class GlobalManager {
     this.sensitiveConfig = sensitiveConfig;
     this.registry = registry;
     this.mailProvider = mailProvider;
+    this.phoneProvider = phoneProvider;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 
@@ -99,6 +103,18 @@ export class GlobalManager {
         this.redisPub,
         this.redisSub,
         this.mailProvider,
+        this.phoneProvider,
+        this.customServices,
+        this.root
+      );
+    phoneProvider &&
+      phoneProvider.setupGlobalResources(
+        this.databaseConnection,
+        this.globalCache,
+        this.redisPub,
+        this.redisSub,
+        this.mailProvider,
+        this.phoneProvider,
         this.customServices,
         this.root
       );
@@ -109,6 +125,7 @@ export class GlobalManager {
         this.redisPub,
         this.redisSub,
         this.mailProvider,
+        this.phoneProvider,
         this.customServices,
         this.root
       );
@@ -134,6 +151,7 @@ export class GlobalManager {
       this.redisPub,
       this.redisSub,
       this.mailProvider,
+      this.phoneProvider,
       this.customServices,
       this.root
     );
@@ -141,6 +159,9 @@ export class GlobalManager {
   public async initializeServices() {
     if (this.mailProvider) {
       await this.mailProvider.initialize();
+    }
+    if (this.phoneProvider) {
+      await this.phoneProvider.initialize();
     }
     if (this.currencyFactorsProvider) {
       await this.currencyFactorsProvider.initialize();
@@ -319,7 +340,7 @@ export class GlobalManager {
     if (hasSqlManteniedProperties) {
       logger.info(
         "GlobalManager.processModule: found module that needs mantenience " +
-          mod.getQualifiedPathName()
+        mod.getQualifiedPathName()
       );
       this.modNeedsMantenience.push(mod);
 
@@ -331,7 +352,7 @@ export class GlobalManager {
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
           "GlobalManager.processModule: module has definitions that need mantenience but they hold no AND since request limiter " +
-            mod.getQualifiedPathName()
+          mod.getQualifiedPathName()
         );
       }
     }
@@ -362,7 +383,7 @@ export class GlobalManager {
     if (hasSqlManteniedProperties || hasIncludeSQLManteniedProperties) {
       logger.info(
         "GlobalManager.processIdef: found item definition that needs mantenience " +
-          idef.getQualifiedPathName()
+        idef.getQualifiedPathName()
       );
       this.idefNeedsMantenience.push(idef);
 
@@ -376,7 +397,7 @@ export class GlobalManager {
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
           "GlobalManager.processIdef: item definition need mantenience but item definition nor module holds no AND since request limiter " +
-            idef.getQualifiedPathName()
+          idef.getQualifiedPathName()
         );
       }
     }
@@ -416,7 +437,7 @@ export class GlobalManager {
           if (timeUntilSeoGenNeedsToRun <= 0) {
             logger.error(
               "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next mapping was negative" +
-                " this means the server took forever doing the last mapping, clearly something is off",
+              " this means the server took forever doing the last mapping, clearly something is off",
               {
                 timeUntilSeoGenNeedsToRun,
               }
@@ -424,8 +445,8 @@ export class GlobalManager {
           } else {
             logger.info(
               "GlobalManager.run: SEO generator tasked to run in " +
-                timeUntilSeoGenNeedsToRun +
-                "ms"
+              timeUntilSeoGenNeedsToRun +
+              "ms"
             );
             await wait(timeUntilSeoGenNeedsToRun);
           }
@@ -461,8 +482,8 @@ export class GlobalManager {
         if (timeUntilItNeedsToUpdate <= 0) {
           logger.error(
             "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
-              " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
-              " a real error as it was handled gracefully, this should be addressed to itemize developers",
+            " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
+            " a real error as it was handled gracefully, this should be addressed to itemize developers",
             {
               timeUntilItNeedsToUpdate,
             }
@@ -470,8 +491,8 @@ export class GlobalManager {
         } else {
           logger.info(
             "GlobalManager.run: Server data and updater tasked to run in " +
-              timeUntilItNeedsToUpdate +
-              "ms"
+            timeUntilItNeedsToUpdate +
+            "ms"
           );
           await wait(timeUntilItNeedsToUpdate);
         }
@@ -749,7 +770,7 @@ export class GlobalManager {
           `INSERT INTO ${JSON.stringify(
             CURRENCY_FACTORS_IDENTIFIER
           )} ("code", "factor") VALUES ${valuesContainer} ` +
-            `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`,
+          `ON CONFLICT ("code") DO UPDATE SET "factor" = EXCLUDED."factor"`,
           valuesAsArray
         );
       } catch (err) {

@@ -47,6 +47,11 @@ export async function ssrGenerator(
     return;
   }
 
+  // USSD mode, loads the application for usage in the USSD method
+  const isUSSD = req.headers["ussd"] === "true";
+  const ussdToken = isUSSD ? req.headers["ussd-token"] : null;
+  const submode = isUSSD ? "ussd" : "std";
+
   const ifNoneMatch = req.headers["if-none-match"];
 
   // now we need to see if we are going to use SSR, due to the fact the NODE_ENV must
@@ -58,6 +63,12 @@ export async function ssrGenerator(
     NO_SSR ||
     (mode === "development" && !developmentISSSRMode) ||
     (mode === "production" && developmentISSSRMode);
+
+  // SSR must be enabled when
+  if (SSRIsDisabledInThisMode && isUSSD) {
+    res.status(500).end("Cannot provide a USSD style response when SSR is disabled");
+    return;
+  }
 
   // now we get the config, and the language, from the original path, rememebr this generator runs
   // on an express router
@@ -82,6 +93,12 @@ export async function ssrGenerator(
     // by the service worker to fetch a no-ssr file that is totally clean
     (!language && !req.query.noredirect)
   );
+
+  // SSR must be enabled when
+  if (!willUseSSR && isUSSD) {
+    res.status(400).end("The language is unsupported or not provided, you should specify a language by the URL");
+    return;
+  }
 
   // prepare to build etag
   // these etags are different per url on purpose
@@ -110,7 +127,7 @@ export async function ssrGenerator(
 
     // standard etag with an asterisk which means this is the general version
     // NO SSR is used when this etag comes
-    etag = "*." + appData.buildnumber + "." + mode;
+    etag = "*." + appData.buildnumber + "." + mode + "." + submode;
     // this is the root form without any language or any means, there's no SSR data to fill
 
     // etag quoted
@@ -149,7 +166,7 @@ export async function ssrGenerator(
     };
 
     // and we get such from the cookie itself
-    const currentToken = getCookie(splittedCookies, "token");
+    const currentToken = ussdToken || getCookie(splittedCookies, "token");
     // if we have it we need to extract its data, we are going to use, we are actually
     // kind of cheating this graphql call, first is the request fields info and second are the
     // args, we only concerned about the args so we pass the token, in the client the TokenProvider
@@ -188,7 +205,7 @@ export async function ssrGenerator(
     }
 
     // creating etag for this url
-    etag = appData.buildnumber + "." + mode;
+    etag = appData.buildnumber + "." + mode + "." + submode;
   }
 
   // now we need a root instance, because this will be used
@@ -215,15 +232,22 @@ export async function ssrGenerator(
   const usedDir = appliedRule.rtl ? "rtl" : "ltr";
 
   // and we start replacing from the HTML itself, note how these things might have returned null for some
-  let newHTML = html;
-  newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
-  newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
-  newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
+  let newHTML: string = null;
+  let newText: string = null;
+  let langHrefLangTags: string = null;
 
-  // and now the href lang tags
-  const langHrefLangTags = appliedRule.languages.map((language: string) => {
-    return `<link rel="alternate" href="https://${req.get("host")}${req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
-  }).join("");
+  // only need to go over these expenses if the result is HTML
+  if (!isUSSD) {
+    newHTML = html;
+    newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
+    newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
+    newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
+
+    // and now the href lang tags
+    langHrefLangTags = appliedRule.languages.map((language: string) => {
+      return `<link rel="alternate" href="https://${req.get("host")}${req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
+    }).join("");
+  }
 
   // this flags marks whether we can use etags
   // due to an error
@@ -235,6 +259,8 @@ export async function ssrGenerator(
   // since we cannot really keep it consistent
   if (appliedRule.noSSR) {
     // and we go here
+    // it doesn't go here if it's ussd anyway because
+    // it will throw an error
     const usedTitle = i18nAppName || config.appName || "";
     const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
     const usedOgTitle = usedTitle;
@@ -260,7 +286,7 @@ export async function ssrGenerator(
 
     // we need to rid of the token for the client
     let clientSSR: ISSRContextType = { ...ssr };
-    if (clientSSR.user && clientSSR.user.token) {
+    if (!isUSSD && clientSSR.user && clientSSR.user.token) {
       // make a copy it is slightly different
       clientSSR = {
         ...ssr,
@@ -292,13 +318,13 @@ export async function ssrGenerator(
       // mainly because calls to the localizations service and whatnot which must
       // be consistent
       serverAppData = await initializeItemizeApp(
-        appData.ssrConfig.rendererContext,
-        appData.ssrConfig.mainComponent,
+        isUSSD ? appData.ssrConfig.ussdConfig.rendererContext : appData.ssrConfig.rendererContext,
+        isUSSD ? appData.ssrConfig.ussdConfig.mainComponent : appData.ssrConfig.mainComponent,
         {
-          appWrapper: appData.ssrConfig.appWrapper,
-          mainWrapper: appData.ssrConfig.mainWrapper,
+          appWrapper: isUSSD ? appData.ssrConfig.ussdConfig.appWrapper : appData.ssrConfig.appWrapper,
+          mainWrapper: isUSSD ? appData.ssrConfig.ussdConfig.mainWrapper : appData.ssrConfig.mainWrapper,
           serverMode: {
-            collector: appData.ssrConfig.collector,
+            collector: isUSSD ? appData.ssrConfig.ussdConfig.collector : appData.ssrConfig.collector,
             config: appData.config,
             ssrContext: ssr,
             clientDetails: {
@@ -375,61 +401,70 @@ export async function ssrGenerator(
         return;
       }
 
-      // now we calculate the og fields that are final, given they can be functions
-      // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
-      const finalOgTitle: string = root.getStateKey("ogTitle");
+      if (isUSSD) {
+        // TODO use staticMarkup and parse it in order to make a text only representation
+        // p and div tags make newlines
+        // chunks will use divs with data-chunk tags
+        // actions will use span tags with data-action tags
+        newHTML = staticMarkup;
+      } else {
+        // now we calculate the og fields that are final, given they can be functions
+        // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
+        const finalOgTitle: string = root.getStateKey("ogTitle");
 
-      // the description as well, same thing
-      const finalOgDescription: string = root.getStateKey("ogDescription");
+        // the description as well, same thing
+        const finalOgDescription: string = root.getStateKey("ogDescription");
 
-      // same for the image but this is special
-      let finalOgImage: string = root.getStateKey("ogImage");
-      // because if it's a url and og image tags require absolute paths with entire urls
-      // we check if it's an absolute path with no host
-      if (finalOgImage && finalOgImage.startsWith("/")) {
-        // and add the host
-        finalOgImage = `https://${req.get("host")}` + finalOgImage;
-      } else if (finalOgImage && !finalOgImage.includes("://")) {
-        // otherwise we just add the protocol if it was not added
-        finalOgImage = `https://` + finalOgImage;
+        // same for the image but this is special
+        let finalOgImage: string = root.getStateKey("ogImage");
+        // because if it's a url and og image tags require absolute paths with entire urls
+        // we check if it's an absolute path with no host
+        if (finalOgImage && finalOgImage.startsWith("/")) {
+          // and add the host
+          finalOgImage = `https://${req.get("host")}` + finalOgImage;
+        } else if (finalOgImage && !finalOgImage.includes("://")) {
+          // otherwise we just add the protocol if it was not added
+          finalOgImage = `https://` + finalOgImage;
+        }
+
+        // now we calculate the same way title and description
+        const finalTitle = root.getStateKey("title");
+        const finalDescription = root.getStateKey("description");
+
+        const usedTitle = finalTitle || i18nAppName || config.appName || "";
+        const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
+        const usedOgTitle = finalOgTitle || usedTitle;
+        const usedOgDescription = finalOgDescription || usedDescription;
+        const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
+
+        ssr.title = usedTitle;
+        clientSSR.title = usedTitle;
+        clientSSR.queries = collector.getQueries();
+
+        // now we need to make the title match
+        newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup.replace(/__SSR_TITLE__/g, usedTitle));
+
+        // replace with this information
+        newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
+        newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
+        newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
+        newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
+        newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
+
+        // we replace the HTML with the SSR information that we are using
+        newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(clientSSR));
+
+        // but we need the SSR head which includes our hreflang tags
+        let finalSSRHead: string = langHrefLangTags;
+        if (serverAppData.id) {
+          // and also our collected data
+          finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
+        }
+
+        // we add that
+        newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
       }
 
-      // now we calculate the same way title and description
-      const finalTitle = root.getStateKey("title");
-      const finalDescription = root.getStateKey("description");
-
-      const usedTitle = finalTitle || i18nAppName || config.appName || "";
-      const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
-      const usedOgTitle = finalOgTitle || usedTitle;
-      const usedOgDescription = finalOgDescription || usedDescription;
-      const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
-
-      ssr.title = usedTitle;
-      clientSSR.title = usedTitle;
-      clientSSR.queries = collector.getQueries(); 
-
-      // now we need to make the title match
-      newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup.replace(/__SSR_TITLE__/g, usedTitle));
-
-      // replace with this information
-      newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
-      newHTML = newHTML.replace(/\$SSRDESCR/g, usedDescription);
-      newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
-      newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
-      newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
-
-      // we replace the HTML with the SSR information that we are using
-      newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(clientSSR));
-
-      // but we need the SSR head which includes our hreflang tags
-      let finalSSRHead: string = langHrefLangTags;
-      if (serverAppData.id) {
-        // and also our collected data
-        finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
-      }
-
-      // we add that
-      newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
     } catch (e) {
       // if it fails then we can't do SSR and we just provide without SSR
       logger.error(
@@ -440,6 +475,14 @@ export async function ssrGenerator(
           appliedRule,
         }
       );
+
+      if (isUSSD) {
+        root.cleanState();
+        appData.rootPool.release(root);
+        res.status(500).end("Failed to run SSR due to failed initialization");
+        return;
+      }
+
       const usedTitle = i18nAppName || config.appName || "";
       const usedDescription = i18nAppDescription || i18nAppName || config.appName || "";
       const usedOgTitle = usedTitle;

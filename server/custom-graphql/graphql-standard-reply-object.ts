@@ -23,7 +23,10 @@ const STANDARD_REPLY = new GraphQLObjectType({
   fields: {
     status: {
       type: GraphQLNonNull(GraphQLString),
-    }
+    },
+    content: {
+      type: GraphQLString,
+    },
   },
 });
 
