@@ -356,6 +356,10 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
+    phone: {
+      type: ["object", "null"],
+      additionalProperties: {},
+    },
     mailDomain: {
       type: ["string", "null"],
     },
@@ -411,6 +415,7 @@ export const rawSensitiveConfigSchema = {
     "locationSearch",
     "payment",
     "mail",
+    "phone",
     "mailDomain",
     "mailStorage",
     "defaultContainerID",

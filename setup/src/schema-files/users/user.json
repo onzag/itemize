@@ -178,7 +178,7 @@
             "REQUIRES_PASSWORD_CONFIRMATION": {
                 "roles": "$CONFIG:return config.roles.filter((r) => r !== 'ADMIN');",
                 "properties": ["password"],
-                "applyingProperties": ["username", "password"]
+                "applyingProperties": ["username", "email", "phone", "password"]
             }
         },
         "delete": {

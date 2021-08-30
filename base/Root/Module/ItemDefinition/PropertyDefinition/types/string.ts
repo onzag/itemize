@@ -41,6 +41,10 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
   "|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53" +
   "-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
+const PHONE_REGEX = new RegExp("\\+(9[976]\\d|8[987530]\\d|6[987]\\d|5[90]\\d|42\\d|3[875]\\d|" +
+  "2[98654321]\\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|" +
+  "4[987654310]|3[9643210]|2[70]|7|1)\\d{1,14}$");
+
 /**
  * Represents characters that are not allowed in identifier types, while this seems a bit arbitrary
  * remember that we try to keep it so that many languages are allowed, this is so usernames in
@@ -49,7 +53,7 @@ const EMAIL_REGEX = new RegExp("(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#
  * 
  * These identifiers are expected to be used as email handles so be careful
  */
-const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\""];
+const SPECIAL_CHARACTERS = [" ", "!", "¡", "?", "¿", "@", "#", "$", "£", "%", "/", "\\", "*", "\"", "+"];
 
 /**
  * The string type is described, by, you guessed it, a string
@@ -58,6 +62,7 @@ export type PropertyDefinitionSupportedStringType = string;
 
 export const exactStringSearchSubtypes = [
   "comprehensive-locale",
+  "phone",
   "language",
   "country",
   "currency",
@@ -152,6 +157,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   nullableDefault: "",
   supportedSubtypes: [
     "email",
+    "phone",
     "identifier",
     "exact-identifier",
     "locale",
@@ -178,6 +184,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     }
 
     if (subtype === "email" && !EMAIL_REGEX.test(s)) {
+      return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
+    }
+
+    if (subtype === "phone" && !PHONE_REGEX.test(s)) {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
     }
 
@@ -267,8 +277,8 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     optional: CLASSIC_OPTIONAL_I18N,
     searchBase: CLASSIC_SEARCH_BASE_I18N,
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    tooLargeErrorInclude: [null, "email", "identifier", "exact-identifier", "exact-value"],
-    invalidSubtypeErrorInclude: ["email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
+    tooLargeErrorInclude: [null, "phone", "email", "identifier", "exact-identifier", "exact-value"],
+    invalidSubtypeErrorInclude: ["phone", "email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
   },
 };
 export default typeValue;

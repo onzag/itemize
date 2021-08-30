@@ -312,6 +312,7 @@ export const ENDPOINT_ERRORS = {
   INVALID_POLICY: "INVALID_POLICY",
   INVALID_INCLUDE: "INVALID_INCLUDE",
   INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  TOKEN_EXPIRED: "TOKEN_EXPIRED",
   BLOCKED: "BLOCKED",
   CANT_CONNECT: "CANT_CONNECT",
   INVALID_DATA_SUBMIT_REFUSED: "INVALID_DATA_SUBMIT_REFUSED",
@@ -322,6 +323,7 @@ export const ENDPOINT_ERRORS = {
   USER_BLOCKED: "USER_BLOCKED",
   USER_REMOVED: "USER_REMOVED",
   USER_EMAIL_TAKEN: "USER_EMAIL_TAKEN",
+  USER_PHONE_TAKEN: "USER_PHONE_TAKEN",
   NOT_FOUND: "NOT_FOUND",
 };
 
@@ -330,15 +332,14 @@ export const ENDPOINT_ERRORS = {
  * of the validation email and the recovery email
  */
 export const USER_EXTRA_CUSTOM_I18N = [
-  "validate_account_fragment_id",
+  "validate_account_email_fragment_id",
+  "validate_account_phone_fragment_id",
   "validate_account",
   "validate_account_user",
   "validate_account_email_user",
   "forgot_password_link_target",
   "forgot_password_fragment_id",
   "forgot_password_title",
-  "validate_account_user",
-  "validate_account_email_user",
 ];
 
 /**

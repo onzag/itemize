@@ -12,6 +12,8 @@ export const customUserTriggers: ITriggerRegistry = {
         // if these properties are even real
         const hasEmail = arg.itemDefinition.hasPropertyDefinitionFor("email", false);
         const hasEvalidated = arg.itemDefinition.hasPropertyDefinitionFor("e_validated", false);
+        const hasPhone = arg.itemDefinition.hasPropertyDefinitionFor("phone", false);
+        const hasPValidated = arg.itemDefinition.hasPropertyDefinitionFor("p_validated", false);
         
         // check for sessionId changes in order to trigger a whole kick
         // event
@@ -45,6 +47,8 @@ export const customUserTriggers: ITriggerRegistry = {
             }
           }
         }
+
+        let toReturn: any = null;
 
         // we add a trigger for when the user updated the email
         // either because of creation or from a normal update
@@ -88,7 +92,7 @@ export const customUserTriggers: ITriggerRegistry = {
             // if there's no such
             if (!result) {
               // then it's allowed and we mark e_validated as false
-              return {
+              toReturn = {
                 ...arg.requestedUpdate,
                 e_validated: false,
               }
@@ -103,13 +107,74 @@ export const customUserTriggers: ITriggerRegistry = {
             // if otherwise we gave a new email that is null
             // then we set e_vaidated to false, null cannot be a valid
             // email after all
-            return {
+            toReturn = {
               ...arg.requestedUpdate,
               e_validated: false,
             }
           }
         }
-        return null;
+
+        // this is the same as what is done with email
+        if (
+          hasPhone &&
+          hasPValidated &&
+          (arg.action === IOTriggerActions.CREATE || arg.action === IOTriggerActions.EDIT) &&
+          arg.requestedUpdate
+        ) {
+          const newPhone = arg.requestedUpdate.phone;
+          const changedPhone = !arg.originalValue || (typeof newPhone !== "undefined" && newPhone !== arg.originalValue.phone);
+          // newEmail being set is not null, and new email being set is not undefined which means is not
+          // being updated at all
+          if (
+            changedPhone && newPhone !== null && typeof newPhone !== "undefined"
+          ) {
+            // now we try to find another user with such email
+            let result: ISQLTableRowValue;
+            try {
+              result = await arg.appData.databaseConnection.queryFirst(
+                `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(arg.itemDefinition.getQualifiedPathName())} ` +
+                `WHERE "phone" = $1 AND "p_validated" = $2 LIMIT 1`,
+                [
+                  newPhone as string,
+                  true,
+                ],
+              );
+            } catch (err) {
+              logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
+                "if phone had been taken for phone " + newPhone + " this caused the whole user not to be able to update/create");
+              throw err;
+            }
+
+            // if there's no such
+            if (!result) {
+              // then it's allowed and we mark p_validated as false
+              if (toReturn) {
+                toReturn.p_validated = false;
+              } else {
+                toReturn = {
+                  ...arg.requestedUpdate,
+                  p_validated: false,
+                }
+              }
+            } else {
+              throw new EndpointError({
+                message: "The phone has been taken and validated by another user",
+                code: ENDPOINT_ERRORS.USER_PHONE_TAKEN,
+              });
+            }
+          } else if (newPhone === null) {
+            if (toReturn) {
+              toReturn.p_validated = false;
+            } else {
+              toReturn = {
+                ...arg.requestedUpdate,
+                p_validated: false,
+              }
+            }
+          }
+        }
+
+        return toReturn;
       }
     },
   }

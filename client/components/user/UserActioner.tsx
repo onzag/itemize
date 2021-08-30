@@ -24,13 +24,31 @@ export interface IUserActionerArg {
   /**
    * Sends the email validation, for the current logged in user
    */
-  sendValidateEmail: () => Promise<{error: EndpointErrorType}>,
+  sendValidateEmail: () => Promise<{ error: EndpointErrorType }>,
+  /**
+   * Sends the email validation, for the current logged in user
+   */
+  sendValidateSMS: () => Promise<{ error: EndpointErrorType }>,
+  /**
+   * Validates the phone from the given random id
+   */
+  validatePhoneFromRandomId: (randomId: string) => Promise<{ error: EndpointErrorType }>,
+  /**
+   * Validates the email from the given random id
+   */
+  validateEmailFromRandomId: (randomId: string) => Promise<{ error: EndpointErrorType }>,
   /**
    * Sends a password reset, requires to be in an item definition context
    * of type user where the email property is available and filled, as it will
    * read from such context
    */
-  sendResetPassword: () => Promise<{error: EndpointErrorType}>,
+  sendResetPasswordEmail: () => Promise<{ error: EndpointErrorType }>,
+  /**
+   * Sends a password reset, requires to be in an item definition context
+   * of type user where the email property is available and filled, as it will
+   * read from such context
+   */
+  sendResetPasswordSMS: () => Promise<{ error: EndpointErrorType }>,
   /**
    * Resets the password of a given user, requires a token that is sent via
    * the email reset link, usually in the query string and you will be available to access it via the
@@ -38,7 +56,21 @@ export interface IUserActionerArg {
    * 
    * clean when successful will clean the unsafe fields, virtually the password
    */
-  resetPassword: (token: string, cleanWhenSuccessful?: boolean) => Promise<{error: EndpointErrorType}>,
+  resetPasswordWithToken: (token: string, cleanWhenSuccessful?: boolean) => Promise<{ error: EndpointErrorType }>,
+  /**
+   * Resets the password of a given user, requires a a random id that is often sent
+   * with a text message
+   * 
+   * clean when successful will clean the unsafe fields, virtually the password
+   */
+  resetPasswordWithEmailReceivedRandomId: (randomId: string, email: string, cleanWhenSuccessful?: boolean) => Promise<{ error: EndpointErrorType }>,
+  /**
+  * Resets the password of a given user, requires a a random id that is often sent
+  * with a text message
+  * 
+  * clean when successful will clean the unsafe fields, virtually the password
+  */
+  resetPasswordWithSMSReceivedRandomId: (randomId: string, phone: string, cleanWhenSuccessful?: boolean) => Promise<{ error: EndpointErrorType }>,
   /**
    * stateful on progress, a boolean that specifies the last action being on progress, the actions that
    * can be executed in this actioner are stateful, which means they do not belong to any context
@@ -111,12 +143,23 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       onProgress: false,
     };
 
-    this.sendValidateEmail = this.sendValidateEmail.bind(this);
+    this.sendValidate = this.sendValidate.bind(this);
     this.sendResetPassword = this.sendResetPassword.bind(this);
     this.dismissStatefulSuccess = this.dismissStatefulSuccess.bind(this);
     this.dismissStatefulError = this.dismissStatefulError.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
+    this.validateFromRandomId = this.validateFromRandomId.bind(this);
     this.cleanUnsafeFields = this.cleanUnsafeFields.bind(this);
+
+    this.sendResetPasswordEmail = this.sendResetPasswordEmail.bind(this);
+    this.sendResetPasswordSMS = this.sendResetPasswordSMS.bind(this);
+    this.sendValidateEmail = this.sendValidateEmail.bind(this);
+    this.sendValidateSMS = this.sendValidateSMS.bind(this);
+    this.resetPasswordWithSMSReceivedRandomId = this.resetPasswordWithSMSReceivedRandomId.bind(this);
+    this.resetPasswordWithEmailReceivedRandomId = this.resetPasswordWithEmailReceivedRandomId.bind(this);
+    this.resetPasswordWithToken = this.resetPasswordWithToken.bind(this);
+    this.validateEmailFromRandomId = this.validateEmailFromRandomId.bind(this);
+    this.validatePhoneFromRandomId = this.validatePhoneFromRandomId.bind(this);
   }
   public shouldComponentUpdate(nextProps: IActualUserActionerProps, nextState: IActualUserActionerState) {
     // we only truly update a render on changes of the children or the state itself
@@ -150,7 +193,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
    * Sends the validate email, requires to be logged in
    * as it will use the token
    */
-  async sendValidateEmail() {
+  async sendValidate(type: "email" | "phone") {
     // if we are on progress do nothing
     if (this.state.onProgress) {
       return;
@@ -165,10 +208,11 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     const data = await gqlQuery(
       buildGqlQuery(
         {
-          name: "send_validate_email",
+          name: "send_validate",
           args: {
             // with the token
             token: this.props.token,
+            type,
           },
           fields: {
             status: {},
@@ -207,7 +251,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
    * sends the reset password, requires to be in an item definition context for an user
    * with the property of email filled
    */
-  async sendResetPassword() {
+  async sendResetPassword(type: "email" | "phone") {
     // if we are on progress we avoid
     if (this.state.onProgress) {
       return;
@@ -219,8 +263,8 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     });
 
     // let's try to get the email from the context itself
-    const emailPropertyState = this.props.userContext.state.properties.find((p) => p.propertyId === "email");
-    const emailPropertyValue = emailPropertyState ? emailPropertyState.value as string : null;
+    const propertyState = this.props.userContext.state.properties.find((p) => p.propertyId === type);
+    const propertyValue = propertyState ? propertyState.value as string : null;
 
     // execute the send reset password query
     const data = await gqlQuery(
@@ -228,7 +272,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
         {
           name: "send_reset_password",
           args: {
-            email: emailPropertyValue,
+            [type]: propertyValue,
           },
           fields: {
             status: {},
@@ -260,6 +304,52 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     return { error };
   }
 
+  async validateFromRandomId(type: "phone" | "email", randomId: string) {
+    // if we are on progress we return
+    if (this.state.onProgress) {
+      return;
+    }
+
+    // now we are on progress
+    this.setState({
+      onProgress: true,
+    });
+
+    // execute the send reset password query
+    const data = await gqlQuery(
+      buildGqlQuery(
+        {
+          name: "validate",
+          args: {
+            user_id: this.props.userContext.forId,
+            random_id: randomId,
+          },
+          fields: {
+            status: {},
+          },
+        },
+      ),
+    );
+
+    const error = data.errors ? data.errors[0].extensions : null;
+
+    if (error) {
+      this.setState({
+        error,
+        onProgress: false,
+        successful: false,
+      });
+    } else {
+      this.setState({
+        error: null,
+        successful: true,
+        onProgress: false,
+      });
+    }
+
+    return { error };
+  }
+
   /**
    * Given the token provided via email by the reset password, this is able to actually
    * update the password of an user so that such can login
@@ -268,7 +358,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
    * @param cleanWhenSuccessful whether to clean the unsafe fields, aka, password when successful
    * default is true 
    */
-  async resetPassword(token: string, cleanWhenSuccessful: boolean = true) {
+  async resetPassword(type: "token" | "random_id", method: "phone" | "email", methodValue: string, tokenOrRandomId: string, cleanWhenSuccessful: boolean = true) {
     // if we are on progress we return
     if (this.state.onProgress) {
       return;
@@ -283,15 +373,21 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     const passwordPropertyState = this.props.userContext.state.properties.find((p) => p.propertyId === "password");
     const passwordPropertyValue = passwordPropertyState ? passwordPropertyState.value as string : null;
 
+    const args = {
+      [type]: tokenOrRandomId,
+      new_password: passwordPropertyValue,
+    }
+
+    if (method) {
+      args[method] = methodValue;
+    }
+
     // do the reset password call, also passing our token
     const data = await gqlQuery(
       buildGqlQuery(
         {
           name: "reset_password",
-          args: {
-            token,
-            new_password: passwordPropertyValue,
-          },
+          args,
           fields: {
             status: {},
           },
@@ -340,14 +436,56 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     });
   }
 
+  public sendResetPasswordEmail() {
+    return this.sendResetPassword("email");
+  }
+
+  public sendResetPasswordSMS() {
+    return this.sendResetPassword("phone");
+  }
+
+  public sendValidateEmail() {
+    return this.sendValidate("email");
+  }
+
+  public sendValidateSMS() {
+    return this.sendValidate("phone");
+  }
+
+  public resetPasswordWithSMSReceivedRandomId(randomId: string, phone: string, cleanWhenSuccessful?: boolean) {
+    return this.resetPassword("random_id", "phone", phone, randomId, cleanWhenSuccessful);
+  }
+
+  public resetPasswordWithEmailReceivedRandomId(randomId: string, email: string, cleanWhenSuccessful?: boolean) {
+    return this.resetPassword("random_id", "email", email, randomId, cleanWhenSuccessful);
+  }
+
+  public resetPasswordWithToken(token: string, cleanWhenSuccessful?: boolean) {
+    return this.resetPassword("token", null, null, token, cleanWhenSuccessful);
+  }
+
+  public validateEmailFromRandomId(randomId: string) {
+    return this.validateFromRandomId("email", randomId);
+  }
+
+  public validatePhoneFromRandomId(randomId: string) {
+    return this.validateFromRandomId("phone", randomId);
+  }
+
   /**
    * The rather straightforward render function
    */
   render() {
     return this.props.children({
+      sendResetPasswordEmail: this.sendResetPasswordEmail,
+      sendResetPasswordSMS: this.sendResetPasswordSMS,
       sendValidateEmail: this.sendValidateEmail,
-      sendResetPassword: this.sendResetPassword,
-      resetPassword: this.resetPassword,
+      sendValidateSMS: this.sendValidateSMS,
+      validateEmailFromRandomId: this.validateEmailFromRandomId,
+      validatePhoneFromRandomId: this.validatePhoneFromRandomId,
+      resetPasswordWithSMSReceivedRandomId: this.resetPasswordWithSMSReceivedRandomId,
+      resetPasswordWithEmailReceivedRandomId: this.resetPasswordWithEmailReceivedRandomId,
+      resetPasswordWithToken: this.resetPasswordWithToken,
       dismissStatefulSuccess: this.dismissStatefulSuccess,
       dismissStatefulError: this.dismissStatefulError,
       statefulError: this.state.error,
@@ -378,7 +516,7 @@ export default function UserActioner(props: IUserActionerProps) {
             {
               // as well as an item definition context to read our password and email fields
               (itemContext) => {
-                return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemContext}/>
+                return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemContext} />
               }
             }
           </ItemContext.Consumer>

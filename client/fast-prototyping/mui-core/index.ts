@@ -157,6 +157,7 @@ import CropSquareIcon from '@material-ui/icons/CropSquare';
 import SaveIcon from '@material-ui/icons/Save';
 import QueueIcon from '@material-ui/icons/Queue';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
 
 export {
   Grid,
@@ -313,4 +314,5 @@ export {
   Drawer,
   TreeView,
   TreeItem,
+  PhoneIphoneIcon,
 }

@@ -933,11 +933,14 @@ const nodesThatRepresentLines = [
   "html",
 ]
 export function convertNodeToText(node: Node): string {
+  if (node.nodeType === 3) {
+    return node.textContent;
+  }
   if (!node.childNodes) {
     return "";
   }
-  return Array.from(node.childNodes).map((cnode) => {
-    if (cnode.nodeType !== Node.TEXT_NODE) {
+  return Array.from(node.childNodes).map((cnode, index) => {
+    if (cnode.nodeType !== 3) {
       // we consider it an html element
       const childNodeASHTMLElement = cnode as HTMLElement;
       if (childNodeASHTMLElement.tagName && nodesThatRepresentLines.includes(childNodeASHTMLElement.tagName.toLowerCase())) {
@@ -945,7 +948,7 @@ export function convertNodeToText(node: Node): string {
       }
       return convertNodeToText(cnode);
     } else {
-      cnode.textContent;
+      return cnode.textContent;
     }
   }).join("");
 }

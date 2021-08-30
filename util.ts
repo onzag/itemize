@@ -17,6 +17,7 @@ import type { IPropertyDefinitionSupportedUnitType } from "./base/Root/Module/It
 import { IPropertyDefinitionSupportedLocationType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import convert from "convert-units";
+import { countries } from "./imported-resources";
 
 export const Moment = MomentDef;
 export const JSDOM = JSDOMDef;
@@ -545,6 +546,34 @@ export function createRealFileValue(
   }
 
   return value;
+}
+
+
+const numberRegex = /^\+?[0-9]+$/;
+
+export function checkIsPossiblePhoneNumber(number: string) {
+  return numberRegex.test(number);
+}
+
+export function convertPhoneNumberToInternational(
+  number: string,
+  countryCode: string,
+) {
+  if (number.startsWith("+")) {
+    return number;
+  }
+
+  const country = countries[countryCode];
+  if (!country) {
+    return number;
+  }
+
+  let newNumber = number;
+  if (newNumber.startsWith("0")) {
+    newNumber = newNumber.substr(1);
+  }
+
+  return "+" + country.phone + newNumber;
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

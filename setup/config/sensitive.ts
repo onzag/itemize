@@ -160,7 +160,8 @@ export async function sensitiveConfigSetup(
       },
       {
         variableName: "phone",
-        message: "The configuration used by the phone service provider by default itemize will use twilio",
+        message: "The configuration used by the phone service provider by default itemize will use twilio however you can also start the system " +
+        "with FAKE_SMS=true in order to use an sms delivery system that just logs the sms",
         type: "config",
         defaultValue: null,
         extractData: [

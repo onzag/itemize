@@ -113,3 +113,9 @@ Disables seo indexing, useful for development
 Default `false`
 
 Emails do not get delivered instead get logged to console, useful for development
+
+## FAKE_SMS
+
+Default `false`
+
+Sms do not get delivered instead get logged to console, useful for development
