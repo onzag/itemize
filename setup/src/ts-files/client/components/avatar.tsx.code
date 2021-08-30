@@ -41,7 +41,7 @@ interface IAvatarProps {
  * @param props the avatar props
  * @returns a react component
  */
-export function Avatar(props: IAvatarProps)<0>{
+export function Avatar(props: IAvatarProps) {
 	// so this is the standard logic
 	return (
 		<Reader id="id">
@@ -97,45 +97,57 @@ export function Avatar(props: IAvatarProps)<0>{
 													{(email: string, emailState: IPropertyDefinitionState) => (
 														<Reader id="e_validated">
 															{(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
-																<Reader id="address">
-																	{(address, addressState) => {
-																		// now we check for these warnings
-																		const hasWarningForMissingEmail =
-																			!(emailState && emailState.stateAppliedValue);
-																		const hasWarningForNotValidEmail =
-																			!(eValidatedState && eValidatedState.stateAppliedValue);
-																		const hasAnotherWarningForMissingAddress =
-																			!(addressState && addressState.stateAppliedValue);
+																<Reader id="phone">
+																	{(phone: string, phoneState: IPropertyDefinitionState) => (
+																		<Reader id="p_validated">
+																			{(pValidated: boolean, pValidatedState: IPropertyDefinitionState) => {
+																				// now we check for these warnings
+																				const hasWarningForMissingEmailAndPhone =
+																					!(emailState && emailState.stateAppliedValue) &&
+																					!(phoneState && phoneState.stateAppliedValue);
+																				const hasWarningForNotValidEmail =
+																					(emailState && emailState.stateAppliedValue) &&
+																					!(eValidatedState && eValidatedState.stateAppliedValue);
+																				const hasWarningForNotValidPhone =
+																					(phoneState && phoneState.stateAppliedValue) &&
+																					!(pValidated && pValidatedState.stateAppliedValue);
 
-																		let warningCount = 0;
-																		if (hasWarningForMissingEmail || hasWarningForNotValidEmail) {
-																			warningCount++;
-																		}
-																		if (hasAnotherWarningForMissingAddress) {
-																			warningCount++;
-																		}
+																				let warningCount = 0;
+																				if (hasWarningForMissingEmailAndPhone) {
+																					warningCount++;
+																				}
 
-																		if (props.hideFlag) {
-																			return (
-																				<FastPrototypingAvatar
-																					{...baseAvatarProps}
-																					warningCount={warningCount}
-																				/>
-																			);
-																		} else {
-																			return (
-																				<Reader id="app_country">
-																					{(countryCode: string) => (
+																				if (!hasWarningForMissingEmailAndPhone && hasWarningForNotValidEmail) {
+																					warningCount++;
+																				}
+
+																				if (!hasWarningForMissingEmailAndPhone && hasWarningForNotValidPhone) {
+																					warningCount++;
+																				}
+
+																				if (props.hideFlag) {
+																					return (
 																						<FastPrototypingAvatar
 																							{...baseAvatarProps}
 																							warningCount={warningCount}
-																							countryCode={countryCode}
 																						/>
-																					)}
-																				</Reader>
-																			);
-																		}
-																	}}
+																					);
+																				} else {
+																					return (
+																						<Reader id="app_country">
+																							{(countryCode: string) => (
+																								<FastPrototypingAvatar
+																									{...baseAvatarProps}
+																									warningCount={warningCount}
+																									countryCode={countryCode}
+																								/>
+																							)}
+																						</Reader>
+																					);
+																				}
+																			}}
+																		</Reader>
+																	)}
 																</Reader>
 															)}
 														</Reader>

@@ -31,12 +31,15 @@ export function MyProfile()<0>{
 					"app_country",
 					"app_currency",
 					"e_validated",
+					"p_validated",
 					"role",
 					"profile_picture",
 					"email",
+					"phone",
 					"password",
 					"e_notifications",
 					"e_newsletter",
+					"p_notifications",
 					"address",
 					"about_me",
 				];
@@ -54,6 +57,7 @@ export function MyProfile()<0>{
 								propertiesToRestoreOnAny: [
 									"username",
 									"email",
+									"phone",
 									"about_me",
 								],
 							}}
@@ -61,12 +65,13 @@ export function MyProfile()<0>{
 							<NeedsSubmitPrompt
 								properties={[
 									"email",
+									"phone",
 									"username",
 									"about_me",
 								]}
 								i18nConfirm="update_profile"
 								confirmationSubmitOptions={{
-									properties: ["email", "username", "about_me"],
+									properties: ["email", "phone", "username", "about_me"],
 									differingOnly: true,
 								}}
 							/>

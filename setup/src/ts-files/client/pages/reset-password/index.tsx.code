@@ -10,8 +10,10 @@ import Reader from "@onzag/itemize/client/components/property/Reader";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
-import { createStyles, withStyles, WithStyles, Typography,
-	Paper, Container, Divider, Button, DoneIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import {
+	createStyles, withStyles, WithStyles, Typography,
+	Paper, Container, Divider, Button, DoneIcon, TextField
+} from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 
@@ -49,8 +51,21 @@ const resetPasswordStyles = createStyles({
  * @param token the token for resetting the password
  * @param actioner and the user actioner
  */
-async function resetPassword(token: string, actioner: IUserActionerArg)<0>{
-	const result = await actioner.resetPassword(token, true);
+async function resetPassword(
+	userRandomId: string,
+	randomId: string,
+	randomIdType: "email" | "phone",
+	randomIdValue: string,
+	token: string,
+	actioner: IUserActionerArg,
+) {
+	const result = userRandomId ?
+		(
+			randomIdType === "phone" ?
+			await actioner.resetPasswordWithSMSReceivedRandomId(randomId, randomIdValue, true) :
+			await actioner.resetPasswordWithEmailReceivedRandomId(randomId, randomIdValue, true)
+		) :
+		await actioner.resetPasswordWithToken(token, true);
 	if (!result.error) {
 		// we give the reset_password_success message from the root message
 		localizedRedirectTo("/?msg=reset_password_success&msgtitle=reset_password", null, true);
@@ -67,14 +82,23 @@ async function resetPassword(token: string, actioner: IUserActionerArg)<0>{
 export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<typeof resetPasswordStyles>) => {
 	return (
 		<LocationStateReader
-			defaultState={{ token: null, id: null } as { token: string, id: string }}
+			defaultState={{
+				token: null as string,
+				id: null as string,
+				userandomid: null as string,
+				randomidtype: null as string,
+				randomidvalue: null as string,
+				randomid: ""
+			}}
 			stateIsInQueryString={true}
 		>
-			{(state) => {
+			{(state, setState) => {
 				const userId = state.id;
 
-				if (!userId) {
-					return null;
+				const setRandomId = (e: React.ChangeEvent<HTMLInputElement>) => {
+					setState({
+						randomid: e.target.value,
+					}, true)
 				}
 
 				return (
@@ -101,15 +125,18 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 										</TitleSetter>
 										<Container maxWidth="md" className={props.classes.container}>
 											<Paper className={props.classes.paper}>
-												<ItemLoader>
-													<Avatar size="large" fullWidth={true} hideFlag={true}/>
-													<Reader id="username">
-														{(username: string) => (
-															<Typography variant="h4" className={props.classes.username}>{username}</Typography>
-														)}
-													</Reader>
-												</ItemLoader>
-												<Divider className={props.classes.divider} />
+												{userId ?
+													<><ItemLoader>
+														<Avatar size="large" fullWidth={true} hideFlag={true} />
+														<Reader id="username">
+															{(username: string) => (
+																<Typography variant="h4" className={props.classes.username}>{username}</Typography>
+															)}
+														</Reader>
+													</ItemLoader>
+														<Divider className={props.classes.divider} />
+													</> : null
+												}
 												<Typography variant="h6" className={props.classes.recoverTitle}>{i18nResetPassword}</Typography>
 												<I18nRead id="reset_password_field_alt_label">
 													{(i18nAltLabel: string) => (
@@ -130,6 +157,18 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 														</I18nRead>
 													)}
 												</I18nRead>
+												{state.userandomid ? <I18nRead id="reset_password_insert_code_label">
+													{(i18nLabel: string) => (
+														<TextField
+															variant="filled"
+															color="primary"
+															value={state.randomid || ""}
+															onChange={setRandomId}
+															label={i18nLabel}
+															placeholder={i18nLabel}
+														/>
+													)}
+												</I18nRead> : null}
 												<UserActioner>
 													{(actioner) => (
 														<React.Fragment>
@@ -143,7 +182,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 																			variant="contained"
 																			color="primary"
 																			endIcon={<DoneIcon />}
-																			onClick={resetPassword.bind(null, state.token, actioner)}
+																			onClick={resetPassword.bind(null, state.userandomid, state.randomid, state.randomidtype, state.randomidvalue, state.token, actioner)}
 																		>
 																			{i18nUpdatePassword}
 																		</Button>

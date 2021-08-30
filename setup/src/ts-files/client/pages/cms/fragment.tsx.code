@@ -59,6 +59,10 @@ const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
 				type: "link",
 				label: "Validation Link",
 			},
+			validate_account_random_id: {
+				type: "text",
+				label: "Validation Code",
+			},
 			username: {
 				type: "text",
 				label: "Username",
@@ -72,6 +76,46 @@ const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
 			forgot_password_link: {
 				type: "link",
 				label: "Recovery Link",
+			},
+			forgot_password_random_id: {
+				type: "text",
+				label: "Recovery Code",
+			},
+			username: {
+				type: "text",
+				label: "Username",
+			},
+		},
+	},
+	"ACCOUNT_VALIDATION_SMS": {
+		type: "context",
+		label: "Account Validation SMS",
+		properties: {
+			validate_account_link: {
+				type: "link",
+				label: "Validation Link",
+			},
+			validate_account_random_id: {
+				type: "text",
+				label: "Validation Code",
+			},
+			username: {
+				type: "text",
+				label: "Username",
+			},
+		},
+	},
+	"ACCOUNT_RECOVERY_SMS": {
+		type: "context",
+		label: "Account Recovery SMS",
+		properties: {
+			forgot_password_link: {
+				type: "link",
+				label: "Recovery Link",
+			},
+			forgot_password_random_id: {
+				type: "text",
+				label: "Recovery Code",
 			},
 			username: {
 				type: "text",

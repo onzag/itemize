@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useCallback } from "react";
 import { IActionSubmitOptions } from "@onzag/itemize/client/providers/item";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
@@ -13,7 +14,8 @@ import DifferingPropertiesRetriever from
 import { Button, Box, Paper, createStyles, withStyles, WithStyles,
 	Divider, Theme, DoneIcon, DoneOutlineIcon, MailIcon,
 	Alert, AlertTitle, FaceIcon,
-	ErrorIcon, AccountCircleIcon, AlernateEmailIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+	ErrorIcon, AccountCircleIcon, AlernateEmailIcon,
+	PhoneIphoneIcon, TextField, IconButton } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 import { CountryPicker } from "@onzag/itemize/client/fast-prototyping/components/country-picker";
@@ -116,7 +118,7 @@ const currentUserProfileStandardInfoStyles = (theme: Theme) => createStyles({
 	alertButtonValidateEmailContainer: {
 		paddingTop: "0.75rem",
 	},
-	emailInButton: {
+	emailOrPhoneInButton: {
 		textTransform: "none",
 		opacity: 0.7,
 	},
@@ -124,6 +126,143 @@ const currentUserProfileStandardInfoStyles = (theme: Theme) => createStyles({
 		color: theme.palette.error.main,
 	},
 });
+
+interface AlertBoxMissingProps extends WithStyles<typeof currentUserProfileStandardInfoStyles> {
+	propertyId: "email" | "phone";
+	validatedPropertyId: "p_validated" | "e_validated";
+}
+
+function AlertBoxMissing(props: AlertBoxMissingProps) {
+	const [isInInsertCode, setIsInInsertCode] = useState(false);
+	const [codeValue, setCodeValue] = useState("");
+
+	const setCodeValueOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		setCodeValue(e.target.value);
+	}, []);
+	return (
+		<Reader id="email">
+			{(email: string, emailState: IPropertyDefinitionState) => {
+				const missesEmail = !(emailState && emailState.stateAppliedValue);
+
+				return (<Reader id="phone">
+					{(phone: string, phoneState: IPropertyDefinitionState) => {
+						const missesPhone = !(phone && phoneState.stateAppliedValue);
+						if (missesEmail && missesPhone) {
+							return (
+								<Alert severity="error">
+									<AlertTitle>
+										<I18nRead capitalize={true} id="missing_email_and_phone_warning_title" />
+									</AlertTitle>
+									<I18nRead id="missing_email_and_phone_warning" />
+								</Alert>
+							);
+						}
+
+						if (props.propertyId === "email" ? missesEmail : missesPhone) {
+							return (
+								<Alert severity="error">
+									<I18nRead capitalize={true} id="missing_email_warning_title" />
+								</Alert>
+							);
+						}
+
+						return (
+							<Reader id={props.validatedPropertyId}>
+								{(validatedProperty: boolean, validatedPropertyState: IPropertyDefinitionState) => {
+									const missesValidation = !(validatedPropertyState && validatedPropertyState.stateAppliedValue);
+									if (missesValidation) {
+										return (
+											<Alert severity="error">
+												<AlertTitle>
+													<I18nRead capitalize={true} id={"missing_" + props.propertyId + "_validation_warning_title"} />
+												</AlertTitle>
+												<div className={props.classes.alertButtonValidateEmailContainer}>
+													<UserActioner>
+														{(actioner) => {
+															const sendValidateSMS = async () => {
+																const rs = await actioner.sendValidateSMS();
+																if (!rs.error) {
+																	setIsInInsertCode(true);
+																}
+															}
+															const validateFromCode = async () => {
+																const rs = await actioner.validatePhoneFromRandomId(codeValue);
+																if (!rs.error) {
+																	setIsInInsertCode(false);
+																}
+															}
+															return (
+																<>
+																	<ProgressingElement isProgressing={actioner.statefulOnProgress}>
+																		{!isInInsertCode ? <Button
+																			variant="outlined"
+																			color="secondary"
+																			endIcon={<MailIcon />}
+																			onClick={props.propertyId === "email" ? actioner.sendValidateEmail : sendValidateSMS}
+																		>
+																			<I18nRead capitalize={true} id={"missing_" + props.propertyId + "_validation_warning_action"} />
+																			<i className={props.classes.emailOrPhoneInButton}>
+																				{" " + (props.propertyId === "email" ? emailState.stateAppliedValue : phoneState.stateAppliedValue)}
+																			</i>
+																		</Button> :
+																			<>
+																				<I18nRead capitalize={true} id={"missing_" + props.propertyId + "_validation_insert_code_label"}>
+																					{(i18nLabel: string) => (
+																						<TextField
+																							value={codeValue}
+																							onChange={setCodeValueOnChange}
+																							variant="outlined"
+																							label={i18nLabel}
+																							placeholder={i18nLabel}
+																						/>
+																					)}
+																				</I18nRead>
+																				<I18nRead id="ok">
+																					{(i18nOk: string) => (
+																						<IconButton
+																							onClick={validateFromCode}
+																							title={i18nOk}
+																						>
+																							<DoneIcon />
+																						</IconButton>
+																					)}
+																				</I18nRead>
+																			</>
+																		}
+																	</ProgressingElement>
+																	<Snackbar
+																		id="standard-info-edit-error"
+																		severity="error"
+																		i18nDisplay={actioner.statefulError}
+																		open={!!actioner.statefulError}
+																		onClose={actioner.dismissStatefulError}
+																	/>
+																	<Snackbar
+																		id="standard-info-edit-success"
+																		severity="success"
+																		i18nDisplay={"missing_" + props.propertyId + "_validation_warning_action_success"}
+																		open={actioner.statefulSuccess}
+																		onClose={actioner.dismissStatefulSuccess}
+																	/>
+																</>
+															);
+														}}
+													</UserActioner>
+												</div>
+											</Alert>
+										);
+									}
+
+									return null;
+								}}
+							</Reader>
+						)
+					}}
+				</Reader>);
+			}}
+		</Reader>
+	);
+}
 
 /**
  * The current user profile standard info shows the standard information of the current
@@ -192,83 +331,18 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 						</I18nReadMany>
 					</Box>
 					<Entry id="username" icon={<AccountCircleIcon />} />
-					<Reader id="email">
-						{(email: string, emailState: IPropertyDefinitionState) => {
-							const missesEmail = !(emailState && emailState.stateAppliedValue);
-							if (missesEmail) {
-								return (
-									<Alert severity="error">
-										<AlertTitle>
-											<I18nRead capitalize={true} id="missing_email_warning_title" />
-										</AlertTitle>
-										<I18nRead id="missing_email_warning" />
-									</Alert>
-								);
-							}
-							return (
-								<Reader id="e_validated">
-									{(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => {
-										const missesValidation = !(eValidatedState && eValidatedState.stateAppliedValue);
-										if (missesValidation) {
-											return (
-												<Alert severity="error">
-													<AlertTitle>
-														<I18nRead capitalize={true} id="missing_email_validation_warning_title" />
-													</AlertTitle>
-													<I18nRead id="missing_email_validation_warning" />
-													<div className={props.classes.alertButtonValidateEmailContainer}>
-														<UserActioner>
-															{(actioner) => (
-																<>
-																	<ProgressingElement isProgressing={actioner.statefulOnProgress}>
-																		<Button
-																			variant="outlined"
-																			color="secondary"
-																			endIcon={<MailIcon />}
-																			onClick={actioner.sendValidateEmail}
-																		>
-																			<I18nRead capitalize={true} id="missing_email_validation_warning_action" />
-																			<i className={props.classes.emailInButton}>
-																				{" " + emailState.stateAppliedValue}
-																			</i>
-																		</Button>
-																	</ProgressingElement>
-																	<Snackbar
-																		id="standard-info-edit-error"
-																		severity="error"
-																		i18nDisplay={actioner.statefulError}
-																		open={!!actioner.statefulError}
-																		onClose={actioner.dismissStatefulError}
-																	/>
-																	<Snackbar
-																		id="standard-info-edit-success"
-																		severity="success"
-																		i18nDisplay="missing_email_validation_warning_action_success"
-																		open={actioner.statefulSuccess}
-																		onClose={actioner.dismissStatefulSuccess}
-																	/>
-																</>
-															)}
-														</UserActioner>
-													</div>
-												</Alert>
-											);
-										}
 
-										return null;
-									}}
-								</Reader>
-							);
-						}}
-					</Reader>
-
+					<AlertBoxMissing propertyId="email" validatedPropertyId="e_validated" classes={props.classes} />
 					<Entry id="email" rendererArgs={{ descriptionAsAlert: true }} icon={<AlernateEmailIcon />} />
+					<AlertBoxMissing propertyId="phone" validatedPropertyId="p_validated" classes={props.classes} />
+					<Entry id="phone" rendererArgs={{ descriptionAsAlert: true }} icon={<PhoneIphoneIcon />} />
+
 					<Entry id="about_me" icon={<FaceIcon />} />
 
 					<Divider />
 
 					<Box className={props.classes.buttonBox}>
-						<DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "about_me"]}>
+						<DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "phone", "about_me"]}>
 							{(differingProperties) => {
 								const options: IActionSubmitOptions = {
 									properties: differingProperties,
@@ -277,7 +351,8 @@ export const CurrentUserProfileStandardInfo = withStyles(currentUserProfileStand
 
 								if (
 									differingProperties.includes("username") ||
-									differingProperties.includes("email")
+									differingProperties.includes("email") ||
+									differingProperties.includes("phone")
 								) {
 									options.policies = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
 									options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];

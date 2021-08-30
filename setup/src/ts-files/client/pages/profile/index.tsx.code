@@ -33,6 +33,7 @@ export function Profile(props: IProfileProps)<0>{
 		"app_country",
 		"app_currency",
 		"e_validated",
+		"p_validated",
 		"role",
 		"profile_picture",
 		"about_me",

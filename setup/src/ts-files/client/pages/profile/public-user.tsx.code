@@ -6,8 +6,11 @@ import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import View from "@onzag/itemize/client/components/property/View";
 import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
 
-import { Container, createStyles, WithStyles, withStyles,
-	Typography, Paper, Theme, Tooltip, Card, VerifiedUserIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import {
+	Container, createStyles, WithStyles, withStyles,
+	Typography, Paper, Theme, Tooltip, Card, VerifiedUserIcon, Badge,
+	AlernateEmailIcon, PhoneIphoneIcon
+} from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 
 import { AdminToolbox } from "./admin-toolbox";
@@ -72,21 +75,39 @@ export const PublicUserProfile = withStyles(publicUserProfileStyles)(
 							<Avatar size="large" hideFlag={true} fullWidth={true} />
 							<Reader id="e_validated">
 								{(eValidated: boolean) => (
-									<Reader id="username">
-										{(username: string) => (
-											<Typography variant="h4" className={props.classes.username}>
-												{username}
-												{eValidated ? <span>
-													<span className={props.classes.spacer} />
-													<I18nRead id="label" propertyId="e_validated" capitalize={true}>
-														{(i18nUserValidated: string) => (
-															<Tooltip title={i18nUserValidated}>
-																<VerifiedUserIcon className={props.classes.verifiedIcon} />
-															</Tooltip>
-														)}
-													</I18nRead>
-												</span> : null}
-											</Typography>
+									<Reader id="p_validated">
+										{(pValidated: boolean) => (
+											<Reader id="username">
+												{(username: string) => (
+													<Typography variant="h4" className={props.classes.username}>
+														{username}
+														{eValidated ? <span>
+															<span className={props.classes.spacer} />
+															<I18nRead id="label" propertyId="e_validated" capitalize={true}>
+																{(i18nUserValidated: string) => (
+																	<Tooltip title={i18nUserValidated}>
+																		<Badge badgeContent={<VerifiedUserIcon className={props.classes.verifiedIcon} />}>
+																			<AlernateEmailIcon />
+																		</Badge>
+																	</Tooltip>
+																)}
+															</I18nRead>
+														</span> : null}
+														{pValidated ? <span>
+															<span className={props.classes.spacer} />
+															<I18nRead id="label" propertyId="p_validated" capitalize={true}>
+																{(i18nUserValidated: string) => (
+																		<Tooltip title={i18nUserValidated}>
+																		<Badge badgeContent={<VerifiedUserIcon className={props.classes.verifiedIcon} />}>
+																			<PhoneIphoneIcon />
+																		</Badge>
+																	</Tooltip>
+																)}
+															</I18nRead>
+														</span> : null}
+													</Typography>
+												)}
+											</Reader>
 										)}
 									</Reader>
 								)}
