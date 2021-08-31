@@ -906,7 +906,7 @@ export function checkEqualityPlain(text1: string, text2: string) {
 }
 
 // bit overkill but so be it
-const nodesThatRepresentLines = [
+export const nodesThatRepresentLines = [
   "address",
   "blockquote",
   "body",
@@ -936,7 +936,7 @@ export function convertNodeToText(node: Node): string {
   if (node.nodeType === 3) {
     return node.textContent;
   }
-  if (!node.childNodes) {
+  if (!node.childNodes || !node.childNodes.length) {
     return "";
   }
   return Array.from(node.childNodes).map((cnode, index) => {

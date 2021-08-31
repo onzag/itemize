@@ -17,9 +17,10 @@ import { StaticRouter } from "react-router-dom";
 import Root from "../../base/Root";
 import Moment from "moment";
 import { Collector } from "./collect";
-import { capitalize } from "../../util";
+import { capitalize, DOMWindow } from "../../util";
 import { jwtDecode } from "../token";
 import { IServerSideTokenDataType } from "../resolvers/basic";
+import { convertHTMLToUSSDTree } from "../../ussd";
 
 // This is a custom react dom build
 const ReactDOMServer = require('@onzag/react-dom/server');
@@ -52,6 +53,11 @@ export async function ssrGenerator(
   const ussdToken = isUSSD ? req.headers["ussd-token"] : null;
   const submode = isUSSD ? "ussd" : "std";
 
+  if (isUSSD && !appData.ssrConfig.ussdConfig) {
+    res.status(400).end("This server does not support USSD style responses");
+    return;
+  }
+
   const ifNoneMatch = req.headers["if-none-match"];
 
   // now we need to see if we are going to use SSR, due to the fact the NODE_ENV must
@@ -59,10 +65,12 @@ export async function ssrGenerator(
   // that the client recieved, eg. the client is using development or production builds and we activate
   // only if it matches our NODE_ENV, this means that in development mode, with development builds there is SSR
   // but not with production builds, and vice-versa
-  const SSRIsDisabledInThisMode =
-    NO_SSR ||
+  const SSRIsDisabledBecauseOfMismatchOfSignature =
     (mode === "development" && !developmentISSSRMode) ||
     (mode === "production" && developmentISSSRMode);
+  const SSRIsDisabledInThisMode =
+    (isUSSD ? false : NO_SSR) ||
+    SSRIsDisabledBecauseOfMismatchOfSignature
 
   // SSR must be enabled when
   if (SSRIsDisabledInThisMode && isUSSD) {
@@ -407,6 +415,11 @@ export async function ssrGenerator(
         // chunks will use divs with data-chunk tags
         // actions will use span tags with data-action tags
         newHTML = staticMarkup;
+
+        const cheapdiv = DOMWindow.document.createElement("div");
+        cheapdiv.innerHTML = html;
+
+        newText = JSON.stringify(convertHTMLToUSSDTree(cheapdiv));
       } else {
         // now we calculate the og fields that are final, given they can be functions
         // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
@@ -504,7 +517,11 @@ export async function ssrGenerator(
   }
 
   // and finally answer the client
-  res.setHeader("content-type", "text/html; charset=utf-8");
+  if (isUSSD) {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+  } else {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+  }
   if (!errorOccured) {
     res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
     res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
@@ -521,6 +538,10 @@ export async function ssrGenerator(
       res.setHeader("x-ssr", "true");
     }
 
+    if (isUSSD) {
+      res.setHeader("x-ussd", "true");
+    }
+
     if (appliedRule.language) {
       res.setHeader("Content-Language", appliedRule.language);
     }
@@ -532,7 +553,12 @@ export async function ssrGenerator(
       res.status(403);
     }
   }
-  res.end(newHTML);
+
+  if (isUSSD) {
+    res.end(newText);
+  } else {
+    res.end(newHTML);
+  }
 
   // clean and release, it's done!!!
   root.cleanState();
