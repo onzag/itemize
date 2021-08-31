@@ -442,7 +442,8 @@ export async function initializeItemizeApp(
           // changes and whatnot, it also trigger that, the build number is coded in the
           // index as well, etc... so safer it is to reload, the cache should be cleaned
           // by the service worker after a mismatch so the next load should be clean
-          location.reload(true);
+          (location as any).reload(true);
+          // reload true is deprecated but we want it forced anyway
         }
       }
     } catch (err) {

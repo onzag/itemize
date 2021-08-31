@@ -57,9 +57,9 @@ custom.delete_account = delete account
 custom.delete_account_warning = Warning! this will delete your account and all associated data, this action cannot be reversed, do you wish to proceed?
 
 custom.recover_account = account recovery
-custom.recover_account_message = Note that your email/phone needs to be set and validated in order for the recover account to function
+custom.recover_account_message = Note that your email needs to be set and validated in order for the recover account to function
 custom.recover_account_action = send email with instructions
-custom.recover_account_action_sms = send SMS with code
+custom.recover_account_action_success = sucessfully sent email
 
 custom.recover_account_phone = account recovery
 custom.recover_account_message_phone = Note that your phone number needs to be set and validated in order for the recover account to function
