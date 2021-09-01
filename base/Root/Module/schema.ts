@@ -39,12 +39,6 @@ export default {
         type: "string",
       },
     },
-    flagRoleAccess: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
     searchable: {
       type: "boolean",
     },

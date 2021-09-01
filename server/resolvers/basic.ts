@@ -1,5 +1,4 @@
 import {
-  MODERATION_FIELDS,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   GUEST_METAROLE,
   ANYONE_METAROLE,
@@ -207,57 +206,6 @@ export async function validateParentingRules(
 
   CAN_LOG_SILLY && logger.silly(
     "validateParentingRules: parenting rules have passed",
-  );
-}
-
-/**
- * Checks if the basic fields are available for the given role, basic
- * fields are of those reserved properties that are in every module
- * @param tokenData the token data that is obtained via the validateTokenAndGetData
- * function
- * @param requestedFields the requested fields
- */
-export async function checkBasicFieldsAreAvailableForRole(
-  itemDefinitionOrModule: ItemDefinition | Module,
-  tokenData: IServerSideTokenDataType,
-  ownerId: string,
-  rolesManager: CustomRoleManager,
-  requestedFields: any,
-) {
-  if (typeof requestedFields === "undefined" || requestedFields === null) {
-    return true;
-  }
-  // now we check if moderation fields have been requested
-  const moderationFieldsHaveBeenRequested = MODERATION_FIELDS.some((field) => requestedFields[field]);
-
-  // if they have been requested, and our role has no native access to that
-  if (
-    moderationFieldsHaveBeenRequested
-  ) {
-    const hasAccessToModerationFields = await itemDefinitionOrModule.checkRoleAccessForModeration(
-      tokenData.role,
-      tokenData.id,
-      ownerId,
-      rolesManager,
-    );
-    if (!hasAccessToModerationFields) {
-      CAN_LOG_SILLY && logger.silly(
-        "checkBasicFieldsAreAvailableForRole: Attempted to access to moderation fields with invalid role",
-        {
-          role: tokenData.role,
-          rolesThatHaveAccessToModerationFields: itemDefinitionOrModule.getRolesWithModerationAccess(),
-        }
-      );
-      // we throw an error
-      throw new EndpointError({
-        message: "You have requested to add/edit/view moderation fields with role: " + tokenData.role,
-        code: ENDPOINT_ERRORS.FORBIDDEN,
-      });
-    }
-  }
-
-  CAN_LOG_SILLY && logger.silly(
-    "checkBasicFieldsAreAvailableForRole: basic fields access role succeed",
   );
 }
 
@@ -741,20 +689,20 @@ export async function filterAndPrepareGQLValue(
   };
 
   if (value.blocked_at !== null) {
-    const rolesThatHaveAccessToModerationFields = parentModuleOrIdef.getRolesWithModerationAccess();
-    const hasBaseAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
-      (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
-      (rolesThatHaveAccessToModerationFields.includes(OWNER_METAROLE) && userId === ownerUserId)
-      rolesThatHaveAccessToModerationFields.includes(role);
+    const rolesThatHaveAccessToModeration = parentModuleOrIdef.getRolesWithModerationAccess();
+    const hasBaseAccessToModerationFields = rolesThatHaveAccessToModeration.includes(ANYONE_METAROLE) ||
+      (rolesThatHaveAccessToModeration.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
+      (rolesThatHaveAccessToModeration.includes(OWNER_METAROLE) && userId === ownerUserId)
+      rolesThatHaveAccessToModeration.includes(role);
 
-    let hasAccessToModerationFields = hasBaseAccessToModerationFields;
-    if (!hasAccessToModerationFields) {
-      hasAccessToModerationFields = await rolesManager.checkRoleAccessFor(
-        rolesThatHaveAccessToModerationFields,
+    let hasAccessToModeration = hasBaseAccessToModerationFields;
+    if (!hasAccessToModeration) {
+      hasAccessToModeration = await rolesManager.checkRoleAccessFor(
+        rolesThatHaveAccessToModeration,
       );
     }
     
-    if (!hasAccessToModerationFields) {
+    if (!hasAccessToModeration) {
       valueToProvide.toReturnToUser.DATA = null;
     }
   }

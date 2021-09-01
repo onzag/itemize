@@ -9,7 +9,6 @@ import {
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
   checkReadPoliciesAllowThisUserToSearch,
-  checkBasicFieldsAreAvailableForRole,
   filterAndPrepareGQLValue,
   retrieveSince,
   checkLimit,
@@ -148,8 +147,6 @@ export async function searchModule(
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
-    await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
-
     const fieldsToRequestRawValue = Object.keys(requestedFields);
 
     const requestedFieldsInMod = {};
@@ -553,9 +550,8 @@ export async function searchItemDefinition(
   const generalFields = graphqlFields(resolverArgs.info);
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
-    await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
-
     const fieldsToRequestRawValue = Object.keys(requestedFields);
+
     const requestedFieldsInIdef = {};
     Object.keys(requestedFields || {}).forEach((arg) => {
       if (

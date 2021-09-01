@@ -57,6 +57,7 @@ export interface ICustomRoleManager {
 }
 
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
+type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
 
 /**
  * This is the raw processed form of the root
@@ -208,6 +209,14 @@ export default class Root {
   private requestManager: RequestManagerFn = null;
 
   /**
+   * This is used for SSR and lives in the root
+   * allows the root to request for data, this is what is used
+   * by the beforeSSRRender functionality
+   * @internal
+   */
+  private requestManagerSearch: RequestManagerSearchFn = null;
+
+  /**
    * Used by the server side to set server flags to flag
    * other parts of the schema how to operate, mainly
    * conditional rule set about what it should evaluate
@@ -268,6 +277,17 @@ export default class Root {
   }
 
   /**
+   * Sets the request manager that is used to resolve search requests
+   * during the SSR renders to resolve values for the item
+   * definitions in id and version
+   * @param manager the manager in question
+   * @internal
+   */
+   public setRequestManagerSearch(manager: RequestManagerSearchFn) {
+    this.requestManagerSearch = manager;
+  }
+
+  /**
    * Sets the request manager that is used to resolve requests
    * during the SSR renders to resolve values for the item
    * definitions in id and version
@@ -276,6 +296,18 @@ export default class Root {
    */
   public setRequestManager(manager: RequestManagerFn) {
     this.requestManager = manager;
+  }
+
+  /**
+   * Calls the request manager to request it for a given value
+   * to be stored and be applied the state inside our
+   * root
+   * @param itemDefinition the item definition we need a value for
+   * @param args the search arguments
+   * @internal
+   */
+  public async callRequestManagerSearch(itemDefinition: ItemDefinition, id: string, version: string, args: any) {
+    await this.requestManagerSearch(itemDefinition, id, version, args);
   }
 
   /**

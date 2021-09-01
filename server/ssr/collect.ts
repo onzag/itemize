@@ -16,6 +16,7 @@ import { ISSRRule } from ".";
 import { IOTriggerActions } from "../resolvers/triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
+import type { IActionSearchOptions } from "../../client/providers/item";
 
 /**
  * This is what a collection result looks like
@@ -158,6 +159,36 @@ export class Collector {
     return this.results.some((r) => r === null);
   }
 
+  public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {
+    const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
+
+    // request has been done and it's ready
+    if (this.collectionStatuses[mergedID]) {
+      return;
+    } else if (this.collectionStatuses[mergedID] === false) {
+      // request is in progress, add it to queue
+      return new Promise((resolve, reject) => {
+        this.collectionRequestsCbs[mergedID].push(resolve);
+        this.collectionRequestsRejectedCbs[mergedID].push(reject);
+      });
+    }
+
+    // mark it as in progress
+    this.collectionStatuses[mergedID] = false;
+    this.collectionRequestsCbs[mergedID] = [];
+    this.collectionRequestsRejectedCbs[mergedID] = [];
+
+    // TODO collect search results
+    // this function is too complicated to be like the second so it's better to just use searchModule and work
+    // from that, basically create a token for the given user (or pass a flag?), build the args, do everything like
+    // the thing wants to, copy the client search to see how it's done to create the args
+    // TODO SSR excluded requested properties too that need to be added
+
+    // completed
+    this.collectionStatuses[mergedID] = true;
+    this.collectionRequestsCbs[mergedID].forEach((r) => r());
+  }
+
   /**
    * This is the actual collection function and it is what is called
    * by the beforeSSRRender function in the custom build on the server side
@@ -249,6 +280,11 @@ export class Collector {
     );
 
     // now we build the fileds for the given role access
+    // TODO we need to change this, this is too expensive, we are loading
+    // every field even if that is not necessary
+    // TODO we also need some form of SSR prevented properties even on top of that
+    // to use in our item provider, some things may just be way too heavy, let it refresh
+    // when it gets to the client side
     const fields: IGQLRequestFields = await idef.buildFieldsForRoleAccess(
       ItemDefinitionIOActions.READ,
       this.appliedRule.forUser.role,

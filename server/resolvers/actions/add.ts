@@ -11,7 +11,6 @@ import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../bas
 import {
   checkLanguage,
   validateTokenAndGetData,
-  checkBasicFieldsAreAvailableForRole,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
@@ -188,9 +187,6 @@ export async function addItemDefinition(
   // we flatten the fields, remember that we have external and internal fields
   // contained in the DATA value, we flatten that first
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  // now we use the basic functions and we check if the basic fields are available,
-  // basic fields are module based, like moderation fields
-  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
 
   // now we extract the fields that we are actually adding to the item
   // definition, that is what is valid for adding and nothing else

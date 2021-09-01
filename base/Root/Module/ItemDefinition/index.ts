@@ -23,7 +23,6 @@ import {
   PREFIX_BUILD,
   POLICY_PREFIXES,
   RESERVED_BASE_PROPERTIES,
-  MODERATION_FIELDS,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
@@ -1746,14 +1745,6 @@ export default class ItemDefinition {
   }
 
   /**
-   * Provides the roles that are alowed to flag the
-   * contents of an item definition given its module
-   */
-  public getRolesWithFlaggingAccess(): string[] {
-    return this.parentModule.getRolesWithFlaggingAccess();
-  }
-
-  /**
    * Returns the FLATTENED fields for the graphql request
    * @param action 
    * @param role 
@@ -1794,17 +1785,6 @@ export default class ItemDefinition {
     Object.keys(RESERVED_BASE_PROPERTIES).forEach((pKey) => {
       requestFields[pKey] = {};
     });
-
-    const modFieldsAccess = this.getRolesWithModerationAccess();
-    const modLevelAccess =
-      modFieldsAccess.includes(ANYONE_METAROLE) ||
-      (modFieldsAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
-      modFieldsAccess.includes(role);
-    if (!modLevelAccess) {
-      MODERATION_FIELDS.forEach((mf) => {
-        delete requestFields[mf];
-      });
-    }
 
     await Promise.all(this.getAllPropertyDefinitionsAndExtensions().map(async (pd) => {
       if (pd.isRetrievalDisabled()) {

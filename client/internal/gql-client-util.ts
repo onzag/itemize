@@ -8,7 +8,6 @@
 import {
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
-  MODERATION_FIELDS,
   PREFIX_GET,
   PREFIX_SEARCH,
   PREFIX_DELETE,
@@ -143,7 +142,6 @@ export function getFieldsAndArgs(
     includesForArgs?: {
       [include: string]: string[],
     },
-    includeModeration: boolean,
     policiesForArgs?: [string, string, string][],
     itemDefinitionInstance: ItemDefinition;
     forId: string;
@@ -194,13 +192,6 @@ export function getFieldsAndArgs(
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
     requestFields[p] = {};
   });
-
-  // and if our role allows it, we add the moderation fields
-  if (options.includeModeration) {
-    MODERATION_FIELDS.forEach((mf) => {
-      requestFields.DATA[mf] = {};
-    });
-  }
 
   if (options.includeFields) {
     if (options.properties && options.properties.length) {

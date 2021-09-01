@@ -5,7 +5,6 @@ import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../bas
 import {
   checkLanguage,
   validateTokenAndGetData,
-  checkBasicFieldsAreAvailableForRole,
   runPolicyCheck,
   validateTokenIsntBlocked,
   defaultTriggerForbiddenFunction,
@@ -101,18 +100,18 @@ export async function deleteItemDefinition(
         if (
           content.blocked_at !== null
         ) {
-          const rolesThatHaveAccessToModerationFields = itemDefinition.getRolesWithModerationAccess();
-          const hasAccessToModerationFields = rolesThatHaveAccessToModerationFields.includes(ANYONE_METAROLE) ||
-            (rolesThatHaveAccessToModerationFields.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
-            (rolesThatHaveAccessToModerationFields.includes(OWNER_METAROLE) && tokenData.id === userId) ||
-            rolesThatHaveAccessToModerationFields.includes(tokenData.role);
+          const rolesThatHaveAccessToModeration = itemDefinition.getRolesWithModerationAccess();
+          const hasAccessToModerationFields = rolesThatHaveAccessToModeration.includes(ANYONE_METAROLE) ||
+            (rolesThatHaveAccessToModeration.includes(ANYONE_LOGGED_METAROLE) && tokenData.role !== GUEST_METAROLE) ||
+            (rolesThatHaveAccessToModeration.includes(OWNER_METAROLE) && tokenData.id === userId) ||
+            rolesThatHaveAccessToModeration.includes(tokenData.role);
           if (!hasAccessToModerationFields) {
             CAN_LOG_DEBUG && logger.debug(
               "deleteItemDefinition: failed due to blocked content and no moderation access for role " + tokenData.role,
             );
             throw new EndpointError({
               message: "The item is blocked, only users with role " +
-              rolesThatHaveAccessToModerationFields.join(",") + " can wipe this data",
+              rolesThatHaveAccessToModeration.join(",") + " can wipe this data",
               code: ENDPOINT_ERRORS.BLOCKED,
             });
           }
@@ -149,7 +148,6 @@ export async function deleteItemDefinition(
 
   // we flatten and get the requested fields
   const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerUserId, rolesManager, requestedFields);
 
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant

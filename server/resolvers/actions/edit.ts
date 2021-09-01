@@ -5,7 +5,6 @@ import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../bas
 import {
   checkLanguage,
   validateTokenAndGetData,
-  checkBasicFieldsAreAvailableForRole,
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
@@ -168,8 +167,6 @@ export async function editItemDefinition(
     } : null,
     customId: null,
   });
-
-  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerUserId, rolesManager, requestedFields);
 
   await validateParentingRules(
     appData,

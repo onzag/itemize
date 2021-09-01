@@ -175,15 +175,6 @@ export interface IModuleRawJSONDataType {
    * modding only exist at module level as well
    */
   modRoleAccess?: string[];
-
-  /**
-   * The roles that have flagging capabilities over
-   * the item definitions of this module, if not
-   * specified defaults to anyone logged, flagging only
-   * exists at module level and affects all the children
-   */
-  flagRoleAccess?: string[];
-
   /**
    * Whether the module, and only the module itself
    * is searchable
@@ -845,18 +836,6 @@ export default class Module {
       return this.rawData.modRoleAccess;
     }
     return [];
-  }
-
-  /**
-   * Provides the roles that are alowed to flag the
-   * contents of an module
-   * @returns an array of string for the flagging role access
-   */
-  public getRolesWithFlaggingAccess(): string[] {
-    if (this.rawData.flagRoleAccess) {
-      return this.rawData.flagRoleAccess;
-    }
-    return [ANYONE_LOGGED_METAROLE];
   }
 
   /**

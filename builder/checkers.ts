@@ -1234,21 +1234,6 @@ export function checkModule(
     );
   }
 
-  if (
-    rawData.flagRoleAccess &&
-    (
-      rawData.flagRoleAccess.includes(ANYONE_METAROLE) ||
-      rawData.flagRoleAccess.includes(GUEST_METAROLE)
-    )
-  ) {
-    // imagine if literally anyone can flag, the possibility of robots flagging and reflagging without moderation
-    // how would you even keep track of the flagging, that's the security flag, technically you can only flag once
-    throw new CheckUpError(
-      "Allowing the roles for anyone or guests to flag is not allowed, as this can create a security flaw",
-      actualTraceback.newTraceToBit("flagRoleAccess"),
-    );
-  }
-
   // and we got to check the prop extensions if we have some
   if (rawData.propExtensions) {
     // and now the prop extension traceback

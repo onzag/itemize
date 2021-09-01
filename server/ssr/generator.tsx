@@ -320,6 +320,7 @@ export async function ssrGenerator(
     // setting the request manager to handle incoming request
     // in order to build or signature
     root.setRequestManager(collector.collect);
+    root.setRequestManagerSearch(collector.collectSearch);
 
     try {
       // for that we try to initialize, which can indeed, fail

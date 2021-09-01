@@ -737,14 +737,6 @@ export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
     type: GraphQLString,
     description: "A written text of why it was blocked",
   },
-  flagged_by: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Users who flagged this item",
-  },
-  flagged_reasons: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Users who flagged this item, reason",
-  },
 };
 
 export const CREATED_AT_INDEX = "CREATED_AT_INDEX";
@@ -873,12 +865,6 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
   },
   blocked_reason: {
     type: "TEXT",
-  },
-  flagged_by: {
-    type: "TEXT[]",
-  },
-  flagged_reasons: {
-    type: "TEXT[]",
   },
 });
 
@@ -1348,13 +1334,6 @@ export const ANYONE_LOGGED_METAROLE = "&ANYONE_LOGGED";
  * Role that means any guest
  */
 export const GUEST_METAROLE = "&GUEST";
-/**
- * Moderation fields for flagging
- */
-export const MODERATION_FIELDS = [
-  "flagged_by",
-  "flagged_reasons",
-];
 
 /**
  * Units that are allowed within the itemize application these

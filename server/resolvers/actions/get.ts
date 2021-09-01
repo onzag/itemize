@@ -5,7 +5,6 @@ import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolver
 import {
   checkLanguage,
   validateTokenAndGetData,
-  checkBasicFieldsAreAvailableForRole,
   filterAndPrepareGQLValue,
   checkLimit,
   validateTokenIsntBlocked,
@@ -113,8 +112,6 @@ export async function getItemDefinition(
     } : null,
     customId: null,
   });
-
-  await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
 
   // if we don't have any result, we cannot even check permissions
   // the thing does not exist, returning null
@@ -381,8 +378,6 @@ export async function getItemDefinitionList(
         customId: null,
       });
 
-      await checkBasicFieldsAreAvailableForRole(itemDefinition, tokenData, ownerId, rolesManager, requestedFields);
-
       await itemDefinition.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,
         tokenData.role,
@@ -573,7 +568,6 @@ export async function getModuleList(
         } : null,
         customId: null,
       });
-      await checkBasicFieldsAreAvailableForRole(mod, tokenData, ownerId, rolesManager, requestedFields);
       await mod.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,
         tokenData.role,

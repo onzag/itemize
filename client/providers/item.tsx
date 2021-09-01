@@ -27,7 +27,7 @@ import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/a
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, reprocessFileArgument, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
+  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
 } from "../internal/gql-client-util";
 import { IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -130,7 +130,7 @@ function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOp
     return !equals(searchANoFn, searchBNoFn);
   }
 
-  return !equals(searchA, searchB); 
+  return !equals(searchA, searchB);
 }
 
 /**
@@ -4052,6 +4052,17 @@ export class ActualItemProvider extends
   }
   public async beforeSSRRender(): Promise<void> {
     if (
+      this.props.itemDefinitionInstance.isInSearchMode() &&
+      this.props.automaticSearch
+    ) {
+      // cheesy way to get to the root
+      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+      const id = this.props.forId || null;
+      const version = this.props.forVersion || null;
+      await root.callRequestManagerSearch(this.props.itemDefinitionInstance, id, version, this.props.automaticSearch);
+      this.state = this.setupInitialState();
+      return;
+    } else if (
       this.state.loaded ||
       this.props.forId === null ||
       this.props.itemDefinitionInstance.isInSearchMode() ||
