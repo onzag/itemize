@@ -890,14 +890,24 @@ export default class Module {
     userId: string,
     ownerUserId: string,
     rolesManager: ICustomRoleManager,
-  ) {
+    throwError: boolean,
+  ): Promise<boolean> {
     const rolesWithAccess = this.getRolesWithModerationAccess();
-    return rolesWithAccess.includes(ANYONE_METAROLE) ||
+    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
       (
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
       ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+
+    if (!hasAccess && throwError) {
+      throw new EndpointError({
+        message: "Your role has no access to moderation",
+        code: "FORBIDDEN",
+      });
+    }
+
+    return hasAccess;
   }
 
   /**

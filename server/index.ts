@@ -593,6 +593,7 @@ export async function initializeServer(
       const manager: GlobalManager = new GlobalManager(
         root,
         databaseConnection,
+        rawDB,
         redisGlobalClient,
         redisPub,
         redisSub,

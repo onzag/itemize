@@ -86,14 +86,6 @@ export async function editItemDefinition(
     "editItemDefinition: retrieving actual owner of this item",
   );
 
-  // now we get these variables ready
-  // we need to get the userId and the current
-  // entire item definition value that is in the database
-  // there's an easy way to request that, and now, we do it
-  // at the same time we run the policy check
-  let userId: string;
-  let containerId: string;
-
   // so we run the policy check for edit, this item definition,
   // with the given id
   const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
@@ -117,13 +109,6 @@ export async function editItemDefinition(
             code: ENDPOINT_ERRORS.NOT_FOUND,
           });
         }
-
-        // and fetch the userId
-        userId = content.created_by;
-        if (itemDefinition.isOwnerObjectId()) {
-          userId = content.id;
-        }
-        containerId = content.container_id;
 
         // also throw an error if it's blocked
         if (content.blocked_at !== null) {
@@ -179,6 +164,22 @@ export async function editItemDefinition(
     rolesManager,
     true,
   );
+
+  const isToBlock = resolverArgs.args.blocked === true;
+  const isToUnblock = resolverArgs.args.blocked === false;
+
+  if (isToBlock || isToUnblock) {
+    itemDefinition.checkRoleAccessForModeration(
+      tokenData.role, tokenData.id, ownerUserId, rolesManager, false,
+    );
+
+    if (resolverArgs.args.blocked_reason && resolverArgs.args.blocked_reason.length > 128) {
+      throw new EndpointError({
+        message: "Blocked reason is too long",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+  }
 
   // and now basically we create a new value that is the combination or both, where our new
   // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
@@ -250,7 +251,7 @@ export async function editItemDefinition(
     ItemDefinitionIOActions.EDIT,
     tokenData.role,
     tokenData.id,
-    userId,
+    ownerUserId,
     editingFields,
     rolesManager,
     true,
@@ -294,9 +295,13 @@ export async function editItemDefinition(
         module: mod,
         originalValue: currentWholeValueAsGQL,
         originalValueSQL: wholeSqlStoredValue,
+        originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: gqlValueToConvert,
+        requestedUpdateToBlock: isToBlock,
+        requestedUpdateToUnblock: isToUnblock,
         newValue: null,
         newValueSQL: null,
+        newValueBlocked: null,
         extraArgs,
         action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as string,
@@ -324,9 +329,13 @@ export async function editItemDefinition(
         module: mod,
         originalValue: currentWholeValueAsGQL,
         originalValueSQL: wholeSqlStoredValue,
+        originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: gqlValueToConvert,
+        requestedUpdateToBlock: isToBlock,
+        requestedUpdateToUnblock: isToUnblock,
         newValue: null,
         newValueSQL: null,
+        newValueBlocked: null,
         extraArgs,
         action: IOTriggerActions.EDIT,
         id: resolverArgs.args.id as string,
@@ -360,12 +369,17 @@ export async function editItemDefinition(
     currentWholeValueAsGQL,
     tokenData.id,
     dictionary,
-    containerId,
+    wholeSqlStoredValue.container_id as string,
     resolverArgs.args.listener_uuid || null,
     isReparenting ? {
       id: resolverArgs.args.parent_id as string,
       version: resolverArgs.args.parent_version as string,
       type: resolverArgs.args.parent_type as string,
+    } : null,
+    (isToUnblock || isToBlock) ? {
+      reason: resolverArgs.args.blocked_reason,
+      status: resolverArgs.args.blocked,
+      until: resolverArgs.args.blocked_until,
     } : null,
   );
 
@@ -392,9 +406,13 @@ export async function editItemDefinition(
       module: mod,
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
+      originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: gqlValueToConvert,
+      requestedUpdateToBlock: isToBlock,
+      requestedUpdateToUnblock: isToUnblock,
       newValue: gqlValue,
       newValueSQL: sqlValue,
+      newValueBlocked: !!sqlValue.blocked_at,
       extraArgs,
       action: IOTriggerActions.EDITED,
       id: resolverArgs.args.id as string,
@@ -417,9 +435,13 @@ export async function editItemDefinition(
       module: mod,
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
+      originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: gqlValueToConvert,
+      requestedUpdateToBlock: isToBlock,
+      requestedUpdateToUnblock: isToUnblock,
       newValue: gqlValue,
       newValueSQL: sqlValue,
+      newValueBlocked: !!sqlValue.blocked_at,
       extraArgs,
       action: IOTriggerActions.EDITED,
       id: resolverArgs.args.id as string,
@@ -444,7 +466,7 @@ export async function editItemDefinition(
     ItemDefinitionIOActions.READ,
     tokenData.role,
     tokenData.id,
-    userId,
+    ownerUserId,
     requestedFieldsInIdef,
     newRolesManagerWithEditedValue,
     true,
@@ -453,7 +475,7 @@ export async function editItemDefinition(
   await itemDefinition.applySoftReadRoleAccessTo(
     tokenData.role,
     tokenData.id,
-    userId,
+    ownerUserId,
     newRolesManagerWithEditedValue,
     gqlValue,
   );

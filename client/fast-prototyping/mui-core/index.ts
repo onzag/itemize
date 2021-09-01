@@ -98,6 +98,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
+import ReportIcon from '@material-ui/icons/Report';
 
 import TranslateIcon from "@material-ui/icons/Translate";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
@@ -315,4 +316,5 @@ export {
   TreeView,
   TreeItem,
   PhoneIphoneIcon,
+  ReportIcon,
 }

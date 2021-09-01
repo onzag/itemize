@@ -149,6 +149,11 @@ export function getFieldsAndArgs(
     uniteFieldsWithAppliedValue?: boolean;
     propertyOverrides?: IPropertyOverride[];
     includeOverrides?: IIncludeOverride[];
+    block?: {
+      status: boolean;
+      reason: string;
+      until: string;
+    }
   },
 ) {
   // so the requested fields, at base
@@ -183,6 +188,16 @@ export function getFieldsAndArgs(
   }
   // and these would be the arguments for the graphql query
   const argumentsForQuery: any = {};
+
+  if (options.block && typeof options.block.status === "boolean") {
+    argumentsForQuery.blocked = options.block.status;
+    if (options.block.status === true && options.block.reason) {
+      argumentsForQuery.blocked_reason = options.block.reason;
+    }
+    if (options.block.status === true && options.block.until) {
+      argumentsForQuery.blocked_until = options.block.until;
+    }
+  }
 
   // now we go for the standard fields, and we add all of them
   STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {

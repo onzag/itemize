@@ -11,6 +11,7 @@ import {
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
   SERVER_MAPPING_TIME,
+  SERVER_BLOCK_UNTIL_REFRESH_TIME,
 } from "../constants";
 import {
   ISensitiveConfigRawJSONDataType,
@@ -30,6 +31,7 @@ import MailProvider from "./services/base/MailProvider";
 import { DatabaseConnection } from "../database";
 import { IManyValueType } from "../database/base";
 import PhoneProvider from "./services/base/PhoneProvider";
+import { ItemizeRawDB } from "./raw-db";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -46,6 +48,7 @@ const wait = (time: number) => {
 export class GlobalManager {
   private root: Root;
   private databaseConnection: DatabaseConnection;
+  private rawDB: ItemizeRawDB;
   private globalCache: ItemizeRedisClient;
   private redisPub: ItemizeRedisClient;
   private redisSub: ItemizeRedisClient;
@@ -54,6 +57,7 @@ export class GlobalManager {
   private serverData: IServerDataType;
   private serverDataLastUpdated: number;
   private seoGenLastUpdated: number;
+  private blocksReleaseLastExecuted: number;
   private currencyFactorsProvider: CurrencyFactorsProvider<any>;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private mailProvider: MailProvider<any>;
@@ -68,6 +72,7 @@ export class GlobalManager {
   constructor(
     root: Root,
     databaseConnection: DatabaseConnection,
+    rawDB: ItemizeRawDB,
     globalCache: ItemizeRedisClient,
     redisPub: ItemizeRedisClient,
     redisSub: ItemizeRedisClient,
@@ -80,6 +85,7 @@ export class GlobalManager {
   ) {
     this.root = root;
     this.databaseConnection = databaseConnection;
+    this.rawDB = rawDB;
     this.globalCache = globalCache;
     this.redisPub = redisPub;
     this.redisSub = redisSub;
@@ -402,8 +408,72 @@ export class GlobalManager {
       }
     }
   }
+  public async releaseBlocksFor(m: Module | Root) {
+    if (m instanceof Module) {
+      this.rawDB.performModuleBatchRawDBUpdate(m, {
+        whereCriteriaSelector: (arg) => {
+          arg.andWhereColumnNotNull("blocked_at")
+          arg.andWhereColumnNotNull("blocked_until")
+          arg.andWhereColumn("blocked_until", "<=", ["NOW()", []])
+        },
+        moduleTableUpdate: {
+          blocked_at: null,
+          blocked_by: null,
+          blocked_until: null,
+        },
+      });
+    }
+
+    const childModules = m.getAllModules();
+
+    for (let subm of childModules) {
+      await this.releaseBlocksFor(subm);
+    }
+  }
+  public async releaseBlocks() {
+    while (true) {
+      this.blocksReleaseLastExecuted = new Date().getTime();
+
+      logger.info("GlobalManager.releaseBlocks: running release temporary blocks");
+      try {
+        await this.releaseBlocksFor(this.root);
+      } catch (err) {
+        logger.error(
+          "GlobalManager.releaseBlocks: temporary blocks failed to be released",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+          }
+        );
+      }
+
+      const nowTime = new Date().getTime();
+      const timeItPassedSinceBlockReleaseRan = nowTime - this.blocksReleaseLastExecuted;
+      const timeUntilBlockReleaseNeedsToRun =
+        SERVER_BLOCK_UNTIL_REFRESH_TIME - timeItPassedSinceBlockReleaseRan;
+
+      if (timeUntilBlockReleaseNeedsToRun <= 0) {
+        logger.error(
+          "GlobalManager.releaseBlocks [SERIOUS]: during the processing of events the time needed until releasing blocks was negative" +
+          " this means the server took forever doing the last mapping, clearly something is off",
+          {
+            timeUntilBlockReleaseNeedsToRun,
+          }
+        );
+      } else {
+        logger.info(
+          "GlobalManager.releaseBlocks: Blocking releaser tasked to run in " +
+          timeUntilBlockReleaseNeedsToRun +
+          "ms"
+        );
+        await wait(timeUntilBlockReleaseNeedsToRun);
+      }
+    }
+  }
   public run() {
     logger.info("GlobalManager.run: running global manager");
+
+    this.releaseBlocks();
 
     // currency factors shoudn't really have its own execution but who knows
     if (this.currencyFactorsProvider) {

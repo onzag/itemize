@@ -1,5 +1,5 @@
 {
     "type": "module",
-    "children": ["user"],
+    "children": ["user", "flag"],
     "searchable": false
 }

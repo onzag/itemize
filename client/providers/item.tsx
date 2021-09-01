@@ -337,6 +337,9 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     version?: string,
   };
   action?: "add" | "edit";
+  blockStatus?: boolean;
+  blockUntil?: string;
+  blockReason?: string;
   submitForId?: string;
   submitForVersion?: string;
   /**
@@ -625,10 +628,6 @@ export interface IItemProviderProps {
    * an unversioned primary form
    */
   loadUnversionedFallback?: boolean;
-  /**
-   * Allows to load the moderation fields
-   */
-  loadModerationFields?: boolean;
   /**
    * whether this is about the search counterpart for using
    * with searches, this opens a whole can of worms
@@ -1099,7 +1098,6 @@ export class ActualItemProvider extends
         uniteFieldsWithAppliedValue: true,
         includes: this.props.includes || {},
         properties: this.props.properties || [],
-        includeModeration: this.props.loadModerationFields,
         itemDefinitionInstance: this.props.itemDefinitionInstance,
         forId: this.props.forId || null,
         forVersion: this.props.forVersion || null,
@@ -1487,7 +1485,6 @@ export class ActualItemProvider extends
     return updatedIntoSomethingThatInvalidatesTheState ||
       !equals(this.state, nextState, { strict: true }) ||
       (nextProps.forId || null) !== (this.props.forId || null) ||
-      !!nextProps.loadModerationFields !== !!this.props.loadModerationFields ||
       nextProps.children !== this.props.children ||
       nextProps.localeData !== this.props.localeData ||
       nextProps.tokenData.id !== this.props.tokenData.id ||
@@ -1709,7 +1706,6 @@ export class ActualItemProvider extends
       (prevProps.forVersion || null) !== (this.props.forVersion || null) ||
       prevProps.tokenData.id !== this.props.tokenData.id ||
       prevProps.tokenData.role !== this.props.tokenData.role ||
-      prevProps.loadModerationFields !== this.props.loadModerationFields ||
       itemDefinitionWasUpdated ||
       !equals(prevProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true })
     ) {
@@ -1864,7 +1860,6 @@ export class ActualItemProvider extends
           includeFields: true,
           includes: this.props.includes || {},
           properties: this.props.properties || [],
-          includeModeration: this.props.loadModerationFields,
           itemDefinitionInstance: this.props.itemDefinitionInstance,
           forId: this.props.forId,
           forVersion: this.props.forVersion || null,
@@ -2061,7 +2056,6 @@ export class ActualItemProvider extends
       uniteFieldsWithAppliedValue: true,
       includes: this.props.includes || {},
       properties: this.props.properties || [],
-      includeModeration: this.props.loadModerationFields,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: forId,
       forVersion: forVersion,
@@ -2758,7 +2752,6 @@ export class ActualItemProvider extends
       includesForArgs: {},
       propertiesForArgs: [],
       policiesForArgs: options.policies || [],
-      includeModeration: false,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId,
       forVersion: this.props.forVersion || null,
@@ -2999,6 +2992,10 @@ export class ActualItemProvider extends
     return triggeredUpdate;
   }
   public async submit(originalOptions: IActionSubmitOptions): Promise<IActionResponseWithId> {
+    if ((originalOptions.blockUntil || originalOptions.blockReason) && !originalOptions.blockStatus) {
+      throw new Error("blockUntil nor blockReason can be set if blockStatus is not true");
+    }
+    
     // the reason we might need to wait for load is because unless we have avoided
     // loading the applied value matters in order to unite the applied fields, however
     // if we are avoiding loading this doesn't really matter as it's truly loading and somehow
@@ -3124,7 +3121,6 @@ export class ActualItemProvider extends
       includes: this.props.includes || {},
       properties: this.props.properties || [],
       includesForArgs: options.includes || {},
-      includeModeration: false,
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
       itemDefinitionInstance: itemDefinitionToRetrieveDataFrom,
@@ -3132,6 +3128,11 @@ export class ActualItemProvider extends
       forVersion: this.props.forVersion || null,
       propertyOverrides: options.propertyOverrides,
       includeOverrides: options.includeOverrides,
+      block: {
+        status: options.blockStatus || null,
+        reason: options.blockReason || null,
+        until: options.blockUntil || null,
+      },
     });
 
     if (options.parentedBy) {
@@ -3660,7 +3661,6 @@ export class ActualItemProvider extends
       includeFields: false,
       propertiesForArgs,
       includesForArgs: options.searchByIncludes || {},
-      includeModeration: false,
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
@@ -3672,7 +3672,6 @@ export class ActualItemProvider extends
       includeFields: true,
       properties: options.requestedProperties,
       includes: options.requestedIncludes || {},
-      includeModeration: false,
       itemDefinitionInstance: standardCounterpart,
       forId: null,
       forVersion: null,

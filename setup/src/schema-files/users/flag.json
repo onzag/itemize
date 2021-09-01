@@ -1,0 +1,57 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "reason",
+            "type": "string",
+            "subtype": "exact-value",
+            "values": [
+                "NO_CONSENT_ADD",
+                "PORN",
+                "VIOLENCE",
+                "RELIGION",
+                "POLITICS",
+                "XENOPHOBIA",
+                "RACISM",
+                "MISOGYNY",
+                "ANTISCIENCE",
+                "OTHER"
+            ],
+            "default": "NO_CONSENT_ADD"
+        },
+        {
+            "id": "status",
+            "type": "string",
+            "subtype": "exact-value",
+            "nullable": true,
+            "values": [
+                "OPEN",
+                "CLOSED_NO_EFFECT",
+                "CLOSED_APPLIED"
+            ],
+            "default": "OPEN",
+            "createRoleAccess": "$CONFIG:const r = [];if(config.roles.includes('MODERATOR')){r.push('MODERATOR')};if(config.roles.includes('ADMIN')){r.push('ADMIN')};return r;",
+            "coerceNullsIntoDefault": true
+        },
+        {
+            "id": "reason_text",
+            "type": "text",
+            "subtype": "plain",
+            "maxLength": 128,
+            "nullable": true,
+            "searchable": false
+        }
+    ],
+    "parentingRoleAccess": ["&ANYONE_LOGGED"],
+    "mustBeParented": true,
+    "canBeParentedBy": [
+        {
+            "module": "users",
+            "item": "user"
+        }
+    ],
+    "createRoleAccess": ["&ANYONE_LOGGED"],
+    "readRoleAccess": "$CONFIG:const r = [];if(config.roles.includes('MODERATOR')){r.push('MODERATOR')};if(config.roles.includes('ADMIN')){r.push('ADMIN')};return r;",
+    "editRoleAccess": "$CONFIG:const r = [];if(config.roles.includes('MODERATOR')){r.push('MODERATOR')};if(config.roles.includes('ADMIN')){r.push('ADMIN')};return r;",
+    "deleteRoleAccess": "$CONFIG:const r = [];if(config.roles.includes('MODERATOR')){r.push('MODERATOR')};if(config.roles.includes('ADMIN')){r.push('ADMIN')};return r;"
+}

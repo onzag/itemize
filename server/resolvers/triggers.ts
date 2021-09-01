@@ -29,6 +29,10 @@ export interface IOTriggerArgType {
    */
   originalValueSQL: ISQLTableRowValue;
   /**
+   * whether the original value is blocked
+   */
+  originalValueBlocked: boolean;
+  /**
    * the new value that it is hosting usually only available
    * on done requests
    */
@@ -38,10 +42,24 @@ export interface IOTriggerArgType {
    */
   newValueSQL: ISQLTableRowValue;
   /**
+   * whether the new value is blocked
+   */
+  newValueBlocked: boolean;
+  /**
    * A partial arg based update for the value, remember this is a partial
    * value
    */
   requestedUpdate: IGQLArgs;
+  /**
+   * Whether the requested update is trying to set the state
+   * to blocked
+   */
+  requestedUpdateToBlock: boolean;
+  /**
+   * Whether the requested update is trying to set the state
+   * to blocked
+   */
+  requestedUpdateToUnblock: boolean;
   /**
    * Arguments that are not part of the patch that were passed to graphql
    */
@@ -127,7 +145,7 @@ function fixPaths<T>(src: T): T {
       actualPathKey.substr(1);
     }
     if (actualPathKey.endsWith("/")) {
-      actualPathKey.substr(0, actualPathKey.length -1);
+      actualPathKey.substr(0, actualPathKey.length - 1);
     }
     output[actualPathKey] = src[key];
   });

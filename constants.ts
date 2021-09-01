@@ -14,6 +14,7 @@ import {
   GraphQLList,
   GraphQLObjectType,
   GraphQLInputObjectType,
+  GraphQLBoolean,
 } from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { ISQLTableDefinitionType } from "./base/Root/sql";
@@ -88,6 +89,13 @@ export interface IItemizeConstantsConfig {
    * this is a millisecond amount
    */
   SERVER_MAPPING_TIME?: number;
+  /**
+   * The time it takes for block_until to be refreshed
+   * and blockage to be cleared
+   * 
+   * this is a millisecond amount
+   */
+  SERVER_BLOCK_UNTIL_REFRESH_TIME?: number;
   /**
    * The maximum amount of remote listeners a socket can
    * have at once before the server denies adding more
@@ -207,6 +215,11 @@ export const SERVER_DATA_MIN_UPDATE_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_DAT
  * The time it takes for sitemaps to be refreshed
  */
 export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIME || 86400000; // 1 day, to sitemap the site
+
+/**
+ * The time it takes for blocks to be refreshed
+ */
+export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_BLOCK_UNTIL_REFRESH_TIME || 86400000; // 1 day
 
 /**
  * The maximum amount of remote listeners a socket supports
@@ -1259,6 +1272,18 @@ export const RESERVED_CHANGE_PROPERTIES = {
   parent_type: {
     type: GraphQLString,
     description: "A new parent to move this node to (the type)",
+  },
+  blocked: {
+    type: GraphQLBoolean,
+    description: "Makes the item to be blocked (or unblocks it)",
+  },
+  blocked_reason: {
+    type: GraphQLString,
+    description: "Given if block is set to true, this will set a short reason for the blocking",
+  },
+  blocked_until: {
+    type: GraphQLString,
+    description: "A date in the future to make a temporary blockage",
   },
 };
 

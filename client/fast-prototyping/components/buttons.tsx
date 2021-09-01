@@ -14,6 +14,7 @@ import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
 import { Button, PropTypes } from "../mui-core";
 import DeleteActioner from "../../components/item/DeleteActioner";
+import { CreateReportDialog } from "./moderation";
 
 /**
  * A redirect function called on the success event
@@ -73,7 +74,7 @@ interface ISubmitButtonProps extends IGenericButtonProps {
    * must take an isActive prop and onClose props, when it closes it would give true or false
    * to specifies if it will submit or cancel, true = submit, false = cancel
    */
-  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
+  CustomConfirmationComponent?: React.ComponentType<{ isActive: boolean, onClose: (continueWithProcess: boolean) => void }>;
   /**
    * Redirect to an url if succeeded
    */
@@ -161,7 +162,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
             </ProgressingElement>
             {
               CustomConfirmationComponent ?
-                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction}/> :
+                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction} /> :
                 null
             }
           </>
@@ -237,7 +238,7 @@ interface IDeleteButtonProps extends IGenericButtonProps {
    * must take an isActive prop and onClose props, when it closes it would give true or false
    * to specifies if it will delete or cancel, true = delete, false = cancel
    */
-  CustomConfirmationComponent?: React.ComponentType<{isActive: boolean, onClose: (continueWithProcess: boolean) => void}>;
+  CustomConfirmationComponent?: React.ComponentType<{ isActive: boolean, onClose: (continueWithProcess: boolean) => void }>;
   /**
    * Redirect to an url if succeeded
    */
@@ -315,12 +316,46 @@ export function DeleteButton(props: IDeleteButtonProps) {
             </ProgressingElement>
             {
               CustomConfirmationComponent ?
-                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction}/> :
+                <CustomConfirmationComponent isActive={confirmationIsActive} onClose={onCloseAction} /> :
                 null
             }
           </>
         );
       }}
     </DeleteActioner>
+  );
+}
+
+/**
+ * The delete button props
+ */
+interface IReportButtonProps extends IGenericButtonProps {
+  dialogMessageNode?: React.ReactNode;
+  dialogTitle?: React.ReactNode;
+}
+
+export function ReportButton(props: IReportButtonProps) {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <>
+      <Button
+        variant={props.buttonVariant}
+        color={props.buttonColor}
+        endIcon={props.buttonEndIcon}
+        startIcon={props.buttonStartIcon}
+        className={props.buttonClassName}
+        disabled={props.buttonDisabled}
+        onClick={setIsActive.bind(null, true)}
+      >
+        <I18nRead capitalize={true} id={props.i18nId} />
+      </Button>
+      <CreateReportDialog
+        isOpened={isActive}
+        onClose={setIsActive.bind(null, false)}
+        title={props.dialogTitle}
+        messageNode={props.dialogMessageNode}
+      />
+    </>
   );
 }

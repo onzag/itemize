@@ -6,8 +6,6 @@ import { IAppDataType } from "..";
 import { IGraphQLResolversType } from "../../base/Root/gql";
 import { deleteItemDefinitionFn } from "./actions/delete";
 
-// TODO flagging
-
 export default function resolvers(appData: IAppDataType): IGraphQLResolversType {
   return {
     getItemDefinition: getItemDefinitionFn(appData),
@@ -21,10 +19,6 @@ export default function resolvers(appData: IAppDataType): IGraphQLResolversType 
     getItemDefinitionList: getItemDefinitionListFn(appData),
     getModuleList: getModuleListFn(appData),
 
-    // flagItem
-    // clearFlags
-    // addModerationMessage
     // blockItem
-    // banItem
   };
 }

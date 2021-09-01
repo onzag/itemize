@@ -689,19 +689,10 @@ export async function filterAndPrepareGQLValue(
   };
 
   if (value.blocked_at !== null) {
-    const rolesThatHaveAccessToModeration = parentModuleOrIdef.getRolesWithModerationAccess();
-    const hasBaseAccessToModerationFields = rolesThatHaveAccessToModeration.includes(ANYONE_METAROLE) ||
-      (rolesThatHaveAccessToModeration.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE) ||
-      (rolesThatHaveAccessToModeration.includes(OWNER_METAROLE) && userId === ownerUserId)
-      rolesThatHaveAccessToModeration.includes(role);
+    const hasAccessToModeration = parentModuleOrIdef.checkRoleAccessForModeration(
+      role, userId, ownerUserId, rolesManager, false,
+    );
 
-    let hasAccessToModeration = hasBaseAccessToModerationFields;
-    if (!hasAccessToModeration) {
-      hasAccessToModeration = await rolesManager.checkRoleAccessFor(
-        rolesThatHaveAccessToModeration,
-      );
-    }
-    
     if (!hasAccessToModeration) {
       valueToProvide.toReturnToUser.DATA = null;
     }

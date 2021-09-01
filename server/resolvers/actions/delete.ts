@@ -146,9 +146,6 @@ export async function deleteItemDefinition(
     customId: null,
   });
 
-  // we flatten and get the requested fields
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
-
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant
   // for the delete action
@@ -184,9 +181,13 @@ export async function deleteItemDefinition(
         module: mod,
         originalValue: currentWholeValueAsGQL,
         originalValueSQL: wholeSqlStoredValue,
+        originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: null,
+        requestedUpdateToBlock: false,
+        requestedUpdateToUnblock: false,
         newValue: null,
         newValueSQL: null,
+        newValueBlocked: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as string,
@@ -209,9 +210,13 @@ export async function deleteItemDefinition(
         module: mod,
         originalValue: currentWholeValueAsGQL,
         originalValueSQL: wholeSqlStoredValue,
+        originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: null,
+        requestedUpdateToBlock: false,
+        requestedUpdateToUnblock: false,
         newValue: null,
         newValueSQL: null,
+        newValueBlocked: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as string,
@@ -244,9 +249,13 @@ export async function deleteItemDefinition(
       module: mod,
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
+      originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: null,
+      requestedUpdateToBlock: false,
+      requestedUpdateToUnblock: false,
       newValue: null,
       newValueSQL: null,
+      newValueBlocked: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,
@@ -270,9 +279,13 @@ export async function deleteItemDefinition(
       module: mod,
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
+      originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: null,
+      requestedUpdateToBlock: false,
+      requestedUpdateToUnblock: false,
       newValue: null,
       newValueSQL: null,
+      newValueBlocked: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,

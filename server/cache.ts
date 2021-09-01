@@ -739,6 +739,7 @@ export class Cache {
       currentValue.container_id,
       null,
       null,
+      null,
       options,
     );
   }
@@ -786,6 +787,11 @@ export class Cache {
       id: string,
       version: string,
       type: string,
+    },
+    blocking: {
+      status: boolean,
+      reason: string,
+      until: string,
     },
     options: {
       ignorePreSideEffects?: boolean;
@@ -907,6 +913,31 @@ export class Cache {
       // empty string value
       sqlModData.parent_version = reparent.version || "";
       sqlModData.parent_type = reparent.type;
+    }
+
+    if (blocking) {
+      CAN_LOG_DEBUG && logger.debug(
+        "Cache.requestUpdate: blocking for resource specified as " + blocking.status,
+      );
+
+      if (blocking.status) {
+        sqlModData.blocked_at = [
+          "NOW()",
+          [],
+        ];
+        sqlModData.blocked_by = editedBy;
+        if (blocking.reason) {
+          sqlModData.blocked_reason = blocking.reason;
+        }
+        if (blocking.until) {
+          sqlModData.blocked_until = blocking.until;
+        }
+      } else {
+        sqlModData.blocked_at = null;
+        sqlModData.blocked_by = null;
+        sqlModData.blocked_reason = null;
+        sqlModData.blocked_until = null;
+      }
     }
 
     // now we check if we are updating anything at all
