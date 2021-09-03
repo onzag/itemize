@@ -171,18 +171,6 @@ export async function addItemDefinition(
     });
   }
 
-  await validateParentingRules(
-    appData,
-    resolverArgs.args.parent_id,
-    resolverArgs.args.parent_version || null,
-    resolverArgs.args.parent_type,
-    itemDefinition,
-    tokenData.id,
-    tokenData.role,
-    rolesManager,
-    false,
-  );
-
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
   // contained in the DATA value, we flatten that first
@@ -223,6 +211,19 @@ export async function addItemDefinition(
       await checkUserExists(appData.cache, finalOwner);
     }
   }
+
+  await validateParentingRules(
+    appData,
+    resolverArgs.args.parent_id,
+    resolverArgs.args.parent_version || null,
+    resolverArgs.args.parent_type,
+    itemDefinition,
+    tokenData.id,
+    finalOwner,
+    tokenData.role,
+    rolesManager,
+    false,
+  );
 
   CAN_LOG_DEBUG && logger.debug(
     "addItemDefinition: Fields to add have been extracted",

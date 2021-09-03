@@ -57,8 +57,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
    */
   getAppliedValue: () => IItemDefinitionGQLValueType;
   /**
-   * The search result that you have retrieved, only avaliable in
-   * traditional mode
+   * The search result that you have retrieved
    */
   searchResult?: IGQLValue;
 }
@@ -217,6 +216,7 @@ interface IActualSearchLoaderState {
   currentlySearching: IGQLSearchRecord[];
   searchFields: IGQLRequestFields;
   currentSearchRecords: IGQLSearchRecord[];
+  currentSearchResultsFromTheRecords: IGQLValue[];
   error: EndpointErrorType;
 }
 
@@ -238,12 +238,15 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       currentlySearching: [],
       searchFields: null,
       currentSearchRecords: [],
+      currentSearchResultsFromTheRecords: [],
       error: null,
+      ...this.refreshPage(true),
     };
   }
   public componentDidMount() {
-    // on mounting we call a refresh of the page
-    this.refreshPage();
+    if (this.state.currentlySearching && this.state.currentlySearching.length) {
+      this.refreshPage();
+    }
   }
   public getRawSearchResults() {
     return this.props.searchResults;
@@ -310,13 +313,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       this.loadValues(currentSearchRecords);
     }
   }
-  public refreshPage() {
+  public refreshPage(isConstruct?: boolean): Partial<IActualSearchLoaderState> {
     // a refresh will reload regardless
     const currentSearchRecords = (this.props.searchRecords || []).slice(
       this.props.pageSize * this.props.currentPage,
       this.props.pageSize * (this.props.currentPage + 1),
     );
-    this.loadValues(currentSearchRecords);
+    return this.loadValues(currentSearchRecords, isConstruct);
   }
   public dismissError() {
     if (this.isUnmounted) {
@@ -345,7 +348,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
     });
   }
-  public async loadValues(currentSearchRecords: IGQLSearchRecord[]) {
+  public loadValues(currentSearchRecords: IGQLSearchRecord[], isConstruct?: boolean): Partial<IActualSearchLoaderState> {
     if (this.isUnmounted) {
       return;
     }
@@ -355,13 +358,15 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // if we have no search id we have nothing to search for
     if (!this.props.searchId) {
-      this.setState({
+      const newState: Partial<IActualSearchLoaderState> = {
         error: null,
         currentlySearching: [],
         currentSearchRecords,
+        currentSearchResultsFromTheRecords: currentSearchRecords.map((r) => null),
         searchFields: this.props.searchFields,
-      });
-      return;
+      };
+      !isConstruct && this.setState(newState as any);
+      return newState;
     }
 
     // this happens for traditional search, we dont need to
@@ -377,30 +382,79 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // as they realize they are already loaded in memory
 
       // this serves a double purpose both for SSR and this, which works the same way
-      this.setState({
+      const newState: Partial<IActualSearchLoaderState> = {
         error: null,
         currentlySearching: [],
         currentSearchRecords,
+        currentSearchResultsFromTheRecords: currentSearchRecords.map((r) => {
+          return this.props.searchResults.find((sr) => sr.id === r.id && sr.version === r.version && sr.type === r.type);
+        }),
         searchFields: this.props.searchFields,
-      });
-      return;
+      };
+      !isConstruct && this.setState(newState as any);
+      return newState;
     }
 
-    // but now we are back to the standard mode
-    // for that we need to get the standard counterpart, as we are supposed
-    // to be in a search mode item definition context
-    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+    const foundIndexes = currentSearchRecords.map((r, index) => {
+      return false;
+    });
+    const currentSearchResultsFromTheRecords = currentSearchRecords.map((searchRecord, index) => {
+      // note that our records might be different to the context we are in
+      const itemDefintionInQuestion =
+        this.props.itemDefinitionInstance.getParentModule()
+          .getParentRoot().registry[searchRecord.type] as ItemDefinition;
+
+      // check if it's in memory cache, in such a case the value will have already loaded
+      // as the item definition would have applied it initially, as in it would have loaded
+      // already and it can be pretty much ignored
+      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
+      if (
+        appliedGQLValue &&
+        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
+        appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
+      ) {
+        foundIndexes[index] = true;
+        return appliedGQLValue.rawValue;
+      }
+
+      return null;
+    });
 
     // and then we set the state, and what we are currently searching, as those records
     // we are searching everything and the item loader will pick on these searching attributes
     // and prevent them from loading from network or cache and will only be able to pick
     // on applied values
-    this.setState({
+    const newState: Partial<IActualSearchLoaderState> = {
       error: null,
-      currentlySearching: currentSearchRecords,
+      currentlySearching: currentSearchRecords.filter((r, index) => {
+        return !foundIndexes[index];
+      }),
       currentSearchRecords,
+      currentSearchResultsFromTheRecords,
       searchFields: this.props.searchFields,
-    });
+    };
+
+    if (!isConstruct) {
+      this.setState(newState as any);
+      this.loadValuesAsyncPart(currentSearchLoadTime, currentSearchResultsFromTheRecords, currentSearchRecords, foundIndexes);
+    }
+
+    return newState;
+  }
+
+  private async loadValuesAsyncPart(
+    currentSearchLoadTime: number,
+    currentSearchResultsFromTheRecords: IGQLValue[],
+    currentSearchRecords: IGQLSearchRecord[],
+    foundIndexes: boolean[],
+  ) {
+    // We are done with this since all that follows is async and cannot be executed
+    // during construction
+
+    // but now we are back to the standard mode
+    // for that we need to get the standard counterpart, as we are supposed
+    // to be in a search mode item definition context
+    const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
 
     // now we need to build the query for getting this information
     const queryBase = (standardCounterpart.isExtensionsInstance() ?
@@ -412,9 +466,17 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // and now we need to request
     const uncachedResults: IGQLSearchRecord[] = [];
+    const uncachedResultsToIndex: number[] = [];
+
+    const newSearchResultsFromTheRecords = [...currentSearchResultsFromTheRecords];
 
     // first we try to request our indexeddb worker cache and memory cache, one by one
-    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchRecord: IGQLSearchRecord) => {
+    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchRecord: IGQLSearchRecord, index) => {
+      // we already found it in our applied value check
+      if (foundIndexes[index]) {
+        return null;
+      }
+
       // note that our records might be different to the context we are in
       const itemDefintionInQuestion =
         this.props.itemDefinitionInstance.getParentModule()
@@ -422,22 +484,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       const itemDefinitionInQuestionQualifiedName = itemDefintionInQuestion.getQualifiedPathName();
 
-      // check if it's in memory cache, in such a case the value will have already loaded
-      // as the item definition would have applied it initially, as in it would have loaded
-      // already and it can be pretty much ignored
-      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
-      if (
-        appliedGQLValue &&
-        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
-        appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
-      ) {
-        return null;
-      }
-
       // otherwise let's see our cache
       // if it's not supported then we push already to our uncached results
       if (!CacheWorkerInstance.isSupported) {
         uncachedResults.push(searchRecord);
+        uncachedResultsToIndex.push(index);
         return null;
       } else {
         // otherwise let's try to get it
@@ -457,6 +508,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         if (!cachedResult || cachedResult.value.last_modified !== searchRecord.last_modified) {
           // then it's uncached
           uncachedResults.push(searchRecord);
+          uncachedResultsToIndex.push(index);
           return null;
         }
 
@@ -476,9 +528,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }
 
     // we need to check our worker cache results
-    workerCachedResults.forEach((cr) => {
+    workerCachedResults.forEach((cr, index) => {
       // if we have one
       if (cr) {
+        // we can set it up in our new search results that have been collected
+        newSearchResultsFromTheRecords[index] = cr.cachedResult.value;
+
         // then we try to get such item definition
         const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
           .getParentRoot().registry[cr.forType] as ItemDefinition;
@@ -521,8 +576,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     if (this.isUnmounted) {
       return;
     }
+
     this.setState({
       currentlySearching: uncachedResults,
+      currentSearchResultsFromTheRecords: newSearchResultsFromTheRecords,
     });
 
     // now let's go back to our uncached results
@@ -581,12 +638,22 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         gqlValue.data[getListQueryName] &&
         gqlValue.data[getListQueryName].results
       ) {
+        const loadedNewSearchResultsFromTheRecords = [
+          ...newSearchResultsFromTheRecords,
+        ];
+
         // and we loop into them
         (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
           // get these basic details for each one of these results
           const forId = uncachedResults[index].id;
           const forVersion = uncachedResults[index].version;
           const forType = uncachedResults[index].type;
+
+          loadedNewSearchResultsFromTheRecords[uncachedResultsToIndex[index]] = value;
+
+          this.setState({
+            currentSearchResultsFromTheRecords: loadedNewSearchResultsFromTheRecords,
+          });
 
           // and now the item definition that we are referring to from the registry
           const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -693,15 +760,14 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       >
         {
           this.props.children({
-            searchRecords: this.state.error ? [] : this.state.currentSearchRecords.map((searchRecord) => {
+            searchRecords: this.state.error ? [] : this.state.currentSearchRecords.map((searchRecord, index) => {
               // note how our search records here are special first we nee the matching item definition
               // of the record
               const itemDefinition = this.props.itemDefinitionInstance
                 .getParentModule().getParentRoot().registry[searchRecord.type] as ItemDefinition;
 
               // fird the search result information, if any, for the given record
-              const searchResult = (this.props.searchResults && this.props.searchResults
-                .find((r) => r.id === searchRecord.id && r.version === r.version)) || null;
+              const searchResult = this.state.currentSearchResultsFromTheRecords[index];
 
               // and we add something called the provider props, which explains how to instantiate
               // a item definition provider so that it's in sync with this seach and loads what this search

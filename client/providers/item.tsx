@@ -366,6 +366,8 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
 }
 
 export interface IActionDeleteOptions extends IActionCleanOptions {
+  deleteForId?: string;
+  deleteForVersion?: string;
   policies?: PolicyPathType[];
   beforeDelete?: () => boolean | Promise<boolean>;
   progresser?: ProgresserFn;
@@ -2743,6 +2745,9 @@ export class ActualItemProvider extends
       }
     }
 
+    const forId = options.deleteForId || this.props.forId;
+    const forVersion = options.deleteForId ? (options.deleteForVersion || null) : (options.deleteForVersion || this.props.forVersion || null);
+
     const {
       argumentsForQuery,
     } = getFieldsAndArgs({
@@ -2753,8 +2758,8 @@ export class ActualItemProvider extends
       propertiesForArgs: [],
       policiesForArgs: options.policies || [],
       itemDefinitionInstance: this.props.itemDefinitionInstance,
-      forId: this.props.forId,
-      forVersion: this.props.forVersion || null,
+      forId,
+      forVersion,
     });
 
     if (!this.isUnmounted) {
@@ -2768,8 +2773,8 @@ export class ActualItemProvider extends
     } = await runDeleteQueryFor({
       args: argumentsForQuery,
       itemDefinition: this.props.itemDefinitionInstance,
-      id: this.props.forId,
-      version: this.props.forVersion || null,
+      id: forId,
+      version: forVersion,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,
       listenerUUID: this.props.remoteListener.getUUID(),
@@ -2792,29 +2797,34 @@ export class ActualItemProvider extends
       this.cleanWithProps(this.props, options, "success");
     } else {
       this.props.itemDefinitionInstance.applyValue(
-        this.props.forId || null,
-        this.props.forVersion || null,
+        forId,
+        forVersion,
         null,
         false,
         null,
         true,
       );
-      this.props.itemDefinitionInstance.cleanValueFor(this.props.forId || null, this.props.forVersion || null);
+      this.props.itemDefinitionInstance.cleanValueFor(forId, forVersion);
       if (!this.isUnmounted) {
         this.setState({
           deleteError: null,
           deleting: false,
           deleted: true,
-          notFound: true,
           pokedElements: {
             properties: [],
             includes: {},
             policies: (options.policies || []),
           },
         });
+
+        if (forId === (this.props.forId || null) && forVersion === (this.props.forVersion || null)) {
+          this.setState({
+            notFound: true,
+          });
+        }
       }
       this.cleanWithProps(this.props, options, "fail");
-      this.props.itemDefinitionInstance.triggerListeners("change", this.props.forId, this.props.forVersion || null);
+      this.props.itemDefinitionInstance.triggerListeners("change", forId, forVersion);
     }
 
     this.props.onDelete && this.props.onDelete({ error });
@@ -4337,9 +4347,9 @@ export function ParentItemContextProvider(props: { children: React.ReactNode }) 
     <ItemContext.Consumer>
       {(value) => {
         if (!value.injectedParentContext) {
-          throw new Error("You need to have injected parent context in your parent item provider");
+          console.warn("No parent context was injected during the usage of parent item context provider, defaulting to null");
         }
-        return (<ItemContext.Provider value={value.injectedParentContext}>
+        return (<ItemContext.Provider value={value.injectedParentContext || null}>
           {props.children}
         </ItemContext.Provider>);
       }}

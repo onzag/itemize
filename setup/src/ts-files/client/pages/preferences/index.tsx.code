@@ -3,7 +3,7 @@ import { ModuleProvider } from "@onzag/itemize/client/providers/module";
 import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box,
-	NotificationsIcon, MenuBookIcon, DoneOutlineIcon, PersonPinIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+	NotificationsIcon, MenuBookIcon, DoneOutlineIcon, PersonPinIcon, PhoneIphoneIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import { NeedsSubmitPrompt } from "@onzag/itemize/client/fast-prototyping/components/needs-submit-prompt";
@@ -42,6 +42,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 			{(userData) => {
 				const properties = [
 					"e_notifications",
+					"p_notifications",
 					"e_newsletter",
 					"address",
 				];
@@ -80,6 +81,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 								<Container maxWidth="md" className={props.classes.container}>
 									<Paper className={props.classes.paper}>
 										<Entry id="e_notifications" icon={<NotificationsIcon />} />
+										<Entry id="p_notifications" icon={<PhoneIphoneIcon />} />
 										<Entry id="e_newsletter" icon={<MenuBookIcon />} />
 
 										<Entry id="address" icon={<PersonPinIcon />} rendererArgs={{ descriptionAsAlert: true }} />

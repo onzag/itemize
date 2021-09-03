@@ -113,6 +113,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   canCreateInBehalfRoleAccess?: string[];
   canCreateInBehalfTargetRoles?: string[];
   mustBeParented?: boolean;
+  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY",
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
   ownerReadRoleAccess?: string[];
@@ -678,6 +679,10 @@ async function buildItemDefinition(
 
   if (actualEvaledFileData.mustBeParented) {
     finalValue.mustBeParented = true;
+  }
+
+  if (actualEvaledFileData.parentingRule === "ONCE" || actualEvaledFileData.parentingRule === "ONCE_PER_OWNER") {
+    finalValue.parentingRule = actualEvaledFileData.parentingRule;
   }
 
   if (actualEvaledFileData.canBeParentedBy) {

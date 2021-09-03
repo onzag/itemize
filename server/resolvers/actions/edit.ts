@@ -160,6 +160,7 @@ export async function editItemDefinition(
     resolverArgs.args.parent_type,
     itemDefinition,
     tokenData.id,
+    tokenData.id,
     tokenData.role,
     rolesManager,
     true,

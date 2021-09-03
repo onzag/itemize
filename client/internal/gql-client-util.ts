@@ -353,8 +353,6 @@ export function getFieldsAndArgs(
     }
   }
 
-  options.itemDefinitionInstance.getPropertiesForPolicy
-
   return { requestFields, argumentsForQuery, argumentsFoundFilePaths };
 }
 

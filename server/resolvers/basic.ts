@@ -133,6 +133,7 @@ export async function validateParentingRules(
   parentType: string,
   itemDefinition: ItemDefinition,
   userId: string,
+  actualFinalOwnerId: string,
   role: string,
   rolesManager: CustomRoleManager,
   isEdit: boolean,
@@ -155,6 +156,47 @@ export async function validateParentingRules(
     }
 
     itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
+
+    const parentingRule = itemDefinition.getParentingRule();
+    if (parentingRule === "ONCE") {
+      const valueExists =
+        await appData.databaseConnection.queryFirst(
+          `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND "parent_id"=$3 AND "parent_version"=$4`,
+          [
+            itemDefinition.getQualifiedPathName(),
+            parentingItemDefinition.getQualifiedPathName(),
+            parentId,
+            parentVersion,
+          ]
+        );
+
+      if (valueExists) {
+        throw new EndpointError({
+          message: "Parenting rule is set to ONCE and there's already a children of this type for the given parent",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
+    } else if (parentingRule === "ONCE_PER_OWNER") {
+      const valueExists =
+        await appData.databaseConnection.queryFirst(
+          `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND ` +
+          `"parent_id"=$3 AND "parent_version"=$4 AND "created_by"=$5 `,
+          [
+            itemDefinition.getQualifiedPathName(),
+            parentingItemDefinition.getQualifiedPathName(),
+            parentId,
+            parentVersion,
+            actualFinalOwnerId,
+          ]
+        );
+
+      if (valueExists) {
+        throw new EndpointError({
+          message: "Parenting rule is set to ONCE_PER_OWNER and there's already a children of this type for the given parent with that owner",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
+    }
     let result: ISQLTableRowValue;
     try {
       result = await appData.cache.requestValue(

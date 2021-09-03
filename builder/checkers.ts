@@ -216,6 +216,14 @@ export function checkItemDefinition(
     );
   }
 
+  // Also these two must be specified together
+  if (rawData.parentingRule && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting parentingRule without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("parentingRule"),
+    );
+  }
+
   // if it can be parented
   if (rawData.canBeParentedBy) {
     if (!rawData.parentingRoleAccess) {

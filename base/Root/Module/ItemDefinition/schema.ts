@@ -258,6 +258,10 @@ export default {
     mustBeParented: {
       type: "boolean",
     },
+    parentingRule: {
+      type: "string",
+      enum: ["ONCE", "ONCE_PER_OWNER", "MANY"],
+    },
     parentingRoleAccess: {
       type: "array",
       items: {

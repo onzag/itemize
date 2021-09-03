@@ -254,6 +254,14 @@ export interface IItemDefinitionRawJSONDataType {
    */
   mustBeParented?: boolean;
   /**
+   * The parenting rule
+   * ONCE means that this item can only be parented once for the given parent
+   * so one parent can only have one children of this same type
+   * ONCE_PER_OWNER means that the rule applies as of a per owner basis
+   * MANY is the default there can be as many children of the same type as it wants
+   */
+  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
+  /**
    * A list of roles who have access to parenting
    */
   parentingRoleAccess?: string[];
@@ -2174,6 +2182,10 @@ export default class ItemDefinition {
    */
   public mustBeParented() {
     return !!this.rawData.mustBeParented;
+  }
+
+  public getParentingRule() {
+    return this.rawData.parentingRule || "MANY";
   }
 
   /**
