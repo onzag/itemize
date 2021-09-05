@@ -73,6 +73,11 @@ export interface ISearchLoaderArg {
    */
   searchId: string;
   /**
+   * Whether it is currently searching according to the search
+   * parameters in order to retrieve records
+   */
+  searching: boolean;
+  /**
    * Whether it's currently searching for that given search id
    * this variable can be very useful to check for applied values
    * if you are doing your own custom logic and not using traditional search
@@ -80,7 +85,7 @@ export interface ISearchLoaderArg {
    * for the given page are ensured to be there, this is also true for
    * traditional search
    */
-  isSearching: boolean;
+  isLoadingSearchResults: boolean;
   /**
    * the search records are records that allow to be requested
    * as well as organized, partial information of a search result
@@ -199,6 +204,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   localeData: ILocaleContextType;
   remoteListener: RemoteListener;
   searchId: string;
+  searching: boolean;
   searchWasRestored: boolean;
   searchOwner: string;
   searchShouldCache: boolean;
@@ -803,7 +809,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             dismissError: this.dismissError,
             refreshPage: this.refreshPage,
             searchId: this.props.searchId,
-            isSearching: this.state.currentlySearching.length !== 0,
+            isLoadingSearchResults: this.state.currentlySearching.length !== 0,
+            searching: this.props.searching,
           })
         }
       </SearchItemValueContext.Provider>
@@ -842,6 +849,7 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                       searchRequestedIncludes={itemContext.searchRequestedIncludes}
                       searchRequestedProperties={itemContext.searchRequestedProperties}
                       searchFields={itemContext.searchFields}
+                      searching={itemContext.searching}
                       tokenData={tokenData}
                       localeData={localeData}
                     />
