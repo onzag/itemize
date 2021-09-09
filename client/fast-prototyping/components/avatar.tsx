@@ -5,8 +5,7 @@
  */
 
 import React from "react";
-import { Avatar as MAvatar, Badge, RootRef, withStyles,
-  WithStyles, createStyles, Alert, BrokenImageIcon, AddAPhotoIcon} from "../mui-core";
+import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
 import { countries } from "../../../imported-resources";
 import Link from "../../components/navigation/Link";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
@@ -15,6 +14,12 @@ import { IPropertyEntryFileRendererProps } from "../../internal/components/Prope
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { MAX_FILE_SIZE } from "../../../constants";
 import Reader from "../../components/property/Reader";
+import { default as MAvatar } from "@material-ui/core/Avatar";
+import Badge from "@material-ui/core/Badge";
+import RootRef from "@material-ui/core/RootRef";
+import BrokenImageIcon from "@material-ui/icons/BrokenImage";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
+import Alert from "@material-ui/lab/Alert";
 
 /**
  * We build the styles with the create styles function

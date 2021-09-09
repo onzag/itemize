@@ -4,30 +4,25 @@
  */
 
 import React from "react";
-import {
-  WithStyles,
-  withStyles,
-  createStyles,
-  InputAdornment,
-  IconButton,
-  Typography,
-  TextField,
-  Dialog,
-  DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
-  ListSubheader,
-  Divider,
-  useTheme,
-  useMediaQuery,
-  ClearIcon,
-  RestoreIcon,
-  IconVisibility,
-  IconVisibilityOff,
-  Alert,
-} from "../../mui-core/index";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
+import { createStyles, useTheme, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import RestoreIcon from "@material-ui/icons/Restore";
+import ClearIcon from "@material-ui/icons/Clear";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import Divider from "@material-ui/core/Divider";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import TextField from "@material-ui/core/TextField";
+import IconVisibility from "@material-ui/icons/Visibility";
+import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 
 /**
  * A simple helper function that says when it should show invalid

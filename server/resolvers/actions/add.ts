@@ -368,6 +368,9 @@ export async function addItemDefinition(
     // and if we have a module trigger
     if (moduleTrigger) {
       // we execute the trigger
+      const isNowParenting = !!(
+        gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      );
       const newValueAccordingToModule = await moduleTrigger({
         appData,
         itemDefinition: itemDefinition,
@@ -376,6 +379,12 @@ export async function addItemDefinition(
         originalValueSQL: null,
         originalValueBlocked: null,
         requestedUpdate: gqlValueToConvert,
+        requestedUpdateCreatedBy: ownerId,
+        requestedUpdateParent: isNowParenting ? {
+          id: gqlValueToConvert.parent_id as string,
+          version: gqlValueToConvert.parent_version as string,
+          type: gqlValueToConvert.parent_type as string,
+        } : null,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
         newValue: null,
@@ -402,6 +411,9 @@ export async function addItemDefinition(
     // same with the item definition
     if (itemDefinitionTrigger) {
       // we call the trigger
+      const isNowParenting = !!(
+        gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
         appData,
         itemDefinition: itemDefinition,
@@ -410,6 +422,12 @@ export async function addItemDefinition(
         originalValueSQL: null,
         originalValueBlocked: null,
         requestedUpdate: gqlValueToConvert,
+        requestedUpdateParent: isNowParenting ? {
+          id: gqlValueToConvert.parent_id as string,
+          version: gqlValueToConvert.parent_version as string,
+          type: gqlValueToConvert.parent_type as string,
+        } : null,
+        requestedUpdateCreatedBy: ownerId,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
         newValue: null,
@@ -486,6 +504,12 @@ export async function addItemDefinition(
       originalValueSQL: null,
       originalValueBlocked: null,
       requestedUpdate: gqlValueToConvert,
+      requestedUpdateParent: isNowParenting ? {
+        id: gqlValueToConvert.parent_id as string,
+        version: gqlValueToConvert.parent_version as string,
+        type: gqlValueToConvert.parent_type as string,
+      } : null,
+      requestedUpdateCreatedBy: ownerId,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
       newValue: gqlValue,
@@ -515,6 +539,12 @@ export async function addItemDefinition(
       requestedUpdate: gqlValueToConvert,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
+      requestedUpdateParent: isNowParenting ? {
+        id: gqlValueToConvert.parent_id as string,
+        version: gqlValueToConvert.parent_version as string,
+        type: gqlValueToConvert.parent_type as string,
+      } : null,
+      requestedUpdateCreatedBy: ownerId,
       newValue: gqlValue,
       newValueSQL: value,
       newValueBlocked: false,

@@ -6,15 +6,20 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Divider, Typography, Tab, Tabs, BorderStyleIcon, TouchAppIcon, WebIcon, SettingsIcon
-} from "../../../mui-core";
 import { IWrapperContainerProps } from "../wrapper";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
 import { TemplatingOptions } from "./templating";
 import { getInfoOf, Tree } from "./tree";
+import Divider from "@material-ui/core/Divider";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import SettingsIcon from "@material-ui/icons/Settings";
+import BorderStyleIcon from "@material-ui/icons/BorderStyle";
+import WebIcon from "@material-ui/icons/Web";
+import TouchAppIcon from "@material-ui/icons/TouchApp";
+import Typography from "@material-ui/core/Typography";
 
 class ScrollSlowly {
   private speed: number;

@@ -4,15 +4,23 @@
  */
 
 import { IPropertyEntryFileRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFile";
-import {
-  FormLabel, RootRef, Paper, Button, Typography, IconButton,
-  RemoveCircleOutlineIcon, NoteAddIcon, CloudUploadIcon,
-  createStyles, WithStyles, withStyles, Alert, RestoreIcon, ClearIcon,
-} from "../../mui-core";
 import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import RestoreIcon from "@material-ui/icons/Restore";
+import ClearIcon from "@material-ui/icons/Clear";
+import FormLabel from "@material-ui/core/FormLabel";
+import RootRef from "@material-ui/core/RootRef";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline"
+import NoteAddIcon from "@material-ui/icons/NoteAdd"
+import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 
 /**
  * A simple helper function that says when it should show invalid

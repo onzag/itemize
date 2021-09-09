@@ -5,10 +5,13 @@
  */
 
 import React from "react";
-import { Button, Typography, withStyles, Theme, createStyles, WithStyles, UpdateIcon } from "../../mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
 import { DialogResponsive } from "../dialog";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import UpdateIcon from "@material-ui/icons/Update";
 
 /**
  * The dialog styles

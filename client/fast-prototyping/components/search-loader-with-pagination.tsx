@@ -6,14 +6,18 @@
 
 import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";
 import React from "react";
-import { Pagination } from "../mui-core";
 import Snackbar from "./snackbar";
+import Pagination from "@material-ui/lab/Pagination";
 
 
 /**
  * The paginated search loader props
  */
 interface ISearchLoaderWithPaginationProps {
+  /**
+   * Whether to use a local state
+   */
+  localState?: boolean;
   /**
    * An unique id to track this loader
    */
@@ -43,7 +47,7 @@ interface ISearchLoaderWithPaginationProps {
  */
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
   return (
-    <PagedSearchLoader pageSize={props.pageSize} cleanOnDismount={props.cleanOnDismount}>
+    <PagedSearchLoader pageSize={props.pageSize} cleanOnDismount={props.cleanOnDismount} localState={props.localState}>
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {
           arg.goToPage(value - 1);

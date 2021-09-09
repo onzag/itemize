@@ -7,9 +7,15 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
-import { FormControl, InputLabel, Select, Chip, MenuItem, TextField, FilledInput } from "../../../mui-core";
 import { Path } from "slate";
 import equals from "deep-equal";
+import TextField from "@material-ui/core/TextField";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import FilledInput from "@material-ui/core/FilledInput";
+import Chip from "@material-ui/core/Chip";
+import MenuItem from "@material-ui/core/MenuItem";
 
 /**
  * The single style option props that define a single

@@ -37,6 +37,11 @@ export interface IPagedSearchLoaderArg extends ISearchLoaderArg {
  */
 interface IPagedSearchLoaderProps {
   /**
+   * Does not use query string to store a global state but rather
+   * a local state
+   */
+  localState?: boolean;
+  /**
    * The page size
    */
   pageSize: number;
@@ -50,12 +55,17 @@ interface IPagedSearchLoaderProps {
   children: (arg: IPagedSearchLoaderArg) => React.ReactNode;
 }
 
+interface IPagedSearchLoaderState {
+  p: string;
+  r: string;
+}
+
 /**
  * The page search loader component allows for creating pagination UI elements rather
  * simply, it extends the standard search loader for this, it uses the navigation in order
  * to store its page number so that searches are kept consistent
  */
-export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> {
+export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, IPagedSearchLoaderState> {
   constructor(props: IPagedSearchLoaderProps) {
     super(props);
 
@@ -63,8 +73,13 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     this.goToPrevPage = this.goToPrevPage.bind(this);
     this.goToPage = this.goToPage.bind(this);
     this.onSearchDataChange = this.onSearchDataChange.bind(this);
+
+    this.state = {
+      p: "1",
+      r: "t",
+    }
   }
-  public goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: {p: string, r: string}) => void) {
+  public goToNextPage(currentPage: number, hasNextPage: boolean, setState: (qs: { p: string, r: string }) => void) {
     if (hasNextPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
@@ -73,7 +88,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
       });
     }
   }
-  public goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: {p: string, r: string}) => void) {
+  public goToPrevPage(currentPage: number, hasPrevPage: boolean, setState: (qs: { p: string, r: string }) => void) {
     if (hasPrevPage) {
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       setState({
@@ -82,7 +97,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
       });
     }
   }
-  public goToPage(setState: (qs: {p: string, r: string}) => void, page: number) {
+  public goToPage(setState: (qs: { p: string, r: string }) => void, page: number) {
     setState({
       p: (page + 1).toString(),
       r: "t",
@@ -92,7 +107,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     return nextProps.pageSize !== this.props.pageSize ||
       nextProps.children !== this.props.children;
   }
-  public onSearchDataChange(actualP: number, setState: (qs: {p: string, r: string}) => void, searchId: string, wasRestored: boolean) {
+  public onSearchDataChange(actualP: number, setState: (qs: { p: string, r: string }) => void, searchId: string, wasRestored: boolean) {
     if (!wasRestored) {
       if (actualP !== 0) {
         // this is rFlagged
@@ -108,30 +123,36 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps> 
     // load whatever if it was a restoration event
     return null;
   }
+  public renderPagedLoader(state: IPagedSearchLoaderState, setState: (qs: { p: string, r: string }) => void) {
+    let actualP = parseInt(state.p, 10) || 1;
+    actualP--;
+    return (
+      <SearchLoader
+        pageSize={this.props.pageSize}
+        currentPage={actualP}
+        cleanOnDismount={this.props.cleanOnDismount}
+        onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
+      >
+        {(arg) => {
+          return this.props.children({
+            ...arg,
+            currentPage: actualP,
+            goToNextPage: this.goToNextPage.bind(this, actualP, arg.hasNextPage, setState),
+            goToPrevPage: this.goToPrevPage.bind(this, actualP, arg.hasPrevPage, setState),
+            goToPage: this.goToPage.bind(this, setState),
+          });
+        }}
+      </SearchLoader>
+    );
+  }
   public render() {
+    if (this.props.localState) {
+      return this.renderPagedLoader(this.state, this.setState);
+    }
     return (
       <LocationStateReader defaultState={{ p: "1", r: "f" }} stateIsInQueryString={true}>
         {(state, setState) => {
-          let actualP = parseInt(state.p, 10) || 1;
-          actualP--;
-          return (
-            <SearchLoader
-              pageSize={this.props.pageSize}
-              currentPage={actualP}
-              cleanOnDismount={this.props.cleanOnDismount}
-              onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
-            >
-              {(arg) => {
-                return this.props.children({
-                  ...arg,
-                  currentPage: actualP,
-                  goToNextPage: this.goToNextPage.bind(this, actualP, arg.hasNextPage, setState),
-                  goToPrevPage: this.goToPrevPage.bind(this, actualP, arg.hasPrevPage, setState),
-                  goToPage: this.goToPage.bind(this, setState),
-                });
-              }}
-            </SearchLoader>
-          );
+          return this.renderPagedLoader(state, setState);
         }}
       </LocationStateReader>
     );

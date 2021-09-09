@@ -6,11 +6,14 @@
  */
 
 import React, {useEffect} from "react";
-import { ThemeProvider as MuiThemeProvider, MuiPickersUtilsProvider, createTheme, CssBaseline } from "./mui-core";
+import { createTheme } from "@material-ui/core/styles";
 import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
 import MomentUtils from "@date-io/moment";
 import { IConfigRawJSONDataType } from "../../config";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import MuiPickersUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
 
 /**
  * Removes the #ssr-sheets component that is injected by the collector if

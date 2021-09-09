@@ -8,13 +8,17 @@
 import View from "../../components/property/View";
 import Entry from "../../components/property/Entry";
 import React, { useEffect, useRef, useState } from "react";
-import { withStyles, WithStyles, createStyles, IconButton, EditIcon, CloseIcon, SaveIcon } from "../mui-core";
+import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
 import UserDataRetriever from "../../components/user/UserDataRetriever";
 import SubmitActioner from "../../components/item/SubmitActioner";
 import Snackbar from "../components/snackbar";
 import ReactDOM from "react-dom";
 import IdVersionRetriever from "../../components/item/IdVersionRetriever";
 import { IActionSubmitOptions } from "../../providers/item";
+import CloseIcon from "@material-ui/icons/Close";
+import IconButton from "@material-ui/core/IconButton";
+import SaveIcon from "@material-ui/icons/Save";
+import EditIcon from "@material-ui/icons/Edit";
 
 /**
  * The item definition loader styles

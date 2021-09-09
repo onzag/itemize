@@ -4,11 +4,14 @@
  * @module
  */
 
+import Button from "@material-ui/core/Button";
+import FilledInput from "@material-ui/core/FilledInput";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 import React from "react";
 import { ITemplateArgsContext } from "..";
-import {
-  Button, FilledInput, FormControl, InputLabel, MenuItem, Select,
-} from "../../../mui-core";
 import { Dialog } from "../../dialog";
 
 /**

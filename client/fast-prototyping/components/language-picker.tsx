@@ -6,10 +6,13 @@
 
 import React from "react";
 import { capitalize } from "../../components/localization";
-import { Button, Menu, MenuItem, TranslateIcon } from "../mui-core";
 import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 import { LocaleContext } from "../../internal/providers/locale-provider";
 import { arrLanguages } from "../../../imported-resources";
+import TranslateIcon from "@material-ui/icons/Translate";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@material-ui/core/Button";
 
 /**
  * The props of the language picker, a bit different from other pickers

@@ -4,11 +4,10 @@
  */
 
 import React from "react";
-import {
-  Typography, Button,
-} from "../../../mui-core";
 import { Dialog } from "../../dialog";
 import { capitalize } from "../../../../../util";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 /**
  * The error dialog props

@@ -7,14 +7,16 @@
 
 import { IPropertyEntryPaymentRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryPayment";
 import React from "react";
-import {
-  Alert, Typography, IconButton,
-  createStyles, WithStyles, withStyles, RestoreIcon, InputLabel,
-  QueueIcon, HighlightOffIcon,
-} from "../../mui-core";
 import { capitalize } from "../../../components/localization";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import PropertyEntryFieldRenderer from "./PropertyEntryField";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import RestoreIcon from "@material-ui/icons/Restore";
+import QueueIcon from "@material-ui/icons/Queue";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
 
 /**

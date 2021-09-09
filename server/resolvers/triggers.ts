@@ -51,6 +51,24 @@ export interface IOTriggerArgType {
    */
   requestedUpdate: IGQLArgs;
   /**
+   * The creator for the requested update
+   * only truly exists during an add action and represents
+   * the expected creator
+   * might differ from the current user if create in behalf is active
+   */
+  requestedUpdateCreatedBy: string;
+  /**
+   * The parent for the requested update
+   * only truly exists during an add and edit action and represents
+   * the expected parent or the new parent
+   * might differ from the current user if create in behalf is active
+   */
+  requestedUpdateParent: {
+    id: string;
+    version: string;
+    type: string;
+  }
+  /**
    * Whether the requested update is trying to set the state
    * to blocked
    */

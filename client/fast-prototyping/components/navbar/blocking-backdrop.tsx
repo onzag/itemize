@@ -5,9 +5,11 @@
  */
 
 import React from "react";
-import { createStyles, WithStyles, withStyles, Theme, Backdrop, CircularProgress } from "../../mui-core";
+import { createStyles, Theme, WithStyles, withStyles } from "@material-ui/core/styles";
 import { AppIsBlockedFromUpdate } from "../../../components/outdated/AppIsBlockedFromUpdate";
 import I18nRead from "../../../components/localization/I18nRead";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 /**
  * the blocking backdrop styles

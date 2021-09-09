@@ -6,16 +6,20 @@
 
 import React from "react";
 import Link from "../../../components/navigation/Link";
-import {
-  SwipeableDrawer, List, Divider, ListItem, ListItemIcon,
-  ListItemText, createStyles, WithStyles, withStyles, Badge
-} from "../../mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead, { II18nReadProps } from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
 import { NoStateItemProvider } from "../../../providers/item";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import Badge from "@material-ui/core/Badge";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import List from "@material-ui/core/List";
+import Divider from "@material-ui/core/Divider/Divider";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 
 /**
  * The menu styles

@@ -5,10 +5,13 @@
  */
 
 import React from "react";
-import { Button, Typography, WithStyles, createStyles, withStyles, DoneIcon } from "../../mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import DoneIcon from "@material-ui/icons/Done";
 import { DialogResponsive } from "../dialog";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 /**
  * The external dialog style creator

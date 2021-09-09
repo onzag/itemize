@@ -8,24 +8,20 @@
  */
 
 import React from "react";
-import {
-  MenuItem,
-  InputAdornment,
-  IconButton,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  FilledInput,
-  Divider,
-  WithStyles,
-  withStyles,
-  createStyles,
-  Alert,
-  RestoreIcon,
-  Chip,
-} from "../../mui-core";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import InputLabel from "@material-ui/core/InputLabel";
+import RestoreIcon from "@material-ui/icons/Restore";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Select from "@material-ui/core/Select";
+import FilledInput from "@material-ui/core/FilledInput";
+import Chip from "@material-ui/core/Chip";
+import MenuItem from "@material-ui/core/MenuItem";
+import Divider from "@material-ui/core/Divider";
+import FormControl from "@material-ui/core/FormControl";
 
 /**
  * A simple helper function that says when it should show invalid

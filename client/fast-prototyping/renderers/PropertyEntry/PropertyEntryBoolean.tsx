@@ -7,10 +7,18 @@
 
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";
 import React from "react";
-import { Alert, FormControl, FormControlLabel, Switch,
-  Typography, Radio, RadioGroup, FormLabel, IconButton,
-  createStyles, WithStyles, withStyles, RestoreIcon } from "../../mui-core";
 import { capitalize } from "../../../components/localization";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import FormControl from "@material-ui/core/FormControl";
+import RestoreIcon from "@material-ui/icons/Restore";
+import FormLabel from "@material-ui/core/FormLabel";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Radio from "@material-ui/core/Radio";
+import Switch from "@material-ui/core/Switch";
 
 /**
  * The styles of the renderer

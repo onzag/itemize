@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { AppBar, Toolbar, IconButton, createStyles, WithStyles, withStyles, Theme, Typography, MenuIcon } from "../../mui-core";
+import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";
@@ -17,6 +17,11 @@ import { Menu, IMenuEntry } from "./menu";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleReader from "../../../components/util/TitleReader";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import MenuIcon from "@material-ui/icons/Menu";
 
 /**
  * the navbar styles generator

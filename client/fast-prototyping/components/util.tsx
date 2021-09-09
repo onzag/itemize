@@ -5,10 +5,11 @@
  */
 
 import React from "react";
-import { createStyles, WithStyles, withStyles, CircularProgress } from "../mui-core";
 import { DelayDisplay } from "../../components/util";
 
 import "./util.scss";
+import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 /**
  * The progressing element sytle for the progressing element

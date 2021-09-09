@@ -9,15 +9,25 @@
  */
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import React, { useEffect, useState } from "react";
-import { IAccessibleFeatureSupportOptions, IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
-import {
-  IconButton, Toolbar, WithStyles, withStyles, createStyles, AppBar,
-  AttachFileIcon, VideoLibraryIcon, InsertPhotoIcon, FormatListBulletedIcon,
-  FormatListNumberedIcon, FormatQuoteIcon, TitleIcon, FormatUnderlinedIcon, FormatItalicIcon,
-  FormatBoldIcon, MoreHorizIcon, ExpandLessIcon, Divider, LinkIcon, CheckBoxOutlineBlankIcon,
-  TextFieldsIcon, CodeIcon, Badge, Theme,
-} from "../../mui-core";
+import React from "react";
+import { IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
+import AttachFileIcon from "@material-ui/icons/AttachFile";
+import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
+import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
+import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
+import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
+import FormatQuoteIcon from "@material-ui/icons/FormatQuote";
+import TitleIcon from "@material-ui/icons/Title";
+import FormatUnderlinedIcon from "@material-ui/icons/FormatUnderlined";
+import FormatItalicIcon from "@material-ui/icons/FormatItalic";
+import FormatBoldIcon from "@material-ui/icons/FormatBold";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import LinkIcon from "@material-ui/icons/Link";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import TextFieldsIcon from "@material-ui/icons/TextFields";
+import CodeIcon from "@material-ui/icons/Code";
+
 import { Path, Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
 import { WrapperDrawer } from "./drawer";
@@ -27,6 +37,12 @@ import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
 import ReactDOM from "react-dom";
 import { countSizeAndWords } from "../../../internal/text";
+import Badge from "@material-ui/core/Badge";
+import IconButton from "@material-ui/core/IconButton";
+import Divider from "@material-ui/core/Divider";
+import { Theme, WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from "@material-ui/core/AppBar";
 
 /**
  * Defining a bunch of styles for the wrapper

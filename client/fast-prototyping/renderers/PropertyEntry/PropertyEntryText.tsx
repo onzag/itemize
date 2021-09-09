@@ -9,15 +9,18 @@
  * @module
  */
 import React from "react";
-import {
-  InputLabel, IconButton, Typography, RestoreIcon, ClearIcon,
-  WithStyles, withStyles, createStyles, Alert,
-} from "../../mui-core";
 import { IPropertyEntryTextRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { SlateEditor } from "../../components/slate";
 import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
 
 import { capitalize } from "../../../../util";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import InputLabel from "@material-ui/core/InputLabel";
+import RestoreIcon from "@material-ui/icons/Restore";
+import ClearIcon from "@material-ui/icons/Clear";
 
 /**
  * A simple helper function that says when it should show invalid

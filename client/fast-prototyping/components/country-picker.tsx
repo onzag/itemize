@@ -4,9 +4,11 @@
  * @module
  */
 
+import Button from "@material-ui/core/Button";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import React from "react";
 import { capitalize } from "../../components/localization";
-import { Button, Menu, MenuItem } from "../mui-core";
 import AppCountryRetriever from "../../components/localization/AppCountryRetriever";
 import { LocaleContext } from "../../internal/providers/locale-provider";
 

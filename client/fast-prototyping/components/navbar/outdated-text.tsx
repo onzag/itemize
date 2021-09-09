@@ -5,9 +5,10 @@
  */
 
 import React from "react";
-import { Button, UpdateIcon } from "../../mui-core";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nRead from "../../../components/localization/I18nRead";
+import UpdateIcon from "@material-ui/icons/Update";
+import Button from "@material-ui/core/Button";
 
 /**
  * The props are simple it just takes a click event

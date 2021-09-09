@@ -8,12 +8,16 @@
 import React from "react";
 import ONeedsSubmitPrompt from "../../components/navigation/NeedsSubmitPrompt";
 import { Dialog } from "./dialog";
-import { Button, Typography, WithStyles, createStyles, withStyles, Theme, DoneIcon, CloseIcon } from "../mui-core";
 import { EndpointErrorType } from "../../../base/errors";
 import { IActionSubmitOptions } from "../../providers/item";
 import { ProgressingElement } from "./util";
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";
+import { WithStyles, createStyles, withStyles, Theme } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import CloseIcon from "@material-ui/icons/Close";
+import DoneIcon from "@material-ui/icons/Done";
 
 interface NeedsSubmitDialogProps {
   open: boolean;

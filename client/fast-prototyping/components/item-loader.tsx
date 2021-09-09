@@ -5,11 +5,15 @@
  */
 
 import React from "react";
-import { withStyles, WithStyles, createStyles, Typography, IconButton, CircularProgress, RefreshIcon } from "../mui-core";
 import NItemLoader from "../../components/item/ItemLoader";
 import { DelayDisplay } from "../../components/util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
+import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 /**
  * The item definition loader styles

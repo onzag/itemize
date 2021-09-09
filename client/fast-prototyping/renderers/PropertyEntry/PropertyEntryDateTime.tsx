@@ -13,8 +13,11 @@ import {
   TimePicker,
   KeyboardTimePicker,
 } from "@material-ui/pickers";
-import { Alert, Typography, createStyles, WithStyles, withStyles, TextField } from "../../mui-core";
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
 
 /**
  * A simple helper function that says when it should show invalid

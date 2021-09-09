@@ -290,6 +290,9 @@ export async function editItemDefinition(
     // and if we have a module trigger
     if (moduleTrigger) {
       // we execute the trigger
+      const isReparenting = !!(
+        gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      );
       const newValueAccordingToModule = await moduleTrigger({
         appData,
         itemDefinition,
@@ -300,6 +303,12 @@ export async function editItemDefinition(
         requestedUpdate: gqlValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
+        requestedUpdateParent: isReparenting ? {
+          id: resolverArgs.args.parent_id as string,
+          version: resolverArgs.args.parent_version as string,
+          type: resolverArgs.args.parent_type as string,
+        } : null,
+        requestedUpdateCreatedBy: null,
         newValue: null,
         newValueSQL: null,
         newValueBlocked: null,
@@ -324,6 +333,9 @@ export async function editItemDefinition(
     // same with the item definition
     if (itemDefinitionTrigger) {
       // we call the trigger
+      const isReparenting = !!(
+        gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
         appData,
         itemDefinition,
@@ -334,6 +346,12 @@ export async function editItemDefinition(
         requestedUpdate: gqlValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
+        requestedUpdateParent: isReparenting ? {
+          id: resolverArgs.args.parent_id as string,
+          version: resolverArgs.args.parent_version as string,
+          type: resolverArgs.args.parent_type as string,
+        } : null,
+        requestedUpdateCreatedBy: null,
         newValue: null,
         newValueSQL: null,
         newValueBlocked: null,
@@ -357,7 +375,7 @@ export async function editItemDefinition(
   }
 
   const isReparenting = !!(
-    resolverArgs.args.parent_id || resolverArgs.args.parent_type || resolverArgs.args.parent_version
+    gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
   );
 
   const dictionary = getDictionary(appData, resolverArgs.args);
@@ -373,9 +391,9 @@ export async function editItemDefinition(
     wholeSqlStoredValue.container_id as string,
     resolverArgs.args.listener_uuid || null,
     isReparenting ? {
-      id: resolverArgs.args.parent_id as string,
-      version: resolverArgs.args.parent_version as string,
-      type: resolverArgs.args.parent_type as string,
+      id: gqlValueToConvert.parent_id as string,
+      version: gqlValueToConvert.parent_version as string,
+      type: gqlValueToConvert.parent_type as string,
     } : null,
     (isToUnblock || isToBlock) ? {
       reason: resolverArgs.args.blocked_reason,
@@ -411,6 +429,12 @@ export async function editItemDefinition(
       requestedUpdate: gqlValueToConvert,
       requestedUpdateToBlock: isToBlock,
       requestedUpdateToUnblock: isToUnblock,
+      requestedUpdateCreatedBy: null,
+      requestedUpdateParent: isReparenting ? {
+        id: gqlValueToConvert.parent_id as string,
+        version: gqlValueToConvert.parent_version as string,
+        type: gqlValueToConvert.parent_type as string,
+      } : null,
       newValue: gqlValue,
       newValueSQL: sqlValue,
       newValueBlocked: !!sqlValue.blocked_at,
@@ -440,6 +464,12 @@ export async function editItemDefinition(
       requestedUpdate: gqlValueToConvert,
       requestedUpdateToBlock: isToBlock,
       requestedUpdateToUnblock: isToUnblock,
+      requestedUpdateCreatedBy: null,
+      requestedUpdateParent: isReparenting ? {
+        id: gqlValueToConvert.parent_id as string,
+        version: gqlValueToConvert.parent_version as string,
+        type: gqlValueToConvert.parent_type as string,
+      } : null,
       newValue: gqlValue,
       newValueSQL: sqlValue,
       newValueBlocked: !!sqlValue.blocked_at,

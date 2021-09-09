@@ -3,12 +3,10 @@ import { Path } from "slate";
 import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/PropertyEntry/PropertyEntryText";
 import { localeReplacer } from "../../../../../util";
 import React from "react";
-import {
-  Button,
-  DeleteIcon,
-  IconButton,
-} from "../../../mui-core";
 import ReactDOM from "react-dom";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 /**
  * The interactive actions that exist that mark

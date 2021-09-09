@@ -6,26 +6,22 @@
  */
 
 import React from "react";
-import {
-  WithStyles,
-  withStyles,
-  createStyles,
-  InputAdornment,
-  IconButton,
-  Typography,
-  TextField,
-  ClearIcon,
-  RestoreIcon,
-  Alert,
-  Paper,
-  MenuItem,
-} from "../../mui-core/index";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import equals from "deep-equal";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import RestoreIcon from "@material-ui/icons/Restore";
+import ClearIcon from "@material-ui/icons/Clear";
+import MenuItem from "@material-ui/core/MenuItem";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 /**
  * A simple helper function that says when it should show invalid

@@ -5,22 +5,18 @@
  */
 
 import React from "react";
-import {
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Dialog as MDialog,
-  AppBar,
-  Toolbar,
-  IconButton,
-  DialogContent,
-  DialogActions,
-  createStyles,
-  WithStyles,
-  withStyles,
-  CloseIcon,
-} from "../mui-core";
+import { WithStyles, createStyles, withStyles, useTheme } from "@material-ui/core/styles";
 import I18nRead from "../../components/localization/I18nRead";
+import { default as MDialog } from "@material-ui/core/Dialog";
+import AppBar from "@material-ui/core/AppBar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import Toolbar from "@material-ui/core/Toolbar";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import CloseIcon from "@material-ui/icons/Close";
+
 
 /**
  * The standard dialog styles

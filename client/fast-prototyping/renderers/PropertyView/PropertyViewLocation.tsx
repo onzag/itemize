@@ -4,11 +4,13 @@
  * @module
  */
 
+import IconButton from "@material-ui/core/IconButton";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 import React from "react";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { IPropertyViewLocationRendererProps } from "../../../internal/components/PropertyView/PropertyViewLocation";
-import { createStyles, withStyles, WithStyles, IconButton, GpsFixedIcon } from "../../mui-core";
 import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
+import GPSFixedIcon from "@material-ui/icons/GpsFixed";
 
 // this logic is similar to the entry
 // it has to do with SSR not supporting
@@ -124,7 +126,7 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
         ]} /> : null}
         {this.props.canResetViewportCenter ?
           <IconButton onClick={this.props.onResetViewportCenter} className={this.props.classes.restoreButton}>
-            <GpsFixedIcon/>
+            <GPSFixedIcon/>
           </IconButton>
         : null}
       </CMap>

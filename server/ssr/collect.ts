@@ -8,7 +8,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLRequestFields } from "../../gql-querier";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
-import {  IAppDataType } from "../../server";
+import { IAppDataType } from "../../server";
 import { logger } from "../logger";
 import { UNSPECIFIED_OWNER } from "../../constants";
 import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
@@ -332,6 +332,8 @@ export class Collector {
             requestedUpdate: null,
             requestedUpdateToBlock: null,
             requestedUpdateToUnblock: null,
+            requestedUpdateParent: null,
+            requestedUpdateCreatedBy: null,
             newValue: null,
             newValueSQL: null,
             newValueBlocked: null,
@@ -363,6 +365,8 @@ export class Collector {
             requestedUpdate: null,
             requestedUpdateToBlock: null,
             requestedUpdateToUnblock: null,
+            requestedUpdateParent: null,
+            requestedUpdateCreatedBy: null,
             newValue: null,
             newValueSQL: null,
             newValueBlocked: null,

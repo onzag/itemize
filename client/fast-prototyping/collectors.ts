@@ -5,9 +5,9 @@
  * @module
  */
 
+import { ServerStyleSheets } from "@material-ui/core/styles";
 import React from "react";
 import uuid from "uuid";
-import { ServerStyleSheets } from "./mui-core";
 import { ICollectorType } from "../../client";
 
 /**

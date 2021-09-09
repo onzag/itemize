@@ -7,28 +7,24 @@
 import "../../../internal/theme/leaflet.scss";
 
 import React from "react";
-import {
-  MenuItem,
-  Paper,
-  InputAdornment,
-  IconButton,
-  Typography,
-  createStyles,
-  WithStyles,
-  withStyles,
-  Alert,
-  RestoreIcon,
-  ClearIcon,
-  SearchIcon,
-  SwapHorizIcon,
-  TextField,
-} from "../../mui-core";
 import { IPropertyDefinitionSupportedLocationType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { IPropertyEntryLocationRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryLocation";
 import { capitalize } from "../../../../util";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
+import Typography from "@material-ui/core/Typography";
+import RestoreIcon from "@material-ui/icons/Restore";
+import ClearIcon from "@material-ui/icons/Clear";
+import SearchIcon from "@material-ui/icons/Search";
+import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
+import MenuItem from "@material-ui/core/MenuItem";
 
 // we import the react-leaflet types, however note
 // how we are not using them at all, this is because

@@ -12,9 +12,11 @@ import {
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
-import { ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
-  GUEST_METAROLE, 
-  OWNER_METAROLE} from "../../../constants";
+import {
+  ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,
+  GUEST_METAROLE,
+  OWNER_METAROLE
+} from "../../../constants";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
@@ -111,7 +113,7 @@ export async function deleteItemDefinition(
             );
             throw new EndpointError({
               message: "The item is blocked, only users with role " +
-              rolesThatHaveAccessToModeration.join(",") + " can wipe this data",
+                rolesThatHaveAccessToModeration.join(",") + " can wipe this data",
               code: ENDPOINT_ERRORS.BLOCKED,
             });
           }
@@ -185,6 +187,8 @@ export async function deleteItemDefinition(
         requestedUpdate: null,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
+        requestedUpdateCreatedBy: null,
+        requestedUpdateParent: null,
         newValue: null,
         newValueSQL: null,
         newValueBlocked: null,
@@ -214,13 +218,15 @@ export async function deleteItemDefinition(
         requestedUpdate: null,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
+        requestedUpdateCreatedBy: null,
+        requestedUpdateParent: null,
         newValue: null,
         newValueSQL: null,
         newValueBlocked: null,
         extraArgs: resolverArgs.args,
         action: IOTriggerActions.DELETE,
         id: resolverArgs.args.id as string,
-        version: resolverArgs.args.version as string || null,
+        version: resolverArgs.args.version as string || null,
         user: {
           role: tokenData.role,
           id: tokenData.id,
@@ -253,6 +259,8 @@ export async function deleteItemDefinition(
       requestedUpdate: null,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
+      requestedUpdateCreatedBy: null,
+      requestedUpdateParent: null,
       newValue: null,
       newValueSQL: null,
       newValueBlocked: null,
@@ -283,13 +291,15 @@ export async function deleteItemDefinition(
       requestedUpdate: null,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
+      requestedUpdateCreatedBy: null,
+      requestedUpdateParent: null,
       newValue: null,
       newValueSQL: null,
       newValueBlocked: null,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,
-      version: resolverArgs.args.version as string || null,
+      version: resolverArgs.args.version as string || null,
       user: {
         role: tokenData.role,
         id: tokenData.id,

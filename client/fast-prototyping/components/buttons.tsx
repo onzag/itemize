@@ -12,9 +12,10 @@ import SubmitActioner from "../../components/item/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
 import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
-import { Button, PropTypes } from "../mui-core";
 import DeleteActioner from "../../components/item/DeleteActioner";
 import { CreateReportDialog } from "./moderation";
+import Button from "@material-ui/core/Button";
+import type { PropTypes } from "@material-ui/core";
 
 /**
  * A redirect function called on the success event

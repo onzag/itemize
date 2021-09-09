@@ -7,18 +7,6 @@
 
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  FilledInput,
-  MenuItem,
-  TextField,
-  FormControlLabel,
-  Switch,
-  Typography,
-  Paper,
-} from "../../../mui-core";
 import { IContainer } from "../../../../internal/text/serializer/types/container";
 import { ITitle } from "../../../../internal/text/serializer/types/title";
 import { IImage } from "../../../../internal/text/serializer/types/image";
@@ -31,6 +19,16 @@ import {
   IDrawerUIHandlerElementConfigCustomProps
 } from "../wrapper";
 import type { ISlateEditorStateType } from "..";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import FilledInput from "@material-ui/core/FilledInput";
+import MenuItem from "@material-ui/core/MenuItem";
+import Paper from "@material-ui/core/Paper";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 
 /**
  * The state of the general option selector for the given item

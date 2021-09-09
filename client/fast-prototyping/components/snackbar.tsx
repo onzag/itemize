@@ -5,10 +5,13 @@
  */
 
 import React from "react";
-import { Snackbar as MUISnackbar, IconButton, withStyles, WithStyles, createStyles, Theme, CloseIcon } from "../mui-core";
+import { WithStyles, createStyles, withStyles, Theme } from "@material-ui/core/styles";
 import { EndpointErrorType } from "../../../base/errors";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
+import { default as MUISnackbar } from "@material-ui/core/Snackbar";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 /**
  * the snackbar styles

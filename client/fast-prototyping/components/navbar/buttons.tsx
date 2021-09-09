@@ -5,11 +5,12 @@
  */
 
 import React from "react";
-import { Button, Theme, createStyles, WithStyles, withStyles } from "../../mui-core";
+import { createStyles, Theme, WithStyles, withStyles } from "@material-ui/core/styles";
 import { LanguagePicker } from "../language-picker";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import { IfLogStatus } from "../../../components/login/IfLogStatus";
 import I18nRead from "../../../components/localization/I18nRead";
+import Button from "@material-ui/core/Button";
 
 /**
  * provides the styles for the buttons
