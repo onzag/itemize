@@ -2,7 +2,10 @@ import React from "react";
 
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 
-import { Paper, createStyles, withStyles, WithStyles, Container, Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
 
 /**
  * The information styles

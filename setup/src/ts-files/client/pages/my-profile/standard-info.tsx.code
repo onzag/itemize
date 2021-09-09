@@ -11,11 +11,24 @@ import UserActioner from "@onzag/itemize/client/components/user/UserActioner";
 import DifferingPropertiesRetriever from
 	"@onzag/itemize/client/components/item/DifferingPropertiesRetriever";
 
-import { Button, Box, Paper, createStyles, withStyles, WithStyles,
-	Divider, Theme, DoneIcon, DoneOutlineIcon, MailIcon,
-	Alert, AlertTitle, FaceIcon,
-	ErrorIcon, AccountCircleIcon, AlernateEmailIcon,
-	PhoneIphoneIcon, TextField, IconButton } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import DoneIcon from "@material-ui/icons/Done";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import Alert from "@material-ui/lab/Alert";
+import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
+import MailIcon from "@material-ui/icons/Mail";
+import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
+import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
+import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import IconButton from "@material-ui/core/IconButton";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import TextField from "@material-ui/core/TextField";
+import ErrorIcon from "@material-ui/icons/Error";
+import FaceIcon from "@material-ui/icons/Face";
+
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 import { CountryPicker } from "@onzag/itemize/client/fast-prototyping/components/country-picker";

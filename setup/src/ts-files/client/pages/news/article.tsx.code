@@ -8,8 +8,11 @@ import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/it
 import View from "@onzag/itemize/client/components/property/View";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
-import { Container, WithStyles, withStyles,
-	Theme, createStyles, Paper, Typography, Divider } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
 
 import { Avatar } from "../../components/avatar";
 

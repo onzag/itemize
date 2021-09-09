@@ -8,8 +8,12 @@ import AppLanguageRetriever from "@onzag/itemize/client/components/localization/
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
-import { withStyles, createStyles, WithStyles,
-	Typography, Paper, Theme, Box, Container, Button } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
 
 import { Avatar } from "../../components/avatar";
 

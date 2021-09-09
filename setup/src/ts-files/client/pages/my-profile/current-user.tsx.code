@@ -5,8 +5,13 @@ import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner"
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { Button, Container, createStyles, WithStyles, withStyles,
-	Box, Typography, ExitToAppIcon, ArrowBackIcon} from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container/Container";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import Box from "@material-ui/core/Box";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
 

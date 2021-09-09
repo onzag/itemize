@@ -12,11 +12,15 @@ import Entry from "@onzag/itemize/client/components/property/Entry";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import {
-	Paper, createStyles, withStyles, WithStyles,
-	Container, Box, List, ListItem, ListItemText,
-	ExtensionIcon, ListItemIcon,
-} from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import ExtensionIcon from "@material-ui/icons/Extension";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate";

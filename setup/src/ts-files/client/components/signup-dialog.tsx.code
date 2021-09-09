@@ -12,8 +12,12 @@ import AppCurrencyRetriever from "@onzag/itemize/client/components/localization/
 import I18nReadError from "@onzag/itemize/client/components/localization/I18nReadError";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 
-import { Button, createStyles, withStyles, WithStyles,
-	Typography, Divider, DoneIcon, AccountCircleIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import DoneIcon from "@material-ui/icons/Done";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";

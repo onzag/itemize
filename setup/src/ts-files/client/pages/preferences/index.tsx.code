@@ -2,8 +2,6 @@ import React from "react";
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
 import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
-import { Paper, createStyles, withStyles, WithStyles, Container, Divider, Box,
-	NotificationsIcon, MenuBookIcon, DoneOutlineIcon, PersonPinIcon, PhoneIphoneIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import { NeedsSubmitPrompt } from "@onzag/itemize/client/fast-prototyping/components/needs-submit-prompt";
@@ -12,6 +10,17 @@ import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
+
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Divider from "@material-ui/core/Divider";
+import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
+import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import PersonPinIcon from "@material-ui/icons/PersonPin";
+import MenuBookIcon from "@material-ui/icons/MenuBook";
 
 /**
  * The styles for the preferences page

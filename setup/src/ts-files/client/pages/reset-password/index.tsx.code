@@ -9,11 +9,15 @@ import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
+import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import DoneIcon from "@material-ui/icons/Done";
+import Container from "@material-ui/core/Container/Container";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
-import {
-	createStyles, withStyles, WithStyles, Typography,
-	Paper, Container, Divider, Button, DoneIcon, TextField
-} from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 

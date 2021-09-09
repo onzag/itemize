@@ -23,9 +23,9 @@ And get into it
 
 `npm init`
 
-Install the peer dependencies
+Install the peer dependencies, note that material ui is only used for fast prototyping, and you can get rid of it afterwards by deciding not to use it in your project but it's necessary for proper initialization due to it being a dependency for fast prototyping client components (you'd get an error otherwise)
 
-`npm install --save react react-dom @types/react @types/react-dom`
+`npm install --save react react-dom @types/react @types/react-dom @material-ui/core @material-ui/icons @material-ui/lab @material-ui/pickers`
 
 Install itemize
 

@@ -3,7 +3,8 @@ import React from "react";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 
-import { createStyles, WithStyles, withStyles, Theme, CopyrightIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
+import CopyrightIcon from "@material-ui/icons/Copyright";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 import { CurrencyPicker } from "@onzag/itemize/client/fast-prototyping/components/currency-picker";
 import { CountryPicker } from "@onzag/itemize/client/fast-prototyping/components/country-picker";
