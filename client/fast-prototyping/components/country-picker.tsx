@@ -25,6 +25,10 @@ interface ICountryPickerProps {
    */
   useCode?: boolean;
   /**
+   * Whether to use the phone code rather than the native name
+   */
+  usePhoneCode?: boolean;
+  /**
    * Whether null is a valid value
    */
   allowUnspecified?: boolean;
@@ -107,7 +111,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
       return (
         <LocaleContext.Consumer>
           {(localeContext) => (
-            <CountryPicker {...this.props} unspecifiedLabel={localeContext.i18n[localeContext.language].unspecified}/>
+            <CountryPicker {...this.props} unspecifiedLabel={localeContext.i18n[localeContext.language].unspecified} />
           )}
         </LocaleContext.Consumer>
       );
@@ -118,7 +122,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
         {(countryData) => {
           let currentCountry = countryData.currentCountry;
           if (typeof this.props.currentCode !== "undefined") {
-            currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode) || null;
+            currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode) || null;
           }
           if (currentCountry === null) {
             currentCountry = {
@@ -162,7 +166,10 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                 startIcon={currentCountry.emoji}
                 onClick={this.handleButtonSelectClick}
               >
-                {this.props.useCode && currentCountry.code ? currentCountry.code : currentCountry.native}
+                {
+                  this.props.usePhoneCode && currentCountry.phone ?
+                    "+" + currentCountry.phone :
+                    (this.props.useCode && currentCountry.code ? currentCountry.code : currentCountry.native)}
               </Button>
               {menu}
             </React.Fragment>

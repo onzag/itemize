@@ -23,6 +23,8 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import TextField from "@material-ui/core/TextField";
 import IconVisibility from "@material-ui/icons/Visibility";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
+import { CountryPicker } from "../../components/country-picker";
+import type { ICountryType } from "../../../../imported-resources";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -138,6 +140,10 @@ export const style = createStyles({
     backgroundColor: "white",
     borderBottom: "solid 1px #eee",
   },
+  fieldForPhone: {
+    width: "100%",
+    display: "flex",
+  }
 });
 
 /**
@@ -159,6 +165,10 @@ interface IPropertyEntryFieldRendererState {
    * to change the current is open
    */
   dialogOpen: boolean;
+  /*
+   * the default country code
+   */
+  defaultCountryCode: string;
 }
 
 /**
@@ -206,21 +216,21 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
             button={true}
             onClick={closeAndChangeUnit.bind(null, props.unitPrimary)}
           >
-            <ListItemText primary={props.unitToNode(props.unitPrimary)}/>
+            <ListItemText primary={props.unitToNode(props.unitPrimary)} />
           </ListItem>
           <ListItem
             selected={props.unitPrimaryImperial === props.unit}
             button={true}
             onClick={closeAndChangeUnit.bind(null, props.unitPrimaryImperial)}
           >
-            <ListItemText primary={props.unitToNode(props.unitPrimaryImperial)}/>
+            <ListItemText primary={props.unitToNode(props.unitPrimaryImperial)} />
           </ListItem>
         </List>
         {!props.unitIsLockedToPrimaries ? <>
-          <Divider/>
+          <Divider />
           <List
             subheader={<ListSubheader
-              classes={{root: "props.subheaderClassName"}}
+              classes={{ root: "props.subheaderClassName" }}
             >
               {props.unitI18n.others}
             </ListSubheader>}
@@ -232,13 +242,13 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
                 onClick={closeAndChangeUnit.bind(null, unit)}
                 key={unit}
               >
-                <ListItemText primary={props.unitToNode(unit)}/>
+                <ListItemText primary={props.unitToNode(unit)} />
               </ListItem>
             ))}
           </List>
-          <Divider/>
+          <Divider />
           <List
-            subheader={<ListSubheader classes={{root: "props.subheaderClassName"}}>
+            subheader={<ListSubheader classes={{ root: "props.subheaderClassName" }}>
               {props.unitPrefersImperial ? props.unitI18n.metric : props.unitI18n.imperial}
             </ListSubheader>}
           >
@@ -249,7 +259,7 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
                 onClick={closeAndChangeUnit.bind(null, unit)}
                 key={unit}
               >
-                <ListItemText primary={props.unitToNode(unit)}/>
+                <ListItemText primary={props.unitToNode(unit)} />
               </ListItem>
             ))}
           </List>
@@ -262,11 +272,11 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
 /**
  * The select unit dialog, but responsive
  */
-const SelectUnitDialogResponsive = function(props: ISelectCurrencyDialogProps) {
+const SelectUnitDialogResponsive = function (props: ISelectCurrencyDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  return <SelectUnitDialog {...props} fullScreen={fullScreen}/>;
+  return <SelectUnitDialog {...props} fullScreen={fullScreen} />;
 }
 
 /**
@@ -314,7 +324,7 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
               onClick={closeAndChangeCurrency.bind(null, currency.code)}
               key={currency.code}
             >
-              <ListItemText primary={currency.symbol + " - " + currency.code}/>
+              <ListItemText primary={currency.symbol + " - " + currency.code} />
             </ListItem>
           ))}
         </List>
@@ -326,11 +336,11 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
 /**
  * The select currency dialog, but responsive
  */
-const SelectCurrencyDialogResponsive = function(props: ISelectCurrencyDialogProps) {
+const SelectCurrencyDialogResponsive = function (props: ISelectCurrencyDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  return <SelectCurrencyDialog {...props} fullScreen={fullScreen}/>;
+  return <SelectCurrencyDialog {...props} fullScreen={fullScreen} />;
 }
 
 /**
@@ -344,12 +354,13 @@ class ActualPropertyEntryFieldRenderer
   private inputRef: HTMLInputElement;
   private inputRefSelectionStart: number;
 
-  constructor(props: IPropertyEntryFieldRendererWithStylesProps) {
+  constructor(props: IPropertyEntryFieldRendererWithStylesProps) {
     super(props);
 
     this.state = {
       visible: props.type !== "password",
       dialogOpen: false,
+      defaultCountryCode: props.country && props.country.code,
     }
 
     this.toggleVisible = this.toggleVisible.bind(this);
@@ -358,6 +369,7 @@ class ActualPropertyEntryFieldRenderer
     this.closeDialog = this.closeDialog.bind(this);
     this.openDialog = this.openDialog.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onPhoneCountryChange = this.onPhoneCountryChange.bind(this);
   }
 
   public componentDidMount() {
@@ -383,7 +395,7 @@ class ActualPropertyEntryFieldRenderer
       if (
         typeof this.inputRefSelectionStart !== "undefined" &&
         typeof this.inputRef.setSelectionRange !== "undefined"
-      ) { 
+      ) {
         // We need to do it in a timeout of 0 because chrome reports
         // the wrong caret location and will refuse to update otherwise
         // adding this as a side effect say as a callback of setState
@@ -414,7 +426,20 @@ class ActualPropertyEntryFieldRenderer
     // the change has two values, a textual value, and a
     // numeric value, texual value is always set but
     // numeric value is only set for numbers
-    const value: string = e.target.value.toString();
+    let value: string = e.target.value.toString();
+
+    if (this.props.subtype === "phone" && value !== "") {
+      const currentCountryUsed = this.props.currentValue ?
+        this.props.countriesAvailable.find((c) => this.props.currentValue.toString().indexOf("+" + c.phone) === 0) :
+        this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode);
+
+      if (value.indexOf("0") === 0) {
+        value = value.replace("0", "+" + currentCountryUsed.phone);
+      } else {
+        value = "+" + currentCountryUsed.phone + value;
+      }
+    }
+
     this.props.onChangeByTextualValue(value);
   }
 
@@ -432,8 +457,25 @@ class ActualPropertyEntryFieldRenderer
 
   public onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (this.props.args.onEnter && e.keyCode === 13) {
-      this.props.args.onEnter();      
+      this.props.args.onEnter();
     }
+  }
+
+  public onPhoneCountryChange(newCountryCode: string) {
+    const phoneCodeOfNewCountry = "+" + this.props.countriesAvailable.find((c) => c.code === newCountryCode).phone;
+    const phoneCodeOfOldCountry = "+" + (this.props.currentValue ?
+      this.props.countriesAvailable.find((c) => this.props.currentValue.toString().indexOf("+" + c.phone) === 0).phone :
+      this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode).phone);
+
+    const currentValue = this.props.currentValue;
+    if (currentValue) {
+      const newValue = currentValue.toString().replace(phoneCodeOfOldCountry, phoneCodeOfNewCountry);
+      this.props.onChangeByTextualValue(newValue);
+    }
+
+    this.setState({
+      defaultCountryCode: newCountryCode,
+    });
   }
 
   public render() {
@@ -443,6 +485,9 @@ class ActualPropertyEntryFieldRenderer
     let inputMode = "text";
     if (this.props.subtype === "email") {
       inputMode = "email";
+    }
+    if (this.props.subtype === "phone") {
+      inputMode = "phone";
     }
 
     // these are the inputProps of the small input
@@ -470,11 +515,11 @@ class ActualPropertyEntryFieldRenderer
         >
           <IconButton
             tabIndex={-1}
-            classes={{root: this.props.classes.iconButton}}
+            classes={{ root: this.props.classes.iconButton }}
             onClick={this.toggleVisible}
             onMouseDown={this.catchToggleMouseDownEvent}
           >
-            {this.state.visible ? <IconVisibility/> : <IconVisibilityOff/>}
+            {this.state.visible ? <IconVisibility /> : <IconVisibilityOff />}
           </IconButton>
         </InputAdornment>
       );
@@ -487,7 +532,7 @@ class ActualPropertyEntryFieldRenderer
           >
             <IconButton
               tabIndex={-1}
-              classes={{root: this.props.classes.iconButtonSmall}}
+              classes={{ root: this.props.classes.iconButtonSmall }}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
             >
@@ -503,7 +548,7 @@ class ActualPropertyEntryFieldRenderer
           >
             <IconButton
               tabIndex={-1}
-              classes={{root: this.props.classes.iconButton}}
+              classes={{ root: this.props.classes.iconButton }}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
             >
@@ -531,7 +576,7 @@ class ActualPropertyEntryFieldRenderer
     } else if (this.props.canRestore) {
       let icon: React.ReactNode;
       if (this.props.currentAppliedValue) {
-        icon = <RestoreIcon/>
+        icon = <RestoreIcon />
       } else {
         icon = <ClearIcon />
       }
@@ -542,7 +587,7 @@ class ActualPropertyEntryFieldRenderer
         >
           <IconButton
             tabIndex={-1}
-            classes={{root: this.props.classes.iconButton}}
+            classes={{ root: this.props.classes.iconButton }}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
           >
@@ -556,7 +601,7 @@ class ActualPropertyEntryFieldRenderer
         <InputAdornment position="end" className={this.props.classes.standardAddornment}>
           <IconButton
             tabIndex={-1}
-            classes={{root: this.props.classes.iconButton}}
+            classes={{ root: this.props.classes.iconButton }}
           >
             {this.props.icon}
           </IconButton>
@@ -580,53 +625,83 @@ class ActualPropertyEntryFieldRenderer
       />
     ) : null;
 
+    let valueToUse = this.props.currentTextualValue;
+    let currentCountryUsed: ICountryType = null;
+    if (this.props.subtype === "phone") {
+      currentCountryUsed = this.props.currentValue ?
+        this.props.countriesAvailable.find((c) => this.props.currentValue.toString().indexOf("+" + c.phone) === 0) :
+        this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode);
+
+      if (valueToUse) {
+        valueToUse = valueToUse.replace("+" + currentCountryUsed.phone, "0");
+      }
+    }
+
+    const textField = (
+      <TextField
+        fullWidth={true}
+        type={this.state.visible ? "text" : "password"}
+        className={this.props.classes.entry}
+        label={this.props.label}
+        placeholder={this.props.placeholder}
+        value={valueToUse}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        onBlur={this.props.enableUserSetErrors}
+        InputProps={{
+          classes: {
+            root: this.props.classes.fieldInput,
+            focused: "focused",
+          },
+          disabled: this.props.disabled,
+          ...appliedInputProps,
+        }}
+        InputLabelProps={{
+          classes: {
+            root: this.props.classes.label,
+            focused: "focused",
+          },
+        }}
+        inputProps={inputProps}
+        disabled={this.props.disabled}
+        variant="filled"
+        {...appliedTextFieldProps}
+      />
+    );
+
+    let fieldComponent = textField;
+    if (this.props.subtype === "phone") {
+      fieldComponent = (
+        <div className={this.props.classes.fieldForPhone}>
+          <CountryPicker
+            currentCode={currentCountryUsed.code}
+            handleCountryChange={this.onPhoneCountryChange}
+            usePhoneCode={true}
+          />
+          {textField}
+        </div>
+      )
+    }
+
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     // return the complex overengineered component in all its glory
     return (
       <div className={this.props.classes.container}>
         {
           this.props.description && descriptionAsAlert ?
-          <Alert severity="info" className={this.props.classes.description}>
-            {this.props.description}
-          </Alert> :
-          null
+            <Alert severity="info" className={this.props.classes.description}>
+              {this.props.description}
+            </Alert> :
+            null
         }
         {
           this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={this.props.classes.description}>
-            {this.props.description}
-          </Typography> :
-          null
+            <Typography variant="caption" className={this.props.classes.description}>
+              {this.props.description}
+            </Typography> :
+            null
         }
-        <TextField
-          fullWidth={true}
-          type={this.state.visible ? "text" : "password"}
-          className={this.props.classes.entry}
-          label={this.props.label}
-          placeholder={this.props.placeholder}
-          value={this.props.currentTextualValue}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          onBlur={this.props.enableUserSetErrors}
-          InputProps={{
-            classes: {
-              root: this.props.classes.fieldInput,
-              focused: "focused",
-            },
-            disabled: this.props.disabled,
-            ...appliedInputProps,
-          }}
-          InputLabelProps={{
-            classes: {
-              root: this.props.classes.label,
-              focused: "focused",
-            },
-          }}
-          inputProps={inputProps}
-          disabled={this.props.disabled}
-          variant="filled"
-          {...appliedTextFieldProps}
-        />
+        {fieldComponent}
         <div className={this.props.classes.errorMessage}>
           {this.props.currentInvalidReason}
         </div>

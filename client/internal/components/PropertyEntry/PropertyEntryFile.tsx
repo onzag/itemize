@@ -347,14 +347,16 @@ export default class PropertyEntryFile
     });
   }
   public render() {
+    const currentValue = this.getCurrentValue();
+
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const i18nLabel = this.props.hideLabel ? null : (typeof this.props.altLabel !== "undefined" ? this.props.altLabel : (i18nData && i18nData.label));
     const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
     const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
-    const isSupportedImage = !this.props.state.value ?
+    const isSupportedImage = !currentValue ?
       false :
-      FILE_SUPPORTED_IMAGE_TYPES.includes((this.props.state.value as PropertyDefinitionSupportedFileType).type);
+      FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
 
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
@@ -368,7 +370,6 @@ export default class PropertyEntryFile
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const currentValue = this.getCurrentValue();
     const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, this.props.property) : null;
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
 

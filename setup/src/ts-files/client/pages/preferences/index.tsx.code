@@ -101,7 +101,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 											<SubmitButton
 												i18nId="update_your_preferences"
 												options={{
-													properties: ["e_notifications", "e_newsletter", "address"],
+													properties: ["e_notifications", "p_notifications", "e_newsletter", "address"],
 													differingOnly: true,
 													unpokeAfterAny: true,
 												}}

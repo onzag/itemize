@@ -131,6 +131,7 @@ export async function buildLang(
       if (!propertyToRequestObject.base) {
         propertyResult = propertiesRoot[locale];
       }
+      
       if (!propertyResult) {
         throw new CheckUpError(
           "File does not include data for locale '" + locale + "'",

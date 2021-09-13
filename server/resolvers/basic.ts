@@ -825,7 +825,8 @@ export async function serverSideCheckItemDefinitionAgainst(
         }
       );
       throw new EndpointError({
-        message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated value`,
+        message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated` +
+        ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(gqlPropertyValue)}`,
         code: ENDPOINT_ERRORS.INVALID_PROPERTY,
         // someone might have been trying to hack for this to happen
         // a null pcode is a red flag, well almost all these checks show tampering

@@ -203,7 +203,7 @@ export async function editItemDefinition(
   // and that the updated value will be exactly the result and it will be valid
   await serverSideCheckItemDefinitionAgainst(
     itemDefinition,
-    expectedUpdatedValue,
+    resolverArgs.args,
     resolverArgs.args.id,
     resolverArgs.args.version || null,
   );

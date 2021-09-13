@@ -66,7 +66,7 @@ function i18nReadErrorInternal(
   // in an module, item, include, etc... context, it's an average error
   if (!freeError.modulePath) {
     // so we get the error message directly from the locale context
-    let errorMessage: string = localeContext.i18n[localeContext.language].error[props.error.code];
+    let errorMessage: string = localeContext.i18n[localeContext.language].error[props.error.code] || props.error.code;
     if (props.capitalize) {
       errorMessage = capitalize(errorMessage);
     }

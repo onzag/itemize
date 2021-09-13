@@ -137,7 +137,7 @@ export interface IPropertyEntryI18nRichTextInfo {
     submit: string;
   };
 
-  richCustom: {
+  richUIHandlerElement: {
     [key: string]: string;
   }
 }
@@ -1016,7 +1016,7 @@ export default class PropertyEntryText
           submit: i18nInLanguage.add_template_html_submit,
         },
 
-        richCustom: i18nRoot.rich_custom || {},
+        richUIHandlerElement: i18nRoot.rich_ui_handler_element || {},
       } : null,
 
       i18nGenericError: i18nInLanguage.generic_error,

@@ -9,7 +9,7 @@ import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../util";
 import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
 import { MAX_DECIMAL_COUNT } from "../../../../constants";
-import { ICurrencyType, currencies, arrCurrencies } from "../../../../imported-resources";
+import { ICurrencyType, currencies, arrCurrencies, ICountryType, arrCountries } from "../../../../imported-resources";
 import convert from "convert-units";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
 import { deepRendererArgsComparer } from "../general-fn";
@@ -93,7 +93,7 @@ interface IUnitI18nType {
  * Contains the currency i18n data, usually to build
  * a dialog or menu of sorts
  */
-interface ICurrencyI18nType {
+interface ICurrencyI18nType {
   /**
    * The title of such structure
    */
@@ -112,7 +112,7 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
   /**
    * These are the subtypes
    */
-  subtype?: "email" | "identifier" | "locale" | "comprehensive-locale" | "language" | "country" | "currency" | "plain" | string;
+  subtype?: "email" | "identifier" | "locale" | "comprehensive-locale" | "language" | "country" | "currency" | "plain" | string;
   /**
    * The html autocomplete value is a property that comes in the schema to define how it is
    * to be html autocompleted
@@ -134,6 +134,15 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
    * of knowing what value to apply to the actual item definition
    */
   onChangeByTextualValue: (textualValue: string) => void;
+
+  /**
+   * The country we are currently using, only avaliable if subtype is phone or country
+   */
+  country?: ICountryType;
+  /**
+   * The countries we have available, only avaliable if subtype is phone or country
+   */
+  countriesAvailable?: ICountryType[];
 
   /**
    * So the curency we are currently using, only available if type="currency"
@@ -225,8 +234,8 @@ interface IPropertyEntryFieldState {
  */
 export default class PropertyEntryField
   extends React.Component<
-    IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
-    IPropertyEntryFieldState
+  IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
+  IPropertyEntryFieldState
   > {
 
   constructor(props: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>) {
@@ -258,10 +267,10 @@ export default class PropertyEntryField
     if (unit === "l") {
       // we just return big liter
       return <span>L</span>;
-    // for mililiters, deciliters, kiloliters, etc...
+      // for mililiters, deciliters, kiloliters, etc...
     } else if (unit === "ml" || unit === "cl" || unit === "dl" || unit === "kl") {
       return <span>{unit[0]}L</span>;
-    // degrees, celcius, farenheit, kelvin, and whatever R degrees are
+      // degrees, celcius, farenheit, kelvin, and whatever R degrees are
     } else if (unit === "C" || unit === "K" || unit === "F" || unit === "R") {
       return <span>&deg;{unit}</span>;
     }
@@ -276,7 +285,7 @@ export default class PropertyEntryField
     );
   }
 
-  public componentDidMount() {
+  public componentDidMount() {
     // we take the initial prefill, which only truly exists for the unit and currency type
     const initialPrefill = this.props.property.getSpecialProperty("initialPrefill") as number;
     // and if we have one
@@ -310,7 +319,7 @@ export default class PropertyEntryField
         currency: this.props.currency.code,
       }, this.props.state.internalValue);
 
-    // otherwise if our country code changed
+      // otherwise if our country code changed
     } else if (
       prevProps.country.code !== this.props.country.code &&
       this.props.property.getType() === "unit" &&
@@ -471,8 +480,8 @@ export default class PropertyEntryField
     // it's the standard unit for this user
     const currentUnit = (
       this.props.state.value ?
-      (this.props.state.value as IPropertyDefinitionSupportedUnitType).unit :
-      (this.props.state.internalValue && this.props.state.internalValue.unit)
+        (this.props.state.value as IPropertyDefinitionSupportedUnitType).unit :
+        (this.props.state.internalValue && this.props.state.internalValue.unit)
     ) || usedUnit;
 
     // return that info
@@ -489,8 +498,8 @@ export default class PropertyEntryField
     const countrySelectedCurrency = this.props.currency.code;
     const currentCurrency = (
       this.props.state.value ?
-      (this.props.state.value as IPropertyDefinitionSupportedCurrencyType).currency :
-      (this.props.state.internalValue && this.props.state.internalValue.currency)
+        (this.props.state.value as IPropertyDefinitionSupportedCurrencyType).currency :
+        (this.props.state.internalValue && this.props.state.internalValue.currency)
     ) || countrySelectedCurrency;
     return [currentCurrency, countrySelectedCurrency];
   }
@@ -560,7 +569,7 @@ export default class PropertyEntryField
       // NaN is a possibility
       numericValue = parseFloat(normalizedTextualValueAsString);
 
-    // if we have an integer of course the normalized value is the same
+      // if we have an integer of course the normalized value is the same
     } else if (numericType === NumericType.INTEGER) {
       // we just set the numeric value
       // NaN is a possibility
@@ -643,11 +652,11 @@ export default class PropertyEntryField
     } else if (type === "unit") {
       const [newUnit, standardUnit] = this.getCurrentUnit();
       this.props.onChange({
-         value: actualNumericValue,
-         unit: newUnit,
-         normalizedValue: convert(actualNumericValue)
-           .from(newUnit as any).to(standardUnit as any),
-         normalizedUnit: standardUnit,
+        value: actualNumericValue,
+        unit: newUnit,
+        normalizedValue: convert(actualNumericValue)
+          .from(newUnit as any).to(standardUnit as any),
+        normalizedUnit: standardUnit,
       }, {
         unit: newUnit,
         value: newTextualValue,
@@ -694,6 +703,13 @@ export default class PropertyEntryField
       currencyI18n = {
         title: this.props.i18n[this.props.language].currency_dialog_title,
       };
+    }
+
+    let country: ICountryType = null;
+    let countriesAvailable: ICountryType[] = null;
+    if (subtype === "phone" || subtype === "country") {
+      countriesAvailable = arrCountries;
+      country = this.props.country;
     }
 
     let unitPrefersImperial: boolean;
@@ -755,7 +771,7 @@ export default class PropertyEntryField
     const RendererElement = this.props.renderer;
     const rendererArgs = {
       propertyId: this.props.property.getId(),
-  
+
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
       label: i18nLabel,
@@ -774,7 +790,7 @@ export default class PropertyEntryField
       currentTextualValue,
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
-      disabled: this.props.state.enforced || this.props.disabled,
+      disabled: this.props.state.enforced || this.props.disabled,
 
       autoFocus: this.props.autoFocus || false,
 
@@ -782,7 +798,10 @@ export default class PropertyEntryField
       onChangeByTextualValue: this.onChangeByTextualValue,
       onChangeCurrency: this.onChangeCurrency,
       onRestore: this.props.onRestore,
-      
+
+      country,
+      countriesAvailable,
+
       currency,
       currencyFormat: currencyFormat as any,
       currencyAvailable: currencyAvailable,
@@ -803,6 +822,6 @@ export default class PropertyEntryField
       enableUserSetErrors: this.enableUserSetErrors,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />
   }
 }

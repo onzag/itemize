@@ -98,7 +98,7 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
 
   // now let's build the name label for the given language
-  const foundCustomName = (!node.givenName && node.uiHandler) ? i18nData.richCustom[node.uiHandler.replace(/-/g,"_")] : null;
+  const foundCustomName = (!node.givenName && node.uiHandler) ? i18nData.richUIHandlerElement[node.uiHandler.replace(/-/g,"_")] : null;
   let nameLabel: string = node.givenName ? node.givenName : (
     foundCustomName || (node.type ? (i18nData[node.type] || node.type) : i18nData.text)
   );

@@ -34,6 +34,9 @@ const menuStyles = createStyles({
   },
 });
 
+type PathRetriever = (path: string) => React.ReactNode;
+type PathRetrieverFn = (ele: PathRetriever) => React.ReactNode;
+
 /**
  * The menu entry itself that specifies
  * how a menu is to be built
@@ -43,7 +46,7 @@ export interface IMenuEntry {
    * The path it will take to, aka, the navigation
    * location
    */
-  path: string;
+  path: string | PathRetrieverFn;
   /**
    * The icon to use
    */
@@ -76,7 +79,12 @@ export interface IMenuEntry {
   /**
    * A wrapper to wrap the content
    */
-   wrapper?: (entry: React.ReactNode) => React.ReactNode;
+  wrapper?: (entry: React.ReactNode) => React.ReactNode;
+  /**
+   * A wrapper key to use, normally it'd use the path as the wrapper key
+   * but if path is a function you rather specify this
+   */
+  wrapperKey?: string;
 }
 
 /**
@@ -162,11 +170,11 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
       icon = <ListItemIcon><Badge color="primary" badgeContent={entry.badgeContent}>{entry.icon}</Badge></ListItemIcon>
     }
 
-    const element = (
-      <Link to={entry.path} className={className} propagateClicks={true} key={entry.path}>
+    const elementPathFn = (path: string) => (
+      <Link to={path} className={className} propagateClicks={true} key={path}>
         <LocationReader>
           {(arg) => (
-            <ListItem button={true} selected={arg.pathname === entry.path}>
+            <ListItem button={true} selected={arg.pathname === path}>
               {icon}
               <ListItemText>
                 {i18nNodeInfo}
@@ -177,9 +185,11 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
       </Link>
     );
 
+    const element = typeof entry.path === "string" ? elementPathFn(entry.path) : entry.path(elementPathFn);
+
     if (entry.wrapper) {
       return (
-        <React.Fragment key={entry.path}>
+        <React.Fragment key={entry.wrapperKey || (typeof entry.path === "string" ? entry.path : entry.wrapperKey)}>
           {entry.wrapper(element)}
         </React.Fragment>
       );
