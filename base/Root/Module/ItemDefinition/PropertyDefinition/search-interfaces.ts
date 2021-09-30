@@ -26,6 +26,11 @@ export enum PropertyDefinitionSearchInterfacesType {
    */
   TEXT,
   /**
+   * string basic text search, uses a simple raw string as search but also enables
+   * for multiple matches as a taglist using IN
+   */
+  STRING,
+  /**
    * uses location and radius for searching
    */
   LOCATION_RADIUS,
@@ -60,6 +65,10 @@ export const PropertyDefinitionSearchInterfacesPrefixes = {
    * Used to prefix FTS queries
    */
   SEARCH: PREFIX_BUILD("SEARCH"),
+  /**
+   * Used to prefix FTS queries
+   */
+  IN: PREFIX_BUILD("IN"),
 
   // LOCATION SPECIFIC
 
@@ -102,6 +111,10 @@ export const PropertyDefinitionSearchInterfacesPrefixesList = [
     PropertyDefinitionSearchInterfacesPrefixes.SEARCH,
   ],
   [
+    PropertyDefinitionSearchInterfacesPrefixes.SEARCH,
+    PropertyDefinitionSearchInterfacesPrefixes.IN,
+  ],
+  [
     PropertyDefinitionSearchInterfacesPrefixes.LOCATION,
     PropertyDefinitionSearchInterfacesPrefixes.RADIUS,
   ],
@@ -111,5 +124,8 @@ export const PropertyDefinitionSearchInterfacesPrefixesList = [
     PropertyDefinitionSearchInterfacesPrefixes.TO,
     PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE,
     PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS,
-  ]
+  ],
+  [
+    PropertyDefinitionSearchInterfacesPrefixes.SEARCH,
+  ],
 ];

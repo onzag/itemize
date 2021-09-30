@@ -18,6 +18,7 @@ import { IPropertyDefinitionSupportedLocationType } from "./base/Root/Module/Ite
 import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import convert from "convert-units";
 import { countries } from "./imported-resources";
+import type { IAppDataType } from "./server";
 
 export const Moment = MomentDef;
 export const JSDOM = JSDOMDef;
@@ -574,6 +575,34 @@ export function convertPhoneNumberToInternational(
   }
 
   return "+" + country.phone + newNumber;
+}
+
+export function convertCurrencyValue(value: IPropertyDefinitionSupportedCurrencyType, code: string, appData: IAppDataType): IPropertyDefinitionSupportedCurrencyType {
+  if (value === null || code === null) {
+    return null;
+  } else if (value.currency === code) {
+    return value;
+  } else if (value.value === 0) {
+    return {
+      value: value.value,
+      currency: code,
+    };
+  }
+
+  const currencyFactors = appData.cache.getServerData().CURRENCY_FACTORS;
+  
+  // convert from the original value to a normalized value in the given standardized currency
+  const factor: number = currencyFactors[value.currency];
+  const normalized = factor * value.value;
+
+  // convert from the normalized to the target currency
+  const reverseFactor: number = currencyFactors[code];
+  const reversed = normalized / reverseFactor;
+
+  return {
+    value: reversed,
+    currency: code,
+  };
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

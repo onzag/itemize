@@ -59,7 +59,7 @@ interface IDialogProps {
   /**
    * A function that calls when the user wants to close the dialog
    */
-  onClose: () => void;
+  onClose: (e: React.MouseEvent) => void;
   /**
    * A function that calls when the dialog has opened
    */

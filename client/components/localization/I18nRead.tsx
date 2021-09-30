@@ -260,7 +260,7 @@ function i18nReadInternal(
   // if we are passing arguments to replace the {0} {1} etc... numbers
   if (props.args) {
     // we have two options, these are for basic types, which is faster and returns a string
-    if (props.args.every((a) => typeof a === "string" || typeof a === "number")) {
+    if (props.args.every((a) => typeof a === "string" || typeof a === "number" || a === null || typeof a === "undefined")) {
       // the standard locale replacer
       i18nValue = localeReplacer(i18nValue as string, ...props.args);
     } else {

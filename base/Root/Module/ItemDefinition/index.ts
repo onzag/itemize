@@ -1926,8 +1926,6 @@ export default class ItemDefinition {
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
       ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
 
-    console.log(rolesWithAccess, userId, ownerUserId);
-
     // if you got not access
     if (!idefLevelAccess) {
       // let's check the throw error flag

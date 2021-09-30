@@ -233,7 +233,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   },
   // it is searchable by an exact value, use text for organic things
   searchable: true,
-  searchInterface: PropertyDefinitionSearchInterfacesType.TEXT,
+  searchInterface: PropertyDefinitionSearchInterfacesType.STRING,
   allowsMinMaxLengthDefined: true,
 
   specialProperties: [

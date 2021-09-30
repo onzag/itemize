@@ -15,8 +15,9 @@ import React from "react";
  * - nullComponentArgs: an object to pass as props to the null component
  * - nullNode: a react node to render instead of the default when the value is null
  * - className: the class name for the root span container
- * - valueClassName: the class name for the actual value
- * - symbolClassName: the class name for the symbol that value has
+ * - convertedValueClassName: the class name for the actual value
+ * - convertedSymbolClassName: the class name for the symbol that value has
+ * - convertedClassName: the class name for the converted value
  * - originalClassName: the class name for the original value (if there is one)
  * - originalSymbolClassName: the class name for the original value symbol (if there is one)
  * 
@@ -25,8 +26,9 @@ import React from "react";
  */
 export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrencyRendererProps) {
   const rootClassName = props.args.className || null;
-  const valueClassName = props.args.valueClassName || null;
-  const symbolClassName = props.args.symbolClassName || null;
+  const valueClassName = props.args.convertedValueClassName || null;
+  const symbolClassName = props.args.convertedSymbolClassName || null;
+  const convertedClassName = props.args.convertedClassName || null;
   const originalClassName = props.args.originalClassName || null;
   const originalValueClassName = props.args.originalValueClassName || null;
   const originalSymbolClassName = props.args.originalSymbolClassName || null;
@@ -42,12 +44,12 @@ export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrenc
     const nullArgs = props.args.nullComponentArgs;
     return (
       <span className={rootClassName}>
-        <NullComponent {...nullArgs}/>
+        <NullComponent {...nullArgs} />
       </span>
     );
   } else if (props.currentValue === null) {
     return (
-      <span className={rootClassName}/>
+      <span className={rootClassName} />
     );
   }
 
@@ -57,11 +59,13 @@ export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrenc
   if (props.format === "$N") {
     return (
       <span className={rootClassName}>
-        <span className={symbolClassName}>
-          {mainCurrency.symbol}
-        </span>
-        <span className={valueClassName}>
-          {mainStrValue}
+        <span className={convertedClassName}>
+          <span className={symbolClassName}>
+            {mainCurrency.symbol}
+          </span>
+          <span className={valueClassName}>
+            {mainStrValue}
+          </span>
         </span>
         {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <span className={originalClassName}>
           <span className={originalSymbolClassName}>
@@ -77,11 +81,13 @@ export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrenc
 
   return (
     <span className={rootClassName}>
-      <span className={valueClassName}>
-        {mainStrValue}
-      </span>
-      <span className={symbolClassName}>
-        {mainCurrency.symbol}
+      <span className={convertedClassName}>
+        <span className={valueClassName}>
+          {mainStrValue}
+        </span>
+        <span className={symbolClassName}>
+          {mainCurrency.symbol}
+        </span>
       </span>
       {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <span className={originalClassName}>
         <span className={originalValueClassName}>

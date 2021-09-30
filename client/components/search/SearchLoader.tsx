@@ -17,7 +17,6 @@ import { LocaleContext, ILocaleContextType } from "../../internal/providers/loca
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { RemoteListener } from "../../internal/app/remote-listener";
-import { checkMismatchCondition, ICacheMetadataMismatchAction } from "../../internal/gql-client-util";
 
 /**
  * The property for the provider but with the key and no children
@@ -262,9 +261,14 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
    * we need to cleanup the search results still
    * @param props 
    */
-  public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps) {
+  public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps, currentRecords: IGQLSearchRecord[]) {
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-    (props.searchRecords || []).forEach((r) => {
+    const oldRecords = (props.searchRecords || []);
+    const newRecords = (currentRecords || []);
+    const lostRecords = oldRecords.filter((r) => {
+      return !!newRecords.find((r2) => r.id === r2.id && r.version === r2.version && r.type === r2.type);
+    });
+    lostRecords.forEach((r) => {
       const id = r.id;
       const version = r.version || null;
       const itemDefintionInQuestion = root.registry[r.type as string] as ItemDefinition;
@@ -277,19 +281,25 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public componentWillUnmount() {
     this.isUnmounted = true;
-    this.ensureCleanupOfOldSearchResults(this.props);
+    this.ensureCleanupOfOldSearchResults(this.props, null);
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     // on update we must seek what the current page is to
     // see if something changes
     let currentPage = this.props.currentPage;
 
+    // and then we slice our records to see what we need to load
+    const currentSearchRecords = (this.props.searchRecords || []).slice(
+      this.props.pageSize * currentPage,
+      this.props.pageSize * (currentPage + 1),
+    );
+
     // if this is a new search
     if (
       prevProps.searchId !== this.props.searchId
     ) {
       if (prevProps.searchResults && prevProps.cleanOnDismount) {
-        this.ensureCleanupOfOldSearchResults(prevProps);
+        this.ensureCleanupOfOldSearchResults(prevProps, currentSearchRecords);
       }
       if (this.props.searchResults) {
         this.loadSearchResults();
@@ -305,15 +315,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       }
     }
 
-    // and then we slice our records to see what we need to load
-    const currentSearchRecords = (this.props.searchRecords || []).slice(
-      this.props.pageSize * currentPage,
-      this.props.pageSize * (currentPage + 1),
-    );
-
     // if it doesn't equal what we currently have loaded
     if (
-      !equals(this.state.currentSearchRecords, currentSearchRecords, { strict: true })
+      !equals(this.state.currentSearchRecords, currentSearchRecords, { strict: true }) ||
+      !equals(this.props.searchResults, prevProps.searchResults, { strict: true })
     ) {
       // then we load the values
       this.loadValues(currentSearchRecords);
@@ -631,10 +636,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // now we set these so that once
       // we apply the values below and load value is triggered
       // in the provider it actually succeeds loading and doesn't abort
-      this.setState({
+      const finalState: Partial<IActualSearchLoaderState> = {
         error,
         currentlySearching: [],
-      });
+      };
 
       // now we need to see if we got information
       if (
@@ -657,9 +662,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
           loadedNewSearchResultsFromTheRecords[uncachedResultsToIndex[index]] = value;
 
-          this.setState({
-            currentSearchResultsFromTheRecords: loadedNewSearchResultsFromTheRecords,
-          });
+          finalState.currentSearchResultsFromTheRecords = loadedNewSearchResultsFromTheRecords;
 
           // and now the item definition that we are referring to from the registry
           const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -714,6 +717,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
           }
         });
+
+        this.setState(finalState as any);
       }
     } else {
       if (this.lastSearchLoadValuesTime !== currentSearchLoadTime || this.isUnmounted) {

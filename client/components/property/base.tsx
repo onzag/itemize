@@ -20,20 +20,23 @@ import { IGQLFile } from "../../../gql-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
 import equals from "deep-equal";
 
-/**
- * The base interface, all entry, read, view, set contain these attributes
- */
-export interface IPropertyBaseProps {
+export interface IPropertyCoreProps {
   /**
-  * the id of the property that must exist under the item definition
-  * provider
-  */
+    * the id of the property that must exist under the item definition
+    * provider
+    */
   id: string;
   /**
    * A search variant, exact, from, to, radius, etc...
    * only truly available in search mode
    */
   searchVariant?: SearchVariants;
+}
+
+/**
+ * The base interface, all entry, read, view, set contain these attributes
+ */
+export interface IPropertyBaseProps extends IPropertyCoreProps {
   /**
    * the policy type, should be provided with a policy name
    */
@@ -234,7 +237,7 @@ export function EntryViewReadSet(
                               .getPropertyDefinitionFor(actualId, true)
                         )
                     ) : null;
-                    
+
                     // now we need to get the property state
                     let propertyState: IPropertyDefinitionState = null;
                     // if it's not a meta property we can access it
@@ -324,7 +327,7 @@ export function EntryViewReadSet(
                           gqlValue = itemContextualValue.forVersion;
                         } else {
                           gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
-                           itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
+                            itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
                         }
 
                         // if it's undefined we give null
@@ -338,7 +341,7 @@ export function EntryViewReadSet(
                       // Property has no state, and no internal value, it must be somehow hidden
                       return null;
 
-                    // we go now for views
+                      // we go now for views
                     } else if (type === "view") {
                       // now in the case of these, we have special considerations
                       if (propertyState) {
@@ -391,7 +394,7 @@ export function EntryViewReadSet(
                       // has no state, it must somehow be hidden or unavailable
                       return null;
 
-                    // now for entries
+                      // now for entries
                     } else if (type === "entry") {
                       // property has no state it must be hidden
                       // or somehow not accessible eg. it has been optimized for

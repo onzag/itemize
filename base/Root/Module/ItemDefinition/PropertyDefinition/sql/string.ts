@@ -16,6 +16,7 @@ import { exactStringSearchSubtypes } from "../types/string";
 export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+  const inName = PropertyDefinitionSearchInterfacesPrefixes.IN + arg.prefix + arg.id;
 
   // now we see if we have an argument for it
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
@@ -34,6 +35,17 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
         ],
       );
     }
+
+    return true;
+  }
+
+  // now we see if we have an argument for it
+  if (typeof arg.args[inName] !== "undefined" && arg.args[inName] !== null) {
+    const tagCompareCheck = arg.args[inName] as string[];
+    arg.whereBuilder.andWhere(
+      JSON.stringify(arg.prefix + arg.id) + " = ANY(ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[])",
+      tagCompareCheck,
+    );
 
     return true;
   }

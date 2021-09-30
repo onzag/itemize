@@ -25,6 +25,7 @@ import IconVisibility from "@material-ui/icons/Visibility";
 import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
 import { CountryPicker } from "../../components/country-picker";
 import type { ICountryType } from "../../../../imported-resources";
+import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -360,7 +361,7 @@ class ActualPropertyEntryFieldRenderer
     this.state = {
       visible: props.type !== "password",
       dialogOpen: false,
-      defaultCountryCode: props.country && props.country.code,
+      defaultCountryCode: props.defaultCountry && props.defaultCountry.code,
     }
 
     this.toggleVisible = this.toggleVisible.bind(this);
@@ -479,6 +480,49 @@ class ActualPropertyEntryFieldRenderer
   }
 
   public render() {
+    if (this.props.subtype === "country" || this.props.subtype === "language" || this.props.subtype === "currency") {
+      return (
+        <PropertyEntrySelectRenderer
+          args={this.props.args}
+          autoFocus={this.props.autoFocus}
+          canRestore={this.props.canRestore}
+          currentAppliedValue={this.props.currentAppliedValue as any}
+          currentI18nValue={this.props.currentTextualValue}
+          currentValid={this.props.currentValid}
+          currentValue={this.props.currentValue as any}
+          disabled={this.props.disabled}
+          enableUserSetErrors={this.props.enableUserSetErrors}
+          isList={false}
+          isNullable={false}
+          isNumeric={false}
+          nullValue={{
+            i18nValue: "",
+            value: null,
+          }}
+          onChange={this.props.onChange as any}
+          onRestore={this.props.onRestore}
+          propertyId={this.props.propertyId}
+          rtl={this.props.rtl}
+          values={this.props.subtype === "country" ? this.props.countriesAvailable.map((c) => ({
+            i18nValue: c.native,
+            value: c.code,
+          })) : (this.props.subtype === "language" ? this.props.languagesAvailable.map((l) => ({
+            i18nValue: l.native,
+            value: l.code,
+          })) : this.props.currencyAvailable.map((l) => ({
+            i18nValue: l.name + "(" + l.symbol + ")",
+            value: l.code,
+          })))}
+          currentInternalValue={this.props.currentInternalValue}
+          currentInvalidReason={this.props.currentInvalidReason}
+          description={this.props.description}
+          icon={this.props.icon}
+          label={this.props.label}
+          placeholder={this.props.placeholder}
+        />
+      )
+    }
+
     // set the input mode, this is for mobile,
     // basically according to our input we need
     // different keys

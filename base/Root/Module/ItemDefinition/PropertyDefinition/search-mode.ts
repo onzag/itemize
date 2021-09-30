@@ -19,10 +19,14 @@ import { Ii18NType } from "../../../../Root";
 /**
  * Provides all the ids that a property would be referred to in search mode
  * @param rawData the raw property
+ * @param noConflict in search mode when used some of these search ways can be conflicting with each other
+ * used only in case of string, when you can use SEARCH or IN, but both are conflicting and shouldn't be used together
+ * this is used mainly for usability
  * @returns an array of string for the ids in search mode for the property
  */
 export function getConversionIds(
   rawData: IPropertyDefinitionRawJSONDataType,
+  noConflict?: boolean,
 ): string[] {
   // we need the description
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
@@ -69,6 +73,17 @@ export function getConversionIds(
     PropertyDefinitionSearchInterfacesType.TAGS
   ) {
     ids = [PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.STRING
+  ) {
+    ids = noConflict ? [
+      PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
+    ] : 
+    [
+      PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
+      PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
+    ];
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
@@ -448,6 +463,48 @@ export function buildSearchModePropertyDefinitions(
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + newPropDef.id;
     if (newPropDef.i18nData) {
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
+    }
+
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.STRING
+  ) {
+    newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + newPropDef.id;
+    if (newPropDef.i18nData) {
+      newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
+    }
+
+    newPropDef2 = {
+      ...newPropDef,
+      type: "taglist",
+      subtype: rawData.values ? null : "arbitrary-tags",
+      id: PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
+    }
+
+    if (newPropDef2.default) {
+      newPropDef2.default = [newPropDef2.default] as any;
+    }
+
+    if (newPropDef2.defaultIf) {
+      newPropDef2.defaultIf = newPropDef2.defaultIf.map((c) => {
+        return {
+          ...c,
+          value: [c.value] as any,
+        }
+      });
+    }
+
+    if (newPropDef2.enforcedValue) {
+      newPropDef2.enforcedValue = [newPropDef2.enforcedValue] as any;
+    }
+
+    if (newPropDef2.enforcedValues) {
+      newPropDef2.enforcedValues = newPropDef2.enforcedValues.map((c) => {
+        return {
+          ...c,
+          value: [c.value] as any,
+        }
+      });
     }
 
   // location radius is fancy

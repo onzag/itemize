@@ -29,7 +29,7 @@ import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
   IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
 } from "../internal/gql-client-util";
-import { IPropertySetterProps } from "../components/property/base";
+import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
 import { IConfigRawJSONDataType } from "../../config";
@@ -66,20 +66,31 @@ function getSearchStateOf(state: IActualItemProviderState): IActualItemProviderS
   };
 }
 
-function getPropertyListForSearchMode(properties: string[], standardCounterpart: ItemDefinition) {
+function getPropertyListForSearchMode(properties: Array<string | IPropertyCoreProps>, standardCounterpart: ItemDefinition) {
   let result: string[] = [];
-  properties.forEach((propertyId) => {
+  properties.forEach((property) => {
+
+    const propertyId = typeof property === "string" ? property : property.id;
+    const searchVariantSpecified = typeof property !== "string" ? property.searchVariant : null;
+
     if (
       propertyId === "search" ||
       propertyId === "created_by" ||
       propertyId === "since" ||
-      standardCounterpart.isPropertyInSearchModeOnly(propertyId)
+      (!searchVariantSpecified && standardCounterpart.isPropertyInSearchModeOnly(propertyId))
     ) {
       result.push(propertyId);
       return;
     }
+    
     const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
-    result = result.concat(getConversionIds(standardProperty.rawData));
+
+    if (!searchVariantSpecified) {
+      result = result.concat(getConversionIds(standardProperty.rawData, true));
+    } else {
+      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
+      result.push(id);
+    }
   });
   return result;
 }
@@ -393,7 +404,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * you have access to three other special properties
    * that only exist within search mode "search", "created_by" and "since"
    */
-  searchByProperties: string[];
+  searchByProperties: Array<string | IPropertyCoreProps>;
   searchByIncludes?: { [include: string]: string[] };
   orderBy?: IOrderByRuleType;
   /**

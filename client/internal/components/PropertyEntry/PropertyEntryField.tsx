@@ -9,7 +9,7 @@ import equals from "deep-equal";
 import { escapeStringRegexp } from "../../../../util";
 import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
 import { MAX_DECIMAL_COUNT } from "../../../../constants";
-import { ICurrencyType, currencies, arrCurrencies, ICountryType, arrCountries } from "../../../../imported-resources";
+import { ICurrencyType, currencies, arrCurrencies, ICountryType, arrCountries, ILanguageType, arrLanguages } from "../../../../imported-resources";
 import convert from "convert-units";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
 import { deepRendererArgsComparer } from "../general-fn";
@@ -136,14 +136,27 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
   onChangeByTextualValue: (textualValue: string) => void;
 
   /**
-   * The country we are currently using, only avaliable if subtype is phone or country
+   * The country we are currently using, only avaliable if subtype is phone, country or language
    */
-  country?: ICountryType;
+  defaultCountry?: ICountryType;
   /**
-   * The countries we have available, only avaliable if subtype is phone or country
+   * The countries we have available, only avaliable if subtype is phone, country or language
    */
   countriesAvailable?: ICountryType[];
 
+  /**
+   * The language we are currently using, only avaliable if subtype is language
+   */
+  defaultLanguage?: ILanguageType;
+  /**
+   * The languages we have available
+   */
+  languagesAvailable?: ILanguageType[];
+
+  /**
+   * The currency we are currently using, only avaliable if subtype is currency or type is currency
+   */
+  defaultCurrency?: ICurrencyType;
   /**
    * So the curency we are currently using, only available if type="currency"
    */
@@ -155,7 +168,7 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
   currencyFormat?: "$N" | "N$",
   /**
    * All the currency types that are available, so you can allow for chosing
-   * an alternative currency, only available if type="currency"
+   * an alternative currency, only available if type="currency" or subtype is currency 
    */
   currencyAvailable?: ICurrencyType[],
   /**
@@ -695,6 +708,7 @@ export default class PropertyEntryField
     let currencyFormat: string = null;
     let currencyAvailable: ICurrencyType[] = null;
     let currencyI18n: ICurrencyI18nType = null;
+    let defaultCurrency: ICurrencyType = null;
     if (type === "currency") {
       currencyAvailable = arrCurrencies;
       const [currencCurrency] = this.getCurrentCurrency();
@@ -703,13 +717,25 @@ export default class PropertyEntryField
       currencyI18n = {
         title: this.props.i18n[this.props.language].currency_dialog_title,
       };
+      defaultCurrency = this.props.currency;
     }
 
-    let country: ICountryType = null;
+    let defaultCountry: ICountryType = null;
     let countriesAvailable: ICountryType[] = null;
-    if (subtype === "phone" || subtype === "country") {
+    if (subtype === "phone" || subtype === "country" || subtype === "language") {
+      defaultCountry = this.props.country;
       countriesAvailable = arrCountries;
-      country = this.props.country;
+    }
+
+    let defaultLanguage: ILanguageType = null;
+    let languagesAvailable: ILanguageType[] = null;
+    if (subtype === "language") {
+      defaultLanguage = arrLanguages.find((l) => l.code === this.props.language);
+      languagesAvailable = arrLanguages;
+    }
+
+    if (subtype === "currency") {
+      currencyAvailable = arrCurrencies;
     }
 
     let unitPrefersImperial: boolean;
@@ -799,9 +825,13 @@ export default class PropertyEntryField
       onChangeCurrency: this.onChangeCurrency,
       onRestore: this.props.onRestore,
 
-      country,
+      defaultCountry,
       countriesAvailable,
 
+      defaultLanguage,
+      languagesAvailable,
+
+      defaultCurrency,
       currency,
       currencyFormat: currencyFormat as any,
       currencyAvailable: currencyAvailable,

@@ -217,12 +217,13 @@ export class Cache {
     },
     record: IGQLSearchRecord,
     location: "new" | "lost" | "modified",
+    doNotTriggerOwnedEventsBecauseItsReparent?: boolean,
   ) {
     const newRecordArr = [record];
     const idefQualifiedPathName = itemDefinition.getQualifiedPathName();
     const modQualifiedPathName = itemDefinition.getParentModule().getQualifiedPathName();
 
-    if (createdBy) {
+    if (createdBy && !doNotTriggerOwnedEventsBecauseItsReparent) {
       const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsEvent = {
         qualifiedPathName: idefQualifiedPathName,
         createdBy: itemDefinition.isOwnerObjectId() ? record.id : createdBy,
@@ -904,7 +905,27 @@ export class Cache {
     const sqlModData: IManyValueType = sqlModDataComposed.value;
     const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
 
-    if (reparent) {
+    let actualReparent = reparent;
+    if (actualReparent) {
+      const currentParent = {
+        id: currentSQLValue.parent_id || null,
+        version: currentSQLValue.parent_version || null,
+        type: currentSQLValue.parent_type || null,
+      };
+
+      if (
+        actualReparent.id === currentParent.id &&
+        actualReparent.version === currentParent.version &&
+        actualReparent.type === currentParent.type
+      ) {
+        actualReparent = null;
+        CAN_LOG_DEBUG && logger.debug(
+          "Cache.requestUpdate: re-parent specified but ignored because it's the same parent as now",
+        );
+      }
+    }
+
+    if (actualReparent) {
       CAN_LOG_DEBUG && logger.debug(
         "Cache.requestUpdate: re-parent specified is id " + reparent.id + " with version " + reparent.version + " and type " + reparent.type,
       );
@@ -1118,7 +1139,7 @@ export class Cache {
         last_modified: sqlValue.last_modified,
       };
 
-      if (!reparent) {
+      if (!actualReparent) {
         this.triggerSearchListenersFor(
           itemDefinition,
           sqlValue.created_by || null,
@@ -1133,6 +1154,10 @@ export class Cache {
           "modified",
         );
       } else {
+        // for the listeners that are searching
+        // by owner they do not care about the parent
+        // so we can just trigger a modified listener
+        // on that basis alone
         this.triggerSearchListenersFor(
           itemDefinition,
           sqlValue.created_by,
@@ -1140,28 +1165,42 @@ export class Cache {
           searchRecord,
           "modified",
         );
+
+        // for the parenting ones, now for the ones that
+        // now receive that new record, both by parent
+        // and the combination of by owner and parent
+        // however, the ones listening by owner alone should
+        // not be triggered with a new record because they
+        // aren't filtering by that
         this.triggerSearchListenersFor(
           itemDefinition,
-          null,
+          sqlValue.created_by,
           {
             id: sqlValue.parent_id,
             version: sqlValue.parent_version || null,
             type: sqlValue.parent_type,
           },
           searchRecord,
-          "new"
+          "new",
+          true,
         );
+
+        // and if we had a previous parent
         if (currentSQLValue.parent_id) {
+          // now we can trigger that listener for lost values
+          // equally ignoring the by-owner basis and only telling
+          // the ones that lost
           this.triggerSearchListenersFor(
             itemDefinition,
-            null,
+            currentSQLValue.created_by,
             {
               id: currentSQLValue.parent_id,
               version: currentSQLValue.parent_version || null,
               type: currentSQLValue.parent_type,
             },
             searchRecord,
-            "lost"
+            "lost",
+            true,
           );
         }
       }
