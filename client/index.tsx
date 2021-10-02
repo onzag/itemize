@@ -381,8 +381,8 @@ export async function initializeItemizeApp(
 
     // Let's set the values
     guessedLang = storedLang || guessedUserData.language;
-    guessedCountry = storedCurrency || guessedUserData.country;
-    guessedCurrency = storedCountry || guessedUserData.currency;
+    guessedCountry = storedCountry || guessedUserData.country;
+    guessedCurrency = storedCurrency|| guessedUserData.currency;
 
     // So this is a global variable, that must exist, sadly but necessary
     // this is a very simple way to have it available in the client side
