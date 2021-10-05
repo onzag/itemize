@@ -698,7 +698,7 @@ export async function filterAndPrepareGQLValue(
     }
   });
 
-  parentModuleOrIdef.applySoftReadRoleAccessTo(role, userId, ownerUserId, rolesManager, valueOfTheItemForSoftReads);
+  await parentModuleOrIdef.applySoftReadRoleAccessTo(role, userId, ownerUserId, rolesManager, valueOfTheItemForSoftReads);
 
   // we add the object like this, all the non requested data, eg.
   // values inside that should be outside, and outside that will be inside
