@@ -116,6 +116,7 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
       <CMap
         viewport={viewport}
         onViewportChanged={this.props.onViewportChange}
+        className={this.props.args.leafletMapClassName}
       >
         <CTileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -146,12 +147,27 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
       ) : null;
     }
 
+    let containerClassName: string = this.props.classes.container;
+    if (this.props.args.className) {
+      containerClassName += " " + this.props.args.className;
+    }
+
+    let textHeaderClassName: string = this.props.classes.locationTextHeader;
+    if (this.props.args.textHeaderClassName) {
+      textHeaderClassName += " " + this.props.args.textHeaderClassName;
+    }
+
+    let mapClassName: string = this.props.classes.locationMapContainer;
+    if (this.props.args.mapClassName) {
+      mapClassName += " " + this.props.args.mapClassName;
+    }
+
     return (
-      <div className={this.props.classes.container}>
-        <div className={this.props.classes.locationTextHeader}>
+      <div className={containerClassName}>
+        <div className={textHeaderClassName}>
           {textHeader}
         </div>
-        <div className={this.props.classes.locationMapContainer}>
+        <div className={mapClassName}>
           {map}
         </div>
       </div>

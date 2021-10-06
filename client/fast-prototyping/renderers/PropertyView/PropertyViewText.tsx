@@ -145,6 +145,7 @@ function lazyloaderExecute(element: HTMLElement) {
 interface IPropertyViewRichTextViewerProps {
   children?: string;
   className?: string;
+  Node?: any;
 }
 
 /**
@@ -320,8 +321,9 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     return this.state.html !== nextState.html;
   }
   public render() {
+    const Node = this.props.Node;
     return (
-      <div
+      <Node
         className={"rich-text"  + (this.props.className ? " " + this.props.className : "")}
         ref={this.divref}
         dangerouslySetInnerHTML={{ __html: this.state.html }}
@@ -352,9 +354,10 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   }
   public render() {
     const deserializedValue = deserialize(this.props.children);
-    return <div className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
+    const Node = this.props.Node;
+    return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
       {renderTemplateDynamically(deserializedValue, this.props.templateArgs)}
-    </div>;
+    </Node>;
   }
 }
 
@@ -379,33 +382,36 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
     return <NullComponent {...nullArgs} />;
   }
 
+  const Node: any = props.args.Node ? props.args.Node : ((props.isRichText || props.subtype === "plain") ? "div" : "span");
+
   if (props.isRichText) {
     if (props.args.makeTemplate) {
       return (
         <TemplatedPropertyViewRichTextRenderer
           className={props.args.className}
           templateArgs={props.args.templateArgs}
+          Node={Node}
         >
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className}>
+        <PropertyViewRichTextViewer className={props.args.className} Node={Node}>
           {props.currentValue}
         </PropertyViewRichTextViewer>
       );
     }
   } else if (props.subtype === "plain") {
     return (
-      <div className={"plain-text" + (props.args.className ? " " + props.args.className : "")}>
+      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")}>
         {props.currentValue}
-      </div>
+      </Node>
     );
   }
   return (
-    <span>
+    <Node>
       {props.currentValue}
-    </span>
+    </Node>
   )
 }

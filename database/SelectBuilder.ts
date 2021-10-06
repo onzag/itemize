@@ -177,7 +177,7 @@ export class SelectBuilder extends QueryBuilder {
       (groupByRule ? " " + groupByRule : "") +
       (havingRule ? " " + havingRule : "") +
       (orderByRule ? " " + orderByRule : "") +
-      (this.ilimit ? " LIMIT " + this.ilimit : "") +
-      (this.ioffset ? " OFFSET " + this.ioffset : "");
+      (typeof this.ilimit === "number" ? " LIMIT " + this.ilimit : "") +
+      (typeof this.ioffset === "number" ? " OFFSET " + this.ioffset : "");
   }
 }

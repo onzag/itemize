@@ -8,6 +8,10 @@ $general-highlight-color: #0d47a1;
 $template-highlight-color: #0d47a1;
 $superblock-highlight-color: #33691e;
 
+.plain-text {
+  white-space: pre-wrap;
+}
+
 .rich-text {
   font-size: 1rem;
   position: relative;

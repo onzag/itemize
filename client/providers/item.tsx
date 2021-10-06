@@ -1839,7 +1839,7 @@ export class ActualItemProvider extends
 
     this.setState(searchState);
   }
-  public changeListener() {
+  public async changeListener(repairCorruption?: boolean) {
     if (this.isUnmounted) {
       return;
     } else if (!this.isCMounted) {
@@ -1847,6 +1847,22 @@ export class ActualItemProvider extends
         this.mountCbFns.push(this.changeListener);
       }
       return;
+    }
+
+    // it is still loading and we get an overlapping
+    // change event while we are still loading something
+    // we cannot be sure of what is going to happen until
+    // that is done
+    // this happened when 2 same users were loading at the same time with different data
+    // one of them was cached and returned really fast, the other however used the network and was slower
+    // the data signature was different, the change listener was triggered making it think that data
+    // was corrupted, because it was, but the request was already on its way making it do two network requests
+    // unnecessarily because it wasn't aware of the first one which would have solved the conflict
+    // so this add awareness of the first request if it's on its way
+    if (!this.lastLoadValuePromiseIsResolved) {
+      // so let's wait until all that is done and then check
+      // that way the slower value is ready and a proper fair comparison can be done
+      await this.lastLoadValuePromise;
     }
 
     let isNotFound = false;
@@ -1885,8 +1901,21 @@ export class ActualItemProvider extends
     }
 
     if (dataIsCorrupted) {
+      if (!repairCorruption) {
+        // in the past this would be a call for reload listener but now
+        // we want to call the repair corruption as this same event
+        // just for even more resilliance to errors so that the corruption
+        // is checked again and we pass true as the flag in order to ensure
+        // that any corruption will be immediately fixed
+        clearTimeout(this.repairCorruptionTimeout);
+        this.repairCorruptionTimeout = setTimeout(this.changeListener.bind(this, true), 70);
+      } else {
+        // that is done here
+        this.reloadListener();
+        return;
+      }
+    } else {
       clearTimeout(this.repairCorruptionTimeout);
-      this.repairCorruptionTimeout = setTimeout(this.reloadListener, 70);
     }
 
     // we basically just upgrade the state
@@ -2028,17 +2057,6 @@ export class ActualItemProvider extends
     this.lastLoadingForId = forId;
     this.lastLoadingForVersion = forVersion;
 
-    // we wil reuse the old promise in case
-    // there's an overlapping value being loaded
-    // the old call won't trigger the promise
-    // as it won't match the current signature
-    if (this.lastLoadValuePromiseIsResolved) {
-      this.lastLoadValuePromise = new Promise((resolve) => {
-        this.lastLoadValuePromiseResolve = resolve;
-      });
-      this.lastLoadValuePromiseIsResolved = false;
-    }
-
     // we don't use loading here because there's one big issue
     // elements are assumed into the loading state by the constructor
     // if they have an id
@@ -2098,6 +2116,17 @@ export class ActualItemProvider extends
         });
       }
       return null;
+    }
+
+    // we wil reuse the old promise in case
+    // there's an overlapping value being loaded
+    // the old call won't trigger the promise
+    // as it won't match the current signature
+    if (this.lastLoadValuePromiseIsResolved) {
+      this.lastLoadValuePromise = new Promise((resolve) => {
+        this.lastLoadValuePromiseResolve = resolve;
+      });
+      this.lastLoadValuePromiseIsResolved = false;
     }
 
     const qualifiedName = this.props.itemDefinitionQualifiedName;
