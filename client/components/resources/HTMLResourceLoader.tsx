@@ -7,6 +7,7 @@
  */
 
 import React from "react";
+import type { IAppDataType } from "../../../server";
 import type { IResourceLoaderProps } from "./ResourceLoader";
 import ResourceLoader from "./ResourceLoader";
 
@@ -30,6 +31,35 @@ interface IHTMLResourceLoaderProps extends IResourceLoaderProps {
    * An optional component to render if it fails to load
    */
   failedComponent?: React.ReactNode;
+
+  /**
+   * the source path as a string, by default it is /rest/resource/
+   */
+   path?: string;
+   /**
+    * The server side resolver
+    * TODO this has to do with the generator in order
+    * to realize how this is resolved we need to support resources
+    * in our SSR and request manager
+    */
+   serverSideResolver?: (appData: IAppDataType) => Promise<string>;
+   /**
+    * the source as a string, without the /rest/resource/ part, which is
+    * defined in the path
+    */
+   src: string;
+   /**
+    * sw cacheable flag, defaults to true
+    */
+   swCacheable?: boolean;
+   /**
+    * sw network first flag, defaults to false
+    */
+   swNetworkFirst?: boolean;
+   /**
+    * sw recheck flag, rechecks the content after done, defaults to false
+    */
+   swRecheck?: boolean;
 }
 
 /**
