@@ -9,6 +9,7 @@
  * @module
  */
 
+import type { IAppDataType } from "../../server";
 import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
 
@@ -58,6 +59,7 @@ export interface ICustomRoleManager {
 
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
 type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
+type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType) => Promise<string>) => Promise<string>;
 
 /**
  * This is the raw processed form of the root
@@ -217,6 +219,14 @@ export default class Root {
   private requestManagerSearch: RequestManagerSearchFn = null;
 
   /**
+   * This is used for SSR and lives in the root
+   * allows the root to request for resources, this is what is used
+   * by the beforeSSRRender functionality
+   * @internal
+   */
+  private requestManagerResource: RequestManagerResourceFn = null;
+
+  /**
    * Used by the server side to set server flags to flag
    * other parts of the schema how to operate, mainly
    * conditional rule set about what it should evaluate
@@ -299,6 +309,16 @@ export default class Root {
   }
 
   /**
+   * Sets the request manager that is used to resolve resources
+   * during the SSR renders
+   * @param manager the manager in question
+   * @internal
+   */
+   public setRequestManagerResource(manager: RequestManagerResourceFn) {
+    this.requestManagerResource = manager;
+  }
+
+  /**
    * Calls the request manager to request it for a given value
    * to be stored and be applied the state inside our
    * root
@@ -321,6 +341,16 @@ export default class Root {
    */
   public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string) {
     await this.requestManager(itemDefinition, id, version);
+  }
+
+  /**
+   * Calls the request manager to request for a given resource
+   * @param finalPath
+   * @param customResolver
+   * @internal
+   */
+   public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType) => Promise<string>): Promise<string> {
+    return await this.requestManagerResource(finalPath, customResolver);
   }
 
   /**

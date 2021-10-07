@@ -103,6 +103,8 @@ export class Collector {
     this.appliedRule = rule;
 
     this.collect = this.collect.bind(this);
+    this.collectSearch = this.collectSearch.bind(this);
+    this.collectResource = this.collectResource.bind(this);
   }
 
   /**
@@ -119,6 +121,8 @@ export class Collector {
         final = r.lastModified;
       }
     });
+    // TODO add resources and whatnot to calculate
+    // do we need to then add last modified into the math for resources?
     return final;
   }
 
@@ -128,6 +132,20 @@ export class Collector {
   public getQueries() {
     // remove the non-accessible ones
     return this.results.filter((r) => r !== null).map((r) => r.query);
+  }
+
+  /**
+   * TODO
+   */
+  public getSearches() {
+
+  }
+
+  /**
+   * TODO
+   */
+  public getResources() {
+
   }
 
   /**
@@ -157,6 +175,22 @@ export class Collector {
    */
   public hasForbiddenResources() {
     return this.results.some((r) => r === null);
+  }
+
+  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<string>): Promise<string> {
+    const mergedID = "__RESOURCE__" + finalPath;
+
+    this.collectionStatuses[mergedID] = false;
+    this.collectionRequestsCbs[mergedID] = [];
+    this.collectionRequestsRejectedCbs[mergedID] = [];
+
+    // TODO collect resource
+    // resources will use a hash of the content itself for signature
+    // completed
+    this.collectionStatuses[mergedID] = true;
+    this.collectionRequestsCbs[mergedID].forEach((r) => r());
+
+    return null;
   }
 
   public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {

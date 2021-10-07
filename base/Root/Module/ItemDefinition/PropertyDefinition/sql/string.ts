@@ -4,9 +4,34 @@
  * @module
  */
 
-import { ISQLSearchInfo, ISQLStrSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { exactStringSearchSubtypes } from "../types/string";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+
+export function stringSQL(arg: ISQLArgInfo) {
+  const subtype = arg.property.getSubtype();
+
+  return {
+    // the sql prefix defined plus the id, eg for includes
+    [arg.prefix + arg.id]: {
+      // the type is defined
+      type: subtype === "json" ? "JSONB" : "TEXT",
+      // and we add an unique index if this property is deemed unique
+      index: arg.property.isUnique() ? {
+        type: "unique",
+        id: SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
+        level: 0,
+      } : (
+        subtype ? ({
+          type: subtype === "json" ? "gin" : "btree",
+          id: SQL_CONSTRAINT_PREFIX + arg.prefix + arg.id,
+          level: 0,
+        }) : null
+      ),
+    },
+  }
+};
 
 /**
  * The string sql search functionality
@@ -14,6 +39,10 @@ import { exactStringSearchSubtypes } from "../types/string";
  * @returns a boolean on whether it was searched by it
  */
 export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
+  if (arg.property.getSubtype() === "json") {
+    return false;
+  }
+
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
   const inName = PropertyDefinitionSearchInterfacesPrefixes.IN + arg.prefix + arg.id;
@@ -59,6 +88,10 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
  * @returns a boolean on whether it was searched by it
  */
 export function stringSQLStrSearch(arg: ISQLStrSearchInfo) {
+  if (arg.property.getSubtype() === "json") {
+    return false;
+  }
+
   // so we check it
   if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
     arg.whereBuilder.andWhereColumn(

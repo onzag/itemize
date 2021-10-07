@@ -29,7 +29,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
-import { stringSQLSearch, stringSQLStrSearch } from "../sql/string";
+import { stringSQL, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
 
 /**
  * The email regex that is used to validate emails
@@ -70,6 +70,9 @@ export const exactStringSearchSubtypes = [
   "exact-identifier",
   "exact-value",
   "reference",
+  // TODO check that JSON works well
+  // it's an unchecked subtype
+  "json",
 ];
 
 /**
@@ -79,16 +82,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   gql: GraphQLString,
   // a string is a string
   json: "string",
-  sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", null, (subtype: string, sqlPrefix: string, id: string) => {
-    if (subtype) {
-      return {
-        type: "btree",
-        id: SQL_CONSTRAINT_PREFIX + sqlPrefix + id,
-        level: 0,
-      }
-    }
-    return null;
-  }),
+  sql: stringSQL,
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

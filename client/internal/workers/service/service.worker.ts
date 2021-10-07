@@ -66,7 +66,8 @@ self.addEventListener("fetch", (event: any) => {
       urlAnalyzed.pathname.indexOf("/sitemap.xml") === 0 ||
       urlAnalyzed.pathname.indexOf("/robots.txt") === 0 ||
       urlAnalyzed.pathname.indexOf("/favicon") === 0 ||
-      urlAnalyzed.pathname.indexOf("/socket.io") === 0
+      urlAnalyzed.pathname.indexOf("/socket.io") === 0 ||
+      event.request.headers.get("sw-cacheable") === "false"
     );
 
   // returning false in such case
@@ -87,7 +88,9 @@ self.addEventListener("fetch", (event: any) => {
         urlAnalyzed.pathname.indexOf("/uploads") !== 0
       ) ||
       // or it is our special rest endpoint we enable
-      urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0
+      urlAnalyzed.pathname.indexOf("/rest/currency-factors") === 0 ||
+      // or we have the special header for network first
+      event.request.headers.get("sw-network-first") === "true"
     );
   // this basically means that we would be serving the response for / for the index response
   // rather than whatever the request was pointing too, that means we ignore the request

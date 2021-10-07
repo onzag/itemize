@@ -154,6 +154,7 @@ export interface IAppDataType {
   customServices: {
     [name: string]: ServiceProvider<any>;
   };
+  express: typeof express,
   customRoles: ICustomRoleType[];
   rawDB: ItemizeRawDB;
 }
@@ -952,6 +953,7 @@ export async function initializeServer(
       registry,
       customRoles: custom.customRoles || [],
       rawDB,
+      express,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };
