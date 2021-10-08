@@ -149,7 +149,10 @@ export default class PropertyEntryBoolean extends React.Component<
       currentInternalValue: this.props.state.internalValue,
       canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
 
-      disabled: this.props.state.enforced || this.props.disabled,
+      disabled:
+        typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
+        this.props.disabled :
+        this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,

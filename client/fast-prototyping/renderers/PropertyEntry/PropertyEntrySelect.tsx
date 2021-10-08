@@ -22,6 +22,8 @@ import Chip from "@material-ui/core/Chip";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import FormControl from "@material-ui/core/FormControl";
+import ListItemText from "@material-ui/core/ListItemText";
+import { ListItemIcon } from "@material-ui/core";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -104,6 +106,10 @@ export const style = createStyles({
   selectFieldIconWhenAddornmentIsActive: {
     right: "46px",
   },
+  selectRoot: {
+    display: "flex",
+    alignItems: "center",
+  },
 });
 
 /** 
@@ -160,6 +166,11 @@ class ActualPropertyEntrySelectRenderer
       icon = this.props.icon;
     }
 
+    const allowedOptions = this.props.args.allowedOptions;
+    const denyAny = this.props.args.denyAny;
+    const anyAddornment = this.props.args.anyAddornment;
+    const optionAddornment = this.props.args.optionAddornment;
+
     const addornment = icon ? (
       <InputAdornment position="end">
         <IconButton
@@ -178,11 +189,12 @@ class ActualPropertyEntrySelectRenderer
         <Select
           classes={{
             icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
+            root: this.props.classes.selectRoot,
           }}
           multiple={true}
           value={this.props.currentValue || []}
           onChange={this.onChange}
-          input={<FilledInput fullWidth={true}/>}
+          input={<FilledInput fullWidth={true} />}
           renderValue={(selected: any[]) => {
             return (
               <div className={this.props.classes.chips}>
@@ -202,16 +214,37 @@ class ActualPropertyEntrySelectRenderer
         >
           {
             // render the valid values that we display and choose
-            this.props.values.map((vv) => {
+            this.props.values.filter((vv) => {
+              if (!allowedOptions) {
+                return true;
+              }
+
+              return allowedOptions.includes(vv.value);
+            }).map((vv) => {
+              const addornment = optionAddornment && optionAddornment[vv.value];
+              let content: React.ReactNode;
+              let addr: React.ReactNode = null;
+              if (!optionAddornment) {
+                content = vv.i18nValue;
+              } else {
+                content = <ListItemText>{vv.i18nValue}</ListItemText>
+                addr = <ListItemIcon>{addornment}</ListItemIcon>
+              }
               // the i18n value from the i18n data
-              return <MenuItem key={vv.value} value={vv.value}>{
-                vv.i18nValue
-              }</MenuItem>;
+              return <MenuItem key={vv.value} value={vv.value}>{addr}{content}</MenuItem>;
             })
           }
         </Select>
       );
     } else {
+      let anyContent: React.ReactNode;
+      let anyAddr: React.ReactNode = null;
+      if (!anyAddornment) {
+        anyContent = this.props.nullValue.i18nValue
+      } else {
+        anyContent = <ListItemText><em>{this.props.nullValue.i18nValue}</em></ListItemText>
+        anyAddr = <ListItemIcon>{anyAddornment}</ListItemIcon>
+      }
       selectElement = (
         <Select
           value={this.props.currentValue || ""}
@@ -222,6 +255,7 @@ class ActualPropertyEntrySelectRenderer
           variant="filled"
           classes={{
             icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
+            root: this.props.classes.selectRoot,
           }}
           input={
             <FilledInput
@@ -244,16 +278,30 @@ class ActualPropertyEntrySelectRenderer
             <em>{this.props.placeholder}</em>
           </MenuItem>
           <Divider />
-          {this.props.isNullable ? <MenuItem value="">
-            <em>{this.props.nullValue.i18nValue}</em>
+          {this.props.isNullable && !denyAny ? <MenuItem value="">
+            {anyAddr}
+            {anyContent}
           </MenuItem> : null}
           {
             // render the valid values that we display and choose
-            this.props.values.map((vv) => {
+            this.props.values.filter((vv) => {
+              if (!allowedOptions) {
+                return true;
+              }
+
+              return allowedOptions.includes(vv.value);
+            }).map((vv) => {
+              const addornment = optionAddornment && optionAddornment[vv.value];
+              let content: React.ReactNode;
+              let addr: React.ReactNode = null;
+              if (!optionAddornment) {
+                content = vv.i18nValue;
+              } else {
+                content = <ListItemText>{vv.i18nValue}</ListItemText>
+                addr = <ListItemIcon>{addornment}</ListItemIcon>
+              }
               // the i18n value from the i18n data
-              return <MenuItem key={vv.value} value={vv.value}>{
-                vv.i18nValue
-              }</MenuItem>;
+              return <MenuItem key={vv.value} value={vv.value}>{addr}{content}</MenuItem>;
             })
           }
         </Select>

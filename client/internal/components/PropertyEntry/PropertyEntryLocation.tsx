@@ -787,7 +787,10 @@ export default class PropertyEntryLocation
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
 
-      disabled: this.props.state.enforced || this.props.disabled,
+      disabled:
+        typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
+        this.props.disabled :
+        this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,

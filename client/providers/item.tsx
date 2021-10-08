@@ -82,7 +82,7 @@ function getPropertyListForSearchMode(properties: Array<string | IPropertyCorePr
       result.push(propertyId);
       return;
     }
-    
+
     const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
 
     if (!searchVariantSpecified) {
@@ -605,6 +605,7 @@ export interface ISearchItemValueContextType {
 
 // This is the context that will serve it
 export const ItemContext = React.createContext<IItemContextType>(null);
+export const ItemContextPhaserContext = React.createContext<{ [slotId: string]: IItemContextType }>({});
 export const SearchItemValueContext = React.createContext<ISearchItemValueContextType>(null);
 
 // Now we pass on the provider, this is what the developer
@@ -759,6 +760,7 @@ export interface IItemProviderProps {
   waitAndMerge?: boolean;
   /**
    * allows insertion of the parent context within the children
+   * @deprecated please use ItemContextPhase and ItemContextRetrieve instead
    */
   injectParentContext?: boolean;
   /**
@@ -2785,8 +2787,8 @@ export class ActualItemProvider extends
       }
     }
 
-    const forId = options.deleteForId || this.props.forId;
-    const forVersion = options.deleteForId ? (options.deleteForVersion || null) : (options.deleteForVersion || this.props.forVersion || null);
+    const forId = options.deleteForId || this.props.forId;
+    const forVersion = options.deleteForId ? (options.deleteForVersion || null) : (options.deleteForVersion || this.props.forVersion || null);
 
     const {
       argumentsForQuery,
@@ -3045,7 +3047,7 @@ export class ActualItemProvider extends
     if ((originalOptions.blockUntil || originalOptions.blockReason) && !originalOptions.blockStatus) {
       throw new Error("blockUntil nor blockReason can be set if blockStatus is not true");
     }
-    
+
     // the reason we might need to wait for load is because unless we have avoided
     // loading the applied value matters in order to unite the applied fields, however
     // if we are avoiding loading this doesn't really matter as it's truly loading and somehow
@@ -4382,6 +4384,12 @@ export function NoStateItemProvider(props: INoStateItemProviderProps) {
   )
 }
 
+/**
+ * Provides a previously injected parent context
+ * @deprecated please use ItemContextPhase and ItemContextRetrieve instead
+ * @param props 
+ * @returns 
+ */
 export function ParentItemContextProvider(props: { children: React.ReactNode }) {
   return (
     <ItemContext.Consumer>
@@ -4394,5 +4402,38 @@ export function ParentItemContextProvider(props: { children: React.ReactNode }) 
         </ItemContext.Provider>);
       }}
     </ItemContext.Consumer>
-  )
+  );
+}
+
+export function ItemContextPhase(props: { children: React.ReactNode, slot?: string }) {
+  return (
+    <ItemContextPhaserContext.Consumer>
+      {(phaserValue) => (
+        <ItemContext.Consumer>
+          {(value) => {
+            const newValue = {
+              ...phaserValue,
+            };
+            const slotId = props.slot || "null";
+            newValue[slotId] = value;
+            return (<ItemContextPhaserContext.Provider value={newValue}>
+              {props.children}
+            </ItemContextPhaserContext.Provider>);
+          }}
+        </ItemContext.Consumer>
+      )}
+    </ItemContextPhaserContext.Consumer>
+  );
+}
+
+export function ItemContextRetrieve(props: { children: React.ReactNode, slot?: string }) {
+  return (
+    <ItemContextPhaserContext.Consumer>
+      {(value) => {
+        return (<ItemContext.Provider value={value[props.slot || "null"]}>
+          {props.children}
+        </ItemContext.Provider>);
+      }}
+    </ItemContextPhaserContext.Consumer>
+  );
 }
