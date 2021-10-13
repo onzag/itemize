@@ -2000,7 +2000,6 @@ export class ActualItemProvider extends
       }
 
       this.props.onLoad && this.props.onLoad(completedValue);
-      return completedValue;
     }
 
     // we basically just upgrade the state

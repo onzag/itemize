@@ -166,6 +166,12 @@ export interface ISearchLoaderProps {
    */
   disableExternalChecks?: boolean;
   /**
+   * Prevents the loading of the search results use this
+   * if you have no data to load and just want the records
+   * off a search
+   */
+  avoidLoadingSearchResults?: boolean;
+  /**
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
    * or NO_LISTENING for just not getting updates but asking for feedback
@@ -361,6 +367,16 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public loadValues(currentSearchRecords: IGQLSearchRecord[], isConstruct?: boolean): Partial<IActualSearchLoaderState> {
     if (this.isUnmounted) {
+      return;
+    } else if (this.props.avoidLoadingSearchResults) {
+      const newState: Partial<IActualSearchLoaderState> = {
+        error: null,
+        currentlySearching: [],
+        currentSearchRecords,
+        currentSearchResultsFromTheRecords: currentSearchRecords.map((r) => null),
+        searchFields: this.props.searchFields,
+      };
+      !isConstruct && this.setState(newState as any);
       return;
     }
 

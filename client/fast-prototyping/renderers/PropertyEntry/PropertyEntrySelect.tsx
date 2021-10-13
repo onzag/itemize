@@ -239,11 +239,13 @@ class ActualPropertyEntrySelectRenderer
     } else {
       let anyContent: React.ReactNode;
       let anyAddr: React.ReactNode = null;
-      if (!anyAddornment) {
-        anyContent = this.props.nullValue.i18nValue
-      } else {
-        anyContent = <ListItemText><em>{this.props.nullValue.i18nValue}</em></ListItemText>
-        anyAddr = <ListItemIcon>{anyAddornment}</ListItemIcon>
+      if (this.props.isNullable) {
+        if (!anyAddornment) {
+          anyContent = this.props.nullValue.i18nValue
+        } else {
+          anyContent = <ListItemText><em>{this.props.nullValue.i18nValue}</em></ListItemText>
+          anyAddr = <ListItemIcon>{anyAddornment}</ListItemIcon>
+        }
       }
       selectElement = (
         <Select
