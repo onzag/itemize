@@ -14,7 +14,7 @@ import ResourceLoader from "./ResourceLoader";
 /**
  * The props for the html resource loader
  */
-interface IHTMLResourceLoaderProps extends IResourceLoaderProps {
+interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"> {
   /**
    * an optional wrapper component string, eg, "div", "span", etc...
    */

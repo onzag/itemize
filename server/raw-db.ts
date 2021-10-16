@@ -18,7 +18,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import Module from "../base/Root/Module";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { DatabaseConnection } from "../database";
-import { IManyValueType } from "../database/base";
+import { BasicBindingType, IManyValueType } from "../database/base";
 import { SelectBuilder } from "../database/SelectBuilder";
 import { WhereBuilder } from "../database/WhereBuilder";
 import { SetBuilder } from "../database/SetBuilder";
@@ -801,18 +801,11 @@ export class ItemizeRawDB {
     return result;
   }
 
-  /**
-   * Provides a db query builder for the given item or a module
-   * @param itemDefinitionOrModule the item or module
-   * @param preventJoin when using an item, if you will not be using properties
-   * that are in the module table, like id, parents, creators, and prop extensions
-   * then you can prevent the join from happening
-   */
-  public async performRawDBSelect(
+  private _retrieveRawDBSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
     preventJoin?: boolean,
-  ): Promise<ISQLTableRowValue[]> {
+  ) {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
@@ -832,7 +825,44 @@ export class ItemizeRawDB {
 
     selecter(builder);
 
+    return builder;
+  }
+
+  /**
+   * Provides a db query builder for the given item or a module
+   * @param itemDefinitionOrModule the item or module
+   * @param preventJoin when using an item, if you will not be using properties
+   * that are in the module table, like id, parents, creators, and prop extensions
+   * then you can prevent the join from happening
+   */
+  public async performRawDBSelect(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    selecter: (builder: SelectBuilder) => void,
+    preventJoin?: boolean,
+  ): Promise<ISQLTableRowValue[]> {
+    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, preventJoin);
+
     return await this.databaseConnection.queryRows(builder);
+  }
+
+  /**
+   * Retrieves a raw db select query in order to be used to assign values in updates
+   * @param itemDefinitionOrModule 
+   * @param selecter 
+   * @param preventJoin 
+   * @returns 
+   */
+  public retrieveRawDBSelect(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    selecter: (builder: SelectBuilder) => void,
+    preventJoin?: boolean,
+  ): [string, BasicBindingType[]] {
+    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, preventJoin);
+
+    return [
+      "(" + builder.compile() + ")",
+      builder.getBindings(),
+    ];
   }
 
   /**
