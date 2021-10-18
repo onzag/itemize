@@ -24,7 +24,6 @@ import {
   CLASSIC_OPTIONAL_I18N,
   CLASSIC_SEARCH_BASE_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N,
-  SQL_CONSTRAINT_PREFIX,
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";

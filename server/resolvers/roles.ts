@@ -4,7 +4,7 @@ import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
 import { IServerSideTokenDataType } from "./basic";
 import equals from "deep-equal";
-import Root from "../../base/Root";
+import Root, { ICustomRoleManagerRoleStatus } from "../../base/Root";
 import { DatabaseConnection } from "../../database";
 import { ItemizeRawDB } from "../../server/raw-db";
 
@@ -41,14 +41,14 @@ export interface ICustomRoleType {
   role: string;
   module?: string[];
   item?: string[];
-  grant: (arg: ICustomRoleGranterArg) => boolean | Promise<boolean>;
+  grant: (arg: ICustomRoleGranterArg) => boolean | Promise<boolean> | ICustomRoleManagerRoleStatus | Promise<ICustomRoleManagerRoleStatus>;
   priority?: number;
 }
 
 export class CustomRoleManager {
   private filteredRoles: ICustomRoleType[];
   private allRoles: ICustomRoleType[];
-  private granteds: {[role: string]: boolean};
+  private granteds: {[role: string]: ICustomRoleManagerRoleStatus};
   private argEnv: ICustomRoleGranterArg;
   constructor(allRoles: ICustomRoleType[], env: ICustomRoleGranterArg) {
     const modulePath = env.module.getPath();
@@ -69,27 +69,48 @@ export class CustomRoleManager {
     this.granteds = {};
     this.argEnv = env;
   }
-  private async isRoleGranted(role: ICustomRoleType) {
-    if (typeof this.granteds[role.role] === "boolean") {
+  private async isRoleGranted(role: ICustomRoleType): Promise<ICustomRoleManagerRoleStatus> {
+    if (typeof this.granteds[role.role] !== "undefined") {
       return this.granteds[role.role];
     }
 
     const result = await role.grant(this.argEnv);
-    this.granteds[role.role] = result;
-    return result;
+    if (typeof result === "boolean") {
+      this.granteds[role.role] = {
+        granted: result,
+        errorCode: null,
+        errorMessage: null,
+      }
+    } else {
+      this.granteds[role.role] = result;
+    }
+    
+    return this.granteds[role.role];
   }
-  async checkRoleAccessFor(allowedRoles: string[]) {
+  async checkRoleAccessFor(allowedRoles: string[]): Promise<ICustomRoleManagerRoleStatus> {
     const allowedRolesByPriority = allowedRoles.map((r) => {
       return this.filteredRoles.find((r2) => r === r2.role);
     }).filter((r) => !!r).sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
+    // we must loop but also fetch our first denial
+    // as that would be our main error by priority
+    let firstPriorityDeniedValue: ICustomRoleManagerRoleStatus = null;
     for (const role of allowedRolesByPriority) {
-      if (await this.isRoleGranted(role)) {
-        return true;
+      const value = await this.isRoleGranted(role);
+      if (value.granted) {
+        return value;
+      } else if (!firstPriorityDeniedValue) {
+        firstPriorityDeniedValue = value;
       }
     }
 
-    return false;
+    // in case there was no denied value in the allowed roles
+    // we return a generic denial
+    return firstPriorityDeniedValue || {
+      granted: false,
+      errorMessage: null,
+      errorCode: null,
+    };
   }
   public subEnvironment(newEnv: Partial<ICustomRoleGranterArg>): CustomRoleManager {
     return new CustomRoleManager(this.allRoles, {

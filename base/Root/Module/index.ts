@@ -21,6 +21,7 @@ import {
   ANYONE_LOGGED_METAROLE,
   MAX_SEARCH_RECORDS_DEFAULT,
   MAX_SEARCH_RESULTS_DEFAULT,
+  ENDPOINT_ERRORS,
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
@@ -893,17 +894,27 @@ export default class Module {
     throwError: boolean,
   ): Promise<boolean> {
     const rolesWithAccess = this.getRolesWithModerationAccess();
-    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+    let hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
       (
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!hasAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      hasAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     if (!hasAccess && throwError) {
       throw new EndpointError({
-        message: "Your role has no access to moderation",
-        code: "FORBIDDEN",
+        message: message || "Your role has no access to moderation",
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
@@ -931,25 +942,39 @@ export default class Module {
     throwError: boolean,
   ) {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
-    const modLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+    let modLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
       rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-    ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+    ) || rolesWithAccess.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!modLevelAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      modLevelAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     if (!modLevelAccess) {
       if (throwError) {
         const notLoggedInWhenShould = role === GUEST_METAROLE && rolesWithAccess.length;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
           rolesWithAccess.includes(OWNER_METAROLE);
-        let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-          ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
-        if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
-          errorMessage += ", this error might have been avoided if an owner had" +
-            " been specified which matched yourself as there's a self rule, if performing a search" +
-            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+
+        if (message === null) {
+          message = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+            ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+          if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+            message += ", this error might have been avoided if an owner had" +
+              " been specified which matched yourself as there's a self rule, if performing a search" +
+              " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+          }
         }
+
         throw new EndpointError({
-          message: errorMessage,
-          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+          message,
+          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
       return false;

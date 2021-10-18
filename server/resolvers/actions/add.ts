@@ -21,6 +21,7 @@ import {
   validateContainerIdIsReal,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
+  validateCustomId,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -99,6 +100,10 @@ export async function addItemDefinition(
 
   const isCustomId: boolean = resolverArgs.args.for_id && hasNoVersion;
   const customId = isCustomId ? resolverArgs.args.for_id : null;
+
+  if (isCustomId) {
+    validateCustomId(customId);
+  }
 
   const rolesManager = new CustomRoleManager(appData.customRoles, {
     cache: appData.cache,

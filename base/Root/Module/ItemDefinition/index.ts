@@ -1781,7 +1781,7 @@ export default class ItemDefinition {
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role) || (await rolesManager.checkRoleAccessFor(rolesWithAccess)).granted;
 
     if (!idefLevelAccess) {
       return null;
@@ -1875,17 +1875,27 @@ export default class ItemDefinition {
     throwError: boolean,
   ) {
     const rolesWithAccess = this.getRolesWithModerationAccess();
-    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+    let hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
       (
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!hasAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      hasAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     if (!hasAccess && throwError) {
       throw new EndpointError({
-        message: "Your role has no access to moderation",
-        code: "FORBIDDEN",
+        message: message || "Your role has no access to moderation",
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
@@ -1919,12 +1929,22 @@ export default class ItemDefinition {
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // if anyone is included, or anyone logged is included and you are not
     // a guest, or your role is included
-    const idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
+    let idefLevelAccess = rolesWithAccess.includes(ANYONE_METAROLE) ||
       (
         rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!idefLevelAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      idefLevelAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     // if you got not access
     if (!idefLevelAccess) {
@@ -1935,17 +1955,21 @@ export default class ItemDefinition {
         const notLoggedInWhenShould = role === GUEST_METAROLE && rolesWithAccess.length;
         const errorMightHaveBeenAvoidedIfOwnerSpecified = ownerUserId === UNSPECIFIED_OWNER &&
           rolesWithAccess.includes(OWNER_METAROLE);
-        let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
-          ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
-        if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
-          errorMessage += ", this error might have been avoided if an owner had" +
-            " been specified which matched yourself as there's a self rule, if performing a search" +
-            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+
+        if (message === null) {
+          message = `Forbidden, user ${userId} with role ${role} has no ${action} access to resource ${this.getName()}` +
+            ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+          if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+            message += ", this error might have been avoided if an owner had" +
+              " been specified which matched yourself as there's a self rule, if performing a search" +
+              " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+          }
         }
+
         throw new EndpointError({
-          message: errorMessage,
+          message,
           // this is where the code comes in handy, it's forbidden by default, and must be logged in for guests
-          code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
       return false;
@@ -2010,16 +2034,25 @@ export default class ItemDefinition {
         this.rawData.createInBehalfRoleAccess.includes(ANYONE_METAROLE) ||
         (
           this.rawData.createInBehalfRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-        ) || this.rawData.createInBehalfRoleAccess.includes(role) ||
-        await rolesManager.checkRoleAccessFor(this.rawData.createInBehalfRoleAccess);
+        ) || this.rawData.createInBehalfRoleAccess.includes(role);
 
-      const notLoggedInWhenShould = role === GUEST_METAROLE;
+
+      let code: string = null;
+      let message: string = null;
+
+      if (!canCreateInBehalf) {
+        const managerStatus = await rolesManager.checkRoleAccessFor(this.rawData.createInBehalfRoleAccess);
+        canCreateInBehalf = managerStatus.granted;
+        code = managerStatus.errorCode;
+        message = managerStatus.errorMessage;
+      }
 
       if (!canCreateInBehalf && throwError) {
+        const notLoggedInWhenShould = role === GUEST_METAROLE;
         throw new EndpointError({
-          message: `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
+          message: message || `Forbidden, role ${role} cannot create in behalf in resource ${this.getName()}` +
             ` only roles ${this.rawData.createInBehalfRoleAccess.join(", ")} can do so`,
-          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
 
@@ -2087,18 +2120,28 @@ export default class ItemDefinition {
 
     const roles = this.getRolesForVersioning();
 
-    const versioningAccess = roles.includes(ANYONE_METAROLE) ||
+    let versioningAccess = roles.includes(ANYONE_METAROLE) ||
       (
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         roles.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
+      ) || roles.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+
+    if (!versioningAccess) {
+      const rolesStatus = await rolesManager.checkRoleAccessFor(roles);
+      versioningAccess = rolesStatus.granted;
+      code = rolesStatus.errorCode;
+      message = rolesStatus.errorMessage;
+    }
 
     if (!versioningAccess && throwError) {
       throw new EndpointError({
-        message: `Forbidden, role ${role} cannot version resource ${this.getName()}` +
+        message: message || `Forbidden, role ${role} cannot version resource ${this.getName()}` +
           ` only roles ${roles.join(", ")} can do so`,
-        code: ENDPOINT_ERRORS.FORBIDDEN,
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
@@ -2126,16 +2169,25 @@ export default class ItemDefinition {
     throwError: boolean,
   ) {
     const roles = this.getRolesForCustomId();
-    const customIdAccess = roles.includes(ANYONE_METAROLE) ||
+    let customIdAccess = roles.includes(ANYONE_METAROLE) ||
       (
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
-      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
+      ) || roles.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+    if (!customIdAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(roles);
+      customIdAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     if (!customIdAccess && throwError) {
       throw new EndpointError({
-        message: `Forbidden, role ${role} cannot custom id resource ${this.getName()}` +
+        message: message || `Forbidden, role ${role} cannot custom id resource ${this.getName()}` +
           ` only roles ${roles.join(", ")} can do so`,
-        code: ENDPOINT_ERRORS.FORBIDDEN,
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
@@ -2158,18 +2210,27 @@ export default class ItemDefinition {
   ) {
     const roles = this.getRolesWithReadOwnerAccess();
 
-    const onwerReadAccess = roles.includes(ANYONE_METAROLE) ||
+    let onwerReadAccess = roles.includes(ANYONE_METAROLE) ||
       (
         roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
       ) || (
         roles.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || roles.includes(role) || await rolesManager.checkRoleAccessFor(roles);
+      ) || roles.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+    if (!onwerReadAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(roles);
+      onwerReadAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     if (!onwerReadAccess && throwError) {
       throw new EndpointError({
-        message: `Forbidden, role ${role} cannot read the owner of resource ${this.getName()}` +
+        message: message || `Forbidden, role ${role} cannot read the owner of resource ${this.getName()}` +
           ` only roles ${roles.join(", ")} can do so`,
-        code: ENDPOINT_ERRORS.FORBIDDEN,
+        code: code || ENDPOINT_ERRORS.FORBIDDEN,
       });
     }
 
@@ -2185,7 +2246,7 @@ export default class ItemDefinition {
   }
 
   public getParentingRule() {
-    return this.rawData.parentingRule || "MANY";
+    return this.rawData.parentingRule || "MANY";
   }
 
   /**
@@ -2257,16 +2318,24 @@ export default class ItemDefinition {
           this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
         ) || (
           this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
-        ) || this.rawData.parentingRoleAccess.includes(role) ||
-        await rolesManager.checkRoleAccessFor(this.rawData.parentingRoleAccess);
+        ) || this.rawData.parentingRoleAccess.includes(role);
+
+      let code: string = null;
+      let message: string = null;
+      if (!hasParentingRoleAccess) {
+        const managerStatus = await rolesManager.checkRoleAccessFor(this.rawData.parentingRoleAccess);
+        hasParentingRoleAccess = managerStatus.granted;
+        code = managerStatus.errorCode;
+        message = managerStatus.errorMessage;
+      }
 
       const notLoggedInWhenShould = role === GUEST_METAROLE;
 
       if (!hasParentingRoleAccess && throwError) {
         throw new EndpointError({
-          message: `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
+          message: message || `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
             ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
-          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : ENDPOINT_ERRORS.FORBIDDEN,
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
     } else {

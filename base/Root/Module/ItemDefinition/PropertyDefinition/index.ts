@@ -19,6 +19,7 @@ import {
   LAST_RICH_TEXT_CHANGE_LENGTH,
   MAX_RAW_TEXT_LENGTH,
   ANYONE_LOGGED_METAROLE,
+  ENDPOINT_ERRORS,
 } from "../../../../../constants";
 import Module from "../..";
 import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefinitionSupportedTypeName } from "./types";
@@ -2271,7 +2272,7 @@ export default class PropertyDefinition {
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role) || (await rolesManager.checkRoleAccessFor(rolesWithAccess)).granted;
 
     // if no access then null
     if (!hasAccess) {
@@ -2306,7 +2307,7 @@ export default class PropertyDefinition {
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role) || (await rolesManager.checkRoleAccessFor(rolesWithAccess)).granted;
 
     return hasAccess;
   }
@@ -2332,14 +2333,23 @@ export default class PropertyDefinition {
     // first we get all the roles that have the access
     const rolesWithAccess = this.getRolesWithAccessTo(action);
     // so if ANYONE_METAROLE is included we have access
-    const hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
+    let hasAccess = rolesWithAccess.includes(ANYONE_METAROLE) || (
       rolesWithAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
     ) || (
         // or if OWNER_METAROLE is included and our user matches our owner user
         // note that this is why it's important to pass UNSPECIFIED_OWNER rather than null
         // because null === null in the case of eg. GUEST_METAROLE
         rolesWithAccess.includes(OWNER_METAROLE) && userId === ownerUserId
-      ) || rolesWithAccess.includes(role) || await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      ) || rolesWithAccess.includes(role);
+
+    let code: string = null;
+    let message: string = null;
+    if (!hasAccess) {
+      const managerStatus = await rolesManager.checkRoleAccessFor(rolesWithAccess);
+      hasAccess = managerStatus.granted;
+      code = managerStatus.errorCode;
+      message = managerStatus.errorMessage;
+    }
 
     // if we don't have access and we are requested to throw an error
     if (!hasAccess && throwError) {
@@ -2354,19 +2364,22 @@ export default class PropertyDefinition {
         rolesWithAccess.includes(OWNER_METAROLE);
 
       // this is the error message
-      let errorMessage = `Forbidden, user ${userId} with role ${role} has no ${action} access to property ${this.getId()}` +
-        ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
-      if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
-        // this is the bit we add
-        errorMessage += ", this error might have been avoided if an owner had" +
-          " been specified which matched yourself as there's a self rule, if performing a search" +
-          " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+      if (!message) {
+        message = `Forbidden, user ${userId} with role ${role} has no ${action} access to property ${this.getId()}` +
+          ` with only roles ${rolesWithAccess.join(", ")} can be granted access`;
+        if (errorMightHaveBeenAvoidedIfOwnerSpecified) {
+          // this is the bit we add
+          message += ", this error might have been avoided if an owner had" +
+            " been specified which matched yourself as there's a self rule, if performing a search" +
+            " you might have wanted to add the created_by filter in order to ensure this rule is followed";
+        }
       }
+
 
       // and we throw the error
       throw new EndpointError({
-        message: errorMessage,
-        code: notLoggedInWhenShould ? "MUST_BE_LOGGED_IN" : "FORBIDDEN",
+        message,
+        code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
       });
     }
 

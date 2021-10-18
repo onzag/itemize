@@ -69,6 +69,16 @@ export function defaultTriggerInvalidForbiddenFunction(message: string, customCo
   return;
 }
 
+const customIdRegex = /[A-Za-z0-9-_\+\!\#]+/;
+export function validateCustomId(id: string) {
+  if (!customIdRegex.test(id)) {
+    throw new EndpointError({
+      message: "Invalid custom id must only contain alphanumeric characters, numbers, -, +, ! or #",
+      code: ENDPOINT_ERRORS.FORBIDDEN,
+    });
+  }
+}
+
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
