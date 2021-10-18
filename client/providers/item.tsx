@@ -3217,7 +3217,9 @@ export class ActualItemProvider extends
     // there's a value for it and it is loaded so we can be guaranteed this is meant to be an edit
     if (options.action ? options.action === "edit" : (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)) {
 
-      const submitTargetIsDifferent = !!itemDefinitionToSubmitFor || submitForId !== this.props.forId;
+      const submitTargetIsDifferent =
+        itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ||
+        submitForId !== this.props.forId;
       if (submitTargetIsDifferent) {
         // if we are submitting to edit to a different target to our own
         // basically copying during an edit action we need to do the same we do
