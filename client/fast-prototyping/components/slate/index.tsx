@@ -2440,6 +2440,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // with no text
         Transforms.insertNodes(this.editor, {
           ...this.state.currentBlockElement,
+          uiHandler: null,
+          uiHandlerArgs: null,
           children: [
             {
               ...this.state.currentText,
