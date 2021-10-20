@@ -2708,6 +2708,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param value the value that we got
    */
   public onFocusedChange(anchor: Path, value: Node[]) {
+    if (this.isUnmounted) {
+      return;
+    }
     // now we can calculate the anchors and context
     this.setState(this.calculateAnchorsAndContext(anchor, value));
 
@@ -2727,6 +2730,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param value the value that we are working with
    */
   public onBlurredChange(value?: Node[]) {
+    if (this.isUnmounted) {
+      return;
+    }
     // if we are considered as focused
     if (this.state.focused) {
       // well not anymore
@@ -3201,6 +3207,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Performs a hard blur event and the paths are cleared out
    */
   public hardBlur() {
+    if (this.isUnmounted) {
+      return;
+    }
     this.setState({
       currentSelectedElementAnchor: null,
       currentSelectedElement: null,
@@ -3245,6 +3254,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param p the path to select
    */
   public selectPath(p: Path) {
+    if (this.isUnmounted) {
+      return;
+    }
     // first we need to find the actual node that is referred to that path
     let finalNode: any = this.state.internalValue;
     p.forEach((v) => {
@@ -3282,6 +3294,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param p the path to select
    */
   public movePaths(from: Path, to: Path) {
+    if (this.isUnmounted) {
+      return;
+    }
     // first we pick the old selected position from what we have now
     // it might be null
     const oldPosition = this.state.currentSelectedElementAnchor;
@@ -4926,11 +4941,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     await ALL_PROMISE;
     // and fit the information there as we have gotten
     // our arrays filled from the stylesheet
-    this.setState({
-      allContainers: ALL_CONTAINERS,
-      allCustom: ALL_CUSTOM,
-      allRichClasses: ALL_RICH_CLASSES,
-    });
+    if (!this.isUnmounted) {
+      this.setState({
+        allContainers: ALL_CONTAINERS,
+        allCustom: ALL_CUSTOM,
+        allRichClasses: ALL_RICH_CLASSES,
+      });  
+    }
 
     if (this.props.autoFocus) {
       ReactEditor.focus(this.editor);
