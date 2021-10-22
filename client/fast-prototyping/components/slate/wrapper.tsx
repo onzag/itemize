@@ -387,6 +387,13 @@ export interface IDrawerConfiguratorElementBase {
    */
   basis?: "selected" | "block" | "superblock";
   /**
+   * Will match parent of the given element instead useful for nested
+   * superblocks, so if you are in the current super block you may
+   * want to match the parent of it instead, eg. if such superblock
+   * is not selectable
+   */
+  basisParent?: number;
+  /**
    * The relevant argument of the ui handler
    * if not provided value will be null and change functions wont
    * work
@@ -412,6 +419,13 @@ export interface IDrawerConfiguratorElementSection {
    */
   uiHandler?: string;
   basis?: "selected" | "block" | "superblock";
+  /**
+   * Will match parent of the given element instead useful for nested
+   * superblocks, so if you are in the current super block you may
+   * want to match the parent of it instead, eg. if such superblock
+   * is not selectable
+   */
+  basisParent?: number;
   unblur?: boolean;
   title: string | React.ReactNode;
   elements: IDrawerConfiguratorElementBase[];

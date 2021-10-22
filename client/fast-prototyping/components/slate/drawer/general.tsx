@@ -18,7 +18,7 @@ import {
   IDrawerConfiguratorElementSection,
   IDrawerUIHandlerElementConfigCustomProps
 } from "../wrapper";
-import type { ISlateEditorStateType } from "..";
+import type { IHelperFunctions, ISlateEditorStateType } from "..";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -29,6 +29,36 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Paper from "@material-ui/core/Paper";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+
+function getPathFromBasisParent(path: Path, basisParent?: number) {
+  if (!basisParent) {
+    return path;
+  }
+
+  const newPath = [...path];
+  for (let i = 0; i < basisParent; i++) {
+    newPath.pop();
+  }
+
+  return newPath;
+}
+
+function getNodeFromBasisParent(helpers: IHelperFunctions, element: RichElement, path: Path, basisParent?: number): RichElement {
+  if (!basisParent) {
+    return element;
+  }
+
+  const newPath = getPathFromBasisParent(path, basisParent);
+  if (Path.equals(path, newPath)) {
+    return element;
+  }
+
+  if (!newPath || newPath.length === 0) {
+    return null;
+  }
+
+  return helpers.Node.get(helpers.editor, newPath) as any;
+}
 
 /**
  * The state of the general option selector for the given item
@@ -517,6 +547,7 @@ class GeneralImageOptions extends React.PureComponent<IWrapperContainerProps, IG
 interface IGeneralUIHandlerOptionProps extends IWrapperContainerProps {
   arg: string;
   basisState: string;
+  basisParent: number;
   label: string | React.ReactNode;
   placeholder: string | React.ReactNode;
   isSelect: boolean;
@@ -534,23 +565,29 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
     if (!props.arg) {
       return {
         value: null as any,
-        valueForAnchor: props.state[props.basisState + "Anchor"],
+        valueForAnchor: getPathFromBasisParent(props.state[props.basisState + "Anchor"], props.basisParent),
       }
     }
 
-    const selectedNode: RichElement = props.state[props.basisState] as any;
+    const selectedNode: RichElement = getNodeFromBasisParent(
+      props.helpers,
+      props.state[props.basisState] as any,
+      props.state[props.basisState + "Anchor"],
+      props.basisParent,
+    );
+    const selectedNodeAnchor = getPathFromBasisParent(props.state[props.basisState + "Anchor"], props.basisParent);
     const currentValueItHolds = ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "");
     const time = (new Date()).getTime()
     if (
       currentValueItHolds !== state.value &&
       (
-        !Path.equals(props.state[props.basisState + "Anchor"], state.valueForAnchor) ||
+        !Path.equals(selectedNodeAnchor, state.valueForAnchor) ||
         time - state.valueLastTimeRequestedUpdate > 300
       )
     ) {
       return {
         value: state.invalid ? state.value : currentValueItHolds,
-        valueForAnchor: props.state[props.basisState + "Anchor"],
+        valueForAnchor: selectedNodeAnchor,
       }
     }
 
@@ -566,11 +603,17 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
   public constructor(props: IGeneralUIHandlerOptionProps) {
     super(props);
 
-    const selectedNode: RichElement = props.state[props.basisState] as any;
+    const selectedNode: RichElement = getNodeFromBasisParent(
+      props.helpers,
+      props.state[props.basisState] as any,
+      props.state[props.basisState + "Anchor"],
+      props.basisParent,
+    );
+    const selectedNodeAnchor = getPathFromBasisParent(props.state[props.basisState + "Anchor"], props.basisParent);
 
     this.state = {
       value: props.arg ? ((selectedNode.uiHandlerArgs && selectedNode.uiHandlerArgs[props.arg]) || "") : null,
-      valueForAnchor: props.state[props.basisState + "Anchor"],
+      valueForAnchor: selectedNodeAnchor,
       valueLastTimeRequestedUpdate: 0,
       invalid: false,
     }
@@ -604,7 +647,8 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
       // we use the helper set for the title subtype
       // which does an arbitrary partial value update at the selected
       // anchor
-      this.props.helpers.setUIHandlerArg(this.props.arg, v || null, this.props.state[this.props.basisState + "Anchor"]);
+      const selectedNodeAnchor = getPathFromBasisParent(this.props.state[this.props.basisState + "Anchor"], this.props.basisParent);
+      this.props.helpers.setUIHandlerArg(this.props.arg, v || null, selectedNodeAnchor);
     });
   }
 
@@ -657,7 +701,8 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
       this.setState({
         valueLastTimeRequestedUpdate: (new Date()).getTime(),
       }, () => {
-        this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, this.props.state[this.props.basisState + "Anchor"]);
+        const selectedNodeAnchor = getPathFromBasisParent(this.props.state[this.props.basisState + "Anchor"], this.props.basisParent);
+        this.props.helpers.setUIHandlerArg(this.props.arg, this.state.value || null, selectedNodeAnchor);
       });
     }
   }
@@ -933,6 +978,7 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: IWra
     <GeneralUIHandlerOption
       {...props}
       basisState={stateElem}
+      basisParent={x.basisParent}
       condition={x.condition}
       arg={x.arg}
       label={(x.input as any).label}
@@ -970,13 +1016,27 @@ function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], prop
     <div className={props.classes.box}>
       {elems.filter((x) => {
         const stateElem = basisToState[x.basis || "selected"];
+        let element: RichElement = props.state[stateElem];
 
-        if (!props.state[stateElem]) {
+        if (!element) {
           return false;
         }
 
+        if (x.basisParent) {
+          element = getNodeFromBasisParent(
+            props.helpers,
+            element,
+            props.state[stateElem + "Anchor"],
+            x.basisParent,
+          );
+  
+          if (!element) {
+            return false;
+          }
+        }
+
         // if an ui handler is specified
-        return checkUIHandlerMatches(x, props.state[stateElem].uiHandler);
+        return checkUIHandlerMatches(x, element.uiHandler);
       }).map((x, index) => {
         return processDrawerElementBase(x, props, index);
       })}
@@ -1059,13 +1119,27 @@ export function GeneralOptions(props: IWrapperContainerProps) {
   const extrasApplied = props.drawerExtras && props.drawerExtras
     .filter((x) => {
       const stateElem = basisToState[x.basis || "selected"];
+      let element: RichElement = props.state[stateElem];
 
-      if (!props.state[stateElem]) {
+      if (!element) {
         return false;
       }
 
+      if (x.basisParent) {
+        element = getNodeFromBasisParent(
+          props.helpers,
+          element,
+          props.state[stateElem + "Anchor"],
+          x.basisParent,
+        );
+
+        if (!element) {
+          return false;
+        }
+      }
+
       // if an ui handler is specified
-      return checkUIHandlerMatches(x as any, props.state[stateElem].uiHandler);
+      return checkUIHandlerMatches(x as any, element.uiHandler);
     });
   if (extrasApplied && extrasApplied.length) {
     extraNodeOptions = processDrawerElements(extrasApplied, props);

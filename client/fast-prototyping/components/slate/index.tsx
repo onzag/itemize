@@ -169,6 +169,12 @@ export interface ITemplateArg {
    * use this method to keep and use the split method
    */
   handlerKeepOnBreaks?: boolean;
+  /**
+   * when super breaking in the ui handler this ui handler will also
+   * be escaped alongside it and as such no new element
+   * will be created in it
+   */
+  handlerEscapeOnSuperBreaks?: boolean;
 }
 
 
@@ -2420,7 +2426,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we need to get the next anchor that is next to such block
       const currentSuperBlockElementAnchor = this.state.currentSuperBlockElementAnchor;
       const nextAnchor = [...currentSuperBlockElementAnchor];
-      nextAnchor[currentSuperBlockElementAnchor.length - 1]++;
+
+      if (nextAnchor.length >= 2 && this.state.currentSuperBlockElement.uiHandler) {
+        const uiHandler =
+          (this.state.currentContext && this.state.currentContext.properties[this.state.currentSuperBlockElement.uiHandler]) ||
+          (this.props.rootContext && this.props.rootContext.properties[this.state.currentSuperBlockElement.uiHandler])
+  
+        if (uiHandler && uiHandler.type === "ui-handler" && uiHandler.handlerEscapeOnSuperBreaks) {
+          nextAnchor.pop();
+        }
+      }
+
+      nextAnchor[nextAnchor.length - 1]++;
 
       if (this.state.currentSuperBlockElement === this.state.currentBlockElement) {
         // in cases where the block is also the super block, these odd types
@@ -4946,7 +4963,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         allContainers: ALL_CONTAINERS,
         allCustom: ALL_CUSTOM,
         allRichClasses: ALL_RICH_CLASSES,
-      });  
+      });
     }
 
     if (this.props.autoFocus) {
