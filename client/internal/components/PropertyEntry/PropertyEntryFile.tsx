@@ -120,6 +120,9 @@ interface IPropertyEntryFileState {
    * The reason why it was rejected
    */
   rejectedReason: string;
+  /**
+   * Whether to show the user set errors
+   */
   showUserSetErrors: boolean;
 }
 
@@ -242,7 +245,7 @@ export default class PropertyEntryFile
 
   public onUpdateExtraMetadata(extraMetadata: string) {
     const currentValue = this.props.state.value as PropertyDefinitionSupportedFileType;
-    if (!currentValue || !currentValue.metadata) {
+    if (!currentValue) {
       return;
     }
 
@@ -250,10 +253,14 @@ export default class PropertyEntryFile
       ...currentValue,
     };
 
-    const metadataCreated = updatedValue.metadata.split(";");
-    const wxh = metadataCreated[0];
-    const sizes = metadataCreated[1];
-    updatedValue.metadata = wxh + ";" + sizes + ";" + extraMetadata;
+    if (!updatedValue.metadata) {
+      updatedValue.metadata = ";;" + extraMetadata;
+    } else {
+      const metadataCreated = updatedValue.metadata.split(";");
+      const wxh = metadataCreated[0];
+      const sizes = metadataCreated[1];
+      updatedValue.metadata = wxh + ";" + sizes + ";" + extraMetadata;
+    }
 
     this.props.onChange(updatedValue, null);
   }
@@ -273,6 +280,10 @@ export default class PropertyEntryFile
       metadata: null,
     };
 
+    if (extraMetadata) {
+      value.metadata = ";;" + extraMetadata;
+    }
+
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
     const accept = processAccepts(
       this.props.property.getSpecialProperty("accept") as string,
@@ -283,19 +294,13 @@ export default class PropertyEntryFile
     if (!checkFileInAccepts(value.type, accept)) {
       this.setState({
         rejectedValue: value,
-        rejectedReason: this.props.i18n[this.props.language]
-          [(isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type")],
+        rejectedReason: isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type",
       });
       return;
     } else if (value.size > MAX_FILE_SIZE) {
-      const prettySize = prettyBytes(MAX_FILE_SIZE);
       this.setState({
         rejectedValue: value,
-        rejectedReason: localeReplacer(
-          this.props.i18n[this.props.language]
-            [(isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big")],
-          prettySize,
-        ),
+        rejectedReason: isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
       });
       return;
     } else {
@@ -324,7 +329,7 @@ export default class PropertyEntryFile
       img.onerror = () => {
         this.setState({
           rejectedValue: value,
-          rejectedReason: this.props.i18n[this.props.language]["image_uploader_invalid_type"],
+          rejectedReason: "image_uploader_invalid_type",
         });
       }
       img.src = value.url;
@@ -404,6 +409,16 @@ export default class PropertyEntryFile
     const stateValue = (this.props.state.value as PropertyDefinitionSupportedFileType);
     const extraMetadata: string = (stateValue && stateValue.metadata && stateValue.metadata.split(";")[3]) || null;
 
+
+    let rejectedReason = this.state.rejectedReason ? this.props.i18n[this.props.language][this.state.rejectedReason] : null;
+    if (
+      this.state.rejectedReason === "image_uploader_file_too_big" ||
+      this.state.rejectedReason === "file_uploader_file_too_big"
+    ) {
+      const prettySize = prettyBytes(MAX_FILE_SIZE);
+      rejectedReason = localeReplacer(rejectedReason, prettySize);
+    }
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFileRendererProps = {
       propertyId: this.props.property.getId(),
@@ -443,7 +458,7 @@ export default class PropertyEntryFile
       extraMetadata,
 
       rejected: !!this.state.rejectedReason,
-      rejectedReason: this.state.rejectedReason,
+      rejectedReason,
 
       isSupportedImage,
       imageSrcSet,

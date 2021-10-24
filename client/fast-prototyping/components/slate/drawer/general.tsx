@@ -53,7 +53,7 @@ function getNodeFromBasisParent(helpers: IHelperFunctions, element: RichElement,
     return element;
   }
 
-  if (!newPath || newPath.length === 0) {
+  if (!newPath || newPath.length === 0) {
     return null;
   }
 
@@ -972,8 +972,17 @@ class GeneralElementOptions extends React.PureComponent<IWrapperContainerProps, 
   }
 }
 
-function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: IWrapperContainerProps, index: number) {
+function processDrawerElementBase(
+  x: IDrawerConfiguratorElementBase,
+  props: IWrapperContainerProps,
+  index: number,
+) {
   const stateElem = basisToState[x.basis || "selected"];
+  let key: string = x.arg || index.toString();
+  if (x.arg) {
+    key += "_" + (x.basis || "selected") + "_" + (x.basisParent || 0);
+  }
+
   return (
     <GeneralUIHandlerOption
       {...props}
@@ -990,7 +999,7 @@ function processDrawerElementBase(x: IDrawerConfiguratorElementBase, props: IWra
       isCustom={x.input.type === "custom"}
       CustomComponent={x.input.type === "custom" && x.input.component}
       options={x.input.type === "select" && x.input.options}
-      key={x.arg || index}
+      key={key}
     />
   );
 }
@@ -1029,7 +1038,7 @@ function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], prop
             props.state[stateElem + "Anchor"],
             x.basisParent,
           );
-  
+
           if (!element) {
             return false;
           }
@@ -1051,8 +1060,12 @@ function processDrawerElements(elems: DrawerConfiguratorElement[], props: IWrapp
       const asSection: IDrawerConfiguratorElementSection = x as any;
 
       if (asBase.input) {
+        let key: string = asBase.arg || index.toString();
+        if (asBase.arg) {
+          key += "_" + (x.basis || "selected") + "_" + (x.basisParent || 0);
+        }
         return (
-          <div className={props.classes.box} key={asBase.arg || index}>
+          <div className={props.classes.box} key={key}>
             {processDrawerElementBase(asBase, props, index)}
           </div>
         );

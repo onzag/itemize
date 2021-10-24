@@ -22,6 +22,7 @@ import { IPropertyViewLocationRendererProps } from "../internal/components/Prope
 import { IPropertyViewCurrencyRendererProps } from "../internal/components/PropertyView/PropertyViewCurrency";
 import { IPropertyEntryReferenceRendererProps } from "../internal/components/PropertyEntry/PropertyEntryReference";
 import { IPropertyEntryPaymentRendererProps } from "../internal/components/PropertyEntry/PropertyEntryPayment";
+import { IPropertyEntryFilesRendererProps } from "../internal/components/PropertyEntry/PropertyEntryFiles";
 
 /**
  * The renderer context we do expect for defining how are things to be renderered,
@@ -71,6 +72,12 @@ export interface IRendererContext {
    * Do not use the onChange function to update, use onSetFile instead
    */
   PropertyEntryFile?: React.ComponentType<IPropertyEntryFileRendererProps>;
+  /**
+   * The file renderer is used only for files, as simple as that
+   * 
+   * Do not use the onChange function to update, use onSetFile instead
+   */
+  PropertyEntryFiles?: React.ComponentType<IPropertyEntryFilesRendererProps>;
   /**
    * The property entry boolean renderer, non-special
    */
@@ -190,7 +197,7 @@ export default function RendererProvider(props: IRendererProviderProps) {
   return <RendererContext.Consumer>
     {
       (value) => {
-        const newProviderValue: IRendererContext = {...value};
+        const newProviderValue: IRendererContext = { ...value };
         Object.keys(props).forEach((key) => {
           if (key === "children") {
             return;

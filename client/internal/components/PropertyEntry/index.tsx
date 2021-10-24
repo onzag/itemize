@@ -31,6 +31,7 @@ import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
 import { TokenContext, ITokenContextType } from "../../providers/token-provider";
 import { ISSRContextType, SSRContext } from "../../providers/ssr-provider";
+import PropertyEntryFiles from "./PropertyEntryFiles";
 
 /**
  * This is what every renderer gets regardless of type as long as it's an entry
@@ -578,8 +579,12 @@ const handlerRegistry:
   // into play
   taglist: null,
 
-  // TODO
-  files: null,
+  files: {
+    // and file uses its own renderer as well
+    renderer: "PropertyEntryFiles",
+    handler: PropertyEntryFiles,
+    includeConfig: true,
+  },
 };
 
 /**

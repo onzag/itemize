@@ -1,469 +1,618 @@
-// import React from "react";
-// import { IPropertyEntryHandlerProps } from ".";
-// import Dropzone, { DropzoneRef } from "react-dropzone";
-// import { Paper, RootRef, Icon, FormLabel, IconButton, Button } from "@material-ui/core";
-// import { mimeTypeToExtension, localeReplacer } from "../../../../util";
-// import prettyBytes from "pretty-bytes";
-// import equals from "deep-equal";
-// import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
-// import uuid from "uuid";
-// import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+/**
+ * Contains the entry file handler
+ * @module
+ */
 
-// // in reality there might be invisible for the property
-// // rejected files, so all files will have this state
-// // regardless of anything, this is for the internal
-// interface IInternalURLFileDataWithState {
-//   value: IPropertyDefinitionSupportedSingleFilesType;
-//   rejected?: boolean;
-//   reason?: string;
-// }
+import React from "react";
+import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
+import equals from "deep-equal";
+import { MAX_FILE_SIZE, FILE_SUPPORTED_IMAGE_TYPES } from "../../../../constants";
+import uuid from "uuid";
+import { PropertyDefinitionSupportedFileType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
+import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import prettyBytes from "pretty-bytes";
+import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
+import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
+import { deepRendererArgsComparer } from "../general-fn";
 
-// export default class PropertyEntryFiles extends React.Component<
-// IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>, {}> {
-//   // we have a pool of owned urls that are alive during the existance
-//   // of this component, be careful of using those urls elsewhere, they
-//   // will be revoked when this component unmounts
-//   private ownedObjectURLPool: {[key: string]: string};
+interface PropertyDefinitionSupportedFileTypeWithInfo extends PropertyDefinitionSupportedFileType {
+  /**
+   * Specifies whether the current value is of a supported image type, this
+   * is independent of the isExpectingImages or accept; as a generic file
+   * can be of the image type and the user might have specified an image for it
+   * even if the file could have been any type
+   */
+  isSupportedImage: boolean;
+  /**
+   * A boolean that specifies whether the current value is actually a rejected
+   * value that was not accepted by the filtering functions, either because of size
+   * or whatnot, when rejected is true, the true property has a value of null
+   */
+  rejected: boolean;
+  /**
+   * A localized reason on why the rejected status is active
+   */
+  rejectedReason: string;
+  /**
+   * A source set for the image type that exists if isSupportedImage is true
+   */
+  imageSrcSet: string;
+  /**
+   * The image sizes that exist if isSupportedImage is true for the current value
+   */
+  imageSizes: IImageSizes;
+  /**
+   * A human readable form of the current size of the file, or null if no file
+   */
+  prettySize: string;
+  /**
+   * The extension for this file, it has nothing to do with the name; it's more
+   * used for display purposes
+   */
+  extension: string;
+  /**
+   * The extra metadata that is provided
+   */
+  extraMetadata: string;
+  /**
+   * Allows to update and set the extra metadata that is contained within the file
+   */
+  updateExtraMetadata: (extraMetadata: string) => void;
+  /**
+   * A function to clear the file
+   */
+  removeFile: () => void;
+  /**
+   * A function to open the current file
+   */
+  openFile: () => void;
+}
 
-//   // the dropzone ref
-//   private dropzoneRef = React.createRef<DropzoneRef>();
+/**
+ * This is the entry file renderer props that every renderer for a files type will recieve.
+ * please do not use onChange with the file renderer, as it's odd, use onSetFile instead
+ * 
+ * You might want to check text-specs.md for consistency on displaying files, but it is not
+ * required to display as text-specs.md specifies
+ */
+export interface IPropertyEntryFilesRendererProps extends IPropertyEntryRendererProps<PropertyDefinitionSupportedFilesType> {
+  /**
+   * The accept string, use it in your input type
+   */
+  accept: string;
+  /**
+   * Whether we are expecting images and only images, this correlates
+   * to accept
+   */
+  isExpectingImages: boolean;
+  /**
+   * A placeholder to show when the file field is active, normally
+   * it'll contains something on the drop files here
+   */
+  genericActivePlaceholder: string;
+  /**
+   * A label to show for a button or the likes for the file to be
+   * deleted
+   */
+  genericDeleteLabel: string;
+  /**
+   * A label to show for a button or the likes for the file to be
+   * selected
+   */
+  genericSelectLabel: string;
+  /**
+   * The values with information
+   */
+  currentValueWithInfo: PropertyDefinitionSupportedFileTypeWithInfo[];
+  /**
+   * Once you have got hold of a file use this function and pass it so
+   * properties can be calculated, do not use onChange, use this function
+   * instead
+   * 
+   * If the property is image uploader type, or if the file is on itself
+   * an image it will ensure to give it metadata
+   */
+  onPushFile: (file: File, extraMetadata?: string) => void;
+  onPushFiles: (file: File[], extraMetadata?: string) => void;
+}
 
-//   constructor(props: IPropertyEntryProps) {
-//     super(props);
+/**
+ * The property entry files contains an state for the rejected files
+ * if that happens to occur
+ */
+interface IPropertyEntryFilesState {
+  /**
+   * The rejected file value
+   */
+  rejectedValues: Array<{
+    value: PropertyDefinitionSupportedFileType;
+    reason: string;
+    afterFileId: string;
+  }>;
+  /**
+   * Whether to show the user set errors
+   */
+  showUserSetErrors: boolean;
+}
 
-//     // the pool is set
-//     this.ownedObjectURLPool = {};
+/**
+ * This is the property entry file class
+ */
+export default class PropertyEntryFile
+  extends React.Component<
+  IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>,
+  IPropertyEntryFilesState
+  > {
 
-//     // the functions are binded
-//     this.onDropAccepted = this.onDropAccepted.bind(this);
-//     this.onDropRejected = this.onDropRejected.bind(this);
-//     this.onRemoveFile = this.onRemoveFile.bind(this);
-//     this.openFile = this.openFile.bind(this);
-//     this.manuallyTriggerUpload = this.manuallyTriggerUpload.bind(this);
-//   }
-//   public shouldComponentUpdate(
-//     nextProps: IPropertyEntryProps,
-//   ) {
-//     // This is optimized to only update for the thing it uses
-//     return nextProps.property !== this.props.property ||
-//       !equals(this.props.state, nextProps.state) ||
-//       !!this.props.poked !== !!nextProps.poked ||
-//       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
-//       nextProps.language !== this.props.language ||
-//       nextProps.i18n !== this.props.i18n ||
-//       nextProps.icon !== this.props.icon;
-//   }
-//   public manuallyTriggerUpload() {
-//     // utility for the button to manually trigger upload
-//     // using the ref when it is disabled
-//     if (this.dropzoneRef.current) {
-//       this.dropzoneRef.current.open();
-//     }
-//   }
-//   public componentWillUnmount() {
-//     // revoke urls on unmount
-//     Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
-//       URL.revokeObjectURL(this.ownedObjectURLPool[id]);
-//     });
-//   }
-//   public onDropAccepted(files: File[]) {
-//     // when a drop is accepted, let's check, if it's a single file
-//     const singleFile = this.props.property.getMaxLength() === 1;
+  /**
+   * Owned object urls that creates blob urls
+   * for the given files, it is cleared on dismount; this means
+   * that any urls used that are temporary blobs will only
+   * be available as long as the entry is active, as such
+   * views will update, using the given url, and other entries
+   * will keep themselves in sync, however once the entry is done
+   * the values aren't available anymore, even if the state
+   * still specifies a blob url because it hasn't been changed
+   * 
+   * Submitting will still work just fine, because the src still
+   * points to a file
+   */
+  private ownedObjectURLPool: { [key: string]: string };
 
-//     // let's get the object urls of the files added
-//     const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
-//       const objectURL = URL.createObjectURL(file);
-//       const id = "FILE" + uuid.v4().replace(/-/g, "");
-//       this.ownedObjectURLPool[id] = objectURL;
-//       return {
-//         name: file.name,
-//         type: file.type,
-//         id,
-//         url: objectURL,
-//         size: file.size,
-//         src: file,
-//       };
-//     });
+  constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>) {
+    super(props);
 
-//     const newInternalFiles: IInternalURLFileDataWithState[] = newFiles.map((value) => {
-//       return {
-//         value,
-//       };
-//     });
+    // the pool is set
+    this.ownedObjectURLPool = {};
 
-//     // call the onchange, as replacing or as concatenating depending
-//     // on whether it is a single file or not
-//     this.props.onChange(
-//       (singleFile ? [] : this.props.state.value as PropertyDefinitionSupportedFilesType || [])
-//         .concat(newFiles),
-//       (singleFile ? [] : this.props.state.internalValue as IInternalURLFileDataWithState[] || [])
-//         .concat(newInternalFiles),
-//     );
-//   }
-//   public onDropRejected(files: File[]) {
+    this.state = {
+      rejectedValues: [],
+      showUserSetErrors: false,
+    };
 
-//     // let's get the object urls of the files added
-//     const newFiles: IPropertyDefinitionSupportedSingleFilesType[] = files.map((file: File) => {
-//       const objectURL = URL.createObjectURL(file);
-//       const id = "FILE" + uuid.v4().replace(/-/g, "");
-//       this.ownedObjectURLPool[id] = objectURL;
-//       return {
-//         name: file.name,
-//         type: file.type,
-//         id,
-//         url: objectURL,
-//         size: file.size,
-//         src: file,
-//       };
-//     });
+    // the functions are binded
+    this.onPushFile = this.onPushFile.bind(this);
+    this.onPushFileInternal = this.onPushFileInternal.bind(this);
+    this.onPushFiles = this.onPushFiles.bind(this);
+    this.onRemoveFileAt = this.onRemoveFileAt.bind(this);
+    this.onRemoveRejectFileAt = this.onRemoveRejectFileAt.bind(this);
+    this.openFile = this.openFile.bind(this);
+    this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
+    this.onUpdateExtraMetadataAt = this.onUpdateExtraMetadataAt.bind(this);
+    this.onUpdateRejectExtraMetadataAt = this.onUpdateRejectExtraMetadataAt.bind(this);
+  }
+  public shouldComponentUpdate(
+    nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>,
+    nextState: IPropertyEntryFilesState,
+  ) {
+    // This is optimized to only update for the thing it uses
+    // This is optimized to only update for the thing it uses
+    return nextProps.property !== this.props.property ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
+      !!this.props.poked !== !!nextProps.poked ||
+      nextProps.forId !== this.props.forId ||
+      nextProps.forVersion !== this.props.forVersion ||
+      !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
+      this.props.altDescription !== nextProps.altDescription ||
+      this.props.altPlaceholder !== nextProps.altPlaceholder ||
+      this.props.altLabel !== nextProps.altLabel ||
+      this.props.hideLabel !== nextProps.hideLabel ||
+      !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      nextProps.language !== this.props.language ||
+      nextProps.i18n !== this.props.i18n ||
+      nextProps.icon !== this.props.icon ||
+      nextProps.renderer !== this.props.renderer ||
+      !equals(this.state, nextState, { strict: true }) ||
+      !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
+  }
+  public componentWillUnmount() {
+    // revoke urls on unmount
+    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
+    });
+  }
 
-//     // we need to create our internal values with the rejection and the reason of why
-//     // they were rejected
-//     const newInternalValueData: IInternalURLFileDataWithState[] = newFiles.map((value) => {
-//       // check if it's images we are accepting
-//       const isImage = (this.props.property.getSpecialProperty("accept") as string || "").startsWith("image");
-//       // the reason by default is that is an invalid type
-//       let reason = isImage ? "image_uploader_invalid_type" : "file_uploader_invalid_type";
-//       // but if the file is too large
-//       if (value.size > MAX_FILE_SIZE) {
-//         // change it to that
-//         reason = isImage ? "image_uploader_file_too_big" : "file_uploader_file_too_big";
-//       }
+  private getIdOfLastValue() {
+    const currentValue: PropertyDefinitionSupportedFilesType = (
+      this.props.state.value as PropertyDefinitionSupportedFilesType || []
+    );
 
-//       return {
-//         value,
-//         rejected: true,
-//         reason,
-//       };
-//     });
+    if (!currentValue.length) {
+      return null;
+    }
 
-//     // if it's a single file
-//     const singleFile = this.props.property.getMaxLength() === 1;
+    return currentValue[currentValue.length - 1].id;
+  }
 
-//     // the internal value currently, it might be null so we need to recreate it
-//     // as what is the value currently, before the drop is going to be added
-//     // note that it is hardset to an empty string if it's a single file
-//     // so it forces a replacement, none of the conditionals will pass, it will
-//     // just remain an empty array, making it replace
-//     let valueAsInternal: IInternalURLFileDataWithState[] = singleFile ? [] : this.props.state.internalValue;
-//     if (!valueAsInternal && this.props.state.value) {
-//       valueAsInternal = (
-//         this.props.state.value as PropertyDefinitionSupportedFilesType
-//       ).map((value) => {
-//         return {value};
-//       });
-//     } else if (!valueAsInternal) {
-//       valueAsInternal = [];
-//     }
+  /**
+   * Provides the current value, either the actual value
+   * or the rejected value
+   * @returns a PropertyDefinitionSupportedFileType
+   */
+  private getCurrentValue() {
+    const currentValue: PropertyDefinitionSupportedFilesType = (
+      this.props.state.value as PropertyDefinitionSupportedFilesType || []
+    ).map((v) => {
+      if (v.url.indexOf("blob:") !== 0) {
+        if (this.ownedObjectURLPool[v.id]) {
+          return {
+            ...v,
+            url: this.ownedObjectURLPool[v.id],
+          };
+        } else {
+          const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
+          return fileURLAbsoluter(
+            domain,
+            this.props.config.containersHostnamePrefixes,
+            v,
+            this.props.itemDefinition,
+            this.props.forId,
+            this.props.forVersion,
+            this.props.containerId,
+            this.props.include,
+            this.props.property,
+            this.props.cacheFiles,
+          );
+        }
+      }
 
-//     // by the same logic the onchange set it to null
-//     // replacing an existant file if there was one
-//     this.props.onChange(
-//       singleFile ? null : this.props.state.value,
-//       valueAsInternal.concat(newInternalValueData),
-//     );
-//   }
-//   public openFile(
-//     value: IPropertyDefinitionSupportedSingleFilesType,
-//     e: React.MouseEvent<HTMLButtonElement>,
-//   ) {
-//     // open a file, let's stop the propagation
-//     // for some reason it's not possible to set the window title
-//     e.stopPropagation();
-//     e.preventDefault();
+      return v;
+    });
 
-//     window.open(value.url, "_blank");
-//   }
-//   public onRemoveFile(value: IPropertyDefinitionSupportedSingleFilesType, e: React.MouseEvent<HTMLButtonElement>) {
-//     // stop the propagation and stuff
-//     e.stopPropagation();
-//     e.preventDefault();
+    return currentValue;
+  }
 
-//     // revoke the url and remove it from the pool
-//     if (this.ownedObjectURLPool[value.id]) {
-//       URL.revokeObjectURL(this.ownedObjectURLPool[value.id]);
-//       delete this.ownedObjectURLPool[value.id];
-//     }
+  private getValueWithInfoFromSpecific(
+    v: PropertyDefinitionSupportedFileType,
+    data: {
+      givenIndex: number,
+      isReject?: boolean,
+      rejectedReason?: string,
+    }
+  ): PropertyDefinitionSupportedFileTypeWithInfo {
+    const isSupportedImage = FILE_SUPPORTED_IMAGE_TYPES.includes(v.type);
+    const imageSizes = isSupportedImage ? imageSizeRetriever(v, this.props.property) : null;
+    const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(v, this.props.property, imageSizes) : null;
+    const prettySize = prettyBytes(v.size);
+    const extension = mimeTypeToExtension(v.type);
+    const extraMetadata: string = (v.metadata && v.metadata.split(";")[3]) || null;
 
-//     // let's get the index in the internal value
-//     const indexInInternalValue = (this.props.state.internalValue as IInternalURLFileDataWithState[] || []).findIndex(
-//       (internalValue) => internalValue.value.id === value.id,
-//     );
-//     // this will be the new value
-//     let newInternalValue = this.props.state.internalValue as IInternalURLFileDataWithState[];
-//     // if the index in the internal value the url is there
-//     if (indexInInternalValue !== -1) {
-//       // we make a copy, and splice it, and set it to null if necessary
-//       newInternalValue = [...newInternalValue];
-//       newInternalValue.splice(indexInInternalValue, 1);
-//       if (newInternalValue.length === 0) {
-//         newInternalValue = null;
-//       }
-//     }
+    const vWithInfo: PropertyDefinitionSupportedFileTypeWithInfo = {
+      ...v,
+      isSupportedImage,
+      extension,
+      extraMetadata,
+      imageSizes,
+      imageSrcSet,
+      openFile: this.openFile.bind(this, v),
+      prettySize,
+      rejected: !!data.isReject,
+      rejectedReason: !data.isReject ? null : data.rejectedReason,
+      removeFile: data.isReject ?
+        this.onRemoveRejectFileAt.bind(this, data.givenIndex) :
+        this.onRemoveFileAt.bind(this, data.givenIndex),
+      updateExtraMetadata: data.isReject ?
+        this.onUpdateRejectExtraMetadataAt.bind(this, data.givenIndex) :
+        this.onUpdateExtraMetadataAt.bind(this, data.givenIndex),
+    }
 
-//     // let's do the exact same but for the actual value
-//     const indexInValue = (this.props.state.value as PropertyDefinitionSupportedFilesType || []).findIndex(
-//       (standardValue) => standardValue.id === value.id,
-//     );
-//     let newValue = this.props.state.value as PropertyDefinitionSupportedFilesType;
-//     if (indexInValue !== -1) {
-//       newValue = [...newValue];
-//       newValue.splice(indexInValue, 1);
-//       if (newValue.length === 0) {
-//         newValue = null;
-//       }
-//     }
+    return vWithInfo;
+  }
 
-//     // trigger the on change
-//     this.props.onChange(newValue, newInternalValue);
-//   }
-//   public render() {
-//     // getting the basic data
-//     const i18nData = this.props.property.getI18nDataFor(this.props.language);
-//     const i18nLabel = i18nData && i18nData.label;
-//     const i18nDescription = i18nData && i18nData.description;
-//     const i18nPlaceholder = i18nData && i18nData.placeholder;
+  private getCurrentValueWithInfo() {
+    const baseElements = this.getCurrentValue().map((v, index) => {
+      return this.getValueWithInfoFromSpecific(v, {
+        givenIndex: index,
+      });
+    });
 
-//     // getting the icon
-//     const icon = this.props.icon;
-//     const iconComponent = icon ? (
-//       <Icon classes={{root: this.props.classes.icon}}>{icon}</Icon>
-//     ) : null;
+    // now we need to add the rejects to that base so that they
+    // are displayed even when they are not in our field
+    this.state.rejectedValues.forEach((reject, rejectIndex) => {
+      // here we go first we need to see after which index
+      // they are supposed to be set
+      let afterIndex: number = -1;
+      // if there's none this means that the reject goes at first so stays at -1
+      if (reject.afterFileId !== null) {
+        // otherwise we see where
+        afterIndex = baseElements.findIndex((v) => v.id === reject.afterFileId);
+      }
 
-//     // whether it is a single file
-//     const singleFile = this.props.property.getMaxLength() === 1;
-//     // whether we are expecting images only
-//     const isExpectingImages = (this.props.property.getSpecialProperty("accept") as string || "").startsWith("image");
+      // now we need to see where it is going to be placed, after all the other
+      // possible rejects
+      do {
+        afterIndex++;
+      } while (baseElements[afterIndex] && baseElements[afterIndex].rejected);
 
-//     // the placeholder when active
-//     let placeholderActive = singleFile ?
-//       this.props.i18n[this.props.language].file_uploader_placeholder_active_single :
-//       this.props.i18n[this.props.language].file_uploader_placeholder_active;
-//     if (isExpectingImages) {
-//       placeholderActive = singleFile ?
-//         this.props.i18n[this.props.language].image_uploader_placeholder_active_single :
-//         this.props.i18n[this.props.language].image_uploader_placeholder_active;
-//     }
+      // and now we build the rejected reason
+      let rejectedReason = this.props.i18n[this.props.language][reject.reason];
+      if (
+        reject.reason === "image_uploader_file_too_big" ||
+        reject.reason === "file_uploader_file_too_big"
+      ) {
+        const prettySize = prettyBytes(MAX_FILE_SIZE);
+        rejectedReason = localeReplacer(rejectedReason, prettySize);
+      }
 
-//     // the invalid reason
-//     const invalidReason = this.props.state.invalidReason;
-//     let i18nInvalidReason = null;
-//     if (
-//       (this.props.poked || this.props.state.userSet) &&
-//       invalidReason && i18nData &&
-//       i18nData.error && i18nData.error[invalidReason]
-//     ) {
-//       i18nInvalidReason = i18nData.error[invalidReason];
-//     }
+      // now we can push the element in place
+      baseElements.splice(afterIndex, 0, this.getValueWithInfoFromSpecific(reject.value, {
+        givenIndex: rejectIndex,
+        isReject: true,
+        rejectedReason,
+      }));
+    });
 
-//     // what are we accepting, note that "image" will trasnlate to the
-//     // supported browser image types
-//     let accept: string | string[] = this.props.property.getSpecialProperty("accept") as string;
-//     if (accept === "image") {
-//       accept = FILE_SUPPORTED_IMAGE_TYPES;
-//     }
+    // and return it
+    return baseElements;
+  }
 
-//     // the value from the internal source, either recreated or from the internal value
-//     let valueAsInternal: IInternalURLFileDataWithState[] = this.props.state.internalValue;
-//     if (!valueAsInternal && this.props.state.value) {
-//       valueAsInternal = (
-//         this.props.state.value as PropertyDefinitionSupportedFilesType
-//       ).map((value) => ({value}));
-//     } else if (!valueAsInternal) {
-//       valueAsInternal = [];
-//     }
+  public openFile(v: PropertyDefinitionSupportedFileType) {
+    window.open(v.url, v.name);
+  }
 
-//     // return the component itself
-//     return (
-//       <div className={this.props.classes.container}>
-//         <FormLabel
-//           aria-label={i18nLabel}
-//           classes={{
-//             root: this.props.classes.label + " " + this.props.classes.labelSingleLine,
-//             focused: "focused",
-//           }}
-//         >
-//           {i18nLabel}{iconComponent}
-//         </FormLabel>
-//         {i18nDescription ? <div className={this.props.classes.description}>
-//           {i18nDescription}
-//         </div> : null}
-//         <Dropzone
-//           onDropAccepted={this.onDropAccepted}
-//           onDropRejected={this.onDropRejected}
-//           maxSize={MAX_FILE_SIZE}
-//           accept={accept}
-//           multiple={!singleFile}
-//           noClick={singleFile && valueAsInternal.length === 1}
-//           ref={this.dropzoneRef}
-//           disabled={this.props.state.enforced}
-//         >
-//           {({
-//             getRootProps,
-//             getInputProps,
-//             isDragActive,
-//             isDragAccept,
-//             isDragReject,
-//           }) => {
-//             const {ref, ...rootProps} = getRootProps();
+  public onUpdateExtraMetadataAt(index: number, extraMetadata: string) {
+    const value = this.getCurrentValue();
+    const currentValue = value[index];
+    if (!currentValue) {
+      return;
+    }
 
-//             const files = valueAsInternal.map((value, index) => {
-//               const isSupportedImage = value.value.type.indexOf("image/") === 0 &&
-//                 FILE_SUPPORTED_IMAGE_TYPES.includes(value.value.type);
-//               const mainFileClassName = this.props.classes.file +
-//                 (value.rejected ? " " + this.props.classes.fileRejected : "");
+    const updatedValue = {
+      ...currentValue,
+    };
 
-//               if (isSupportedImage) {
-//                 let toUseURL = value.value.url;
-//                 if (toUseURL.indexOf("blob:") !== 0) {
-//                   const objectURL = this.ownedObjectURLPool[value.value.id];
-//                   if (objectURL) {
-//                     toUseURL = objectURL;
-//                   }
-//                 }
+    if (!updatedValue.metadata) {
+      updatedValue.metadata = ";;" + extraMetadata;
+    } else {
+      const metadataCreated = updatedValue.metadata.split(";");
+      const wxh = metadataCreated[0];
+      const sizes = metadataCreated[1];
+      updatedValue.metadata = wxh + ";" + sizes + ";" + extraMetadata;
+    }
 
-//                 let reduceSizeURL = toUseURL;
-//                 if (
-//                   reduceSizeURL.indexOf("blob:") !== 0 &&
-//                   value.value.type.indexOf("image/svg") !== 0
-//                 ) {
-//                   const splittedURL = reduceSizeURL.split("/");
-//                   const fileName = splittedURL.pop();
-//                   const baseURL = splittedURL.join("/");
-//                   const fileNameDotSplitted = fileName.split(".");
-//                   fileNameDotSplitted.pop();
-//                   const recoveredFileName = fileNameDotSplitted.join(".");
-//                   const fileNameWithoutExtension =
-//                     recoveredFileName === "" ?
-//                     fileName :
-//                     recoveredFileName;
-//                   if (singleFile) {
-//                     reduceSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg";
-//                   } else {
-//                     reduceSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg";
-//                   }
-//                 }
-//                 return (
-//                   <div
-//                     className={mainFileClassName}
-//                     key={index}
-//                     onClick={this.openFile.bind(this, value.value)}
-//                   >
-//                     <div className={this.props.classes.fileDataContainer}>
-//                       <img src={reduceSizeURL} className={this.props.classes.imageThumbnail}/>
-//                       {!singleFile ? <IconButton
-//                         className={this.props.classes.fileDeleteButton}
-//                         onClick={this.onRemoveFile.bind(this, value.value)}
-//                       >
-//                         <Icon>remove_circle</Icon>
-//                       </IconButton> : null}
-//                     </div>
-//                     <p className={this.props.classes.fileName}>{value.value.name}</p>
-//                     <p className={this.props.classes.fileSize}>({
-//                       prettyBytes(value.value.size)
-//                     })</p>
-//                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
-//                       {localeReplacer(this.props.i18n[this.props.language][value.reason], prettyBytes(MAX_FILE_SIZE))}
-//                     </p> : null}
-//                   </div>
-//                 );
-//               } else {
-//                 return (
-//                   <div
-//                     className={mainFileClassName}
-//                     key={index}
-//                     onClick={this.openFile.bind(this, value.value)}
-//                   >
-//                     <div className={this.props.classes.fileDataContainer}>
-//                       <Icon className={this.props.classes.fileIcon}>insert_drive_file</Icon>
-//                       <span className={this.props.classes.fileMimeType}>{
-//                         mimeTypeToExtension(value.value.type)
-//                       }</span>
-//                       {!singleFile ? <IconButton
-//                         className={this.props.classes.fileDeleteButton}
-//                         onClick={this.onRemoveFile.bind(this, value.value)}
-//                       >
-//                         <Icon>remove_circle</Icon>
-//                       </IconButton> : null}
-//                     </div>
-//                     <p className={this.props.classes.fileName}>{value.value.name}</p>
-//                     <p className={this.props.classes.fileSize}>({
-//                       prettyBytes(value.value.size)
-//                     })</p>
-//                     {value.rejected ? <p className={this.props.classes.fileRejectedDescription}>
-//                       {localeReplacer(this.props.i18n[this.props.language][value.reason], prettyBytes(MAX_FILE_SIZE))}
-//                     </p> : null}
-//                   </div>
-//                 );
-//               }
-//             });
+    value[index] = updatedValue;
 
-//             return (
-//               <RootRef rootRef={ref}>
-//                 <Paper
-//                   {...rootProps}
-//                   classes={{
-//                     root: `${this.props.classes.filesPaper} ${singleFile ?
-//                       this.props.classes.filesPaperSingleFile : ""}`,
-//                   }}
-//                 >
-//                   <input {...getInputProps()} />
-//                   {files}
-//                   {
-//                     (
-//                       this.props.property.getMaxLength() === 1 &&
-//                       valueAsInternal.length === 1
-//                     ) ? null :
-//                     <div
-//                       className={`${this.props.classes.filesPlaceholder} ${isDragAccept ?
-//                           this.props.classes.filesPlaceholderAccepting : ""} ${isDragReject ?
-//                           this.props.classes.filesPlaceholderRejecting : ""}`}
-//                     >
-//                       {!valueAsInternal.length ? <p>{isDragActive ? placeholderActive : i18nPlaceholder}</p> : null}
-//                       <Icon className={this.props.classes.filesIconAdd}>note_add</Icon>
-//                     </div>
-//                   }
-//                   {
-//                     singleFile && valueAsInternal.length === 1 ? <div
-//                       className={this.props.classes.filesSingleFileButtonContainer}
-//                     >
-//                       <Button
-//                         className={this.props.classes.filesSingleFileButton}
-//                         variant="contained"
-//                         color="secondary"
-//                         onClick={this.onRemoveFile.bind(this, valueAsInternal[0].value)}
-//                       >
-//                         {
-//                           isExpectingImages ?
-//                           this.props.i18n[this.props.language].image_uploader_delete_file :
-//                           this.props.i18n[this.props.language].file_uploader_delete_file
-//                         }
-//                         <Icon className={this.props.classes.filesSingleFileButtonIcon}>remove_circle_outline</Icon>
-//                       </Button>
-//                       <Button
-//                         className={this.props.classes.filesSingleFileButton}
-//                         variant="contained"
-//                         color="primary"
-//                         onClick={this.manuallyTriggerUpload}
-//                       >
-//                         {
-//                           isExpectingImages ?
-//                           this.props.i18n[this.props.language].image_uploader_select_file :
-//                           this.props.i18n[this.props.language].file_uploader_select_file
-//                         }
-//                         <Icon className={this.props.classes.filesSingleFileButtonIcon}>cloud_upload</Icon>
-//                       </Button>
-//                     </div> : null
-//                   }
-//                 </Paper>
-//               </RootRef>
-//             );
-//           }}
-//         </Dropzone>
-//         <div className={this.props.classes.errorMessage}>
-//           {i18nInvalidReason}
-//         </div>
-//       </div>
-//     );
-//   }
-// }
+    this.props.onChange(value, null);
+  }
+
+  public onUpdateRejectExtraMetadataAt() {
+    // DO NOTHING
+  }
+  public async onPushFiles(files: File[], extraMetadata?: string) {
+    const arrAwaited = (await Promise.all(files.map((f) => {
+      return this.onPushFileInternal(f, extraMetadata);
+    }))).filter((v) => !!v);
+
+    // now we can commit all at once
+    // once they have loaded all avoding triggering
+    // an entry driven change per file
+    let newFilesValue = this.getCurrentValue();
+    newFilesValue = newFilesValue.concat(arrAwaited);
+
+    this.props.onChange(
+      newFilesValue,
+      null,
+    );
+  }
+  public onPushFile(file: File, extraMetadata?: string) {
+    return this.onPushFileInternal(file, extraMetadata);
+  }
+  public async onPushFileInternal(file: File, extraMetadata?: string, avoidChanges?: boolean): Promise<PropertyDefinitionSupportedFileType> {
+    // when a drop is accepted, let's check, if it's a single file
+    const id = "FILE" + uuid.v4().replace(/-/g, "");
+    const objectURL = URL.createObjectURL(file);
+    this.ownedObjectURLPool[id] = objectURL;
+    const value: PropertyDefinitionSupportedFileType = {
+      name: file.name,
+      type: file.type,
+      id,
+      url: objectURL,
+      size: file.size,
+      src: file,
+      metadata: null,
+    };
+
+    if (extraMetadata) {
+      value.metadata = ";;" + extraMetadata;
+    }
+
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+    const accept = processAccepts(
+      this.props.property.getSpecialProperty("accept") as string,
+      isExpectingImages,
+    );
+
+    // check if it's images we are accepting
+    if (!checkFileInAccepts(value.type, accept)) {
+      const newRejectedArray = [...this.state.rejectedValues];
+      newRejectedArray.push({
+        value,
+        reason: isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type",
+        afterFileId: this.getIdOfLastValue(),
+      })
+      this.setState({
+        rejectedValues: newRejectedArray,
+      });
+      return;
+    } else if (value.size > MAX_FILE_SIZE) {
+      const newRejectedArray = [...this.state.rejectedValues];
+      newRejectedArray.push({
+        value,
+        reason: isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
+        afterFileId: this.getIdOfLastValue(),
+      })
+      this.setState({
+        rejectedValues: newRejectedArray,
+      });
+      return;
+    }
+
+    if (isExpectingImages || value.type.startsWith("image")) {
+      const promise = new Promise<PropertyDefinitionSupportedFileType>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+          const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
+          value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
+
+          if (extraMetadata) {
+            value.metadata += ";" + extraMetadata;
+          }
+
+          if (!avoidChanges) {
+            const newFilesValue = this.getCurrentValue();
+            newFilesValue.push(value);
+
+            this.props.onChange(
+              newFilesValue,
+              null,
+            );
+          } else {
+            resolve(value);
+          }
+        }
+        img.onerror = () => {
+          const newRejectedArray = [...this.state.rejectedValues];
+          newRejectedArray.push({
+            value,
+            reason: "image_uploader_invalid_type",
+            afterFileId: this.getIdOfLastValue(),
+          })
+          this.setState({
+            rejectedValues: newRejectedArray,
+          });
+
+          resolve(null);
+        }
+        img.src = value.url;
+      });
+      return await promise;
+    } else {
+      if (!avoidChanges) {
+        const newFilesValue = this.getCurrentValue();
+        newFilesValue.push(value);
+        this.props.onChange(
+          newFilesValue,
+          null,
+        );
+      } else {
+        return value;
+      }
+    }
+  }
+  public onRemoveFileAt(index: number) {
+    const newFilesValue = this.getCurrentValue();
+    newFilesValue.splice(index, 1);
+    if (newFilesValue.length === 0) {
+      this.props.onChange(
+        null,
+        null,
+      );
+    } else {
+      this.props.onChange(
+        newFilesValue,
+        null,
+      );
+    }
+  }
+  public onRemoveRejectFileAt(index: number) {
+    const newFilesValue = [...this.state.rejectedValues];
+    newFilesValue.splice(index, 1);
+    this.setState({
+      rejectedValues: newFilesValue,
+    });
+  }
+  public enableUserSetErrors() {
+    this.setState({
+      showUserSetErrors: true,
+    });
+  }
+  public render() {
+    const currentValueWithInfo = this.getCurrentValueWithInfo();
+
+    // getting the basic data
+    const i18nData = this.props.property.getI18nDataFor(this.props.language);
+    const i18nLabel = this.props.hideLabel ? null : (typeof this.props.altLabel !== "undefined" ? this.props.altLabel : (i18nData && i18nData.label));
+    const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
+    const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
+
+    // get the invalid reason if any
+    const invalidReason = this.props.state.invalidReason;
+    const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
+      (this.props.poked || (this.state.showUserSetErrors && this.props.state.userSet)) && invalidReason;
+    let i18nInvalidReason = null;
+    if (
+      isCurrentlyShownAsInvalid && i18nData &&
+      i18nData.error && i18nData.error[invalidReason]
+    ) {
+      i18nInvalidReason = i18nData.error[invalidReason];
+    }
+
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+    const accept = processAccepts(
+      this.props.property.getSpecialProperty("accept") as string,
+      isExpectingImages
+    );
+
+    // the placeholder when active
+    let genericActivePlaceholder = this.props.i18n[this.props.language].file_uploader_placeholder_active;
+    if (isExpectingImages) {
+      genericActivePlaceholder = this.props.i18n[this.props.language].image_uploader_placeholder_active;
+    }
+    genericActivePlaceholder = capitalize(genericActivePlaceholder);
+
+    let genericDeleteLabel = this.props.i18n[this.props.language].file_uploader_delete_file;
+    if (isExpectingImages) {
+      genericDeleteLabel = this.props.i18n[this.props.language].image_uploader_delete_file;
+    }
+    genericDeleteLabel = capitalize(genericDeleteLabel);
+
+    let genericSelectLabel = this.props.i18n[this.props.language].file_uploader_select_file;
+    if (isExpectingImages) {
+      genericSelectLabel = this.props.i18n[this.props.language].image_uploader_select_file;
+    }
+    genericSelectLabel = capitalize(genericSelectLabel);
+
+    const RendererElement = this.props.renderer;
+    const rendererArgs: IPropertyEntryFilesRendererProps = {
+      propertyId: this.props.property.getId(),
+
+      args: this.props.rendererArgs,
+      rtl: this.props.rtl,
+      label: i18nLabel,
+      placeholder: i18nPlaceholder,
+      description: i18nDescription,
+      icon: this.props.icon,
+
+      currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedFilesType,
+      currentValue: this.props.state.value as PropertyDefinitionSupportedFilesType,
+      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: i18nInvalidReason,
+      currentInternalValue: this.props.state.internalValue,
+
+      disabled:
+        typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
+          this.props.disabled :
+          this.props.state.enforced,
+      autoFocus: this.props.autoFocus || false,
+      onChange: this.props.onChange,
+      onRestore: this.props.onRestore,
+      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, { strict: true }),
+
+      onPushFile: this.onPushFile,
+      onPushFiles: this.onPushFiles,
+
+      accept,
+      isExpectingImages,
+      genericActivePlaceholder,
+      genericDeleteLabel,
+      genericSelectLabel,
+
+      currentValueWithInfo,
+
+      enableUserSetErrors: this.enableUserSetErrors,
+    };
+
+    return <RendererElement {...rendererArgs} />;
+  }
+}
