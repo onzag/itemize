@@ -148,7 +148,7 @@ export default class PropertyEntryFile
    * Submitting will still work just fine, because the src still
    * points to a file
    */
-  private ownedObjectURLPool: {[key: string]: string};
+  private ownedObjectURLPool: { [key: string]: string };
 
   constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>) {
     super(props);
@@ -265,26 +265,10 @@ export default class PropertyEntryFile
     this.props.onChange(updatedValue, null);
   }
 
-  public onSetFile(file: File, extraMetadata?: string) {
-    // when a drop is accepted, let's check, if it's a single file
-    const id = "FILE" + uuid.v4().replace(/-/g, "");
-    const objectURL = URL.createObjectURL(file);
-    this.ownedObjectURLPool[id] = objectURL;
-    const value: PropertyDefinitionSupportedFileType = {
-      name: file.name,
-      type: file.type,
-      id,
-      url: objectURL,
-      size: file.size,
-      src: file,
-      metadata: null,
-    };
-
-    if (extraMetadata) {
-      value.metadata = ";;" + extraMetadata;
-    }
-
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+  public checkFileAcceptsAndCommit(
+    isExpectingImages: boolean,
+    value: PropertyDefinitionSupportedFileType,
+  ) {
     const accept = processAccepts(
       this.props.property.getSpecialProperty("accept") as string,
       isExpectingImages,
@@ -310,10 +294,37 @@ export default class PropertyEntryFile
       })
     }
 
+    this.props.onChange(
+      value,
+      null,
+    );
+  }
+
+  public onSetFile(file: File, extraMetadata?: string) {
+    // when a drop is accepted, let's check, if it's a single file
+    const id = "FILE" + uuid.v4().replace(/-/g, "");
+    const objectURL = URL.createObjectURL(file);
+    this.ownedObjectURLPool[id] = objectURL;
+    const value: PropertyDefinitionSupportedFileType = {
+      name: file.name,
+      type: file.type,
+      id,
+      url: objectURL,
+      size: file.size,
+      src: file,
+      metadata: null,
+    };
+
+    if (extraMetadata) {
+      value.metadata = ";;" + extraMetadata;
+    }
+
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+
     if (isExpectingImages || value.type.startsWith("image")) {
       const img = new Image();
       img.onload = () => {
-        const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+        const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
         const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
         value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
@@ -321,10 +332,7 @@ export default class PropertyEntryFile
           value.metadata += ";" + extraMetadata;
         }
 
-        this.props.onChange(
-          value,
-          null,
-        );
+        this.checkFileAcceptsAndCommit(isExpectingImages, value);
       }
       img.onerror = () => {
         this.setState({
@@ -333,11 +341,33 @@ export default class PropertyEntryFile
         });
       }
       img.src = value.url;
+    } else if (value.type.startsWith("audio")) {
+      const audio = new Audio();
+      audio.onloadeddata = () => {
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=642012
+        if (audio.duration === Infinity) {
+          audio.ontimeupdate = () => {
+            value.metadata = audio.duration.toString();
+            if (extraMetadata) {
+              value.metadata += ";;" + extraMetadata;
+            }
+            this.checkFileAcceptsAndCommit(isExpectingImages, value);
+          }
+          audio.currentTime = Number.MAX_SAFE_INTEGER;
+        } else {
+          value.metadata = audio.duration.toString();
+          if (extraMetadata) {
+            value.metadata += ";;" + extraMetadata;
+          }
+          this.checkFileAcceptsAndCommit(isExpectingImages, value);
+        }
+      }
+      audio.onerror = () => {
+        this.checkFileAcceptsAndCommit(isExpectingImages, value);
+      }
+      audio.src = value.url;
     } else {
-      this.props.onChange(
-        value,
-        null,
-      );
+      this.checkFileAcceptsAndCommit(isExpectingImages, value);
     }
   }
   public onRemoveFile() {
@@ -438,12 +468,12 @@ export default class PropertyEntryFile
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
-      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, {strict: true}),
+      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, { strict: true }),
 
       onSetFile: this.onSetFile,
       onRemoveFile: this.onRemoveFile,

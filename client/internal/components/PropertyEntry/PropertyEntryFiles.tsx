@@ -380,7 +380,7 @@ export default class PropertyEntryFile
   }
   public async onPushFiles(files: File[], extraMetadata?: string) {
     const arrAwaited = (await Promise.all(files.map((f) => {
-      return this.onPushFileInternal(f, extraMetadata);
+      return this.onPushFileInternal(f, extraMetadata, true);
     }))).filter((v) => !!v);
 
     // now we can commit all at once
@@ -396,6 +396,52 @@ export default class PropertyEntryFile
   }
   public onPushFile(file: File, extraMetadata?: string) {
     return this.onPushFileInternal(file, extraMetadata);
+  }
+  public checkFileInAcceptsAndCommit(
+    isExpectingImages: boolean,
+    value: PropertyDefinitionSupportedFileType,
+    avoidChanges: boolean,
+  ) {
+    const accept = processAccepts(
+      this.props.property.getSpecialProperty("accept") as string,
+      isExpectingImages,
+    );
+
+    // check if it's images we are accepting
+    if (!checkFileInAccepts(value.type, accept)) {
+      const newRejectedArray = [...this.state.rejectedValues];
+      newRejectedArray.push({
+        value,
+        reason: isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type",
+        afterFileId: this.getIdOfLastValue(),
+      })
+      this.setState({
+        rejectedValues: newRejectedArray,
+      });
+      return false;
+    } else if (value.size > MAX_FILE_SIZE) {
+      const newRejectedArray = [...this.state.rejectedValues];
+      newRejectedArray.push({
+        value,
+        reason: isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
+        afterFileId: this.getIdOfLastValue(),
+      })
+      this.setState({
+        rejectedValues: newRejectedArray,
+      });
+
+      return false;
+    } else if (!avoidChanges) {
+      const newFilesValue = this.getCurrentValue();
+      newFilesValue.push(value);
+
+      this.props.onChange(
+        newFilesValue,
+        null,
+      );
+    }
+
+    return true;
   }
   public async onPushFileInternal(file: File, extraMetadata?: string, avoidChanges?: boolean): Promise<PropertyDefinitionSupportedFileType> {
     // when a drop is accepted, let's check, if it's a single file
@@ -417,35 +463,6 @@ export default class PropertyEntryFile
     }
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
-    const accept = processAccepts(
-      this.props.property.getSpecialProperty("accept") as string,
-      isExpectingImages,
-    );
-
-    // check if it's images we are accepting
-    if (!checkFileInAccepts(value.type, accept)) {
-      const newRejectedArray = [...this.state.rejectedValues];
-      newRejectedArray.push({
-        value,
-        reason: isExpectingImages ? "image_uploader_invalid_type" : "file_uploader_invalid_type",
-        afterFileId: this.getIdOfLastValue(),
-      })
-      this.setState({
-        rejectedValues: newRejectedArray,
-      });
-      return;
-    } else if (value.size > MAX_FILE_SIZE) {
-      const newRejectedArray = [...this.state.rejectedValues];
-      newRejectedArray.push({
-        value,
-        reason: isExpectingImages ? "image_uploader_file_too_big" : "file_uploader_file_too_big",
-        afterFileId: this.getIdOfLastValue(),
-      })
-      this.setState({
-        rejectedValues: newRejectedArray,
-      });
-      return;
-    }
 
     if (isExpectingImages || value.type.startsWith("image")) {
       const promise = new Promise<PropertyDefinitionSupportedFileType>((resolve) => {
@@ -459,17 +476,13 @@ export default class PropertyEntryFile
             value.metadata += ";" + extraMetadata;
           }
 
-          if (!avoidChanges) {
-            const newFilesValue = this.getCurrentValue();
-            newFilesValue.push(value);
+          const valuePassed = this.checkFileInAcceptsAndCommit(
+            isExpectingImages,
+            value,
+            avoidChanges,
+          );
 
-            this.props.onChange(
-              newFilesValue,
-              null,
-            );
-          } else {
-            resolve(value);
-          }
+          resolve(valuePassed ? value : null);
         }
         img.onerror = () => {
           const newRejectedArray = [...this.state.rejectedValues];
@@ -487,17 +500,62 @@ export default class PropertyEntryFile
         img.src = value.url;
       });
       return await promise;
+    } else if (value.type.startsWith("audio")) {
+      const promise = new Promise<PropertyDefinitionSupportedFileType>((resolve) => {
+        const audio = new Audio();
+        audio.onloadeddata = () => {
+          // https://bugs.chromium.org/p/chromium/issues/detail?id=642012
+          if (audio.duration === Infinity) {
+            audio.ontimeupdate = () => {
+              value.metadata = audio.duration.toString();
+              if (extraMetadata) {
+                value.metadata += ";;" + extraMetadata;
+              }
+
+              const valuePassed = this.checkFileInAcceptsAndCommit(
+                isExpectingImages,
+                value,
+                avoidChanges,
+              );
+
+              resolve(valuePassed ? value : null);
+            }
+            audio.currentTime = Number.MAX_SAFE_INTEGER;
+          } else {
+            value.metadata = audio.duration.toString();
+            if (extraMetadata) {
+              value.metadata += ";;" + extraMetadata;
+            }
+
+            const valuePassed = this.checkFileInAcceptsAndCommit(
+              isExpectingImages,
+              value,
+              avoidChanges,
+            );
+
+            resolve(valuePassed ? value : null);
+          }
+        }
+        audio.onerror = () => {
+          const valuePassed = this.checkFileInAcceptsAndCommit(
+            isExpectingImages,
+            value,
+            avoidChanges,
+          );
+
+          resolve(valuePassed ? value : null);
+        }
+        audio.src = value.url;
+      });
+      return await promise;
     } else {
-      if (!avoidChanges) {
-        const newFilesValue = this.getCurrentValue();
-        newFilesValue.push(value);
-        this.props.onChange(
-          newFilesValue,
-          null,
-        );
-      } else {
-        return value;
-      }
+      const valuePassed = this.checkFileInAcceptsAndCommit(
+        isExpectingImages,
+        value,
+        avoidChanges,
+      );
+
+      return valuePassed ? value : null;
     }
   }
   public onRemoveFileAt(index: number) {
