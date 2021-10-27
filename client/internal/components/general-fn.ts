@@ -64,6 +64,17 @@ export function deepRendererArgsComparer(a: any, b: any): boolean {
       }
     
       return Object.keys(a).every((k) => {
+        if (a[k] === b[k]) {
+          return true;
+        } else if (
+          a[k] === null ||
+          b[k] === null ||
+          typeof a[k] === "undefined" ||
+          typeof b[k] === "undefined"
+        ) {
+          return a[k] === b[k];
+        }
+
         if (a[k].$$typeof) {
           return a[k] === b[k];
         }

@@ -631,6 +631,19 @@ export default class PropertyEntryFile
     }
     genericSelectLabel = capitalize(genericSelectLabel);
 
+    const canRestore = !this.props.state.value ? (
+      this.props.state.value !== this.props.state.stateAppliedValue
+    ) : !(this.props.state.value as PropertyDefinitionSupportedFilesType).every((v, index) => {
+      if (!this.props.state.stateAppliedValue) {
+        return false;
+      }
+      const stateValueCounterpart = this.props.state.stateAppliedValue[index];
+      if (!stateValueCounterpart) {
+        return false;
+      }
+      return (v.id === stateValueCounterpart.id);
+    });
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFilesRendererProps = {
       propertyId: this.props.property.getId(),
@@ -655,7 +668,7 @@ export default class PropertyEntryFile
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
-      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, { strict: true }),
+      canRestore,
 
       onPushFile: this.onPushFile,
       onPushFiles: this.onPushFiles,
