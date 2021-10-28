@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.167",
+  "version": "0.0.168",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
@@ -83,7 +83,7 @@
     "pretty-bytes": "^5.6.0",
     "properties-reader": "0.0.16",
     "react-autosuggest": "^9.4.3",
-    "react-dropzone": "^10.2.2",
+    "react-dropzone": "^11.4.2",
     "react-leaflet": "^2.8.0",
     "react-router-dom": "^5.2.0",
     "read": "^1.0.7",

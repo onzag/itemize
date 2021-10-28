@@ -17,10 +17,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import FormLabel from "@material-ui/core/FormLabel";
 import RootRef from "@material-ui/core/RootRef";
 import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline"
 import NoteAddIcon from "@material-ui/icons/NoteAdd"
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 import { Close } from "@material-ui/icons";
 
 /**
@@ -143,14 +140,9 @@ interface IPropertyEntryFileRendererWithStylesProps extends IPropertyEntryFilesR
  * @param onSetFile the on set file function from the handler
  * @param files the files the dropper got
  */
-function onDrop(enableUserSetErrors: () => void, onPushFiles: (files: File[]) => void, files: File[]) {
+function onDrop(enableUserSetErrors: () => void, onPushFiles: (files: File[]) => void, files: any[]) {
   enableUserSetErrors();
-  onPushFiles(files);
-}
-
-function manuallyRemove(enableUserSetErrors: () => void, removeFile: () => void) {
-  enableUserSetErrors();
-  removeFile();
+  onPushFiles(files.map((f) => typeof f.file !== "undefined" ? f.file : f));
 }
 
 /**
@@ -201,7 +193,7 @@ const PropertyEntryFilesRenderer = withStyles(style)((props: IPropertyEntryFileR
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
         onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
         maxSize={MAX_FILE_SIZE}
-        accept={props.accept}
+        accept={props.accept === "*" ? null : props.accept}
         multiple={true}
         ref={dropzoneRef}
         disabled={props.disabled}

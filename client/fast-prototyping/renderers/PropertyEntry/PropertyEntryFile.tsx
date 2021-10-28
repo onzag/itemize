@@ -142,9 +142,9 @@ interface IPropertyEntryFileRendererWithStylesProps extends IPropertyEntryFileRe
  * @param onSetFile the on set file function from the handler
  * @param files the files the dropper got
  */
-function onDrop(enableUserSetErrors: () => void, onSetFile: (file: File) => void, files: File[]) {
+function onDrop(enableUserSetErrors: () => void, onSetFile: (file: File) => void, files: any[]) {
   enableUserSetErrors();
-  onSetFile(files[0]);
+  onSetFile(typeof files[0].file !== "undefined" ? files[0].file : files[0]);
 }
 
 /**
@@ -212,7 +212,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
         onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
         maxSize={MAX_FILE_SIZE}
-        accept={props.accept}
+        accept={props.accept === "*" ? null : props.accept}
         multiple={false}
         noClick={!!props.currentValue}
         ref={dropzoneRef}

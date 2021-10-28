@@ -357,9 +357,10 @@ interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyl
  * @param onSetFile the onSetFile function of the renderer, it's bind here
  * @param files the files that have dropped by the react dropzone utility
  */
-function onDrop(onSetFile: (file: File) => void, files: File[]) {
+function onDrop(onSetFile: (file: File) => void, files: any[]) {
   // we only set one file
-  onSetFile(files[0]);
+  // dropzone API became inconsistent with this on its previous version
+  onSetFile(typeof files[0].file !== "undefined" ? files[0].file : files[0]);
 }
 
 /**
@@ -381,7 +382,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
               <Reader id="id">
                 {(id: string) => {
                   const numberColorClassName = id ? props.classes["randomColor" + (id.charCodeAt(0) % 10)] : "";
-                  const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
+                  const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
                   const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
 
                   return (
@@ -429,11 +430,11 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                   )
                 }}
               </Reader>
-            )  
+            )
           }</Reader>
         )
       }</Reader>
-      {props.currentInvalidReason || props.rejectedReason ? <Alert classes={{root: props.classes.avatarUploadError}} severity="error">
+      {props.currentInvalidReason || props.rejectedReason ? <Alert classes={{ root: props.classes.avatarUploadError }} severity="error">
         {props.currentInvalidReason || props.rejectedReason}
       </Alert> : null}
     </div>

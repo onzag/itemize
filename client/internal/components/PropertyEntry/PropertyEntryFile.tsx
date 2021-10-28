@@ -14,6 +14,12 @@ import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, pr
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 import { deepRendererArgsComparer } from "../general-fn";
 
+interface IOnSetDataInfo {
+  extraMetadata?: string,
+  accept?: string,
+  expectImage?: boolean,
+};
+
 /**
  * This is the entry file renderer props that every renderer for a files type will recieve.
  * please do not use onChange with the file renderer, as it's odd, use onSetFile instead
@@ -26,6 +32,10 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    * The accept string, use it in your input type
    */
   accept: string;
+  /**
+   * The max file size
+   */
+  maxFileSize: number;
   /**
    * Whether we are expecting images and only images, this correlates
    * to accept
@@ -92,7 +102,7 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    * If the property is image uploader type, or if the file is on itself
    * an image it will ensure to give it metadata
    */
-  onSetFile: (file: File, extraMetadata?: string) => void;
+  onSetFile: (file: File, info?: IOnSetDataInfo) => void;
   /**
    * Allows to update and set the extra metadata that is contained within the file
    */
@@ -267,10 +277,11 @@ export default class PropertyEntryFile
 
   public checkFileAcceptsAndCommit(
     isExpectingImages: boolean,
+    acceptOverride: string,
     value: PropertyDefinitionSupportedFileType,
   ) {
     const accept = processAccepts(
-      this.props.property.getSpecialProperty("accept") as string,
+      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
       isExpectingImages,
     );
 
@@ -300,7 +311,7 @@ export default class PropertyEntryFile
     );
   }
 
-  public onSetFile(file: File, extraMetadata?: string) {
+  public onSetFile(file: File, info: IOnSetDataInfo = {}) {
     // when a drop is accepted, let's check, if it's a single file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
     const objectURL = URL.createObjectURL(file);
@@ -315,11 +326,11 @@ export default class PropertyEntryFile
       metadata: null,
     };
 
-    if (extraMetadata) {
-      value.metadata = ";;" + extraMetadata;
+    if (info.extraMetadata) {
+      value.metadata = ";;" + info.extraMetadata;
     }
 
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader") || info.expectImage;
 
     if (isExpectingImages || value.type.startsWith("image")) {
       const img = new Image();
@@ -328,11 +339,11 @@ export default class PropertyEntryFile
         const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
         value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
-        if (extraMetadata) {
-          value.metadata += ";" + extraMetadata;
+        if (info.extraMetadata) {
+          value.metadata += ";" + info.extraMetadata;
         }
 
-        this.checkFileAcceptsAndCommit(isExpectingImages, value);
+        this.checkFileAcceptsAndCommit(isExpectingImages, info.accept, value);
       }
       img.onerror = () => {
         this.setState({
@@ -348,26 +359,26 @@ export default class PropertyEntryFile
         if (audio.duration === Infinity) {
           audio.ontimeupdate = () => {
             value.metadata = audio.duration.toString();
-            if (extraMetadata) {
-              value.metadata += ";;" + extraMetadata;
+            if (info.extraMetadata) {
+              value.metadata += ";;" + info.extraMetadata;
             }
-            this.checkFileAcceptsAndCommit(isExpectingImages, value);
+            this.checkFileAcceptsAndCommit(isExpectingImages, info.accept, value);
           }
           audio.currentTime = Number.MAX_SAFE_INTEGER;
         } else {
           value.metadata = audio.duration.toString();
-          if (extraMetadata) {
-            value.metadata += ";;" + extraMetadata;
+          if (info.extraMetadata) {
+            value.metadata += ";;" + info.extraMetadata;
           }
-          this.checkFileAcceptsAndCommit(isExpectingImages, value);
+          this.checkFileAcceptsAndCommit(isExpectingImages, info.accept, value);
         }
       }
       audio.onerror = () => {
-        this.checkFileAcceptsAndCommit(isExpectingImages, value);
+        this.checkFileAcceptsAndCommit(isExpectingImages, info.accept, value);
       }
       audio.src = value.url;
     } else {
-      this.checkFileAcceptsAndCommit(isExpectingImages, value);
+      this.checkFileAcceptsAndCommit(isExpectingImages, info.accept, value);
     }
   }
   public onRemoveFile() {
@@ -452,6 +463,7 @@ export default class PropertyEntryFile
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFileRendererProps = {
       propertyId: this.props.property.getId(),
+      maxFileSize: MAX_FILE_SIZE,
 
       args: this.props.rendererArgs,
       rtl: this.props.rtl,

@@ -15,6 +15,12 @@ import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, pr
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 import { deepRendererArgsComparer } from "../general-fn";
 
+interface IOnSetDataInfo {
+  extraMetadata?: string,
+  accept?: string,
+  expectImage?: boolean,
+};
+
 interface PropertyDefinitionSupportedFileTypeWithInfo extends PropertyDefinitionSupportedFileType {
   /**
    * Specifies whether the current value is of a supported image type, this
@@ -81,6 +87,10 @@ export interface IPropertyEntryFilesRendererProps extends IPropertyEntryRenderer
    */
   accept: string;
   /**
+   * The max file size individually
+   */
+  maxFileSize: number;
+  /**
    * Whether we are expecting images and only images, this correlates
    * to accept
    */
@@ -112,8 +122,8 @@ export interface IPropertyEntryFilesRendererProps extends IPropertyEntryRenderer
    * If the property is image uploader type, or if the file is on itself
    * an image it will ensure to give it metadata
    */
-  onPushFile: (file: File, extraMetadata?: string) => void;
-  onPushFiles: (file: File[], extraMetadata?: string) => void;
+  onPushFile: (file: File, info?: IOnSetDataInfo) => void;
+  onPushFiles: (file: File[], info?: IOnSetDataInfo) => void;
 }
 
 /**
@@ -378,9 +388,9 @@ export default class PropertyEntryFile
   public onUpdateRejectExtraMetadataAt() {
     // DO NOTHING
   }
-  public async onPushFiles(files: File[], extraMetadata?: string) {
+  public async onPushFiles(files: File[], info: IOnSetDataInfo = {}) {
     const arrAwaited = (await Promise.all(files.map((f) => {
-      return this.onPushFileInternal(f, extraMetadata, true);
+      return this.onPushFileInternal(f, info, true);
     }))).filter((v) => !!v);
 
     // now we can commit all at once
@@ -394,16 +404,17 @@ export default class PropertyEntryFile
       null,
     );
   }
-  public onPushFile(file: File, extraMetadata?: string) {
-    return this.onPushFileInternal(file, extraMetadata);
+  public onPushFile(file: File, info: IOnSetDataInfo = {}) {
+    return this.onPushFileInternal(file, info);
   }
   public checkFileInAcceptsAndCommit(
     isExpectingImages: boolean,
+    acceptOverride: string,
     value: PropertyDefinitionSupportedFileType,
     avoidChanges: boolean,
   ) {
     const accept = processAccepts(
-      this.props.property.getSpecialProperty("accept") as string,
+      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
       isExpectingImages,
     );
 
@@ -443,7 +454,7 @@ export default class PropertyEntryFile
 
     return true;
   }
-  public async onPushFileInternal(file: File, extraMetadata?: string, avoidChanges?: boolean): Promise<PropertyDefinitionSupportedFileType> {
+  public async onPushFileInternal(file: File, info: IOnSetDataInfo = {}, avoidChanges?: boolean): Promise<PropertyDefinitionSupportedFileType> {
     // when a drop is accepted, let's check, if it's a single file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
     const objectURL = URL.createObjectURL(file);
@@ -458,11 +469,11 @@ export default class PropertyEntryFile
       metadata: null,
     };
 
-    if (extraMetadata) {
-      value.metadata = ";;" + extraMetadata;
+    if (info.extraMetadata) {
+      value.metadata = ";;" + info.extraMetadata;
     }
 
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader") || info.expectImage;
 
     if (isExpectingImages || value.type.startsWith("image")) {
       const promise = new Promise<PropertyDefinitionSupportedFileType>((resolve) => {
@@ -472,12 +483,13 @@ export default class PropertyEntryFile
           const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
           value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
-          if (extraMetadata) {
-            value.metadata += ";" + extraMetadata;
+          if (info.extraMetadata) {
+            value.metadata += ";" + info.extraMetadata;
           }
 
           const valuePassed = this.checkFileInAcceptsAndCommit(
             isExpectingImages,
+            info.accept,
             value,
             avoidChanges,
           );
@@ -508,12 +520,13 @@ export default class PropertyEntryFile
           if (audio.duration === Infinity) {
             audio.ontimeupdate = () => {
               value.metadata = audio.duration.toString();
-              if (extraMetadata) {
-                value.metadata += ";;" + extraMetadata;
+              if (info.extraMetadata) {
+                value.metadata += ";;" + info.extraMetadata;
               }
 
               const valuePassed = this.checkFileInAcceptsAndCommit(
                 isExpectingImages,
+                info.accept,
                 value,
                 avoidChanges,
               );
@@ -523,12 +536,13 @@ export default class PropertyEntryFile
             audio.currentTime = Number.MAX_SAFE_INTEGER;
           } else {
             value.metadata = audio.duration.toString();
-            if (extraMetadata) {
-              value.metadata += ";;" + extraMetadata;
+            if (info.extraMetadata) {
+              value.metadata += ";;" + info.extraMetadata;
             }
 
             const valuePassed = this.checkFileInAcceptsAndCommit(
               isExpectingImages,
+              info.accept,
               value,
               avoidChanges,
             );
@@ -539,6 +553,7 @@ export default class PropertyEntryFile
         audio.onerror = () => {
           const valuePassed = this.checkFileInAcceptsAndCommit(
             isExpectingImages,
+            info.accept,
             value,
             avoidChanges,
           );
@@ -551,6 +566,7 @@ export default class PropertyEntryFile
     } else {
       const valuePassed = this.checkFileInAcceptsAndCommit(
         isExpectingImages,
+        info.accept,
         value,
         avoidChanges,
       );
@@ -647,6 +663,7 @@ export default class PropertyEntryFile
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFilesRendererProps = {
       propertyId: this.props.property.getId(),
+      maxFileSize: MAX_FILE_SIZE,
 
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
