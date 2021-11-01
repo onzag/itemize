@@ -409,6 +409,8 @@ export function deserializeChildrenForNode(
   return result as any;
 }
 
+const emptyRegex = /^\n\s+$/;
+
 /**
  * Deserializes a single element from its node into a rich element
  * or a text
@@ -469,6 +471,19 @@ export function deserializeElement(
 
   const isText = typeof (result as IText).text !== "undefined";
   if (isText) {
+    // if it's a text node that represents just a newline
+    // which is used in some other text editors
+    // to represent newlines within it
+    if (
+      (
+        parentContainment === "superblock" ||
+        parentContainment === "list-superblock"
+      ) &&
+      emptyRegex.test((result as IText).text)
+    ) {
+      return null;
+    }
+
     // text placed right in a superblock
     // no paragraph
     if (parentContainment === "superblock") {

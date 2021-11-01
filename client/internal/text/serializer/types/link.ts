@@ -66,7 +66,7 @@ export function registerLink(registry: ISerializationRegistryType) {
     if (node.dataset.href) {
       thref = node.dataset.href;
     } else {
-      href = node.href || null;
+      href = node.getAttribute("href") || null;
     }
 
     // and now time to deserialize the children

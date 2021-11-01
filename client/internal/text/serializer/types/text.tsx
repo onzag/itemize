@@ -25,8 +25,6 @@ export const STANDARD_TEXT_NODE = (text?: string): IText => {
   }
 };
 
-const emptyRegex = /^\n\s+$/;
-
 /**
  * The function that registers and adds the text node in the given
  * registry
