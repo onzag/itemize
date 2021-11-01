@@ -6,11 +6,10 @@
  * @module
  */
 
-import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg } from "..";
+import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg, deserializeChildrenForNode } from "..";
 import { CUSTOM_CLASS_PREFIX } from "../..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { STANDARD_PARAGRAPH } from "./paragraph";
-import { STANDARD_TEXT_NODE } from "./text";
 
 /**
  * The function that registers and adds the custom in the given
@@ -66,7 +65,7 @@ export function registerCustom(registry: ISerializationRegistryType) {
       type: "custom",
       containment: "superblock",
       customType,
-      children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as RichElement[],
+      children: deserializeChildrenForNode(node, "superblock") as RichElement[],
     }
 
     if (!custom.children.length) {

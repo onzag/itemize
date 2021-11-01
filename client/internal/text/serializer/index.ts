@@ -13,7 +13,7 @@ import { ICustom, registerCustom } from "./types/custom";
 import { IFile, registerFile } from "./types/file";
 import { IImage, registerImage } from "./types/image";
 import { ILink, registerLink } from "./types/link";
-import { IParagraph, registerParagraph } from "./types/paragraph";
+import { IParagraph, registerParagraph, STANDARD_PARAGRAPH } from "./types/paragraph";
 import { IQuote, registerQuote } from "./types/quote";
 import { IText, registerText, STANDARD_TEXT_NODE } from "./types/text";
 import { ITitle, registerTitle } from "./types/title";
@@ -351,7 +351,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
 
   // now we can use the final children as we call then via the deserializeElement
   // function, and remember to remove nulls
-  const finalChildren = childNodes.map(deserializeElement).filter((n) => n !== null) as RichElement[];
+  const finalChildren = childNodes.map(deserializeElement.bind(null, "superblock")).flat().filter((n) => n !== null) as RichElement[];
 
   // and now we can build the document
   const newDocument: IRootLevelDocument = {
@@ -375,53 +375,180 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   return newDocument;
 }
 
+function gatherAllInlines(ele: RichElement): (RichElement | IText)[] {
+  return ele.children.map((child) => {
+    if (
+      typeof (child as IText).text !== "undefined" ||
+      (child as RichElement).containment === "inline" ||
+      (child as RichElement).containment === "void-inline"
+    ) {
+      return child;
+    }
+
+    return gatherAllInlines(child as RichElement);
+  }).flat();
+}
+
+function gatherAllText(ele: RichElement): IText[] {
+  return ele.children.map((child) => {
+    if (
+      typeof (child as IText).text !== "undefined"
+    ) {
+      return child;
+    }
+
+    return gatherAllText(child as RichElement);
+  }).flat() as IText[];
+}
+
+export function deserializeChildrenForNode(
+  node: Node,
+  parentContainment: "block" | "superblock" | "list-superblock" | "inline",
+): Array<RichElement | IText> {
+  const result = Array.from(node.childNodes).map(deserializeElement.bind(null, parentContainment)).flat().filter((n) => n !== null);
+  return result as any;
+}
+
 /**
  * Deserializes a single element from its node into a rich element
  * or a text
  * @param node the html node to deserialize
+ * @param parentContainment specifies the containment of the parent
  * @returns a RichElement or a text node 
  */
-export function deserializeElement(node: Node): RichElement | IText {
+export function deserializeElement(
+  parentContainment: "block" | "superblock" | "list-superblock" | "inline",
+  node: Node,
+): RichElement | IText | Array<RichElement | IText> {
   // first we get the tag name
   const tagName = (node as HTMLElement).tagName;
+  // and we prepare the result
+  let result: RichElement | IText | Array<RichElement | IText> = null;
   // if there's no tag name, then it must be a text node
   if (!tagName) {
-    return SERIALIZATION_REGISTRY.DESERIALIZE.text(node);
-  }
+    result = SERIALIZATION_REGISTRY.DESERIALIZE.text(node);
+  } else {
+    // now we get the class list first
+    const classList = (node as HTMLElement).classList;
 
-  // and we prepare the result
-  let result: RichElement | IText = null;
-
-  // now we get the class list first
-  const classList = (node as HTMLElement).classList;
-
-  // if we have it
-  if (classList) {
-    // we first search by prefix if there's a function
-    const foundPrefix = Object.keys(SERIALIZATION_REGISTRY.DESERIALIZE.byClassNamePrefix).find((prefix) => {
-      return classList.forEach((v) => v.startsWith(prefix));
-    });
-
-    // if we find it, we call it
-    if (foundPrefix) {
-      result = SERIALIZATION_REGISTRY.DESERIALIZE.byClassNamePrefix[foundPrefix](node) as any;
-    } else {
-      // otherwise let's find by exact class
-      const foundExactClass = Object.keys(SERIALIZATION_REGISTRY.DESERIALIZE.byClassName).find((className) => {
-        return classList.contains(className);
+    // if we have it
+    if (classList) {
+      // we first search by prefix if there's a function
+      const foundPrefix = Object.keys(SERIALIZATION_REGISTRY.DESERIALIZE.byClassNamePrefix).find((prefix) => {
+        return classList.forEach((v) => v.startsWith(prefix));
       });
 
-      // if we find it we call it
-      if (foundExactClass) {
-        result = SERIALIZATION_REGISTRY.DESERIALIZE.byClassName[foundExactClass](node) as any;
+      // if we find it, we call it
+      if (foundPrefix) {
+        result = SERIALIZATION_REGISTRY.DESERIALIZE.byClassNamePrefix[foundPrefix](node) as any;
+      } else {
+        // otherwise let's find by exact class
+        const foundExactClass = Object.keys(SERIALIZATION_REGISTRY.DESERIALIZE.byClassName).find((className) => {
+          return classList.contains(className);
+        });
+
+        // if we find it we call it
+        if (foundExactClass) {
+          result = SERIALIZATION_REGISTRY.DESERIALIZE.byClassName[foundExactClass](node) as any;
+        }
       }
+    }
+
+    // if all our previous attempts for some reason didn't get a result
+    // and there's a raw tag catcher, then let's use that one
+    if (!result && SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName]) {
+      result = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
     }
   }
 
-  // if all our previous attempts for some reason didn't get a result
-  // and there's a raw tag catcher, then let's use that one
-  if (!result && SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName]) {
-    result = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
+  // invalid or unknown tag that can't deserialize
+  if (!result) {
+    return null;
+  }
+
+
+  const isText = typeof (result as IText).text !== "undefined";
+  if (isText) {
+    // text placed right in a superblock
+    // no paragraph
+    if (parentContainment === "superblock") {
+      return STANDARD_PARAGRAPH((result as IText).text);
+    } else if (parentContainment === "list-superblock") {
+      // text placed right into a list without
+      // the required li tag
+      return {
+        type: "list-item",
+        containment: "block",
+        children: [(result as IText)],
+      };
+    }
+  } else {
+    // Normalization for invalid text values
+    // this is done in case there are invalid values that create
+    // invalid structures
+    const richElement = (result as RichElement);
+    if (parentContainment === "superblock") {
+      // eg a link placed inside a div and not within
+      // a paragraph
+      if (
+        richElement.containment !== "block" &&
+        richElement.containment !== "superblock" &&
+        richElement.containment !== "list-superblock" &&
+        richElement.containment !== "void-block"
+      ) {
+        const newP = STANDARD_PARAGRAPH();
+        newP.children = [
+          result as any,
+        ];
+      }
+    } else if (parentContainment === "list-superblock") {
+      // can't fix this, eg. a container inside a list
+      // or another list inside it
+      if (
+        richElement.containment === "superblock" ||
+        richElement.containment === "list-superblock" ||
+        richElement.containment === "void-block"
+      ) {
+        const newLi: IListItem = {
+          type: "list-item",
+          containment: "block",
+          children: gatherAllInlines(result as RichElement) as any,
+        };
+        result = newLi;
+
+        // eg. a link inside the li
+      } else if (
+        richElement.containment === "inline" ||
+        richElement.containment === "void-inline"
+      ) {
+        const newLi: IListItem = {
+          type: "list-item",
+          containment: "block",
+          children: [
+            result as any,
+          ],
+        };
+        result = newLi;
+
+        // eg a paragraph inside the li, it's another block
+      } else if (
+        richElement.type !== "list-item"
+      ) {
+        // coerce into list item
+        (result as IListItem).type = "list-item";
+      }
+    } else if (parentContainment === "block") {
+      // a div within a paragraph
+      if (
+        richElement.containment !== "inline" &&
+        richElement.containment !== "void-inline"
+      ) {
+        result = gatherAllInlines(richElement);
+      }
+    } else if (parentContainment === "inline") {
+      // a paragraph within a link
+      result = gatherAllText(richElement);
+    }
   }
 
   // if there are children in the result and they happen

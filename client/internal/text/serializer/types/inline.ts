@@ -6,7 +6,7 @@
  * @module
  */
 
-import { IReactifyArg, ISerializationRegistryType, deserializeElement } from "..";
+import { IReactifyArg, ISerializationRegistryType, deserializeChildrenForNode } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
@@ -31,8 +31,8 @@ export function registerInline(registry: ISerializationRegistryType) {
       inline,
       // the element should be a span element type
       "span",
-      // no class
-      null,
+      // inline class
+      "inline",
       // no special attributes
       null,
       // the children inside the inline, these are rich elements
@@ -46,11 +46,11 @@ export function registerInline(registry: ISerializationRegistryType) {
    * @param node the node in question
    * @returns a inline element structure
    */
-  function deserializeInline(node: HTMLDivElement): IInline {
+  function deserializeInline(node: HTMLSpanElement): IInline {
     // first we take the base
     const base = deserializeElementBase(node);
 
-    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as IText[];
+    const children = deserializeChildrenForNode(node, "inline") as IText[];
 
     // now we can build the inline itself
     const inline: IInline = {
@@ -77,7 +77,7 @@ export function registerInline(registry: ISerializationRegistryType) {
       // the span element
       "span",
       // we pass either the inline type prefixed or the inline class itself
-      null,
+      "inline",
       // the children of the inline
       arg.element.children,
       // no wrap children function
@@ -90,7 +90,7 @@ export function registerInline(registry: ISerializationRegistryType) {
   // register in the registry
   registry.REACTIFY.inline = reactifyInline;
   registry.SERIALIZE.inline = serializeInline;
-  registry.DESERIALIZE.byTag.SPAN = deserializeInline;
+  registry.DESERIALIZE.byClassName.inline = deserializeInline;
 }
 
 /**

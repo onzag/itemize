@@ -31,7 +31,7 @@ export const SANITIZE_CONFIG = {
 export const ALLOWED_CLASSES = [
   "image", "image-container", "image-pad", "video", "video-container",
   "file", "file-container", "file-icon", "file-name", "file-extension", "file-size",
-  "container",
+  "container", "inline",
 ]
 
 export const RICH_TEXT_CLASS_PREFIX = "rich-text--";

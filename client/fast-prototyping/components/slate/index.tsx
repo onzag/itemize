@@ -1822,7 +1822,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       if (node.children.length === 0) {
         // we insert a paragraph
         Transforms.insertNodes(this.editor,
-          { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE()] },
+          { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE() as any] },
           { at: path.concat(0) }
         );
       }
@@ -1975,7 +1975,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // then we add a basic text node
           Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE(),
+            STANDARD_TEXT_NODE() as any,
             { at: path.concat(0) }
           );
         }
@@ -2028,7 +2028,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         } else if ((newerNode.children as any).length === 0) {
           // equally we add a simple text node
           Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE(),
+            STANDARD_TEXT_NODE() as any,
             { at: path.concat(0) }
           );
         }
@@ -2056,7 +2056,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we add an empty paragraph
           Transforms.insertNodes(this.editor,
-            { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE()] },
+            { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE() as any] },
             { at: path.concat(0) }
           );
         }
@@ -2091,7 +2091,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we need to add an emtpy list item node
           Transforms.insertNodes(this.editor,
-            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE()] },
+            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE() as any] },
             { at: path.concat(0) }
           );
         }

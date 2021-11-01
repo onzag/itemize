@@ -5,7 +5,7 @@
  * @module
  */
 
-import { IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
@@ -71,7 +71,7 @@ export function registerLink(registry: ISerializationRegistryType) {
 
     // and now time to deserialize the children
     // because they should all be text nodes
-    const children = Array.from(node.childNodes).map(registry.DESERIALIZE.text).filter((n) => n !== null);
+    const children = deserializeChildrenForNode(node, "inline") as IText[];
   
     // and let's build the link
     const link: ILink = {

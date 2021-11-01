@@ -7,7 +7,7 @@
  * @module
  */
 
-import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
@@ -40,7 +40,7 @@ export function registerListItem(registry: ISerializationRegistryType) {
     // first we prepare the base
     const base = deserializeElementBase(node);
     // then we deserialize all the child nodes with the generic function
-    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as any[];
+    const children = deserializeChildrenForNode(node, "block") as any;
 
     // and now we can do this
     const li: IListItem = {

@@ -5,7 +5,7 @@
  * @module
  */
 
-import { deserializeElement, IReactifyArg, ISerializationRegistryType} from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType} from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
@@ -53,7 +53,7 @@ export function registerQuote(registry: ISerializationRegistryType) {
     const base = deserializeElementBase(node);
 
     // process the children
-    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as any[];
+    const children = deserializeChildrenForNode(node, "block") as any;
 
     // and build the quote with the base
     const quote: IQuote = {

@@ -5,18 +5,18 @@
  * @module
  */
 
-import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { IInline } from "./inline";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
-export function STANDARD_PARAGRAPH(): IParagraph {
+export function STANDARD_PARAGRAPH(text?: string): IParagraph {
   return {
     type: "paragraph",
     containment: "block",
-    children: [STANDARD_TEXT_NODE()],
+    children: [STANDARD_TEXT_NODE(text)],
   };
 };
 
@@ -48,7 +48,7 @@ export function registerParagraph(registry: ISerializationRegistryType) {
     // first let's get trhe base
     const base = deserializeElementBase(node);
     // now let's get the children
-    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as any[];
+    const children = deserializeChildrenForNode(node, "block") as Array<IText | ILink | IFile | IInline>;
 
     // and build the paragraph itself
     const paragraph: IParagraph = {

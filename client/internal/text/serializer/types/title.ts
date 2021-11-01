@@ -6,7 +6,7 @@
  */
 
 import { title } from "process";
-import { deserializeElement, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
@@ -40,7 +40,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
     // first we get the base
     const base = deserializeElementBase(node);
     // process the children
-    const children = Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as any[];
+    const children = deserializeChildrenForNode(node, "block") as any;
 
     // and then build the title form
     const title: ITitle = {

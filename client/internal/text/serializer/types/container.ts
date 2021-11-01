@@ -6,11 +6,11 @@
  * @module
  */
 
-import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeElement } from "..";
+import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeChildrenForNode } from "..";
 import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "../..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { STANDARD_PARAGRAPH } from "./paragraph";
-import { IText, STANDARD_TEXT_NODE } from "./text";
+import { IText } from "./text";
 
 /**
  * The function that registers and adds the container in the given
@@ -67,7 +67,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       type: "container",
       containment: "superblock",
       containerType,
-      children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null),
+      children: deserializeChildrenForNode(node, "superblock"),
     }
 
     if (!container.children.length) {

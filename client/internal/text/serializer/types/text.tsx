@@ -10,19 +10,22 @@
 
 import React from "react";
 import { IReactifyArg, ISerializationRegistryType } from "..";
+import { convertStyleStringToReactObject } from "../base";
 
 /**
  * Represents a standard text node as it should be given
  * for a void text node
  */
-export const STANDARD_TEXT_NODE = () => {
+export const STANDARD_TEXT_NODE = (text?: string): IText => {
   return {
     bold: false,
     italic: false,
     underline: false,
-    text: "",
+    text: text || "",
   }
 };
+
+const emptyRegex = /^\n\s+$/;
 
 /**
  * The function that registers and adds the text node in the given
@@ -65,6 +68,17 @@ export function registerText(registry: ISerializationRegistryType) {
       final = u;
     }
 
+    if (text.style) {
+      if ((final as HTMLElement).tagName) {
+        (final as HTMLElement).setAttribute("style", text.style);
+      } else {
+        const span = document.createElement("span");
+        span.setAttribute("style", text.style);
+        span.appendChild(final);
+        final = span;
+      }
+    }
+
     // and return that
     return final;
   }
@@ -96,100 +110,131 @@ export function registerText(registry: ISerializationRegistryType) {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       // it's bold
       textValue.bold = true;
+      const style = nodeAsHTMLElement.getAttribute("style");
+      if (style) {
+        textValue.style = style;
+      }
       return textValue;
       // we do the same we did before for I
     } else if (nodeAsHTMLElement.tagName === "I") {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       textValue.italic = true;
+      const style = nodeAsHTMLElement.getAttribute("style");
+      if (style) {
+        textValue.style = style;
+      }
       return textValue;
       // Underline
     } else if (nodeAsHTMLElement.tagName === "U") {
       const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
       textValue.underline = true;
+      const style = nodeAsHTMLElement.getAttribute("style");
+      if (style) {
+        textValue.style = style;
+      }
       return textValue;
       // and span
-    }
-
-    // now if it's a text node and it's not an HTML element
-    // we must check this
-    let actualTextContent: string = node.textContent;
-
-    // we want to know if we are going to trim, the text content might be some
-    // sort of multiline weirdness, which can cause issues
-    const shouldCheckForTrimStart = actualTextContent[0] === " " || actualTextContent[0] === "\n";
-    const lastCharIndex = actualTextContent.length - 1;
-    const shouldCheckForTrimEnd = actualTextContent[lastCharIndex] === " " || actualTextContent[lastCharIndex] === "\n";
-
-    // by default we do not trim
-    let needsTrimStart = false;
-    let needsTrimEnd = false;
-
-    // but we check now
-    if (shouldCheckForTrimStart) {
-      // we consider that we will trim
-      needsTrimStart = true;
-
-      // and now we will loop into the nodes
-      let previousNode = node;
-      // while we have one
-      while (previousNode) {
-        // we will get into the previous sibling of our current
-        // node, this is not in the children itself, it's the previous
-        // sibling of our current node
-        previousNode = previousNode.previousSibling;
-        // if we don't have one, then we will trim
-        // because our character is just there, dangling
-        if (!previousNode) {
-          break;
-        }
-        // otherwise let's get the text of that previous node, if we have any
-        const text = (previousNode instanceof HTMLElement) ? previousNode.innerText : previousNode.textContent.trim();
-
-        // if there's text before, in any of those previous nodes
-        if (text) {
-          // we do not trim
-          needsTrimStart = false;
-          break;
-        }
+    } else if (nodeAsHTMLElement.tagName === "SPAN") {
+      const textValue = Array.from(node.childNodes).map(deserializeText).filter((n) => n !== null)[0] || STANDARD_TEXT_NODE();
+      const style = nodeAsHTMLElement.getAttribute("style");
+      if (style) {
+        textValue.style = style;
       }
+      return textValue;
     }
 
-    // now we do the same for trim ending
-    if (shouldCheckForTrimEnd) {
-      needsTrimEnd = true;
+    // TRIMMING POLICIES HAVE BEEN REMOVED
+    // THIS DOES NOT WORK VERY WELL AND INSTEAD MAKES FOR INCONSISTENCIES
+    // INPUT TEXT WILL BE DISPLAYED AS IT IS
 
-      let nextNode = node;
-      while (nextNode) {
-        nextNode = nextNode.nextSibling;
-        if (!nextNode) {
-          break;
-        }
-        const text = (nextNode instanceof HTMLElement) ? nextNode.innerText : nextNode.textContent.trim();
-        if (text) {
-          needsTrimEnd = false;
-          break;
-        }
-      }
-    }
+    // // now if it's a text node and it's not an HTML element
+    // // we must check this
+    // let actualTextContent: string = node.textContent;
 
-    // now we use the content of these
-    // in order to decide our trimming policy
-    if (needsTrimStart) {
-      actualTextContent = actualTextContent.trimStart();
-    }
-    if (needsTrimEnd) {
-      actualTextContent = actualTextContent.trimEnd();
-    }
+    // // we want to know if we are going to trim, the text content might be some
+    // // sort of multiline weirdness, which can cause issues
+    // const shouldCheckForTrimStart = actualTextContent[0] === " " || actualTextContent[0] === "\n";
+    // const lastCharIndex = actualTextContent.length - 1;
+    // const shouldCheckForTrimEnd = actualTextContent[lastCharIndex] === " " || actualTextContent[lastCharIndex] === "\n";
 
-    // and if we have nothing remaning
-    if (actualTextContent.length === 0 || actualTextContent === "\n") {
-      // we just drop our text content
-      return null;
-    }
+    // // by default we do not trim
+    // let needsTrimStart = false;
+    // let needsTrimEnd = false;
+
+    // // but we check now
+    // if (shouldCheckForTrimStart) {
+    //   // we consider that we will trim
+    //   needsTrimStart = true;
+
+    //   // and now we will loop into the nodes
+    //   let previousNode = node;
+    //   // while we have one
+    //   while (previousNode) {
+    //     // we will get into the previous sibling of our current
+    //     // node, this is not in the children itself, it's the previous
+    //     // sibling of our current node
+    //     previousNode = previousNode.previousSibling;
+    //     // if we don't have one, then we will trim
+    //     // because our character is just there, dangling
+    //     if (!previousNode) {
+    //       break;
+    //     }
+    //     // otherwise let's get the text of that previous node, if we have any
+    //     const text = (previousNode instanceof HTMLElement) ?
+    //       previousNode.textContent.replace(/\n\s+/g, " ").trim() :
+    //       previousNode.textContent.trim();
+
+    //     // if there's text before, in any of those previous nodes
+    //     if (text) {
+    //       // we do not trim
+    //       needsTrimStart = false;
+    //       break;
+    //     }
+    //   }
+    // }
+
+    // // now we do the same for trim ending
+    // if (shouldCheckForTrimEnd) {
+    //   needsTrimEnd = true;
+
+    //   let nextNode = node;
+    //   while (nextNode) {
+    //     nextNode = nextNode.nextSibling;
+    //     if (!nextNode) {
+    //       break;
+    //     }
+    //     const text = (nextNode instanceof HTMLElement) ?
+    //       nextNode.textContent.replace(/\n\s+/g, " ").trim() :
+    //       nextNode.textContent.trim();
+    //     if (text) {
+    //       needsTrimEnd = false;
+    //       break;
+    //     }
+    //   }
+    // }
+
+    // // now we use the content of these
+    // // in order to decide our trimming policy
+    // if (needsTrimStart) {
+    //   actualTextContent = actualTextContent.trimStart();
+    // }
+    // if (needsTrimEnd) {
+    //   actualTextContent = actualTextContent.trimEnd();
+    // }
+
+    // // and if we have nothing remaning
+    // if (
+    //   actualTextContent.length === 0 ||
+    //   actualTextContent === "\n" ||
+    //   emptyRegex.test(actualTextContent)
+    // ) {
+    //   // we just drop our text content
+    //   return null;
+    // }
 
     // then we return this
     return {
-      text: actualTextContent,
+      text: node.textContent,
       bold: false,
       italic: false,
       underline: false,
@@ -228,6 +273,12 @@ export function registerText(registry: ISerializationRegistryType) {
         textDecoration: "underline",
       }
     }
+    if (arg.element.style) {
+      newCustomProps.style = {
+        ...newCustomProps.style,
+        ...convertStyleStringToReactObject(arg.element.style),
+      }
+    }
 
     // now we add the text if we haven't specified custom children
     if (!newCustomProps.children) {
@@ -248,6 +299,7 @@ export function registerText(registry: ISerializationRegistryType) {
   registry.DESERIALIZE.byTag.B = deserializeText;
   registry.DESERIALIZE.byTag.STRONG = deserializeText;
   registry.DESERIALIZE.byTag.I = deserializeText;
+  registry.DESERIALIZE.byTag.SPAN = deserializeText;
   registry.DESERIALIZE.text = deserializeText;
 }
 
@@ -271,4 +323,8 @@ export interface IText {
    * Whether the text is underline
    */
   underline: boolean;
+  /**
+   * customized style
+   */
+  style?: string;
 }

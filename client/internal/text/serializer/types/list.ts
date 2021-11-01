@@ -7,7 +7,7 @@
  * @module
  */
 
-import { deserializeElement, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IListItem } from "./list-item";
 import { STANDARD_TEXT_NODE } from "./text";
@@ -58,7 +58,7 @@ export function registerList(registry: ISerializationRegistryType) {
       type: "list",
       containment: "list-superblock",
       listType: node.tagName === "OL" ? "numbered" : "bulleted",
-      children: Array.from(node.childNodes).map(deserializeElement).filter((n) => n !== null) as IListItem[],
+      children: deserializeChildrenForNode(node, "list-superblock") as IListItem[],
     }
 
     if (!list.children.length) {

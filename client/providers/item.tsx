@@ -4214,7 +4214,9 @@ export class ActualItemProvider extends
   }
 }
 
-export function ItemProvider(props: IItemProviderProps) {
+export type ItemProviderType = ActualItemProvider;
+export type ItemProviderRefObject = React.RefObject<ActualItemProvider>;
+export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderProps>((props, ref) => {
   return (
     <ConfigContext.Consumer>
       {(config) => (
@@ -4271,6 +4273,7 @@ export function ItemProvider(props: IItemProviderProps) {
                                               {...actualProps}
                                               injectedParentContext={value}
                                               location={location}
+                                              ref={ref}
                                             />
                                           )
                                         }</ItemContext.Consumer>
@@ -4284,6 +4287,7 @@ export function ItemProvider(props: IItemProviderProps) {
                                         <ActualItemProvider
                                           {...actualProps}
                                           injectedParentContext={value}
+                                          ref={ref}
                                         />
                                       )
                                     }</ItemContext.Consumer>
@@ -4299,6 +4303,7 @@ export function ItemProvider(props: IItemProviderProps) {
                                         {...actualProps}
                                         injectedParentContext={null}
                                         location={location}
+                                        ref={ref}
                                       />
                                     )}
                                   </LocationRetriever>
@@ -4308,6 +4313,7 @@ export function ItemProvider(props: IItemProviderProps) {
                                   <ActualItemProvider
                                     {...actualProps}
                                     injectedParentContext={null}
+                                    ref={ref}
                                   />
                                 );
                               }
@@ -4325,7 +4331,7 @@ export function ItemProvider(props: IItemProviderProps) {
       )}
     </ConfigContext.Consumer>
   );
-}
+});
 
 interface INoStateItemProviderProps {
   itemDefinition?: string;
