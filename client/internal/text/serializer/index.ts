@@ -409,7 +409,7 @@ export function deserializeChildrenForNode(
   return result as any;
 }
 
-const emptyRegex = /^\n\s+$/;
+const emptyRegex = /^\s+$/;
 
 /**
  * Deserializes a single element from its node into a rich element
