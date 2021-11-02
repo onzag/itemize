@@ -19,6 +19,7 @@ import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefi
 import convert from "convert-units";
 import { countries } from "./imported-resources";
 import type { IAppDataType } from "./server";
+import prettyBytes from "pretty-bytes";
 
 export const Moment = MomentDef;
 export const JSDOM = JSDOMDef;
@@ -205,6 +206,15 @@ export function mimeTypeToExtension(str: string) {
     return expectedExt;
   }
   return (str.split("/")[1] || "txt").substr(0, 3);
+}
+
+/**
+ * Basically an extension to pretty bytes
+ * @param size 
+ * @returns 
+ */
+export function prettySize(size: number) {
+  return prettyBytes(size);
 }
 
 /**

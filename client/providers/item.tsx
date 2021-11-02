@@ -433,6 +433,8 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
+  // TODO implement pile search
+  pileSearch?: boolean;
 }
 
 export interface IPokeElementsType {

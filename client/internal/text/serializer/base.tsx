@@ -562,7 +562,7 @@ export function reactifyElementBase(
         currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler]
       );
 
-    const handlerChildren = children.map((c, index: number) => {
+    const handlerChildren = children ? children.map((c, index: number) => {
       // we use these options and we add the key
       // in there
       const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
@@ -584,7 +584,7 @@ export function reactifyElementBase(
 
       // ohteriwse null
       return null;
-    });
+    }) : children;
 
     // if we have it, we use it
     if (Handler) {

@@ -80,7 +80,11 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     if (isRichText && currentValue !== null) {
       const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
       const currentFiles = mediaProperty &&
-        mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+        (
+          this.props.useAppliedValue ?
+            mediaProperty.getAppliedValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType :
+            mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType
+        );
 
       currentValue = sanitize(
         {
