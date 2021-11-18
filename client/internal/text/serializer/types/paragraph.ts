@@ -12,11 +12,19 @@ import { IInline } from "./inline";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
-export function STANDARD_PARAGRAPH(text?: string): IParagraph {
+export function STANDARD_PARAGRAPH(text?: string | IText): IParagraph {
   return {
     type: "paragraph",
     containment: "block",
-    children: [STANDARD_TEXT_NODE(text)],
+    children: [
+      (
+        typeof text !== "undefined" &&
+        text !== null &&
+        typeof (text as IText).text === "string"
+      ) ?
+        (text as IText) :
+        STANDARD_TEXT_NODE(text as string)
+    ],
   };
 };
 
@@ -37,7 +45,7 @@ export function registerParagraph(registry: ISerializationRegistryType) {
     // simple
     return serializeElementBase(registry, p, "p", null, null, p.children);
   }
-  
+
   /**
    * Deserializes an HTML node into the given paragraph
    * rich element
