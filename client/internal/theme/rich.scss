@@ -83,6 +83,11 @@ $superblock-highlight-color: #33691e;
       width: 1rem;
       margin-left: 1rem;
       margin-right: 0.5rem;
+      position: absolute;
+    }
+
+    li > * {
+      padding-left: 2.5rem;
     }
   }
 
@@ -106,6 +111,11 @@ $superblock-highlight-color: #33691e;
       margin-right: 0.5rem;
       text-align: right;
       direction: rtl;
+      position: absolute;
+    }
+
+    li > * {
+      padding-left: 2.5rem;
     }
   }
 

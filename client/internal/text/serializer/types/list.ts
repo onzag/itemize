@@ -10,7 +10,7 @@
 import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IListItem } from "./list-item";
-import { STANDARD_TEXT_NODE } from "./text";
+import { STANDARD_PARAGRAPH } from "./paragraph";
 
 /**
  * The function that registers and adds the list element in the given
@@ -65,9 +65,9 @@ export function registerList(registry: ISerializationRegistryType) {
       list.children = [
         {
           type: "list-item",
-          containment: "block",
+          containment: "superblock",
           children: [
-            STANDARD_TEXT_NODE(),
+            STANDARD_PARAGRAPH(),
           ],
         },
       ];

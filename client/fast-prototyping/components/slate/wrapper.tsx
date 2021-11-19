@@ -811,9 +811,12 @@ function Quote(props: RichTextEditorToolbarElementProps) {
 
 
 function NumberedList(props: RichTextEditorToolbarElementProps) {
-  let currentSuperBlockElement = props.state.currentSuperBlockElement;
-  if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
-    currentSuperBlockElement = props.state.currentSelectedElement;
+  const currentSuperBlockElement = props.state.currentSelectedSuperBlockElement;
+  let parentOfSuperblock: RichElement = null;
+  if (currentSuperBlockElement && currentSuperBlockElement.type === "list-item") {
+    const parentAnchor = [...props.state.currentSelectedSuperBlockElementAnchor];
+    parentAnchor.pop();
+    parentOfSuperblock = props.helpers.Node.get(props.helpers.editor, parentAnchor) as any as RichElement;
   }
 
   const element = (
@@ -821,8 +824,8 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
       tabIndex={-1}
       title={props.i18nRichInfo.formatListNumberedLabel}
       color={
-        currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-          currentSuperBlockElement.listType === "numbered" ? "primary" : "default"
+        parentOfSuperblock && parentOfSuperblock.type === "list" &&
+          parentOfSuperblock.listType === "numbered" ? "primary" : "default"
       }
       disabled={!props.featureSupport.canInsertList}
       onClick={props.helpers.toggleList.bind(null, "numbered", null)}
@@ -838,9 +841,12 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
-  let currentSuperBlockElement = props.state.currentSuperBlockElement;
-  if (!currentSuperBlockElement && props.state.currentSelectedElement && props.state.currentSelectedElement.containment === "superblock") {
-    currentSuperBlockElement = props.state.currentSelectedElement;
+  const currentSuperBlockElement = props.state.currentSelectedSuperBlockElement;
+  let parentOfSuperblock: RichElement = null;
+  if (currentSuperBlockElement && currentSuperBlockElement.type === "list-item") {
+    const parentAnchor = [...props.state.currentSelectedSuperBlockElementAnchor];
+    parentAnchor.pop();
+    parentOfSuperblock = props.helpers.Node.get(props.helpers.editor, parentAnchor) as any as RichElement;
   }
 
   const element = (
@@ -848,8 +854,8 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
       tabIndex={-1}
       title={props.i18nRichInfo.formatListBulletedLabel}
       color={
-        currentSuperBlockElement && currentSuperBlockElement.type === "list" &&
-          currentSuperBlockElement.listType === "bulleted" ? "primary" : "default"
+        parentOfSuperblock && parentOfSuperblock.type === "list" &&
+          parentOfSuperblock.listType === "bulleted" ? "primary" : "default"
       }
       disabled={!props.featureSupport.canInsertList}
       onClick={props.helpers.toggleList.bind(null, "bulleted", null)}

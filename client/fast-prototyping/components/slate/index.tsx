@@ -2083,7 +2083,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             // then we wrap it into a list item
             // list item being a block will unwrap things inside it that are not
             // inline
-            Transforms.wrapNodes(this.editor, { type: "list-item", containment: "block", children: [] }, { at: path.concat(i + offset) });
+            Transforms.wrapNodes(this.editor, { type: "list-item", containment: "superblock", children: [] }, { at: path.concat(i + offset) });
           }
         }
 
@@ -2091,7 +2091,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we need to add an emtpy list item node
           Transforms.insertNodes(this.editor,
-            { type: "list-item", containment: "block", children: [STANDARD_TEXT_NODE() as any] },
+            { type: "list-item", containment: "superblock", children: [STANDARD_TEXT_NODE() as any] },
             { at: path.concat(0) }
           );
         }
@@ -2147,26 +2147,30 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Override for the default editor insert break function
    */
   public insertBreak() {
+    const isListItemBreak = (
+      this.state.currentSuperBlockElement &&
+      // and we are within a list and a list item
+      this.state.currentSuperBlockElement.type === "list-item"
+    );
     if (
       // if we are simply collapsed
       Range.isCollapsed(this.editor.selection) &&
-      // and we have a superblock
-      this.state.currentSuperBlockElement &&
-      // and we are within a list and a list item
-      this.state.currentSuperBlockElement.type === "list" &&
-      this.state.currentBlockElement.type === "list-item" &&
-      // and our current block element, our list item, has
+      // and we have a list item
+      isListItemBreak &&
+      // and our current super block element, our list item, has
       // only one children
-      this.state.currentBlockElement.children.length === 1 &&
-      // and that children is a text node
-      Text.isText(this.state.currentBlockElement.children[0]) &&
+      this.state.currentSuperBlockElement.children.length === 1 &&
+      // and that children is an empty paragraph
+      (this.state.currentSuperBlockElement.children[0] as any).type === "paragraph" &&
+      (this.state.currentSuperBlockElement.children[0] as any).children.length === 1 &&
+      Text.isText((this.state.currentSuperBlockElement.children[0] as any).children[0]) &&
+      (this.state.currentSuperBlockElement.children[0] as any).children[0].text === ""
       // and that text node is empty
       // basically
       // 1. list item 1
       // 2. |
       // 3. list item 3
       // and we are pressing enter there where | represents the caret
-      this.state.currentBlockElement.children[0].text === ""
     ) {
       // we need to break the list
       this.breakList();
@@ -2235,24 +2239,49 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (shouldCreateFreshParagraph) {
       // then we want to clone the current block
       // we are dealing with and copy all its properties
-      Transforms.insertNodes(this.editor, {
-        ...this.state.currentBlockElement,
-        uiHandler: null,
-        uiHandlerArgs: null,
-        givenName: null,
-        // but certainly not its current text properties
-        // that we might be at, as we don't want to copy nor the
-        // text, nor the template text values
-        children: [
-          {
-            ...this.state.currentText,
-            text: "",
-          }
-        ]
-      });
+      if (isListItemBreak) {
+        Transforms.insertNodes(this.editor, {
+          ...this.state.currentSuperBlockElement,
+          uiHandler: null,
+          uiHandlerArgs: null,
+          givenName: null,
+          // but certainly not its current text properties
+          // that we might be at, as we don't want to copy nor the
+          // text, nor the template text values
+          children: [
+            {
+              ...this.state.currentText,
+              text: "",
+            }
+          ]
+        }, {
+          match: (n: any) => n.type === "list-item"
+        });
+      } else {
+        Transforms.insertNodes(this.editor, {
+          ...this.state.currentBlockElement,
+          uiHandler: null,
+          uiHandlerArgs: null,
+          givenName: null,
+          // but certainly not its current text properties
+          // that we might be at, as we don't want to copy nor the
+          // text, nor the template text values
+          children: [
+            {
+              ...this.state.currentText,
+              text: "",
+            }
+          ]
+        });
+      }
     } else {
-      // otherwise we do a simple split node
-      Transforms.splitNodes(this.editor, { always: true })
+      if (isListItemBreak) {
+        // otherwise we do a simple split node
+        Transforms.splitNodes(this.editor, { always: true, match: (n: any) => n.type === "list-item" })
+      } else {
+        // otherwise we do a simple split node
+        Transforms.splitNodes(this.editor, { always: true })
+      }
     }
   }
 
@@ -2327,90 +2356,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * list one
    */
   public breakList() {
-    // so we can get the current list item index in the list
-    const currentListItemIndex = this.state.currentBlockElementAnchor[this.state.currentBlockElementAnchor.length - 1];
-    // and then we check if we have more list items next ot it based on how many the super block has off children
-    const hasChildrenNext = currentListItemIndex < this.state.currentSuperBlockElement.children.length - 1;
-
-    // now we can get the last children anchor we basically calculate it
-    // by changing the last value
-    const lastListItemAnchor = [...this.state.currentBlockElementAnchor];
-    lastListItemAnchor[lastListItemAnchor.length - 1] = this.state.currentSuperBlockElement.children.length - 1;
-
-    // and then we need to check what's the next for such an event
-    // we clone the anchor, and add 1 to the last value of the path
-    // so say [1,1,1] turns to [1,1,2]
-    const nextSuperAnchor = [...this.state.currentSuperBlockElementAnchor];
-    const lastSuperAnchorIndex = nextSuperAnchor.length - 1;
-    nextSuperAnchor[lastSuperAnchorIndex] = nextSuperAnchor[lastSuperAnchorIndex] + 1;
-
-    // if the index of our list item is 0
-    // then we are basically taking off the first node
-    if (currentListItemIndex === 0) {
-      // we remove the whole superblock that contains everything
-      Transforms.removeNodes(this.editor, { at: this.state.currentSuperBlockElementAnchor });
-      // and we say that the next super anchor position is back to be our current
-      // superblock position
-      nextSuperAnchor[lastSuperAnchorIndex]--;
-    } else {
-      // otherwise we just remove the entire list item itself all the way
-      // to the last, so our superblock only keeps the previous existing
-      // items in the list
-      Transforms.removeNodes(this.editor, {
-        at: {
-          anchor: Editor.start(this.editor, this.state.currentBlockElementAnchor),
-          focus: Editor.end(this.editor, lastListItemAnchor)
-        }
-      });
-    }
-
-    // now if we have children in the next place that we are supposed to
-    // deal with
-    if (hasChildrenNext) {
-      const sliceFrom = this.state.currentBlockElementAnchor[this.state.currentBlockElementAnchor.length - 1] + 1;
-      // we are inserting those nodes at the next place after the super anchor
-      // that we have calculated is
-      Transforms.insertNodes(
-        this.editor,
-        {
-          // we copy our super block
-          ...copyElementBase(this.state.currentSuperBlockElement),
-          type: "list",
-          containment: "list-superblock",
-          listType: (this.state.currentSuperBlockElement as any).listType,
-          // and slice the children
-          children: (this.state.currentSuperBlockElement.children.slice(sliceFrom) as any as Node[]),
-        },
-        {
-          at: nextSuperAnchor,
-        },
-      );
-    }
-
-    // now at that exact same place at the next super anchor
-    // we will insert a paragraph, so now the list item superblock has been
-    // split in 3 pieces
-    Transforms.insertNodes(
+    Transforms.unwrapNodes(
       this.editor,
       {
-        ...copyElementBase(this.state.currentSuperBlockElement),
-        type: "paragraph",
-        containment: "block",
-        children: this.state.currentBlockElement.children as any,
-      },
-      {
-        at: nextSuperAnchor,
-      },
-    );
-
-    // and we reset the selection at the paragraph
-    Transforms.setSelection(
-      this.editor,
-      {
-        anchor: Editor.start(this.editor, nextSuperAnchor),
-        focus: Editor.start(this.editor, nextSuperAnchor),
+        match: (n: any) => {
+          return n.type === "list";
+        },
+        mode: "highest",
+        split: true,
       }
     );
+    Transforms.unwrapNodes(
+      this.editor,
+      {
+        match: (n: any) => {
+          return n.type === "list-item";
+        },
+        mode: "highest",
+        split: true,
+      }
+    )
   }
 
   /**
@@ -2431,7 +2396,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const uiHandler =
           (this.state.currentContext && this.state.currentContext.properties[this.state.currentSuperBlockElement.uiHandler]) ||
           (this.props.rootContext && this.props.rootContext.properties[this.state.currentSuperBlockElement.uiHandler])
-  
+
         if (uiHandler && uiHandler.type === "ui-handler" && uiHandler.handlerEscapeOnSuperBreaks) {
           nextAnchor.pop();
         }
@@ -2595,10 +2560,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentSelectedElementEachSelectContext: ITemplateArgsContext = null;
     let currentSelectedElementContextSelectContext: ITemplateArgsContext = null;
 
+    let givenSelectedNodeAnchorIsCorrupted = false;
+
+    if (currentGivenSelectedNodeAnchor) {
+      let currentSelectedElementCorruptionTest = value ? {
+        children: value,
+      } as any : this.state.internalValue;
+      givenSelectedNodeAnchorIsCorrupted = currentGivenSelectedNodeAnchor.some((n: number, index: number) => {
+        if (
+          !currentSelectedElementCorruptionTest ||
+          !currentSelectedElementCorruptionTest.children ||
+          !currentSelectedElementCorruptionTest.children[n]
+        ) {
+          return true;
+        }
+        currentSelectedElementCorruptionTest = currentSelectedElementCorruptionTest.children[n];
+      });
+    }
+
     // if we don't have a selected anchor and origin
     // we have purposely set then we should
     // default to the currently selected values, if any
-    if (!currentGivenSelectedNodeAnchor) {
+    if (!currentGivenSelectedNodeAnchor || givenSelectedNodeAnchorIsCorrupted) {
       // so the selected anchor will be the element anchor
       currentSelectedElementAnchor = currentElementAnchor;
       // the selected node is the element just like the anchor
@@ -4213,27 +4196,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const anchorData = at ? this.calculateAnchorsAndContext((at as Range).anchor.path) : this.state;
 
       // if we have a current super block and which is a list already
-      if (anchorData.currentSuperBlockElement && anchorData.currentSuperBlockElement.type === "list") {
-        // if the super block is not of the same list type, then we basically rewrap
-        // to normalize it out
-        if (anchorData.currentSuperBlockElement.listType !== type) {
-          // so here we rewrap with the new list type
-          Transforms.wrapNodes(
-            this.editor,
-            {
-              ...copyElementBase(anchorData.currentSuperBlockElement),
-              type: "list",
-              listType: type,
-              containment: "list-superblock",
-              children: [],
-            },
-            { split: false, at: anchorData.currentSuperBlockElementAnchor },
-          );
-        } else {
-          // otherwise we just break the list
-          // which will delete the list if all is chosen or whatever
-          // is chosen will be broken
-          this.breakList();
+      if (anchorData.currentSuperBlockElement && anchorData.currentSuperBlockElement.type === "list-item") {
+        const parentOfSuperBlockAnchor = [...anchorData.currentSuperBlockElementAnchor];
+        parentOfSuperBlockAnchor.pop();
+        const parentOfSuperBlock = Node.get(this.editor, parentOfSuperBlockAnchor) as any as RichElement;
+
+        if (parentOfSuperBlock.containment === "list-superblock") {
+          // if the super block is not of the same list type, then we basically rewrap
+          // to normalize it out
+          if (parentOfSuperBlock.listType !== type) {
+            // so here we rewrap with the new list type
+            Transforms.wrapNodes(
+              this.editor,
+              {
+                ...copyElementBase(parentOfSuperBlock),
+                type: "list",
+                listType: type,
+                containment: "list-superblock",
+                children: [],
+              },
+              { split: false, at: parentOfSuperBlockAnchor },
+            );
+          } else {
+            // otherwise we just break the list
+            // which will delete the list if all is chosen or whatever
+            // is chosen will be broken
+            this.breakList();
+          }
         }
       } else {
         // otherwise we wrap into a new list

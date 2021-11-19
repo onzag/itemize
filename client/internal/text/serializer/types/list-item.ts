@@ -7,7 +7,7 @@
  * @module
  */
 
-import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
@@ -40,13 +40,13 @@ export function registerListItem(registry: ISerializationRegistryType) {
     // first we prepare the base
     const base = deserializeElementBase(node);
     // then we deserialize all the child nodes with the generic function
-    const children = deserializeChildrenForNode(node, "block") as any;
+    const children = deserializeChildrenForNode(node, "superblock") as any;
 
     // and now we can do this
     const li: IListItem = {
       ...base,
       type: "list-item",
-      containment: "block",
+      containment: "superblock",
       children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
@@ -92,10 +92,10 @@ export interface IListItem extends IElementBase {
   /**
    * can only contain text
    */
-  containment: "block",
+  containment: "superblock",
 
   /**
    * It needs to have list item as children
    */
-  children: Array<IText | ILink>;
+  children: Array<RichElement>;
 }

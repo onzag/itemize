@@ -413,7 +413,7 @@ export function deserializeChildrenForNode(
 ): Array<RichElement | IText> {
   const nodes = Array.isArray(node) ? node : Array.from(node.childNodes);
 
-  const resultRaw: Array<RichElement | IText | Array<RichElement | IText>> = [];
+  const resultRaw: Array<RichElement | IText | Array<RichElement | IText>> = [];
   let previousNodeInfo: INodeInfo = null;
   for (node of nodes) {
     const currentNodeInfo = deserializeElement(parentContainment, node, previousNodeInfo);
@@ -542,8 +542,10 @@ export function deserializeElement(
         raw,
         normalized: {
           type: "list-item",
-          containment: "block",
-          children: [(raw as IText)],
+          containment: "superblock",
+          children: [
+            STANDARD_PARAGRAPH(raw as IText)
+          ],
         },
         consumedPreviousSibling: false,
       };
@@ -589,40 +591,30 @@ export function deserializeElement(
       // can't fix this, eg. a container inside a list
       // or another list inside it
       if (
-        richElement.containment === "superblock" ||
-        richElement.containment === "list-superblock" ||
-        richElement.containment === "void-block"
-      ) {
-        const newLi: IListItem = {
-          type: "list-item",
-          containment: "block",
-          children: gatherAllInlines(richElement) as any,
-        };
-        normalized = newLi;
-
-        // eg. a link inside the li
-      } else if (
-        richElement.containment === "inline" ||
-        richElement.containment === "void-inline"
-      ) {
-        const newLi: IListItem = {
-          type: "list-item",
-          containment: "block",
-          children: [
-            raw as any,
-          ],
-        };
-        normalized = newLi;
-
-        // eg a paragraph inside the li, it's another block
-      } else if (
         richElement.type !== "list-item"
       ) {
-        // coerce into list item
-        normalized = {
-          ...normalized
-        };
-        (normalized as IListItem).type = "list-item";
+        if (
+          richElement.containment === "inline" ||
+          richElement.containment === "void-inline"
+        ) {
+          const p = STANDARD_PARAGRAPH();
+          p.children = [raw as any];
+          const newLi: IListItem = {
+            type: "list-item",
+            containment: "superblock",
+            children: [p],
+          };
+          normalized = newLi;
+        } else {
+          const p = STANDARD_PARAGRAPH();
+          p.children = gatherAllInlines(richElement) as any;
+          const newLi: IListItem = {
+            type: "list-item",
+            containment: "superblock",
+            children: [p],
+          };
+          normalized = newLi;
+        }
       }
     } else if (parentContainment === "block") {
       // a div within a paragraph
