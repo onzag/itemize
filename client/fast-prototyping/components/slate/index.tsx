@@ -31,6 +31,7 @@ import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/typ
 import { ICustom } from "../../../internal/text/serializer/types/custom";
 import { IInline } from "../../../internal/text/serializer/types/inline";
 import { CurrentElementProvider, CurrentElementRetriever } from "./current-element";
+import { STANDARD_PARAGRAPH } from "../../../internal/text/serializer/types/paragraph";
 
 /**
  * Combine both interfaces
@@ -2052,8 +2053,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           }
         }
 
-        // or if we have no children
-        if ((newNode.children as any).length === 0) {
+        // or if we have no children or in a list item
+        // we have no initial paragraph
+        if (
+          (newNode.children as any).length === 0 ||
+          (
+            nodeAsRichElement.type === "list-item" &&
+            (
+              nodeAsRichElement.children[0].type !== "paragraph" &&
+              !Text.isText(nodeAsRichElement.children[0])
+            )
+          )
+        ) {
           // we add an empty paragraph
           Transforms.insertNodes(this.editor,
             { type: "paragraph", containment: "block", children: [STANDARD_TEXT_NODE() as any] },
@@ -2091,7 +2102,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         if ((newNode.children as any).length === 0) {
           // we need to add an emtpy list item node
           Transforms.insertNodes(this.editor,
-            { type: "list-item", containment: "superblock", children: [STANDARD_TEXT_NODE() as any] },
+            { type: "list-item", containment: "superblock", children: [STANDARD_PARAGRAPH() as any] },
             { at: path.concat(0) }
           );
         }
@@ -2362,7 +2373,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         match: (n: any) => {
           return n.type === "list";
         },
-        mode: "highest",
+        mode: "lowest",
         split: true,
       }
     );
@@ -2372,10 +2383,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         match: (n: any) => {
           return n.type === "list-item";
         },
-        mode: "highest",
+        mode: "lowest",
         split: true,
       }
-    )
+    );
+
+    // let's check if the now new nodes are laying right into
+    // the list item, which is valid indeed, but rather unwanted
+    // this should make it so that the paragraph that now dangles at
+    // the end is unwrapped
+    Transforms.unwrapNodes(
+      this.editor,
+      {
+        match: (n: any) => {
+          return n.type === "list-item" &&
+            n.children.length >= 2 &&
+            n.children[n.children.length - 1] &&
+            n.children[n.children.length - 1].type === "paragraph";
+        },
+        mode: "lowest",
+        split: true,
+      }
+    );
   }
 
   /**
