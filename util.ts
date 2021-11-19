@@ -209,6 +209,37 @@ export function mimeTypeToExtension(str: string) {
 }
 
 /**
+ * Gives the mime type based on a extension
+ * @param ext 
+ * @returns 
+ */
+export function extensionToMimeType(ext: string) {
+  return (
+    Object.keys(mimeExtensions).find((mime) => mimeExtensions[mime] === ext.toLowerCase()) ||
+    "application/octet-stream"
+  );
+}
+
+/**
+ * Gets the extension from a given file name
+ * @param fileName 
+ * @returns 
+ */
+export function getFileExtension(fileName: string) {
+  const splitted = fileName.split(".");
+  return splitted[splitted.length - 1];
+}
+
+/**
+ * Specifies whether the given mime type is of a supported image
+ * @param fileName 
+ * @returns 
+ */
+export function isSupportedImage(mimeType: string) {
+  return FILE_SUPPORTED_IMAGE_TYPES.includes(mimeType);
+}
+
+/**
  * Basically an extension to pretty bytes
  * @param size 
  * @returns 
