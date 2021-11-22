@@ -258,6 +258,9 @@ export default {
     mustBeParented: {
       type: "boolean",
     },
+    enableReparenting: {
+      type: "boolean",
+    },
     parentingRule: {
       type: "string",
       enum: ["ONCE", "ONCE_PER_OWNER", "MANY"],

@@ -250,6 +250,11 @@ export interface IItemDefinitionRawJSONDataType {
    */
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
   /**
+   * Allows to move children from one parent to another
+   * by providing a new parent during edit
+   */
+  enableReparenting?: boolean;
+  /**
    * Whether it actually must always be parented
    */
   mustBeParented?: boolean;
@@ -2243,6 +2248,14 @@ export default class ItemDefinition {
    */
   public mustBeParented() {
     return !!this.rawData.mustBeParented;
+  }
+
+  /**
+   * Tells whether reparenting is enabled
+   * @returns a boolean
+   */
+  public isReparentingEnabled() {
+    return !!this.rawData.enableReparenting;
   }
 
   public getParentingRule() {

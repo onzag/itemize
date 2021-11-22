@@ -146,10 +146,10 @@ export async function validateParentingRules(
   actualFinalOwnerId: string,
   role: string,
   rolesManager: CustomRoleManager,
-  isEdit: boolean,
+  isReparenting: boolean,
 ) {
   const isParenting = !!(parentId || parentVersion || parentType);
-  if (!isParenting && itemDefinition.mustBeParented() && !isEdit) {
+  if (!isParenting && itemDefinition.mustBeParented() && !isReparenting) {
     // this is only relevant during add, as it is required when adding
     // but as modifying a parent is already set
     throw new EndpointError({
@@ -157,6 +157,13 @@ export async function validateParentingRules(
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   } else if (isParenting) {
+    if (isReparenting && !itemDefinition.isReparentingEnabled()) {
+      throw new EndpointError({
+        message: "Reparenting is not been enabled as such you can't move children after they have been created",
+        code: ENDPOINT_ERRORS.FORBIDDEN,
+      });
+    }
+
     const parentingItemDefinition = appData.root.registry[parentType] as ItemDefinition;
     if (!(parentingItemDefinition instanceof ItemDefinition)) {
       throw new EndpointError({

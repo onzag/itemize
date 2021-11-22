@@ -217,6 +217,14 @@ export function checkItemDefinition(
   }
 
   // Also these two must be specified together
+  if (rawData.enableReparenting && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting enableReparenting without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("enableReparenting"),
+    );
+  }
+
+  // Also these two must be specified together
   if (rawData.parentingRule && !rawData.canBeParentedBy) {
     throw new CheckUpError(
       "Setting parentingRule without canBeParentedBy specifications",
