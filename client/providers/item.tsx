@@ -347,6 +347,12 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
     id: string,
     version?: string,
   };
+  /**
+   * Prevents a reparent from being triggered by triggering
+   * parented by only if it's determined that the action to use
+   * will be of add type
+   */
+  parentedByAddOnly?: boolean;
   action?: "add" | "edit";
   blockStatus?: boolean;
   blockUntil?: string;
@@ -3188,7 +3194,16 @@ export class ActualItemProvider extends
       },
     });
 
-    if (options.parentedBy) {
+    const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
+    const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
+
+    const determinedActionIsEdit = options.action ?
+      options.action === "edit" :
+      (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)
+
+    if (options.parentedBy && (
+      !options.parentedByAddOnly || (options.parentedByAddOnly && !determinedActionIsEdit)
+    )) {
       const itemDefinitionInQuestion = root.registry[options.parentedBy.item] as ItemDefinition;
 
       argumentsForQuery.parent_id = options.parentedBy.id;
@@ -3207,9 +3222,6 @@ export class ActualItemProvider extends
       });
     }
 
-    const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
-    const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
-
     let value: IGQLValue;
     let error: EndpointErrorType;
     let getQueryFields: IGQLRequestFields;
@@ -3217,8 +3229,7 @@ export class ActualItemProvider extends
     // if we are in edit as we have specified an action that is meant to be edit
     // or if we have a submit for id that is also our current item id and it is indeed found which means that we are sure
     // there's a value for it and it is loaded so we can be guaranteed this is meant to be an edit
-    if (options.action ? options.action === "edit" : (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)) {
-
+    if (determinedActionIsEdit) {
       const submitTargetIsDifferent =
         itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ||
         submitForId !== this.props.forId;
