@@ -3,6 +3,7 @@ import equals from "deep-equal";
 
 interface ISetVarProps {
   id: string;
+  objKey?: string;
   value: any;
 }
 
@@ -33,23 +34,59 @@ export default class SetVar extends React.Component<ISetVarProps> {
     }
   }
   public componentDidMount() {
-    SetVar.VAR_REGISTRY[this.props.id] = this.props.value;
+    if (typeof this.props.objKey !== "undefined") {
+      if (typeof SetVar.VAR_REGISTRY[this.props.id] === "undefined") {
+        SetVar.VAR_REGISTRY[this.props.id] = {};
+      }
+
+      SetVar.VAR_REGISTRY[this.props.id][this.props.objKey] = this.props.value;
+    } else {
+      SetVar.VAR_REGISTRY[this.props.id] = this.props.value;
+    }
     this.tickle(this.props.id);
   }
   public shouldComponentUpdate(nextProps: ISetVarProps) {
-    if (nextProps.id !== this.props.id) {
-      delete SetVar.VAR_REGISTRY[this.props.id];
-      SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
+    if (nextProps.id !== this.props.id || nextProps.objKey !== this.props.objKey) {
+      if (typeof this.props.objKey !== "undefined") {
+        delete SetVar.VAR_REGISTRY[this.props.id][this.props.objKey];
+        if (Object.keys(SetVar.VAR_REGISTRY[this.props.id]).length === 0) {
+          delete SetVar.VAR_REGISTRY[this.props.id];
+        }
+      } else {
+        delete SetVar.VAR_REGISTRY[this.props.id];
+      }
+
+      if (typeof nextProps.objKey !== "undefined") {
+        if (typeof SetVar.VAR_REGISTRY[nextProps.id] === "undefined") {
+          SetVar.VAR_REGISTRY[nextProps.id] = {};
+        }
+  
+        SetVar.VAR_REGISTRY[nextProps.id][nextProps.objKey] = nextProps.value;
+      } else {
+        SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
+      }
+      
       this.tickle(this.props.id);
       this.tickle(nextProps.id);
     } else if (!equals(nextProps.value, this.props.value, { strict: true })) {
-      SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
+      if (typeof nextProps.objKey !== "undefined") {
+        SetVar.VAR_REGISTRY[nextProps.id][nextProps.objKey] = nextProps.value;
+      } else {
+        SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
+      }
       this.tickle(nextProps.id);
     }
     return false;
   }
   public componentWillUnmount() {
-    delete SetVar.VAR_REGISTRY[this.props.id];
+    if (typeof this.props.objKey !== "undefined") {
+      delete SetVar.VAR_REGISTRY[this.props.id][this.props.objKey];
+      if (Object.keys(SetVar.VAR_REGISTRY[this.props.id]).length === 0) {
+        delete SetVar.VAR_REGISTRY[this.props.id];
+      }
+    } else {
+      delete SetVar.VAR_REGISTRY[this.props.id];
+    }
     this.tickle(this.props.id);
   }
   public render() {
