@@ -93,3 +93,7 @@ export default class SetVar extends React.Component<ISetVarProps> {
     return null as any;
   }
 }
+
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+  (window as any).SetVar = SetVar;
+}

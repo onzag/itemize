@@ -16,7 +16,7 @@ export default class ReadVar extends React.PureComponent<IReadVarProps> {
 
     this.onTickled = this.onTickled.bind(this);
   }
-  public onTickled() {
+  public onTickled() {  
     if (!this.isUnmounted) {
       this.forceUpdate();
     }
