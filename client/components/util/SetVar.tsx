@@ -48,6 +48,12 @@ export default class SetVar extends React.Component<ISetVarProps> {
   public shouldComponentUpdate(nextProps: ISetVarProps) {
     if (nextProps.id !== this.props.id || nextProps.objKey !== this.props.objKey) {
       if (typeof this.props.objKey !== "undefined") {
+        // we make a new one because this may cause memory pollution
+        // when reading and comparing previous with new value
+        // in some form of simplified way
+        SetVar.VAR_REGISTRY[this.props.id] = {
+          ...SetVar.VAR_REGISTRY[this.props.id],
+        };
         delete SetVar.VAR_REGISTRY[this.props.id][this.props.objKey];
         if (Object.keys(SetVar.VAR_REGISTRY[this.props.id]).length === 0) {
           delete SetVar.VAR_REGISTRY[this.props.id];
@@ -56,12 +62,14 @@ export default class SetVar extends React.Component<ISetVarProps> {
         delete SetVar.VAR_REGISTRY[this.props.id];
       }
 
-      if (typeof nextProps.objKey !== "undefined") {
-        if (typeof SetVar.VAR_REGISTRY[nextProps.id] === "undefined") {
-          SetVar.VAR_REGISTRY[nextProps.id] = {};
-        }
-  
-        SetVar.VAR_REGISTRY[nextProps.id][nextProps.objKey] = nextProps.value;
+      if (typeof nextProps.objKey !== "undefined") { 
+        // we make a new one because this may cause memory pollution
+        // when reading and comparing previous with new value
+        // in some form of simplified way
+        SetVar.VAR_REGISTRY[nextProps.id] = {
+          ...SetVar.VAR_REGISTRY[nextProps.id],
+          [nextProps.objKey]: nextProps.value,
+        };
       } else {
         SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
       }
@@ -70,7 +78,13 @@ export default class SetVar extends React.Component<ISetVarProps> {
       this.tickle(nextProps.id);
     } else if (!equals(nextProps.value, this.props.value, { strict: true })) {
       if (typeof nextProps.objKey !== "undefined") {
-        SetVar.VAR_REGISTRY[nextProps.id][nextProps.objKey] = nextProps.value;
+        // we make a new one because this may cause memory pollution
+        // when reading and comparing previous with new value
+        // in some form of simplified way
+        SetVar.VAR_REGISTRY[nextProps.id] = {
+          ...SetVar.VAR_REGISTRY[nextProps.id],
+          [nextProps.objKey]: nextProps.value,
+        }
       } else {
         SetVar.VAR_REGISTRY[nextProps.id] = nextProps.value;
       }
@@ -80,10 +94,16 @@ export default class SetVar extends React.Component<ISetVarProps> {
   }
   public componentWillUnmount() {
     if (typeof this.props.objKey !== "undefined") {
-      delete SetVar.VAR_REGISTRY[this.props.id][this.props.objKey];
-      if (Object.keys(SetVar.VAR_REGISTRY[this.props.id]).length === 0) {
-        delete SetVar.VAR_REGISTRY[this.props.id];
-      }
+      // we make a new one because this may cause memory pollution
+        // when reading and comparing previous with new value
+        // in some form of simplified way
+        SetVar.VAR_REGISTRY[this.props.id] = {
+          ...SetVar.VAR_REGISTRY[this.props.id],
+        };
+        delete SetVar.VAR_REGISTRY[this.props.id][this.props.objKey];
+        if (Object.keys(SetVar.VAR_REGISTRY[this.props.id]).length === 0) {
+          delete SetVar.VAR_REGISTRY[this.props.id];
+        }
     } else {
       delete SetVar.VAR_REGISTRY[this.props.id];
     }
