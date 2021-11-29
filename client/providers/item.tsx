@@ -2601,12 +2601,19 @@ export class ActualItemProvider extends
       includes?: { [include: string]: string[] },
       policies?: PolicyPathType[],
       onlyIncludeIfDiffersFromAppliedValue?: boolean,
+      propertyOverrides?: IPropertyOverride[];
+      includeOverrides?: IIncludeOverride[];
     },
   ): boolean {
     // let's make this variable to check on whether things are invalid or not
     // first we check every property, that is included and allowed we use some
     // and return whether it's invalid
     const allIncludedPropertiesValid = options.properties.every((pId) => {
+      // ignore if it is within an override
+      if (options.propertyOverrides && options.propertyOverrides.find((override) => override.id === pId)) {
+        return true;
+      }
+
       // first lets try to get the state for the current state if any
       let p = this.state.itemState.properties.find((p) => p.propertyId === pId);
       // in some situations, say when we try to manually submit a property this property might not be avaliable
@@ -2655,6 +2662,11 @@ export class ActualItemProvider extends
     }
 
     const allIncludedIncludesAreValid = !options.includes ? true : Object.keys(options.includes).every((iId) => {
+      // ignore if it is within an override
+      if (options.includeOverrides && options.includeOverrides.find((override) => override.id === iId)) {
+        return true;
+      }
+
       const i = this.state.itemState.includes.find((i) => i.includeId === iId);
       // and now we get the sinking property ids
       const include = this.props.itemDefinitionInstance.getIncludeFor(i.includeId);
@@ -4434,7 +4446,7 @@ export function ItemContextPhase(props: { children: React.ReactNode, slot?: stri
             const newValue = {
               ...phaserValue,
             };
-            const slotId = props.slot || "null";
+            const slotId = props.slot || "null";
             newValue[slotId] = value;
             return (<ItemContextPhaserContext.Provider value={newValue}>
               {props.children}
@@ -4450,7 +4462,7 @@ export function ItemContextRetrieve(props: { children: React.ReactNode, slot?: s
   return (
     <ItemContextPhaserContext.Consumer>
       {(value) => {
-        return (<ItemContext.Provider value={value[props.slot || "null"]}>
+        return (<ItemContext.Provider value={value[props.slot || "null"]}>
           {props.children}
         </ItemContext.Provider>);
       }}
