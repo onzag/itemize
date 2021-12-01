@@ -198,7 +198,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
       !paymentStatusesArr.includes(l.status) ||
       !paymentTypesArr.includes(l.type) ||
       (typeof l.metadata !== "string" && l.metadata !== null) ||
-      (typeof l.rometadata !== "string" && l.metadata !== null)
+      (typeof l.rometadata !== "string" && l.rometadata !== null)
     ) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
