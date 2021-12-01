@@ -1112,7 +1112,7 @@ export const ORDERBY_RULE = GraphQLInputObjectType && new GraphQLInputObjectType
   description: "Order by the property, which might be an extension, in any direction",
 });
 
-export type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search" | "in";
+export type SearchVariants = "exact" | "from" | "to" | "location" | "radius" | "search" | "in" | "payment-status" | "payment-type";
 
 export interface IOrderByRuleType {
   [property: string]: {

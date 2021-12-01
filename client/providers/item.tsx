@@ -98,7 +98,7 @@ function getPropertyListForSearchMode(properties: Array<string | IPropertyCorePr
 function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: ItemDefinition) {
   let actualId: string = setter.id;
   if (setter.searchVariant) {
-    actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase()] + setter.id;
+    actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase().replace("-", "_")] + setter.id;
   }
   if (setter.policyName && setter.policyType) {
     return itemDefinition.getPropertyDefinitionForPolicy(setter.policyType, setter.policyName, actualId);
@@ -436,6 +436,19 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   traditional?: boolean;
   limit: number;
   offset: number;
+  /**
+   * By default when searching if a field is valued as null
+   * then it will not be searched by it, the search action will delete
+   * all null attributes, however if this flag is enabled these nulls will
+   * be sent as search parameters, this means that only nulls will match
+   * 
+   * for example if searching an username the value "a" will search for all
+   * users that contain an a, when the field is empty this is null, the default
+   * behaviour is to send nothing, this means no filtering by username, however
+   * with this flag a null value will be sent, which means only users that match
+   * null itself will match, or a lack of username
+   */
+  enableNulls?: boolean;
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
@@ -3810,6 +3823,7 @@ export class ActualItemProvider extends
       language: this.props.localeData.language,
       limit: options.limit,
       offset: options.offset,
+      enableNulls: options.enableNulls,
       parentedBy,
       waitAndMerge: options.waitAndMerge,
       progresser: options.progresser,

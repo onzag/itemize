@@ -98,9 +98,13 @@ export function dateLocalSearchExactAndRange(
   // and get the conditions
   const conditions: boolean[] = [];
   if (typeof usefulArgs[exactName] !== "undefined") {
-    // we use moment in each of these conditions
-    const exactComparedValueMoment = Moment(usefulArgs[exactName], format);
-    conditions.push(propertyValueMoment.isSame(exactComparedValueMoment));
+    if (usefulArgs[exactName] === null) {
+      conditions.push(propertyValue === null);
+    } else {
+      // we use moment in each of these conditions
+      const exactComparedValueMoment = Moment(usefulArgs[exactName], format);
+      conditions.push(propertyValueMoment.isSame(exactComparedValueMoment));
+    }
   }
 
   if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {

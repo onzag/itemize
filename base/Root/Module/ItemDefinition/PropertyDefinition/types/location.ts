@@ -110,8 +110,10 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
     const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.id;
 
     const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
-
-    if (
+    if (typeof usefulArgs[locationName] === null) {
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      return propertyValue === null;
+    } else if (
       typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
       typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null
     ) {

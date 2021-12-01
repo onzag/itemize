@@ -125,7 +125,10 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
   const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
   const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
 
-  if (
+  if (arg.args[locationName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id + "_GEO");
+    return true;
+  } else if (
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
     typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
   ) {

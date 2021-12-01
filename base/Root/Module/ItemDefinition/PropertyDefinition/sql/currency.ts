@@ -112,6 +112,9 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
     searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id + "_VALUE");
+    searchedByIt = true;
   }
 
   // if we have a from search

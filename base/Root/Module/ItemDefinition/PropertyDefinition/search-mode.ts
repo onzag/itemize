@@ -234,7 +234,16 @@ export function buildSearchModePaymentProperty(
     }
   }
 
-  return null;
+  return newPropDef2 ? [
+    newPropDef,
+    newPropDef2,
+    newPropDefPaymentStatus,
+    newPropDefPaymentType,
+  ] : [
+    newPropDef,
+    newPropDefPaymentStatus,
+    newPropDefPaymentType,
+  ];
 }
 
 /**

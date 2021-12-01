@@ -143,6 +143,10 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
     // we just match it as it is
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", exactArg.currency);
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", exactArg.value);
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.whereBuilder.andWhereColumnNull(argPrefixPlusId + "_AMOUNT");
+    searchedByIt = true;
   }
 
   // if we have a from search

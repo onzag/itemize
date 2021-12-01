@@ -156,6 +156,9 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[exactName] as any);
     searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id);
+    searchedByIt = true;
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {

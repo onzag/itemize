@@ -483,6 +483,25 @@ export async function reprocessFileArgument(
   };
 }
 
+function deleteNulls<T>(
+  args: T
+): T {
+  const newArgs: any = {};
+  Object.keys(args).forEach((argKey) => {
+    const value = args[argKey];
+    if (value !== null) {
+      if (typeof value === "object" && !Array.isArray(value)) {
+        newArgs[argKey] = deleteNulls(value);
+      } else {
+        newArgs[argKey] = value;
+      }
+      
+    }
+  });
+
+  return newArgs;
+}
+
 /**
  * Provies the querying args for a given list of args
  * @param args the list of args
@@ -1152,6 +1171,7 @@ interface IRunSearchQueryArg {
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
   cacheStoreMetadata?: any,
   cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction,
+  enableNulls: boolean,
   traditional: boolean,
   limit: number,
   offset: number,
@@ -1234,7 +1254,7 @@ export async function runSearchQueryFor(
   const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
 
   const searchArgs = getQueryArgsFor(
-    arg.args,
+    arg.enableNulls ? arg.args : deleteNulls(arg.args),
     arg.token,
     arg.language,
   );

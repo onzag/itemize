@@ -301,6 +301,7 @@ export default class PropertyEntryReference
       versionFilter: filterByLanguage ? this.props.language : null,
       waitAndMerge: true,
       since: null,
+      enableNulls: false,
     }, null);
     // these nulls which represent the listener are only truly used for the
     // cached searches, we don't use that here

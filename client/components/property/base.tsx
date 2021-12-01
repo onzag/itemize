@@ -218,7 +218,7 @@ export function EntryViewReadSet(
                     if (props.searchVariant) {
                       // for that we just get the prefix and add it
                       actualId =
-                        PropertyDefinitionSearchInterfacesPrefixes[props.searchVariant.toUpperCase()] + props.id;
+                        PropertyDefinitionSearchInterfacesPrefixes[props.searchVariant.toUpperCase().replace("-", "_")] + props.id;
                     }
 
                     // now we need to check if this is a meta property such a created_at, edited_at, etc...

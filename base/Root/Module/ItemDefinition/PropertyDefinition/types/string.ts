@@ -130,7 +130,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.id;
     const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
 
-    if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
+    if (typeof usefulArgs[searchName] !== "undefined") {
       const searchMatch = usefulArgs[searchName];
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
@@ -141,6 +141,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
       // this is the FTS in the client side, it's not good, it's not meant
       // to be good, but it gets the job done
       return propertyValue.includes(searchMatch);
+    } else if (usefulArgs[searchName] === null) {
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      return propertyValue === null;
     }
 
     return true;

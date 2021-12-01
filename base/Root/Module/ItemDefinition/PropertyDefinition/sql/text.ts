@@ -151,6 +151,14 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
     }
 
     return true;
+  } else if (arg.args[searchName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id);
+
+    // was not included in search because we cannot really
+    // order by nulls, this is used for ordering
+    // and the ordering of text is complex, bit of a hack
+    // but otherwise we would have to create the column for ranking
+    return false;
   }
 
   return false;

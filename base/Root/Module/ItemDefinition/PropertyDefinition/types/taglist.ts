@@ -80,6 +80,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
       }
 
       return propertyValue.every((v: string) => searchMatch.includes(v)) && searchMatch.every((v: string) => propertyValue.includes(v));
+    } else if (usefulArgs[searchName] === null) {
+      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      return propertyValue === null;
     }
 
     return true;

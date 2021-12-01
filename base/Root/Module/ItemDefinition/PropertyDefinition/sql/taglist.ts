@@ -49,6 +49,9 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
     );
 
     return true;
+  } else if (arg.args[searchName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id);
+    return true;
   }
 
   return false;

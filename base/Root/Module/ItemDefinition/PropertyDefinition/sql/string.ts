@@ -66,6 +66,11 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
     }
 
     return true;
+  } else if (arg.args[searchName] === null) {
+    arg.whereBuilder.andWhereColumnNull(
+      arg.prefix + arg.id,
+    );
+    return true;
   }
 
   // now we see if we have an argument for it

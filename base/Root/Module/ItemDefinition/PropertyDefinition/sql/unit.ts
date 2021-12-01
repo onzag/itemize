@@ -100,6 +100,10 @@ export function unitSQLSearch(arg: ISQLSearchInfo) {
     const exactAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[exactName] as any;
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", exactAsUnit.normalizedUnit);
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", exactAsUnit.normalizedValue);
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id + "_NORMALIZED_VALUE");
+    searchedByIt = true;
   }
 
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
