@@ -107,7 +107,12 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
     </IconButton>
   ) : null;
 
-  const secondIconComponent = props.isAllowedToToggleNullStatus ? (
+  let shouldShowToggleNull = props.isAllowedToToggleNullStatus;
+  if (props.currentValue !== null && props.args.denyNull) {
+    shouldShowToggleNull = false;
+  }
+
+  const secondIconComponent = shouldShowToggleNull ? (
     <IconButton
       onClick={props.onToggleNullStatus}
       className={props.classes.icon}

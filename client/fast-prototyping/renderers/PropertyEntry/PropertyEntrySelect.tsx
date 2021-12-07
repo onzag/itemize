@@ -167,6 +167,8 @@ class ActualPropertyEntrySelectRenderer
     }
 
     const allowedOptions = this.props.args.allowedOptions;
+    const altLabels = this.props.args.altLabels;
+    const altNullLabel = this.props.args.altNullLabel;
     const denyAny = this.props.args.denyAny;
     const anyAddornment = this.props.args.anyAddornment;
     const optionAddornment = this.props.args.optionAddornment;
@@ -200,10 +202,11 @@ class ActualPropertyEntrySelectRenderer
               <div className={this.props.classes.chips}>
                 {selected.map((selectedValue) => {
                   const gatheredResult = this.props.values.find((v) => v.value === selectedValue);
+                  const gatheredResultAltLabel = altLabels && gatheredResult && altLabels[gatheredResult.value];
                   return (
                     <Chip
                       key={selectedValue}
-                      label={(gatheredResult && gatheredResult.i18nValue) || selectedValue}
+                      label={gatheredResultAltLabel || (gatheredResult && gatheredResult.i18nValue) || selectedValue}
                       className={this.props.classes.chip} color="primary"
                     />
                   );
@@ -224,10 +227,11 @@ class ActualPropertyEntrySelectRenderer
               const addornment = optionAddornment && optionAddornment[vv.value];
               let content: React.ReactNode;
               let addr: React.ReactNode = null;
+              const altLabel = altLabels && altLabels[vv.value];
               if (!optionAddornment) {
-                content = vv.i18nValue;
+                content = altLabel || vv.i18nValue;
               } else {
-                content = <ListItemText>{vv.i18nValue}</ListItemText>
+                content = <ListItemText>{altLabel || vv.i18nValue}</ListItemText>
                 addr = <ListItemIcon>{addornment}</ListItemIcon>
               }
               // the i18n value from the i18n data
@@ -241,9 +245,9 @@ class ActualPropertyEntrySelectRenderer
       let anyAddr: React.ReactNode = null;
       if (this.props.isNullable) {
         if (!anyAddornment) {
-          anyContent = this.props.nullValue.i18nValue
+          anyContent = altNullLabel || this.props.nullValue.i18nValue
         } else {
-          anyContent = <ListItemText><em>{this.props.nullValue.i18nValue}</em></ListItemText>
+          anyContent = <ListItemText><em>{altNullLabel || this.props.nullValue.i18nValue}</em></ListItemText>
           anyAddr = <ListItemIcon>{anyAddornment}</ListItemIcon>
         }
       }
@@ -296,10 +300,11 @@ class ActualPropertyEntrySelectRenderer
               const addornment = optionAddornment && optionAddornment[vv.value];
               let content: React.ReactNode;
               let addr: React.ReactNode = null;
+              const altLabel = altLabels && altLabels[vv.value];
               if (!optionAddornment) {
-                content = vv.i18nValue;
+                content = altLabel || vv.i18nValue;
               } else {
-                content = <ListItemText>{vv.i18nValue}</ListItemText>
+                content = <ListItemText>{altLabel || vv.i18nValue}</ListItemText>
                 addr = <ListItemIcon>{addornment}</ListItemIcon>
               }
               // the i18n value from the i18n data

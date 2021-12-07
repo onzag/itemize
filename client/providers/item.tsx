@@ -462,7 +462,7 @@ export interface IPokeElementsType {
   policies: PolicyPathType[];
 }
 
-interface IBasicFns {
+export interface IBasicFns {
   // to remove the poked status
   poke: (elements: IPokeElementsType) => void;
   unpoke: () => void;
