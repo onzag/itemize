@@ -249,7 +249,7 @@ export default class CacheWorker {
       dbPromise = openDB<ICacheDB>(CACHE_NAME, version, {
         upgrade: (db) => {
           try {
-            console.log("CLEARING CACHE DUE TO UPGRADE");
+            // console.log("CLEARING CACHE DUE TO UPGRADE");
             try {
               db.deleteObjectStore(QUERIES_TABLE_NAME);
               db.deleteObjectStore(SEARCHES_TABLE_NAME);
@@ -277,7 +277,7 @@ export default class CacheWorker {
           }
         },
         blocked: () => {
-          console.log("BLOCKED");
+          // console.log("BLOCKED");
 
           // if we managed it here, we are blocked
           this.isCurrentlyBlocked = true;
@@ -287,7 +287,7 @@ export default class CacheWorker {
         },
         terminated: () => {
           // maybe no support to indexed db who knows
-          console.log("TERMINATED");
+          // console.log("TERMINATED");
           this.db = null;
         }
       });
@@ -335,7 +335,7 @@ export default class CacheWorker {
       this.waitForSetupPromiseResolve();
     }
 
-    console.log("CACHE SETUP", version);
+    // console.log("CACHE SETUP", version);
   }
 
   public async storeState(
@@ -344,7 +344,7 @@ export default class CacheWorker {
     version: string,
     value: any,
   ) {
-    console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
+    // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
 
     await this.waitForSetupPromise;
 
@@ -374,7 +374,7 @@ export default class CacheWorker {
     id: string,
     version: string,
   ) {
-    console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
+    // console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
 
@@ -402,7 +402,7 @@ export default class CacheWorker {
     id: string,
     version: string,
   ) {
-    console.log("REQUESTED TO DELETE STATE FOR", qualifiedName, id, version);
+    // console.log("REQUESTED TO DELETE STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
 
@@ -446,9 +446,9 @@ export default class CacheWorker {
     partialFields: IGQLRequestFields,
     merge?: boolean,
   ): Promise<boolean> {
-    if (!merge) {
-      console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
-    }
+    // if (!merge) {
+    //   console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
+    // }
 
     await this.waitForSetupPromise;
 
@@ -489,7 +489,7 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<boolean> {
-    console.log("REQUESTED TO DELETE", queryName, id, version);
+    // console.log("REQUESTED TO DELETE", queryName, id, version);
 
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
@@ -524,9 +524,9 @@ export default class CacheWorker {
     parentVersionIfKnown: string,
     metadata: any,
   ) {
-    console.log(
-      "REQUESTED TO STORE SEARCH METADATA FOR",
-      queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
+    // console.log(
+    //   "REQUESTED TO STORE SEARCH METADATA FOR",
+    //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
 
     await this.waitForSetupPromise;
 
@@ -566,7 +566,7 @@ export default class CacheWorker {
     version: string,
     metadata: any,
   ) {
-    console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
+    // console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
 
     await this.waitForSetupPromise;
 
@@ -602,9 +602,9 @@ export default class CacheWorker {
     parentIdIfKnown: string,
     parentVersionIfKnown: string,
   ): Promise<ICacheMetadataMatchType> {
-    console.log(
-      "REQUESTED TO READ SEARCH METADATA FOR",
-      queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
+    // console.log(
+    //   "REQUESTED TO READ SEARCH METADATA FOR",
+    //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
 
     await this.waitForSetupPromise;
 
@@ -636,7 +636,7 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<ICacheMetadataMatchType> {
-    console.log("REQUESTED TO READ METADATA FOR", queryName, id, version);
+    // console.log("REQUESTED TO READ METADATA FOR", queryName, id, version);
 
     await this.waitForSetupPromise;
 
@@ -736,7 +736,7 @@ export default class CacheWorker {
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
   ): Promise<boolean> {
-    console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
+    // console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
     // so we get the current value
     const currentValue = await this.getCachedValue(queryName, id, version);
@@ -806,9 +806,9 @@ export default class CacheWorker {
     version: string,
     requestedFields?: IGQLRequestFields,
   ): Promise<ICacheMatchType> {
-    if (requestedFields) {
-      console.log("CACHED QUERY REQUESTED", queryName, id, version, requestedFields);
-    }
+    // if (requestedFields) {
+    //   console.log("CACHED QUERY REQUESTED", queryName, id, version, requestedFields);
+    // }
 
     await this.waitForSetupPromise;
 
@@ -831,9 +831,9 @@ export default class CacheWorker {
         const fields = idbValue.fields;
 
         if (!requestedFields || requestFieldsAreContained(requestedFields, fields)) {
-          if (requestedFields) {
-            console.log("RETURNING FROM CACHE", queryName, id, version, requestedFields, idbValue);
-          }
+          // if (requestedFields) {
+          //   console.log("RETURNING FROM CACHE", queryName, id, version, requestedFields, idbValue);
+          // }
           return idbValue;
         }
       }
@@ -841,9 +841,9 @@ export default class CacheWorker {
       console.warn(err);
     }
 
-    if (requestedFields) {
-      console.log("NO MATCH", queryName, id, requestedFields);
-    }
+    // if (requestedFields) {
+    //   console.log("NO MATCH", queryName, id, requestedFields);
+    // }
     // cache didn't match, returning no match
     // something wrong might have happened as well
     return null;
@@ -1482,7 +1482,7 @@ export default class CacheWorker {
   }
 }
 
-console.log("CACHE WORKER EXPOSING");
+// console.log("CACHE WORKER EXPOSING");
 
 // expose using comlink
 expose(new CacheWorker());

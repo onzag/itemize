@@ -2059,7 +2059,7 @@ export class ActualItemProvider extends
             !this.props.includePolicies,
           ),
         }, () => {
-          this.props.onStateLoadedFromStore(storedState, {
+          this.props.onStateLoadedFromStore && this.props.onStateLoadedFromStore(storedState, {
             submit: this.submit,
             delete: this.delete,
             reload: this.loadValue,

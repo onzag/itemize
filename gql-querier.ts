@@ -762,7 +762,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
             const alias = rs[0];
             const origName = rs[1];
 
-            newResponse.data[origName] = response.data[alias];
+            newResponse.data[origName] = response.data && response.data[alias];
 
             if (response.errors) {
               response.errors.forEach((e) => {
@@ -771,7 +771,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
                   if (newError.path) {
                     newError.path = [origName];
                   }
-                  if (newResponse.errors) {
+                  if (!newResponse.errors) {
                     newResponse.errors = [];
                   }
                   newResponse.errors.push(newError);
