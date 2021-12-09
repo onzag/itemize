@@ -139,6 +139,7 @@ export async function deleteItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.REMOVAL,
+    requestArgs: resolverArgs.args,
     owner: ownerUserId,
     parent: wholeSqlStoredValue && wholeSqlStoredValue.parent_id ? {
       id: wholeSqlStoredValue.parent_id,

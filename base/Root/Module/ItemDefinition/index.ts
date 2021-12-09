@@ -1398,6 +1398,10 @@ export default class ItemDefinition {
     // we already have a value for that
     if (this.stateHasAppliedValueTo[mergedID]) {
       if (this.stateGQLAppliedValue[mergedID].flattenedValue === null && value === null) {
+        const currentRequestFields = this.stateGQLAppliedValue[mergedID].requestFields;
+        if (!requestFieldsAreContained(requestFields, currentRequestFields)) {
+          this.stateGQLAppliedValue[mergedID].requestFields = requestFields;
+        }
         return false;
       }
 

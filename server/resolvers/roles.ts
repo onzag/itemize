@@ -1,4 +1,4 @@
-import { IGQLValue } from "../../gql-querier";
+import { IGQLArgs, IGQLValue } from "../../gql-querier";
 import Module from "../../base/Root/Module";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
@@ -27,6 +27,7 @@ export interface ICustomRoleGranterArg {
   module: Module;
   value: IGQLValue;
   environment: CustomRoleGranterEnvironment;
+  requestArgs: IGQLArgs;
   owner: string;
   root: Root;
   parent: {

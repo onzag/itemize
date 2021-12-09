@@ -303,6 +303,7 @@ export class Collector {
           type: rowValue.parent_type,
           version: rowValue.parent_version,
         } : null,
+        requestArgs: null,
         tokenData: this.appliedRule.forUser,
         value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
           this.appData.cache.getServerData(),

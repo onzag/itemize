@@ -144,6 +144,7 @@ export async function editItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.MODIFYING,
+    requestArgs: resolverArgs.args,
     owner: ownerUserId,
     parent: wholeSqlStoredValue.parent_id ? {
       id: wholeSqlStoredValue.parent_id,

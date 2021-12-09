@@ -124,6 +124,7 @@ export async function searchModule(
     root: appData.root,
     tokenData: tokenData,
     environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+    requestArgs: resolverArgs.args,
     owner: ownerId,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
       id: resolverArgs.args.parent_id,
@@ -502,6 +503,7 @@ export async function searchItemDefinition(
     tokenData: tokenData,
     root: appData.root,
     environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+    requestArgs: resolverArgs.args,
     owner: ownerId,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
       id: resolverArgs.args.parent_id,

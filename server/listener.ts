@@ -579,6 +579,7 @@ export class Listener {
           value,
         ) : value,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
+        requestArgs: null,
         owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
         parent: value && value.parent_id ? {
           id: value.parent_id,
@@ -687,6 +688,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: null,
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
@@ -791,6 +793,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: null,
           owner: null,
           parent: {
             id: request.parentId,
@@ -901,6 +904,7 @@ export class Listener {
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy || UNSPECIFIED_OWNER,
+          requestArgs: null,
           parent: {
             id: request.parentId,
             type: request.parentType,
@@ -1009,6 +1013,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: null,
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
@@ -1200,6 +1205,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: null,
           owner: null,
           parent: {
             id: request.parentId,
@@ -1403,6 +1409,7 @@ export class Listener {
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy || UNSPECIFIED_OWNER,
+          requestArgs: null,
           parent: {
             id: request.parentId,
             type: request.parentType,
@@ -1618,6 +1625,7 @@ export class Listener {
         ) : value,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
+        requestArgs: null,
         parent: value && value.parent_id ? {
           id: value.parent_id,
           type: value.parent_type,

@@ -104,6 +104,7 @@ export async function getItemDefinition(
     root: appData.root,
     tokenData: tokenData,
     environment: CustomRoleGranterEnvironment.RETRIEVING,
+    requestArgs: resolverArgs.args,
     owner: ownerId,
     parent: selectQueryValue && selectQueryValue.parent_id ? {
       id: selectQueryValue.parent_id,
@@ -381,6 +382,7 @@ export async function getItemDefinitionList(
         root: appData.root,
         tokenData: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
+        requestArgs: resolverArgs.args,
         owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,
@@ -584,6 +586,7 @@ export async function getModuleList(
         root: appData.root,
         tokenData: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
+        requestArgs: resolverArgs.args,
         owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,
