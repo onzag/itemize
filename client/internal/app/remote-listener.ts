@@ -251,6 +251,10 @@ export class RemoteListener {
    * sets this function
    */
   private currencyFactorsHandler: () => void;
+  /**
+   * Counts how many listeners have been registered
+   */
+  private listenerCount: number = 0;
 
   /**
    * Instantiates a new remote listener
@@ -517,6 +521,8 @@ export class RemoteListener {
       return;
     }
 
+    this.listenerCount++;
+
     // now the request
     const request: IRegisterRequest = {
       itemDefinition: itemDefinitionQualifiedPathName,
@@ -585,6 +591,7 @@ export class RemoteListener {
       if (newListenerValue.parentInstances.length === 0) {
         // delete the listener
         delete this.listeners[qualifiedID];
+        this.listenerCount--;
         // and if we are connected
         if (this.socket.connected) {
           // we can launch the unregister request
@@ -719,6 +726,8 @@ export class RemoteListener {
       return;
     }
 
+    this.listenerCount++;
+
     // we now build the request
     const request: IOwnedSearchRegisterRequest = {
       qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -787,6 +796,7 @@ export class RemoteListener {
       if (listenerValue.callbacks.length === 0) {
         // then we can delete the listener
         delete this.ownedSearchListeners[qualifiedIdentifier];
+        this.listenerCount--;
         // and if we are connected
         if (this.socket.connected) {
           // we can perform the unregister request
@@ -867,6 +877,8 @@ export class RemoteListener {
       return;
     }
 
+    this.listenerCount++;
+
     // we build the request for it
     const request: IParentedSearchRegisterRequest = {
       qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -924,6 +936,8 @@ export class RemoteListener {
       }
       return;
     }
+
+    this.listenerCount++;
 
     // we build the request for it
     const request: IOwnedParentedSearchRegisterRequest = {
@@ -1027,6 +1041,7 @@ export class RemoteListener {
       if (listenerValue.callbacks.length === 0) {
         // we can delete the listener
         delete this.parentedSearchListeners[qualifiedIdentifier];
+        this.listenerCount--;
         // and if we are connected
         if (this.socket.connected) {
           // we can unregister the listener
@@ -1088,6 +1103,7 @@ export class RemoteListener {
       if (listenerValue.callbacks.length === 0) {
         // we can delete the listener
         delete this.ownedParentedSearchListeners[qualifiedIdentifier];
+        this.listenerCount--;
         // and if we are connected
         if (this.socket.connected) {
           // we can unregister the listener

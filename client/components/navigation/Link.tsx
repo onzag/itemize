@@ -88,7 +88,7 @@ export default function Link(props: ICustomLinkProps) {
 
   // now let's get the url we want to go to
   let urlDefined = props.to;
-  if (urlDefined !== null && urlDefined[0] !== "/") {
+  if (urlDefined !== null && typeof urlDefined !== "undefined" && urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;
   }
   const urlTo = urlDefined ? `/${currentLocaleFromURL}${urlDefined}` : null;

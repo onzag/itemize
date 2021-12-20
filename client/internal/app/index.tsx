@@ -186,6 +186,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
       this.remoteListener.setCurrencyFactorsHandler(
         this.updateCurrencyFactorsIfNecessary,
       );
+
+      if (process.env.NODE_ENV === "development") {
+        (window as any).REMOTE_LISTENER = this.remoteListener;
+      }
     }
   }
 
