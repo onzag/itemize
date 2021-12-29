@@ -1517,6 +1517,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    */
   private accumulatedFastKeyCombo: string;
 
+  private isUnmounted: boolean;
+
   /**
    * Constructs a new material ui based wrapper for the slate editor
    * @param props the base properties that every wrapper gets extended for this specific wrapper
@@ -1542,6 +1544,8 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       altKey: false,
       shiftKey: false,
     }
+
+    this.isUnmounted = false;
 
     // create the refs
     this.inputImageRef = React.createRef();
@@ -1606,7 +1610,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
           // and re-enable the animation
           // if the drawer opened it won't animate
           // this keeps SSR compatibility
-          this.setState({
+          !this.isUnmounted && this.setState({
             noAnimate: false,
           })
         }, 300);
@@ -1633,6 +1637,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     document.body.removeEventListener("keydown", this.keyDownListener);
     window.removeEventListener("focus", this.windowfocusListener);
     document.removeEventListener("visibilitychange", this.visibilityListener);
+    this.isUnmounted = true;
   }
 
   public keyDownListener(e: KeyboardEvent) {
@@ -1857,6 +1862,10 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
    * mainly used by dialogs once they haave closed
    */
   public refocus() {
+    if (this.isUnmounted) {
+      return;
+    }
+
     if (this.originalSelectionArea) {
       this.props.helpers.focusAt(this.originalSelectionArea);
     } else if (this.originalSelectionPath) {
