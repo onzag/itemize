@@ -100,7 +100,7 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
   // now let's build the name label for the given language
   const foundCustomName = (!node.givenName && node.uiHandler) ? i18nData.richUIHandlerElement[node.uiHandler.replace(/-/g,"_")] : null;
   let nameLabel: string = node.givenName ? node.givenName : (
-    foundCustomName || (node.type ? (i18nData[node.type] || node.type) : i18nData.text)
+    foundCustomName || (node.type ? (i18nData[node.type] || node.type) : i18nData.text)
   );
   if (!node.givenName && !foundCustomName) {
     if (isBasicStyled || isTemplateStyled) {
@@ -123,7 +123,7 @@ export function getInfoOf(node: any, i18nData: IPropertyEntryI18nRichTextInfo): 
 }
 
 function canAcceptAsChildren(expectedParent: RichElement, expectedChild: RichElement) {
-  const expectedParentContainment = expectedParent ? (expectedParent.containment || "superblock") : "superblock";
+  const expectedParentContainment = expectedParent ? (expectedParent.containment || "superblock") : "superblock";
 
   if (expectedParentContainment === "superblock") {
     return true;
