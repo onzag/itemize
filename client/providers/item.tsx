@@ -4157,7 +4157,8 @@ export class ActualItemProvider extends
       this.state.loaded ||
       this.props.forId === null ||
       this.props.itemDefinitionInstance.isInSearchMode() ||
-      this.props.itemDefinitionInstance.isExtensionsInstance()
+      this.props.itemDefinitionInstance.isExtensionsInstance() ||
+      this.props.avoidLoading
     ) {
       return null;
     }

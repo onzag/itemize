@@ -76,7 +76,9 @@ export class OrderByBuilder extends QueryBuilder {
       nulls,
     });
 
-    this.addBindingSources(bindings);
+    if (bindings) {
+      this.addBindingSources(bindings);
+    }
 
     return this;
   }
@@ -97,7 +99,9 @@ export class OrderByBuilder extends QueryBuilder {
       nulls,
     });
 
-    this.addBindingSources(bindings);
+    if (bindings) {
+      this.addBindingSources(bindings);
+    }
 
     return this;
   }

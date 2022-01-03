@@ -354,7 +354,7 @@ export class Collector {
       const moduleTrigger = this.appData.triggers.module.io[pathOfThisModule];
 
       let queryWasForbiddenByTriggers = false;
-      if (moduleTrigger || itemDefinitionTrigger) {
+      if ((moduleTrigger || itemDefinitionTrigger) && value) {
 
         if (moduleTrigger) {
           await moduleTrigger({
