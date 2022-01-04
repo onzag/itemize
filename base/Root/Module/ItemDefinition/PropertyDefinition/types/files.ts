@@ -84,8 +84,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   localEqual: standardLocalEqual,
 
   allowsMinMaxLengthDefined: true,
-  validate: (l: PropertyDefinitionSupportedFilesType) => {
-    if (l.length > MAX_FILES_PER_PROPERTY) {
+  validate: (l: PropertyDefinitionSupportedFilesType, p) => {
+    // only too large if max lenght is not defined
+    // as per the max files per property
+    if (typeof p.maxLength !== "number" && l.length > MAX_FILES_PER_PROPERTY) {
       return PropertyInvalidReason.TOO_LARGE;
     }
 

@@ -21,6 +21,7 @@ import { IVideo, registerVideo } from "./types/video";
 import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
 import { IInline, registerInline } from "./types/inline";
+import { ITableElement, registerTableElement } from "./types/table-element";
 import { TemplateArgs } from "./template-args";
 import uuidv5 from "uuid/v5";
 
@@ -171,12 +172,14 @@ registerTitle(SERIALIZATION_REGISTRY);
 registerVideo(SERIALIZATION_REGISTRY);
 registerList(SERIALIZATION_REGISTRY);
 registerListItem(SERIALIZATION_REGISTRY);
+registerTableElement(SERIALIZATION_REGISTRY);
 
 /**
  * This is what a rich element can be, it can be all these
  * but it's not a text
  */
-export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage | IFile | IVideo | IList | IListItem | IInline;
+export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
+  IFile | IVideo | IList | IListItem | IInline | ITableElement;
 
 /**
  * Represents the root level document and a id

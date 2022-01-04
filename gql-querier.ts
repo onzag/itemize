@@ -8,7 +8,7 @@ import { Stream } from "stream";
 import FormDataNode from "form-data";
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
-import { ENDPOINT_ERRORS, MAX_ALL_COMBINED_FILES_SIZE } from "./constants";
+import { ENDPOINT_ERRORS, MAX_FILES_PER_REQUEST } from "./constants";
 import equals from "deep-equal";
 import { requestFieldsAreContained } from "./gql-util";
 
@@ -236,7 +236,7 @@ export class GQLQuery {
     query.foundUnprocessedArgFiles.forEach((f) => {
       totalFilesSize += f.size;
     });
-    if (totalFilesSize > MAX_ALL_COMBINED_FILES_SIZE) {
+    if (totalFilesSize > MAX_FILES_PER_REQUEST) {
       return false;
     }
 

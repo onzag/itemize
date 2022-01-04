@@ -181,15 +181,15 @@ export const MAX_FILES_PER_PROPERTY = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_P
  * how many files can there be total
  * in a single request, this is more of a security concern
  */
-export const MAX_ALL_COMBINED_FILES_SIZE =
+export const MAX_FILES_PER_REQUEST =
   R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST ?
-  R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST * MAX_FILE_SIZE :
+  R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST :
   MAX_FILES_PER_PROPERTY * 10;
 /**
  * Another just a security concern, this
  * is the size of the graphql query, 1MB should be way more than enough for a graphql query
  */
-export const MAX_FIELD_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FIELD_SIZE || 1000000; // equivalent to 1MB
+export const MAX_FIELD_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FIELD_SIZE || 1000000; // equivalent to 1MB
 /**
  * how many search results can be retrieved at once these are
  * used for the actual search results

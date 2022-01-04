@@ -1374,13 +1374,27 @@ export class Cache {
             // we use the registry to get the proper item definition that represented
             // that module item
             const deleteItemDefinition = this.root.registry[r.type] as ItemDefinition;
+            if (r.version) {
+              const isDestroyedByUnversionedParent = results.find((r2) => r2.id === r.id && !r2.version);
+
+              // an unversioned parent will do a delete all versions that applies to this version
+              // as well
+              if (isDestroyedByUnversionedParent) {
+                return;
+              }
+            }
+
             try {
               // and request a delete on it
               await this.requestDelete(
                 deleteItemDefinition,
                 r.id,
                 r.version || null,
-                false,
+                // delete all versions is false because
+                // different versions may have different parents
+                // however if the version is the unversioned
+                // then it will destroy everything
+                r.version ? false : true,
                 r.container_id,
                 null,
               );
@@ -1571,7 +1585,13 @@ export class Cache {
       if (dropAllVersions) {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING ${returningElements}`;
         const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)} WHERE "id" = $1), "MTABLE" AS (${deleteQueryBase}) ` +
+          `WITH "ITABLE" AS (SELECT * FROM ${
+            JSON.stringify(selfTable)
+          } WHERE ${
+            JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+          } = $1), "MTABLE" AS (${
+            deleteQueryBase
+          }) ` +
           `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
           deleteQueryBase;
@@ -1657,7 +1677,15 @@ export class Cache {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
           `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElements}`;
         const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)} WHERE "id" = $1 AND "version" = $2), "MTABLE" AS (${deleteQueryBase}) ` +
+          `WITH "ITABLE" AS (SELECT * FROM ${
+            JSON.stringify(selfTable)
+          } WHERE ${
+            JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+          } = $1 AND ${
+            JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)
+          } = $2), "MTABLE" AS (${
+            deleteQueryBase
+          }) ` +
           `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
           deleteQueryBase;
