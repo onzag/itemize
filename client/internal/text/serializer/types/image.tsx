@@ -5,7 +5,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DOMWindow } from "../../../../../util";
 import { IReactifyArg, ISerializationRegistryType } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, IAttrs, reactifyElementBase } from "../base";
@@ -216,6 +216,7 @@ export function registerImage(registry: ISerializationRegistryType) {
                     sizes: arg.element.sizes,
                     src: arg.element.src,
                     srcSet: arg.element.srcSet,
+                    loading: "lazy",
                   } as any)
                 },
               )
@@ -274,7 +275,7 @@ export function registerImage(registry: ISerializationRegistryType) {
         return (
           <div className="image-container">
             <div className="image-pad" style={{ paddingBottom: padPercentage }}>
-              <img alt={arg.element.alt} sizes={arg.element.sizes} src={arg.element.src} srcSet={arg.element.srcSet} />
+              <img alt={arg.element.alt} sizes={arg.element.sizes} src={arg.element.src} srcSet={arg.element.srcSet} loading="lazy" />
               {children}
             </div>
           </div>

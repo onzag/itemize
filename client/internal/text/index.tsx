@@ -6,7 +6,7 @@ import { imageSrcSetRetriever } from "../../components/util";
 import { IConfigRawJSONDataType } from "../../../config";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
-import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement, SERIALIZATION_REGISTRY } from "./serializer";
+import { IRootLevelDocument, serialize as oserialize, deserialize as odeserialize, RichElement, SERIALIZATION_REGISTRY, IReactifyExtraOptions } from "./serializer";
 import { IText } from "./serializer/types/text";
 import { DOMWindow } from "../../../util";
 import { TemplateArgs } from "./serializer/template-args";
@@ -826,6 +826,7 @@ export function renderTemplate(
 export function renderTemplateDynamically(
   document: IRootLevelDocument,
   args: TemplateArgs,
+  options: IReactifyExtraOptions,
 ) {
   if (document === NULL_DOCUMENT) {
     return null;
@@ -842,6 +843,7 @@ export function renderTemplateDynamically(
             key: index,
             templateArgs: args,
             selected: false,
+            extraOptions: options,
           });
         })
       }

@@ -14,6 +14,9 @@ import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
 import { deserialize, renderTemplateDynamically } from "../../../internal/text";
 import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
+import type { IImage } from "../../../internal/text/serializer/types/image";
+import { deserializeElementBase } from "../../../internal/text/serializer/base";
+import { STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 
 /**
  * The current intersection observer
@@ -146,6 +149,7 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
   className?: string;
   Node?: any;
+  onImageSelect?: (arg: IImage, e: MouseEvent) => void;
 }
 
 /**
@@ -273,6 +277,41 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         // so we would execute our lazyloader on the image if we know it needs such
         lazyloaderExecute(img);
       }
+
+      if (this.props.onImageSelect) {
+        let targetEvent: HTMLElement = img;
+        let standalone = true;
+        if (
+          img.parentElement &&
+          img.parentElement.parentElement &&
+          img.parentElement.parentElement.parentElement &&
+          img.parentElement.parentElement.parentElement.classList.contains("image")
+        ) {
+          targetEvent = img.parentElement.parentElement.parentElement;
+          standalone = false;
+        }
+
+        const base = deserializeElementBase(targetEvent);
+
+        const imgInfo: IImage = {
+          ...base,
+          type: "image",
+          containment: "void-block",
+          alt: img.getAttribute("alt") || null,
+          src: img.getAttribute("src") || img.dataset.src,
+          srcId: img.dataset.srcId,
+          srcSet: img.getAttribute("srcset") || img.dataset.srcset || null,
+          sizes: img.getAttribute("sizes") || img.dataset.sizes || null,
+          width: parseInt(img.dataset.srcWidth) || null,
+          height: parseInt(img.dataset.srcHeight) || null,
+          standalone,
+          children: [STANDARD_TEXT_NODE()]
+        };
+
+        targetEvent.addEventListener("click", (e: MouseEvent) => {
+          this.props.onImageSelect(imgInfo, e);
+        });
+      }
     });
 
     // the same can be said about iframe
@@ -324,7 +363,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     const Node = this.props.Node;
     return (
       <Node
-        className={"rich-text"  + (this.props.className ? " " + this.props.className : "")}
+        className={"rich-text" + (this.props.className ? " " + this.props.className : "")}
         ref={this.divref}
         dangerouslySetInnerHTML={{ __html: this.state.html }}
       />
@@ -356,7 +395,7 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
     const deserializedValue = deserialize(this.props.children);
     const Node = this.props.Node;
     return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
-      {renderTemplateDynamically(deserializedValue, this.props.templateArgs)}
+      {renderTemplateDynamically(deserializedValue, this.props.templateArgs, { onImageSelect: this.props.onImageSelect })}
     </Node>;
   }
 }
@@ -391,13 +430,14 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
           className={props.args.className}
           templateArgs={props.args.templateArgs}
           Node={Node}
+          onImageSelect={props.args.onImageSelect}
         >
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className} Node={Node}>
+        <PropertyViewRichTextViewer className={props.args.className} Node={Node} onImageSelect={props.args.onImageSelect}>
           {props.currentValue}
         </PropertyViewRichTextViewer>
       );

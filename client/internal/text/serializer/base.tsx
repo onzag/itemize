@@ -476,6 +476,7 @@ export function reactifyElementBase(
               templateArgs: eachElementContext,
               templateRootArgs: currentTemplateRootArgs,
               templateIgnoreContextualChanges: true,
+              extraOptions: arg.extraOptions,
             }
           );
         }
@@ -534,6 +535,7 @@ export function reactifyElementBase(
             templateArgs: newContext,
             templateRootArgs: currentTemplateRootArgs,
             templateIgnoreContextualChanges: true,
+            extraOptions: arg.extraOptions,
           }
         );
       })
@@ -573,6 +575,7 @@ export function reactifyElementBase(
         templateArgs: currentTemplateArgs,
         templateRootArgs: currentTemplateRootArgs,
         key: index,
+        extraOptions: arg.extraOptions,
       };
 
       // and then we call the reactify
@@ -718,6 +721,7 @@ export function reactifyElementBase(
               templateArgs: currentTemplateArgs,
               templateRootArgs: currentTemplateRootArgs,
               key: index,
+              extraOptions: arg.extraOptions,
             };
 
             // and then we call the reactify

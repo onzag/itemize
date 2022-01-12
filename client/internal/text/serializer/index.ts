@@ -38,7 +38,9 @@ interface IDeserializeRegistryType {
   [attr: string]: DeserializationFn;
 }
 
-
+export interface IReactifyExtraOptions {
+  onImageSelect?: (arg: IImage, e: MouseEvent) => void;
+}
 
 /**
  * The argument that is passed to the reactify function that allows to convert
@@ -89,6 +91,10 @@ export interface IReactifyArg<T> {
    * A key to use in the react component
    */
   key?: number | string;
+  /**
+   * Some extra options for utilities
+   */
+  extraOptions?: IReactifyExtraOptions;
 }
 
 /**

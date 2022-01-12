@@ -26,7 +26,7 @@ Any images that are added to the text should be compounded like this
 <a class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
-      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000">
+      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000" loading="lazy">
     </div>
   </div>
 </a>
@@ -38,7 +38,7 @@ However the attributes `src`, `srcset` and `sizes` might be added as well and it
 <a class="image">
   <div class="image-container">
     <div class="image-pad" style="padding-bottom: 50%">
-      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000" sizes="70vw" src="blob:xxxxxx" srcset="etc...">
+      <img alt="" data-src-height="500" data-src-id="FILE2132131231231" data-src-width="1000" sizes="70vw" src="blob:xxxxxx" srcset="etc..." loading="lazy">
     </div>
   </div>
 </a>
