@@ -171,6 +171,7 @@ export async function blobToTransferrable(blob: File | Blob): Promise<any> {
     const filePath = fileInfo.path;
 
     const file = blob.slice(lastSlicePoint, lastSlicePoint + fileSize, fileType);
+    lastSlicePoint += fileSize;
 
     let currentValueToAssign = jsonRecovered.content;
     filePath.forEach((key, index) => {
