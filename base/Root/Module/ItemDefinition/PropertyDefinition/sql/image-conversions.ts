@@ -126,13 +126,26 @@ export async function runImageConversions(
 
   // we use that for svg types, no need to convert
   if (fileMimeType === "image/svg+xml") {
-    await sqlUploadPipeFile(
-      uploadsClient,
-      imageStream,
-      domain,
-      originalImageFilePath,
-    );
-    return;
+    return new Promise(async (resolve, reject) => {
+      let hasBeenRejected = false;
+      imageStream.on("error", (error) => {
+        !hasBeenRejected && reject(error);
+        hasBeenRejected = true;
+      });
+
+      try {
+        await sqlUploadPipeFile(
+          uploadsClient,
+          imageStream,
+          domain,
+          originalImageFilePath,
+        );
+        !hasBeenRejected && resolve();
+      } catch (err) {
+        !hasBeenRejected && reject(err);
+        hasBeenRejected = true;
+      }
+    });
   }
 
   // the properties in question are, smallDimension
@@ -183,40 +196,89 @@ export async function runImageConversions(
 
   // and now we get the filename without a extension and the dirname
   const fileNameNoExtension = path.basename(fileName, path.extname(fileName));
-  // this is the sharp pipeline that will stream the data directly from the network
-  // this stream hasn't been piped before and has been on hold so far
-  const conversionPipeline = sharp();
-  const conversionPromises = imageConversionOutputs.map((conversionOutput) => {
-    // note how we attach the output name before the filename without a extension and make it
-    // a jpg extension because that's what we want, the original can be anything
-    const outputFileName = path.join(filePath, conversionOutput.name + "_" + fileNameNoExtension + ".jpg");
 
-    // we pass it through a cloned stream for the sharp, and pass the conversion options
-    // note how a converted image is always a jpg image
-    const outputPipeline = conversionPipeline.clone()
-      .resize(conversionOutput.width, conversionOutput.height, {
-        fit: conversionOutput.fit,
-        withoutEnlargement: true,
-      }).rotate().flatten({background: {r: 255, g: 255, b: 255, alpha: 1}}).jpeg();
+  let hasBeenRejected: boolean = false;
+  return new Promise(async (resolve, reject) => {
+    // this is the sharp pipeline that will stream the data directly from the network
+    // this stream hasn't been piped before and has been on hold so far
+    const conversionPipeline = sharp();
+    const conversionPromises = imageConversionOutputs.map((conversionOutput) => {
+      return new Promise<void>(async (cResolve, cReject) => {
+        let hasBeenCRejected: boolean = false;
+        // note how we attach the output name before the filename without a extension and make it
+        // a jpg extension because that's what we want, the original can be anything
+        const outputFileName = path.join(filePath, conversionOutput.name + "_" + fileNameNoExtension + ".jpg");
 
-    return sqlUploadPipeFile(
-      uploadsClient,
-      outputPipeline,
-      domain,
-      outputFileName,
-    );
-  }).concat([
-    sqlUploadPipeFile(
-      uploadsClient,
-      conversionPipeline.clone(),
-      domain,
-      originalImageFilePath,
-    ),
-  ]);
-  // now we pipe the image read stream to the conversion pipeline
-  // that will run the conversions
-  imageStream.pipe(conversionPipeline);
+        // we pass it through a cloned stream for the sharp, and pass the conversion options
+        // note how a converted image is always a jpg image
+        const conversionPipelineCloned = conversionPipeline.clone();
+        conversionPipelineCloned.on("error", (error) => {
+          !hasBeenCRejected && cReject(error);
+          hasBeenCRejected = true;
+        })
+        const outputPipeline =
+          conversionPipelineCloned.resize(conversionOutput.width, conversionOutput.height, {
+            fit: conversionOutput.fit,
+            withoutEnlargement: true,
+          }).rotate().flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } }).jpeg();
 
-  // and we basically create the image for all of those
-  await Promise.all(conversionPromises);
+        try {
+          await sqlUploadPipeFile(
+            uploadsClient,
+            outputPipeline,
+            domain,
+            outputFileName,
+          );
+          !hasBeenCRejected && cResolve();
+        } catch (err) {
+          !hasBeenCRejected && cReject(err);
+          hasBeenCRejected = true;
+        }
+      })
+    }).concat([
+      new Promise<void>(async (cResolve, cReject) => {
+        let hasBeenCRejected: boolean = false;
+
+        const conversionPipelineCloned = conversionPipeline.clone();
+        conversionPipelineCloned.on("error", (error) => {
+          !hasBeenCRejected && cReject(error);
+          hasBeenCRejected = true;
+        })
+
+        try {
+          sqlUploadPipeFile(
+            uploadsClient,
+            conversionPipelineCloned,
+            domain,
+            originalImageFilePath,
+          )
+          !hasBeenCRejected && cResolve();
+        } catch (err) {
+          !hasBeenCRejected && cReject(err);
+          hasBeenCRejected = true;
+        }
+      }),
+    ]);
+
+    // now we pipe the image read stream to the conversion pipeline
+    // that will run the conversions
+    imageStream.pipe(conversionPipeline);
+    conversionPipeline.on("error", (error) => {
+      !hasBeenRejected && reject(error);
+      hasBeenRejected = true;
+    });
+    imageStream.on("error", (error) => {
+      !hasBeenRejected && reject(error);
+      hasBeenRejected = true;
+    });
+
+    // and we basically create the image for all of those
+    try {
+      await Promise.all(conversionPromises);
+      !hasBeenRejected && resolve();
+    } catch (err) {
+      !hasBeenRejected && reject(err);
+      hasBeenRejected = true;
+    }
+  });
 }

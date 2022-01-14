@@ -1534,20 +1534,32 @@ export default class ItemDefinition {
       if (specificProperties && !specificProperties.includes(p.propertyId)) {
         return;
       }
-      const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
-      pInIdef.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
+      try {
+        const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
+        pInIdef.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
+      } catch (err) {
+        console.warn("Could not apply to property " + p.propertyId + " due to state shape incompatibility");
+      }
     });
 
     state.includes.forEach((i) => {
       if (specificIncludes && !specificIncludes.includes(i.includeId)) {
         return;
       }
-      const iInIdef = this.getIncludeFor(i.includeId);
-      iInIdef.setExclusionState(id, version, i.exclusionState);
-      i.itemState.properties.forEach((p) => {
-        const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
-        pInInclude.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
-      });
+      try {
+        const iInIdef = this.getIncludeFor(i.includeId);
+        iInIdef.setExclusionState(id, version, i.exclusionState);
+        i.itemState.properties.forEach((p) => {
+          try {
+            const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
+            pInInclude.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
+          } catch (err) {
+            console.warn("Could not apply to property " + p.propertyId + " in include " + i.includeId + " due to state shape incompatibility");
+          }
+        });
+      } catch (err) {
+        console.warn("Could not apply to include " + i.includeId + " due to state shape incompatibility");
+      }
     });
   }
 

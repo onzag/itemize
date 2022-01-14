@@ -575,7 +575,7 @@ export interface IItemContextType extends IBasicFns {
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
   downloadState: () => Promise<Blob>,
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[]) => Promise<void>,
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: string[]) => Promise<void>,
 
   // the remote listener
   remoteListener: RemoteListener;
