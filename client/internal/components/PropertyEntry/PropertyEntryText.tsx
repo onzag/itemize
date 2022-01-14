@@ -326,11 +326,12 @@ export default class PropertyEntryText
   }
 
   public componentWillUnmount() {
-    Object.keys(this.internalFileCache).forEach((k) => {
-      if (this.internalFileCache[k].url.startsWith("blob:")) {
-        URL.revokeObjectURL(this.internalFileCache[k].url);
-      }
-    });
+    // Now revoking happens when the items are released from the central memory handle
+    // Object.keys(this.internalFileCache).forEach((k) => {
+    //   if (this.internalFileCache[k].url.startsWith("blob:")) {
+    //     URL.revokeObjectURL(this.internalFileCache[k].url);
+    //   }
+    // });
 
     this.activeDataURIs = {};
   }
@@ -417,11 +418,9 @@ export default class PropertyEntryText
 
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
     const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
-    // we assume that our related property has update if a value has been applied in which case we might want to load
-    // such values in the cache
     if (
       relatedPropertyName &&
-      prevProps.state.stateAppliedValue !== this.props.state.stateAppliedValue &&
+      prevProps.state.value !== this.props.state.value &&
       this.props.property.isRichText()
     ) {
       this.cacheCurrentFiles();
@@ -507,6 +506,11 @@ export default class PropertyEntryText
         [...currentValue] : [];
 
       const fileCacheValue = this.internalFileCache[fileId];
+      // we need to recover the blob url because it has been cleaned up
+      // when it was deemed unnecessary
+      if (fileCacheValue.src) {
+        fileCacheValue.url = URL.createObjectURL(fileCacheValue.src as Blob);
+      }
       newValue.push(fileCacheValue);
 
       if (!this.activeDataURIs[fileId]) {
@@ -1019,7 +1023,7 @@ export default class PropertyEntryText
           submit: i18nInLanguage.add_template_html_submit,
         },
 
-        richUIHandlerElement: i18nRoot.rich_ui_handler_element || {},
+        richUIHandlerElement: i18nRoot.rich_ui_handler_element || {},
       } : null,
 
       i18nGenericError: i18nInLanguage.generic_error,

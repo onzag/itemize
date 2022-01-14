@@ -215,11 +215,12 @@ export default class PropertyEntryFile
       !equals(this.state, nextState, { strict: true }) ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
+
   public componentWillUnmount() {
-    // revoke urls on unmount
-    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
-      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
-    });
+    // now revoking happens at base level once the items are cleaned or released
+    // Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+    //   URL.revokeObjectURL(this.ownedObjectURLPool[id]);
+    // });
   }
 
   private getIdOfLastValue() {
@@ -414,7 +415,7 @@ export default class PropertyEntryFile
     avoidChanges: boolean,
   ) {
     const accept = processAccepts(
-      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
+      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
       isExpectingImages,
     );
 

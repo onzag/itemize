@@ -33,6 +33,158 @@ const TIMED_FN_WAIT_LIST: {
 
 type TimedExecutedFn = () => void;
 
+type HeaderType = Array<{
+  type: string;
+  path: string[];
+}>;
+
+interface IExtractedStructure {
+  header: HeaderType;
+  content: any;
+  objs: Array<File | Blob>,
+}
+
+function extractAllFilesAndBlobs(obj: any, headerConcat: string[] = []): IExtractedStructure {
+  if (obj instanceof File || obj instanceof Blob) {
+    return {
+      header: [
+        {
+          type: obj.type || null,
+          path: headerConcat.concat([]),
+        }
+      ],
+      content: null,
+      objs: [
+        obj
+      ],
+    }
+  } else if (Array.isArray(obj)) {
+    let header: HeaderType = [];
+    let objs: Array<File | Blob> = [];
+    const content = obj.map((innerObj, index) => {
+      const extracted = extractAllFilesAndBlobs(innerObj, headerConcat.concat([index.toString()]));
+      header = header.concat(extracted.header);
+      objs = objs.concat(extracted.objs);
+
+      return extracted.content;
+    });
+
+    return {
+      header,
+      objs,
+      content,
+    }
+  } else if (typeof obj === "object" && obj) {
+    let header: HeaderType = [];
+    let objs: Array<File | Blob> = [];
+    let content: any = {};
+    Object.keys(obj).forEach((key) => {
+      const extracted = extractAllFilesAndBlobs(obj[key], headerConcat.concat([key]));
+      header = header.concat(extracted.header);
+      objs = objs.concat(extracted.objs);
+
+      content[key] = extracted.content;
+    });
+
+    return {
+      header,
+      objs,
+      content,
+    }
+  } else {
+    return {
+      header: [],
+      objs: [],
+      content: obj,
+    }
+  }
+}
+
+/**
+ * Converts a transferrable object, that contains blobs within its structure
+ * to a simple blob that contains everything including these blobs
+ * @param transferrable the transferrable object
+ * @returns a blob that contains everything
+ */
+export function transferrableToBlob(transferrable: any): Blob {
+  const extracted = extractAllFilesAndBlobs(transferrable);
+  const jsonContent = {
+    header: extracted.header,
+    content: extracted.content,
+  };
+
+  const filesHeader = extracted.objs.map((f) => f.size);
+  const contentBlob = new Blob([JSON.stringify(jsonContent)], {
+    type: "application/json",
+  });
+
+  // end of header
+  filesHeader.push(0);
+  filesHeader.push(contentBlob.size);
+  filesHeader.push(0);
+
+  const headerFormatted = new Uint32Array(filesHeader.length);
+  filesHeader.forEach((element, index) => headerFormatted[index] = element);
+
+  const finalBlob = new Blob([headerFormatted, contentBlob].concat(extracted.objs));
+  return finalBlob;
+}
+
+/**
+ * Converts a blob back into the json transferrable form
+ * @param blob 
+ */
+export async function blobToTransferrable(blob: File | Blob): Promise<any> {
+  const arrayBuffer = await blob.arrayBuffer();
+  const uint8 = new Uint8Array(arrayBuffer);
+
+  let contentBlobSize: number = null;
+  let nextIsBlobSize: boolean = false;
+  let headerByteLen: number = 0;
+  const fileSizes: number[] = [];
+
+  for (let i = 0; i < uint8.length; i += 4) {
+    const b1 = uint8[i];
+    const b2 = uint8[i + 1];
+    const b3 = uint8[i + 2];
+    const b4 = uint8[i + 3];
+    const value = (b4 << 24) | (b3 << 16) | (b2 << 8) | (b1);
+
+    headerByteLen += 4;
+    if (value === 0 && contentBlobSize) {
+      break;
+    } else if (value === 0) {
+      nextIsBlobSize = true;
+    } else if (nextIsBlobSize) {
+      contentBlobSize = value;
+    } else {
+      fileSizes.push(value);
+    }
+  }
+
+  const jsonRecovered = JSON.parse(await blob.slice(headerByteLen, headerByteLen + contentBlobSize, "application/json").text());
+  let lastSlicePoint = headerByteLen + contentBlobSize;
+
+  (jsonRecovered.header as HeaderType).map((fileInfo, index) => {
+    const fileSize = fileSizes[index];
+    const fileType = fileInfo.type;
+    const filePath = fileInfo.path;
+
+    const file = blob.slice(lastSlicePoint, lastSlicePoint + fileSize, fileType);
+
+    let currentValueToAssign = jsonRecovered.content;
+    filePath.forEach((key, index) => {
+      if (index !== filePath.length - 1) {
+        currentValueToAssign = currentValueToAssign[key];
+      } else {
+        currentValueToAssign[key] = file;
+      }
+    });
+  });
+
+  return jsonRecovered.content;
+}
+
 /**
  * Delays the execution of a function by given milliseconds
  * ensure these do not stack together

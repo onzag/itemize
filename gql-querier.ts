@@ -97,7 +97,7 @@ export interface IGQLFile {
   /**
    * A source, either a File, Blob or a read stream
    */
-  src?: File | Blob | Promise<any>;
+  src?: File | Blob | Promise<any>;
 }
 
 /**

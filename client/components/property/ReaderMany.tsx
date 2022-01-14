@@ -18,7 +18,7 @@ interface IReaderManyInternalProps extends IReaderManyProps {
 }
 
 class ReaderManyInternal extends React.Component<IReaderManyInternalProps> {
-  constructor(props: IReaderManyInternalProps) {
+  constructor(props: IReaderManyInternalProps) {
     super(props);
 
     this.renderNextInternal = this.renderNextInternal.bind(this);

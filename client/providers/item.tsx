@@ -37,6 +37,7 @@ import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
+import { transferrableToBlob, blobToTransferrable } from "../../util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -142,39 +143,6 @@ function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOp
   }
 
   return !equals(searchA, searchB);
-}
-
-/**
- * Rips the internal values from the state so it can be
- * serialized
- * @param state 
- */
-function getSerializableState(state: IItemStateType): IItemStateType {
-  const newState: IItemStateType = {
-    ...state,
-    properties: [
-      ...state.properties,
-    ],
-    includes: [
-      ...state.includes
-    ]
-  };
-
-  newState.properties.forEach((p, index) => {
-    newState.properties[index] = {
-      ...p,
-      internalValue: null,
-    };
-  });
-
-  newState.includes.forEach((i, index) => {
-    newState.includes[index] = {
-      ...i,
-      itemState: getSerializableState(i.itemState)
-    };
-  });
-
-  return newState;
 }
 
 /**
@@ -606,6 +574,8 @@ export interface IItemContextType extends IBasicFns {
   dismissDeleted: () => void;
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
+  downloadState: () => Promise<Blob>,
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[]) => Promise<void>,
 
   // the remote listener
   remoteListener: RemoteListener;
@@ -1074,6 +1044,8 @@ export class ActualItemProvider extends
     this.installPrefills = this.installPrefills.bind(this);
     this.blockCleanup = this.blockCleanup.bind(this);
     this.releaseCleanupBlock = this.releaseCleanupBlock.bind(this);
+    this.loadStateFromFile = this.loadStateFromFile.bind(this);
+    this.downloadState = this.downloadState.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
@@ -2031,6 +2003,26 @@ export class ActualItemProvider extends
       loaded: true,
     });
   }
+  public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: string[]) {
+    await this.props.itemDefinitionInstance.applyStateFromPackage(
+      this.props.forId || null,
+      this.props.forVersion || null,
+      state,
+      specificProperties,
+      specificIncludes,
+    );
+    this.props.itemDefinitionInstance.triggerListeners(
+      "change",
+      this.props.forId || null,
+      this.props.forVersion || null,
+    );
+  }
+  public async downloadState(): Promise<Blob> {
+    return this.props.itemDefinitionInstance.getStatePackage(
+      this.props.forId || null,
+      this.props.forVersion || null,
+    );
+  }
   public async loadStoredState() {
     if (CacheWorkerInstance.isSupported) {
       const storedState = await CacheWorkerInstance.instance.retrieveState(
@@ -2044,6 +2036,12 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
           storedState,
+        );
+        this.props.itemDefinitionInstance.triggerListeners(
+          "change",
+          this.props.forId || null,
+          this.props.forVersion || null,
+          this.changeListener,
         );
         this.setState({
           itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -3377,7 +3375,7 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
-        const serializable = getSerializableState(state);
+        const serializable = ItemDefinition.getSerializableState(state);
         storedState = await CacheWorkerInstance.instance.storeState(
           // eh its the same as itemDefinitionToRetrieveDataFrom
           this.props.itemDefinitionQualifiedName,
@@ -3902,7 +3900,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: getSerializableState(stateOfSearch),
+                  searchIdefState: ItemDefinition.getSerializableState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged || isReloadSearch,
@@ -3974,7 +3972,7 @@ export class ActualItemProvider extends
                 [options.storeResultsInNavigation]: {
                   searchId,
                   searchState,
-                  searchIdefState: getSerializableState(stateOfSearch),
+                  searchIdefState: ItemDefinition.getSerializableState(stateOfSearch),
                 }
               },
               initialAutomatic || rFlagged,
@@ -4246,6 +4244,8 @@ export class ActualItemProvider extends
           remoteListener: this.props.remoteListener,
           injectSubmitBlockPromise: this.injectSubmitBlockPromise,
           injectedParentContext: this.props.injectedParentContext,
+          downloadState: this.downloadState,
+          loadStateFromFile: this.loadStateFromFile,
         }}
       >
         {this.props.children}

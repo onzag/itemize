@@ -1784,6 +1784,35 @@ export default class PropertyDefinition {
     delete this.stateLastCached[mergedIDWithoutExternal1];
     delete this.stateLastCached[mergedIDWithoutExternal2];
 
+    // let's clean up object urls that are in memory
+    // only truly happens client side
+    if ((this.getType() === "files" || this.getType() === "file") && URL.revokeObjectURL) {
+      const actualValue = this.stateValue[mergedID];
+      const previousValue = currentValue;
+
+      // we will revoke anything of the urls that are in memory for files
+      if (previousValue) {
+        if (this.getType() === "file") {
+          if (
+            (previousValue as IGQLFile).url.startsWith("blob:") &&
+            (!actualValue || (actualValue as IGQLFile).url !== (previousValue as IGQLFile).url)
+          ) {
+            URL.revokeObjectURL((previousValue as IGQLFile).url);
+          }
+        } else {
+          (previousValue as IGQLFile[]).forEach((p) => {
+            if (!p.url.startsWith("blob:")) {
+              return;
+            }
+            const shouldRevoke = actualValue ? !(actualValue as IGQLFile[]).find((v) => v.url === p.url) : true;
+            if (shouldRevoke) {
+              URL.revokeObjectURL(p.url);
+            }
+          });
+        }
+      }
+    }
+
     if (this.listeners.length) {
       const valueDiffers = !equals(this.stateValue[mergedID] || null, currentValue, { strict: true });
       if (valueDiffers) {
@@ -1805,6 +1834,26 @@ export default class PropertyDefinition {
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
+  
+    // let's clean up object urls that are in memory
+    // only truly happens client side
+    if ((this.getType() === "files" || this.getType() === "file") && URL.revokeObjectURL) {
+      const actualValue = this.stateValue[mergedID];
+
+      // we will revoke anything of the urls that are in memory for files
+      if (actualValue) {
+        if (this.getType() === "file") {
+          if ((actualValue as IGQLFile).url.startsWith("blob:")) {
+            URL.revokeObjectURL((actualValue as IGQLFile).url);
+          }
+        } else {
+          (actualValue as IGQLFile[]).forEach((p) => {
+            p.url.startsWith("blob:") && URL.revokeObjectURL(p.url);
+          });
+        }
+      }
+    }
+
     delete this.stateValue[mergedID];
     delete this.stateValueModified[mergedID];
     delete this.stateInternalValue[mergedID];

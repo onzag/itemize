@@ -28,9 +28,11 @@ import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../gql-util";
-import { IGQLValue, IGQLRequestFields } from "../../../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLFile } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
-import { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
+import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
+import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
+import type { IConfigRawJSONDataType } from "../../../../config";
 
 /**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
@@ -394,6 +396,87 @@ export interface IPoliciesType {
   parent?: IPolicyType;
 }
 
+function resolveFile(
+  file: IGQLFile,
+  propertyId: string,
+  include: string,
+  originalState: IItemStateType,
+  root: Root,
+  config: IConfigRawJSONDataType,
+): IGQLFile {
+  const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
+
+  const containerId: string = (originalState.gqlOriginalFlattenedValue &&
+    originalState.gqlOriginalFlattenedValue.container_id as string) || null;
+
+  const idef = root.registry[originalState.itemDefQualifiedName] as ItemDefinition;
+
+  return fileURLAbsoluter(
+    domain,
+    config.containersHostnamePrefixes,
+    file,
+    idef,
+    originalState.forId,
+    originalState.forVersion,
+    containerId,
+    include ? idef.getIncludeFor(include) : null,
+    idef.getPropertyDefinitionFor(propertyId, true),
+    false,
+  );
+}
+
+function recoverBlobFiles(
+  value: any,
+): any {
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(recoverBlobFiles);
+  }
+
+  if (value.src instanceof Blob || value.src instanceof File) {
+    return {
+      ...value,
+      url: URL.createObjectURL(value.src),
+    }
+  }
+
+  return value;
+}
+
+async function resolveFiles(
+  p: IPropertyDefinitionState,
+  include: string,
+  originalState: IItemStateType,
+  root: Root,
+  config: IConfigRawJSONDataType,
+): Promise<void> {
+  if (!p.stateValue || typeof p.stateValue !== "object") {
+    return;
+  }
+
+  if (Array.isArray(p.stateValue)) {
+    await Promise.all(p.stateValue.map(async (v, index) => {
+      if (!v || typeof v !== "object" || !v.url || v.src) {
+        return;
+      }
+
+      const resolvedFile = resolveFile(v, p.propertyId, include, originalState, root, config);
+
+      const blob = await (await fetch(resolvedFile.url)).blob();
+      p.stateValue[index].src = blob;
+    }));
+
+    return;
+  } else if (p.stateValue.url && !p.stateValue.src) {
+    const resolvedFile = resolveFile(p.stateValue, p.propertyId, include, originalState, root, config);
+    const blob = await (await fetch(resolvedFile.url)).blob();
+    p.stateValue.src = blob;
+  }
+}
+
 /**
  * This is the max expression, the item definition class
  * which basically compounds all how this is defined
@@ -478,6 +561,66 @@ export default class ItemDefinition {
 
     // We return the definition or null on its defect
     return definition || null;
+  }
+
+  /**
+   * Rips the internal values from the state so it can be
+   * serialized, the serialized state removes possible useless data
+   * @param state 
+   */
+  public static getSerializableState(state: IItemStateType): IItemStateType {
+    const newState: IItemStateType = {
+      forId: state.forId,
+      forVersion: state.forVersion,
+      itemDefName: state.itemDefName,
+      itemDefQualifiedName: state.itemDefQualifiedName,
+      moduleName: state.moduleName,
+      properties: [
+        ...state.properties,
+      ],
+      includes: [
+        ...state.includes
+      ]
+    } as any;
+
+    newState.properties.forEach((p, index) => {
+      newState.properties[index] = {
+        stateValue: p.stateValue,
+        stateValueModified: p.stateValueModified,
+        propertyId: p.propertyId,
+      } as any;
+    });
+
+    newState.includes.forEach((i, index) => {
+      newState.includes[index] = {
+        includeId: i.includeId,
+        exclusionState: i.exclusionState,
+        itemState: ItemDefinition.getSerializableState(i.itemState),
+      } as any;
+    });
+
+    return newState;
+  }
+
+  /**
+   * Rips the internal values from the state so it can be
+   * serialized, the serialized state removes possible useless data
+   * @param state 
+   */
+  public static async getSerializableStateWithFiles(state: IItemStateType, root: Root, config: IConfigRawJSONDataType): Promise<IItemStateType> {
+    const newState: IItemStateType = ItemDefinition.getSerializableState(state);
+
+    await Promise.all(newState.properties.map((p) => {
+      return resolveFiles(p, null, state, root, config);
+    }));
+
+    await Promise.all(newState.includes.map((i) => {
+      return Promise.all(i.itemState.properties.map((p) => {
+        return resolveFiles(p, i.includeId, state, root, config);
+      }));
+    }));
+
+    return newState;
   }
 
   /**
@@ -1205,6 +1348,40 @@ export default class ItemDefinition {
   }
 
   /**
+   * Only works in the client side, provides a blob package of the current
+   * state of the item definition
+   * @param id 
+   * @param version 
+   * @param emulateExternalChecking 
+   * @param onlyIncludeProperties 
+   * @param onlyIncludeIncludes 
+   * @param excludePolicies 
+   * @returns 
+   */
+  public async getStatePackage(
+    id: string,
+    version: string,
+    emulateExternalChecking?: boolean,
+    onlyIncludeProperties?: string[],
+    onlyIncludeIncludes?: { [include: string]: string[] },
+    excludePolicies?: boolean,
+  ): Promise<Blob> {
+    const state = await ItemDefinition.getSerializableStateWithFiles(
+      this.getStateNoExternalChecking(
+        id,
+        version,
+        emulateExternalChecking,
+        onlyIncludeProperties,
+        onlyIncludeIncludes,
+        excludePolicies
+      ),
+      this.getParentModule().getParentRoot(),
+      window.CONFIG,
+    );
+    return transferrableToBlob(state);
+  }
+
+  /**
    * same as getCurrentValue but ignores external checking
    * so it doesn't have to be async and no need to spend
    * network resources, checks most, but ignores unique checkings
@@ -1350,20 +1527,39 @@ export default class ItemDefinition {
     id: string,
     version: string,
     state: IItemStateType,
+    specificProperties?: string[],
+    specificIncludes?: string[],
   ) {
     state.properties.forEach((p) => {
+      if (specificProperties && !specificProperties.includes(p.propertyId)) {
+        return;
+      }
       const pInIdef = this.getPropertyDefinitionFor(p.propertyId, true);
-      pInIdef.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
+      pInIdef.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
     });
 
     state.includes.forEach((i) => {
+      if (specificIncludes && !specificIncludes.includes(i.includeId)) {
+        return;
+      }
       const iInIdef = this.getIncludeFor(i.includeId);
       iInIdef.setExclusionState(id, version, i.exclusionState);
       i.itemState.properties.forEach((p) => {
         const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
-        pInInclude.applyValue(id, version, p.stateValue, p.stateValueModified, false, true);
+        pInInclude.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
       });
     });
+  }
+
+  public async applyStateFromPackage(
+    id: string,
+    version: string,
+    state: Blob | File,
+    specificProperties?: string[],
+    specificIncludes?: string[],
+  ) {
+    const stateObj = await blobToTransferrable(state);
+    return this.applyState(id, version, stateObj, specificProperties, specificIncludes);
   }
 
   /**
@@ -2350,9 +2546,9 @@ export default class ItemDefinition {
 
       if (!hasParentingRoleAccess && throwError) {
         throw new EndpointError({
-          message: message || `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
+          message: message || `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
             ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
-          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
+          code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
     } else {

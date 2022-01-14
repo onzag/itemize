@@ -205,9 +205,9 @@ export default class PropertyEntryFile
   }
   public componentWillUnmount() {
     // revoke urls on unmount
-    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
-      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
-    });
+    // Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+    //   URL.revokeObjectURL(this.ownedObjectURLPool[id]);
+    // });
   }
 
   /**

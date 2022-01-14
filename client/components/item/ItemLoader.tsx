@@ -48,6 +48,16 @@ export interface IItemLoaderInfoArgType {
    * A function that allows to try to reload the element
    */
   reload: () => Promise<IBasicActionResponse>;
+  /**
+   * Allows to download the current state of the item, including
+   * its files and download them
+   */
+  downloadState: () => Promise<Blob>;
+  /**
+   * Allows to load the state from a file that has previously
+   * been downloaded and packaged
+   */
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: string[]) => Promise<void>;
 }
 
 /**
@@ -90,6 +100,8 @@ class ActualItemLoader extends React.Component<IActualItemLoaderProps> {
         hasBlockedAccess: this.props.itemContext.blockedButDataAccessible,
         error: this.props.itemContext.loadError,
         reload: this.props.itemContext.reload,
+        downloadState: this.props.itemContext.downloadState,
+        loadStateFromFile: this.props.itemContext.loadStateFromFile,
       },
     );
   }
