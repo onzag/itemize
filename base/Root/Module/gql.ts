@@ -8,7 +8,6 @@
 import {
   RESERVED_BASE_PROPERTIES,
   PREFIX_SEARCH,
-  RESERVED_IDEF_SEARCH_PROPERTIES,
   EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES,
   SEARCH_RECORDS_CONTAINER_GQL,
   PREFIX_GET_LIST,
@@ -16,6 +15,7 @@ import {
   ENDPOINT_ERRORS,
   PREFIX_TRADITIONAL_SEARCH,
   ORDERBY_RULE,
+  RESERVED_MODULE_SEARCH_PROPERTIES,
 } from "../../../constants";
 import { GraphQLList, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType, GraphQLString } from "graphql";
 import Module from ".";
@@ -268,7 +268,7 @@ export function getGQLQueryFieldsForModule(
         propertiesAsInput: true,
         optionalForm: true,
       }),
-      ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
+      ...RESERVED_MODULE_SEARCH_PROPERTIES(orderByRule),
     };
 
     fields = {

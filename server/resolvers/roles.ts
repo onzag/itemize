@@ -47,9 +47,9 @@ export interface ICustomRoleType {
 }
 
 export class CustomRoleManager {
-  private filteredRoles: ICustomRoleType[];
-  private allRoles: ICustomRoleType[];
-  private granteds: {[role: string]: ICustomRoleManagerRoleStatus};
+  public filteredRoles: ICustomRoleType[];
+  public allRoles: ICustomRoleType[];
+  public granteds: {[role: string]: ICustomRoleManagerRoleStatus};
   private argEnv: ICustomRoleGranterArg;
   constructor(allRoles: ICustomRoleType[], env: ICustomRoleGranterArg) {
     const modulePath = env.module.getPath();
@@ -91,7 +91,7 @@ export class CustomRoleManager {
   async checkRoleAccessFor(allowedRoles: string[]): Promise<ICustomRoleManagerRoleStatus> {
     const allowedRolesByPriority = allowedRoles.map((r) => {
       return this.filteredRoles.find((r2) => r === r2.role);
-    }).filter((r) => !!r).sort((a, b) => (a.priority || 0) - (b.priority || 0));
+    }).filter((r) => !!r).sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
     // we must loop but also fetch our first denial
     // as that would be our main error by priority

@@ -404,6 +404,10 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   limit: number;
   offset: number;
   /**
+   * Types to search as, only truly usable on module based search
+   */
+  types?: string[];
+  /**
    * By default when searching if a field is valued as null
    * then it will not be searched by it, the search action will delete
    * all null attributes, however if this flag is enabled these nulls will
@@ -3770,6 +3774,13 @@ export class ActualItemProvider extends
       forId: null,
       forVersion: null,
     });
+
+    let types: string[] = null;
+    if (options.types) {
+      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+      types = options.types.map((t) => root.registry[t].getQualifiedPathName());
+    }
+
     // while these search fields are of virtually no use for standard searchs
     // these are used when doing a traditional search and when doing a search
     // in a cache policy mode
@@ -3821,6 +3832,7 @@ export class ActualItemProvider extends
           direction: "desc",
         }
       },
+      types,
       traditional: !!options.traditional,
       token: this.props.tokenData.token,
       language: this.props.localeData.language,

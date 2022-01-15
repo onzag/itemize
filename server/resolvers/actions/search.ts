@@ -143,6 +143,57 @@ export async function searchModule(
     true,
   );
 
+  // because we have just checked that our properties have the role access
+  // this is not enough, because we must also check that the given children
+  // have the basic readRoleAccess as well into them
+  let typesToCheckReadToo: ItemDefinition[];
+  if (!resolverArgs.args.types) {
+    typesToCheckReadToo = mod.getAllChildDefinitionsRecursive();
+  } else {
+    typesToCheckReadToo = resolverArgs.args.types.map((t: string) => {
+      const idef = appData.root.registry[t] as ItemDefinition;
+      if (!idef) {
+        throw new EndpointError({
+          message: "Invalid item type: " + t,
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      } else if (!(idef instanceof ItemDefinition)) {
+        throw new EndpointError({
+          message: "Invalid item type " + t + ", not an Item Definition",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      } else if (idef.getParentModule() !== mod) {
+        throw new EndpointError({
+          message: "Invalid item type " + t + ", not a child of " + mod.getQualifiedPathName(),
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        });
+      }
+
+      return idef;
+    });
+  }
+
+  for (let t of typesToCheckReadToo) {
+    const specificRolesManager = rolesManager.subEnvironment({
+      item: t,
+    });
+
+    await t.checkRoleAccessFor(
+      ItemDefinitionIOActions.READ,
+      tokenData.role,
+      tokenData.id,
+      ownerToCheckAgainst,
+      // we are now not checking for any property just
+      // the item as a whole
+      // because we are just dealing with prop extensions
+      // so this is irrelevant, and using it will just re-execute
+      // what has already been done so
+      {},
+      specificRolesManager,
+      true,
+    );
+  }
+
   let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
   const generalFields = graphqlFields(resolverArgs.info);
@@ -254,7 +305,10 @@ export async function searchModule(
 
   // if we filter by type
   if (resolverArgs.args.types) {
-    queryModel.whereBuilder.andWhere(`"type" = ANY(?)`, [resolverArgs.args.types]);
+    queryModel.whereBuilder.andWhere(
+      `"type" = ANY(ARRAY[${resolverArgs.args.types.map(() => "?").join(",")}]::TEXT[])`,
+      resolverArgs.args.types,
+    );
   }
 
   const limit: number = resolverArgs.args.limit;

@@ -242,6 +242,8 @@ async function checkOne(
   // if there is no DATA aka the item is blocked
   } else if (!value.DATA) {
     shouldBeIncluded = false;
+  } else if (searchArgs.types && !searchArgs.types.includes(searchRecord.type)) {
+    shouldBeIncluded = false;
   }
 
   // otherwise if it passed that, let's check more specifically

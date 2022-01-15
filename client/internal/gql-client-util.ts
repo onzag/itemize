@@ -1168,6 +1168,7 @@ interface IRunSearchQueryArg {
     id: string,
     version: string,
   };
+  types?: string[];
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
   cacheStoreMetadata?: any,
   cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction,
@@ -1269,6 +1270,10 @@ export async function runSearchQueryFor(
 
   if (arg.since) {
     searchArgs.since = arg.since;
+  }
+
+  if (arg.types) {
+    searchArgs.types = arg.types;
   }
 
   if (arg.parentedBy) {

@@ -1189,50 +1189,10 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
  * These apply when doing module searches
  */
 export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
-  ...RESERVED_IDEF_SEARCH_PROPERTIES,
-  limit: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
-    description: "The SQL limit to use in order to page the amount of results",
-  },
-  offset: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
-    description: "The SQL offset to use in order to page the amount of results",
-  },
+  ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
   types: {
     type: GraphQLList && GraphQLList(GraphQLNonNull(GraphQLString)),
     description: "A list of types (qualified names) to filter by",
-  },
-  since: {
-    type: GraphQLString,
-    description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
-  },
-  order_by: {
-    type: GraphQLNonNull && orderByRule && GraphQLNonNull(orderByRule),
-    description: "An order type",
-  },
-  created_by: {
-    type: GraphQLString,
-    description: "An specified owner to filter by (this affects permissions)",
-  },
-  parent_id: {
-    type: GraphQLString,
-    description: "a parent id for the item (must be specified with parent_type)",
-  },
-  parent_version: {
-    type: GraphQLString,
-    description: "a parent version for the item (must be specified with parent_type)",
-  },
-  parent_type: {
-    type: GraphQLString,
-    description: "a parent item definition qualified path (must be specified with parent_id)",
-  },
-  version_filter: {
-    type: GraphQLString,
-    description: "Allow only items that are of this version",
-  },
-  search: {
-    type: GraphQLString,
-    description: "A search string",
   },
 });
 
