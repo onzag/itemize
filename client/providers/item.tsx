@@ -37,7 +37,6 @@ import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
-import { transferrableToBlob, blobToTransferrable } from "../../util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -2024,7 +2023,6 @@ export class ActualItemProvider extends
     return this.props.itemDefinitionInstance.getStatePackage(
       this.props.forId || null,
       this.props.forVersion || null,
-      false,
       specificProperties,
       specificIncludes,
       true,

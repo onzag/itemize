@@ -1371,7 +1371,6 @@ export default class ItemDefinition {
   public async getStatePackage(
     id: string,
     version: string,
-    emulateExternalChecking?: boolean,
     onlyIncludeProperties?: string[],
     onlyIncludeIncludes?: { [include: string]: string[] },
     excludePolicies?: boolean,
@@ -1380,7 +1379,7 @@ export default class ItemDefinition {
       this.getStateNoExternalChecking(
         id,
         version,
-        emulateExternalChecking,
+        false,
         onlyIncludeProperties,
         onlyIncludeIncludes,
         excludePolicies
