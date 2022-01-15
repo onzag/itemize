@@ -216,6 +216,30 @@ export function checkItemDefinition(
     );
   }
 
+  if (rawData.parentMaxChildCountSameType && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting parentMaxChildCountSameType without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("parentMaxChildCountSameType"),
+    );
+  } else if (rawData.parentMaxChildCountSameType <= 0) {
+    throw new CheckUpError(
+      "Setting parentMaxChildCountSameType cannot be less or equal to zero",
+      actualTraceback.newTraceToBit("parentMaxChildCountSameType"),
+    );
+  }
+
+  if (rawData.parentMaxChildCountAnyType && !rawData.canBeParentedBy) {
+    throw new CheckUpError(
+      "Setting parentMaxChildCountAnyType without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("parentMaxChildCountAnyType"),
+    );
+  } else if (rawData.parentMaxChildCountAnyType <= 0) {
+    throw new CheckUpError(
+      "Setting parentMaxChildCountAnyType cannot be less or equal to zero",
+      actualTraceback.newTraceToBit("parentMaxChildCountAnyType"),
+    );
+  }
+
   // Also these two must be specified together
   if (rawData.enableReparenting && !rawData.canBeParentedBy) {
     throw new CheckUpError(

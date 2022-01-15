@@ -53,7 +53,7 @@ export class CustomRoleManager {
   private argEnv: ICustomRoleGranterArg;
   constructor(allRoles: ICustomRoleType[], env: ICustomRoleGranterArg) {
     const modulePath = env.module.getPath();
-    const idefPath = env.item.getPath();
+    const idefPath = env.item && env.item.getPath();
 
     this.allRoles = allRoles;
 

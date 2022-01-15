@@ -52,12 +52,12 @@ export interface IItemLoaderInfoArgType {
    * Allows to download the current state of the item, including
    * its files and download them
    */
-  downloadState: () => Promise<Blob>;
+  downloadState: (specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<Blob>;
   /**
    * Allows to load the state from a file that has previously
    * been downloaded and packaged
    */
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: string[]) => Promise<void>;
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<void>;
 }
 
 /**

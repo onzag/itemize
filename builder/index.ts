@@ -108,6 +108,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   readRoleAccess?: string[];
   parentingRoleAccess?: string[];
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
+  parentMaxChildCountSameType?: number;
+  parentMaxChildCountAnyType?: number;
   customIdRoleAccess?: string[];
   canCreateInBehalf?: boolean;
   canCreateInBehalfRoleAccess?: string[];
@@ -692,6 +694,14 @@ async function buildItemDefinition(
 
   if (actualEvaledFileData.canBeParentedBy) {
     finalValue.canBeParentedBy = actualEvaledFileData.canBeParentedBy;
+  }
+
+  if (actualEvaledFileData.parentMaxChildCountSameType) {
+    finalValue.parentMaxChildCountSameType = actualEvaledFileData.parentMaxChildCountSameType;
+  }
+
+  if (actualEvaledFileData.parentMaxChildCountAnyType) {
+    finalValue.parentMaxChildCountAnyType = actualEvaledFileData.parentMaxChildCountAnyType;
   }
 
   if (actualEvaledFileData.canCreateInBehalf) {

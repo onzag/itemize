@@ -252,6 +252,16 @@ export interface IItemDefinitionRawJSONDataType {
    */
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
   /**
+   * Limits the number of children that can be parented
+   * by the same type
+   */
+  parentMaxChildCountSameType?: number;
+  /**
+   * Limits the number of children that can be parented
+   * by the any type
+   */
+  parentMaxChildCountAnyType?: number;
+  /**
    * Allows to move children from one parent to another
    * by providing a new parent during edit
    */
@@ -1528,7 +1538,7 @@ export default class ItemDefinition {
     version: string,
     state: IItemStateType,
     specificProperties?: string[],
-    specificIncludes?: string[],
+    specificIncludes?: {[includeId: string]: string[]},
   ) {
     state.properties.forEach((p) => {
       if (specificProperties && !specificProperties.includes(p.propertyId)) {
@@ -1543,13 +1553,17 @@ export default class ItemDefinition {
     });
 
     state.includes.forEach((i) => {
-      if (specificIncludes && !specificIncludes.includes(i.includeId)) {
+      if (specificIncludes && !specificIncludes[i.includeId]) {
         return;
       }
       try {
         const iInIdef = this.getIncludeFor(i.includeId);
         iInIdef.setExclusionState(id, version, i.exclusionState);
         i.itemState.properties.forEach((p) => {
+          if (specificIncludes && !specificIncludes[i.includeId].includes(p.propertyId)) {
+            return;
+          }
+
           try {
             const pInInclude = iInIdef.getSinkingPropertyFor(p.propertyId);
             pInInclude.applyValue(id, version, recoverBlobFiles(p.stateValue), p.stateValueModified, false, true);
@@ -1568,7 +1582,7 @@ export default class ItemDefinition {
     version: string,
     state: Blob | File,
     specificProperties?: string[],
-    specificIncludes?: string[],
+    specificIncludes?: {[includeId: string]: string[]},
   ) {
     const stateObj = await blobToTransferrable(state);
     return this.applyState(id, version, stateObj, specificProperties, specificIncludes);
@@ -2472,6 +2486,14 @@ export default class ItemDefinition {
 
   public getParentingRule() {
     return this.rawData.parentingRule || "MANY";
+  }
+
+  public getParentingMaxChildCountSameType() {
+    return this.rawData.parentMaxChildCountSameType || null;
+  }
+
+  public getParentingMaxChildCountAnyType() {
+    return this.rawData.parentMaxChildCountAnyType || null;
   }
 
   /**

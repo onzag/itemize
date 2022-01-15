@@ -574,8 +574,8 @@ export interface IItemContextType extends IBasicFns {
   dismissDeleted: () => void;
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
-  downloadState: () => Promise<Blob>,
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: string[]) => Promise<void>,
+  downloadState: (specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<Blob>,
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<void>,
 
   // the remote listener
   remoteListener: RemoteListener;
@@ -2003,7 +2003,7 @@ export class ActualItemProvider extends
       loaded: true,
     });
   }
-  public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: string[]) {
+  public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: {[includeId: string]: string[]}) {
     await this.props.itemDefinitionInstance.applyStateFromPackage(
       this.props.forId || null,
       this.props.forVersion || null,
@@ -2017,10 +2017,17 @@ export class ActualItemProvider extends
       this.props.forVersion || null,
     );
   }
-  public async downloadState(): Promise<Blob> {
+  public async downloadState(specificProperties?: string[], specificIncludes?: {[includeId: string]: string[]}): Promise<Blob> {
+    if (!this.lastLoadValuePromiseIsResolved) {
+      await this.lastLoadValuePromise;
+    }
     return this.props.itemDefinitionInstance.getStatePackage(
       this.props.forId || null,
       this.props.forVersion || null,
+      false,
+      specificProperties,
+      specificIncludes,
+      true,
     );
   }
   public async loadStoredState() {

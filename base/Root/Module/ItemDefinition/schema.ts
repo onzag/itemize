@@ -255,6 +255,12 @@ export default {
       items: itemReferenceSchema,
       minItems: 1,
     },
+    parentMaxChildCountSameType: {
+      type: "number",
+    },
+    parentMaxChildCountAnyType: {
+      type: "number",
+    },
     mustBeParented: {
       type: "boolean",
     },
@@ -289,7 +295,7 @@ export default {
     versionIsCountry: {
       type: "boolean",
     },
-    requestLimiters: {
+    requestLimiters: {
       type: "object",
       properties: {
         condition: {

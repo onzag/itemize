@@ -175,25 +175,55 @@ export async function validateParentingRules(
     itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
 
     const parentingRule = itemDefinition.getParentingRule();
-    if (parentingRule === "ONCE") {
-      const valueExists =
+    const maxChildCountSameType = itemDefinition.getParentingMaxChildCountSameType();
+    const maxChildCountAnyType = itemDefinition.getParentingMaxChildCountAnyType();
+    if (parentingRule === "ONCE" || maxChildCountSameType) {
+      const valueCount =
         await appData.databaseConnection.queryFirst(
-          `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND "parent_id"=$3 AND "parent_version"=$4`,
+          `SELECT COUNT(*) AS "count" FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND "parent_id"=$3 AND "parent_version"=$4`,
           [
             itemDefinition.getQualifiedPathName(),
             parentingItemDefinition.getQualifiedPathName(),
             parentId,
-            parentVersion,
+            parentVersion || "",
           ]
         );
 
-      if (valueExists) {
+      if (valueCount.count) {
+        if (parentingRule === "ONCE") {
+          throw new EndpointError({
+            message: "Parenting rule is set to ONCE and there's already a children of this type for the given parent",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        } else if (valueCount.count >= maxChildCountSameType) {
+          throw new EndpointError({
+            message: "Max child count for the same type is set to " + maxChildCountSameType + " and there's already that much",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
+      }
+    }
+
+    if (maxChildCountAnyType) {
+      const valueCount =
+        await appData.databaseConnection.queryFirst(
+          `SELECT COUNT(*) AS "count" FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "parent_type"=$1 AND "parent_id"=$2 AND "parent_version"=$3`,
+          [
+            parentingItemDefinition.getQualifiedPathName(),
+            parentId,
+            parentVersion || "",
+          ]
+        );
+
+      if (valueCount.count && valueCount.count >= maxChildCountAnyType) {
         throw new EndpointError({
-          message: "Parenting rule is set to ONCE and there's already a children of this type for the given parent",
+          message: "Max child count for any type is set to " + maxChildCountAnyType + " and there's already that much",
           code: ENDPOINT_ERRORS.FORBIDDEN,
         });
       }
-    } else if (parentingRule === "ONCE_PER_OWNER") {
+    }
+
+    if (parentingRule === "ONCE_PER_OWNER") {
       const valueExists =
         await appData.databaseConnection.queryFirst(
           `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND ` +
@@ -202,7 +232,7 @@ export async function validateParentingRules(
             itemDefinition.getQualifiedPathName(),
             parentingItemDefinition.getQualifiedPathName(),
             parentId,
-            parentVersion,
+            parentVersion || "",
             actualFinalOwnerId,
           ]
         );
@@ -214,6 +244,7 @@ export async function validateParentingRules(
         });
       }
     }
+
     let result: ISQLTableRowValue;
     try {
       result = await appData.cache.requestValue(
@@ -843,7 +874,7 @@ export async function serverSideCheckItemDefinitionAgainst(
       );
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated` +
-        ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(gqlPropertyValue)}`,
+          ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(gqlPropertyValue)}`,
         code: ENDPOINT_ERRORS.INVALID_PROPERTY,
         // someone might have been trying to hack for this to happen
         // a null pcode is a red flag, well almost all these checks show tampering
