@@ -439,7 +439,7 @@ export default class PropertyEntryText
    */
   public onChangeHijacked(value: string, internalValue: any) {
     // so first we try to read the html content in this fast and dirty way
-    const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9]+)\"/g;
+    const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9_-]+)\"/g;
     // this array for the ids we find
     const idsGathered: string[] = [];
     // and now we build a match loop

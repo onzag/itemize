@@ -318,7 +318,7 @@ export function postprocess(
       node.removeAttribute("loading");
 
       if (!srcId || !currentFile) {
-        node.parentElement && node.parentElement.removeChild(node);
+        // node.parentElement && node.parentElement.removeChild(node);
       } else {
         const domain = process.env.NODE_ENV === "production" ? context.config.productionHostname : context.config.developmentHostname;
         const absolutedFile = fileURLAbsoluter(
@@ -392,7 +392,7 @@ export function postprocess(
         // class
         node.className = "file";
       } else {
-        node.parentElement && node.parentElement.removeChild(node);
+        // node.parentElement && node.parentElement.removeChild(node);
       }
     } else {
       node.parentElement && node.parentElement.removeChild(node);
@@ -400,7 +400,7 @@ export function postprocess(
   }
 
   if (node.tagName === "A" && (node.hasAttribute("href") || node.hasAttribute("data-href"))) {
-    if (!options.supportsLinks) {
+    if (!options.supportsLinks || node.classList.contains("image")) {
       node.removeAttribute("href");
       node.removeAttribute("data-href");
     } else if (!options.supportsExternalLinks) {
