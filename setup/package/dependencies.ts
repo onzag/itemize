@@ -6,14 +6,14 @@
 
 export default {
   // builder typescript that is ran after npm install
-  "typescript": "^3.8.3",
+  "typescript": "^4.5.5",
   // tsconfig because typescript compiler doesn't get the paths right
-  "tsconfig-paths": "^3.9.0",
+  "tsconfig-paths": "^3.10.1",
 
   // peer dependencies
-  "@types/react": "^16.9.53",
-  "@types/react-dom": "^16.9.8",
-  "react": "^16.14.0",
-  "react-dom": "^16.14.0",
+  "@types/react-dom": "^17.0.11",
+  "@types/react": "^17.0.38",
+  "react": "^17.0.2",
+  "react-dom": "^17.0.2",
   "deep-equal": "^1.1.1",
 };
