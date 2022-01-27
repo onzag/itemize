@@ -5,13 +5,16 @@
  */
 
 import React from "react";
-import { WithStyles, createStyles, withStyles, Theme } from "@material-ui/core/styles";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { EndpointErrorType } from "../../../base/errors";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
-import { default as MUISnackbar } from "@material-ui/core/Snackbar";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import { default as MUISnackbar } from "@mui/material/Snackbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 /**
  * the snackbar styles
@@ -114,7 +117,7 @@ class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
                 aria-label={i18nClose}
                 color="inherit"
                 onClick={this.props.onClose}
-              >
+                size="large">
                 <CloseIcon/>
               </IconButton>
             )}

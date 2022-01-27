@@ -7,7 +7,7 @@
 import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";
 import React from "react";
 import Snackbar from "./snackbar";
-import Pagination from "@material-ui/lab/Pagination";
+import Pagination from '@mui/material/Pagination';
 
 
 /**

@@ -11,22 +11,22 @@
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React from "react";
 import { IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
-import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
-import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
-import FormatQuoteIcon from "@material-ui/icons/FormatQuote";
-import TitleIcon from "@material-ui/icons/Title";
-import FormatUnderlinedIcon from "@material-ui/icons/FormatUnderlined";
-import FormatItalicIcon from "@material-ui/icons/FormatItalic";
-import FormatBoldIcon from "@material-ui/icons/FormatBold";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import LinkIcon from "@material-ui/icons/Link";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import TextFieldsIcon from "@material-ui/icons/TextFields";
-import CodeIcon from "@material-ui/icons/Code";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
+import InsertPhotoIcon from "@mui/icons-material/InsertPhoto";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import TitleIcon from "@mui/icons-material/Title";
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
+import FormatItalicIcon from "@mui/icons-material/FormatItalic";
+import FormatBoldIcon from "@mui/icons-material/FormatBold";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import LinkIcon from "@mui/icons-material/Link";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import TextFieldsIcon from "@mui/icons-material/TextFields";
+import CodeIcon from "@mui/icons-material/Code";
 
 import { Path, Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
@@ -37,12 +37,15 @@ import { VideoDialog } from "./dialogs/video";
 import { TemplateElementDialog } from "./dialogs/template-element";
 import ReactDOM from "react-dom";
 import { countSizeAndWords } from "../../../internal/text";
-import Badge from "@material-ui/core/Badge";
-import IconButton from "@material-ui/core/IconButton";
-import Divider from "@material-ui/core/Divider";
-import { Theme, WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
-import Toolbar from "@material-ui/core/Toolbar";
-import AppBar from "@material-ui/core/AppBar";
+import Badge from "@mui/material/Badge";
+import IconButton from "@mui/material/IconButton";
+import Divider from "@mui/material/Divider";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Toolbar from "@mui/material/Toolbar";
+import AppBar from "@mui/material/AppBar";
 
 /**
  * Defining a bunch of styles for the wrapper
@@ -526,7 +529,7 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    * A function to define custom extra children
    */
   customExtraChildren?: (characterCount: number, wordCount: number) => React.ReactNode;
-};
+}
 
 /**
  * These are the rich text editor toolbar properties they basically take the same
@@ -614,7 +617,7 @@ interface RichTextEditorToolbarState {
 
 interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps {
   fastKey: string;
-};
+}
 
 function elementBadgeReturn(
   props: RichTextEditorToolbarElementProps,
@@ -648,7 +651,7 @@ function Bold(props: RichTextEditorToolbarElementProps) {
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleBold}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatBoldIcon />
     </IconButton>
   );
@@ -667,7 +670,7 @@ function Italic(props: RichTextEditorToolbarElementProps) {
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleItalic}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatItalicIcon />
     </IconButton>
   );
@@ -686,7 +689,7 @@ function Underline(props: RichTextEditorToolbarElementProps) {
       onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggleUnderline}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatUnderlinedIcon />
     </IconButton>
   );
@@ -751,7 +754,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <LinkIcon />
     </IconButton>
   );
@@ -782,7 +785,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <TitleIcon />
     </IconButton>
   );
@@ -801,7 +804,7 @@ function Quote(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatQuoteIcon />
     </IconButton>
   );
@@ -832,7 +835,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatListNumberedIcon />
     </IconButton>
   );
@@ -862,7 +865,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <FormatListBulletedIcon />
     </IconButton>
   );
@@ -880,7 +883,7 @@ function Image(props: RichTextEditorToolbarElementProps) {
       onMouseDown={props.helpers.blockBlur}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <InsertPhotoIcon />
     </IconButton>
   );
@@ -898,7 +901,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestVideo}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <VideoLibraryIcon />
     </IconButton>
   );
@@ -916,7 +919,7 @@ function File(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestFile}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <AttachFileIcon />
     </IconButton>
   );
@@ -934,7 +937,7 @@ function Container(props: RichTextEditorToolbarElementProps) {
       onClick={props.insertContainer}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <CheckBoxOutlineBlankIcon />
     </IconButton>
   );
@@ -987,7 +990,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestTemplateText}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <TextFieldsIcon />
     </IconButton>
   );
@@ -1055,7 +1058,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
       onClick={props.requestTemplateHTML}
       onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
-    >
+      size="large">
       <CodeIcon />
     </IconButton>
   );
@@ -1104,7 +1107,7 @@ function ToolbarExtra(props: IToolbarExtraProps) {
         {...basicProps}
         title={props.extra.title as string}
         data-fastkey={props.extra.fastKey}
-      >
+        size="large">
         {props.extra.icon}
       </IconButton>
     );
@@ -1116,7 +1119,7 @@ function ToolbarExtra(props: IToolbarExtraProps) {
           {...basicProps}
           title={i18nTitle}
           data-fastkey={props.extra.fastKey}
-        >
+          size="large">
           {props.extra.icon}
         </IconButton>
       )
@@ -1334,7 +1337,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           onMouseDown={this.props.helpers.blockBlur}
           onClick={this.props.toggleDrawer}
           onMouseUp={this.props.helpers.releaseBlur}
-        >
+          size="large">
           {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
         </IconButton> :
         null

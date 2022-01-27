@@ -12,16 +12,18 @@ import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import equals from "deep-equal";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
-import MenuItem from "@material-ui/core/MenuItem";
-import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -399,7 +401,7 @@ class ActualPropertyEntryReferenceRenderer
             classes={{root: this.props.classes.iconButton}}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
-          >
+            size="large">
             {icon}
           </IconButton>
         </InputAdornment>
@@ -411,7 +413,7 @@ class ActualPropertyEntryReferenceRenderer
           <IconButton
             tabIndex={-1}
             classes={{root: this.props.classes.iconButton}}
-          >
+            size="large">
             {this.props.icon}
           </IconButton>
         </InputAdornment>

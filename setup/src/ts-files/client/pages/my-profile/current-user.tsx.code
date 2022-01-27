@@ -5,13 +5,15 @@ import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner"
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container/Container";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import Box from "@material-ui/core/Box";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container/Container";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import Box from "@mui/material/Box";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
 
@@ -52,7 +54,7 @@ interface ILogoutDialogProps extends WithStyles<typeof LogoutDialogStyles> {
  */
 const LogoutDialog = withStyles(LogoutDialogStyles)((props: ILogoutDialogProps) => {
 	return (
-		<I18nReadMany
+        <I18nReadMany
 			data={
 				[
 					{
@@ -74,11 +76,7 @@ const LogoutDialog = withStyles(LogoutDialogStyles)((props: ILogoutDialogProps) 
 					onClose={props.onClose.bind(null, false)}
 					title={i18nTitle}
 					buttons={<Box className={props.classes.buttonBox}>
-						<Button
-							color="default"
-							startIcon={<ArrowBackIcon />}
-							onClick={props.onClose.bind(null, true)}
-						>
+						<Button startIcon={<ArrowBackIcon />} onClick={props.onClose.bind(null, true)}>
 							{i18nCancel}
 						</Button>
 						<LogActioner>
@@ -98,7 +96,7 @@ const LogoutDialog = withStyles(LogoutDialogStyles)((props: ILogoutDialogProps) 
 				</DialogResponsive>
 			)}
 		</I18nReadMany>
-	);
+    );
 });
 
 /**

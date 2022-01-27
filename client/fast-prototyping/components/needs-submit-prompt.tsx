@@ -13,11 +13,14 @@ import { IActionSubmitOptions } from "../../providers/item";
 import { ProgressingElement } from "./util";
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";
-import { WithStyles, createStyles, withStyles, Theme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import CloseIcon from "@material-ui/icons/Close";
-import DoneIcon from "@material-ui/icons/Done";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+import DoneIcon from "@mui/icons-material/Done";
 
 interface NeedsSubmitDialogProps {
   open: boolean;

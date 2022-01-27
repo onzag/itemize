@@ -8,17 +8,18 @@ import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
-import FormLabel from "@material-ui/core/FormLabel";
-import RootRef from "@material-ui/core/RootRef";
-import Paper from "@material-ui/core/Paper";
-import NoteAddIcon from "@material-ui/icons/NoteAdd"
-import { Close } from "@material-ui/icons";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
+import FormLabel from "@mui/material/FormLabel";
+import Paper from "@mui/material/Paper";
+import NoteAddIcon from "@mui/icons-material/NoteAdd"
+import { Close } from "@mui/icons-material";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -187,7 +188,7 @@ const PropertyEntryFilesRenderer = withStyles(style)((props: IPropertyEntryFileR
           tabIndex={-1}
           className={props.classes.icon}
           onClick={props.canRestore ? props.onRestore : null}
-        >{icon}</IconButton> : null}
+          size="large">{icon}</IconButton> : null}
       </FormLabel> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
@@ -247,7 +248,7 @@ const PropertyEntryFilesRenderer = withStyles(style)((props: IPropertyEntryFileR
                     value.removeFile();
                   }}
                   className={props.classes.fileDeleteButton}
-                >
+                  size="large">
                   <Close />
                 </IconButton>
               </div>
@@ -266,7 +267,7 @@ const PropertyEntryFilesRenderer = withStyles(style)((props: IPropertyEntryFileR
           ) : null;
 
           return (
-            <RootRef rootRef={ref}>
+            <>
               <Paper
                 {...rootProps}
                 classes={{
@@ -277,7 +278,7 @@ const PropertyEntryFilesRenderer = withStyles(style)((props: IPropertyEntryFileR
                 {files}
                 {dragInfo}
               </Paper>
-            </RootRef>
+            </>
           );
         }}
       </Dropzone>

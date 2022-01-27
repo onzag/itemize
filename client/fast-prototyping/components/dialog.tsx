@@ -5,17 +5,20 @@
  */
 
 import React from "react";
-import { WithStyles, createStyles, withStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import I18nRead from "../../components/localization/I18nRead";
-import { default as MDialog } from "@material-ui/core/Dialog";
-import AppBar from "@material-ui/core/AppBar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import Toolbar from "@material-ui/core/Toolbar";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import CloseIcon from "@material-ui/icons/Close";
+import { default as MDialog } from "@mui/material/Dialog";
+import AppBar from "@mui/material/AppBar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Toolbar from "@mui/material/Toolbar";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import CloseIcon from "@mui/icons-material/Close";
 
 
 /**
@@ -111,7 +114,11 @@ const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
         <Toolbar>
           <I18nRead id="close">
             {(i18nClose: string) => (
-              <IconButton color="inherit" onClick={props.onClose} aria-label={i18nClose}>
+              <IconButton
+                color="inherit"
+                onClick={props.onClose}
+                aria-label={i18nClose}
+                size="large">
                 <CloseIcon/>
               </IconButton>
             )}
@@ -138,7 +145,7 @@ const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
  */
 const DialogResponsive = function(props: IDialogProps) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return <Dialog {...props} fullScreen={fullScreen}/>
 }

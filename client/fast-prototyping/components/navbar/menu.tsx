@@ -6,20 +6,22 @@
 
 import React from "react";
 import Link from "../../../components/navigation/Link";
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
 import I18nRead, { II18nReadProps } from "../../../components/localization/I18nRead";
 import LocationReader from "../../../components/navigation/LocationReader";
 import { NoStateItemProvider } from "../../../providers/item";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import Badge from "@material-ui/core/Badge";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider/Divider";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Badge from "@mui/material/Badge";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider/Divider";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
 /**
  * The menu styles

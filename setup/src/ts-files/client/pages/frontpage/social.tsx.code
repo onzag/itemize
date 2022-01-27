@@ -1,18 +1,21 @@
 import React from "react";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
-import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container/Container";
-import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import InstagramIcon from "@material-ui/icons/Instagram";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import PinterestIcon from "@material-ui/icons/Pinterest";
-import RedditIcon from "@material-ui/icons/Reddit";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import YouTubeIcon from "@material-ui/icons/YouTube";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container/Container";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import PinterestIcon from "@mui/icons-material/Pinterest";
+import RedditIcon from "@mui/icons-material/Reddit";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import YouTubeIcon from "@mui/icons-material/YouTube";
 import { VKIcon, WeChatIcon } from "@onzag/itemize/client/fast-prototyping/icons/social-icons";
 
 /**
@@ -85,7 +88,7 @@ export const socialStyles = (theme: Theme) => createStyles({
  */
 export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialStyles>) => {
 	return (
-		<Container maxWidth="md" className={props.classes.container}>
+        <Container maxWidth="md" className={props.classes.container}>
 			<Paper className={props.classes.paper}>
 				<Typography variant="h3" className={props.classes.socialTitle}>
 					<I18nRead id="social" capitalize={true}/>
@@ -94,7 +97,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="facebook_url">
 						{(fbURL: string) => (
 							fbURL ? <a href={fbURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<FacebookIcon className={props.classes.icon + " " + props.classes.facebook} />
 								</IconButton>
 							</a> : null
@@ -103,7 +106,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="instagram_url">
 						{(instagramURL: string) => (
 							instagramURL ? <a href={instagramURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<InstagramIcon className={props.classes.icon + " " + props.classes.instagram} />
 								</IconButton>
 							</a> : null
@@ -112,7 +115,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="linkedin_url">
 						{(linkedInURL: string) => (
 							linkedInURL ? <a href={linkedInURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<LinkedInIcon className={props.classes.icon + " " + props.classes.linkedin} />
 								</IconButton>
 							</a> : null
@@ -121,7 +124,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="pinterest_url">
 						{(pinterestURL: string) => (
 							pinterestURL ? <a href={pinterestURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<PinterestIcon className={props.classes.icon + " " + props.classes.pinterest} />
 								</IconButton>
 							</a> : null
@@ -130,7 +133,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="reddit_url">
 						{(redditURL: string) => (
 							redditURL ? <a href={redditURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<RedditIcon className={props.classes.icon + " " + props.classes.reddit} />
 								</IconButton>
 							</a> : null
@@ -139,7 +142,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="twitter_url">
 						{(twitterURL: string) => (
 							twitterURL ? <a href={twitterURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<TwitterIcon className={props.classes.icon + " " + props.classes.twitter} />
 								</IconButton>
 							</a> : null
@@ -148,7 +151,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="vk_url">
 						{(vkURL: string) => (
 							vkURL ? <a href={vkURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<VKIcon className={props.classes.icon} />
 								</IconButton>
 							</a> : null
@@ -157,7 +160,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="wechat_url">
 						{(wechatURL: string) => (
 							wechatURL ? <a href={wechatURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<WeChatIcon className={props.classes.icon} />
 								</IconButton>
 							</a> : null
@@ -166,7 +169,7 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 					<I18nRead id="youtube_url">
 						{(youtubeURL: string) => (
 							youtubeURL ? <a href={youtubeURL} target="_blank">
-								<IconButton className={props.classes.button}>
+								<IconButton className={props.classes.button} size="large">
 									<YouTubeIcon className={props.classes.icon + " " + props.classes.youtube} />
 								</IconButton>
 							</a> : null
@@ -175,5 +178,5 @@ export const Social = withStyles(socialStyles)((props: WithStyles<typeof socialS
 				</Paper>
 			</Paper>
 		</Container>
-	);
+    );
 });

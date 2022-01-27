@@ -1,6 +1,6 @@
 // import React from "react";
 // import { IIncludeExclusionSwitchProps } from ".";
-// import { FormControlLabel, Switch, FormControl } from "@material-ui/core";
+// import { FormControlLabel, Switch, FormControl } from "@material-u/core";
 // import { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 
 // export default function StandardExclusionSwitch(props: IIncludeExclusionSwitchProps) {

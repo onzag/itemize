@@ -1,6 +1,6 @@
 // import React from "react";
 // import { IIncludeExclusionSwitchProps } from ".";
-// import { FormControlLabel, FormLabel, FormControl, RadioGroup, Radio } from "@material-ui/core";
+// import { FormControlLabel, FormLabel, FormControl, RadioGroup, Radio } from "@material-u/core";
 // import { capitalize } from "../../../util";
 // import { IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 

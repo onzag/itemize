@@ -8,17 +8,19 @@
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import FormControl from "@material-ui/core/FormControl";
-import RestoreIcon from "@material-ui/icons/Restore";
-import FormLabel from "@material-ui/core/FormLabel";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Radio from "@material-ui/core/Radio";
-import Switch from "@material-ui/core/Switch";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import RestoreIcon from "@mui/icons-material/Restore";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import RadioGroup from "@mui/material/RadioGroup";
+import Radio from "@mui/material/Radio";
+import Switch from "@mui/material/Switch";
 
 /**
  * The styles of the renderer
@@ -135,10 +137,10 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
           }}
         >
           {props.label}{icon ? <IconButton
-            tabIndex={-1}
-            className={props.classes.icon}
-            onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
-          >{icon}</IconButton> : null}
+          tabIndex={-1}
+          className={props.classes.icon}
+          onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
+          size="large">{icon}</IconButton> : null}
         </FormLabel> : null}
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
@@ -174,7 +176,10 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
           }
           label={props.label}
         />
-        {icon ? <IconButton className={props.classes.icon} onClick={props.canRestore ? props.onRestore : null}>{icon}</IconButton> : null}
+        {icon ? <IconButton
+          className={props.classes.icon}
+          onClick={props.canRestore ? props.onRestore : null}
+          size="large">{icon}</IconButton> : null}
       </FormControl>
     )
   }

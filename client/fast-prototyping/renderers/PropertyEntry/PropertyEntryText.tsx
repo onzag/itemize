@@ -14,13 +14,15 @@ import { SlateEditor } from "../../components/slate";
 import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
 
 import { capitalize } from "../../../../util";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import InputLabel from "@material-ui/core/InputLabel";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -197,7 +199,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         tabIndex={-1}
         className={this.props.classes.icon}
         onClick={this.props.canRestore ? this.props.onRestore : null}
-      >
+        size="large">
         {icon}
       </IconButton>
     ) : null;

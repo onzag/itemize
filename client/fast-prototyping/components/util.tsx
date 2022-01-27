@@ -8,39 +8,15 @@ import React from "react";
 import { DelayDisplay } from "../../components/util";
 
 import "./util.scss";
-import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
-
-/**
- * The progressing element sytle for the progressing element
- */
-const progressingElementStyle: any = createStyles({
-  progressWrapper: (props: IProgressingElementProps) => ({
-    position: "relative",
-    display: "inline-block",
-    width: props.fullWidth ? "100%" : "auto",
-  }),
-  progressElement: (props: IProgressingElementProps) => ({
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -((props.progressCircleSize || 24)/2),
-    marginLeft: -((props.progressCircleSize || 24)/2),
-  }),
-  cover: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    top: 0,
-    left: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.65)",
-  }
-});
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import CircularProgress from "@mui/material/CircularProgress";
 
 /**
  * Progressing element props
  */
-interface IProgressingElementProps extends WithStyles<typeof progressingElementStyle> {
+ interface IProgressingElementBaseProps {
   /**
    * Whether it is currently progressing
    */
@@ -65,6 +41,38 @@ interface IProgressingElementProps extends WithStyles<typeof progressingElementS
    * The class name of the progress wrapper
    */
   className?: string;
+}
+
+/**
+ * The progressing element sytle for the progressing element
+ */
+const progressingElementStyle = createStyles({
+  progressWrapper: (props: IProgressingElementBaseProps) => ({
+    position: "relative",
+    display: "inline-block",
+    width: props.fullWidth ? "100%" : "auto",
+  }),
+  progressElement: (props: IProgressingElementBaseProps) => ({
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -((props.progressCircleSize || 24)/2),
+    marginLeft: -((props.progressCircleSize || 24)/2),
+  }),
+  cover: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.65)",
+  }
+});
+
+/**
+ * Progressing element props
+ */
+interface IProgressingElementProps extends WithStyles<typeof progressingElementStyle>, IProgressingElementBaseProps {
 }
 
 /**

@@ -7,7 +7,7 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@material-ui/core";
+import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@mui/material";
 import { Path } from "slate";
 
 /**

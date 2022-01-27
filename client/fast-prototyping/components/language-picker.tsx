@@ -9,10 +9,10 @@ import { capitalize } from "../../components/localization";
 import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 import { LocaleContext } from "../../internal/providers/locale-provider";
 import { arrLanguages } from "../../../imported-resources";
-import TranslateIcon from "@material-ui/icons/Translate";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Button from "@material-ui/core/Button";
+import TranslateIcon from "@mui/icons-material/Translate";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
 
 /**
  * The props of the language picker, a bit different from other pickers

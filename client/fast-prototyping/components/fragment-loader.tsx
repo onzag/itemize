@@ -8,17 +8,19 @@
 import View from "../../components/property/View";
 import Entry from "../../components/property/Entry";
 import React, { useEffect, useRef, useState } from "react";
-import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import UserDataRetriever from "../../components/user/UserDataRetriever";
 import SubmitActioner from "../../components/item/SubmitActioner";
 import Snackbar from "../components/snackbar";
 import ReactDOM from "react-dom";
 import IdVersionRetriever from "../../components/item/IdVersionRetriever";
 import { IActionSubmitOptions } from "../../providers/item";
-import CloseIcon from "@material-ui/icons/Close";
-import IconButton from "@material-ui/core/IconButton";
-import SaveIcon from "@material-ui/icons/Save";
-import EditIcon from "@material-ui/icons/Edit";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import SaveIcon from "@mui/icons-material/Save";
+import EditIcon from "@mui/icons-material/Edit";
 
 /**
  * The item definition loader styles
@@ -84,7 +86,7 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
           props.roles.includes(userData.role) ? <IconButton
             className={props.classes.buttonEdit}
             onClick={setEditMode.bind(null, true)}
-          >
+            size="large">
             <EditIcon />
           </IconButton> : null
         )}
@@ -125,25 +127,23 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
                     setEditMode(false);
                   }
                 }
-                return (
-                  <>
-                    <IconButton onClick={submitAction} color="primary">
-                      <SaveIcon />
-                    </IconButton>
-                    <Snackbar
-                      id="fragment-edit-error"
-                      severity="error"
-                      i18nDisplay={actioner.submitError}
-                      open={!!actioner.submitError}
-                      onClose={actioner.dismissError}
-                    />
-                  </>
-                );
+                return <>
+                  <IconButton onClick={submitAction} color="primary" size="large">
+                    <SaveIcon />
+                  </IconButton>
+                  <Snackbar
+                    id="fragment-edit-error"
+                    severity="error"
+                    i18nDisplay={actioner.submitError}
+                    open={!!actioner.submitError}
+                    onClose={actioner.dismissError}
+                  />
+                </>;
               }}
             </SubmitActioner>
           )}
         </IdVersionRetriever>
-        <IconButton onClick={setEditMode.bind(null, false)} color="secondary">
+        <IconButton onClick={setEditMode.bind(null, false)} color="secondary" size="large">
           <CloseIcon />
         </IconButton>
       </div>,

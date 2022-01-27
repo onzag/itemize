@@ -6,12 +6,14 @@ import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner"
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import DoneIcon from "@material-ui/icons/Done";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import DoneIcon from "@mui/icons-material/Done";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 

@@ -5,24 +5,27 @@
 
 import React from "react";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
-import { createStyles, useTheme, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import Divider from "@material-ui/core/Divider";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import TextField from "@material-ui/core/TextField";
-import IconVisibility from "@material-ui/icons/Visibility";
-import IconVisibilityOff from "@material-ui/icons/VisibilityOff";
+import { useTheme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import Divider from "@mui/material/Divider";
+import InputAdornment from "@mui/material/InputAdornment";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import TextField from "@mui/material/TextField";
+import IconVisibility from "@mui/icons-material/Visibility";
+import IconVisibilityOff from "@mui/icons-material/VisibilityOff";
 import { CountryPicker } from "../../components/country-picker";
 import type { ICountryType } from "../../../../imported-resources";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
@@ -275,7 +278,7 @@ function SelectUnitDialog(props: ISelectUnitDialogProps) {
  */
 const SelectUnitDialogResponsive = function (props: ISelectCurrencyDialogProps) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   return <SelectUnitDialog {...props} fullScreen={fullScreen} />;
 }
@@ -339,7 +342,7 @@ function SelectCurrencyDialog(props: ISelectCurrencyDialogProps) {
  */
 const SelectCurrencyDialogResponsive = function (props: ISelectCurrencyDialogProps) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   return <SelectCurrencyDialog {...props} fullScreen={fullScreen} />;
 }
@@ -562,7 +565,7 @@ class ActualPropertyEntryFieldRenderer
             classes={{ root: this.props.classes.iconButton }}
             onClick={this.toggleVisible}
             onMouseDown={this.catchToggleMouseDownEvent}
-          >
+            size="large">
             {this.state.visible ? <IconVisibility /> : <IconVisibilityOff />}
           </IconButton>
         </InputAdornment>
@@ -579,7 +582,7 @@ class ActualPropertyEntryFieldRenderer
               classes={{ root: this.props.classes.iconButtonSmall }}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
-            >
+              size="large">
               {this.props.currency.symbol}
             </IconButton>
           </InputAdornment>
@@ -595,7 +598,7 @@ class ActualPropertyEntryFieldRenderer
               classes={{ root: this.props.classes.iconButton }}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
-            >
+              size="large">
               {this.props.currency.symbol}
             </IconButton>
           </InputAdornment>
@@ -612,7 +615,7 @@ class ActualPropertyEntryFieldRenderer
             classes={{ root: this.props.classes.iconButton }}
             onMouseDown={this.catchToggleMouseDownEvent}
             onClick={this.openDialog}
-          >
+            size="large">
             {this.props.unitToNode(this.props.unit)}
           </IconButton>
         </InputAdornment>
@@ -634,7 +637,7 @@ class ActualPropertyEntryFieldRenderer
             classes={{ root: this.props.classes.iconButton }}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
-          >
+            size="large">
             {icon}
           </IconButton>
         </InputAdornment>
@@ -646,7 +649,7 @@ class ActualPropertyEntryFieldRenderer
           <IconButton
             tabIndex={-1}
             classes={{ root: this.props.classes.iconButton }}
-          >
+            size="large">
             {this.props.icon}
           </IconButton>
         </InputAdornment>

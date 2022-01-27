@@ -3,9 +3,11 @@ import React from "react";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
-import Divider from "@material-ui/core/Divider";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Divider from "@mui/material/Divider";
+import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 

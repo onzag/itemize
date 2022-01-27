@@ -9,11 +9,13 @@ import NItemLoader from "../../components/item/ItemLoader";
 import { DelayDisplay } from "../../components/util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
-import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import RefreshIcon from "@material-ui/icons/Refresh";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 /**
  * The item definition loader styles
@@ -135,7 +137,7 @@ export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) 
               {imageComponent}
               <I18nRead id="reload">
                 {(i18nReload: string) => (
-                  <IconButton color="inherit" onClick={arg.reload} aria-label={i18nReload}>
+                  <IconButton color="inherit" onClick={arg.reload} aria-label={i18nReload} size="large">
                     <RefreshIcon />
                   </IconButton>
                 )}
@@ -156,5 +158,5 @@ export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) 
         </div>;
       }}
     </NItemLoader>
-  )
+  );
 });

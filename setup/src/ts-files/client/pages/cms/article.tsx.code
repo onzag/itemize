@@ -11,17 +11,19 @@ import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container/Container";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import WebIcon from "@material-ui/icons/Web";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Container from "@mui/material/Container/Container";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import WebIcon from "@mui/icons-material/Web";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import Route from "@onzag/itemize/client/components/navigation/Route";
@@ -68,10 +70,10 @@ const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof article
 		setLocale(newCode);
 	}
 	return (
-		<Container maxWidth="md" className={props.classes.container}>
+        <Container maxWidth="md" className={props.classes.container}>
 			<Paper className={props.classes.paper}>
 				<Link to="/cms/article/new">
-					<IconButton>
+					<IconButton size="large">
 						<AddCircleIcon />
 					</IconButton>
 				</Link>
@@ -136,7 +138,7 @@ const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof article
 				</List>
 			</Paper>
 		</Container>
-	);
+    );
 });
 
 export function Article() {
@@ -154,7 +156,7 @@ export function Article() {
 			/>
 		</>
 	);
-};
+}
 
 interface ISingleArticleProps extends WithStyles<typeof articleStyles> {
 	match: {

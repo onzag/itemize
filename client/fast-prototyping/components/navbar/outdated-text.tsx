@@ -7,8 +7,8 @@
 import React from "react";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nRead from "../../../components/localization/I18nRead";
-import UpdateIcon from "@material-ui/icons/Update";
-import Button from "@material-ui/core/Button";
+import UpdateIcon from "@mui/icons-material/Update";
+import Button from "@mui/material/Button";
 
 /**
  * The props are simple it just takes a click event

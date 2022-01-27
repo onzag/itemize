@@ -7,9 +7,9 @@ import Route from "@onzag/itemize/client/components/navigation/Route";
 import { localizedRedirectTo } from "@onzag/itemize/client/components/navigation";
 import { NoStateItemProvider } from "@onzag/itemize/client/providers/item";
 
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import { Fragment } from "./fragment";
 import { Article } from "./article";
 import { Info } from "./info";

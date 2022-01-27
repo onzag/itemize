@@ -9,13 +9,13 @@ import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
 import { Path } from "slate";
 import equals from "deep-equal";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import FilledInput from "@material-ui/core/FilledInput";
-import Chip from "@material-ui/core/Chip";
-import MenuItem from "@material-ui/core/MenuItem";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import FilledInput from "@mui/material/FilledInput";
+import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
 
 /**
  * The single style option props that define a single

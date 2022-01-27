@@ -13,18 +13,20 @@ import { capitalize } from "../../../../util";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
-import SearchIcon from "@material-ui/icons/Search";
-import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
-import MenuItem from "@material-ui/core/MenuItem";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
 
 // we import the react-leaflet types, however note
 // how we are not using them at all, this is because
@@ -454,7 +456,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
             disabled={this.props.disabled}
             classes={{ root: this.props.classes.iconButton }}
             onClick={onClickFn}
-          >
+            size="large">
             {iconSearch}
           </IconButton>
         </InputAdornment>
@@ -543,7 +545,8 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
               icon ? <IconButton
                 tabIndex={-1}
                 className={this.props.classes.icon}
-                onClick={this.props.canRestore ? this.props.onRestore : null}>{icon}</IconButton> : null
+                onClick={this.props.canRestore ? this.props.onRestore : null}
+                size="large">{icon}</IconButton> : null
             }
             {
               this.props.currentValue && this.props.currentValue.atxt ||

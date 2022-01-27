@@ -12,15 +12,17 @@ import Entry from "@onzag/itemize/client/components/property/Entry";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container/Container";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ExtensionIcon from "@material-ui/icons/Extension";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Container from "@mui/material/Container/Container";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ExtensionIcon from "@mui/icons-material/Extension";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { ITemplateArgsContext } from "@onzag/itemize/client/fast-prototyping/components/slate";
@@ -191,7 +193,7 @@ export function Fragment() {
 			/>
 		</>
 	);
-};
+}
 
 interface ISingleFragmentProps extends WithStyles<typeof fragmentStyles> {
 	match: {

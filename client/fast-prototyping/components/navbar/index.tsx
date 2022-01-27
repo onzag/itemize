@@ -5,7 +5,10 @@
  */
 
 import React, { useState } from "react";
-import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { ModuleProvider } from "../../../providers/module";
 import { ItemProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";
@@ -17,11 +20,11 @@ import { Menu, IMenuEntry } from "./menu";
 import I18nRead from "../../../components/localization/I18nRead";
 import TitleReader from "../../../components/util/TitleReader";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import MenuIcon from "@material-ui/icons/Menu";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import MenuIcon from "@mui/icons-material/Menu";
 
 /**
  * the navbar styles generator
@@ -41,7 +44,7 @@ const navbarStyles = (theme: Theme) => createStyles({
     paddingRight: "1rem",
     overflow: "hidden",
     flexBasis: "100%",
-    [theme.breakpoints.down(400)]: {
+    [theme.breakpoints.down(undefined)]: {
       display: "none",
     }
   },
@@ -139,7 +142,12 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
               <I18nRead id="menu">
                 {
                   (value: string) => (
-                    <IconButton edge="start" color="inherit" aria-label={value} onClick={setMenuOpen.bind(this, true)}>
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label={value}
+                      onClick={setMenuOpen.bind(this, true)}
+                      size="large">
                       <MenuIcon />
                     </IconButton>
                   )

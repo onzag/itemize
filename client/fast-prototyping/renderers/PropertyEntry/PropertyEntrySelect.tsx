@@ -9,21 +9,23 @@
 
 import React from "react";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import InputLabel from "@material-ui/core/InputLabel";
-import RestoreIcon from "@material-ui/icons/Restore";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Select from "@material-ui/core/Select";
-import FilledInput from "@material-ui/core/FilledInput";
-import Chip from "@material-ui/core/Chip";
-import MenuItem from "@material-ui/core/MenuItem";
-import Divider from "@material-ui/core/Divider";
-import FormControl from "@material-ui/core/FormControl";
-import ListItemText from "@material-ui/core/ListItemText";
-import { ListItemIcon } from "@material-ui/core";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import RestoreIcon from "@mui/icons-material/Restore";
+import InputAdornment from "@mui/material/InputAdornment";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import FilledInput from "@mui/material/FilledInput";
+import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
+import ListItemText from "@mui/material/ListItemText";
+import { ListItemIcon } from "@mui/material";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -131,7 +133,7 @@ class ActualPropertyEntrySelectRenderer
   }
 
   public onChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: SelectChangeEvent<any>,
   ) {
     if (this.props.isList) {
       const arrValue = e.target.value;
@@ -179,7 +181,7 @@ class ActualPropertyEntrySelectRenderer
           tabIndex={-1}
           className={this.props.classes.icon}
           onClick={this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null}
-        >
+          size="large">
           {icon}
         </IconButton>
       </InputAdornment>
@@ -191,10 +193,10 @@ class ActualPropertyEntrySelectRenderer
         <Select
           classes={{
             icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-            root: this.props.classes.selectRoot,
           }}
+          className={this.props.classes.selectRoot}
           multiple={true}
-          value={this.props.currentValue || []}
+          value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
           input={<FilledInput fullWidth={true} />}
           renderValue={(selected: any[]) => {
@@ -206,7 +208,7 @@ class ActualPropertyEntrySelectRenderer
                   return (
                     <Chip
                       key={selectedValue}
-                      label={gatheredResultAltLabel || (gatheredResult && gatheredResult.i18nValue) || selectedValue}
+                      label={gatheredResultAltLabel || (gatheredResult && gatheredResult.i18nValue) || selectedValue}
                       className={this.props.classes.chip} color="primary"
                     />
                   );
@@ -229,7 +231,7 @@ class ActualPropertyEntrySelectRenderer
               let addr: React.ReactNode = null;
               const altLabel = altLabels && altLabels[vv.value];
               if (!optionAddornment) {
-                content = altLabel || vv.i18nValue;
+                content = altLabel || vv.i18nValue;
               } else {
                 content = <ListItemText>{altLabel || vv.i18nValue}</ListItemText>
                 addr = <ListItemIcon>{addornment}</ListItemIcon>
@@ -245,9 +247,9 @@ class ActualPropertyEntrySelectRenderer
       let anyAddr: React.ReactNode = null;
       if (this.props.isNullable) {
         if (!anyAddornment) {
-          anyContent = altNullLabel || this.props.nullValue.i18nValue
+          anyContent = altNullLabel || this.props.nullValue.i18nValue
         } else {
-          anyContent = <ListItemText><em>{altNullLabel || this.props.nullValue.i18nValue}</em></ListItemText>
+          anyContent = <ListItemText><em>{altNullLabel || this.props.nullValue.i18nValue}</em></ListItemText>
           anyAddr = <ListItemIcon>{anyAddornment}</ListItemIcon>
         }
       }
@@ -261,8 +263,8 @@ class ActualPropertyEntrySelectRenderer
           variant="filled"
           classes={{
             icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-            root: this.props.classes.selectRoot,
           }}
+          className={this.props.classes.selectRoot}
           input={
             <FilledInput
               id={this.props.propertyId}
@@ -302,7 +304,7 @@ class ActualPropertyEntrySelectRenderer
               let addr: React.ReactNode = null;
               const altLabel = altLabels && altLabels[vv.value];
               if (!optionAddornment) {
-                content = altLabel || vv.i18nValue;
+                content = altLabel || vv.i18nValue;
               } else {
                 content = <ListItemText>{altLabel || vv.i18nValue}</ListItemText>
                 addr = <ListItemIcon>{addornment}</ListItemIcon>

@@ -14,8 +14,7 @@ import I18nRead from "../../components/localization/I18nRead";
 import SearchActioner from "../../components/search/SearchActioner";
 import DeleteActioner from "../../components/item/DeleteActioner";
 import { CreateReportDialog } from "./moderation";
-import Button from "@material-ui/core/Button";
-import type { PropTypes } from "@material-ui/core";
+import Button from "@mui/material/Button";
 
 /**
  * A redirect function called on the success event
@@ -46,7 +45,7 @@ interface IGenericButtonProps {
   /**
    * The button color
    */
-  buttonColor?: PropTypes.Color;
+  buttonColor?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning";
   /**
    * An icon for the button
    */

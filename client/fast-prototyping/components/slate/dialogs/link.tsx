@@ -7,13 +7,13 @@ import React from "react";
 import { Dialog } from "../../dialog";
 import { ITemplateArgsContext } from "..";
 import { RichElement } from "../../../../internal/text/serializer";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import InputLabel from "@material-ui/core/InputLabel";
-import FilledInput from "@material-ui/core/FilledInput";
-import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FilledInput from "@mui/material/FilledInput";
+import MenuItem from "@mui/material/MenuItem";
 
 /**
  * The props for the dialog that allows to insert a link

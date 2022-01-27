@@ -10,13 +10,15 @@ import React from "react";
 import { capitalize } from "../../../components/localization";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import PropertyEntryFieldRenderer from "./PropertyEntryField";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import QueueIcon from "@material-ui/icons/Queue";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import QueueIcon from "@mui/icons-material/Queue";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 
 /**
@@ -102,7 +104,7 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
       tabIndex={-1}
       className={props.classes.icon}
       onClick={props.canRestore ? props.onRestore : null}
-    >
+      size="large">
       {icon}
     </IconButton>
   ) : null;
@@ -127,7 +129,7 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
           props.i18nPayment.create :
           props.i18nPayment.destroy
       }
-    >
+      size="large">
       {
         props.currentValue === null ?
           (

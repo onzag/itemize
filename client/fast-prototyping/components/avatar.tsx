@@ -5,7 +5,9 @@
  */
 
 import React from "react";
-import { WithStyles, createStyles, withStyles } from "@material-ui/core/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { countries } from "../../../imported-resources";
 import Link from "../../components/navigation/Link";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
@@ -14,12 +16,11 @@ import { IPropertyEntryFileRendererProps } from "../../internal/components/Prope
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import { MAX_FILE_SIZE } from "../../../constants";
 import Reader from "../../components/property/Reader";
-import { default as MAvatar } from "@material-ui/core/Avatar";
-import Badge from "@material-ui/core/Badge";
-import RootRef from "@material-ui/core/RootRef";
-import BrokenImageIcon from "@material-ui/icons/BrokenImage";
-import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
-import Alert from "@material-ui/lab/Alert";
+import { default as MAvatar } from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
+import BrokenImageIcon from "@mui/icons-material/BrokenImage";
+import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import Alert from '@mui/material/Alert';
 
 /**
  * We build the styles with the create styles function
@@ -404,7 +405,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                       }) => {
                         const { ref, ...rootProps } = getRootProps();
                         return (
-                          <RootRef rootRef={ref}>
+                          <>
                             <div {...(rootProps as any)}>
                               <input {...(getInputProps() as any)} />
                               <div className={props.classes.avatarContainer}>
@@ -423,7 +424,7 @@ export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererPr
                                 </div>
                               </div>
                             </div>
-                          </RootRef>
+                          </>
                         );
                       }}
                     </Dropzone>

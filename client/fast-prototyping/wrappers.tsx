@@ -6,14 +6,14 @@
  */
 
 import React, {useEffect} from "react";
-import { createTheme } from "@material-ui/core/styles";
+import { createTheme } from "@mui/material/styles";
 import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
-import MomentUtils from "@date-io/moment";
+import AdapterMoment from '@mui/lab/AdapterMoment';
 import { IConfigRawJSONDataType } from "../../config";
-import { MuiThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import MuiPickersUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 /**
  * Removes the #ssr-sheets component that is injected by the collector if
@@ -50,16 +50,18 @@ export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataTy
       fontWeightLight: 300,
       fontWeightRegular: 400,
       fontWeightMedium: 500,
-    },
+    }
   });
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline/>
-      <SSRSheetsRemover>
-        {app}
-      </SSRSheetsRemover>
-    </MuiThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        <SSRSheetsRemover>
+          {app}
+        </SSRSheetsRemover>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
 
@@ -82,10 +84,10 @@ export function mainWrapper(
   const languageDeregionalized = localeContext.language.includes("-") ?
     localeContext.language.split("-")[0] : localeContext.language;
   return (
-    <MuiPickersUtilsProvider
-      utils={MomentUtils}
+    <LocalizationProvider
+      dateAdapter={AdapterMoment}
       locale={languageDeregionalized}
       libInstance={Moment}
-    >{mainComponent}</MuiPickersUtilsProvider>
+    >{mainComponent}</LocalizationProvider>
   )
 }

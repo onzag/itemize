@@ -8,19 +8,20 @@ import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Alert from "@material-ui/lab/Alert";
-import Typography from "@material-ui/core/Typography";
-import RestoreIcon from "@material-ui/icons/Restore";
-import ClearIcon from "@material-ui/icons/Clear";
-import FormLabel from "@material-ui/core/FormLabel";
-import RootRef from "@material-ui/core/RootRef";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline"
-import NoteAddIcon from "@material-ui/icons/NoteAdd"
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from "@mui/material/IconButton";
+import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
+import RestoreIcon from "@mui/icons-material/Restore";
+import ClearIcon from "@mui/icons-material/Clear";
+import FormLabel from "@mui/material/FormLabel";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline"
+import NoteAddIcon from "@mui/icons-material/NoteAdd"
+import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 
 /**
  * A simple helper function that says when it should show invalid
@@ -206,7 +207,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
           tabIndex={-1}
           className={props.classes.icon}
           onClick={props.canRestore ? props.onRestore : null}
-        >{icon}</IconButton> : null}
+          size="large">{icon}</IconButton> : null}
       </FormLabel> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
@@ -277,7 +278,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
           }
 
           return (
-            <RootRef rootRef={ref}>
+            <>
               <Paper
                 {...rootProps}
                 classes={{
@@ -313,7 +314,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
                   </Button>
                 </div>
               </Paper>
-            </RootRef>
+            </>
           );
         }}
       </Dropzone>

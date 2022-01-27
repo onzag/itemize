@@ -4,9 +4,9 @@ import { IPropertyEntryI18nRichTextInfo } from "../../../../internal/components/
 import { localeReplacer } from "../../../../../util";
 import React from "react";
 import ReactDOM from "react-dom";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 /**
  * The interactive actions that exist that mark
@@ -453,7 +453,7 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
           <IconButton
             onClick={this.props.onDeletePath.bind(null, this.props.currentPath)}
             className={this.props.deleteButtonClassName}
-          >
+            size="large">
             <DeleteIcon className={this.props.deleteIconClassName}/>
           </IconButton>
         </div>

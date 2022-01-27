@@ -1,6 +1,6 @@
 // import React from "react";
 // import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
-// import { ThemeProvider, withStyles, WithStyles } from "@material-ui/styles";
+// import { ThemeProvider, withStyles, WithStyles } from "@material-u/styles";
 // import { style, STANDARD_THEME, IIncludeExclusionSwitchThemeType } from "./styles";
 // import Include, { IIncludeState, IncludeExclusionState } from "../../../base/Root/Module/ItemDefinition/Include";
 // import TernaryExclusionSwitch from "./TernaryExclusionSwitch";

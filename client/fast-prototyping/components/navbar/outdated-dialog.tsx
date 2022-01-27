@@ -5,13 +5,15 @@
  */
 
 import React from "react";
-import { createStyles, WithStyles, withStyles } from "@material-ui/core/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { DialogResponsive } from "../dialog";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import UpdateIcon from "@material-ui/icons/Update";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import UpdateIcon from "@mui/icons-material/Update";
 
 /**
  * The dialog styles

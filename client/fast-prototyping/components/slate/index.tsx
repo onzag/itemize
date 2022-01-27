@@ -4949,7 +4949,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           )
         ) || c
         // and if we find nothing we use the value itself
-      }
+      };
     });
   }
 

@@ -12,14 +12,14 @@ import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
 import { TemplatingOptions } from "./templating";
 import { getInfoOf, Tree } from "./tree";
-import Divider from "@material-ui/core/Divider";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import SettingsIcon from "@material-ui/icons/Settings";
-import BorderStyleIcon from "@material-ui/icons/BorderStyle";
-import WebIcon from "@material-ui/icons/Web";
-import TouchAppIcon from "@material-ui/icons/TouchApp";
-import Typography from "@material-ui/core/Typography";
+import Divider from "@mui/material/Divider";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import SettingsIcon from "@mui/icons-material/Settings";
+import BorderStyleIcon from "@mui/icons-material/BorderStyle";
+import WebIcon from "@mui/icons-material/Web";
+import TouchAppIcon from "@mui/icons-material/TouchApp";
+import Typography from "@mui/material/Typography";
 
 class ScrollSlowly {
   private speed: number;

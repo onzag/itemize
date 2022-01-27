@@ -11,23 +11,26 @@ import UserActioner from "@onzag/itemize/client/components/user/UserActioner";
 import DifferingPropertiesRetriever from
 	"@onzag/itemize/client/components/item/DifferingPropertiesRetriever";
 
-import { createStyles, WithStyles, withStyles, Theme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import DoneIcon from "@material-ui/icons/Done";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import Alert from "@material-ui/lab/Alert";
-import AlernateEmailIcon from "@material-ui/icons/AlternateEmail";
-import MailIcon from "@material-ui/icons/Mail";
-import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import IconButton from "@material-ui/core/IconButton";
-import AlertTitle from "@material-ui/lab/AlertTitle";
-import TextField from "@material-ui/core/TextField";
-import ErrorIcon from "@material-ui/icons/Error";
-import FaceIcon from "@material-ui/icons/Face";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import DoneIcon from "@mui/icons-material/Done";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Alert from '@mui/material/Alert';
+import AlernateEmailIcon from "@mui/icons-material/AlternateEmail";
+import MailIcon from "@mui/icons-material/Mail";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+import IconButton from "@mui/material/IconButton";
+import AlertTitle from '@mui/material/AlertTitle';
+import TextField from "@mui/material/TextField";
+import ErrorIcon from "@mui/icons-material/Error";
+import FaceIcon from "@mui/icons-material/Face";
 
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
@@ -153,59 +156,59 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 		setCodeValue(e.target.value);
 	}, []);
 	return (
-		<Reader id="email">
+        <Reader id="email">
 			{(email: string, emailState: IPropertyDefinitionState) => {
 				const missesEmail = !(emailState && emailState.stateAppliedValue);
 
-				return (<Reader id="phone">
-					{(phone: string, phoneState: IPropertyDefinitionState) => {
-						const missesPhone = !(phone && phoneState.stateAppliedValue);
-						if (missesEmail && missesPhone) {
-							return (
-								<Alert severity="error">
-									<AlertTitle>
-										<I18nRead capitalize={true} id="missing_email_and_phone_warning_title" />
-									</AlertTitle>
-									<I18nRead id="missing_email_and_phone_warning" />
-								</Alert>
-							);
-						}
+				return (
+                    <Reader id="phone">
+                        {(phone: string, phoneState: IPropertyDefinitionState) => {
+                            const missesPhone = !(phone && phoneState.stateAppliedValue);
+                            if (missesEmail && missesPhone) {
+                                return (
+                                    <Alert severity="error">
+                                        <AlertTitle>
+                                            <I18nRead capitalize={true} id="missing_email_and_phone_warning_title" />
+                                        </AlertTitle>
+                                        <I18nRead id="missing_email_and_phone_warning" />
+                                    </Alert>
+                                );
+                            }
 
-						if (props.propertyId === "email" ? missesEmail : missesPhone) {
-							return (
-								<Alert severity="error">
-									<I18nRead capitalize={true} id="missing_email_warning_title" />
-								</Alert>
-							);
-						}
+                            if (props.propertyId === "email" ? missesEmail : missesPhone) {
+                                return (
+                                    <Alert severity="error">
+                                        <I18nRead capitalize={true} id="missing_email_warning_title" />
+                                    </Alert>
+                                );
+                            }
 
-						return (
-							<Reader id={props.validatedPropertyId}>
-								{(validatedProperty: boolean, validatedPropertyState: IPropertyDefinitionState) => {
-									const missesValidation = !(validatedPropertyState && validatedPropertyState.stateAppliedValue);
-									if (missesValidation) {
-										return (
-											<Alert severity="error">
-												<AlertTitle>
-													<I18nRead capitalize={true} id={"missing_" + props.propertyId + "_validation_warning_title"} />
-												</AlertTitle>
-												<div className={props.classes.alertButtonValidateEmailContainer}>
-													<UserActioner>
-														{(actioner) => {
-															const sendValidateSMS = async () => {
-																const rs = await actioner.sendValidateSMS();
-																if (!rs.error) {
-																	setIsInInsertCode(true);
-																}
-															}
-															const validateFromCode = async () => {
-																const rs = await actioner.validatePhoneFromRandomId(codeValue);
-																if (!rs.error) {
-																	setIsInInsertCode(false);
-																}
-															}
-															return (
-																<>
+                            return (
+                                <Reader id={props.validatedPropertyId}>
+                                    {(validatedProperty: boolean, validatedPropertyState: IPropertyDefinitionState) => {
+                                        const missesValidation = !(validatedPropertyState && validatedPropertyState.stateAppliedValue);
+                                        if (missesValidation) {
+                                            return (
+                                                <Alert severity="error">
+                                                    <AlertTitle>
+                                                        <I18nRead capitalize={true} id={"missing_" + props.propertyId + "_validation_warning_title"} />
+                                                    </AlertTitle>
+                                                    <div className={props.classes.alertButtonValidateEmailContainer}>
+                                                        <UserActioner>
+                                                            {(actioner) => {
+                                                                const sendValidateSMS = async () => {
+                                                                    const rs = await actioner.sendValidateSMS();
+                                                                    if (!rs.error) {
+                                                                        setIsInInsertCode(true);
+                                                                    }
+                                                                }
+                                                                const validateFromCode = async () => {
+                                                                    const rs = await actioner.validatePhoneFromRandomId(codeValue);
+                                                                    if (!rs.error) {
+                                                                        setIsInInsertCode(false);
+                                                                    }
+                                                                }
+                                                                return <>
 																	<ProgressingElement isProgressing={actioner.statefulOnProgress}>
 																		{!isInInsertCode ? <Button
 																			variant="outlined"
@@ -232,10 +235,7 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 																				</I18nRead>
 																				<I18nRead id="ok">
 																					{(i18nOk: string) => (
-																						<IconButton
-																							onClick={validateFromCode}
-																							title={i18nOk}
-																						>
+																						<IconButton onClick={validateFromCode} title={i18nOk} size="large">
 																							<DoneIcon />
 																						</IconButton>
 																					)}
@@ -257,24 +257,24 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 																		open={actioner.statefulSuccess}
 																		onClose={actioner.dismissStatefulSuccess}
 																	/>
-																</>
-															);
-														}}
-													</UserActioner>
-												</div>
-											</Alert>
-										);
-									}
+																</>;
+                                                            }}
+                                                        </UserActioner>
+                                                    </div>
+                                                </Alert>
+                                            );
+                                        }
 
-									return null;
-								}}
-							</Reader>
-						)
-					}}
-				</Reader>);
+                                        return null;
+                                    }}
+                                </Reader>
+                            );
+                        }}
+                    </Reader>
+                );
 			}}
 		</Reader>
-	);
+    );
 }
 
 /**

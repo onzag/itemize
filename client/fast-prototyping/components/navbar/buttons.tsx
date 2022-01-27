@@ -5,12 +5,15 @@
  */
 
 import React from "react";
-import { createStyles, Theme, WithStyles, withStyles } from "@material-ui/core/styles";
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import { LanguagePicker } from "../language-picker";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import { IfLogStatus } from "../../../components/login/IfLogStatus";
 import I18nRead from "../../../components/localization/I18nRead";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 
 /**
  * provides the styles for the buttons
@@ -28,13 +31,13 @@ const buttonsStyles = (theme: Theme) => createStyles({
     whiteSpace: "nowrap",
   },
   standardLanguageButtonLabel: {
-    [theme.breakpoints.down(450)]: {
+    [theme.breakpoints.down(undefined)]: {
       display: "none",
     }
   },
   shrunkLanguageButtonLabel: {
     display: "none",
-    [theme.breakpoints.down(450)]: {
+    [theme.breakpoints.down(undefined)]: {
       display: "inline",
     }
   },

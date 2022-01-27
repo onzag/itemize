@@ -4,9 +4,9 @@ import Route from "@onzag/itemize/client/components/navigation/Route";
 
 import { Navbar } from "@onzag/itemize/client/fast-prototyping/components/navbar";
 import { IMenuEntry } from "@onzag/itemize/client/fast-prototyping/components/navbar/menu";
-import ImportantDevicesIcon from "@material-ui/icons/ImportantDevices";
-import HomeIcon from "@material-ui/icons/Home";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
+import ImportantDevicesIcon from "@mui/icons-material/ImportantDevices";
+import HomeIcon from "@mui/icons-material/Home";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 import { Frontpage } from "./pages/frontpage";
 import { Contact } from "./pages/contact";
