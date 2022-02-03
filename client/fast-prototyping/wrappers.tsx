@@ -5,7 +5,7 @@
  * @module
  */
 
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { createTheme } from "@mui/material/styles";
 import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
@@ -14,6 +14,10 @@ import { IConfigRawJSONDataType } from "../../config";
 import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { CacheProvider } from "@emotion/react";
+import createCache from '@emotion/cache';
+
+export const ReuseCacheContextEmotionIsAMess = React.createContext(false);
 
 /**
  * Removes the #ssr-sheets component that is injected by the collector if
@@ -21,7 +25,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
  * @param props the props for the sheet remover
  * @returns a react node
  */
-function SSRSheetsRemover(props: {children: React.ReactNode}) {
+function SSRSheetsRemover(props: { children: React.ReactNode }) {
   useEffect(() => {
     const ssrStyles = document.querySelector('#ssr-sheets');
     if (ssrStyles) {
@@ -31,6 +35,10 @@ function SSRSheetsRemover(props: {children: React.ReactNode}) {
 
   // buggy typescript
   return props.children as any;
+}
+
+export function createEmotionCache() {
+  return createCache({ key: 'css' });
 }
 
 /**
@@ -53,15 +61,41 @@ export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataTy
     }
   });
 
+  // this is what our base app used to be before
+  // very simple and it worked
+  const baseApp = (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <SSRSheetsRemover>
+        {app}
+      </SSRSheetsRemover>
+    </ThemeProvider>
+  );
+
+  // this is what it has to do now with the introduction
+  // of a dreaded emotion cache that is a total mess
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <CssBaseline/>
-        <SSRSheetsRemover>
-          {app}
-        </SSRSheetsRemover>
-      </ThemeProvider>
-    </StyledEngineProvider>
+    <ReuseCacheContextEmotionIsAMess.Consumer>
+      {(shouldReuse: boolean) => {
+        // the cache is already defined for the server
+        // context in the collector, so it's not necessary
+        // to create a new one, because emotion is so smart
+        // it doesn't export its context so I can't read it
+        // and must deal with a hack
+        if (shouldReuse) {
+          return baseApp;
+        } else {
+          const cache = createEmotionCache();
+          // client side basically or when
+          // we don't use a styles collector
+          return (
+            <CacheProvider value={cache}>
+              {baseApp}
+            </CacheProvider>
+          );
+        }
+      }}
+    </ReuseCacheContextEmotionIsAMess.Consumer>
   );
 }
 

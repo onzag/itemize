@@ -978,6 +978,148 @@ export class ActualItemProvider extends
     return null;
   }
 
+  public static async getDerivedServerSideStateFromProps(props: IActualItemProviderProps, state: IActualItemProviderState): Promise<Partial<IActualItemProviderState>> {
+    if (
+      props.itemDefinitionInstance.isInSearchMode() &&
+      props.automaticSearch
+    ) {
+      // cheesy way to get to the root
+      const root = props.itemDefinitionInstance.getParentModule().getParentRoot();
+      const id = props.forId || null;
+      const version = props.forVersion || null;
+      await root.callRequestManagerSearch(props.itemDefinitionInstance, id, version, props.automaticSearch);
+      return ActualItemProvider.setupInitialState(props);
+    } else if (
+      state.loaded ||
+      props.forId === null ||
+      props.itemDefinitionInstance.isInSearchMode() ||
+      props.itemDefinitionInstance.isExtensionsInstance() ||
+      props.avoidLoading
+    ) {
+      return null;
+    }
+
+    // cheesy way to get to the root
+    const root = props.itemDefinitionInstance.getParentModule().getParentRoot();
+    const id = props.forId;
+    const version = props.forVersion || null;
+
+    await root.callRequestManager(props.itemDefinitionInstance, id, version);
+    return ActualItemProvider.setupInitialState(props);
+  }
+
+  public static setupInitialState(props: IActualItemProviderProps): IActualItemProviderState {
+    // the value might already be available in memory, this is either because it was loaded
+    // by another instance or because of SSR during the initial render
+    const memoryLoaded = !!(props.forId && props.itemDefinitionInstance.hasAppliedValueTo(
+      props.forId || null, props.forVersion || null,
+    ));
+    let memoryLoadedAndValid = false;
+    // by default we don't know
+    let isNotFound = false;
+    if (memoryLoaded) {
+      const appliedGQLValue = props.itemDefinitionInstance.getGQLAppliedValue(
+        props.forId || null, props.forVersion || null,
+      );
+      // this is the same as for loadValue we are tyring to predict
+      const { requestFields } = getFieldsAndArgs({
+        includeArgs: false,
+        includeFields: true,
+        uniteFieldsWithAppliedValue: true,
+        includes: props.includes || {},
+        properties: props.properties || [],
+        itemDefinitionInstance: props.itemDefinitionInstance,
+        forId: props.forId || null,
+        forVersion: props.forVersion || null,
+      });
+      // this will work even for null values, and null requestFields
+      memoryLoadedAndValid = (
+        appliedGQLValue &&
+        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+      );
+      isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
+    }
+
+    let searchState: IActualItemProviderSearchState = {
+      searchError: null,
+      searching: false,
+      searchResults: null,
+      searchRecords: null,
+      searchLimit: null,
+      searchOffset: null,
+      searchCount: null,
+      searchId: null,
+      searchOwner: null,
+      searchLastModified: null,
+      searchParent: null,
+      searchShouldCache: false,
+      searchFields: null,
+      searchRequestedIncludes: {},
+      searchRequestedProperties: [],
+    };
+    const internalState = props.itemDefinitionInstance.getInternalState(
+      props.forId || null, props.forVersion || null,
+    );
+    if (internalState) {
+      searchState = internalState.searchState;
+
+      const state = internalState.state;
+      props.itemDefinitionInstance.applyState(
+        props.forId || null,
+        props.forVersion || null,
+        state,
+      );
+    }
+
+    // so the initial setup
+    return {
+      // same we get the initial state, without checking it externally and passing
+      // all the optimization flags
+      itemState: props.itemDefinitionInstance.getStateNoExternalChecking(
+        props.forId || null,
+        props.forVersion || null,
+        !props.disableExternalChecks,
+        props.itemDefinitionInstance.isInSearchMode() ?
+          getPropertyListForSearchMode(
+            props.properties || [],
+            props.itemDefinitionInstance.getStandardCounterpart()
+          ) : props.properties || [],
+        props.includes || {},
+        !props.includePolicies,
+      ),
+      // and we pass all this state
+      isBlocked: false,
+      isBlockedButDataIsAccessible: false,
+      notFound: isNotFound,
+      loadError: null,
+      // loading will be true if we are setting up with an id
+      // as after mount it will attempt to load such id, in order
+      // to avoid pointless refresh we set it up as true from
+      // the beggining
+      loading: memoryLoadedAndValid ? false : (props.avoidLoading ? false : !!props.forId),
+      // loaded will be whether is loaded or not only if there is an id
+      // otherwise it's technically loaded
+      loaded: props.forId ? memoryLoadedAndValid : true,
+
+      submitError: null,
+      submitting: false,
+      submitted: false,
+
+      deleteError: null,
+      deleting: false,
+      deleted: false,
+
+      ...searchState,
+      searchWasRestored: true,
+
+      pokedElements: {
+        properties: [],
+        includes: {},
+        policies: [],
+      },
+    };
+  }
+
   // These are used for external checking, when available
   // we dont want to external check based off every character
   // so we have a timeout and update id
@@ -1062,7 +1204,7 @@ export class ActualItemProvider extends
     }
 
     // we get the initial state
-    this.state = this.setupInitialState();
+    this.state = ActualItemProvider.setupInitialState(props);
 
     // and if we have a cache, which runs behind a worker
     // won't run in server mode so it's safe
@@ -1088,117 +1230,6 @@ export class ActualItemProvider extends
       }
       this.props.itemDefinitionInstance.removeBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
     }
-  }
-  public setupInitialState(): IActualItemProviderState {
-    // the value might already be available in memory, this is either because it was loaded
-    // by another instance or because of SSR during the initial render
-    const memoryLoaded = !!(this.props.forId && this.props.itemDefinitionInstance.hasAppliedValueTo(
-      this.props.forId || null, this.props.forVersion || null,
-    ));
-    let memoryLoadedAndValid = false;
-    // by default we don't know
-    let isNotFound = false;
-    if (memoryLoaded) {
-      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
-        this.props.forId || null, this.props.forVersion || null,
-      );
-      // this is the same as for loadValue we are tyring to predict
-      const { requestFields } = getFieldsAndArgs({
-        includeArgs: false,
-        includeFields: true,
-        uniteFieldsWithAppliedValue: true,
-        includes: this.props.includes || {},
-        properties: this.props.properties || [],
-        itemDefinitionInstance: this.props.itemDefinitionInstance,
-        forId: this.props.forId || null,
-        forVersion: this.props.forVersion || null,
-      });
-      // this will work even for null values, and null requestFields
-      memoryLoadedAndValid = (
-        appliedGQLValue &&
-        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
-      );
-      isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
-    }
-
-    let searchState: IActualItemProviderSearchState = {
-      searchError: null,
-      searching: false,
-      searchResults: null,
-      searchRecords: null,
-      searchLimit: null,
-      searchOffset: null,
-      searchCount: null,
-      searchId: null,
-      searchOwner: null,
-      searchLastModified: null,
-      searchParent: null,
-      searchShouldCache: false,
-      searchFields: null,
-      searchRequestedIncludes: {},
-      searchRequestedProperties: [],
-    };
-    const internalState = this.props.itemDefinitionInstance.getInternalState(
-      this.props.forId || null, this.props.forVersion || null,
-    );
-    if (internalState) {
-      searchState = internalState.searchState;
-
-      const state = internalState.state;
-      this.props.itemDefinitionInstance.applyState(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        state,
-      );
-    }
-
-    // so the initial setup
-    return {
-      // same we get the initial state, without checking it externally and passing
-      // all the optimization flags
-      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        !this.props.disableExternalChecks,
-        this.props.itemDefinitionInstance.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            this.props.properties || [],
-            this.props.itemDefinitionInstance.getStandardCounterpart()
-          ) : this.props.properties || [],
-        this.props.includes || {},
-        !this.props.includePolicies,
-      ),
-      // and we pass all this state
-      isBlocked: false,
-      isBlockedButDataIsAccessible: false,
-      notFound: isNotFound,
-      loadError: null,
-      // loading will be true if we are setting up with an id
-      // as after mount it will attempt to load such id, in order
-      // to avoid pointless refresh we set it up as true from
-      // the beggining
-      loading: memoryLoadedAndValid ? false : (this.props.avoidLoading ? false : !!this.props.forId),
-      // loaded will be whether is loaded or not only if there is an id
-      // otherwise it's technically loaded
-      loaded: this.props.forId ? memoryLoadedAndValid : true,
-
-      submitError: null,
-      submitting: false,
-      submitted: false,
-
-      deleteError: null,
-      deleting: false,
-      deleted: false,
-
-      ...searchState,
-      searchWasRestored: true,
-
-      pokedElements: {
-        properties: [],
-        includes: {},
-        policies: [],
-      },
-    };
   }
   public injectSubmitBlockPromise(p: Promise<any>) {
     this.submitBlockPromises.push(p);
@@ -4166,7 +4197,7 @@ export class ActualItemProvider extends
       const id = this.props.forId || null;
       const version = this.props.forVersion || null;
       await root.callRequestManagerSearch(this.props.itemDefinitionInstance, id, version, this.props.automaticSearch);
-      this.state = this.setupInitialState();
+      this.state = ActualItemProvider.setupInitialState(this.props);
       return;
     } else if (
       this.state.loaded ||
@@ -4184,7 +4215,7 @@ export class ActualItemProvider extends
     const version = this.props.forVersion || null;
 
     await root.callRequestManager(this.props.itemDefinitionInstance, id, version);
-    this.state = this.setupInitialState();
+    this.state = ActualItemProvider.setupInitialState(this.props);
   }
   public render() {
     if (

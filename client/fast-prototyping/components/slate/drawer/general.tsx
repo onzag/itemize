@@ -757,7 +757,7 @@ class GeneralUIHandlerOption extends React.PureComponent<IGeneralUIHandlerOption
                 onChange={this.onChangeByBoolean}
               />
             }
-            label={this.props.label}
+            label={this.props.label as any}
           />
         </FormControl>
       );

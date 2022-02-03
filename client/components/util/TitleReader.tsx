@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { ActualTitleSetter } from "./TitleSetter";
+import { ActualTitleSetter } from "./TitleSetter";
 import { SSRContext } from "../../internal/providers/ssr-provider";
 
 interface ActualTitleReaderProps {

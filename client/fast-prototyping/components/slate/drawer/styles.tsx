@@ -12,7 +12,7 @@ import equals from "deep-equal";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FilledInput from "@mui/material/FilledInput";
 import Chip from "@mui/material/Chip";
 import MenuItem from "@mui/material/MenuItem";
@@ -229,9 +229,10 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
 
   /**
    * Triggers when the select field changes and receives a new value
+   * // TODOCHECKMUIUPGRADE
    * @param e the change event
    */
-  public onRichClassListChange(e: React.ChangeEvent<{ name: string, value: string[] }>) {
+  public onRichClassListChange(e: SelectChangeEvent<any>) {
     // we pick it off, as it's an array of string because
     // this is a multiselect
     let newValue: string[] = e.target.value;
@@ -276,7 +277,7 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
           value={this.state.value}
           onChange={this.onRichClassListChange}
           input={<FilledInput id="slate-styles-option-selector-rich-classes-chip" />}
-          renderValue={(selected: any[]) => (
+          renderValue={(selected: string[]) => (
             <div className={this.props.classes.chips}>
               {selected.map((value) => (
                 <Chip key={value} label={value} className={this.props.classes.chip} color="primary" />

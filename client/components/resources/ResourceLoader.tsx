@@ -77,6 +77,20 @@ interface IActualResourceLoaderState {
 class ActualResourceLoader
   extends React.PureComponent<IActualResourceLoaderProps, IActualResourceLoaderState> {
 
+  public static async getDerivedServerSideStateFromProps(props: IActualResourceLoaderProps) {
+    let path = props.path || "/rest/resource/";
+    if (!path.endsWith("/")) {
+      path += "/";
+    }
+    const actualSrc = path + (props.src[0] === "/" ? props.src.substr(1) : props.src);
+    const value = await props.root.callRequestManagerResource(actualSrc, props.serverSideResolver);
+    return {
+      content: value,
+      loading: false,
+      failed: false,
+    }
+  }
+
   constructor(props: IActualResourceLoaderProps) {
     super(props);
 

@@ -20,7 +20,7 @@ import Badge from "@mui/material/Badge";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
-import Divider from "@mui/material/Divider/Divider";
+import Divider from "@mui/material/Divider";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
 /**

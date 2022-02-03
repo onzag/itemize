@@ -21,9 +21,11 @@ import { capitalize, DOMWindow } from "../../util";
 import { jwtDecode } from "../token";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { convertHTMLToUSSDTree } from "../../ussd";
+import { walkReactTree } from "./react-analyze";
+import ReactDOMServer from "react-dom/server";
 
 // This is a custom react dom build
-const ReactDOMServer = require('@onzag/react-dom/server');
+const ReactDOMServerOnza = require('@onzag/react-dom/server');
 
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
@@ -309,6 +311,10 @@ export async function ssrGenerator(
     }
 
     // and now we need the server app data
+    let prepassAppData: {
+      node: React.ReactNode,
+      id: string;
+    } = null;
     let serverAppData: {
       node: React.ReactNode,
       id: string;
@@ -324,32 +330,35 @@ export async function ssrGenerator(
     root.setRequestManagerResource(collector.collectResource);
 
     try {
+      const serverModeOptions = {
+        collector: isUSSD ? appData.ssrConfig.ussdConfig.collector : appData.ssrConfig.collector,
+        config: appData.config,
+        ssrContext: ssr,
+        clientDetails: {
+          lang: getCookie(splittedCookies, "lang"),
+          currency: getCookie(splittedCookies, "currency"),
+          country: getCookie(splittedCookies, "country"),
+          guessedData: getCookie(splittedCookies, "guessedData"),
+        },
+        langLocales: appData.langLocales,
+        root: root,
+        req: req,
+        res: res,
+        userLocalizationService: appData.userLocalizationService,
+      };
+      const options = {
+        appWrapper: isUSSD ? appData.ssrConfig.ussdConfig.appWrapper : appData.ssrConfig.appWrapper,
+        mainWrapper: isUSSD ? appData.ssrConfig.ussdConfig.mainWrapper : appData.ssrConfig.mainWrapper,
+        serverMode: serverModeOptions,
+      };
+
       // for that we try to initialize, which can indeed, fail
       // mainly because calls to the localizations service and whatnot which must
       // be consistent
       serverAppData = await initializeItemizeApp(
         isUSSD ? appData.ssrConfig.ussdConfig.rendererContext : appData.ssrConfig.rendererContext,
         isUSSD ? appData.ssrConfig.ussdConfig.mainComponent : appData.ssrConfig.mainComponent,
-        {
-          appWrapper: isUSSD ? appData.ssrConfig.ussdConfig.appWrapper : appData.ssrConfig.appWrapper,
-          mainWrapper: isUSSD ? appData.ssrConfig.ussdConfig.mainWrapper : appData.ssrConfig.mainWrapper,
-          serverMode: {
-            collector: isUSSD ? appData.ssrConfig.ussdConfig.collector : appData.ssrConfig.collector,
-            config: appData.config,
-            ssrContext: ssr,
-            clientDetails: {
-              lang: getCookie(splittedCookies, "lang"),
-              currency: getCookie(splittedCookies, "currency"),
-              country: getCookie(splittedCookies, "country"),
-              guessedData: getCookie(splittedCookies, "guessedData"),
-            },
-            langLocales: appData.langLocales,
-            root: root,
-            req: req,
-            res: res,
-            userLocalizationService: appData.userLocalizationService,
-          }
-        }
+        options,
       );
 
       // if there's no data then it means it was redirected
@@ -362,18 +371,36 @@ export async function ssrGenerator(
         return;
       }
 
+      // the collector may not work during the prepass and lead to unexpected outcomes
+      // these collectors are meant for the react dom specific process and may interfere
+      // each other during a second pass
+      const prePassServerModeOptions = {
+        ...serverModeOptions,
+        collector: null as any,
+      };
+
+      const prepassOptions = {
+        ...options,
+        serverMode: prePassServerModeOptions,
+      };
+
+      prepassAppData = await initializeItemizeApp(
+        isUSSD ? appData.ssrConfig.ussdConfig.rendererContext : appData.ssrConfig.rendererContext,
+        isUSSD ? appData.ssrConfig.ussdConfig.mainComponent : appData.ssrConfig.mainComponent,
+        prepassOptions,
+      );
+
       // now we build the app, but we need to put the static router on top
       // as in server mode no router is used so we need this static router to match
       // with SSR
-      const app = (
+      const prepassApp = (
         <StaticRouter location={req.originalUrl}>
-          {serverAppData.node}
+          {prepassAppData.node}
         </StaticRouter>
       );
 
-      // we place such HTML
-      // this one uses our special DOM renderer that is async
-      const staticMarkup = await (ReactDOMServer.renderToStaticMarkup(app) as any);
+      // will walk the react tree and emulate a render on such tree
+      await walkReactTree(prepassApp);
 
       // update the last modified and the etag signature
       lastModified = collector.getLastModified();
@@ -411,6 +438,21 @@ export async function ssrGenerator(
         return;
       }
 
+      const finalTitle = root.getStateKey("title");
+      const usedTitle = finalTitle || i18nAppName || config.appName || "";
+
+      ssr.title = usedTitle;
+      ssr.queries = collector.getQueries();
+      clientSSR.title = ssr.title;
+      clientSSR.queries = ssr.queries;
+
+      const app = (
+        <StaticRouter location={req.originalUrl}>
+          {serverAppData.node}
+        </StaticRouter>
+      );
+      const staticMarkup = ReactDOMServer.renderToStaticMarkup(app);
+
       if (isUSSD) {
         // TODO use staticMarkup and parse it in order to make a text only representation
         // p and div tags make newlines
@@ -443,21 +485,15 @@ export async function ssrGenerator(
         }
 
         // now we calculate the same way title and description
-        const finalTitle = root.getStateKey("title");
         const finalDescription = root.getStateKey("description");
 
-        const usedTitle = finalTitle || i18nAppName || config.appName || "";
         const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
         const usedOgTitle = finalOgTitle || usedTitle;
         const usedOgDescription = finalOgDescription || usedDescription;
         const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
 
-        ssr.title = usedTitle;
-        clientSSR.title = usedTitle;
-        clientSSR.queries = collector.getQueries();
-
         // now we need to make the title match
-        newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup.replace(/__SSR_TITLE__/g, usedTitle));
+        newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup);
 
         // replace with this information
         newHTML = newHTML.replace(/\$SSRTITLE/g, usedTitle);
@@ -473,7 +509,7 @@ export async function ssrGenerator(
         let finalSSRHead: string = langHrefLangTags;
         if (serverAppData.id) {
           // and also our collected data
-          finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id);
+          finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id, staticMarkup);
         }
 
         // we add that

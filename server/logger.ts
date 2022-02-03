@@ -11,7 +11,8 @@ export const logger: winston.Logger = (
   INSTANCE_MODE === "BUILD_DATABASE" ||
   INSTANCE_MODE === "LOAD_DATABASE_DUMP"
 ) ? null : winston.createLogger({
-  level: LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info"),
+  // buggy typescript somehow the definitions change all the time and will not work
+  level: (LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info")) as any,
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json(),
