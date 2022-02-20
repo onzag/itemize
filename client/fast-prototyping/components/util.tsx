@@ -8,15 +8,13 @@ import React from "react";
 import { DelayDisplay } from "../../components/util";
 
 import "./util.scss";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import CircularProgress from "@mui/material/CircularProgress";
+import { styled } from "@mui/material/styles";
 
 /**
  * Progressing element props
  */
- interface IProgressingElementBaseProps {
+interface IProgressingElementProps {
   /**
    * Whether it is currently progressing
    */
@@ -43,58 +41,55 @@ import CircularProgress from "@mui/material/CircularProgress";
   className?: string;
 }
 
-/**
- * The progressing element sytle for the progressing element
- */
-const progressingElementStyle = createStyles({
-  progressWrapper: (props: IProgressingElementBaseProps) => ({
-    position: "relative",
-    display: "inline-block",
-    width: props.fullWidth ? "100%" : "auto",
-  }),
-  progressElement: (props: IProgressingElementBaseProps) => ({
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -((props.progressCircleSize || 24)/2),
-    marginLeft: -((props.progressCircleSize || 24)/2),
-  }),
-  cover: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    top: 0,
-    left: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.65)",
-  }
+interface IProgressWrapperProps {
+  fullWidth?: boolean;
+}
+
+const ProgressWrapper = styled("div", {
+  shouldForwardProp: (prop) => prop !== "fullWidth"
+})<IProgressWrapperProps>(({ fullWidth }) => ({
+  position: "relative",
+  display: "inline-block",
+  width: fullWidth ? "100%" : "auto",
+}));
+
+const Cover = styled("div")({
+  position: "absolute",
+  width: "100%",
+  height: "100%",
+  top: 0,
+  left: 0,
+  backgroundColor: "rgba(255, 255, 255, 0.65)",
 });
 
-/**
- * Progressing element props
- */
-interface IProgressingElementProps extends WithStyles<typeof progressingElementStyle>, IProgressingElementBaseProps {
-}
+const CircularProgressStyled = styled(CircularProgress)(({ size }) => ({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  marginTop: -((size as number) / 2),
+  marginLeft: -((size as number) / 2),
+}))
 
 /**
  * Shows a loading circle on top of a component to show that such is loading
  * @param props the loading props
  * @returns a react component
  */
-export const ProgressingElement = withStyles(progressingElementStyle)((props: IProgressingElementProps) => {
+export function ProgressingElement(props: IProgressingElementProps) {
   const size = props.progressCircleSize || 24;
-  return (<div className={`${props.classes.progressWrapper} ${props.className ? props.className : ""}`}>
+  return (<ProgressWrapper className={props.className} fullWidth={props.fullWidth}>
     {props.children}
     {
       props.isProgressing ?
-      <DelayDisplay duration={props.delayDuration || 300}>
-        <div className={props.classes.cover}>
-          <CircularProgress size={size} className={props.classes.progressElement}/>
-        </div>
-      </DelayDisplay> :
-      null
+        <DelayDisplay duration={props.delayDuration || 300}>
+          <Cover>
+            <CircularProgressStyled size={size} />
+          </Cover>
+        </DelayDisplay> :
+        null
     }
-  </div>);
-});
+  </ProgressWrapper>);
+};
 
 /**
  * The slow loading element props
@@ -199,7 +194,7 @@ export class SlowLoadingElement extends React.Component<SlowLoadingElementProps,
       return this.props.children;
     } else if (!this.props.inline) {
       return <div className="slow-loading-ring-wrapper">
-        <div className="slow-loading-ring"/>
+        <div className="slow-loading-ring" />
       </div>
     } else {
       return null;

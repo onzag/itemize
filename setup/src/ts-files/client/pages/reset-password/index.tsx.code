@@ -9,9 +9,6 @@ import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
@@ -28,7 +25,7 @@ import { Avatar } from "../../components/avatar";
 /**
  * Contains the reset password styles
  */
-const resetPasswordStyles = createStyles({
+const style = {
 	container: {
 		paddingTop: "1rem",
 	},
@@ -50,7 +47,7 @@ const resetPasswordStyles = createStyles({
 	divider: {
 		margin: "1rem 0",
 	},
-});
+};
 
 /**
  * The action as asked once the reset password has been requested
@@ -85,7 +82,7 @@ async function resetPassword(
  * @param props the reset password props
  * @returns a react element
  */
-export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<typeof resetPasswordStyles>) => {
+export function ResetPassword() {
 	return (
 		<LocationStateReader
 			defaultState={{
@@ -129,21 +126,21 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 										<TitleSetter>
 											{i18nResetPassword}
 										</TitleSetter>
-										<Container maxWidth="md" className={props.classes.container}>
-											<Paper className={props.classes.paper}>
+										<Container maxWidth="md" sx={style.container}>
+											<Paper sx={style.paper}>
 												{userId ?
 													<><ItemLoader>
 														<Avatar size="large" fullWidth={true} hideFlag={true} />
 														<Reader id="username">
 															{(username: string) => (
-																<Typography variant="h4" className={props.classes.username}>{username}</Typography>
+																<Typography variant="h4" sx={style.username}>{username}</Typography>
 															)}
 														</Reader>
 													</ItemLoader>
-														<Divider className={props.classes.divider} />
+														<Divider sx={style.divider} />
 													</> : null
 												}
-												<Typography variant="h6" className={props.classes.recoverTitle}>{i18nResetPassword}</Typography>
+												<Typography variant="h6" sx={style.recoverTitle}>{i18nResetPassword}</Typography>
 												<I18nRead id="reset_password_field_alt_label">
 													{(i18nAltLabel: string) => (
 														<I18nRead id="reset_password_field_alt_placeholder">
@@ -177,7 +174,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 												</I18nRead> : null}
 												<UserActioner>
 													{(actioner) => (
-														<React.Fragment>
+														<>
 															<I18nRead id="reset_password_action">
 																{(i18nUpdatePassword: string) => (
 																	<ProgressingElement isProgressing={actioner.statefulOnProgress} fullWidth={true}>
@@ -209,7 +206,7 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 																open={!!actioner.statefulSuccess}
 																onClose={actioner.dismissStatefulSuccess}
 															/>
-														</React.Fragment>
+														</>
 													)}
 												</UserActioner>
 											</Paper>
@@ -223,4 +220,4 @@ export const ResetPassword = withStyles(resetPasswordStyles)((props: WithStyles<
 			}}
 		</LocationStateReader>
 	);
-});
+};

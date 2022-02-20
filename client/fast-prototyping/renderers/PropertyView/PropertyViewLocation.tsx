@@ -5,14 +5,12 @@
  */
 
 import IconButton from "@mui/material/IconButton";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import React from "react";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { IPropertyViewLocationRendererProps } from "../../../internal/components/PropertyView/PropertyViewLocation";
 import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
 import GPSFixedIcon from "@mui/icons-material/GpsFixed";
+import Box from "@mui/material/Box";
 
 // this logic is similar to the entry
 // it has to do with SSR not supporting
@@ -41,7 +39,7 @@ if (typeof document !== "undefined") {
 /**
  * The location map styles
  */
-const locationMapStyles = createStyles({
+const style = {
   container: {
     width: "100%",
   },
@@ -77,13 +75,7 @@ const locationMapStyles = createStyles({
       backgroundColor: "white",
     },
   }
-});
-
-/**
- * The actual props with the injection of the handler
- */
-interface ActualPropertyViewLocationMapProps extends WithStyles<typeof locationMapStyles>, IPropertyViewLocationRendererProps {
-}
+};
 
 /**
  * We need this boolean to do a double pass
@@ -95,8 +87,8 @@ interface PropertyViewLocationMapState {
 /**
  * The actual location map
  */
-class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLocationMapProps, PropertyViewLocationMapState> {
-  constructor(props: ActualPropertyViewLocationMapProps) {
+class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRendererProps, PropertyViewLocationMapState> {
+  constructor(props: IPropertyViewLocationRendererProps) {
     super(props);
 
     this.state = {
@@ -130,7 +122,7 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
         {this.props.canResetViewportCenter ?
           <IconButton
             onClick={this.props.onResetViewportCenter}
-            className={this.props.classes.restoreButton}
+            sx={style.restoreButton as any}
             size="large">
             <GPSFixedIcon/>
           </IconButton>
@@ -152,35 +144,18 @@ class ActualPropertyViewLocationMap extends React.Component<ActualPropertyViewLo
       ) : null;
     }
 
-    let containerClassName: string = this.props.classes.container;
-    if (this.props.args.className) {
-      containerClassName += " " + this.props.args.className;
-    }
-
-    let textHeaderClassName: string = this.props.classes.locationTextHeader;
-    if (this.props.args.textHeaderClassName) {
-      textHeaderClassName += " " + this.props.args.textHeaderClassName;
-    }
-
-    let mapClassName: string = this.props.classes.locationMapContainer;
-    if (this.props.args.mapClassName) {
-      mapClassName += " " + this.props.args.mapClassName;
-    }
-
     return (
-      <div className={containerClassName}>
-        <div className={textHeaderClassName}>
+      <Box className={this.props.args.className} sx={style.container}>
+        <Box className={this.props.args.textHeaderClassName} sx={style.locationTextHeader}>
           {textHeader}
-        </div>
-        <div className={mapClassName}>
+        </Box>
+        <Box className={this.props.args.mapClassName} sx={style.locationMapContainer}>
           {map}
-        </div>
-      </div>
+        </Box>
+      </Box>
     )
   }
 }
-
-const PropertyViewLocationMap = withStyles(locationMapStyles)(ActualPropertyViewLocationMap);
 
 /**
  * Provides a renderer to view location

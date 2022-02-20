@@ -7,8 +7,23 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import FilledInput from "@mui/material/FilledInput";
 import { Path } from "slate";
+
+const style = {
+  box: {
+    padding: "0.5rem",
+  },
+  optionPrimary: {
+    fontWeight: 700,
+    color: "#1b5e20",
+  },
+};
 
 /**
  * This is the list of events that we support
@@ -84,14 +99,6 @@ interface ISingleActionProps {
    * @param anchor in which anchor it generated
    */
   onChange: (key: string, value: string, anchor: Path) => void;
-  /**
-   * The class name for the box that wraps it all
-   */
-  boxClassName?: string;
-  /**
-   * The class name for a primary option
-   */
-  optionPrimaryClassName?: string;
 }
 
 /**
@@ -195,7 +202,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
    */
   public render() {
     return (
-      <div className={this.props.boxClassName}>
+      <Box>
         <FormControl
           variant="filled"
           fullWidth={true}
@@ -230,7 +237,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
                 return <MenuItem
                   key={vv.value}
                   value={vv.value}
-                  className={vv.primary ? this.props.optionPrimaryClassName : null}
+                  sx={vv.primary ? style.optionPrimary : null}
                 >{
                   vv.label
                 }</MenuItem>;
@@ -238,7 +245,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
             }
           </Select>
         </FormControl>
-      </div>
+      </Box>
     );
   }
 }
@@ -295,20 +302,19 @@ export function ActionsOptions(props: IWrapperContainerProps) {
 
   // now we can return the whole box
   return (
-    <div className={props.classes.box}>
+    <Box sx={style.box}>
       {
         EVENTS.map((v) => (
           <SingleAction
             key={v}
             name={v}
-            actionValue={currentNode[v] || null}
+            actionValue={currentNode[v] || null}
             options={allOptions}
-            optionPrimaryClassName={props.classes.optionPrimary}
             anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setAction}
           />
         ))
       }
-    </div>
+    </Box>
   );
 }

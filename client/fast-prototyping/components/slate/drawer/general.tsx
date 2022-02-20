@@ -29,6 +29,13 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import Box from "@mui/material/Box";
+
+const style = {
+  box: {
+    padding: "0.5rem",
+  },
+};
 
 function getPathFromBasisParent(path: Path, basisParent?: number) {
   if (!basisParent) {
@@ -170,7 +177,7 @@ class GeneralContainerOptions extends React.PureComponent<IWrapperContainerProps
    */
   public render() {
     return (
-      <div className={this.props.classes.box}>
+      <Box sx={style.box}>
         <FormControl
           variant="filled"
           fullWidth={true}
@@ -209,7 +216,7 @@ class GeneralContainerOptions extends React.PureComponent<IWrapperContainerProps
             }
           </Select>
         </FormControl>
-      </div>
+      </Box>
     );
   }
 }
@@ -300,7 +307,7 @@ class GeneralTitleOptions extends React.PureComponent<IWrapperContainerProps, IG
    */
   public render() {
     return (
-      <div className={this.props.classes.box}>
+      <Box sx={style.box}>
         <FormControl
           variant="filled"
           fullWidth={true}
@@ -333,7 +340,7 @@ class GeneralTitleOptions extends React.PureComponent<IWrapperContainerProps, IG
             <MenuItem value="h6">h6</MenuItem>
           </Select>
         </FormControl>
-      </div>
+      </Box>
     );
   }
 }
@@ -518,7 +525,7 @@ class GeneralImageOptions extends React.PureComponent<IWrapperContainerProps, IG
    */
   public render() {
     return (
-      <div className={this.props.classes.box}>
+      <Box sx={style.box}>
         <TextField
           value={this.state.altValue}
           label={this.props.i18nRichInfo.alt}
@@ -539,7 +546,7 @@ class GeneralImageOptions extends React.PureComponent<IWrapperContainerProps, IG
           control={<Switch checked={this.state.standalone} onChange={this.updateStandalone} />}
           label={this.props.i18nRichInfo.standalone}
         />
-      </div>
+      </Box>
     );
   }
 }
@@ -958,7 +965,7 @@ class GeneralElementOptions extends React.PureComponent<IWrapperContainerProps, 
    */
   public render() {
     return (
-      <div className={this.props.classes.box}>
+      <Box sx={style.box}>
         <TextField
           value={this.state.name}
           label={this.props.i18nRichInfo.name}
@@ -967,7 +974,7 @@ class GeneralElementOptions extends React.PureComponent<IWrapperContainerProps, 
           onChange={this.updateName}
           fullWidth={true}
         />
-      </div>
+      </Box>
     );
   }
 }
@@ -1022,7 +1029,7 @@ function checkUIHandlerMatches(x: IDrawerConfiguratorElementBase, value: string)
 
 function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], props: IWrapperContainerProps) {
   return (
-    <div className={props.classes.box}>
+    <Box sx={style.box}>
       {elems.filter((x) => {
         const stateElem = basisToState[x.basis || "selected"];
         let element: RichElement = props.state[stateElem];
@@ -1049,7 +1056,7 @@ function processDrawerElementsBase(elems: IDrawerConfiguratorElementBase[], prop
       }).map((x, index) => {
         return processDrawerElementBase(x, props, index);
       })}
-    </div>
+    </Box>
   );
 }
 
@@ -1065,9 +1072,9 @@ function processDrawerElements(elems: DrawerConfiguratorElement[], props: IWrapp
           key += "_" + (x.basis || "selected") + "_" + (x.basisParent || 0);
         }
         return (
-          <div className={props.classes.box} key={key}>
+          <Box sx={style.box} key={key}>
             {processDrawerElementBase(asBase, props, index)}
-          </div>
+          </Box>
         );
       } else {
         const extraProps: any = {};

@@ -7,6 +7,49 @@ import ReactDOM from "react-dom";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Box from "@mui/material/Box";
+
+const style = {
+  wrapperButton: {
+    fontSize: "0.5rem",
+    padding: "0.1rem 0.5rem 0.2rem 0.5rem",
+    borderLeft: "solid 2px #ccc",
+    borderRadius: 0,
+  },
+  treeChildrenBox: {
+    padding: "0 0 0 0.5rem",
+    borderLeft: "solid 1px #ccc",
+  },
+  treeDataBox: {
+    width: "100%",
+    position: "relative",
+    maxHeight: "360px",
+    overflowY: "auto",
+    flex: "1 0 auto",
+  },
+  dropPositionEnabled: {
+    height: "0.5rem",
+    border: "dashed 1px #ccc",
+    "&:hover": {
+      border: "dashed 1px green",
+    },
+  },
+  dropPositionDisabled: {
+    height: "0.5rem",
+    border: "solid 1px invisible",
+  },
+  treeElement: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  deleteButton: {
+    height: "1rem",
+    width: "1rem",
+  },
+  deleteIcon: {
+    fontSize: "1rem",
+  },
+};
 
 /**
  * The interactive actions that exist that mark
@@ -162,13 +205,6 @@ interface ITreeProps {
   currentPath: Path;
   currentIsLastInPath: boolean;
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
-  buttonClassName: string;
-  treeElementClassName?: string;
-  deleteButtonClassName?: string;
-  deleteIconClassName?: string;
-  dropPositionEnabledClassName: string;
-  dropPositionDisabledClassName: string;
-  childrenBoxClassName: string;
   onSelectPath: (p: Path) => void;
   onDeletePath: (p: Path) => void;
   parentDraggingAt?: IDraggingElementInfo;
@@ -385,10 +421,10 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
 
       childTree = shouldShowDrop && canAcceptAsChildren(this.props.currentRichElement, draggingAt.element) ?
         (
-          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(childPath)} />
+          <Box sx={style.dropPositionEnabled} data-path={JSON.stringify(childPath)} />
         ) :
         (
-          <div className={this.props.dropPositionDisabledClassName} />
+          <Box sx={style.dropPositionDisabled} />
         );
     }
 
@@ -413,10 +449,10 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     const prevSpacer =
       shouldShowSiblingDrops && !Path.equals(prevPath, draggingAt.path) ?
         (
-          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(this.props.currentPath)} />
+          <Box sx={style.dropPositionEnabled} data-path={JSON.stringify(this.props.currentPath)} />
         ) :
         (
-          <div className={this.props.dropPositionDisabledClassName} />
+          <Box sx={style.dropPositionDisabled} />
         );
 
     let nextPath: Path = null;
@@ -428,22 +464,22 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
     const nextSpacer = this.props.currentIsLastInPath ? (
       shouldShowSiblingDrops && !Path.equals(nextPath, draggingAt.path) ?
         (
-          <div className={this.props.dropPositionEnabledClassName} data-path={JSON.stringify(nextPath)} />
+          <Box sx={style.dropPositionEnabled} data-path={JSON.stringify(nextPath)} />
         ) :
         (
-          <div className={this.props.dropPositionDisabledClassName} />
+          <Box sx={style.dropPositionDisabled} />
         )
     ) : null;
 
     const internals = (
       <div ref={this.internalsRef}>
         {prevSpacer}
-        <div className={this.props.treeElementClassName}>
+        <Box sx={style.treeElement}>
           <Button
             size="small"
             variant={isSelected ? "contained" : (isSemiSelected ? "outlined" : "text")}
             color={info.isTemplate ? "secondary" : "primary"}
-            className={this.props.buttonClassName}
+            sx={style.wrapperButton}
             onMouseDown={this.startDragMouse}
             onTouchStart={this.startDragTouch}
             ref={this.buttonRef}
@@ -452,14 +488,14 @@ export class Tree extends React.PureComponent<ITreeProps, ITreeState> {
           </Button>
           <IconButton
             onClick={this.props.onDeletePath.bind(null, this.props.currentPath)}
-            className={this.props.deleteButtonClassName}
+            sx={style.deleteButton}
             size="large">
-            <DeleteIcon className={this.props.deleteIconClassName}/>
+            <DeleteIcon sx={style.deleteIcon}/>
           </IconButton>
-        </div>
-        <div className={this.props.childrenBoxClassName}>
+        </Box>
+        <Box sx={style.treeChildrenBox}>
           {childTree}
-        </div>
+        </Box>
         {nextSpacer}
       </div>
     );

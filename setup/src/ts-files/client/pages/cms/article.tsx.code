@@ -11,9 +11,6 @@ import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Container from "@mui/material/Container/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -38,7 +35,7 @@ import Setter from "@onzag/itemize/client/components/property/Setter";
  * The article styles that are used
  * in the page itself
  */
-const articleStyles = createStyles({
+const style = {
 	paper: {
 		padding: "1rem",
 	},
@@ -62,16 +59,16 @@ const articleStyles = createStyles({
 		width: "100%",
 		paddingTop: "1rem",
 	},
-});
+};
 
-const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof articleStyles>) => {
+function ArticleIndex() {
 	const [locale, setLocale] = useState<string>(null);
 	function setLocaleFiltered(newCode: string) {
 		setLocale(newCode);
 	}
 	return (
-        <Container maxWidth="md" className={props.classes.container}>
-			<Paper className={props.classes.paper}>
+        <Container maxWidth="md" sx={style.container}>
+			<Paper sx={style.paper}>
 				<Link to="/cms/article/new">
 					<IconButton size="large">
 						<AddCircleIcon />
@@ -117,7 +114,7 @@ const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof article
 											return (
 												<ItemProvider {...r.providerProps}>
 													<Link to={"/cms/article/" + r.id} key={r.id}>
-														<ListItem className={props.classes.listItem}>
+														<ListItem sx={style.listItem}>
 															<ListItemIcon>
 																<WebIcon />
 															</ListItemIcon>
@@ -127,9 +124,9 @@ const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof article
 												</ItemProvider>
 											);
 										})}
-										<div className={props.classes.paginatorContainer}>
+										<Box sx={style.paginatorContainer}>
 											{pagination}
-										</div>
+										</Box>
 									</>
 								);
 							}}
@@ -139,7 +136,7 @@ const ArticleIndex = withStyles(articleStyles)((props: WithStyles<typeof article
 			</Paper>
 		</Container>
     );
-});
+};
 
 export function Article() {
 	return (
@@ -158,7 +155,7 @@ export function Article() {
 	);
 }
 
-interface ISingleArticleProps extends WithStyles<typeof articleStyles> {
+interface ISingleArticleProps {
 	match: {
 		params: {
 			id: string;
@@ -199,7 +196,7 @@ function LocaleEntry(props: ILocaleEntry) {
  * @param props the fragment styles
  * @returns a react element
  */
-const SingleArticle = withStyles(articleStyles)((props: ISingleArticleProps) => {
+function SingleArticle(props: ISingleArticleProps) {
 	const articleId = props.match.params.id;
 	return (
 		<ItemProvider
@@ -216,9 +213,9 @@ const SingleArticle = withStyles(articleStyles)((props: ISingleArticleProps) => 
 			longTermCaching={false}
 			forId={articleId === "new" ? null : articleId}
 		>
-			<Container maxWidth="md" className={props.classes.container + " trusted"}>
-				<Paper className={props.classes.paper}>
-					<Box className={props.classes.box}>
+			<Container maxWidth="md" sx={style.container} className="trusted">
+				<Paper sx={style.paper}>
+					<Box sx={style.box}>
 						{
 							articleId !== "new" ?
 								(
@@ -281,4 +278,4 @@ const SingleArticle = withStyles(articleStyles)((props: ISingleArticleProps) => 
 
 		</ItemProvider>
 	);
-});
+};

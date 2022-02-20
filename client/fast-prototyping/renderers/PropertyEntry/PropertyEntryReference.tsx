@@ -12,9 +12,6 @@ import parse from "autosuggest-highlight/parse";
 import { IPropertyEntryReferenceRendererProps, IPropertyEntryReferenceOption } from "../../../internal/components/PropertyEntry/PropertyEntryReference";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import equals from "deep-equal";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -24,6 +21,9 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
+import { css as emotionCss } from "@emotion/css";
+import { css } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -37,7 +37,7 @@ function shouldShowInvalid(props: IPropertyEntryReferenceRendererProps) {
 /**
  * The styles for the reference
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -56,12 +56,12 @@ export const style = createStyles({
     height: "1.3rem",
     fontSize: "0.85rem",
   },
-  standardAddornment: (props: IPropertyEntryReferenceRendererProps) => ({
-    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+  standardAddornment: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "#424242",
     marginRight: "-10px",
   }),
-  smallAddornment: (props: IPropertyEntryReferenceRendererProps) => ({
-    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+  smallAddornment: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "#424242",
   }),
   iconButtonPassword: {
     "backgroundColor": "#2196f3",
@@ -197,23 +197,17 @@ export const style = createStyles({
     fontSize: "0.75rem",
     lineHeight: "0.75rem",
   },
-});
-
-/**
- * The props for the reference entry with styles
- */
-interface IPropertyEntryReferenceRendererWithStylesProps extends IPropertyEntryReferenceRendererProps, WithStyles<typeof style> {
-}
+};
 
 /**
  * The actual class for the reference renderer
  */
-class ActualPropertyEntryReferenceRenderer
-  extends React.Component<IPropertyEntryReferenceRendererWithStylesProps> {
+class PropertyEntryReferenceRenderer
+  extends React.Component<IPropertyEntryReferenceRendererProps> {
 
   private inputRef: HTMLInputElement;
 
-  constructor(props: IPropertyEntryReferenceRendererWithStylesProps) {
+  constructor(props: IPropertyEntryReferenceRendererProps) {
     super(props);
 
     this.onChangeByHTMLEvent = this.onChangeByHTMLEvent.bind(this);
@@ -242,7 +236,7 @@ class ActualPropertyEntryReferenceRenderer
     }
   }
 
-  public componentDidUpdate(prevProps: IPropertyEntryReferenceRendererWithStylesProps) {
+  public componentDidUpdate(prevProps: IPropertyEntryReferenceRendererProps) {
     if (
       !equals(prevProps.args.preventIds, this.props.args.preventIds, { strict: true }) ||
       !equals(this.props.args.preventEqualityWithProperties, this.props.args.preventEqualityWithProperties, { strict: true })
@@ -368,12 +362,6 @@ class ActualPropertyEntryReferenceRenderer
         },
       };
 
-      // if we have a className, it will inevitably override our class name
-      // but we need ours too, so let's merge it in the TextField
-      if (appliedTextFieldProps.className) {
-        appliedTextFieldProps.className += " " + this.props.classes.entry;
-      }
-
       // if there are small inputProps, they will override our inputProps,
       // of the input mode and autocomplete html, so we need to merge them
       if (appliedTextFieldProps.inputProps) {
@@ -394,11 +382,11 @@ class ActualPropertyEntryReferenceRenderer
       appliedInputProps.endAdornment = (
         <InputAdornment
           position="end"
-          className={this.props.classes.standardAddornment}
+          sx={style.standardAddornment(shouldShowInvalid(this.props))}
         >
           <IconButton
             tabIndex={-1}
-            classes={{root: this.props.classes.iconButton}}
+            sx={style.iconButton}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
             size="large">
@@ -409,10 +397,10 @@ class ActualPropertyEntryReferenceRenderer
     } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
-        <InputAdornment position="end" className={this.props.classes.standardAddornment}>
+        <InputAdornment position="end" sx={style.standardAddornment(shouldShowInvalid(this.props))}>
           <IconButton
             tabIndex={-1}
-            classes={{root: this.props.classes.iconButton}}
+            sx={style.iconButton}
             size="large">
             {this.props.icon}
           </IconButton>
@@ -423,17 +411,17 @@ class ActualPropertyEntryReferenceRenderer
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     // return the complex overengineered component in all its glory
     return (
-      <div className={this.props.classes.container}>
+      <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-          <Alert severity="info" className={this.props.classes.description}>
+          <Alert severity="info" sx={style.description}>
             {this.props.description}
           </Alert> :
           null
         }
         {
           this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={this.props.classes.description}>
+          <Typography variant="caption" sx={style.description}>
             {this.props.description}
           </Typography> :
           null
@@ -441,7 +429,7 @@ class ActualPropertyEntryReferenceRenderer
         <TextField
           fullWidth={true}
           type="text"
-          className={this.props.classes.entry}
+          sx={style.entry}
           label={this.props.label}
           placeholder={this.props.placeholder}
           value={this.props.currentTextualValue}
@@ -449,16 +437,16 @@ class ActualPropertyEntryReferenceRenderer
           onBlur={this.props.enableUserSetErrors}
           onKeyDown={this.onKeyDown}
           InputProps={{
+            sx: style.fieldInput,
             classes: {
-              root: this.props.classes.fieldInput,
               focused: "focused",
             },
             disabled: this.props.disabled,
             ...appliedInputProps,
           }}
           InputLabelProps={{
+            sx: style.label,
             classes: {
-              root: this.props.classes.label,
               focused: "focused",
             },
           }}
@@ -467,10 +455,10 @@ class ActualPropertyEntryReferenceRenderer
           variant="filled"
           {...appliedTextFieldProps}
         />
-        <div className={this.props.classes.errorMessage}>
+        <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 
@@ -508,12 +496,12 @@ class ActualPropertyEntryReferenceRenderer
 
     return (
       <MenuItem
-        className={this.props.classes.autosuggestMenuItem}
+        sx={style.autosuggestMenuItem}
         selected={params.isHighlighted}
         component="div"
         onClick={this.props.onSelect.bind(this, suggestion)}
       >
-        <div className={this.props.classes.autosuggestMenuItemMainText}>
+        <Box sx={style.autosuggestMenuItemMainText}>
           {
             parts.map((part, index) =>
               part.highlight ? (
@@ -527,7 +515,7 @@ class ActualPropertyEntryReferenceRenderer
               ),
             )
           }
-        </div>
+        </Box>
       </MenuItem>
     );
   }
@@ -614,6 +602,28 @@ class ActualPropertyEntryReferenceRenderer
    * render function
    */
   public renderAsAutosuggest() {
+    const baseTheme = {
+      container: css(style.autosuggestContainer as any),
+      containerOpen: css(style.autosuggestContainerOpen),
+      input: css(style.autosuggestInput),
+      inputOpen: css(style.autosuggestInputOpen),
+      inputFocused: "focused",
+      suggestionsContainer: css(style.autosuggestSuggestionsContainer),
+      suggestionsContainerOpen: css(style.autosuggestSuggestionsContainerOpen),
+      suggestionsList: css(style.autosuggestSuggestionsList),
+      suggestion: css(style.autosuggestSuggestion),
+      suggestionFirst: css(style.autosuggestFirstSuggestion),
+      suggestionHighlighted: css(style.autosuggestSuggestionHighlighted),
+      sectionContainer: css(style.autosuggestSectionContainer),
+      sectionContainerFirst: css(style.autosuggestFirstSectionContainer),
+      sectionTitle: css(style.autosuggestSectionTitle),
+    };
+
+    const rsTheme: any = {};
+    Object.keys(baseTheme).forEach((k) => {
+      rsTheme[k] = emotionCss(baseTheme[k].styles)
+    });
+
     return (
       <Autosuggest
         renderInputComponent={this.renderBasicTextField}
@@ -623,22 +633,7 @@ class ActualPropertyEntryReferenceRenderer
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.props.onCancel}
         suggestions={this.props.currentOptions}
-        theme={{
-          container: this.props.classes.autosuggestContainer,
-          containerOpen: this.props.classes.autosuggestContainerOpen,
-          input: this.props.classes.autosuggestInput,
-          inputOpen: this.props.classes.autosuggestInputOpen,
-          inputFocused: "focused",
-          suggestionsContainer: this.props.classes.autosuggestSuggestionsContainer,
-          suggestionsContainerOpen: this.props.classes.autosuggestSuggestionsContainerOpen,
-          suggestionsList: this.props.classes.autosuggestSuggestionsList,
-          suggestion: this.props.classes.autosuggestSuggestion,
-          suggestionFirst: this.props.classes.autosuggestFirstSuggestion,
-          suggestionHighlighted: this.props.classes.autosuggestSuggestionHighlighted,
-          sectionContainer: this.props.classes.autosuggestSectionContainer,
-          sectionContainerFirst: this.props.classes.autosuggestFirstSectionContainer,
-          sectionTitle: this.props.classes.autosuggestSectionTitle,
-        }}
+        theme={rsTheme}
         inputProps={{
           value: this.props.currentInternalValue || this.props.currentTextualValue || "",
           onChange: this.onChange,
@@ -659,5 +654,4 @@ class ActualPropertyEntryReferenceRenderer
  * - descriptionAsAlert: displays the description if exists as alert rather than the standard
  * - onEnter: A function that triggers when the enter key is pressed
  */
-const PropertyEntryReferenceRenderer = withStyles(style)(ActualPropertyEntryReferenceRenderer);
 export default PropertyEntryReferenceRenderer;

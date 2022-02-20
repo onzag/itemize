@@ -12,9 +12,6 @@ import AppCurrencyRetriever from "@onzag/itemize/client/components/localization/
 import I18nReadError from "@onzag/itemize/client/components/localization/I18nReadError";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
@@ -23,11 +20,13 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
+import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
 
 /**
  * The signup dialog styles
  */
-const signupDialogStyles = createStyles({
+const style = {
 	welcomeTitle: {
 		paddingBottom: "1rem",
 		fontWeight: 300,
@@ -55,12 +54,12 @@ const signupDialogStyles = createStyles({
 	divider: {
 		margin: "1rem 0",
 	},
-});
+};
 
 /**
  * The props for the signup dialog that it needs to take
  */
-interface ISignupDialogProps extends WithStyles<typeof signupDialogStyles> {
+interface ISignupDialogProps {
 	/**
 	 * Whether the dialog is currently open
 	 */
@@ -83,6 +82,8 @@ function runManyFunctions(functions: Array<() => void>)<0>{
 	functions.forEach((f) => f());
 }
 
+const StyledProgressingElement = styled(ProgressingElement)(style.signupButtonWrapper);
+
 /**
  * A fully compatible with the navbar fast prototyping signup dialog for the user
  * to fill in, contains its own item definition provider, but it must be into
@@ -90,7 +91,7 @@ function runManyFunctions(functions: Array<() => void>)<0>{
  * @param props the login props
  * @returns a react component
  */
-export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialogProps) => {
+export function SignupDialog(props: ISignupDialogProps) {
 	return (
 		<ItemProvider
 			itemDefinition="user"
@@ -116,11 +117,11 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 									}
 								title={i18nSignup}
 							>
-								<div className={props.classes.titleContainer}>
-									<Typography variant="h4" className={props.classes.welcomeTitle}>
+								<Box sx={style.titleContainer}>
+									<Typography variant="h4" sx={style.welcomeTitle}>
 										<I18nRead id="signup_welcome" capitalize={true}/>
 									</Typography>
-								</div>
+								</Box>
 								<form>
 									<Entry
 										id="username"
@@ -148,10 +149,9 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 
 									<I18nReadError error={actioner.error} />
 								</form>
-								<ProgressingElement
+								<StyledProgressingElement
 									isProgressing={actioner.isLoggingIn}
 									fullWidth={true}
-									className={props.classes.signupButtonWrapper}
 								>
 									<Button
 										color="primary"
@@ -164,7 +164,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 									>
 										{i18nSignup}
 									</Button>
-								</ProgressingElement>
+								</StyledProgressingElement>
 								<I18nReadMany
 									data={[{
 										id: "terms_and_conditions",
@@ -173,7 +173,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 									}]}
 								>
 									{(i18nTermsAndConditions: string, i18nPrivacyPolicy: string) => (
-										<Typography variant="caption" className={props.classes.signupComplyCaption}>
+										<Typography variant="caption" sx={style.signupComplyCaption}>
 											<I18nRead
 												id="signup_accept_terms"
 												capitalize={true}
@@ -185,7 +185,7 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 										</Typography>
 									)}
 								</I18nReadMany>
-								<Divider className={props.classes.divider}/>
+								<Divider sx={style.divider}/>
 								<I18nRead id="login_instead">
 									{(i18nLoginInstead: string) => (
 										<Button
@@ -213,4 +213,4 @@ export const SignupDialog = withStyles(signupDialogStyles)((props: ISignupDialog
 			</LogActioner>
 		</ItemProvider>
 	);
-});
+};

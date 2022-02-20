@@ -7,8 +7,19 @@
 import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
-import { FormControl, InputLabel, Select, MenuItem, FilledInput } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import FilledInput from "@mui/material/FilledInput";
 import { Path } from "slate";
+
+const style = {
+  box: {
+    padding: "0.5rem",
+  },
+};
 
 /**
  * An utility to define a single templating option
@@ -299,11 +310,11 @@ export function TemplatingOptions(props: IWrapperContainerProps) {
 
   // and return the thing
   return (
-    <div className={props.classes.box}>
+    <Box sx={style.box}>
       <SingleTemplatingElement
         name="context"
         i18nName={props.i18nRichInfo.context}
-        value={currentNode.context || null}
+        value={currentNode.context || null}
         options={allContexts}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setContext}
@@ -311,7 +322,7 @@ export function TemplatingOptions(props: IWrapperContainerProps) {
       <SingleTemplatingElement
         name="if"
         i18nName={props.i18nRichInfo.renderCondition}
-        value={currentNode.ifCondition || null}
+        value={currentNode.ifCondition || null}
         options={allIfConditions}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setIfCondition}
@@ -319,11 +330,11 @@ export function TemplatingOptions(props: IWrapperContainerProps) {
       <SingleTemplatingElement
         name="each"
         i18nName={props.i18nRichInfo.each}
-        value={currentNode.forEach || null}
+        value={currentNode.forEach || null}
         options={allEachContexts}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setForEach}
       />
-    </div>
+    </Box>
   );
 }

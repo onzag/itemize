@@ -5,9 +5,6 @@
  */
 
 import React from "react";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import DoneIcon from "@mui/icons-material/Done";
 import { DialogResponsive } from "../dialog";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
@@ -19,11 +16,11 @@ import Typography from "@mui/material/Typography";
  * The external dialog style creator
  * @returns a bunch of styles
  */
-const externalDialogsStyle = () => createStyles({
+const externalDialogsStyle = {
   needsUpdateContent: {
     padding: "1rem 0.5rem",
   },
-});
+};
 
 /**
  * The external dialogs component, given a
@@ -31,7 +28,7 @@ const externalDialogsStyle = () => createStyles({
  * display a dialog as long as they are there
  * @returns a react element
  */
-export const ExternalDialogs = withStyles(externalDialogsStyle)((props: WithStyles<typeof externalDialogsStyle>) => {
+export function ExternalDialogs() {
   return (
     <LocationStateReader
       stateIsInQueryString={true}
@@ -74,7 +71,7 @@ export const ExternalDialogs = withStyles(externalDialogsStyle)((props: WithStyl
                     </Button>
                   }
                 >
-                  <Typography variant="body1" className={props.classes.needsUpdateContent}>
+                  <Typography variant="body1" sx={externalDialogsStyle.needsUpdateContent}>
                     {i18nDescription}
                   </Typography>
                 </DialogResponsive>
@@ -85,4 +82,4 @@ export const ExternalDialogs = withStyles(externalDialogsStyle)((props: WithStyl
       }}
     </LocationStateReader>
   )
-});
+};

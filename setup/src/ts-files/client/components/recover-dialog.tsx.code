@@ -19,23 +19,24 @@ import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import { localizedRedirectTo } from "@onzag/itemize/client/components/navigation";
+import { styled } from "@mui/material/styles";
 
 /**
  * The recover dialog styles
  */
-const recoverDialogStyles = createStyles({
+const style = {
 	resetPasswordButtonWrapper: {
 		marginTop: "1.5rem",
 	},
 	divider: {
 		margin: "1rem 0",
 	},
-});
+};
 
 /**
  * Props for the recover dialog
  */
-interface IRecoverDialogProps extends WithStyles<typeof recoverDialogStyles> {
+interface IRecoverDialogProps {
 	/**
 	 * Whether the dialog is currently open
 	 */
@@ -58,6 +59,8 @@ function runManyFunctions(functions: Array<() => void>) {
 	functions.forEach((f) => f());
 }
 
+const StyledProgressingElement = styled(ProgressingElement)(style.resetPasswordButtonWrapper);
+
 /**
  * A recover dialog fully compatible with the navbar that allows for quickly adding
  * a dialog for recovering the password, it contains its own item definition provider but depends to
@@ -66,7 +69,7 @@ function runManyFunctions(functions: Array<() => void>) {
  * @param props the props for recovery
  * @returns a react component
  */
-export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDialogProps) => {
+export function RecoverDialog(props: IRecoverDialogProps) {
 	return (
 		<ItemProvider
 			itemDefinition="user"
@@ -135,10 +138,9 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
 												{(phone: string) => (
 													<I18nRead id={phone ? "recover_account_action_phone" : "recover_account_action"}>
 														{(i18nRecoverAction: string) => (
-															<ProgressingElement
+															<StyledProgressingElement
 																isProgressing={actioner.statefulOnProgress}
 																fullWidth={true}
-																className={props.classes.resetPasswordButtonWrapper}
 															>
 																<Reader id="phone">
 																	{(phone: string) => (
@@ -155,12 +157,12 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
 																		</Button>
 																	)}
 																</Reader>
-															</ProgressingElement>
+															</StyledProgressingElement>
 														)}
 													</I18nRead>
 												)}
 											</Reader>
-											<Divider className={props.classes.divider} />
+											<Divider sx={style.divider} />
 											<I18nRead id="login">
 												{(i18nLogin: string) => (
 													<Button
@@ -206,4 +208,4 @@ export const RecoverDialog = withStyles(recoverDialogStyles)((props: IRecoverDia
 			</Reader>
 		</ItemProvider>
 	);
-});
+};

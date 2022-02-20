@@ -8,9 +8,6 @@
 import { IPropertyEntryBooleanRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryBoolean";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -21,11 +18,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
 import Switch from "@mui/material/Switch";
+import Box from "@mui/material/Box";
 
 /**
  * The styles of the renderer
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -59,13 +57,7 @@ export const style = createStyles({
     alignItems: "center",
     justifyContent: "space-between",
   },
-});
-
-/**
- * The renderer props, based on the properties it will take
- */
-interface IPropertyEntryBooleanRendererWithStylesProps extends IPropertyEntryBooleanRendererProps, WithStyles<typeof style> {
-}
+};
 
 /**
  * triggers once the boolean has changed
@@ -73,7 +65,7 @@ interface IPropertyEntryBooleanRendererWithStylesProps extends IPropertyEntryBoo
  * @param e the event itself
  */
 function handleOnChange(
-  props: IPropertyEntryBooleanRendererWithStylesProps,
+  props: IPropertyEntryBooleanRendererProps,
   e: React.ChangeEvent<HTMLInputElement>,
 ) {
   props.enableUserSetErrors();
@@ -99,7 +91,7 @@ function handleOnChange(
  * @param props the entry boolean props
  * @returns a react element
  */
-const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBooleanRendererWithStylesProps) => {
+function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps) {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 
   let icon: React.ReactNode = null;
@@ -126,21 +118,21 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
     internalContent = (
       <FormControl
         component={"fieldset" as any}
-        className={props.classes.entry}
+        sx={style.entry}
       >
         {props.label ? <FormLabel
           aria-label={props.label}
           component={"legend" as any}
+          sx={[style.label, style.labelSingleLine]}
           classes={{
-            root: props.classes.label + " " + props.classes.labelSingleLine,
             focused: "focused",
           }}
         >
           {props.label}{icon ? <IconButton
-          tabIndex={-1}
-          className={props.classes.icon}
-          onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
-          size="large">{icon}</IconButton> : null}
+            tabIndex={-1}
+            sx={style.icon}
+            onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
+            size="large">{icon}</IconButton> : null}
         </FormLabel> : null}
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
@@ -148,11 +140,13 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
         >
           {values.map((v) => <FormControlLabel
             key={v.value}
-            classes={{
-              label: props.classes.label
+            componentsProps={{
+              typography: {
+                sx: style.label,
+              }
             }}
             value={v.value}
-            control={<Radio/>}
+            control={<Radio />}
             label={v.label}
             disabled={props.disabled}
           />)}
@@ -161,11 +155,13 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
     )
   } else {
     internalContent = (
-      <FormControl className={props.classes.entry}>
+      <FormControl sx={style.entry}>
         <FormControlLabel
           aria-label={props.label}
-          classes={{
-            label: props.classes.label,
+          componentsProps={{
+            typography: {
+              sx: style.label,
+            }
           }}
           control={
             <Switch
@@ -177,23 +173,23 @@ const PropertyEntryBooleanRenderer = withStyles(style)((props: IPropertyEntryBoo
           label={props.label}
         />
         {icon ? <IconButton
-          className={props.classes.icon}
+          sx={style.icon}
           onClick={props.canRestore ? props.onRestore : null}
           size="large">{icon}</IconButton> : null}
       </FormControl>
     )
   }
   return (
-    <div className={props.classes.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" className={props.classes.description}>
+    <Box sx={style.container}>
+      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description}>
         {props.description}
       </Alert> : null}
       {internalContent}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" className={props.classes.description}>
+      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
         {props.description}
       </Typography> : null}
-    </div>
+    </Box>
   );
-});
+};
 
 export default PropertyEntryBooleanRenderer;

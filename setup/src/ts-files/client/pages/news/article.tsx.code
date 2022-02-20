@@ -8,16 +8,14 @@ import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/it
 import View from "@onzag/itemize/client/components/property/View";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 
 import { Avatar } from "../../components/avatar";
+import { Theme, styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 
 /**
  * The article page props
@@ -35,7 +33,7 @@ interface IArticleProps {
  * @param theme the mui theme
  * @returns a bunch of styles
  */
-const articleContentStyles = (theme: Theme) => createStyles({
+const style = {
 	container: {
 		padding: 0,
 	},
@@ -49,7 +47,7 @@ const articleContentStyles = (theme: Theme) => createStyles({
 		height: "40vh",
 		lineHeight: 0,
 		overflow: "hidden",
-		position: "relative",
+		position: "relative" as "relative",
 		boxShadow: "0 0 5px rgb(50,50,50)",
 		fallbacks: {
 			height: "30rem",
@@ -69,7 +67,7 @@ const articleContentStyles = (theme: Theme) => createStyles({
 		left: 0,
 		zIndex: 2,
 	},
-	innerContainer: {
+	innerContainer: (theme: Theme) => ({
 		padding: "2rem 4rem 4rem 4rem",
 		[theme.breakpoints.down('md')]: {
 			padding: "2rem 3rem 3rem 3rem",
@@ -77,7 +75,7 @@ const articleContentStyles = (theme: Theme) => createStyles({
 		[theme.breakpoints.down('sm')]: {
 			padding: "2rem",
 		},
-	},
+	}),
 	title: {
 		textTransform: "uppercase",
 		fontWeight: 900,
@@ -105,18 +103,34 @@ const articleContentStyles = (theme: Theme) => createStyles({
 		top: "2rem",
 		left: "3rem",
 	},
-	dateInfo: {
+	dateInfo: (theme: Theme) => ({
 		display: "flex",
 		width: "100%",
 		color: theme.palette.grey[400],
 		paddingBottom: "1.2rem",
-	},
+	}),
 	divider: {
 		margin: "0 0.7rem",
 	},
-});
+};
 
-const profileURLFn = (id: string) => `/profile/${id}`;
+const profileURLFn = (id: string) => `/u/${id}`;
+
+interface ISummaryImageView {
+	className?: string;
+}
+function SummaryImageView(props: ISummaryImageView) {
+	return (
+		<View
+			id="summary_image"
+			rendererArgs={{
+				imageClassName: props.className,
+				imageSizes: "70vw",
+			}}
+		/>
+	);
+}
+const StyledSummaryImageView = styled(SummaryImageView)(style.headerImage);
 
 /**
  * The article content displays the content for a given article inside
@@ -124,21 +138,15 @@ const profileURLFn = (id: string) => `/profile/${id}`;
  * @param props the article content props
  * @returns a react element
  */
-const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeof articleContentStyles>) => {
+function ArticleContent() {
 	return (
-		<Container maxWidth="md" className={props.classes.container}>
-			<Paper className={props.classes.paper}>
+		<Container maxWidth="md" sx={style.container}>
+			<Paper sx={style.paper}>
 				<ItemLoader fullWidth={true}>
-					<div className={props.classes.headerImageContainer}>
-						<View
-							id="summary_image"
-							rendererArgs={{
-								imageClassName: props.classes.headerImage,
-								imageSizes: "70vw",
-							}}
-						/>
-						<div className={props.classes.headerOverlay}/>
-						<Typography variant="h3" className={props.classes.title}>
+					<Box sx={style.headerImageContainer}>
+						<StyledSummaryImageView />
+						<Box sx={style.headerOverlay} />
+						<Typography variant="h3" sx={style.title}>
 							<Reader id="title">{(title: string) => title}</Reader>
 						</Typography>
 						<Reader id="created_by">
@@ -161,15 +169,15 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 													<NoStateItemProvider
 														itemDefinition="article"
 													>
-														<Typography variant="h3" className={props.classes.publisher}>
-															<I18nRead id="by" args={[username]}/>
+														<Typography variant="h3" sx={style.publisher}>
+															<I18nRead id="by" args={[username]} />
 														</Typography>
 													</NoStateItemProvider>
 												</ModuleProvider>
 											)}
 										</Reader>
 										<Avatar
-											linkClassName={props.classes.publisherAvatar}
+											linkSx={style.publisherAvatar}
 											hideFlag={true}
 											size="medium"
 											profileURL={profileURLFn}
@@ -177,18 +185,18 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 									</ItemProvider>
 								</ModuleProvider>
 							)}</Reader>
-					</div>
-					<div className={props.classes.innerContainer + " trusted"}>
-						<div className={props.classes.dateInfo}>
+					</Box>
+					<Box sx={style.innerContainer} className="trusted">
+						<Box sx={style.dateInfo}>
 							<Typography variant="body2">
-								<View id="created_at" rendererArgs={{ dateFormat: "LLLL" }}/>
+								<View id="created_at" rendererArgs={{ dateFormat: "LLLL" }} />
 							</Typography>
 							<Reader id="edited_at">
 								{(editedAt: string) => {
 									if (editedAt) {
 										return (
 											<>
-												<Divider orientation="vertical" flexItem={true} className={props.classes.divider} />
+												<Divider orientation="vertical" flexItem={true} sx={style.divider} />
 												<I18nRead
 													id="updated_at"
 													capitalize={true}
@@ -206,14 +214,14 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
 									return null;
 								}}
 							</Reader>
-						</div>
-						<View id="content"/>
-					</div>
+						</Box>
+						<View id="content" />
+					</Box>
 				</ItemLoader>
 			</Paper>
 		</Container>
 	);
-});
+};
 
 /**
  * the article component itself that will provide for a given
@@ -221,7 +229,7 @@ const ArticleContent = withStyles(articleContentStyles)((props: WithStyles<typeo
  * @param props the props for the article
  * @returns a react element
  */
-export function Article(props: IArticleProps)<0>{
+export function Article(props: IArticleProps) {
 	const articleId = props.match.params.id;
 	return (
 		<>
@@ -247,7 +255,7 @@ export function Article(props: IArticleProps)<0>{
 							</TitleSetter>
 						)}
 					</Reader>
-					<ArticleContent/>
+					<ArticleContent />
 				</ItemProvider>
 			</ModuleProvider>
 		</>

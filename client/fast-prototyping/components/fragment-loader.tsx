@@ -8,9 +8,6 @@
 import View from "../../components/property/View";
 import Entry from "../../components/property/Entry";
 import React, { useEffect, useRef, useState } from "react";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import UserDataRetriever from "../../components/user/UserDataRetriever";
 import SubmitActioner from "../../components/item/SubmitActioner";
 import Snackbar from "../components/snackbar";
@@ -21,17 +18,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
+import { styled } from '@mui/material/styles';
 
 /**
  * The item definition loader styles
  */
-const fragmentLoaderStyles = createStyles({
-  container: {
-    position: "relative",
-  },
-  fullWidthContainer: {
-    width: "100%",
-  },
+const fragmentLoaderStyles = {
   buttonEdit: {
     position: "absolute",
     top: 0,
@@ -45,12 +37,12 @@ const fragmentLoaderStyles = createStyles({
     border: "solid 1px #ccc",
     padding: "1rem",
   },
-});
+};
 
 /**
  * the props for the item definition loader
  */
-interface FragmentLoaderProps extends WithStyles<typeof fragmentLoaderStyles> {
+interface FragmentLoaderProps {
   roles: string[];
   version: string;
   fullWidth?: boolean;
@@ -62,12 +54,25 @@ interface FragmentLoaderProps extends WithStyles<typeof fragmentLoaderStyles> {
   buttonPosition?: "topRight" | "bottomRight" | "topLeft" | "bottomLeft",
 }
 
+const ApprovedRejectGroup = styled("div")(fragmentLoaderStyles.buttonApproveRejectGroup);
+
+interface IContainer {
+  fullWidth?: boolean,
+}
+
+const Container = styled("div", {
+  shouldForwardProp: (prop) => prop !== "fullWidth"
+})<IContainer>(({ fullWidth }) => ({
+  position: "relative",
+  width: fullWidth ? "100%" : "auto",
+}));
+
 /**
  * The item definition loader allows to handle cases of not found, blocked or errors in a nice way
  * @param props the loader props
  * @returns a react component
  */
-export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentLoaderProps) => {
+export function FragmentLoader(props: FragmentLoaderProps) {
   const [editMode, setEditMode] = useState(false);
 
   const mountState = useRef(true)
@@ -84,7 +89,7 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
       <UserDataRetriever>
         {(userData) => (
           props.roles.includes(userData.role) ? <IconButton
-            className={props.classes.buttonEdit}
+            sx={fragmentLoaderStyles.buttonEdit}
             onClick={setEditMode.bind(null, true)}
             size="large">
             <EditIcon />
@@ -94,7 +99,7 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
     );
   } else {
     buttonsToUse = ReactDOM.createPortal(
-      <div className={props.classes.buttonApproveRejectGroup}>
+      <ApprovedRejectGroup>
         <IdVersionRetriever>
           {(idVersion) => (
             <SubmitActioner>
@@ -146,18 +151,18 @@ export const FragmentLoader = withStyles(fragmentLoaderStyles)((props: FragmentL
         <IconButton onClick={setEditMode.bind(null, false)} color="secondary" size="large">
           <CloseIcon />
         </IconButton>
-      </div>,
+      </ApprovedRejectGroup>,
       document.body,
     );
   }
 
   return (
-    <div className={`${props.classes.container} ${props.fullWidth ? props.classes.fullWidthContainer : ""}`}>
+    <Container fullWidth={props.fullWidth}>
       {!editMode ?
         <View id={props.fragmentPropertyId || "content"} rendererArgs={props.viewRendererArgs} useAppliedValue={true} /> :
         <Entry id={props.fragmentPropertyId || "content"} rendererArgs={props.entryRendererArgs} />
       }
       {buttonsToUse}
-    </div>
+    </Container>
   );
-});
+};

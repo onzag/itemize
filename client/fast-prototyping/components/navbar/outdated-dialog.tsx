@@ -5,9 +5,6 @@
  */
 
 import React from "react";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import { DialogResponsive } from "../dialog";
 import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChecker";
 import I18nReadMany from "../../../components/localization/I18nReadMany";
@@ -18,16 +15,16 @@ import UpdateIcon from "@mui/icons-material/Update";
 /**
  * The dialog styles
  */
-const outdatedDialogStyles = createStyles({
+const outdatedDialogStyles = {
   dialogContent: {
     padding: "1rem 0.5rem",
   },
-});
+};
 
 /**
  * The outdated dialog props
  */
-interface OutdatedDialogProps extends WithStyles<typeof outdatedDialogStyles> {
+interface IOutdatedDialogProps {
   /**
    * is open if it's outdated, basically will mean that is open if both this prop
    * and is outdated match as true
@@ -51,7 +48,7 @@ function reloadApp() {
  * @param props the outdated props, needs a flag to see if it will open when is outdated
  * @returns a react component
  */
-export const OutdatedDialog = withStyles(outdatedDialogStyles)((props: OutdatedDialogProps) => {
+export function OutdatedDialog(props: IOutdatedDialogProps) {
   return (
     <AppIsOutdatedChecker>
       {(isOutdated) => {
@@ -88,7 +85,7 @@ export const OutdatedDialog = withStyles(outdatedDialogStyles)((props: OutdatedD
                       </Button>
                     }
                   >
-                    <Typography variant="body1" className={props.classes.dialogContent}>
+                    <Typography variant="body1" sx={outdatedDialogStyles.dialogContent}>
                       {needsUpdateContent}
                     </Typography>
                   </DialogResponsive>
@@ -101,4 +98,4 @@ export const OutdatedDialog = withStyles(outdatedDialogStyles)((props: OutdatedD
       }}
     </AppIsOutdatedChecker>
   )
-});
+};

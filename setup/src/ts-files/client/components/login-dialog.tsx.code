@@ -6,9 +6,6 @@ import { LogActioner } from "@onzag/itemize/client/components/login/LogActioner"
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
@@ -16,11 +13,13 @@ import DoneIcon from "@mui/icons-material/Done";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { ProgressingElement } from "@onzag/itemize/client/fast-prototyping/components/util";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
+import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
 
 /**
  * The login dialog styles
  */
-const loginDialogStyles = createStyles({
+const style = {
 	welcomeTitle: {
 		paddingBottom: "1rem",
 		fontWeight: 300,
@@ -45,12 +44,12 @@ const loginDialogStyles = createStyles({
 	divider: {
 		margin: "1rem 0",
 	},
-});
+};
 
 /**
  * The login dialog props
  */
-interface ILoginDialogProps extends WithStyles<typeof loginDialogStyles> {
+interface ILoginDialogProps {
 	/**
 	 * whether it is currently opened
 	 */
@@ -77,6 +76,9 @@ function runManyFunctions(functions: Array<() => void>)<0>{
 	functions.forEach((f) => f());
 }
 
+const StyledProgressingElement = styled(ProgressingElement)(style.loginButtonWrapper);
+const StyledImg = styled("img")(style.image);
+
 /**
  * A fully compatible with the navbar fast prototyping login dialog for the user
  * to fill in, contains its own item definition provider, but it must be into
@@ -84,7 +86,7 @@ function runManyFunctions(functions: Array<() => void>)<0>{
  * @param props the login props
  * @returns a react component
  */
-export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogProps) => {
+export function LoginDialog(props: ILoginDialogProps) {
 	return (
 		<ItemProvider
 			itemDefinition="user"
@@ -105,12 +107,12 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 								}
 								title={i18nLogin}
 							>
-								<div className={props.classes.titleContainer}>
-									<img src="/rest/resource/icons/android-chrome-64x64.png" className={props.classes.image}/>
-									<Typography variant="h4" className={props.classes.welcomeTitle}>
+								<Box sx={style.titleContainer}>
+									<StyledImg src="/rest/resource/icons/android-chrome-64x64.png"/>
+									<Typography variant="h4" sx={style.welcomeTitle}>
 										<I18nRead id="login_welcome" capitalize={true}/>
 									</Typography>
-								</div>
+								</Box>
 								<form>
 									<I18nRead id="login_alt_field_label">
 										{(i18nAltLabel: string) => (
@@ -132,10 +134,9 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 									</I18nRead>
 									<Entry id="password" onEntryDrivenChange={actioner.dismissError} showAsInvalid={!!actioner.error} />
 
-									<ProgressingElement
+									<StyledProgressingElement
 										isProgressing={actioner.isLoggingIn}
 										fullWidth={true}
-										className={props.classes.loginButtonWrapper}
 									>
 										<Button
 											color="primary"
@@ -148,11 +149,11 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 										>
 											{i18nLogin}
 										</Button>
-									</ProgressingElement>
+									</StyledProgressingElement>
 									<I18nRead id="forgot_password_question">
 										{(i18nForgotPassword: string) => (
 											<Button
-												className={props.classes.forgotPasswordButton}
+												sx={style.forgotPasswordButton}
 												color="primary"
 												variant="text"
 												size="small"
@@ -164,7 +165,7 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 											</Button>
 										)}
 									</I18nRead>
-									<Divider className={props.classes.divider}/>
+									<Divider sx={style.divider}/>
 									<I18nRead id="signup_instead">
 										{(i18nSignupInstead: string) => (
 											<Button
@@ -193,4 +194,4 @@ export const LoginDialog = withStyles(loginDialogStyles)((props: ILoginDialogPro
 			</LogActioner>
 		</ItemProvider>
 	);
-});
+};

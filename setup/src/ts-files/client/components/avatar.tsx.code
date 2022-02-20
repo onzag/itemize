@@ -5,6 +5,7 @@ import { PropertyDefinitionSupportedFileType } from "@onzag/itemize/base/Root/Mo
 import { IPropertyDefinitionState } from "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition";
 
 import { Avatar as FastPrototypingAvatar } from "@onzag/itemize/client/fast-prototyping/components/avatar";
+import type { SxProps } from "@mui/material";
 
 type profileURLFn = (id: string) => string;
 
@@ -16,6 +17,7 @@ interface IAvatarProps {
 	cacheImage?: boolean;
 	fullWidth?: boolean;
 	linkClassName?: string;
+	linkSx?: SxProps;
 }
 
 /**
@@ -71,6 +73,7 @@ export function Avatar(props: IAvatarProps) {
 												cacheImage: props.cacheImage,
 												fullWidth: props.fullWidth,
 												linkClassName: props.linkClassName,
+												linkSx: props.linkSx,
 											};
 
 											if (!props.showWarnings && props.hideFlag) {

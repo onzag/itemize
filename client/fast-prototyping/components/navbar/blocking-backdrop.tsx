@@ -5,10 +5,7 @@
  */
 
 import React from "react";
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled, Theme } from "@mui/material/styles";
 import { AppIsBlockedFromUpdate } from "../../../components/outdated/AppIsBlockedFromUpdate";
 import I18nRead from "../../../components/localization/I18nRead";
 import Backdrop from "@mui/material/Backdrop";
@@ -19,19 +16,21 @@ import CircularProgress from "@mui/material/CircularProgress";
  * @param theme the mui theme
  * @retuns a bunch of styles
  */
-const blockingBackdropStyles = (theme: Theme) => createStyles({
-  backdrop: {
+const blockingBackdropStyles = {
+  backdrop: (theme: Theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
     flexDirection: "column",
     padding: "2rem",
-  },
+  }),
   backdropTextContainer: {
     fontSize: "0.95rem",
     textAlign: "center",
     paddingBottom: "2rem",
   },
-});
+};
+
+const BackDropTextContainer = styled("div")(blockingBackdropStyles.backdropTextContainer);
 
 /**
  * The blocking backdrop appears when the app is blocked from an update check AppIsBlockedFromUpdate component
@@ -39,7 +38,7 @@ const blockingBackdropStyles = (theme: Theme) => createStyles({
  * 
  * It is part of the navbar by default
  */
-interface BlockingBackdropProps extends WithStyles<typeof blockingBackdropStyles> {
+interface BlockingBackdropProps {
   /**
    * Whether it is excluded and won't render
    */
@@ -54,7 +53,7 @@ interface BlockingBackdropProps extends WithStyles<typeof blockingBackdropStyles
  * @param props the props for the blocking backdrop
  * @returns a react component
  */
-export const BlockingBackdrop = withStyles(blockingBackdropStyles)((props: BlockingBackdropProps) => {
+export function BlockingBackdrop(props: BlockingBackdropProps) {
   if (props.exclude) {
     return null;
   }
@@ -66,14 +65,14 @@ export const BlockingBackdrop = withStyles(blockingBackdropStyles)((props: Block
           return null;
         }
         return (
-          <Backdrop className={props.classes.backdrop} open={isBlocked}>
-            <div className={props.classes.backdropTextContainer}>
+          <Backdrop sx={blockingBackdropStyles.backdrop} open={isBlocked}>
+            <BackDropTextContainer>
               <I18nRead id="blocked_update" />
-            </div>
+            </BackDropTextContainer>
             <CircularProgress color="inherit" />
           </Backdrop>
         )
       }}
     </AppIsBlockedFromUpdate>
   );
-})
+}

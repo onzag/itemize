@@ -11,7 +11,7 @@ import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
 import AdapterMoment from '@mui/lab/AdapterMoment';
 import { IConfigRawJSONDataType } from "../../config";
-import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { CacheProvider } from "@emotion/react";

@@ -40,90 +40,46 @@ import { countSizeAndWords } from "../../../internal/text";
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
 import Divider from "@mui/material/Divider";
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled, SxProps, Theme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
 
 /**
  * Defining a bunch of styles for the wrapper
  */
-const style = (theme: Theme) => createStyles({
-  selectionInput: {
-    width: "100%",
-  },
-  box: {
-    padding: "0.5rem",
-  },
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  chip: {
-    margin: 2,
-  },
-  input: {
-    width: "100%",
-  },
+const style = {
   editorContainer: {
     width: "100%",
-    display: "flex",
-    flexDirection: "row",
-  },
-  wrapperButton: {
-    fontSize: "0.5rem",
-    padding: "0.1rem 0.5rem 0.2rem 0.5rem",
-    borderLeft: "solid 2px #ccc",
-    borderRadius: 0,
-  },
-  treeChildrenBox: {
-    padding: "0 0 0 0.5rem",
-    borderLeft: "solid 1px #ccc",
-  },
-  treeDataBox: {
-    width: "100%",
-    position: "relative",
-    maxHeight: "360px",
-    overflowY: "auto",
-    flex: "1 0 auto",
-  },
-  dropPositionEnabled: {
-    height: "0.5rem",
-    border: "dashed 1px #ccc",
-    "&:hover": {
-      border: "dashed 1px green",
-    },
-  },
-  dropPositionDisabled: {
-    height: "0.5rem",
-    border: "solid 1px invisible",
-  },
-  separator: {
-    margin: "1rem 0",
-  },
-  tab: {
-    minWidth: "auto",
+    display: "flex" as "flex",
+    flexDirection: "row" as "row",
   },
   badge: {
-    transform: "scale(1) translate(0%, 0%)",
+    "&. MuiBadge-badge": {
+      transform: "scale(1) translate(0%, 0%)",
+    }
   },
   badgeFastKey: {
-    transform: "scale(1) translate(0%, 0%)",
-    backgroundColor: "#fffde7",
-    color: "#212121",
-    borderColor: "#f9a825",
+    "&. MuiBadge-badge": {
+      transform: "scale(1) translate(0%, 0%)",
+      backgroundColor: "#fffde7",
+      color: "#212121",
+      borderColor: "#f9a825",
+    },
   },
   badgeFastKeyShift: {
-    transform: "scale(1) translate(0%, 0%)",
-    backgroundColor: "#e3f2fd",
-    color: "#212121",
-    borderColor: "#f9a825",
+    "&. MuiBadge-badge": {
+      transform: "scale(1) translate(0%, 0%)",
+      backgroundColor: "#e3f2fd",
+      color: "#212121",
+      borderColor: "#f9a825",
+    },
   },
   badgeDisabled: {
-    transform: "scale(1) translate(0%, 0%)",
-    opacity: 0.5,
+    "&. MuiBadge-badge": {
+      transform: "scale(1) translate(0%, 0%)",
+      opacity: 0.5,
+    },
   },
   elementTitle: {
     textTransform: "capitalize",
@@ -147,7 +103,7 @@ const style = (theme: Theme) => createStyles({
     display: "flex",
     flexDirection: "column",
   },
-  editorDrawerAppbarSpacer: theme.mixins.toolbar,
+  editorDrawerAppbarSpacer: (theme: Theme) => theme.mixins.toolbar,
   editorDrawerFixed: {
     top: 0,
     right: 0,
@@ -181,12 +137,11 @@ const style = (theme: Theme) => createStyles({
     display: "flex",
     flexDirection: "column",
   },
-  editor: (props: ISlateEditorWrapperBaseProps) => {
-    const shouldShowInvalidEditor = !props.state.currentValid;
+  editor: (shouldShowInvalidEditor: boolean, isRichText: boolean) => {
     return {
       "flex": "1 1 100%",
-      "position": "relative",
-      "padding": props.state.isRichText ? "1rem" : "0 1rem 1rem 1rem",
+      "position": "relative" as "relative",
+      "padding": isRichText ? "1rem" : "0 1rem 1rem 1rem",
       // this is the colur when the field is out of focus
       "&::before": {
         left: 0,
@@ -259,18 +214,7 @@ const style = (theme: Theme) => createStyles({
     fontWeight: 700,
     color: "#1b5e20",
   },
-  treeElement: {
-    display: "flex",
-    justifyContent: "space-between",
-  },
-  deleteButton: {
-    height: "1rem",
-    width: "1rem",
-  },
-  deleteIcon: {
-    fontSize: "1rem",
-  },
-});
+};
 
 type RichElementFn = () => RichElement;
 
@@ -475,7 +419,7 @@ export type SlateEditorWrapperCustomToolbarElement =
  * the slate editor as a component the wrapper can receive wrapperArgs so these args are passed
  * when the editor is created with the wrapper itself
  */
-export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps, WithStyles<typeof style> {
+export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps {
   /**
    * A generic error message
    */
@@ -521,10 +465,12 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    * Add a class name to the entire wrapper
    */
   wrapperClassName?: string;
+  wrapperSx?: SxProps;
   /**
    * Add a class name to the container in the wrapper
    */
   wrapperTextEditorClassName?: string;
+  wrapperTextEditorSx?: SxProps;
   /**
    * A function to define custom extra children
    */
@@ -630,7 +576,7 @@ function elementBadgeReturn(
       <Badge
         badgeContent={fastKeyOverride || props.fastKey}
         color="primary"
-        classes={{ badge: shiftKey ? props.classes.badgeFastKeyShift : props.classes.badgeFastKey }}
+        sx={shiftKey ? style.badgeFastKeyShift : style.badgeFastKey }
       >
         {element}
       </Badge>
@@ -699,15 +645,15 @@ function Underline(props: RichTextEditorToolbarElementProps) {
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
   return (
-    <Divider orientation="vertical" className={props.classes.divider} />
+    <Divider orientation="vertical" sx={style.divider} />
   );
 }
 
 function HDivider(props: RichTextEditorToolbarElementProps) {
   return (
     <>
-      <div className={props.classes.hdividerspacer} />
-      <Divider orientation="horizontal" className={props.classes.hdivider} />
+      <Box sx={style.hdividerspacer} />
+      <Divider orientation="horizontal" sx={style.hdivider} />
     </>
   );
 }
@@ -767,7 +713,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
     linkBaseComponent = <Badge
       badgeContent={templateLinkAmount}
       color="secondary"
-      classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
+      sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >{linkBaseComponent}</Badge>
   }
 
@@ -1003,7 +949,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     <Badge
       badgeContent={templateTextAmount}
       color="secondary"
-      classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
+      sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >
       {element}
     </Badge>
@@ -1071,7 +1017,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     <Badge
       badgeContent={templateHTMLAmount}
       color="secondary"
-      classes={{ badge: props.state.currentSelectedElement ? props.classes.badge : props.classes.badgeDisabled }}
+      sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >
       {element}
     </Badge>
@@ -1360,15 +1306,15 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         position={this.props.disjointedMode ? "fixed" : "relative"}
         variant="outlined"
         color="default"
-        className={
-          this.props.disjointedMode ? this.props.classes.appbarFixed : this.props.classes.appbar
+        sx={
+          this.props.disjointedMode ? style.appbarFixed : style.appbar
         }
         data-unblur="true"
         ref={(obj) => {
           this.appBarHeader = obj as any;
         }}
       >
-        <Toolbar className={this.props.classes.toolbar}>
+        <Toolbar sx={style.toolbar}>
           {toolbarForm.map((ele, index) => {
             if (typeof ele === "string") {
               const Element = toolbarRegistry[ele];
@@ -1393,7 +1339,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
               );
             }
           })}
-          <div className={this.props.classes.moreOptionsSpacer} />
+          <Box sx={style.moreOptionsSpacer} />
           {drawerButton}
         </Toolbar>
       </AppBar>
@@ -1470,11 +1416,21 @@ export interface MaterialUISlateWrapperState {
   shiftKey: boolean;
 }
 
+const StyledEditorContainer = styled("div")(style.editorContainer);
+
+interface IStyledEditor {
+  currentValid: boolean;
+  isRichText: boolean;
+}
+const StyledEditor = styled("div", {
+  shouldForwardProp: (p) => p !== "currentValid" && p !== "isRichText",
+})<IStyledEditor>(({ currentValid, isRichText }) => style.editor(!currentValid, isRichText));
+
 /**
  * This represents the unwrapped class that is used for the wrapper, it is not
  * the exported one because it needs to be withStyles for stylization
  */
-class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState> {
+export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState> {
   /**
    * The ref object for the input object for image input
    */
@@ -2186,9 +2142,9 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         linkDialogOpen={this.state.linkDialogOpen}
         selectedElement={this.state.elementThatWasCurrentBeforeLosingFocus}
         supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
-        templateBoxClassName={this.props.classes.linkTemplateOptionsBox}
-        templateTextClassName={this.props.classes.linkTemplateOptionsText}
-        optionPrimaryClassName={this.props.classes.optionPrimary}
+        templateBoxSx={style.linkTemplateOptionsBox}
+        templateTextSx={style.linkTemplateOptionsText}
+        optionPrimarySx={style.optionPrimary}
       />
     ) : null;
 
@@ -2206,7 +2162,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateText.submit}
         i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateText.title}
         elementType="text"
-        optionPrimaryClassName={this.props.classes.optionPrimary}
+        optionPrimarySx={style.optionPrimary}
       />
     ) : null;
 
@@ -2224,7 +2180,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
         i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateHTML.submit}
         i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateHTML.title}
         elementType="html"
-        optionPrimaryClassName={this.props.classes.optionPrimary}
+        optionPrimarySx={style.optionPrimary}
       />
     ) : null;
 
@@ -2258,18 +2214,16 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
       return (
         <>
           {toolbar}
-          <div className={
-            (this.props.wrapperClassName ? " " + this.props.wrapperClassName : "")
-          }>
-            <div className={
+          <Box className={this.props.wrapperClassName} sx={this.props.wrapperSx}>
+            <Box className={
               "rich-text " +
               (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
               (this.props.state.isFocused ? " focused" : "")
-            }>
+            } sx={this.props.wrapperSx}>
               {this.props.children}
-            </div>
+            </Box>
             {extraChildren}
-          </div>
+          </Box>
           <WrapperContainer
             ref={this.wrapperContainerRef}
             {...this.props}
@@ -2293,18 +2247,19 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
     return (
       <>
         {toolbar}
-        <div className={
-          this.props.classes.editorContainer +
-          (this.props.wrapperClassName ? " " + this.props.wrapperClassName : "")
-        }>
-          <div className={
-            "rich-text " +
-            this.props.classes.editor +
-            (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
-            (this.props.state.isFocused ? " focused" : "")
-          }>
+        <StyledEditorContainer sx={this.props.wrapperSx} className={this.props.wrapperClassName}>
+          <StyledEditor
+            className={
+              "rich-text" +
+              (this.props.state.isFocused ? " focused" : "") +
+              this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : ""
+            }
+            currentValid={this.props.state.currentValid}
+            isRichText={this.props.state.isRichText}
+            sx={this.props.wrapperTextEditorSx}
+          >
             {this.props.children}
-          </div>
+          </StyledEditor>
           {extraChildren}
           <WrapperContainer
             {...this.props}
@@ -2314,7 +2269,7 @@ class MaterialUISlateWrapperClass extends React.PureComponent<MaterialUISlateWra
             toolbarHeight={this.state.toolbarHeight}
             fastKeyActive={this.state.altKey && this.state.shiftKey}
           />
-        </div>
+        </StyledEditorContainer>
         {fileLoadErrorDialog}
         {videoDialog}
         {linkDialog}
@@ -2363,27 +2318,27 @@ class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperC
     }
 
     const toReturn = (
-      <div
+      <Box
         data-unblur="true"
         onClick={this.props.helpers.softBlur}
-        className={
-          (this.props.disjointedMode ? this.props.classes.editorDrawerFixed : this.props.classes.editorDrawer) +
-          (this.props.drawerOpen ? " open" : "") +
-          (this.props.noAnimate ? " " + this.props.classes.editorDrawerNoAnimate : "")
-        }
+        sx={[
+          (this.props.disjointedMode ? style.editorDrawerFixed : style.editorDrawer),
+          (this.props.noAnimate ? style.editorDrawerNoAnimate : null)
+        ]}
+        className={this.props.drawerOpen ? "open" : null}
       >
         {
           this.props.disjointedMode && this.props.drawerOpen ?
-            <div
-              className={this.props.classes.editorDrawerAppbarSpacer}
+            <Box
+              sx={style.editorDrawerAppbarSpacer}
               style={{ height: this.props.toolbarHeight, flex: "0 0 " + this.props.toolbarHeight + "px" }}
             /> :
             null
         }
-        <div className={this.props.classes.editorDrawerBody} ref={this.editorDrawerBodyRef}>
+        <Box sx={style.editorDrawerBody} ref={this.editorDrawerBodyRef}>
           {this.props.drawerOpen ? <WrapperDrawer {...this.props} /> : null}
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
 
     if (this.props.disjointedMode) {
@@ -2397,6 +2352,3 @@ class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperC
     }
   }
 }
-
-// export the thing with styles
-export const MaterialUISlateWrapper = withStyles(style)(MaterialUISlateWrapperClass);

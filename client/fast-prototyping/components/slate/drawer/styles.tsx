@@ -16,6 +16,26 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FilledInput from "@mui/material/FilledInput";
 import Chip from "@mui/material/Chip";
 import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+
+const style = {
+  selectionInput: {
+    width: "100%",
+  },
+  box: {
+    padding: "0.5rem",
+  },
+  chips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: 2,
+  },
+  input: {
+    width: "100%",
+  },
+};
 
 /**
  * The single style option props that define a single
@@ -267,22 +287,22 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
   public render() {
     // we use a chip form in order to make it for multiple selection
     return (
-      <FormControl className={this.props.classes.selectionInput} variant="filled">
+      <FormControl sx={style.selectionInput} variant="filled">
         <InputLabel id="slate-styles-option-selector-rich-classes-label">{this.props.i18nRichInfo.classes}</InputLabel>
         <Select
           labelId="slate-styles-option-selector-rich-classes-label"
           id="slate-styles-option-selector-rich-classes"
-          className={this.props.classes.selectionInput}
+          sx={style.selectionInput}
           multiple={true}
           value={this.state.value}
           onChange={this.onRichClassListChange}
           input={<FilledInput id="slate-styles-option-selector-rich-classes-chip" />}
           renderValue={(selected: string[]) => (
-            <div className={this.props.classes.chips}>
+            <Box sx={style.chips}>
               {selected.map((value) => (
-                <Chip key={value} label={value} className={this.props.classes.chip} color="primary" />
+                <Chip key={value} label={value} sx={style.chip} color="primary" />
               ))}
-            </div>
+            </Box>
           )}
           onOpen={this.unblur}
           onClose={this.resetBlur}
@@ -309,7 +329,7 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
 export function StylesOptions(props: IWrapperContainerProps) {
   const currentNode = props.state.currentSelectedElement as RichElement;
   return (
-    <div className={props.classes.box}>
+    <Box sx={style.box}>
       {
         props.featureSupport.supportsRichClasses ?
           <ClassesOptionSelector {...props} /> : null
@@ -321,7 +341,6 @@ export function StylesOptions(props: IWrapperContainerProps) {
             onChange={props.helpers.setStyle}
             name={props.i18nRichInfo.style}
             styleValue={currentNode.style}
-            inputClassName={props.classes.input}
           /> : null
       }
       {
@@ -331,7 +350,6 @@ export function StylesOptions(props: IWrapperContainerProps) {
             onChange={props.helpers.setHoverStyle}
             name={props.i18nRichInfo.styleHover}
             styleValue={currentNode.styleHover}
-            inputClassName={props.classes.input}
           /> : null
       }
       {
@@ -341,9 +359,8 @@ export function StylesOptions(props: IWrapperContainerProps) {
             onChange={props.helpers.setActiveStyle}
             name={props.i18nRichInfo.styleActive}
             styleValue={currentNode.styleActive}
-            inputClassName={props.classes.input}
           /> : null
       }
-    </div>
+    </Box>
   );
 }

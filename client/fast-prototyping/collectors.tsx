@@ -4,8 +4,6 @@
  * 
  * @module
  */
-
-import ServerStyleSheets from '@mui/styles/ServerStyleSheets';
 import React from "react";
 import uuid from "uuid";
 import { ICollectorType } from "../../client";
@@ -29,11 +27,9 @@ export const styleCollector: ICollectorType = {
    */
   collect(app: React.ReactElement) {
     const id = uuid.v4();
-    const sheets = new ServerStyleSheets();
     const cache = createEmotionCache();
     const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
     STYLE_COLLECTION[id] = {
-      sheets,
       extractCriticalToChunks,
       constructStyleTagsFromChunks,
     };
@@ -41,7 +37,7 @@ export const styleCollector: ICollectorType = {
     // returns the resulting node to use and the
     // id where it is supposed to be collected
     return {
-      node: sheets.collect(
+      node: (
         <ReuseCacheContextEmotionIsAMess.Provider value={true}>
           <CacheProvider value={cache}>
             {app}
@@ -66,7 +62,7 @@ export const styleCollector: ICollectorType = {
     const emotionChunks = sheetsObj.extractCriticalToChunks(html);
     const emotionCss = sheetsObj.constructStyleTagsFromChunks(emotionChunks);
 
-    const value = '<style id="#ssr-sheets">' + sheetsObj.sheets.toString() + '</style>' + emotionCss;
+    const value = emotionCss;
 
     delete STYLE_COLLECTION[id];
     return value;

@@ -10,12 +10,11 @@ import DatePicker from '@mui/lab/DatePicker';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import TimePicker from '@mui/lab/TimePicker';
 import { IPropertyEntryDateTimeRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryDateTime";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 
 // TODOCHECKMUIUPGRADE
 
@@ -31,7 +30,7 @@ function shouldShowInvalid(props: IPropertyEntryDateTimeRendererProps) {
 /**
  * The styles for the date time entry
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -53,14 +52,14 @@ export const style = createStyles({
   iconButton: {
     color: "#424242",
   },
-  label: (props: IPropertyEntryDateTimeRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (invalid: boolean) => ({
+    "color": invalid ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
+      color: invalid ? "#f44336" : "#3f51b5",
     },
   }),
-  fieldInput: (props: IPropertyEntryDateTimeRendererProps) => {
-    if (shouldShowInvalid(props)) {
+  fieldInput: (invalid: boolean, disabled: boolean) => {
+    if (invalid) {
       return {
         "width": "100%",
         // this is the colur when the field is out of focus
@@ -73,7 +72,7 @@ export const style = createStyles({
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
+          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
@@ -90,13 +89,7 @@ export const style = createStyles({
       },
     };
   },
-});
-
-/**
- * The props for the ate time renderer
- */
-interface IPropertyEntryDateTimeRendererWithStylesProps extends IPropertyEntryDateTimeRendererProps, WithStyles<typeof style> {
-}
+};
 
 function renderInput(origProps: TextFieldProps) {
   return (props: TextFieldProps) => {
@@ -109,6 +102,10 @@ function renderInput(origProps: TextFieldProps) {
   }
 }
 
+const StyledDatePicker = styled(DatePicker)(style.entry);
+const StyledDateTimePicker = styled(DateTimePicker)(style.entry);
+const StyledTimePicker = styled(TimePicker)(style.entry);
+
 /**
  * The date time renderer, it uses material ui in order to create very nice pickers for the user
  * these pickers are smart and will make a difference on whether it's a mobile or a computer,
@@ -119,9 +116,10 @@ function renderInput(origProps: TextFieldProps) {
  * @param props the entry props
  * @returns a react element
  */
-const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDateTimeRendererWithStylesProps) => {
+function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProps) {
   // setting up the component
   let component = null;
+  const invalid = shouldShowInvalid(props);
   if (props.type === "date") {
     // let's extract the locale format from moment for a long date
     // const basicProps = {
@@ -164,12 +162,11 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
         okText={props.i18nOk}
         label={props.label}
         inputFormat={props.dateTimeFormat}
-        className={props.classes.entry}
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
+          sx: style.fieldInput(invalid, props.disabled),
           classes: {
-            root: props.classes.fieldInput,
             focused: "focused",
           },
         }}
@@ -220,19 +217,18 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
 
     const isAMPM = props.dateTimeFormat.includes("A");
     component = (
-      <DateTimePicker
+      <StyledDateTimePicker
         ampm={isAMPM}
         ampmInClock={isAMPM}
         cancelText={props.i18nCancel}
         okText={props.i18nOk}
         label={props.label}
         inputFormat={props.dateTimeFormat}
-        className={props.classes.entry}
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
+          sx: style.fieldInput(invalid, props.disabled),
           classes: {
-            root: props.classes.fieldInput,
             focused: "focused",
           },
         }}
@@ -281,19 +277,18 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
 
     const isAMPM = props.dateTimeFormat.includes("A")
     component = (
-      <TimePicker
+      <StyledTimePicker
         ampm={isAMPM}
         ampmInClock={isAMPM}
         cancelText={props.i18nCancel}
         okText={props.i18nOk}
         label={props.label}
         inputFormat={props.dateTimeFormat}
-        className={props.classes.entry}
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
+          sx: style.fieldInput(invalid, props.disabled),
           classes: {
-            root: props.classes.fieldInput,
             focused: "focused",
           },
         }}
@@ -309,27 +304,27 @@ const PropertyEntryDateTimeRenderer = withStyles(style)((props: IPropertyEntryDa
   const descriptionAsAlert = props.args["descriptionAsAlert"];
   // return it
   return (
-    <div className={props.classes.container}>
+    <Box sx={style.container}>
       {
         props.description && descriptionAsAlert ?
-          <Alert severity="info" className={props.classes.description}>
+          <Alert severity="info" sx={style.description}>
             {props.description}
           </Alert> :
           null
       }
       {
         props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={props.classes.description}>
+          <Typography variant="caption"  sx={style.description}>
             {props.description}
           </Typography> :
           null
       }
       {component}
-      <div className={props.classes.errorMessage}>
+      <Box sx={style.errorMessage}>
         {props.currentInvalidReason}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
-});
+};
 
 export default PropertyEntryDateTimeRenderer;

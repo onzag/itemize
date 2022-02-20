@@ -9,21 +9,16 @@ import NItemLoader from "../../components/item/ItemLoader";
 import { DelayDisplay } from "../../components/util";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { styled } from "@mui/material/styles";
 
 /**
  * The item definition loader styles
  */
-const ItemLoaderStyles = createStyles({
-  container: {
-    position: "relative",
-  },
+const itemLoaderStyles = {
   flexingContainer: {
     display: "flex",
     alignItems: "center",
@@ -39,15 +34,25 @@ const ItemLoaderStyles = createStyles({
     top: "50%",
     marginTop: "-20px",
   },
-  fullWidthContainer: {
-    width: "100%",
-  }
-});
+};
+
+const FlexingContainer = styled("div")(itemLoaderStyles.flexingContainer);
+
+interface IContainer {
+  fullWidth?: boolean,
+}
+
+const Container = styled("div", {
+  shouldForwardProp: (prop) => prop !== "fullWidth"
+})<IContainer>(({ fullWidth }) => ({
+  position: "relative",
+  width: fullWidth ? "100%" : "auto",
+}));
 
 /**
  * the props for the item definition loader
  */
-interface ItemLoaderProps extends WithStyles<typeof ItemLoaderStyles> {
+interface ItemLoaderProps {
   /**
    * An id to pass to the i18n reader for not found
    * defaults to "error.NOT_FOUND"
@@ -100,7 +105,7 @@ interface ItemLoaderProps extends WithStyles<typeof ItemLoaderStyles> {
  * @param props the loader props
  * @returns a react component
  */
-export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) => {
+export function ItemLoader(props: ItemLoaderProps) {
   return (
     <NItemLoader>
       {(arg) => {
@@ -132,7 +137,7 @@ export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) 
             }
           }
           return (
-            <div className={props.classes.flexingContainer}>
+            <FlexingContainer>
               <Typography>{errorComponent}</Typography>
               {imageComponent}
               <I18nRead id="reload">
@@ -142,21 +147,21 @@ export const ItemLoader = withStyles(ItemLoaderStyles)((props: ItemLoaderProps) 
                   </IconButton>
                 )}
               </I18nRead>
-            </div>
+            </FlexingContainer>
           );
         }
     
-        return <div className={`${props.classes.container} ${props.fullWidth ? props.classes.fullWidthContainer : ""}`}>
+        return <Container fullWidth={props.fullWidth}>
           {
             arg.loading ? 
             <DelayDisplay duration={props.msWaitedToShowLoadingAnimation || 700}>
-              <CircularProgress className={props.classes.circularProgress}/>
+              <CircularProgress sx={itemLoaderStyles.circularProgress}/>
             </DelayDisplay> :
             null
           }
           {props.childrenMustWaitUntilItsLoaded && arg.loading ? null : props.children}
-        </div>;
+        </Container>;
       }}
     </NItemLoader>
   );
-});
+};

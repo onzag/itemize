@@ -4,6 +4,7 @@
  * @module
  */
 
+import { SxProps, Theme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import FilledInput from "@mui/material/FilledInput";
 import FormControl from "@mui/material/FormControl";
@@ -64,9 +65,9 @@ interface ITemplateElementDialogProps {
    */
   elementType: "text" | "html";
   /**
-   * Class name for primary options
+   * Sx for primary options
    */
-  optionPrimaryClassName: string;
+  optionPrimarySx: SxProps<Theme>;
 }
 
 /**
@@ -290,7 +291,7 @@ export class TemplateElementDialog extends React.PureComponent<ITemplateElementD
                       key={vv.value}
                       value={vv.value}
                       id={"slate-template-element-for-" + encodeURIComponent(vv.value)}
-                      className={vv.primary ? this.props.optionPrimaryClassName : null}
+                      sx={vv.primary ? this.props.optionPrimarySx : null}
                     >
                       {
                         vv.label

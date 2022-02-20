@@ -10,16 +10,13 @@ import React from "react";
 import { capitalize } from "../../../components/localization";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import PropertyEntryFieldRenderer from "./PropertyEntryField";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import RestoreIcon from "@mui/icons-material/Restore";
 import QueueIcon from "@mui/icons-material/Queue";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-
+import Box from "@mui/material/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -33,7 +30,7 @@ function shouldShowInvalid(props: IPropertyEntryPaymentRendererProps) {
 /**
  * The styles of the renderer
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -51,8 +48,8 @@ export const style = createStyles({
   icon: {
     color: "#424242",
   },
-  label: (props: IPropertyEntryPaymentRendererProps) => ({
-    color: shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "rgb(66, 66, 66)",
     width: "100%",
     display: "flex",
     alignItems: "center",
@@ -63,7 +60,7 @@ export const style = createStyles({
     height: "1.3rem",
     fontSize: "0.85rem",
   },
-});
+};
 
 const cheapCamelCase = {
   "subscription-monthly": "subscriptionMonthly",
@@ -71,11 +68,6 @@ const cheapCamelCase = {
   "subscription-yearly": "subscriptionYearly",
 }
 
-/**
- * The renderer props, based on the properties it will take
- */
-interface IPropertyEntryPaymentRendererWithStylesProps extends IPropertyEntryPaymentRendererProps, WithStyles<typeof style> {
-}
 
 /**
  * This is the fast prototyping boolean renderer and uses material ui in order to render a slick
@@ -86,7 +78,7 @@ interface IPropertyEntryPaymentRendererWithStylesProps extends IPropertyEntryPay
  * @param props the entry boolean props
  * @returns a react element
  */
-const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPaymentRendererWithStylesProps) => {
+function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps) {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
   const onlyStatus = props.args["onlyStatus"];
 
@@ -102,7 +94,7 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
   const iconComponent = icon ? (
     <IconButton
       tabIndex={-1}
-      className={props.classes.icon}
+      sx={style.icon}
       onClick={props.canRestore ? props.onRestore : null}
       size="large">
       {icon}
@@ -114,10 +106,12 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
     shouldShowToggleNull = false;
   }
 
+  const isInvalid = shouldShowInvalid(props);
+
   const secondIconComponent = shouldShowToggleNull ? (
     <IconButton
       onClick={props.onToggleNullStatus}
-      className={props.classes.icon}
+      sx={style.icon}
       tabIndex={-1}
       aria-label={
         props.currentValue === null ?
@@ -244,36 +238,36 @@ const PropertyEntryPaymentRenderer = withStyles(style)((props: IPropertyEntryPay
   }
 
   return (
-    <div className={props.classes.container}>
+    <Box sx={style.container}>
       {
         props.description && descriptionAsAlert ?
-          <Alert severity="info" className={props.classes.description}>
+          <Alert severity="info" sx={style.description}>
             {props.description}
           </Alert> :
           null
       }
       {
         props.description && !descriptionAsAlert ?
-          <Typography variant="caption" className={props.classes.description}>
+          <Typography variant="caption" sx={style.description}>
             {props.description}
           </Typography> :
           null
       }
       <div>
-        {props.label ? <div
-          className={props.classes.label}
+        {props.label ? <Box
+          sx={style.label(isInvalid)}
         >
           {secondIconComponent}
           {capitalize(props.label)}
           {iconComponent}
-        </div> : null}
+        </Box> : null}
         {internalContent}
       </div>
-      <div className={props.classes.errorMessage}>
+      <Box sx={style.errorMessage}>
         {props.currentInvalidReason}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
-});
+};
 
 export default PropertyEntryPaymentRenderer;

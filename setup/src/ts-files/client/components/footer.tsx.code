@@ -3,22 +3,20 @@ import React from "react";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled, Theme } from "@mui/material/styles";
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
 import { CurrencyPicker } from "@onzag/itemize/client/fast-prototyping/components/currency-picker";
 import { CountryPicker } from "@onzag/itemize/client/fast-prototyping/components/country-picker";
+import Box from "@mui/material/Box";
 
 /**
  * Styles of the footer
  * @param theme the mui theme
  * @returns a bunch of styles
  */
-const footerStyles = (theme: Theme) => createStyles({
-	container: {
+const style = {
+	container: (theme: Theme) => ({
 		width: "100%",
 		display: "flex",
 		alignItems: "center",
@@ -30,13 +28,13 @@ const footerStyles = (theme: Theme) => createStyles({
 		[theme.breakpoints.down('md')]: {
 			padding: "1rem 0",
 		},
-	},
-	containerAbs: {
+	} as any),
+	containerAbs: (theme: Theme) => ({
 		position: "absolute",
 		bottom: 0,
 		backgroundColor: theme.palette.grey[900],
-	},
-	dataSet: {
+	}),
+	dataSet: (theme: Theme) => ({
 		lineHeight: 0,
 		height: "2.5rem",
 		flex: "1 1 0",
@@ -49,8 +47,8 @@ const footerStyles = (theme: Theme) => createStyles({
 			flex: "1 0 100%",
 			padding: "0.5rem 0",
 		},
-	},
-	dataSetAbs: {
+	}),
+	dataSetAbs: (theme: Theme) => ({
 		"&:first-child": {
 			flex: "2 1 0",
 		},
@@ -59,12 +57,12 @@ const footerStyles = (theme: Theme) => createStyles({
 				borderRight: "solid 1px #aaa",
 			},
 		},
-	},
-	copyInfo: {
+	}),
+	copyInfo: (theme: Theme) => ({
 		[theme.breakpoints.down('sm')]: {
 			display: "none",
 		},
-	},
+	}),
 	link: {
 		color: "inherit",
 		textDecoration: "none",
@@ -74,55 +72,77 @@ const footerStyles = (theme: Theme) => createStyles({
 		display: "inline-block",
 		height: "2px",
 	},
+};
+
+const Spacer = styled("span")(style.spacer);
+
+interface IContainer {
+	abs?: boolean;
+	type?: "container" | "dataset";
+}
+
+const Container = styled("div", {
+	shouldForwardProp: (p) => p !== "abs" && p !== "type"
+})<IContainer>(({ abs, type, theme}) => {
+	const basicContainer = type === "dataset" ? style.dataSet(theme) : style.container(theme);
+
+	if (abs) {
+		const absContainer = type === "dataset" ? style.dataSetAbs(theme) : style.containerAbs(theme);
+		Object.assign(basicContainer, absContainer);
+	}
+
+	return basicContainer;
 });
+
+const StyledLink = styled(Link)(style.link);
 
 /**
  * The footer itself
  * takes no props
  */
-export const Footer = withStyles(footerStyles)((props: WithStyles<typeof footerStyles>) => {
+export function Footer() {
 	const year = (new Date()).getUTCFullYear();
 	// the first represents the spacer, the second is the actual footer
 	return (
 		<>
-			<div className={props.classes.container}>
-				<div className={props.classes.dataSet}/>
-				<div className={props.classes.dataSet}/>
-				<div className={props.classes.dataSet}/>
-				<div className={props.classes.dataSet}/>
-			</div>
-			<div className={props.classes.container + " " + props.classes.containerAbs}>
-				<div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
+			<Container>
+				<Container type="dataset"/>
+				<Container type="dataset"/>
+				<Container type="dataset"/>
+				<Container type="dataset"/>
+			</Container>
+			<Container abs={true}>
+				<Container type="dataset" abs={true}>
 					<CopyrightIcon />
-					<span className={props.classes.spacer} />
-					<span className={props.classes.spacer} />
+					<Spacer />
+					<Spacer />
 					{year}
-					<span className={props.classes.spacer} />
-					<span className={props.classes.copyInfo}>
-						<I18nRead id="app_name" capitalize={true} />
-					</span>
-					<span className={props.classes.spacer} />
-					<span className={props.classes.spacer} />
+					<Spacer />
+					<Box component="span" sx={style.copyInfo}>
+						<I18nRead id="app_short_name" capitalize={true} />
+					</Box>
+					<Spacer />
+					<Spacer />
 					<LanguagePicker useCode={true} />
 					<CountryPicker useCode={true} />
 					<CurrencyPicker useCode={true} />
-				</div>
-				<div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
-					<Link to="/contact" className={props.classes.link}>
+				</Container>
+				<Container type="dataset" abs={true}>
+					<StyledLink to="/contact">
 						<I18nRead id="contact" capitalize={true} />
-					</Link>
-				</div>
-				<div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
-					<Link to="/terms-and-conditions" className={props.classes.link}>
+					</StyledLink>
+				</Container>
+				<Container type="dataset" abs={true}>
+					<StyledLink to="/terms-and-conditions">
 						<I18nRead id="terms_and_conditions" capitalize={true} />
-					</Link>
-				</div>
-				<div className={props.classes.dataSet + " " + props.classes.dataSetAbs}>
-					<Link to="/privacy-policy" className={props.classes.link}>
+					</StyledLink>
+				</Container>
+				<Container type="dataset" abs={true}>
+					<StyledLink to="/privacy-policy">
 						<I18nRead id="privacy_policy" capitalize={true} />
-					</Link>
-				</div>
-			</div>
+					</StyledLink>
+				</Container>
+			</Container>
 		</>
 	);
-});
+};

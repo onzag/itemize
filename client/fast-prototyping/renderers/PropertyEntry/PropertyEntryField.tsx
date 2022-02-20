@@ -6,9 +6,6 @@
 import React from "react";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
 import { useTheme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -29,6 +26,7 @@ import IconVisibilityOff from "@mui/icons-material/VisibilityOff";
 import { CountryPicker } from "../../components/country-picker";
 import type { ICountryType } from "../../../../imported-resources";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
+import Box from "@mui/material/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -42,7 +40,7 @@ function shouldShowInvalid(props: IPropertyEntryFieldRendererProps) {
 /**
  * The styles for the field
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -61,12 +59,12 @@ export const style = createStyles({
     height: "1.3rem",
     fontSize: "0.85rem",
   },
-  standardAddornment: (props: IPropertyEntryFieldRendererProps) => ({
-    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+  standardAddornment: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "#424242",
     marginRight: "-10px",
   }),
-  smallAddornment: (props: IPropertyEntryFieldRendererProps) => ({
-    color: shouldShowInvalid(props) ? "#f44336" : "#424242",
+  smallAddornment: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "#424242",
   }),
   iconButtonPassword: {
     "backgroundColor": "#2196f3",
@@ -94,10 +92,10 @@ export const style = createStyles({
     justifyContent: "center",
     borderRadius: "5px",
   },
-  label: (props: IPropertyEntryFieldRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (isInvalid: boolean) => ({
+    "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
+      color: isInvalid ? "#f44336" : "#3f51b5",
     },
   }),
   labelSingleLine: {
@@ -106,8 +104,8 @@ export const style = createStyles({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  fieldInput: (props: IPropertyEntryFieldRendererProps) => {
-    if (shouldShowInvalid(props)) {
+  fieldInput: (isInvalid: boolean, disabled: boolean) => {
+    if (isInvalid) {
       return {
         "width": "100%",
         // this is the colur when the field is out of focus
@@ -120,7 +118,7 @@ export const style = createStyles({
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
+          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
@@ -148,13 +146,7 @@ export const style = createStyles({
     width: "100%",
     display: "flex",
   }
-});
-
-/**
- * The props for the entry renderer
- */
-interface IPropertyEntryFieldRendererWithStylesProps extends IPropertyEntryFieldRendererProps, WithStyles<typeof style> {
-}
+};
 
 /**
  * The state for the entry renderer
@@ -179,7 +171,7 @@ interface IPropertyEntryFieldRendererState {
  * The props for the select unit dialog when the field represents a unit
  * numeric value
  */
-interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+interface ISelectUnitDialogProps extends IPropertyEntryFieldRendererProps {
   /**
    * Whether the dialog is open
    */
@@ -286,7 +278,7 @@ const SelectUnitDialogResponsive = function (props: ISelectCurrencyDialogProps) 
 /**
  * The select currency dialog props
  */
-interface ISelectCurrencyDialogProps extends IPropertyEntryFieldRendererWithStylesProps {
+interface ISelectCurrencyDialogProps extends IPropertyEntryFieldRendererProps {
   /**
    * Whether such a dialog is open
    */
@@ -352,13 +344,13 @@ const SelectCurrencyDialogResponsive = function (props: ISelectCurrencyDialogPro
  * types that are displayed as a single line text, this includes some numeric types, and even some complex types
  * such as unit and currency, this is because unlike other types their primary use is just writting something
  */
-class ActualPropertyEntryFieldRenderer
-  extends React.Component<IPropertyEntryFieldRendererWithStylesProps, IPropertyEntryFieldRendererState> {
+class PropertyEntryFieldRenderer
+  extends React.Component<IPropertyEntryFieldRendererProps, IPropertyEntryFieldRendererState> {
 
   private inputRef: HTMLInputElement;
   private inputRefSelectionStart: number;
 
-  constructor(props: IPropertyEntryFieldRendererWithStylesProps) {
+  constructor(props: IPropertyEntryFieldRendererProps) {
     super(props);
 
     this.state = {
@@ -432,14 +424,14 @@ class ActualPropertyEntryFieldRenderer
     // numeric value is only set for numbers
     let value: string = e.target.value.toString();
 
-    if (this.props.subtype === "phone" && value !== "") {
+    if (this.props.subtype === "phone" && value !== "" && value.indexOf("+") !== 0) {
       const currentCountryUsed = this.props.currentValue ?
         this.props.countriesAvailable.find((c) => this.props.currentValue.toString().indexOf("+" + c.phone) === 0) :
         this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode);
 
       if (value.indexOf("0") === 0) {
         value = value.replace("0", "+" + currentCountryUsed.phone);
-      } else {
+      } else {
         value = "+" + currentCountryUsed.phone + value;
       }
     }
@@ -483,7 +475,7 @@ class ActualPropertyEntryFieldRenderer
   }
 
   public render() {
-    if (this.props.subtype === "country" || this.props.subtype === "language" || this.props.subtype === "currency") {
+    if (this.props.subtype === "country" || this.props.subtype === "language" || this.props.subtype === "currency") {
       return (
         <PropertyEntrySelectRenderer
           args={this.props.args}
@@ -552,17 +544,19 @@ class ActualPropertyEntryFieldRenderer
       },
     };
 
+    const isInvalid = shouldShowInvalid(this.props);
+
     // if the type is a password
     if (this.props.type === "password") {
       // set the end addornment for the show and hide button
       appliedInputProps.endAdornment = (
         <InputAdornment
           position="end"
-          className={this.props.classes.standardAddornment}
+          sx={style.standardAddornment(isInvalid)}
         >
           <IconButton
             tabIndex={-1}
-            classes={{ root: this.props.classes.iconButton }}
+            sx={style.iconButton}
             onClick={this.toggleVisible}
             onMouseDown={this.catchToggleMouseDownEvent}
             size="large">
@@ -575,11 +569,11 @@ class ActualPropertyEntryFieldRenderer
         appliedInputProps.startAdornment = (
           <InputAdornment
             position="start"
-            className={this.props.classes.smallAddornment}
+            sx={style.smallAddornment(isInvalid)}
           >
             <IconButton
               tabIndex={-1}
-              classes={{ root: this.props.classes.iconButtonSmall }}
+              sx={style.iconButtonSmall}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
               size="large">
@@ -591,11 +585,11 @@ class ActualPropertyEntryFieldRenderer
         appliedInputProps.endAdornment = (
           <InputAdornment
             position="end"
-            className={this.props.classes.standardAddornment}
+            sx={style.standardAddornment(isInvalid)}
           >
             <IconButton
               tabIndex={-1}
-              classes={{ root: this.props.classes.iconButton }}
+              sx={style.iconButton}
               onMouseDown={this.catchToggleMouseDownEvent}
               onClick={this.openDialog}
               size="large">
@@ -608,11 +602,11 @@ class ActualPropertyEntryFieldRenderer
       appliedInputProps.endAdornment = (
         <InputAdornment
           position="end"
-          className={this.props.classes.standardAddornment}
+          sx={style.standardAddornment(isInvalid)}
         >
           <IconButton
             tabIndex={-1}
-            classes={{ root: this.props.classes.iconButton }}
+            sx={style.iconButton}
             onMouseDown={this.catchToggleMouseDownEvent}
             onClick={this.openDialog}
             size="large">
@@ -630,11 +624,11 @@ class ActualPropertyEntryFieldRenderer
       appliedInputProps.endAdornment = (
         <InputAdornment
           position="end"
-          className={this.props.classes.standardAddornment}
+          sx={style.standardAddornment(isInvalid)}
         >
           <IconButton
             tabIndex={-1}
-            classes={{ root: this.props.classes.iconButton }}
+            sx={style.iconButton}
             onClick={this.props.onRestore}
             onMouseDown={this.catchToggleMouseDownEvent}
             size="large">
@@ -645,10 +639,10 @@ class ActualPropertyEntryFieldRenderer
     } else if (this.props.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
-        <InputAdornment position="end" className={this.props.classes.standardAddornment}>
+        <InputAdornment position="end" sx={style.standardAddornment(isInvalid)}>
           <IconButton
             tabIndex={-1}
-            classes={{ root: this.props.classes.iconButton }}
+            sx={style.iconButton}
             size="large">
             {this.props.icon}
           </IconButton>
@@ -679,6 +673,10 @@ class ActualPropertyEntryFieldRenderer
         this.props.countriesAvailable.find((c) => this.props.currentValue.toString().indexOf("+" + c.phone) === 0) :
         this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode);
 
+      if (!currentCountryUsed) {
+        currentCountryUsed = this.props.countriesAvailable.find((c) => c.code === this.state.defaultCountryCode);
+      }
+
       if (valueToUse) {
         valueToUse = valueToUse.replace("+" + currentCountryUsed.phone, "0");
       }
@@ -688,7 +686,7 @@ class ActualPropertyEntryFieldRenderer
       <TextField
         fullWidth={true}
         type={this.state.visible ? "text" : "password"}
-        className={this.props.classes.entry}
+        sx={style.entry}
         label={this.props.label}
         placeholder={this.props.placeholder}
         value={valueToUse}
@@ -696,16 +694,16 @@ class ActualPropertyEntryFieldRenderer
         onKeyDown={this.onKeyDown}
         onBlur={this.props.enableUserSetErrors}
         InputProps={{
+          sx: style.fieldInput(isInvalid, this.props.disabled),
           classes: {
-            root: this.props.classes.fieldInput,
             focused: "focused",
           },
           disabled: this.props.disabled,
           ...appliedInputProps,
         }}
         InputLabelProps={{
+          sx: style.label,
           classes: {
-            root: this.props.classes.label,
             focused: "focused",
           },
         }}
@@ -719,43 +717,43 @@ class ActualPropertyEntryFieldRenderer
     let fieldComponent = textField;
     if (this.props.subtype === "phone") {
       fieldComponent = (
-        <div className={this.props.classes.fieldForPhone}>
+        <Box sx={style.fieldForPhone}>
           <CountryPicker
             currentCode={currentCountryUsed.code}
             handleCountryChange={this.onPhoneCountryChange}
             usePhoneCode={true}
           />
           {textField}
-        </div>
+        </Box>
       )
     }
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     // return the complex overengineered component in all its glory
     return (
-      <div className={this.props.classes.container}>
+      <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-            <Alert severity="info" className={this.props.classes.description}>
+            <Alert severity="info" sx={style.description}>
               {this.props.description}
             </Alert> :
             null
         }
         {
           this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" className={this.props.classes.description}>
+            <Typography variant="caption" sx={style.description}>
               {this.props.description}
             </Typography> :
             null
         }
         {fieldComponent}
-        <div className={this.props.classes.errorMessage}>
+        <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </div>
+        </Box>
 
         {unitDialog}
         {currencyDialog}
-      </div>
+      </Box>
     );
   }
 }
@@ -769,5 +767,4 @@ class ActualPropertyEntryFieldRenderer
  * - descriptionAsAlert: the description as alert rather than the standard
  * - onEnter: A function that triggers when the enter key is pressed
  */
-const PropertyEntryFieldRenderer = withStyles(style)(ActualPropertyEntryFieldRenderer);
 export default PropertyEntryFieldRenderer;

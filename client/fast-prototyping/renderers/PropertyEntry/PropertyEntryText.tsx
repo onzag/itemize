@@ -14,15 +14,13 @@ import { SlateEditor } from "../../components/slate";
 import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
 
 import { capitalize } from "../../../../util";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import InputLabel from "@mui/material/InputLabel";
 import RestoreIcon from "@mui/icons-material/Restore";
 import ClearIcon from "@mui/icons-material/Clear";
+import Box from "@mui/material/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -33,10 +31,12 @@ function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
 }
 
+
+
 /**
  * The styles for the text entry
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -76,12 +76,22 @@ export const style = createStyles({
     justifyContent: "center",
     borderRadius: "5px",
   },
-  label: (props: IPropertyEntryTextRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
-    "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
-    },
-  }),
+  label: (isInvalid: boolean, richText: boolean) => {
+    const base = {
+      "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
+      "&.focused": {
+        color: isInvalid ? "#f44336" : "#3f51b5",
+      },
+    };
+
+    if (richText) {
+      Object.assign(base, style.labelSingleLine);    
+    } else {
+      Object.assign(base, style.labelNoToolbar); 
+    }
+
+    return base;
+  },
   labelSingleLine: {
     padding: "1rem 0",
     width: "100%",
@@ -98,8 +108,7 @@ export const style = createStyles({
     height: "5rem",
     padding: "1rem 0 0 0",
   },
-  editor: (props: IPropertyEntryTextRendererProps) => {
-    const shouldShowInvalidEditor = shouldShowInvalid(props);
+  editor: (isInvalid: boolean) => {
     return {
       "position": "relative",
       // this is the colur when the field is out of focus
@@ -111,7 +120,7 @@ export const style = createStyles({
         position: "absolute",
         transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         borderBottom: "1px solid " +
-          (shouldShowInvalidEditor ? "#e57373" : "rgba(0,0,0,0.42)"),
+          (isInvalid ? "#e57373" : "rgba(0,0,0,0.42)"),
         pointerEvents: "none",
       },
       // the color that pops up when the field is in focus
@@ -124,7 +133,7 @@ export const style = createStyles({
         transform: "scaleX(0)",
         transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
         borderBottom: "2px solid " +
-          (shouldShowInvalidEditor ? "#f44336" : "#3f51b5"),
+          (isInvalid ? "#f44336" : "#3f51b5"),
         pointerEvents: "none",
       },
       // during the hover event
@@ -143,24 +152,17 @@ export const style = createStyles({
     fontSize: "1rem",
     overflow: "hidden",
   }
-});
+};
 
 interface IPropertyEntryTextRendererState {
   focused: boolean;
 }
 
-
-/**
- * The text renderer styles
- */
-interface IPropertyEntryTextRendererWithStylesProps extends IPropertyEntryTextRendererProps, WithStyles<typeof style> {
-}
-
 /**
  * The class that does the magic
  */
-class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererWithStylesProps, IPropertyEntryTextRendererState> {
-  constructor(props: IPropertyEntryTextRendererWithStylesProps) {
+class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRendererProps, IPropertyEntryTextRendererState> {
+  constructor(props: IPropertyEntryTextRendererProps) {
     super(props);
 
     this.state = {
@@ -197,7 +199,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const iconComponent = icon ? (
       <IconButton
         tabIndex={-1}
-        className={this.props.classes.icon}
+        sx={style.icon}
         onClick={this.props.canRestore ? this.props.onRestore : null}
         size="large">
         {icon}
@@ -209,7 +211,7 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     const editor =
       <SlateEditor
         id={this.props.propertyId}
-        features={this.props.args.features ? {...this.props.features, ...this.props.args.features} : this.props.features}
+        features={this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features}
         value={this.props.currentValue}
         autoFocus={this.props.autoFocus}
         internalValue={this.props.currentInternalValue}
@@ -244,18 +246,19 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
     }
 
     // we return the component, note how we set the thing to focused
+    const isInvalid = shouldShowInvalid(this.props);
     return (
-      <div className={this.props.classes.container}>
+      <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-            <Alert severity="info" className={this.props.classes.description}>
+            <Alert severity="info" sx={style.description}>
               {this.props.description}
             </Alert> :
             null
         }
         {
           this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" className={this.props.classes.description}>
+            <Typography variant="caption" sx={style.description}>
               {this.props.description}
             </Typography> :
             null
@@ -263,9 +266,8 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
         <div>
           {this.props.label ? <InputLabel
             htmlFor={this.props.propertyId}
+            sx={style.label(isInvalid, this.props.isRichText)}
             classes={{
-              root: this.props.classes.label + " " +
-                (this.props.isRichText ? this.props.classes.labelSingleLine : this.props.classes.labelNoToolbar),
               focused: "focused",
             }}
             focused={this.state.focused}
@@ -274,10 +276,10 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
           </InputLabel> : null}
           {editor}
         </div>
-        <div className={this.props.classes.errorMessage}>
+        <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 }
@@ -287,5 +289,4 @@ class ActualPropertyEntryTextRenderer extends React.PureComponent<IPropertyEntry
  * but rather for any text type that is either plain or html, a text without a subtype
  * will use the same as field
  */
-const PropertyEntryTextRenderer = withStyles(style)(ActualPropertyEntryTextRenderer);
 export default PropertyEntryTextRenderer;

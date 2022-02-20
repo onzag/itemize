@@ -14,9 +14,6 @@ import { ProgressingElement } from "./util";
 import I18nReadError from "../../components/localization/I18nReadError";
 import I18nReadMany from "../../components/localization/I18nReadMany";
 import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
@@ -38,19 +35,17 @@ interface NeedsSubmitDialogProps {
   };
 }
 
-const needsSubmitDialogStyle = (theme: Theme) => createStyles({
+const needsSubmitDialogStyle = {
   content: {
     padding: "1rem 0.5rem",
   },
-  error: {
+  error: (theme: Theme) => ({
     marginTop: "1rem",
     color: theme.palette.error.dark,
-  }
-});
+  }),
+};
 
-interface NeedsSubmitDialogWithStylesProps extends NeedsSubmitDialogProps, WithStyles<typeof needsSubmitDialogStyle> {}
-
-class ActualNeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogWithStylesProps> {
+class NeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogProps> {
   public render() {
     return <Dialog
       title={this.props.args.title}
@@ -79,12 +74,12 @@ class ActualNeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogWithS
         </>
       }
     >
-      <Typography variant="body1" className={this.props.classes.content}>
+      <Typography variant="body1" sx={needsSubmitDialogStyle.content}>
         {this.props.args.message}
       </Typography>
       {
         this.props.confirmationCallbackError ?
-        <Typography variant="body2" className={this.props.classes.error}>
+        <Typography variant="body2" sx={needsSubmitDialogStyle.error}>
           <I18nReadError error={this.props.confirmationCallbackError} capitalize={true}/>
         </Typography> :
         null
@@ -92,8 +87,6 @@ class ActualNeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogWithS
     </Dialog>
   }
 }
-
-const NeedsSubmitDialog = withStyles(needsSubmitDialogStyle)(ActualNeedsSubmitDialog);
 
 /**
  * The props of the needs submit prompt

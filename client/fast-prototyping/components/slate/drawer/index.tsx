@@ -20,6 +20,35 @@ import BorderStyleIcon from "@mui/icons-material/BorderStyle";
 import WebIcon from "@mui/icons-material/Web";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+const style = {
+  box: {
+    padding: "0.5rem",
+  },
+  treeDataBox: {
+    width: "100%",
+    position: "relative",
+    maxHeight: "360px",
+    overflowY: "auto",
+    flex: "1 0 auto",
+  },
+  separator: {
+    margin: "1rem 0",
+  },
+  tab: {
+    minWidth: "auto",
+  },
+  elementTitle: {
+    textTransform: "capitalize",
+    fontWeight: 700,
+    color: "#444",
+    fontSize: "1rem",
+    height: "1rem",
+    flex: "0 0 1rem",
+  },
+};
+
 
 class ScrollSlowly {
   private speed: number;
@@ -135,22 +164,15 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
     parentRichElement={null}
     currentSelectedElement={props.state.currentSelectedElement as any}
     currentSelectedElementPath={props.state.currentSelectedElementAnchor}
-    dropPositionDisabledClassName={props.classes.dropPositionDisabled}
-    dropPositionEnabledClassName={props.classes.dropPositionEnabled}
     currentIsLastInPath={true}
     currentPath={[]}
     i18nRichInfo={props.i18nRichInfo}
-    buttonClassName={props.classes.wrapperButton}
-    childrenBoxClassName={props.classes.treeChildrenBox}
     onSelectPath={props.helpers.selectPath}
     onDeletePath={props.helpers.deletePath}
     onBeginDrag={setDragScroll.bind(null, true)}
     onEndDrag={setDragScroll.bind(null, false)}
     moveFromTo={props.helpers.movePaths}
     scrollableAreaRef={scrollRef}
-    treeElementClassName={props.classes.treeElement}
-    deleteButtonClassName={props.classes.deleteButton}
-    deleteIconClassName={props.classes.deleteIcon}
   />
 
   // now we need to build the settings
@@ -218,12 +240,12 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
           !selectedNodeInfo.isText ?
             (
               <>
-                {props.hideTree ? null : <Divider className={props.classes.separator} />}
+                {props.hideTree ? null : <Divider sx={style.separator} />}
                 {
                   drawerMode !== "simple" && drawerMode !== "barebones" ? (
                     <Tabs value={actualLocation} onChange={setLocationCallback}>
                       <Tab
-                        className={props.classes.tab}
+                        sx={style.tab}
                         label={<SettingsIcon />}
                         value="MAIN"
                         title={props.i18nRichInfo.settings}
@@ -232,7 +254,7 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                         props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
                           (
                             <Tab
-                              className={props.classes.tab}
+                              sx={style.tab}
                               label={<BorderStyleIcon />}
                               value="STYLES"
                               title={props.i18nRichInfo.styles}
@@ -244,7 +266,7 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                         (props.featureSupport.supportsTemplating && drawerMode === "full") ?
                           (
                             <Tab
-                              className={props.classes.tab}
+                            sx={style.tab}
                               label={<WebIcon />}
                               value="TEMPLATING"
                               title={props.i18nRichInfo.templating}
@@ -256,7 +278,7 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                         (props.featureSupport.supportsTemplating && drawerMode === "full") ?
                           (
                             <Tab
-                              className={props.classes.tab}
+                            sx={style.tab}
                               label={<TouchAppIcon />}
                               value="ACTIONS"
                               title={props.i18nRichInfo.actions}
@@ -280,11 +302,11 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
   return (
     <>
       {props.hideTree ? null : <>
-        <Typography className={props.classes.elementTitle} variant="h6">{titleForNode}</Typography>
-        <Divider className={props.classes.separator} />
-        <div className={props.classes.treeDataBox} ref={scrollRef}>
+        <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
+        <Divider sx={style.separator} />
+        <Box sx={style.treeDataBox} ref={scrollRef}>
           {treeData}
-        </div>
+        </Box>
       </>}
       {settingsForNode}
     </>

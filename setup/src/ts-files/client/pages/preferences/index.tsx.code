@@ -11,9 +11,6 @@ import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Divider from "@mui/material/Divider";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import Container from "@mui/material/Container/Container";
@@ -27,7 +24,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 /**
  * The styles for the preferences page
  */
-const preferencesStyles = createStyles({
+const style = {
 	paper: {
 		padding: "1rem",
 	},
@@ -39,7 +36,7 @@ const preferencesStyles = createStyles({
 		justifyContent: "flex-end",
 		paddingTop: "1.2rem",
 	},
-});
+};
 
 /**
  * The preferences page will allow the user to modify things such as notifications, newsletters and address
@@ -47,7 +44,7 @@ const preferencesStyles = createStyles({
  * @param props the preferences props
  * @returns a react element
  */
-export const Preferences = withStyles(preferencesStyles)((props: WithStyles<typeof preferencesStyles>) => {
+export function Preferences() {
 	return (
 		<UserDataRetriever>
 			{(userData) => {
@@ -89,8 +86,8 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 								}}
 							/>
 							<ItemLoader>
-								<Container maxWidth="md" className={props.classes.container}>
-									<Paper className={props.classes.paper}>
+								<Container maxWidth="md" sx={style.container}>
+									<Paper sx={style.paper}>
 										<Entry id="e_notifications" icon={<NotificationsIcon />} />
 										<Entry id="p_notifications" icon={<PhoneIphoneIcon />} />
 										<Entry id="e_newsletter" icon={<MenuBookIcon />} />
@@ -99,7 +96,7 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 
 										<Divider />
 
-										<Box className={props.classes.buttonBox}>
+										<Box sx={style.buttonBox}>
 											<SubmitButton
 												i18nId="update_your_preferences"
 												options={{
@@ -141,4 +138,4 @@ export const Preferences = withStyles(preferencesStyles)((props: WithStyles<type
 			}}
 		</UserDataRetriever>
 	);
-});
+};

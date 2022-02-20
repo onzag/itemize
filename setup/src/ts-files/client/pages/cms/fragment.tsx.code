@@ -12,9 +12,6 @@ import Entry from "@onzag/itemize/client/components/property/Entry";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Container from "@mui/material/Container/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -136,7 +133,7 @@ const ALL_FRAGMENTS = Object.keys(FRAGMENTS);
  * The fragment styles that are used
  * in the page itself
  */
-const fragmentStyles = createStyles({
+const style = {
 	paper: {
 		padding: "1rem",
 	},
@@ -153,18 +150,18 @@ const fragmentStyles = createStyles({
 			backgroundColor: "rgba(0,0,0,0.05)",
 		},
 	},
-});
+};
 
-const FragmentIndex = withStyles(fragmentStyles)((props: WithStyles<typeof fragmentStyles>) => {
+function FragmentIndex() {
 	return (
-		<Container maxWidth="md" className={props.classes.container}>
-			<Paper className={props.classes.paper}>
+		<Container maxWidth="md" sx={style.container}>
+			<Paper sx={style.paper}>
 				<List>
 					{ALL_FRAGMENTS.map((f) => {
 						const fragmentContext = FRAGMENTS[f];
 						return (
 							<Link to={"/cms/fragment/" + f} key={f}>
-								<ListItem className={props.classes.listItem}>
+								<ListItem sx={style.listItem}>
 									<ListItemIcon>
 										<ExtensionIcon />
 									</ListItemIcon>
@@ -177,7 +174,7 @@ const FragmentIndex = withStyles(fragmentStyles)((props: WithStyles<typeof fragm
 			</Paper>
 		</Container>
 	);
-});
+};
 
 export function Fragment() {
 	return (
@@ -195,7 +192,7 @@ export function Fragment() {
 	);
 }
 
-interface ISingleFragmentProps extends WithStyles<typeof fragmentStyles> {
+interface ISingleFragmentProps {
 	match: {
 		params: {
 			id: string;
@@ -208,7 +205,7 @@ interface ISingleFragmentProps extends WithStyles<typeof fragmentStyles> {
  * @param props the fragment styles
  * @returns a react element
  */
-const SingleFragment = withStyles(fragmentStyles)((props: ISingleFragmentProps) => {
+function SingleFragment(props: ISingleFragmentProps) {
 	const fragmentId = props.match.params.id;
 	return (
 		<LocationStateReader defaultState={{ version: "" }} stateIsInQueryString={true}>
@@ -233,9 +230,9 @@ const SingleFragment = withStyles(fragmentStyles)((props: ISingleFragmentProps) 
 						forId={fragmentId}
 						forVersion={locationState.version || null}
 					>
-						<Container maxWidth="md" className={props.classes.container + " trusted"}>
-							<Paper className={props.classes.paper}>
-								<Box className={props.classes.box}>
+						<Container maxWidth="md" sx={style.container} className="trusted">
+							<Paper sx={style.paper}>
+								<Box sx={style.box}>
 									<LanguagePicker
 										currentCode={locationState.version || null}
 										allowUnspecified={true}
@@ -292,4 +289,4 @@ const SingleFragment = withStyles(fragmentStyles)((props: ISingleFragmentProps) 
 			}}
 		</LocationStateReader>
 	);
-});
+};

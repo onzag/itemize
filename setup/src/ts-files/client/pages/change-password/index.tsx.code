@@ -9,9 +9,6 @@ import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
 import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/item-loader";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Divider from "@mui/material/Divider";
 import Container from "@mui/material/Container/Container";
 import Paper from "@mui/material/Paper";
@@ -23,7 +20,7 @@ import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/
 /**
  * Styles for the change password page
  */
-const changePasswordStyles = createStyles({
+const style = {
 	paper: {
 		padding: "1rem",
 	},
@@ -35,14 +32,14 @@ const changePasswordStyles = createStyles({
 		justifyContent: "flex-end",
 		paddingTop: "1.2rem",
 	},
-});
+};
 
 /**
  * A simple page designed to provide functionality to change the password
  * @param props the page props
  * @returns a react element
  */
-export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyles<typeof changePasswordStyles>) => {
+export function ChangePassword(props: WithStyles<typeof changePasswordStyles>) {
 	return (
 		<UserDataRetriever>
 			{(userData) => {
@@ -68,8 +65,8 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 								}}
 							</I18nRead>
 							<ItemLoader>
-								<Container maxWidth="md" className={props.classes.container}>
-									<Paper className={props.classes.paper}>
+								<Container maxWidth="md" sx={style.container}>
+									<Paper sx={style.paper}>
 
 										<form>
 											<I18nRead id="change_password_current_alt_label">
@@ -106,7 +103,7 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 
 										<Divider />
 
-										<Box className={props.classes.buttonBox}>
+										<Box sx={style.buttonBox}>
 											<SubmitButton
 												i18nId="change_password"
 												options={{
@@ -144,4 +141,4 @@ export const ChangePassword = withStyles(changePasswordStyles)((props: WithStyle
 			}}
 		</UserDataRetriever>
 	);
-});
+};

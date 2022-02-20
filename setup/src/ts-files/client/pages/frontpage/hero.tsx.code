@@ -1,4 +1,5 @@
 import React from "react";
+import Box from "@mui/material/Box";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
 import { ItemProvider } from "@onzag/itemize/client/providers/item";
@@ -12,7 +13,7 @@ import { ItemLoader } from "@onzag/itemize/client/fast-prototyping/components/it
 /**
  * The hero style
  */
-const heroStyle = {
+const style = {
 	heroContainer: {
 		display: "flex",
 		alignItems: "center",
@@ -29,9 +30,9 @@ const heroStyle = {
  * id, this represents trusted fragment content to it can be pure HTML
  * it loads the fragment with id 1 for this
  */
-export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) => {
+export function Hero() {
 	return (
-		<div className={props.classes.heroContainer + " trusted"}>
+		<Box sx={style.heroContainer} className="trusted">
 			<ModuleProvider module="cms">
 				<AppLanguageRetriever>
 					{(languageData) => (
@@ -56,6 +57,6 @@ export const Hero = withStyles(heroStyle)((props: WithStyles<typeof heroStyle>) 
 					)}
 				</AppLanguageRetriever>
 			</ModuleProvider>
-		</div>
+		</Box>
 	);
-});
+};

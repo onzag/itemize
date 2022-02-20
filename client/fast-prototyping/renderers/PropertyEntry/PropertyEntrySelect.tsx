@@ -9,9 +9,6 @@
 
 import React from "react";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -26,6 +23,7 @@ import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import { ListItemIcon } from "@mui/material";
+import Box from "@mui/system/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -39,7 +37,7 @@ function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
 /**
  * The styles for the select
  */
-export const style = createStyles({
+export const style = {
   chips: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -67,15 +65,16 @@ export const style = createStyles({
   },
   icon: {
     color: "#424242",
+    right: "46px",
   },
-  label: (props: IPropertyEntrySelectRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (isInvalid: boolean) => ({
+    "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
+      color: isInvalid ? "#f44336" : "#3f51b5",
     },
   }),
-  fieldInput: (props: IPropertyEntrySelectRendererProps) => {
-    if (shouldShowInvalid(props)) {
+  fieldInput: (isInvalid: boolean, disabled: boolean) => {
+    if (isInvalid) {
       return {
         "width": "100%",
         // this is the colur when the field is out of focus
@@ -88,7 +87,7 @@ export const style = createStyles({
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
+          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
@@ -105,28 +104,19 @@ export const style = createStyles({
       },
     };
   },
-  selectFieldIconWhenAddornmentIsActive: {
-    right: "46px",
-  },
   selectRoot: {
     display: "flex",
     alignItems: "center",
   },
-});
-
-/** 
- * The props for the select
- */
-interface IPropertyEntrySelectRendererWithStylesProps extends IPropertyEntrySelectRendererProps, WithStyles<typeof style> {
-}
+};
 
 /**
  * The actual renderer class
  */
-class ActualPropertyEntrySelectRenderer
-  extends React.Component<IPropertyEntrySelectRendererWithStylesProps> {
+class PropertyEntrySelectRenderer
+  extends React.Component<IPropertyEntrySelectRendererProps> {
 
-  constructor(props: IPropertyEntrySelectRendererWithStylesProps) {
+  constructor(props: IPropertyEntrySelectRendererProps) {
     super(props);
 
     this.onChange = this.onChange.bind(this);
@@ -175,11 +165,13 @@ class ActualPropertyEntrySelectRenderer
     const anyAddornment = this.props.args.anyAddornment;
     const optionAddornment = this.props.args.optionAddornment;
 
+    const isInvalid = shouldShowInvalid(this.props);
+
     const addornment = icon ? (
       <InputAdornment position="end">
         <IconButton
           tabIndex={-1}
-          className={this.props.classes.icon}
+          sx={style.icon}
           onClick={this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null}
           size="large">
           {icon}
@@ -191,17 +183,14 @@ class ActualPropertyEntrySelectRenderer
     if (this.props.isList) {
       selectElement = (
         <Select
-          classes={{
-            icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-          }}
-          className={this.props.classes.selectRoot}
+          sx={style.selectRoot}
           multiple={true}
           value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
           input={<FilledInput fullWidth={true} />}
           renderValue={(selected: any[]) => {
             return (
-              <div className={this.props.classes.chips}>
+              <Box sx={style.chips}>
                 {selected.map((selectedValue) => {
                   const gatheredResult = this.props.values.find((v) => v.value === selectedValue);
                   const gatheredResultAltLabel = altLabels && gatheredResult && altLabels[gatheredResult.value];
@@ -209,11 +198,11 @@ class ActualPropertyEntrySelectRenderer
                     <Chip
                       key={selectedValue}
                       label={gatheredResultAltLabel || (gatheredResult && gatheredResult.i18nValue) || selectedValue}
-                      className={this.props.classes.chip} color="primary"
+                      sx={style.chip} color="primary"
                     />
                   );
                 })}
-              </div>
+              </Box>
             );
           }}
         >
@@ -261,18 +250,15 @@ class ActualPropertyEntrySelectRenderer
           displayEmpty={true}
           disabled={this.props.disabled}
           variant="filled"
-          classes={{
-            icon: addornment ? this.props.classes.selectFieldIconWhenAddornmentIsActive : null,
-          }}
-          className={this.props.classes.selectRoot}
+          sx={style.selectRoot}
           input={
             <FilledInput
               id={this.props.propertyId}
               placeholder={this.props.placeholder}
               endAdornment={addornment}
               fullWidth={true}
+              sx={style.fieldInput(isInvalid, this.props.disabled)}
               classes={{
-                root: this.props.classes.fieldInput,
                 focused: "focused",
               }}
             />
@@ -319,29 +305,29 @@ class ActualPropertyEntrySelectRenderer
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     return (
-      <div className={this.props.classes.container}>
+      <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-            <Alert severity="info" className={this.props.classes.description}>
+            <Alert severity="info" sx={style.description}>
               {this.props.description}
             </Alert> :
             null
         }
         {
           this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" className={this.props.classes.description}>
+            <Typography variant="caption" sx={style.description}>
               {this.props.description}
             </Typography> :
             null
         }
         <FormControl
           variant="filled"
-          className={this.props.classes.entry}
+          sx={style.entry}
         >
           {this.props.label ? <InputLabel
             htmlFor={this.props.propertyId}
+            sx={style.label(isInvalid)}
             classes={{
-              root: this.props.classes.label,
               focused: "focused",
             }}
             shrink={this.props.isNullable ? true : undefined}
@@ -350,10 +336,10 @@ class ActualPropertyEntrySelectRenderer
           </InputLabel> : null}
           {selectElement}
         </FormControl>
-        <div className={this.props.classes.errorMessage}>
+        <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 }
@@ -366,5 +352,4 @@ class ActualPropertyEntrySelectRenderer
  * Supported renderer args:
  * - descriptionAsAlert: displays the description if exists as alert rather than the standard
  */
-const PropertyEntrySelectRenderer = withStyles(style)(ActualPropertyEntrySelectRenderer);
 export default PropertyEntrySelectRenderer;

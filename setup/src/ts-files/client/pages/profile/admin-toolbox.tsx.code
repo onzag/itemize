@@ -3,9 +3,6 @@ import React from "react";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Divider from "@mui/material/Divider";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
@@ -14,12 +11,12 @@ import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar
 /**
  * The admin toolbox styles
  */
-const adminToolboxStyles = () => createStyles({
+const style = {
 	divider: {
 		marginTop: "1rem",
 		marginBottom: "1rem",
 	},
-});
+};
 
 /**
  * The admin toolbox appears on the public profile for allowing to change roles
@@ -27,10 +24,10 @@ const adminToolboxStyles = () => createStyles({
  * @param props the toolbox props
  * @returns a react element
  */
-export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<typeof adminToolboxStyles>) => {
+export function AdminToolbox() {
 	return (
-		<React.Fragment>
-			<Divider className={props.classes.divider}/>
+		<>
+			<Divider sx={style.divider}/>
 			<Entry id="role"/>
 			<SubmitButton
 				i18nId="update_profile"
@@ -44,7 +41,7 @@ export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<ty
 			/>
 			<SubmitActioner>
 				{(actioner) => (
-					<React.Fragment>
+					<>
 						<Snackbar
 							id="submit-admin-toolbox-error"
 							severity="error"
@@ -59,9 +56,9 @@ export const AdminToolbox = withStyles(adminToolboxStyles)((props: WithStyles<ty
 							open={actioner.submitted}
 							onClose={actioner.dismissSubmitted}
 						/>
-					</React.Fragment>
+					</>
 				)}
 			</SubmitActioner>
-		</React.Fragment>
+		</>
 	);
-});
+};

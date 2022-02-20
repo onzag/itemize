@@ -8,29 +8,26 @@ import AppLanguageRetriever from "@onzag/itemize/client/components/localization/
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 
 import { Avatar } from "../../components/avatar";
+import { styled, Theme } from "@mui/material/styles";
 
 /**
  * The list of articles styles
  * @param theme the mui theme
  * @returns a bunch of styles
  */
-export const articlesStyles = (theme: Theme) => createStyles({
-	newsTitle: {
+export const style = {
+	newsTitle: (theme: Theme) => ({
 		marginTop: "2rem",
 		paddingLeft: "1rem",
 		borderLeft: "solid 1rem " + theme.palette.secondary.main,
-	},
+	}),
 	paper: {
 		borderRadius: 0,
 		border: 0,
@@ -40,106 +37,15 @@ export const articlesStyles = (theme: Theme) => createStyles({
 	container: {
 		padding: 0,
 	},
-	articleContainer: {
-		"backgroundColor": "white",
-		"marginTop": "2rem",
-		"boxShadow": "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
-		"transition": "box-shadow ease-in-out 0.3s",
-		"borderTop": "solid 1px rgba(0,0,0,0.12)",
-		"cursor": "pointer",
-		"display": "flex",
-		"alignItems": "flex-start",
-		"justifyContent": "center",
-		"position": "relative",
-		"width": "100%",
-		"flexWrap": "wrap",
-		"&:nth-child(even)": {
-			flexDirection: "row-reverse",
-		},
-		[theme.breakpoints.up("sm")]: {
-			"&:nth-child(odd) $publisherInfoBox": {
-				left: "calc(300px + 1.5rem)",
-			},
-			"&:nth-child(even) $articleText": {
-				paddingRight: "calc(1.5rem + 300px)",
-			},
-			"&:nth-child(odd) $articleText": {
-				paddingLeft: "calc(1.5rem + 300px)",
-			},
-			"&:nth-child(even) $articleImageContainer": {
-				right: 0,
-			},
-			"&:nth-child(odd) $articleImageContainer": {
-				left: 0,
-			},
-		},
-		[theme.breakpoints.up("md")]: {
-			"&:nth-child(odd) $publisherInfoBox": {
-				left: "calc(300px + 2rem)",
-			},
-			"&:nth-child(even) $articleText": {
-				paddingRight: "calc(2rem + 300px)",
-			},
-			"&:nth-child(odd) $articleText": {
-				paddingLeft: "calc(2rem + 300px)",
-			},
-		},
-		"&:hover, &:active": {
-			boxShadow: "0px 6px 6px -1px rgba(0,0,0,0.2), 0px 6px 6px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
-		},
-		"&:hover $articleImage, &:active $articleImage": {
-			transform: "scale(1.05)",
-		},
-	},
-	articleImageContainer: {
-		width: "300px",
-		lineHeight: 0,
-		overflow: "hidden",
-		position: "absolute",
-		top: 0,
-		bottom: 0,
-		[theme.breakpoints.down('sm')]: {
-			width: "100%",
-			height: "300px",
-			position: "relative",
-		},
-	},
-	articleImage: {
-		transition: "transform ease-in-out 0.3s",
-		width: "100%",
-		height: "100%",
-		objectFit: "cover",
-	},
-	articleText: {
-		width: "50%",
-		position: "relative",
-		flex: "1 1 50%",
-		padding: "1.5rem",
-		[theme.breakpoints.up("md")]: {
-			padding: "2rem",
-		},
-	},
 	articleSummary: {
 		padding: "1rem 0",
 	},
-	articleSummaryContainer: {
+	articleSummaryContainer: (theme: Theme) => ({
 		paddingBottom: "calc(40px + 2rem)",
 		[theme.breakpoints.up("md")]: {
 			paddingBottom: "calc(40px + 3rem)",
 		},
-	},
-	publisherInfoBox: {
-		display: "flex",
-		position: "absolute",
-		alignItems: "center",
-		justifyContent: "center",
-		bottom: "1.5rem",
-		left: "1.5rem",
-		[theme.breakpoints.up("md")]: {
-			bottom: "2rem",
-			left: "2rem",
-		},
-	},
+	}),
 	publisherInfoDetailsBox: {
 		flex: "1 1 50%",
 		display: "flex",
@@ -159,7 +65,126 @@ export const articlesStyles = (theme: Theme) => createStyles({
 	moreNewsButton: {
 
 	},
+};
+
+interface IStyledImageViewPhaserProps {
+	className?: string;
+}
+function StyledImageViewPhaser(props: IStyledImageViewPhaserProps) {
+	return (
+		<View
+			id="summary_image"
+			rendererArgs={{
+				imageClassName: props.className,
+				imageSizes: "300px",
+				lazyLoad: true,
+			}}
+		/>
+	);
+}
+const StyledImageView = styled(StyledImageViewPhaser)({
+	transition: "transform ease-in-out 0.3s",
+	width: "100%",
+	height: "100%",
+	objectFit: "cover",
 });
+
+const ArticleImageContainer = styled("div")(({ theme }) => (
+	{
+		width: "300px",
+		lineHeight: 0,
+		overflow: "hidden",
+		position: "absolute" as "absolute",
+		top: 0,
+		bottom: 0,
+		[theme.breakpoints.down("xs")]: {
+			width: "100%",
+			height: "300px",
+			position: "relative" as "relative",
+		},
+	}
+));
+
+const ArticleText = styled("div")(({ theme }) => (
+	{
+		width: "50%",
+		position: "relative" as "relative",
+		flex: "1 1 50%",
+		padding: "1.5rem",
+		[theme.breakpoints.up("md")]: {
+			padding: "2rem",
+		},
+	}
+));
+
+const PublisherInfoBox = styled("div")(({ theme }) => (
+	{
+		display: "flex",
+		position: "absolute" as "absolute",
+		alignItems: "center",
+		justifyContent: "center",
+		bottom: "1.5rem",
+		left: "1.5rem",
+		[theme.breakpoints.up("md")]: {
+			bottom: "2rem",
+			left: "2rem",
+		},
+	}
+));
+
+const StyledLink = styled(Link)(({ theme }) => (
+	{
+		"backgroundColor": "white",
+		"marginTop": "2rem",
+		"boxShadow": "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+		"transition": "box-shadow ease-in-out 0.3s",
+		"borderTop": "solid 1px rgba(0,0,0,0.12)",
+		"cursor": "pointer",
+		"display": "flex",
+		"alignItems": "flex-start",
+		"justifyContent": "center",
+		"position": "relative" as "relative",
+		"width": "100%",
+		"flexWrap": "wrap",
+		"&:nth-child(even)": {
+			flexDirection: "row-reverse",
+		},
+		[theme.breakpoints.up("sm")]: {
+			[`&:nth-child(odd) ${PublisherInfoBox}`]: {
+				left: "calc(300px + 1.5rem)",
+			},
+			[`&:nth-child(even) ${ArticleText}`]: {
+				paddingRight: "calc(1.5rem + 300px)",
+			},
+			[`&:nth-child(odd) ${ArticleText}`]: {
+				paddingLeft: "calc(1.5rem + 300px)",
+			},
+			[`&:nth-child(even) ${ArticleImageContainer}`]: {
+				right: 0,
+			},
+			[`&:nth-child(odd) ${ArticleImageContainer}`]: {
+				left: 0,
+			},
+		},
+		[theme.breakpoints.up("md")]: {
+			[`&:nth-child(odd) ${PublisherInfoBox}`]: {
+				left: "calc(300px + 2rem)",
+			},
+			[`&:nth-child(even) ${ArticleText}`]: {
+				paddingRight: "calc(2rem + 300px)",
+			},
+			[`&:nth-child(odd) ${ArticleText}`]: {
+				paddingLeft: "calc(2rem + 300px)",
+			},
+		},
+		"&:hover, &:active": {
+			boxShadow: "0px 6px 6px -1px rgba(0,0,0,0.2), 0px 6px 6px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+		},
+		[`&:hover ${StyledImageView}, &:active ${StyledImageView}`]: {
+			transform: "scale(1.05)",
+		},
+	}
+));
 
 /**
  * Provides a list of articles for fast prototyping that the user can interact with, this is meant
@@ -167,10 +192,10 @@ export const articlesStyles = (theme: Theme) => createStyles({
  * @param props the article list props
  * @returns a react element
  */
-export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof articlesStyles>) => {
+export function Articles() {
 	return (
-		<Container maxWidth="md" className={props.classes.container}>
-			<Paper className={props.classes.paper}>
+		<Container maxWidth="md" sx={style.container}>
+			<Paper sx={style.paper}>
 				<ModuleProvider module="cms">
 					<AppLanguageRetriever>
 						{(languageData) => (
@@ -199,7 +224,7 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 									offset: 0,
 								}}
 							>
-								<Typography variant="h2" className={props.classes.newsTitle}>
+								<Typography variant="h2" sx={style.newsTitle}>
 									<I18nRead id="news" capitalize={true} />
 								</Typography>
 								<SearchLoader
@@ -211,25 +236,18 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 										return loader.searchRecords.map((searchRecord) => {
 											return (
 												<ItemProvider {...searchRecord.providerProps}>
-													<Link to={`/news/${searchRecord.id}`} as="div" className={props.classes.articleContainer}>
-														<div className={props.classes.articleImageContainer}>
-															<View
-																id="summary_image"
-																rendererArgs={{
-																	imageClassName: props.classes.articleImage,
-																	imageSizes: "300px",
-																	lazyLoad: true,
-																}}
-															/>
-														</div>
-														<div className={props.classes.articleText}>
+													<StyledLink to={`/news/${searchRecord.id}`} as="div">
+														<ArticleImageContainer>
+															<StyledImageView />
+														</ArticleImageContainer>
+														<ArticleText>
 															<Typography variant="h4"><View id="title" /></Typography>
-															<div className={props.classes.articleSummaryContainer}>
-																<div className={props.classes.articleSummary}>
+															<Box sx={style.articleSummaryContainer}>
+																<Box sx={style.articleSummary}>
 																	<View id="summary" />
-																</div>
-															</div>
-														</div>
+																</Box>
+															</Box>
+														</ArticleText>
 														<Reader id="created_by">
 															{(createdBy: string) => (
 																<ModuleProvider module="users">
@@ -245,12 +263,12 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 																		]}
 																		injectParentContext={true}
 																	>
-																		<Box className={props.classes.publisherInfoBox}>
+																		<PublisherInfoBox>
 																			<Avatar
 																				hideFlag={true}
 																				size="small"
 																			/>
-																			<Box className={props.classes.publisherInfoDetailsBox}>
+																			<Box sx={style.publisherInfoDetailsBox}>
 																				<Typography variant="body1"><View id="username" /></Typography>
 																				<Typography variant="body2">
 																					<ParentItemContextProvider>
@@ -258,24 +276,24 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 																					</ParentItemContextProvider>
 																				</Typography>
 																			</Box>
-																		</Box>
+																		</PublisherInfoBox>
 																	</ItemProvider>
 																</ModuleProvider>
 															)}
 														</Reader>
-													</Link>
+													</StyledLink>
 												</ItemProvider>
 											);
 										});
 									}}
 								</SearchLoader>
-								<div className={props.classes.moreNewsContainer}>
+								<Box sx={style.moreNewsContainer}>
 									<Link to="/news">
-										<Button size="large" className={props.classes.moreNewsButton} variant="contained" color="primary">
+										<Button size="large" sx={style.moreNewsButton} variant="contained" color="primary">
 											<I18nRead id="more_news" capitalize={true} />
 										</Button>
 									</Link>
-								</div>
+								</Box>
 							</ItemProvider>
 						)}
 					</AppLanguageRetriever>
@@ -283,4 +301,4 @@ export const Articles = withStyles(articlesStyles)((props: WithStyles<typeof art
 			</Paper>
 		</Container>
 	);
-});
+};

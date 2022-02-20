@@ -6,9 +6,6 @@
 
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import I18nRead from "../../components/localization/I18nRead";
 import { default as MDialog } from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
@@ -24,7 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 /**
  * The standard dialog styles
  */
-const dialogStyles = createStyles({
+const dialogStyles = {
   paper: {},
   appbar: {
     position: "relative",
@@ -44,7 +41,7 @@ const dialogStyles = createStyles({
     borderTop: "solid 1px #ccc",
     paddingTop: "10px",
   },
-});
+};
 
 /**
  * The dialog props that need to be passed in order to build a generic
@@ -89,18 +86,12 @@ interface IDialogProps {
   className?: string;
 }
 
-interface IDialogPropsWithStyles extends IDialogProps, WithStyles<typeof dialogStyles> {
-}
-
 /**
  * The dialog itself, non-responsive and rather generic
  */
-const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
+function Dialog(props: IDialogProps) {
   return (
     <MDialog
-      classes={{
-        paper: props.classes.paper,
-      }}
       open={props.open}
       onClose={props.onClose}
       fullScreen={props.fullScreen}
@@ -110,7 +101,7 @@ const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
         onEntering: props.onOpening,
       }}
     >
-      <AppBar className={props.classes.appbar}>
+      <AppBar sx={dialogStyles.appbar}>
         <Toolbar>
           <I18nRead id="close">
             {(i18nClose: string) => (
@@ -119,35 +110,35 @@ const Dialog = withStyles(dialogStyles)((props: IDialogPropsWithStyles) => {
                 onClick={props.onClose}
                 aria-label={i18nClose}
                 size="large">
-                <CloseIcon/>
+                <CloseIcon />
               </IconButton>
             )}
           </I18nRead>
-          <Typography variant="h6" color="inherit" className={props.classes.title}>
+          <Typography variant="h6" color="inherit" sx={dialogStyles.title}>
             {props.title}
           </Typography>
         </Toolbar>
       </AppBar>
-      {props.children ? <DialogContent className={props.classes.content}>
+      {props.children ? <DialogContent sx={dialogStyles.content}>
         {props.children}
       </DialogContent> : null}
-      {props.buttons ? <DialogActions className={props.classes.actions}>
+      {props.buttons ? <DialogActions sx={dialogStyles.actions}>
         {props.buttons}
       </DialogActions> : null}
     </MDialog>
   );
-});
+};
 
 /**
  * This is a responsive version of the dialog
  * it's able to go in fullscreen mode automatically
  * takes all the other props
  */
-const DialogResponsive = function(props: IDialogProps) {
+const DialogResponsive = function (props: IDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  return <Dialog {...props} fullScreen={fullScreen}/>
+  return <Dialog {...props} fullScreen={fullScreen} />
 }
 
 // both are exported

@@ -5,10 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled, Theme } from "@mui/material/styles";
 import { ModuleProvider } from "../../../providers/module";
 import { ItemProvider } from "../../../providers/item";
 import { OutdatedText } from "./outdated-text";
@@ -31,23 +28,23 @@ import MenuIcon from "@mui/icons-material/Menu";
  * @param theme the mui theme
  * @returns a bunch of styles
  */
-const navbarStyles = (theme: Theme) => createStyles({
+const navbarStyles = {
   container: {
     flexBasis: "100%",
     display: "flex",
     flexDirection: "row-reverse",
   },
-  appBarSpacer: theme.mixins.toolbar,
-  title: {
+  appBarSpacer: (theme: Theme) => theme.mixins.toolbar,
+  title: (theme: Theme) => ({
     whiteSpace: "nowrap",
     paddingLeft: "1rem",
     paddingRight: "1rem",
     overflow: "hidden",
     flexBasis: "100%",
-    [theme.breakpoints.down(undefined)]: {
+    [theme.breakpoints.down(theme.breakpoints.values.md)]: {
       display: "none",
     }
-  },
+  }),
   titleTypography: {
     textOverflow: "ellipsis",
     overflow: "hidden",
@@ -56,12 +53,17 @@ const navbarStyles = (theme: Theme) => createStyles({
     paddingRight: "12px",
     display: "inline-block",
   }
-});
+};
+
+const TitleMargin = styled("span")(navbarStyles.titleMargin);
+const AppbarSpacer = styled("div")(navbarStyles.appBarSpacer);
+const Container = styled("div")(navbarStyles.container);
+const Title = styled("div")(navbarStyles.title);
 
 /**
  * The navbar props that allow to build a a navbar based on the folowing logic
  */
-interface INavbarProps extends WithStyles<typeof navbarStyles> {
+interface INavbarProps {
   /**
    * Optional, default is false, exclude the language picker so the language cannot be chosen and instead it goes
    * with whatever default is loaded, a language picker might be added somewhere else
@@ -122,7 +124,7 @@ interface INavbarProps extends WithStyles<typeof navbarStyles> {
  * @param props the navbar props
  * @returns a react component
  */
-export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
+export function Navbar(props: INavbarProps) {
   const [isOutdatedDialogAllowedToBeOpen, setIsOutdatedDialogAllowedToBeOpen] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -153,16 +155,15 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                   )
                 }
               </I18nRead>
-              <div className={props.classes.title}>
-                <Typography variant="body1" className={props.classes.titleTypography}>
-                  <span className={props.classes.titleMargin}>
+              <Title>
+                <Typography variant="body1" sx={navbarStyles.titleTypography}>
+                  <TitleMargin>
                     <TitleReader />
-                  </span>
+                  </TitleMargin>
                   <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)} />
                 </Typography>
-              </div>
-              <div className={props.classes.container}>
-
+              </Title>
+              <Container>
                 <Buttons
                   excludeLanguagePicker={props.excludeLanguagePicker}
                   LoginDialog={props.LoginDialog}
@@ -173,11 +174,11 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
                 />
                 <ExternalDialogs />
 
-              </div>
+              </Container>
               {props.toolbarExtraNode}
             </Toolbar>
           </AppBar>
-          <div className={props.classes.appBarSpacer} />
+          <AppbarSpacer />
           <BlockingBackdrop exclude={props.excludeBlockingBackdrop} />
           <OutdatedDialog
             isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}
@@ -194,4 +195,4 @@ export const Navbar = withStyles(navbarStyles)((props: INavbarProps) => {
       </ModuleProvider>}
     </UserDataRetriever>
   );
-});
+};

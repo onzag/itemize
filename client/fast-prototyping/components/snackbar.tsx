@@ -6,9 +6,6 @@
 
 import React from "react";
 import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import { EndpointErrorType } from "../../../base/errors";
 import I18nRead from "../../components/localization/I18nRead";
 import I18nReadError from "../../components/localization/I18nReadError";
@@ -20,33 +17,33 @@ import CloseIcon from "@mui/icons-material/Close";
  * the snackbar styles
  * @param theme the mui theme
  */
-const snackbarStyles = (theme: Theme) => createStyles({
-  success: {
+const snackbarStyles = {
+  success: (theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
     fontWeight: 900,
-  },
-  info: {
+  }),
+  info: (theme: Theme) => ({
     backgroundColor: theme.palette.info.main,
     color: theme.palette.info.contrastText,
     fontWeight: 900,
-  },
-  error: {
+  }),
+  error: (theme: Theme) => ({
     backgroundColor: theme.palette.error.main,
     color: theme.palette.error.contrastText,
     fontWeight: 900,
-  },
-  warning: {
+  }),
+  warning: (theme: Theme) => ({
     backgroundColor: theme.palette.warning.main,
     color: theme.palette.warning.contrastText,
     fontWeight: 900,
-  },
-});
+  }),
+};
 
 /**
  * The snackbar props that it needs to take
  */
-interface ISnackbarProps extends WithStyles<typeof snackbarStyles> {
+interface ISnackbarProps {
   /**
    * An unique id to describe this snackbar
    */
@@ -76,7 +73,7 @@ interface ISnackbarProps extends WithStyles<typeof snackbarStyles> {
 /**
  * The actual snackbar class
  */
-class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
+export default class Snackbar extends React.PureComponent<ISnackbarProps> {
   constructor(props: ISnackbarProps) {
     super(props);
   }
@@ -101,9 +98,7 @@ class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
         onClose={this.props.onClose}
         ContentProps={{
           "aria-describedby": this.props.id,
-          classes: {
-            root: this.props.classes[this.props.severity],
-          }
+          sx: snackbarStyles[this.props.severity],
         }}
         message={
           <span id={this.props.id}>
@@ -127,5 +122,3 @@ class ActualSnackbar extends React.PureComponent<ISnackbarProps> {
     );
   }
 }
-
-export default withStyles(snackbarStyles)(ActualSnackbar);

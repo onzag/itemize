@@ -14,6 +14,8 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FilledInput from "@mui/material/FilledInput";
 import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import { SxProps, Theme } from "@mui/material/styles";
 
 /**
  * The props for the dialog that allows to insert a link
@@ -98,17 +100,17 @@ interface ILinkDialogProps {
    */
   i18nSetLinkTemplatedUnspecified: string;
   /**
-   * The box class name
+   * The box sx
    */
-  templateBoxClassName: string;
+  templateBoxSx: SxProps<Theme>;
   /**
-   * The text class name
+   * The text sx
    */
-  templateTextClassName: string;
+  templateTextSx: SxProps<Theme>;
   /**
-   * Class name for primary options
+   * Sx for primary options
    */
-  optionPrimaryClassName: string;
+  optionPrimarySx: SxProps<Theme>;
 }
 
 /**
@@ -365,8 +367,8 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
           <div>{this.state.linkInvalid ? this.props.i18nSetLinkInvalid : null}</div>
           {
             this.state.linkTemplateOptions.length ?
-              <div className={this.props.templateBoxClassName}>
-                <div className={this.props.templateTextClassName}>{this.props.i18nSetLinkTemplated}</div>
+              <Box sx={this.props.templateBoxSx}>
+                <Box sx={this.props.templateTextSx}>{this.props.i18nSetLinkTemplated}</Box>
                 <FormControl
                   variant="filled"
                 >
@@ -398,7 +400,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
                         return <MenuItem
                           key={vv.value}
                           value={vv.value}
-                          className={vv.primary ? this.props.optionPrimaryClassName : null}
+                          sx={vv.primary ? this.props.optionPrimarySx : null}
                         >{
                           vv.label
                         }</MenuItem>;
@@ -406,7 +408,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
                     }
                   </Select>
                 </FormControl>
-              </div> :
+              </Box> :
               null
           }
         </div>

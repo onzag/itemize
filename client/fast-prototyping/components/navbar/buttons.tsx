@@ -5,10 +5,8 @@
  */
 
 import React from "react";
-import { Theme } from "@mui/material/styles";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import { css, styled, Theme, useTheme } from "@mui/material/styles";
+import { css as emotionCss } from "@emotion/css";
 import { LanguagePicker } from "../language-picker";
 import LocationStateReader from "../../../components/navigation/LocationStateReader";
 import { IfLogStatus } from "../../../components/login/IfLogStatus";
@@ -20,7 +18,7 @@ import Button from "@mui/material/Button";
  * @param theme the mui theme
  * @returns a bunch of styles
  */
-const buttonsStyles = (theme: Theme) => createStyles({
+const buttonsStyles = {
   languageButton: {
     marginLeft: "1rem",
     marginRight: "1rem",
@@ -30,23 +28,23 @@ const buttonsStyles = (theme: Theme) => createStyles({
   loginButton: {
     whiteSpace: "nowrap",
   },
-  standardLanguageButtonLabel: {
-    [theme.breakpoints.down(undefined)]: {
+  standardLanguageButtonLabel: (theme: Theme) => ({
+    [theme.breakpoints.down(theme.breakpoints.values.md)]: {
       display: "none",
     }
-  },
-  shrunkLanguageButtonLabel: {
+  }),
+  shrunkLanguageButtonLabel: (theme: Theme) => ({
     display: "none",
-    [theme.breakpoints.down(undefined)]: {
+    [theme.breakpoints.down(theme.breakpoints.values.md)]: {
       display: "inline",
     }
-  },
-});
+  }),
+};
 
 /**
  * The button props, that are passed by the navbar
  */
-interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
+interface ButtonsProps {
   /**
    * Whether the language picker that allows for selecting the language on the navbar
    * should be excluded
@@ -84,7 +82,9 @@ interface ButtonsProps extends WithStyles<typeof buttonsStyles> {
  * @param props the props
  * @returns a react component
  */
-export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
+export function Buttons(props: ButtonsProps) {
+  const theme = useTheme();
+
   // we first use the location state reader and keep this in our state
   return (
     <LocationStateReader defaultState={{ signupDialogOpen: false, loginDialogOpen: false, recoverDialogOpen: false }}>
@@ -123,22 +123,30 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
         const SignupDialog = props.SignupDialog;
         const RecoverDialog = props.RecoverDialog;
 
+        const languageButtonStyles = css(buttonsStyles.languageButton);
+        const standardLanguageButtonStyles = css(buttonsStyles.standardLanguageButtonLabel(theme));
+        const shrunkLanguageButtonStyles = css(buttonsStyles.shrunkLanguageButtonLabel(theme));
+
+        const languageButtonClassName = emotionCss(languageButtonStyles.styles);
+        const standardLanguageButtonLabelClassName = emotionCss(standardLanguageButtonStyles.styles);
+        const shrunkLanguageButtonLabelClassName = emotionCss(shrunkLanguageButtonStyles.styles);
+
         // and return
         return (
           <IfLogStatus>
             {(status) => {
               if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                 return <React.Fragment>
-                  <Button color="inherit" variant="outlined" onClick={openLoginDialog} className={props.classes.loginButton}>
+                  <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
                     <I18nRead id="login" />
                   </Button>
                   {
                     !props.excludeLanguagePicker ?
                       <LanguagePicker
-                        className={props.classes.languageButton}
+                        className={languageButtonClassName}
                         shrinkingDisplay={true}
-                        shrinkingDisplayStandardClassName={props.classes.standardLanguageButtonLabel}
-                        shrinkingDisplayShrunkClassName={props.classes.shrunkLanguageButtonLabel}
+                        shrinkingDisplayStandardClassName={standardLanguageButtonLabelClassName}
+                        shrinkingDisplayShrunkClassName={shrunkLanguageButtonLabelClassName}
                       /> :
                       null
                   }
@@ -171,4 +179,4 @@ export const Buttons = withStyles(buttonsStyles)((props: ButtonsProps) => {
       }}
     </LocationStateReader>
   )
-});
+};

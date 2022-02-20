@@ -6,9 +6,6 @@
 
 import React from "react";
 import Link from "../../../components/navigation/Link";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import { ModuleProvider } from "../../../providers/module";
 import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 import UserDataRetriever from "../../../components/user/UserDataRetriever";
@@ -22,11 +19,12 @@ import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import { styled } from "@mui/material/styles";
 
 /**
  * The menu styles
  */
-const menuStyles = createStyles({
+const menuStyles = {
   list: {
     width: "250px",
   },
@@ -34,7 +32,7 @@ const menuStyles = createStyles({
     textDecoration: "none",
     color: "inherit",
   },
-});
+};
 
 type PathRetriever = (path: string) => React.ReactNode;
 type PathRetrieverFn = (ele: PathRetriever) => React.ReactNode;
@@ -92,7 +90,7 @@ export interface IMenuEntry {
 /**
  * The menu properties with the styles attached
  */
-interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
+interface IMenuProps {
   /**
    * Whether the menu is open
    */
@@ -115,14 +113,15 @@ interface MenuPropsWithStyles extends WithStyles<typeof menuStyles> {
   entries: IMenuEntry[];
 }
 
+const StyledLink = styled(Link)(menuStyles.listLink);
+
 /**
  * Given entries, will build an entry list so that it is displayed in the menu
  * list
  * @param entries the entries to use
- * @param className the class name that will pop in the link container
  * @param role the role that the current user is logged as
  */
-function buildEntryFromList(entries: IMenuEntry[], className: string, role: string) {
+function buildEntryFromList(entries: IMenuEntry[], role: string) {
   // so we start looping
   return entries.map((entry) => {
     // first we check if the role is there and if it doesn't match
@@ -173,7 +172,7 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
     }
 
     const elementPathFn = (path: string) => (
-      <Link to={path} className={className} propagateClicks={true} key={path}>
+      <StyledLink to={path} propagateClicks={true} key={path}>
         <LocationReader>
           {(arg) => (
             <ListItem button={true} selected={arg.pathname === path}>
@@ -184,7 +183,7 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
             </ListItem>
           )}
         </LocationReader>
-      </Link>
+      </StyledLink>
     );
 
     const element = typeof entry.path === "string" ? elementPathFn(entry.path) : entry.path(elementPathFn);
@@ -202,12 +201,14 @@ function buildEntryFromList(entries: IMenuEntry[], className: string, role: stri
   })
 }
 
+const StyledDivList = styled("div")(menuStyles.list);
+
 /**
  * Provides a menu for the navbar
  * @param props the menu props
  * @returns a react element
  */
-export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
+export function Menu(props: IMenuProps) {
   // so we render in here, first we need our language retriever to do the rtl thing
   return (
     <AppLanguageRetriever>
@@ -219,8 +220,7 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
           onOpen={props.onOpen}
           disableDiscovery={true}
         >
-          <div
-            className={props.classes.list}
+          <StyledDivList
             role="presentation"
             onClick={props.onClose}
             onKeyDown={props.onClose}
@@ -232,22 +232,21 @@ export const Menu = withStyles(menuStyles)((props: MenuPropsWithStyles) => {
                     props.adminEntries.length ?
                       <>
                         <List>
-                          {buildEntryFromList(props.adminEntries, props.classes.listLink, userData.role)}
+                          {buildEntryFromList(props.adminEntries, userData.role)}
                         </List>
                         <Divider />
                       </> :
                       null
                   }
                   <List>
-                    {buildEntryFromList(props.entries, props.classes.listLink, userData.role)}
+                    {buildEntryFromList(props.entries, userData.role)}
                   </List>
                 </>
               )}
             </UserDataRetriever>
-
-          </div>
+          </StyledDivList>
         </SwipeableDrawer>
       )}
     </AppLanguageRetriever>
   )
-});
+};

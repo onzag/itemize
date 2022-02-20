@@ -4,10 +4,7 @@
  * @module
  */
 
-import React from "react";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import React, { useMemo } from "react";
 import { countries } from "../../../imported-resources";
 import Link from "../../components/navigation/Link";
 import { PropertyDefinitionSupportedFileType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
@@ -21,35 +18,69 @@ import Badge from "@mui/material/Badge";
 import BrokenImageIcon from "@mui/icons-material/BrokenImage";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import Alert from '@mui/material/Alert';
+import { styled, SxProps } from '@mui/material/styles';
+
+const StyledBadge = styled(Badge)({
+  "& .MuiBadge-badge": {
+    transform: "scale(1) translate(25%, -25%)",
+  },
+});
+
+const Flag = styled("div")({
+  position: "absolute",
+  fontSize: "0.8rem",
+  bottom: -2.5,
+  right: -5,
+});
+
+const StyledLink = styled(Link)();
+
+interface IHoverAddBackdropProps {
+  visible: boolean;
+}
+
+const HoverAddBackdrop = styled("div", {
+  shouldForwardProp: (prop) => prop !== "visible"
+})<IHoverAddBackdropProps>(({ visible }) => ({
+  "cursor": "pointer",
+  "width": "100%",
+  "height": "100%",
+  "backgroundColor": "black",
+  "color": "white",
+  "position": "absolute",
+  "alignItems": "center",
+  "justifyContent": "center",
+  "display": "flex",
+  "zIndex": 1,
+  "transition": "opacity 0.3s ease-in-out",
+  "borderRadius": "100%",
+  "&:hover": {
+    opacity: 0.5,
+  },
+  "opacity": visible ? 0.5 : 0,
+}));
+
+interface IAvatarContainerProps {
+  large?: boolean;
+  fullWidth?: boolean;
+}
+
+const AvatarContainer = styled("div", {
+  shouldForwardProp: (prop) => prop !== "large" && prop !== "fullWidth"
+})<IAvatarContainerProps>(({ large, fullWidth }) => ({
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  paddingBottom: large ? "1rem" : "auto",
+  width: fullWidth ? "100%" : "auto",
+}));
 
 /**
  * We build the styles with the create styles function
  */
-const avatarStyles = createStyles({
-  flag: {
-    position: "absolute",
-    fontSize: "0.8rem",
-    bottom: -2.5,
-    right: -5,
-  },
-  hoverAddBackdrop: {
-    "cursor": "pointer",
-    "opacity": 0,
-    "width": "100%",
-    "height": "100%",
-    "backgroundColor": "black",
-    "color": "white",
-    "position": "absolute",
-    "alignItems": "center",
-    "justifyContent": "center",
-    "display": "flex",
-    "zIndex": 1,
-    "transition": "opacity 0.3s ease-in-out",
-    "borderRadius": "100%",
-    "&:hover, &.visible": {
-      opacity: 0.5,
-    }
-  },
+const avatarStyles = {
   avatar: {
     "cursor": "pointer",
     "&::after": {
@@ -81,25 +112,6 @@ const avatarStyles = createStyles({
     "&:active::after": {
       opacity: 1,
     },
-  },
-  fullWidth: {
-    width: "100%",
-  },
-  avatarContainer: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-  avatarUploadError: {
-    marginTop: "1rem",
-  },
-  avatarContainerLarge: {
-    paddingBottom: "1rem",
-  },
-  avatarBadge: {
-    transform: "scale(1) translate(25%, -25%)",
   },
   avatarLarge: {
     width: "200px",
@@ -162,12 +174,12 @@ const avatarStyles = createStyles({
   specialUserLarge: {
     boxShadow: "0px 0px 0px 10px #ffeb3b"
   },
-});
+};
 
 /**
  * The properties for the avatar
  */
-interface IAvatarProps extends WithStyles<typeof avatarStyles> {
+interface IAvatarProps {
   /**
    * size small, medium or large changes how it displays
    */
@@ -191,6 +203,10 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
    * if profileURL is defined
    */
   linkClassName?: string;
+  /**
+   * Material UI based sx props for the link
+   */
+  linkSx?: SxProps;
   /**
    * The id of the user currently logged, it is used
    * for 
@@ -225,7 +241,7 @@ interface IAvatarProps extends WithStyles<typeof avatarStyles> {
  * as it is, without much fuzz, it's pure to mantain itself
  * very efficient
  */
-interface SimpleAvatarProps extends WithStyles<typeof avatarStyles> {
+interface SimpleAvatarProps {
   /**
    * The source of the image
    */
@@ -237,7 +253,7 @@ interface SimpleAvatarProps extends WithStyles<typeof avatarStyles> {
   /**
    * The colored class name that is to be used
    */
-  numberColorClassName: string;
+  numberColorId: number;
   /**
    * Whether it is an special user
    */
@@ -252,39 +268,55 @@ interface SimpleAvatarProps extends WithStyles<typeof avatarStyles> {
  * The simple avatar is just a react component that displays a simple material
  * ui specific avatar, nothing too special about this
  */
-class SimpleAvatar extends React.PureComponent<SimpleAvatarProps> {
-  public render() {
-    return (
-      <MAvatar
-        alt={this.props.userNameValue}
-        classes={{
-          root: `${this.props.classes.avatar} ${this.props.numberColorClassName} ` +
-            `${this.props.size === "large" ? this.props.classes.avatarLarge : ""} ` +
-            `${this.props.size === "medium" ? this.props.classes.avatarMedium : ""} ` +
-            `${this.props.isSpecialUser ? this.props.classes.specialUser : ""} ` +
-            `${this.props.isSpecialUser && this.props.size === "large" ? this.props.classes.specialUserLarge : ""} ` +
-            `${this.props.isSpecialUser && this.props.size === "medium" ? this.props.classes.specialUserMedium : ""}`
-        }}
-        src={this.props.imgSrc}
-      >
-        {this.props.userNameValue ? this.props.userNameValue[0].toUpperCase() : ""}
-      </MAvatar>
-    )
-  }
+function SimpleAvatar(props: SimpleAvatarProps) {
+  const sx = useMemo(() => {
+    const value = {
+      ...avatarStyles.avatar,
+      ...avatarStyles["randomColor" + props.numberColorId],
+    };
+
+    if (props.size === "large") {
+      Object.assign(value, avatarStyles.avatarLarge);
+    } else if (props.size === "medium") {
+      Object.assign(value, avatarStyles.avatarMedium);
+    }
+
+    if (props.isSpecialUser) {
+      Object.assign(value, avatarStyles.specialUser);
+
+      if (props.size === "large") {
+        Object.assign(value, avatarStyles.specialUserLarge);
+      } else if (props.size === "medium") {
+        Object.assign(value, avatarStyles.specialUserMedium);
+      }
+    }
+
+    return value;
+  }, [props.size, props.isSpecialUser, props.numberColorId]);
+
+  return (
+    <MAvatar
+      alt={props.userNameValue}
+      sx={sx}
+      src={props.imgSrc}
+    >
+      {props.userNameValue ? props.userNameValue[0].toUpperCase() : ""}
+    </MAvatar>
+  )
 }
 
 /**
  * The avatar content will do complex logic in order
  * to display the avatar of a given user in an efficient way
  */
-class ActualAvatar extends React.PureComponent<IAvatarProps> {
+export class Avatar extends React.PureComponent<IAvatarProps> {
   public render() {
     // so we assign a random color based on the user id
-    const numberColorClassName = this.props.id ? this.props.classes["randomColor" + (this.props.id.charCodeAt(0) % 10)] : "";
+    const numberColorId = this.props.id.charCodeAt(0) % 10;
 
     // now the flag logic
     const flag = this.props.countryCode && countries[this.props.countryCode] ? (
-      <div className={this.props.classes.flag}>{countries[this.props.countryCode].emoji}</div>
+      <Flag>{countries[this.props.countryCode].emoji}</Flag>
     ) : null;
 
     // and now we get the image sources from the image size retriever, only the standard
@@ -297,40 +329,39 @@ class ActualAvatar extends React.PureComponent<IAvatarProps> {
 
     // now this will be the content
     const content = (
-      <div className={`${this.props.classes.avatarContainer} ${this.props.fullWidth ? this.props.classes.fullWidth : ""}`}>
+      <AvatarContainer fullWidth={true}>
         <SimpleAvatar
           imgSrc={this.props.cacheImage ? cacheableQSLoader(imageSrc) : imageSrc}
           size={this.props.size}
-          numberColorClassName={numberColorClassName}
+          numberColorId={numberColorId}
           isSpecialUser={this.props.isSpecialUser}
           userNameValue={this.props.userNameValue}
-          classes={this.props.classes}
         />
         {flag}
-      </div>
+      </AvatarContainer>
     );
 
     // this will be the actual avatar, depending if we wrap it with a router link or not
     // according to the logic
     const avatar = this.props.profileURL ? (
-      <Link
+      <StyledLink
         className={this.props.linkClassName}
+        sx={this.props.linkSx}
         to={this.props.profileURL}
       >
         {content}
-      </Link>
+      </StyledLink>
     ) : content;
 
     // so now for warnings
     if (this.props.warningCount) {
       return (
-        <Badge
+        <StyledBadge
           badgeContent={this.props.warningCount > 99 ? "99+" : this.props.warningCount}
           color="secondary"
-          classes={{ badge: this.props.classes.avatarBadge }}
         >
           {avatar}
-        </Badge>
+        </StyledBadge>
       );
     } else {
       // no warnings, return as it is
@@ -340,17 +371,9 @@ class ActualAvatar extends React.PureComponent<IAvatarProps> {
 }
 
 /**
- * Will display an avatar for a given user, this fast prototyping
- * component makes no assumptions and as such you will have to implement
- * your own wrapper around it to make your own avatar type
+ * The avatar renderer uses the same property entry file renderer props
  */
-export const Avatar = withStyles(avatarStyles)(ActualAvatar);
-
-/**
- * The avatar renderer uses the same property entry file renderer props with the same
- * styles that the avatar itself uses
- */
-interface IAvatarRendererProps extends IPropertyEntryFileRendererProps, WithStyles<typeof avatarStyles> {
+interface IAvatarRendererProps extends IPropertyEntryFileRendererProps {
 }
 
 /**
@@ -364,80 +387,105 @@ function onDrop(onSetFile: (file: File) => void, files: any[]) {
   onSetFile(typeof files[0].file !== "undefined" ? files[0].file : files[0]);
 }
 
+interface IAvatarRendererInternalContentProps extends IAvatarRendererProps {
+  username: string;
+  numberColorId: number;
+  isSpecialUser: boolean;
+}
+
+function AvatarRendererInternalContent(props: IAvatarRendererInternalContentProps) {
+  const dropzoneRef = React.useRef<DropzoneRef>();
+
+  const sx = useMemo(() => {
+    const value = {
+      ...avatarStyles.avatar,
+      ...avatarStyles.avatarLarge,
+      ...avatarStyles["randomColor" + props.numberColorId],
+    };
+
+    if (props.isSpecialUser) {
+      Object.assign(value, avatarStyles.specialUser);
+      Object.assign(value, avatarStyles.specialUserLarge);
+    }
+
+    return value;
+  }, [props.isSpecialUser, props.numberColorId])
+
+  return (
+    <Dropzone
+      onDropAccepted={onDrop.bind(null, props.onSetFile)}
+      onDropRejected={onDrop.bind(null, props.onSetFile)}
+      maxSize={MAX_FILE_SIZE}
+      accept={props.accept}
+      multiple={false}
+      noClick={false}
+      ref={dropzoneRef}
+      disabled={props.disabled}
+    >
+      {({
+        getRootProps,
+        getInputProps,
+        isDragAccept,
+        isDragReject,
+      }) => {
+        const { ref, ...rootProps } = getRootProps();
+        return (
+          <>
+            <div {...(rootProps as any)}>
+              <input {...(getInputProps() as any)} />
+              <AvatarContainer>
+                <MAvatar
+                  sx={sx}
+                  src={cacheableQSLoader(props.imageSizes && props.imageSizes.imageLargeSizeURL)}
+                >
+                  {props.username ? props.username[0].toLocaleUpperCase() : ""}
+                </MAvatar>
+                <HoverAddBackdrop visible={isDragAccept || isDragReject}>
+                  {isDragReject ? <BrokenImageIcon fontSize="large" /> : <AddAPhotoIcon fontSize="large" />}
+                </HoverAddBackdrop>
+              </AvatarContainer>
+            </div>
+          </>
+        );
+      }}
+    </Dropzone>
+  )
+}
+
 /**
  * A fully custom renderer for the avatar component for usage with file types
  * so it can be passed as a custom renderer via the entry, eg...
  * <Entry id="profile_picture" renderer={AvatarRenderer}/> rather
  * than using the default
  */
-export const AvatarRenderer = withStyles(avatarStyles)((props: IAvatarRendererProps) => {
-  const dropzoneRef = React.useRef<DropzoneRef>();
+export function AvatarRenderer(props: IAvatarRendererProps) {
   // we are using readers inside the avatar renderer, which is quite the feat, but nonetheless allowed
   // a bit inefficient but should work out just fine for this
   return (
-    <div className={`${props.classes.avatarContainer} ${props.classes.avatarContainerLarge}`}>
+    <AvatarContainer large={true}>
       <Reader id="username">{
         (username: string) => (
           <Reader id="role">{
             (role: string) => (
               <Reader id="id">
                 {(id: string) => {
-                  const numberColorClassName = id ? props.classes["randomColor" + (id.charCodeAt(0) % 10)] : "";
-                  const specialUserClassName = (props.args.specialUsers || []).includes(role) ? props.classes.specialUser : "";
-                  const specialUserSizeClassName = specialUserClassName && props.classes.specialUserLarge;
+                  const numberColorId = id.charCodeAt(0) % 10;
 
-                  return (
-                    <Dropzone
-                      onDropAccepted={onDrop.bind(null, props.onSetFile)}
-                      onDropRejected={onDrop.bind(null, props.onSetFile)}
-                      maxSize={MAX_FILE_SIZE}
-                      accept={props.accept}
-                      multiple={false}
-                      noClick={false}
-                      ref={dropzoneRef}
-                      disabled={props.disabled}
-                    >
-                      {({
-                        getRootProps,
-                        getInputProps,
-                        isDragAccept,
-                        isDragReject,
-                      }) => {
-                        const { ref, ...rootProps } = getRootProps();
-                        return (
-                          <>
-                            <div {...(rootProps as any)}>
-                              <input {...(getInputProps() as any)} />
-                              <div className={props.classes.avatarContainer}>
-                                <MAvatar
-                                  classes={{
-                                    root: `${props.classes.avatar} ${numberColorClassName} ` +
-                                      `${props.classes.avatarLarge} ` +
-                                      `${specialUserClassName} ${specialUserSizeClassName}`
-                                  }}
-                                  src={cacheableQSLoader(props.imageSizes && props.imageSizes.imageLargeSizeURL)}
-                                >
-                                  {username ? username[0].toLocaleUpperCase() : ""}
-                                </MAvatar>
-                                <div className={`${props.classes.hoverAddBackdrop} ${isDragAccept || isDragReject ? "visible" : ""}`}>
-                                  {isDragReject ? <BrokenImageIcon fontSize="large" /> : <AddAPhotoIcon fontSize="large" />}
-                                </div>
-                              </div>
-                            </div>
-                          </>
-                        );
-                      }}
-                    </Dropzone>
-                  )
+                  return <AvatarRendererInternalContent
+                    {...props}
+                    username={username}
+                    numberColorId={numberColorId}
+                    isSpecialUser={(props.args.specialUsers || []).includes(role)}
+                  />
                 }}
               </Reader>
             )
           }</Reader>
         )
       }</Reader>
-      {props.currentInvalidReason || props.rejectedReason ? <Alert classes={{ root: props.classes.avatarUploadError }} severity="error">
+      {props.currentInvalidReason || props.rejectedReason ? <Alert sx={{ marginTop: "1rem" }} severity="error">
         {props.currentInvalidReason || props.rejectedReason}
       </Alert> : null}
-    </div>
+    </AvatarContainer>
   );
-});
+}

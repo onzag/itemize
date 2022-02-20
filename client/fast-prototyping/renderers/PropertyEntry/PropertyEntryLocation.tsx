@@ -13,9 +13,6 @@ import { capitalize } from "../../../../util";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -27,12 +24,15 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
+import { css as emotionCss } from "@emotion/css";
+import { css } from "@mui/material/styles";
 
 // we import the react-leaflet types, however note
 // how we are not using them at all, this is because
 // we are not using these as they don't support SSR at all
 // and we need to do a dynamic import
 import { Map, TileLayer, Marker } from "react-leaflet";
+import Box from "@mui/material/Box";
 
 // we only use these types to define these C prefixed types
 let CMap: typeof Map;
@@ -81,7 +81,7 @@ function shouldShowInvalid(props: IPropertyEntryLocationRendererProps) {
 /**
  * The styles for the location entry
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -125,10 +125,10 @@ export const style = createStyles({
     justifyContent: "center",
     borderRadius: "5px",
   },
-  label: (props: IPropertyEntryLocationRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (isInvalid: boolean) => ({
+    "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
     "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
+      color: isInvalid ? "#f44336" : "#3f51b5",
     },
   }),
   labelSingleLine: {
@@ -137,8 +137,8 @@ export const style = createStyles({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  fieldInput: (props: IPropertyEntryLocationRendererProps) => {
-    if (shouldShowInvalid(props)) {
+  fieldInput: (isInvalid: boolean, disabled: boolean) => {
+    if (isInvalid) {
       return {
         "width": "100%",
         // this is the colur when the field is out of focus
@@ -151,7 +151,7 @@ export const style = createStyles({
         },
         // during the hover event
         "&:hover::before": {
-          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
+          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
         },
       };
     }
@@ -247,14 +247,7 @@ export const style = createStyles({
     paddingLeft: "0.5rem",
     marginLeft: "0.5rem",
   },
-});
-
-/**
- * The props with location entry renderer
- */
-interface IPropertyEntryLocationRendererWithStylesProps extends IPropertyEntryLocationRendererProps, WithStyles<typeof style> {
-
-}
+};
 
 /**
  * The state for the location entry renderer
@@ -270,8 +263,8 @@ interface IPropertyEntryLocationRendererState {
 /**
  * The actual property entry location renderer
  */
-class ActualPropertyEntryLocationRendererWithStylesClass extends
-  React.Component<IPropertyEntryLocationRendererWithStylesProps, IPropertyEntryLocationRendererState> {
+class PropertyEntryLocationRenderer extends
+  React.Component<IPropertyEntryLocationRendererProps, IPropertyEntryLocationRendererState> {
 
   /**
    * The input ref for the location
@@ -288,7 +281,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
    * The contructor for the location entry renderer
    * @param props the props
    */
-  constructor(props: IPropertyEntryLocationRendererWithStylesProps) {
+  constructor(props: IPropertyEntryLocationRendererProps) {
     super(props);
 
     this.state = {
@@ -415,7 +408,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
     // these are the applied text props for
     // the class names
     let appliedTextFieldProps: any = {
-      className: this.props.classes.entry,
+      sx: style.entry,
     };
     // the icon we will use for the seach, yes we use two
     // one for the initial search and another for swapping
@@ -454,7 +447,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
           <IconButton
             tabIndex={-1}
             disabled={this.props.disabled}
-            classes={{ root: this.props.classes.iconButton }}
+            sx={style.iconButton}
             onClick={onClickFn}
             size="large">
             {iconSearch}
@@ -521,76 +514,78 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
       </CMap>
     ) : null;
 
+    const isInvalid = shouldShowInvalid(this.props);
+
     // the description as alert arg possibility
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
     return (
-      <div className={this.props.classes.container}>
+      <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-            <Alert severity="info" className={this.props.classes.description}>
+            <Alert severity="info" sx={style.description}>
               {this.props.description}
             </Alert> :
             null
         }
         {
           this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" className={this.props.classes.description}>
+            <Typography variant="caption" sx={style.description}>
               {this.props.description}
             </Typography> :
             null
         }
         {!this.props.args.disableMapAndSearch ?
-          <div className={this.props.classes.locationAlternativeTextHeader}>
+          <Box sx={style.locationAlternativeTextHeader}>
             {
               icon ? <IconButton
                 tabIndex={-1}
-                className={this.props.classes.icon}
+                sx={style.icon}
                 onClick={this.props.canRestore ? this.props.onRestore : null}
                 size="large">{icon}</IconButton> : null
             }
             {
               this.props.currentValue && this.props.currentValue.atxt ||
               (
-                <span className={this.props.classes.locationPlaceholder}>
+                <Box component="span" sx={style.locationPlaceholder}>
                   {capitalize(this.props.placeholder)}
-                </span>
+                </Box>
               )
             }
             {
               this.props.resultOutOfLabel ?
-                <i className={this.props.classes.resultListLabel}>{this.props.resultOutOfLabel}</i> :
+                <Box component="i" sx={style.resultListLabel}>{this.props.resultOutOfLabel}</Box> :
                 null
             }
-          </div> : null
+          </Box> : null
         }
         {
           !this.props.args.disableMapAndSearch ?
-            <div className={this.props.classes.locationMapContainer}>
+            <Box sx={style.locationMapContainer}>
               {map}
-            </div> :
+            </Box> :
             null
         }
         <TextField
           fullWidth={true}
           type="text"
           onKeyPress={this.onKeyPress}
-          className={this.props.classes.entry}
+          sx={style.entry}
           label={this.props.label}
           onChange={this.onSearchQueryChange}
           onBlur={this.props.enableUserSetErrors}
           placeholder={this.props.placeholder}
           value={this.props.searchQuery}
           InputProps={{
+            sx: style.fieldInput(isInvalid, this.props.disabled),
             classes: {
-              root: this.props.classes.fieldInput,
               focused: "focused",
             },
             disabled: this.props.disabled,
             ...appliedInputProps,
           }}
           InputLabelProps={{
+            sx: style.label(isInvalid),
             classes: {
-              root: this.props.classes.label,
               focused: "focused",
             },
           }}
@@ -598,15 +593,15 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
           variant="filled"
           {...appliedTextFieldProps}
         />
-        <div className={this.props.classes.errorMessage}>
+        <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
           {
             !this.props.currentInvalidReason && this.props.activeSearchResults && this.props.activeSearchResults.length === 0 ?
               this.props.noResultsLabel :
               null
           }
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 
@@ -658,13 +653,13 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
 
     return (
       <MenuItem
-        className={this.props.classes.autosuggestMenuItem}
+        sx={style.autosuggestMenuItem}
         selected={params.isHighlighted}
         component="div"
         onClick={this.onChangeBySuggestion.bind(this, suggestion)}
       >
         <div>
-          <div className={this.props.classes.autosuggestMenuItemMainText}>
+          <Box sx={style.autosuggestMenuItemMainText}>
             {parts.map((part, index) =>
               part.highlight ? (
                 <span key={index} style={{ fontWeight: 500 }}>
@@ -676,10 +671,10 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
                   </strong>
                 ),
             )}
-          </div>
-          <div className={this.props.classes.autosuggestMenuItemSubText}>
+          </Box>
+          <Box sx={style.autosuggestMenuItemSubText}>
             {suggestion.atxt}
-          </div>
+          </Box>
         </div>
       </MenuItem>
     );
@@ -689,6 +684,28 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
    * The actual render function
    */
   public render() {
+    const baseTheme = {
+      container: css(style.autosuggestContainer as any),
+      containerOpen: css(style.autosuggestContainerOpen),
+      input: css(style.autosuggestInput),
+      inputOpen: css(style.autosuggestInputOpen),
+      inputFocused: "focused",
+      suggestionsContainer: css(style.autosuggestSuggestionsContainer),
+      suggestionsContainerOpen: css(style.autosuggestSuggestionsContainerOpen),
+      suggestionsList: css(style.autosuggestSuggestionsList),
+      suggestion: css(style.autosuggestSuggestion),
+      suggestionFirst: css(style.autosuggestFirstSuggestion),
+      suggestionHighlighted: css(style.autosuggestSuggestionHighlighted),
+      sectionContainer: css(style.autosuggestSectionContainer),
+      sectionContainerFirst: css(style.autosuggestFirstSectionContainer),
+      sectionTitle: css(style.autosuggestSectionTitle),
+    };
+
+    const rsTheme: any = {};
+    Object.keys(baseTheme).forEach((k) => {
+      rsTheme[k] = emotionCss(baseTheme[k].styles)
+    });
+
     return (
       <Autosuggest
         renderInputComponent={this.renderBody}
@@ -698,22 +715,7 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.props.clearSuggestions}
         suggestions={this.props.searchSuggestions}
-        theme={{
-          container: this.props.classes.autosuggestContainer,
-          containerOpen: this.props.classes.autosuggestContainerOpen,
-          input: this.props.classes.autosuggestInput,
-          inputOpen: this.props.classes.autosuggestInputOpen,
-          inputFocused: "focused",
-          suggestionsContainer: this.props.classes.autosuggestSuggestionsContainer,
-          suggestionsContainerOpen: this.props.classes.autosuggestSuggestionsContainerOpen,
-          suggestionsList: this.props.classes.autosuggestSuggestionsList,
-          suggestion: this.props.classes.autosuggestSuggestion,
-          suggestionFirst: this.props.classes.autosuggestFirstSuggestion,
-          suggestionHighlighted: this.props.classes.autosuggestSuggestionHighlighted,
-          sectionContainer: this.props.classes.autosuggestSectionContainer,
-          sectionContainerFirst: this.props.classes.autosuggestFirstSectionContainer,
-          sectionTitle: this.props.classes.autosuggestSectionTitle,
-        }}
+        theme={rsTheme}
         inputProps={{
           value: this.props.searchQuery,
           onChange: this.onSearchQueryChange,
@@ -732,5 +734,4 @@ class ActualPropertyEntryLocationRendererWithStylesClass extends
  * 
  * - descriptionAsAlert: displays the description if exists as alert rather than the standard
  */
-const PropertyEntryLocationRenderer = withStyles(style)(ActualPropertyEntryLocationRendererWithStylesClass);
 export default PropertyEntryLocationRenderer;

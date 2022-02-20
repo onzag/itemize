@@ -8,9 +8,6 @@ import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
 import React from "react";
 import { capitalize } from "../../../components/localization";
-import { WithStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -22,6 +19,7 @@ import Button from "@mui/material/Button";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline"
 import NoteAddIcon from "@mui/icons-material/NoteAdd"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import Box from "@mui/material/Box";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -35,7 +33,7 @@ function shouldShowInvalid(props: IPropertyEntryFileRendererProps) {
 /**
  * the styles for the file entry
  */
-export const style = createStyles({
+export const style = {
   entry: {
     width: "100%",
     display: "flex",
@@ -57,14 +55,14 @@ export const style = createStyles({
   icon: {
     color: "#424242",
   },
-  label: (props: IPropertyEntryFileRendererProps) => ({
-    "color": shouldShowInvalid(props) ? "#f44336" : "rgb(66, 66, 66)",
+  label: (isInvalid: boolean) => ({
+    "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
     "width": "100%",
     "display": "flex",
     "alignItems": "center",
     "justifyContent": "space-between",
     "&.focused": {
-      color: shouldShowInvalid(props) ? "#f44336" : "#3f51b5",
+      color: isInvalid ? "#f44336" : "#3f51b5",
     },
   }),
   fileDeleteButton: {
@@ -93,7 +91,7 @@ export const style = createStyles({
     padding: "20px 20px calc(2.5rem + 20px) 20px",
     flexWrap: "wrap",
   },
-  paperPlaceholder: {
+  paperPlaceholder: (accepting: boolean, rejecting: boolean) => ({
     flexGrow: 2,
     display: "block",
     textAlign: "center",
@@ -104,13 +102,10 @@ export const style = createStyles({
     border: "dotted 2px #ccc",
     padding: "25px 0",
     margin: "0 25px",
-  },
-  paperPlaceholderAccepting: {
-    borderColor: "#42a5f5",
-  },
-  paperPlaceholderRejecting: {
-    borderColor: "#f44336",
-  },
+    borderColor: !accepting && !rejecting ? (null) : (
+      accepting ? "#42a5f5" : "#f44336"
+    ),
+  }),
   paperIconAdd: {
     opacity: 0.1,
     fontSize: "100px",
@@ -129,13 +124,7 @@ export const style = createStyles({
   buttonIcon: {
     marginLeft: "0.75rem",
   },
-});
-
-/**
- * The props for the file renderer, with styles
- */
-interface IPropertyEntryFileRendererWithStylesProps extends IPropertyEntryFileRendererProps, WithStyles<typeof style> {
-}
+};
 
 /**
  * Simple function that binds the onSetFile function from the handler
@@ -172,9 +161,9 @@ function manuallyRemove(enableUserSetErrors: () => void, removeFile: () => void)
  * @param props the entry props
  * @returns a react element
  */
-const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRendererWithStylesProps) => {
+function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
   const dropzoneRef = React.useRef<DropzoneRef>();
-  
+
   let icon: React.ReactNode;
   if (props.canRestore) {
     if (props.currentAppliedValue) {
@@ -186,26 +175,28 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
     icon = props.icon;
   }
 
+  const isInvalid = shouldShowInvalid(props);
+
   const descriptionAsAlert = props.args["descriptionAsAlert"];
   return (
-    <div className={props.classes.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" className={props.classes.description}>
+    <Box sx={style.container}>
+      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description}>
         {props.description}
       </Alert> : null}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" className={props.classes.description}>
+      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
         {props.description}
       </Typography> : null}
       {props.label ? <FormLabel
         aria-label={props.label}
+        sx={style.label(isInvalid)}
         classes={{
-          root: props.classes.label,
           focused: "focused",
         }}
       >
         {capitalize(props.label)}
         {icon ? <IconButton
           tabIndex={-1}
-          className={props.classes.icon}
+          sx={style.icon}
           onClick={props.canRestore ? props.onRestore : null}
           size="large">{icon}</IconButton> : null}
       </FormLabel> : null}
@@ -233,7 +224,7 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
             const mainFileClassName = "file" +
               (props.rejected ? " rejected" : "");
             displayContent = (
-              <div
+              <Box
                 className={mainFileClassName}
                 onClick={props.openFile}
               >
@@ -258,22 +249,20 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
                   <p className="file-size">{
                     props.prettySize
                   }</p>
-                  {props.rejected ? <p className={props.classes.fileRejectedDescription}>
+                  {props.rejected ? <Box sx={style.fileRejectedDescription} component="p">
                     {props.rejectedReason}
-                  </p> : null}
+                  </Box> : null}
                 </div>
-              </div>
+              </Box>
             )
           } else {
             displayContent = (
-              <div
-                className={`${props.classes.paperPlaceholder} ${isDragAccept ?
-                props.classes.paperPlaceholderAccepting : ""} ${isDragReject ?
-                props.classes.paperPlaceholderRejecting : ""}`}
+              <Box
+                sx={style.paperPlaceholder(isDragAccept, isDragReject)}
               >
                 <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
-                <NoteAddIcon className={props.classes.paperIconAdd}/>
-              </div>
+                <NoteAddIcon sx={style.paperIconAdd} />
+              </Box>
             )
           }
 
@@ -281,27 +270,25 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
             <>
               <Paper
                 {...rootProps}
-                classes={{
-                  root: props.classes.paper,
-                }}
+                sx={style.paper}
               >
                 <input {...(getInputProps() as any)} />
                 {displayContent}
-                <div
-                  className={props.classes.buttonContainer}
+                <Box
+                  sx={style.buttonContainer}
                 >
                   <Button
-                    className={props.classes.button}
+                    sx={style.button}
                     variant="contained"
                     color="secondary"
                     aria-label={props.genericDeleteLabel}
                     onClick={manuallyRemove.bind(null, props.enableUserSetErrors, props.onRemoveFile)}
                   >
                     {props.genericDeleteLabel}
-                    <RemoveCircleOutlineIcon className={props.classes.buttonIcon} />
+                    <RemoveCircleOutlineIcon sx={style.buttonIcon} />
                   </Button>
                   <Button
-                    className={props.classes.button}
+                    sx={style.button}
                     variant="contained"
                     color="primary"
                     aria-label={props.genericSelectLabel}
@@ -310,19 +297,19 @@ const PropertyEntryFileRenderer = withStyles(style)((props: IPropertyEntryFileRe
                     {
                       props.genericSelectLabel
                     }
-                    <CloudUploadIcon className={props.classes.buttonIcon}/>
+                    <CloudUploadIcon sx={style.buttonIcon} />
                   </Button>
-                </div>
+                </Box>
               </Paper>
             </>
           );
         }}
       </Dropzone>
-      <div className={props.classes.errorMessage}>
+      <Box sx={style.errorMessage}>
         {props.currentInvalidReason}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
-});
+};
 
 export default PropertyEntryFileRenderer;
