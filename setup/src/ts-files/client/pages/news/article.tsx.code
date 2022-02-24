@@ -130,7 +130,10 @@ function SummaryImageView(props: ISummaryImageView) {
 		/>
 	);
 }
-const StyledSummaryImageView = styled(SummaryImageView)(style.headerImage);
+
+// at the moment this code was written buggy typescript definitions rejected this value
+// even when it's correct
+const StyledSummaryImageView = styled(SummaryImageView)(style.headerImage as any);
 
 /**
  * The article content displays the content for a given article inside

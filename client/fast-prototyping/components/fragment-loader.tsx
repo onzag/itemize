@@ -54,7 +54,8 @@ interface FragmentLoaderProps {
   buttonPosition?: "topRight" | "bottomRight" | "topLeft" | "bottomLeft",
 }
 
-const ApprovedRejectGroup = styled("div")(fragmentLoaderStyles.buttonApproveRejectGroup);
+// buggy typescript will only accept any
+const ApprovedRejectGroup = styled("div")(fragmentLoaderStyles.buttonApproveRejectGroup as any);
 
 interface IContainer {
   fullWidth?: boolean,

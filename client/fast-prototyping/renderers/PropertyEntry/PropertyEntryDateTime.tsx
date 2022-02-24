@@ -102,9 +102,10 @@ function renderInput(origProps: TextFieldProps) {
   }
 }
 
-const StyledDatePicker = styled(DatePicker)(style.entry);
-const StyledDateTimePicker = styled(DateTimePicker)(style.entry);
-const StyledTimePicker = styled(TimePicker)(style.entry);
+// buggy typescript must cast as any because it is buggy
+const StyledDatePicker = styled(DatePicker)(style.entry as any);
+const StyledDateTimePicker = styled(DateTimePicker)(style.entry as any);
+const StyledTimePicker = styled(TimePicker)(style.entry as any);
 
 /**
  * The date time renderer, it uses material ui in order to create very nice pickers for the user
@@ -157,7 +158,7 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
     // };
 
     component = (
-      <DatePicker
+      <StyledDatePicker
         cancelText={props.i18nCancel}
         okText={props.i18nOk}
         label={props.label}

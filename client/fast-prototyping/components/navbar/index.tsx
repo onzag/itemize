@@ -22,6 +22,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
+import Box from "@mui/material/Box";
 
 /**
  * the navbar styles generator
@@ -36,7 +37,7 @@ const navbarStyles = {
   },
   appBarSpacer: (theme: Theme) => theme.mixins.toolbar,
   title: (theme: Theme) => ({
-    whiteSpace: "nowrap",
+    whiteSpace: "nowrap" as "nowrap",
     paddingLeft: "1rem",
     paddingRight: "1rem",
     overflow: "hidden",
@@ -54,11 +55,6 @@ const navbarStyles = {
     display: "inline-block",
   }
 };
-
-const TitleMargin = styled("span")(navbarStyles.titleMargin);
-const AppbarSpacer = styled("div")(navbarStyles.appBarSpacer);
-const Container = styled("div")(navbarStyles.container);
-const Title = styled("div")(navbarStyles.title);
 
 /**
  * The navbar props that allow to build a a navbar based on the folowing logic
@@ -155,15 +151,15 @@ export function Navbar(props: INavbarProps) {
                   )
                 }
               </I18nRead>
-              <Title>
+              <Box sx={navbarStyles.title}>
                 <Typography variant="body1" sx={navbarStyles.titleTypography}>
-                  <TitleMargin>
+                  <Box component="span" sx={navbarStyles.titleMargin}>
                     <TitleReader />
-                  </TitleMargin>
+                  </Box>
                   <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)} />
                 </Typography>
-              </Title>
-              <Container>
+              </Box>
+              <Box sx={navbarStyles.container}>
                 <Buttons
                   excludeLanguagePicker={props.excludeLanguagePicker}
                   LoginDialog={props.LoginDialog}
@@ -173,12 +169,11 @@ export function Navbar(props: INavbarProps) {
                   avatarProps={props.avatarProps}
                 />
                 <ExternalDialogs />
-
-              </Container>
+              </Box>
               {props.toolbarExtraNode}
             </Toolbar>
           </AppBar>
-          <AppbarSpacer />
+          <Box sx={navbarStyles.appBarSpacer} />
           <BlockingBackdrop exclude={props.excludeBlockingBackdrop} />
           <OutdatedDialog
             isOpenIfOutdated={isOutdatedDialogAllowedToBeOpen}

@@ -30,7 +30,8 @@ const blockingBackdropStyles = {
   },
 };
 
-const BackDropTextContainer = styled("div")(blockingBackdropStyles.backdropTextContainer);
+// buggy typescript
+const BackDropTextContainer = styled("div")(blockingBackdropStyles.backdropTextContainer as any);
 
 /**
  * The blocking backdrop appears when the app is blocked from an update check AppIsBlockedFromUpdate component

@@ -36,7 +36,8 @@ const itemLoaderStyles = {
   },
 };
 
-const FlexingContainer = styled("div")(itemLoaderStyles.flexingContainer);
+// buggy typescript
+const FlexingContainer = styled("div")(itemLoaderStyles.flexingContainer as any);
 
 interface IContainer {
   fullWidth?: boolean,
