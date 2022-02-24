@@ -33,7 +33,7 @@ const Flag = styled("div")({
   right: -5,
 });
 
-const StyledLink = styled(Link)();
+const StyledLink = styled(Link)({});
 
 interface IHoverAddBackdropProps {
   visible: boolean;

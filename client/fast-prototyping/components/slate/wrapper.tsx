@@ -1305,6 +1305,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       <AppBar
         position={this.props.disjointedMode ? "fixed" : "relative"}
         variant="outlined"
+        elevation={0}
         color="default"
         sx={
           this.props.disjointedMode ? style.appbarFixed : style.appbar

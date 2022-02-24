@@ -702,7 +702,7 @@ class PropertyEntryFieldRenderer
           ...appliedInputProps,
         }}
         InputLabelProps={{
-          sx: style.label,
+          sx: style.label(isInvalid),
           classes: {
             focused: "focused",
           },
