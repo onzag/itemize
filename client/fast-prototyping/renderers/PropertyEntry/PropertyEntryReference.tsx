@@ -24,6 +24,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { css as emotionCss } from "@emotion/css";
 import { css } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -398,12 +399,11 @@ class PropertyEntryReferenceRenderer
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end" sx={style.standardAddornment(shouldShowInvalid(this.props))}>
-          <IconButton
-            tabIndex={-1}
+          <RestoreIconButton
             sx={style.iconButton}
-            size="large">
+          >
             {this.props.icon}
-          </IconButton>
+          </RestoreIconButton>
         </InputAdornment>
       );
     }

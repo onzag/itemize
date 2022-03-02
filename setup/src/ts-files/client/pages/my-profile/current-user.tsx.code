@@ -13,6 +13,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import Box from "@mui/material/Box";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
+import { Theme } from "@mui/material/styles";
 
 /**
  * The logout dialog styles
@@ -106,6 +107,9 @@ const currentUserProfileStyle = {
 	logoutButtons: {
 		paddingTop: "0.2rem",
 	},
+	button: (theme: Theme) => ({
+		color: theme.palette.grey[800],
+	}),
 };
 
 /**
@@ -124,10 +128,10 @@ export function CurrentUserProfile() {
 					{(actioner) => {
 						return (
 							<Box sx={currentUserProfileStyle.logoutButtons}>
-								<Button onClick={actioner.logout} endIcon={<ExitToAppIcon />}>
+								<Button onClick={actioner.logout} endIcon={<ExitToAppIcon />} sx={currentUserProfileStyle.button}>
 									<I18nRead capitalize={true} id="logout" />
 								</Button>
-								<Button onClick={setIsDialogOpen.bind(this, true)} endIcon={<ExitToAppIcon />}>
+								<Button onClick={setIsDialogOpen.bind(this, true)} endIcon={<ExitToAppIcon />} sx={currentUserProfileStyle.button}>
 									<I18nRead capitalize={true} id="logout_all" />
 								</Button>
 							</Box>

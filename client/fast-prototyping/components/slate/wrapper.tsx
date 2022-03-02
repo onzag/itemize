@@ -712,7 +712,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
   if (props.featureSupport.supportsLinks && templateLinkAmount && props.isReady) {
     linkBaseComponent = <Badge
       badgeContent={templateLinkAmount}
-      color="secondary"
+      color="error"
       sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >{linkBaseComponent}</Badge>
   }
@@ -948,7 +948,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
   return (
     <Badge
       badgeContent={templateTextAmount}
-      color="secondary"
+      color="error"
       sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >
       {element}
@@ -1016,7 +1016,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
   return (
     <Badge
       badgeContent={templateHTMLAmount}
-      color="secondary"
+      color="error"
       sx={props.state.currentSelectedElement ? style.badge : style.badgeDisabled}
     >
       {element}
@@ -2253,7 +2253,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
             className={
               "rich-text" +
               (this.props.state.isFocused ? " focused" : "") +
-              this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : ""
+              (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "")
             }
             currentValid={this.props.state.currentValid}
             isRichText={this.props.state.isRichText}

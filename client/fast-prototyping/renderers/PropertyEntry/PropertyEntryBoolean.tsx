@@ -19,6 +19,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
 import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * The styles of the renderer
@@ -128,11 +129,10 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
             focused: "focused",
           }}
         >
-          {props.label}{icon ? <IconButton
-            tabIndex={-1}
+          {props.label}{icon ? <RestoreIconButton
             sx={style.icon}
             onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
-            size="large">{icon}</IconButton> : null}
+            >{icon}</RestoreIconButton> : null}
         </FormLabel> : null}
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
@@ -172,10 +172,10 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
           }
           label={props.label}
         />
-        {icon ? <IconButton
+        {icon ? <RestoreIconButton
           sx={style.icon}
           onClick={props.canRestore ? props.onRestore : null}
-          size="large">{icon}</IconButton> : null}
+        >{icon}</RestoreIconButton> : null}
       </FormControl>
     )
   }

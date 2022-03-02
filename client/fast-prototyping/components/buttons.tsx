@@ -15,6 +15,7 @@ import SearchActioner from "../../components/search/SearchActioner";
 import DeleteActioner from "../../components/item/DeleteActioner";
 import { CreateReportDialog } from "./moderation";
 import Button from "@mui/material/Button";
+import type { SxProps } from "@mui/material";
 
 /**
  * A redirect function called on the success event
@@ -58,6 +59,10 @@ interface IGenericButtonProps {
    * Make button disabled
    */
   buttonDisabled?: boolean;
+  /**
+   * Button sx
+   */
+  buttonSx?: SxProps;
 }
 
 /**
@@ -156,6 +161,7 @@ export function SubmitButton(props: ISubmitButtonProps) {
                 className={props.buttonClassName}
                 disabled={props.buttonDisabled}
                 onClick={submitAction}
+                sx={props.buttonSx}
               >
                 <I18nRead capitalize={true} id={props.i18nId} />
               </Button>
@@ -208,6 +214,7 @@ export function SearchButton(props: ISearchButtonProps) {
                 className={props.buttonClassName}
                 disabled={props.buttonDisabled}
                 onClick={actioner.search.bind(null, props.options)}
+                sx={props.buttonSx}
               >
                 <I18nRead capitalize={true} id={props.i18nId} />
               </Button>
@@ -310,6 +317,7 @@ export function DeleteButton(props: IDeleteButtonProps) {
                 className={props.buttonClassName}
                 disabled={props.buttonDisabled}
                 onClick={deleteAction}
+                sx={props.buttonSx}
               >
                 <I18nRead capitalize={true} id={props.i18nId} />
               </Button>
@@ -346,6 +354,7 @@ export function ReportButton(props: IReportButtonProps) {
         startIcon={props.buttonStartIcon}
         className={props.buttonClassName}
         disabled={props.buttonDisabled}
+        sx={props.buttonSx}
         onClick={setIsActive.bind(null, true)}
       >
         <I18nRead capitalize={true} id={props.i18nId} />

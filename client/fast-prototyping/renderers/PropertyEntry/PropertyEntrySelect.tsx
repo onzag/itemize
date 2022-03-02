@@ -9,7 +9,6 @@
 
 import React from "react";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
-import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import InputLabel from "@mui/material/InputLabel";
@@ -24,6 +23,7 @@ import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import { ListItemIcon } from "@mui/material";
 import Box from "@mui/system/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -65,7 +65,6 @@ export const style = {
   },
   icon: {
     color: "#424242",
-    right: "46px",
   },
   label: (isInvalid: boolean) => ({
     "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
@@ -167,15 +166,15 @@ class PropertyEntrySelectRenderer
 
     const isInvalid = shouldShowInvalid(this.props);
 
+    const restoreAction = icon && this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null;
     const addornment = icon ? (
       <InputAdornment position="end">
-        <IconButton
-          tabIndex={-1}
+        <RestoreIconButton
+          onClick={restoreAction}
           sx={style.icon}
-          onClick={this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null}
-          size="large">
+        >
           {icon}
-        </IconButton>
+        </RestoreIconButton>
       </InputAdornment>
     ) : null;
 

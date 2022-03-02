@@ -280,7 +280,7 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
                   <Button
                     sx={style.button}
                     variant="contained"
-                    color="secondary"
+                    color="error"
                     aria-label={props.genericDeleteLabel}
                     onClick={manuallyRemove.bind(null, props.enableUserSetErrors, props.onRemoveFile)}
                   >

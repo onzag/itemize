@@ -124,9 +124,10 @@ const style = {
 	containerBox: {
 		paddingBottom: "1rem",
 	},
-	containerBoxButton: {
+	button: (theme: Theme) => ({
 		padding: 0,
-	},
+    	color: theme.palette.grey[800],
+	}),
 	pickers: {
 		display: "flex",
 		alignItems: "center",
@@ -329,7 +330,7 @@ export function CurrentUserProfileStandardInfo() {
 										variant="text"
 										size="small"
 										fullWidth={true}
-										sx={style.containerBoxButton}
+										sx={style.button}
 									>
 										{i18nPreferences}
 									</Button>
@@ -339,7 +340,7 @@ export function CurrentUserProfileStandardInfo() {
 										variant="text"
 										size="small"
 										fullWidth={true}
-										sx={style.containerBoxButton}
+										sx={style.button}
 									>
 										{i18nChangePassword}
 									</Button>

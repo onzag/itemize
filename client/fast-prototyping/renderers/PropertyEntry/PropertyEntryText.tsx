@@ -14,13 +14,13 @@ import { SlateEditor } from "../../components/slate";
 import { MaterialUISlateWrapper } from "../../components/slate/wrapper";
 
 import { capitalize } from "../../../../util";
-import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import InputLabel from "@mui/material/InputLabel";
 import RestoreIcon from "@mui/icons-material/Restore";
 import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -108,40 +108,7 @@ export const style = {
     height: "5rem",
     padding: "1rem 0 0 0",
   },
-  editor: (isInvalid: boolean) => {
-    return {
-      "position": "relative",
-      // this is the colur when the field is out of focus
-      "&::before": {
-        left: 0,
-        right: 0,
-        bottom: 0,
-        content: "'\\00a0'",
-        position: "absolute",
-        transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-        borderBottom: "1px solid " +
-          (isInvalid ? "#e57373" : "rgba(0,0,0,0.42)"),
-        pointerEvents: "none",
-      },
-      // the color that pops up when the field is in focus
-      "&::after": {
-        left: 0,
-        bottom: 0,
-        right: 0,
-        content: "''",
-        position: "absolute",
-        transform: "scaleX(0)",
-        transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
-        borderBottom: "2px solid " +
-          (isInvalid ? "#f44336" : "#3f51b5"),
-        pointerEvents: "none",
-      },
-      // during the hover event
-      "&.focused::after": {
-        transform: "none",
-      },
-    };
-  },
+  
   rawTextArea: {
     width: "100%",
     border: "none",
@@ -197,13 +164,12 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       icon = this.props.icon;
     }
     const iconComponent = icon ? (
-      <IconButton
-        tabIndex={-1}
+      <RestoreIconButton
         sx={style.icon}
         onClick={this.props.canRestore ? this.props.onRestore : null}
-        size="large">
+      >
         {icon}
-      </IconButton>
+      </RestoreIconButton>
     ) : null;
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];

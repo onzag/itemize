@@ -33,6 +33,7 @@ import { css } from "@mui/material/styles";
 // and we need to do a dynamic import
 import { Map, TileLayer, Marker } from "react-leaflet";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 // we only use these types to define these C prefixed types
 let CMap: typeof Map;
@@ -215,8 +216,9 @@ export const style = {
   },
   autosuggestMenuItem: {
     height: "auto",
-    paddingTop: 4,
-    paddingBottom: 8,
+    // material ui v5 messy engine decides to override my styles
+    paddingTop: "4px !important",
+    paddingBottom: "8px !important",
   },
   autosuggestMenuItemMainText: {
     fontSize: "1rem",
@@ -537,11 +539,10 @@ class PropertyEntryLocationRenderer extends
         {!this.props.args.disableMapAndSearch ?
           <Box sx={style.locationAlternativeTextHeader}>
             {
-              icon ? <IconButton
-                tabIndex={-1}
+              icon ? <RestoreIconButton
                 sx={style.icon}
                 onClick={this.props.canRestore ? this.props.onRestore : null}
-                size="large">{icon}</IconButton> : null
+              >{icon}</RestoreIconButton> : null
             }
             {
               this.props.currentValue && this.props.currentValue.atxt ||

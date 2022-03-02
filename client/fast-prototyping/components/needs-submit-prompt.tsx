@@ -54,7 +54,7 @@ class NeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogProps> {
       buttons={
         <>
           <Button
-            color="secondary"
+            color="error"
             aria-label={this.props.args.discard}
             startIcon={<CloseIcon />}
             onClick={this.props.onDiscard}

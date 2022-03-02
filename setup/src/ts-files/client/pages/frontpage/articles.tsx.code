@@ -23,11 +23,11 @@ import { styled, Theme } from "@mui/material/styles";
  * @returns a bunch of styles
  */
 export const style = {
-	newsTitle: (theme: Theme) => ({
-		marginTop: "2rem",
-		paddingLeft: "1rem",
-		borderLeft: "solid 1rem " + theme.palette.secondary.main,
-	}),
+	newsTitle: {
+    	marginTop: "2rem",
+    	paddingLeft: "1rem",
+    	borderLeft: "solid 1rem #f44336",
+	},
 	paper: {
 		borderRadius: 0,
 		border: 0,

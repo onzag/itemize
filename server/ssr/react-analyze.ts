@@ -123,7 +123,6 @@ function getType(element: any) {
     case REACT_PORTAL_TYPE:
       return REACT_PORTAL_TYPE
     case REACT_ELEMENT_TYPE:
-    case REACT_MEMO_TYPE:                       // memo are treated as element because they are a memo of something
       switch (element.type) {
         case REACT_CONCURRENT_MODE_TYPE:
           return REACT_CONCURRENT_MODE_TYPE
@@ -159,7 +158,10 @@ function getType(element: any) {
   }
 }
 
-export async function walkReactTree(element: any, contextMap: Map<any, any> = new Map()): Promise<void> {
+export async function walkReactTree(
+  element: any,
+  contextMap: Map<any, any> = new Map(),
+): Promise<void> {
   if (element === null || typeof element === "undefined") {
     return;
   }
@@ -167,9 +169,14 @@ export async function walkReactTree(element: any, contextMap: Map<any, any> = ne
     await Promise.all(element.map((c) => walkReactTree(c, contextMap)));
   }
 
+  // first let's check what type of react element we have got here
   const type = getType(element);
+  // now let's check if we have a base type, like <div> or <span>
   const isBaseType = type === REACT_ELEMENT_TYPE && typeof element.type === "string";
+
+  // if we got an element that is not a base
   if (type === REACT_ELEMENT_TYPE && !isBaseType) {
+    // now we check if it's constructed
     const isComponentType = isConstructed(element);
 
     if (isComponentType) {
@@ -270,6 +277,20 @@ export async function walkReactTree(element: any, contextMap: Map<any, any> = ne
     await walkReactTree(childComponent, contextMap);
   } else if (type === REACT_MEMO_TYPE) {
     const elementMemoed = element.type;
-    await walkReactTree(elementMemoed, contextMap);
+
+    // in order to handle memos of something, we will simply create
+    // a fake element and pass the props and ref for this element so it's handled
+    // accordingly, this will cause the elent to unwrap to what it memos
+    // but keeping the props, it's a bit of a hack, but should work
+    const fakeElement = {
+      ...elementMemoed,
+      ["$$typeof"]: REACT_ELEMENT_TYPE,
+      key: element.key,
+      ref: element.ref,
+      props: element.props,
+    };
+
+    // and we will walk over that element
+    await walkReactTree(fakeElement, contextMap);
   }
 }

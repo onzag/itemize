@@ -18,6 +18,7 @@ import Paper from "@mui/material/Paper";
 import NoteAddIcon from "@mui/icons-material/NoteAdd"
 import { Close } from "@mui/icons-material";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -175,11 +176,10 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
         }}
       >
         {capitalize(props.label)}
-        {icon ? <IconButton
-          tabIndex={-1}
+        {icon ? <RestoreIconButton
           sx={style.icon}
           onClick={props.canRestore ? props.onRestore : null}
-          size="large">{icon}</IconButton> : null}
+        >{icon}</RestoreIconButton> : null}
       </FormLabel> : null}
       <Dropzone
         onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}

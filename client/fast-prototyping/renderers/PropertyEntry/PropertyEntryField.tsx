@@ -27,6 +27,7 @@ import { CountryPicker } from "../../components/country-picker";
 import type { ICountryType } from "../../../../imported-resources";
 import PropertyEntrySelectRenderer from "./PropertyEntrySelect";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -640,12 +641,11 @@ class PropertyEntryFieldRenderer
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end" sx={style.standardAddornment(isInvalid)}>
-          <IconButton
-            tabIndex={-1}
+          <RestoreIconButton
             sx={style.iconButton}
-            size="large">
+          >
             {this.props.icon}
-          </IconButton>
+          </RestoreIconButton>
         </InputAdornment>
       );
     }

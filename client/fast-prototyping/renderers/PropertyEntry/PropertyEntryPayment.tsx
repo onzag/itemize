@@ -17,6 +17,7 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import QueueIcon from "@mui/icons-material/Queue";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import Box from "@mui/material/Box";
+import { RestoreIconButton } from "./general";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -92,13 +93,12 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
   }
 
   const iconComponent = icon ? (
-    <IconButton
-      tabIndex={-1}
+    <RestoreIconButton
       sx={style.icon}
       onClick={props.canRestore ? props.onRestore : null}
-      size="large">
+    >
       {icon}
-    </IconButton>
+    </RestoreIconButton>
   ) : null;
 
   let shouldShowToggleNull = props.isAllowedToToggleNullStatus;

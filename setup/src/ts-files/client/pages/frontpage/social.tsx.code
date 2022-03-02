@@ -13,20 +13,19 @@ import RedditIcon from "@mui/icons-material/Reddit";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { VKIcon, WeChatIcon } from "@onzag/itemize/client/fast-prototyping/icons/social-icons";
-import { styled, Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
 /**
  * provides the styles for the social section
- * @param theme the mui theme
  * @returns a bunch of styles
  */
 export const style = {
-	socialTitle: (theme: Theme) => ({
+	socialTitle: {
 		marginTop: "4rem",
 		paddingLeft: "1rem",
-		borderLeft: "solid 1rem " + theme.palette.secondary.main,
+		borderLeft: "solid 1rem #f44336",
 		fontWeight: 300,
-	}),
+	},
 	container: {
 		padding: 0,
 	},

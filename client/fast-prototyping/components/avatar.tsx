@@ -358,7 +358,7 @@ export class Avatar extends React.PureComponent<IAvatarProps> {
       return (
         <StyledBadge
           badgeContent={this.props.warningCount > 99 ? "99+" : this.props.warningCount}
-          color="secondary"
+          color="error"
         >
           {avatar}
         </StyledBadge>

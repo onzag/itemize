@@ -50,7 +50,7 @@ function CMSNavBar(props: ICMSNavBarProps)<0>{
 	const available: string[] = ["fragment", "article"];
 
 	return (
-		<AppBar position="static" variant="outlined" color="default">
+		<AppBar position="static" variant="outlined" color="default" elevation={0}>
 			<Tabs value={current} onChange={handleNavbarChangeEvent} centered={true}>
 				<Tab label={<I18nRead id="info" />} value="info" />
 				{available.map((itemDefinition: string) => {
