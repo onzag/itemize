@@ -76,20 +76,13 @@ export async function start(version: string) {
 
     // and for such we need to first know where we are, we need an absolute path for all this
     try {
-      // and the path is inside pgqsql postgis as we will need postgis
-      const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis/pgsqlpostgis.tar.gz");
-      // now we call to buld such thing as pgsqlpostgis
-      await execSudo(
-        `docker load < ${absPath}`,
-        "Itemize Docker Contained PGSQL Postgis Enabled Database",
-      );
       // and we execute this command with the configuration
       // it will execute for localhost of course
       await execSudo(
         `docker run --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
         `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
-        `-p ${dbConfig.port}:5432 -d pgsqlpostgis`,
+        `-p ${dbConfig.port}:5432 -d postgis/postgis`,
         "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
     } catch (err) {

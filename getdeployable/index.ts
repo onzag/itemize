@@ -279,7 +279,7 @@ export default async function build(version: string, buildID: string, services: 
       "\nremember that the data is saved in pgdata and you need to populate this database, where you intend to deploy " +
       "\nthe database docker-compose-only-db.yml can be used for this purpose which only spawns the database " +
       "\nonce you do that there's a special mode you can initialize your server which will call itemize build database process" +
-      "\nfirst remember to initialize the database image by running `docker load -i pgsqlpostgis.tar.gz` then run" +
+      "\nfor that you will need to use" +
       "\ndocker-compose -f docker-compose-only-db.yml up -d" +
       "\nthen run the code for accessing the builder" +
       "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" " +
@@ -292,11 +292,6 @@ export default async function build(version: string, buildID: string, services: 
       " -e INSTANCE_MODE=LOAD_DATABASE_DUMP app:latest" +
       "\nstop the database by doing" +
       "\ndocker-compose down";
-
-    // the abs path for the pgsql postgis installation we need
-    const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis/pgsqlpostgis.tar.gz");
-    const saveAbsPath = path.resolve(`./deployments/${buildID}/pgsqlpostgis.tar.gz`);
-    await fsAsync.copyFile(absPath, saveAbsPath);
 
     // and now we want to make a docker compose file for the build
     // database mode, and as such it will only have the pgsql service

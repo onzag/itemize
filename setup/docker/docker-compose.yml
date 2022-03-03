@@ -74,7 +74,7 @@ services:
             - ./nginx.processed.conf:/etc/nginx/nginx.conf:ro
             - ./nginx-logs:/var/log/nginx
     pgsql:
-        image: pgsqlpostgis:latest
+        image: postgis/postgis:latest
         restart: always
         ports:
             - "%{DB_PORT}:5432"
