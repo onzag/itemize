@@ -77,10 +77,10 @@ export async function start(version: string) {
     // and for such we need to first know where we are, we need an absolute path for all this
     try {
       // and the path is inside pgqsql postgis as we will need postgis
-      const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
+      const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis/pgsqlpostgis.tar.gz");
       // now we call to buld such thing as pgsqlpostgis
       await execSudo(
-        `docker build -t pgsqlpostgis ${absPath}`,
+        `docker load < ${absPath}`,
         "Itemize Docker Contained PGSQL Postgis Enabled Database",
       );
       // and we execute this command with the configuration

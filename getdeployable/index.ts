@@ -294,20 +294,9 @@ export default async function build(version: string, buildID: string, services: 
       "\ndocker-compose down";
 
     // the abs path for the pgsql postgis installation we need
-    const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis");
-    await execSudo(
-      `docker build -t pgsqlpostgis ${absPath}`,
-      "Itemize Docker Contained PGSQL Postgis Enabled Database",
-    );
+    const absPath = path.resolve("./node_modules/@onzag/itemize/dev-environment/pgsqlpostgis/pgsqlpostgis.tar.gz");
     const saveAbsPath = path.resolve(`./deployments/${buildID}/pgsqlpostgis.tar.gz`);
-    await execSudo(
-      `docker save pgsqlpostgis:latest | gzip > ${saveAbsPath}`,
-      "Itemize Docker Contained PGSQL Postgis Enabled Database",
-    );
-    await execSudo(
-      `chmod 777 ${saveAbsPath}`,
-      "Itemize Docker Contained PGSQL Postgis Enabled Database Save",
-    );
+    await fsAsync.copyFile(absPath, saveAbsPath);
 
     // and now we want to make a docker compose file for the build
     // database mode, and as such it will only have the pgsql service
