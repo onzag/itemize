@@ -23,7 +23,9 @@ interface IRestoreIconButtonProps {
   sx?: SxProps;
 }
 
-const StyledButtonBox = styled("div")(style.button);
+// Buggy typescript bugs with typescript definition force me to use any
+// it won't compile even when the editor does not complain
+const StyledButtonBox = styled("div")(style.button as any);
 
 export function RestoreIconButton(props: IRestoreIconButtonProps) {
   if (props.onClick || props.onMouseDown) {
