@@ -1595,7 +1595,7 @@ export default class ItemDefinition {
    * @param excludeExtensions whether to exclude the extensions for applying the value
    * @param requestFields the fields that were used to request this data (can be null) but be careful
    * this might be used for catching
-   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
    * values when the user is modifying them and an apply value has been called because
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
@@ -1610,7 +1610,7 @@ export default class ItemDefinition {
     value: IGQLValue,
     excludeExtensions: boolean,
     requestFields: IGQLRequestFields,
-    doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ): boolean {
     // first we flatten the value if necessary
     const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value);
@@ -1674,7 +1674,7 @@ export default class ItemDefinition {
       }
       // and we apply such value
       property.applyValue(id, version, givenValue,
-        setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
+        setAsModified, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
 
     // now we get all the items
@@ -1691,7 +1691,7 @@ export default class ItemDefinition {
 
       // and we apply such value
       include.applyValue(id, version, givenValue,
-        givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers);
+        givenExclusionState, doNotApplyValueInPropertyIfPropertyHasBeenManuallySet);
     });
 
     return true;

@@ -21,22 +21,22 @@ const snackbarStyles = {
   success: (theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
-    fontWeight: 900,
+    fontWeight: 600,
   }),
   info: (theme: Theme) => ({
     backgroundColor: theme.palette.info.main,
     color: theme.palette.info.contrastText,
-    fontWeight: 900,
+    fontWeight: 600,
   }),
   error: (theme: Theme) => ({
     backgroundColor: theme.palette.error.main,
     color: theme.palette.error.contrastText,
-    fontWeight: 900,
+    fontWeight: 600,
   }),
   warning: (theme: Theme) => ({
     backgroundColor: theme.palette.warning.main,
     color: theme.palette.warning.contrastText,
-    fontWeight: 900,
+    fontWeight: 600,
   }),
 };
 

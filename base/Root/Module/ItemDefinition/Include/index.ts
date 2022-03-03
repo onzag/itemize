@@ -671,7 +671,7 @@ export default class Include {
    * @param version the slot version to use
    * @param value the value that is applied
    * @param exclusionState the exclusion state
-   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
    * values when the user is modifying them and an apply value has been called because
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
@@ -682,13 +682,13 @@ export default class Include {
     version: string,
     value: IGQLValue,
     exclusionState: IncludeExclusionState,
-    doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
     const mergedID = id + "." + (version || "");
 
     // update the state
     if (
-      doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySet &&
       this.stateExclusionHasBeenManuallySet[mergedID]
     ) {
       // The two of them are equal which means the internal value
@@ -717,7 +717,7 @@ export default class Include {
       true,
       // graphql requested fields, none
       null,
-      doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers,
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySet,
     );
   }
 

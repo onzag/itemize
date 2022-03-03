@@ -1695,7 +1695,7 @@ export default class PropertyDefinition {
    * @param version the slot version
    * @param value the value
    * @param modifiedState a modified state to use
-   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers to avoid hot updating
+   * @param doNotApplyValueInPropertyIfPropertyHasBeenManuallySet to avoid hot updating
    * values when the user is modifying them and an apply value has been called because
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
@@ -1708,7 +1708,7 @@ export default class PropertyDefinition {
     version: string,
     value: PropertyDefinitionSupportedType,
     modifiedState: boolean,
-    doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers: boolean,
+    doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
     rejectStateAppliedValue?: boolean,
   ) {
     if (modifiedState === false && value !== null) {
@@ -1717,7 +1717,7 @@ export default class PropertyDefinition {
         JSON.stringify(value) + ")" +
         " was not null, this means that the property is in a null state that defaults to the property default yet it is not null");
     }
-    // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers
+    // if doNotApplyValueInPropertyIfPropertyHasBeenManuallySet
     // is false, then we don't care and apply the value
     // however if it's true, we need to check the manually set variable
     // in order to know where the value comes from
@@ -1725,13 +1725,20 @@ export default class PropertyDefinition {
     let currentValue = this.stateValue[mergedID] || null;
     // two conditions apply, now we need to check if it differs
     if (
-      doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+      doNotApplyValueInPropertyIfPropertyHasBeenManuallySet &&
       this.stateValueHasBeenManuallySet[mergedID] &&
+
       // the type file always gets replaced, otherwise the blob
       // will be submitted each time, an exception done for the sake
       // of performance
       this.getType() !== "file" &&
-      this.getType() !== "files"
+      this.getType() !== "files" &&
+
+      // we also need to invalidate text/html every time
+      // because otherwise blob urls with mistaken files remain
+      // in the HTML causing issues as these files are lost once new
+      // values are recieved in the property and the urls get revoked
+      !(this.getType() === "text" && this.getSubtype() === "html")
     ) {
       const newValue = value;
 
@@ -1743,6 +1750,10 @@ export default class PropertyDefinition {
         this.stateValueModified[mergedID] = modifiedState;
         this.stateValueHasBeenManuallySet[mergedID] = false;
       }
+
+      // if the values are non-equal then we can just keep our current state
+      // without doing anything about it note that the stateAppliedValue
+      // will always change regardless of the outcome of this function
     } else {
       let newValue = value;
 
@@ -1752,7 +1763,7 @@ export default class PropertyDefinition {
       // priority
       if (
         this.getType() === "files" &&
-        doNotApplyValueInPropertyIfPropertyHasBeenManuallySetAndDiffers &&
+        doNotApplyValueInPropertyIfPropertyHasBeenManuallySet &&
         currentValue &&
         newValue
       ) {
@@ -1772,6 +1783,8 @@ export default class PropertyDefinition {
       this.stateValueHasBeenManuallySet[mergedID] = false;
     }
 
+    // this value does not come from the server
+    // it's just applied to change its state
     if (!rejectStateAppliedValue) {
       // the new applied value gets applied
       this.stateAppliedValue[mergedID] = value;
