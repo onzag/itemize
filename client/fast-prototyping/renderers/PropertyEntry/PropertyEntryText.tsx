@@ -31,8 +31,6 @@ function shouldShowInvalid(props: IPropertyEntryTextRendererProps) {
   return !props.currentValid;
 }
 
-
-
 /**
  * The styles for the text entry
  */

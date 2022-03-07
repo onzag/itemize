@@ -1722,6 +1722,7 @@ export default class PropertyDefinition {
     // however if it's true, we need to check the manually set variable
     // in order to know where the value comes from
     const mergedID = id + "." + (version || "");
+
     let currentValue = this.stateValue[mergedID] || null;
     // two conditions apply, now we need to check if it differs
     if (
@@ -1732,13 +1733,7 @@ export default class PropertyDefinition {
       // will be submitted each time, an exception done for the sake
       // of performance
       this.getType() !== "file" &&
-      this.getType() !== "files" &&
-
-      // we also need to invalidate text/html every time
-      // because otherwise blob urls with mistaken files remain
-      // in the HTML causing issues as these files are lost once new
-      // values are recieved in the property and the urls get revoked
-      !(this.getType() === "text" && this.getSubtype() === "html")
+      this.getType() !== "files"
     ) {
       const newValue = value;
 
@@ -1762,19 +1757,41 @@ export default class PropertyDefinition {
       // file, this will merge the results, keeping the server values as
       // priority
       if (
-        this.getType() === "files" &&
+        (this.getType() === "files" || this.getType() === "file") &&
         doNotApplyValueInPropertyIfPropertyHasBeenManuallySet &&
         currentValue &&
         newValue
       ) {
-        newValue = (currentValue as IGQLFile[]).map((v) => {
-          const serverProvidedValue = (value as IGQLFile[]).find((v2) => v2.id === v.id);
-          if (serverProvidedValue) {
-            return serverProvidedValue;
+        if (this.getType() === "files") {
+          newValue = (currentValue as IGQLFile[]).map((v) => {
+            const serverProvidedValue = (value as IGQLFile[]).find((v2) => v2.id === v.id);
+            if (serverProvidedValue) {
+              return {
+                ...serverProvidedValue,
+  
+                // we keep our current url as it may be a blob type
+                // and we prefer blob types because they are local
+                // if we don't keep these blob types they will not be found and
+                // be revoked, we rather want these urls not to change at all
+                // for the new ones, this fixes a bug where text which stay
+                // at the current value using blob urls when they are written
+                // and then try to save would have the urls revoked because
+                // the file field had saved, but now the url doesn't change
+                // for the same given file, which means the url doesn't change
+                // as long as the file lives
+                url: v.url,
+              };
+            }
+  
+            return v;
+          });
+        } else {
+          if ((newValue as IGQLFile).id === (currentValue as IGQLFile).id) {
+            // we keep our current url as it may be a blob type
+            // and we prefer blob types because they are local
+            (newValue as IGQLFile).url = (currentValue as IGQLFile).url;
           }
-
-          return v;
-        });
+        }
       }
 
       this.stateValue[mergedID] = newValue;
