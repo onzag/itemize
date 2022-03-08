@@ -132,7 +132,20 @@ const PublisherInfoBox = styled("div")(({ theme }) => (
 	}
 ));
 
-const StyledLink = styled(Link)(({ theme }) => (
+
+// due to a bug in material UI I not supporting forwading of the as property
+// we are forced to do this using a hack
+interface IFalseStyledLink {
+	className?: string;
+	searchRecordId: string;
+	children: React.ReactNode;
+}
+
+function FalseStyledLink(props: IFalseStyledLink) {
+	return (<Link className={props.className} to={`/news/${props.searchRecordId}`} as="div">{props.children}</Link>)
+}
+
+const StyledLink = styled(FalseStyledLink)(({ theme }) => (
 	{
 		"backgroundColor": "white",
 		"marginTop": "2rem",
@@ -236,7 +249,7 @@ export function Articles() {
 										return loader.searchRecords.map((searchRecord) => {
 											return (
 												<ItemProvider {...searchRecord.providerProps}>
-													<StyledLink to={`/news/${searchRecord.id}`} as="div">
+													<StyledLink searchRecordId={searchRecord.id}>
 														<ArticleImageContainer>
 															<StyledImageView />
 														</ArticleImageContainer>
