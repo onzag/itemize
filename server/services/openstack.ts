@@ -215,6 +215,11 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
     })
   }
 
+  public async copyFolder(remotePath: string, targetPath: string, target: StorageProvider<any>) {
+    // TODO this needs to be implemented
+    throw new Error("Not Implemented");
+  }
+
   public exists(at: string): Promise<boolean> {
     const strURL = path.join(this.prefix, at);
     const url = new URL(strURL);

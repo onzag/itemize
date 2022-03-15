@@ -34,6 +34,9 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   /**
    * This function is executed when the service
    * uploading a read stream
+   * 
+   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
+   * 
    * @param at the remote file to use
    * @param readStream the stream to read from
    * @param mustBeVerified a boolean that specifies whether the resouce must
@@ -47,6 +50,9 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   /**
    * This function is executed once a folder
    * removal is requested
+   * 
+   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
+   * 
    * @param at the remote folder to remove
    * @override
    */
@@ -55,9 +61,25 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   }
 
   /**
+   * It's executed to verify whether a given remote resource
+   * exists
+   * 
+   * NECESSARY FOR CORE ITEMIZE TO FUNCTION
+   * 
+   * @param at the resource to check for
+   * @override
+   */
+   public async exists(at: string): Promise<boolean> {
+    return false;
+  }
+
+  /**
    * This function is executed once an entire folder
    * is requested to be downloaded locally in the given
    * local path
+   * 
+   * NECESSARY FOR DUMPING TO FUNCTION
+   * 
    * @param remotePath the remote path
    * @param localPath the local path
    * @override
@@ -67,17 +89,25 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   }
 
   /**
-   * It's executed to verify whether a given remote resource
-   * exists
-   * @param at the resource to check for
+   * Should copy a folder from one container to another target container, note that during
+   * calls the target container may be itself, optimize if necessary for such calls
+   * 
+   * NECESSARY FOR CUSTOM SERVER COPY CALLS TO FUNCTION
+   * 
+   * @param remotePath 
+   * @param targetPath 
+   * @param target
    * @override
    */
-  public async exists(at: string): Promise<boolean> {
-    return false;
+  public async copyFolder(remotePath: string, targetPath: string, target: StorageProvider<any>) {
+
   }
 
   /**
    * It's executed to read files
+   * 
+   * NECESSARY FOR SEO TO FUNCTION
+   * 
    * @param at the file to read
    * @override
    */

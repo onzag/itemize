@@ -9,9 +9,9 @@
 
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES
 } from "../constants";
-import { ISQLTableRowValue, ISQLStreamComposedTableRowValue } from "../base/Root/sql";
+import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
@@ -232,7 +232,7 @@ export class Cache {
         modifiedRecords: location === "modified" ? newRecordArr : [],
         newLastModified: record.last_modified,
       };
-  
+
       CAN_LOG_DEBUG && logger.debug(
         "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
         itemDefinitionBasedOwnedEvent,
@@ -241,12 +241,12 @@ export class Cache {
         itemDefinitionBasedOwnedEvent,
         null, // TODO add the listener uuid, maybe?
       );
-  
+
       const moduleBasedOwnedEvent: IOwnedSearchRecordsEvent = {
         ...itemDefinitionBasedOwnedEvent,
         qualifiedPathName: modQualifiedPathName,
       };
-  
+
       CAN_LOG_DEBUG && logger.debug(
         "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
         moduleBasedOwnedEvent,
@@ -349,7 +349,7 @@ export class Cache {
     itemDefinition: ItemDefinition,
     forId: string,
     version: string,
-    value: IGQLArgs,
+    value: IGQLArgs | IGQLValue | ISQLTableRowValue,
     createdBy: string,
     dictionary: string,
     containerId: string,
@@ -372,24 +372,33 @@ export class Cache {
       moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
     );
 
+    const isSQLType = !!value.MODULE_ID;
+
     if (!options.ignorePreSideEffects) {
+      const gqlValue = isSQLType ? (
+        convertSQLValueToGQLValueForItemDefinition(
+          this.serverData,
+          itemDefinition,
+          value,
+        )
+      ) : value;
       const preSideEffected = itemDefinition.getAllSideEffectedProperties(true);
       // looop into them
       await Promise.all(preSideEffected.map(async (preSideEffectedProperty) => {
         const description = preSideEffectedProperty.property.getPropertyDefinitionDescription();
         const preSideEffectFn = description.sqlPreSideEffect;
-  
+
         // now we can get this new value
         let newValue: any;
         if (preSideEffectedProperty.include) {
-          const includeValue = value[preSideEffectedProperty.include.getQualifiedIdentifier()];
+          const includeValue = gqlValue[preSideEffectedProperty.include.getQualifiedIdentifier()];
           newValue = includeValue && includeValue[preSideEffectedProperty.property.getId()];
         } else {
-          newValue = value[preSideEffectedProperty.property.getId()];
+          newValue = gqlValue[preSideEffectedProperty.property.getId()];
         }
-  
+
         if (typeof newValue !== "undefined") {
-          const value = await preSideEffectFn({
+          const returnError = await preSideEffectFn({
             appData: this.appData,
             id: preSideEffectedProperty.property.getId(),
             itemDefinition,
@@ -403,10 +412,10 @@ export class Cache {
             rowVersion: version,
             include: preSideEffectedProperty.include,
           });
-  
-          if (value) {
+
+          if (returnError) {
             throw new EndpointError({
-              message: typeof value === "string" ? value : "The pre side effect function has forbid this action",
+              message: typeof returnError === "string" ? returnError : "The pre side effect function has forbid this action",
               code: ENDPOINT_ERRORS.FORBIDDEN,
             });
           }
@@ -418,26 +427,75 @@ export class Cache {
 
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready
-    const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
-      this.serverData,
-      itemDefinition,
-      value,
-      null,
-      containerExists ? this.storageClients[containerId] : null,
-      this.domain,
-      dictionary,
-    );
-    const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
-      this.serverData,
-      itemDefinition.getParentModule(),
-      value,
-      null,
-      containerExists ? this.storageClients[containerId] : null,
-      this.domain,
-      dictionary,
-    );
-    const sqlModData: IManyValueType = sqlModDataComposed.value;
-    const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
+    let sqlModData: IManyValueType;
+    let sqlIdefData: IManyValueType;
+    let consumeModStreams: ConsumeStreamsFnType;
+    let consumeIdefStreams: ConsumeStreamsFnType;
+
+    if (isSQLType) {
+      sqlModData = {};
+      sqlIdefData = {};
+
+      // these properties cannot be used from the given row value
+      const forbiddenCopyProperties = [
+        "id",
+        "version",
+        "container_id",
+        "last_modified",
+        "created_by",
+        "parent_id",
+        "parent_type",
+        "parent_version",
+        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+      ];
+
+      // now we get the reserved and put it in the module data
+      Object.keys(RESERVED_BASE_PROPERTIES).forEach((p) => {
+        if (forbiddenCopyProperties.includes(p)) {
+          return;
+        }
+        sqlModData[p] = value[p];
+      });
+
+      // and now we add whatever is for the prop extensions
+      itemDefinition.getParentModule().getAllPropExtensions().forEach((p) => {
+        sqlModData[p.getId()] = value[p.getId()];
+      });
+
+      // now we can take whatever is left in the value that was not added
+      // to the module table and is not a forbidden properties into the idef information
+      Object.keys(value).forEach((p) => {
+        if (typeof sqlModData[p] === "undefined" && !forbiddenCopyProperties.includes(p)) {
+          sqlIdefData[p] = value[p];
+        }
+      });
+    } else {
+      // now we extract the SQL information for both item definition table
+      // and the module table, this value is database ready
+      const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
+        this.serverData,
+        itemDefinition,
+        value,
+        null,
+        containerExists ? this.storageClients[containerId] : null,
+        this.domain,
+        dictionary,
+      );
+      const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
+        this.serverData,
+        itemDefinition.getParentModule(),
+        value,
+        null,
+        containerExists ? this.storageClients[containerId] : null,
+        this.domain,
+        dictionary,
+      );
+      sqlModData = sqlModDataComposed.value;
+      sqlIdefData = sqlIdefDataComposed.value;
+      consumeModStreams = sqlModDataComposed.consumeStreams;
+      consumeIdefStreams = sqlIdefDataComposed.consumeStreams;
+    }
 
     // this data is added every time when creating
     sqlModData.type = itemDefinition.getQualifiedPathName();
@@ -574,7 +632,7 @@ export class Cache {
     );
 
     try {
-      await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+      await consumeIdefStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
         "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
@@ -589,7 +647,7 @@ export class Cache {
       );
     }
     try {
-      await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
+      await consumeModStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
         "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
@@ -695,6 +753,145 @@ export class Cache {
     })() : null;
 
     return sqlValue;
+  }
+
+  /**
+   * Given an item that needs to be copied it will create a new copy for it
+   * with all its files and everything
+   * 
+   * @param item the item to copy from
+   * @param id the id to copy from
+   * @param version the version to copy from
+   * @param targetId the target id to copy at
+   * @param targetVersion the target version to copy at
+   * @param targetContainerId the target container id to use (if not specified will use the same)
+   * @param targetCreatedBy the target creator to use (if not specified will use the same)
+   * @param targetParent the target parent to use (if not specified will use the same as the original)
+   * @param currentRawValueSQL the current known value for this source item (if not specified will find it)
+   * @param options some options for side effects as this calls the request creation function
+   */
+  public async requestCopy(
+    item: ItemDefinition | string,
+    id: string,
+    version: string,
+    targetId: string,
+    targetVersion: string,
+    targetContainerId?: string,
+    targetCreatedBy?: string,
+    targetParent?: {
+      id: string;
+      type: string;
+      version: string;
+    },
+    currentRawValueSQL?: ISQLTableRowValue,
+    options: {
+      ignorePreSideEffects?: boolean;
+      ignoreSideEffects?: boolean;
+    } = {},
+  ): Promise<ISQLTableRowValue> {
+    const itemDefinition = typeof item === "string" ?
+      this.root.registry[item] as ItemDefinition :
+      item;
+
+    const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
+
+    const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
+    const allItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${id}.${version || ""}`;
+
+    const targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
+    const targetItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
+
+    const currentContainerId = currentValue.container_id;
+    const currentStorageClient = this.storageClients[currentContainerId];
+    const targetStorageClient = this.storageClients[targetContainerId || currentContainerId];
+
+    const hasModuleFiles = await currentStorageClient.exists(allModuleFilesLocation);
+    const hasIdefFiles = await currentStorageClient.exists(allItemFilesLocation);
+
+    let storedModuleFiles = false;
+    let storedIdefFiles = false;
+
+    try {
+      if (hasModuleFiles) {
+        await currentStorageClient.copyFolder(allModuleFilesLocation, targetModuleFilesLocation, targetStorageClient);
+        storedModuleFiles = true;
+      }
+
+      if (hasIdefFiles) {
+        await currentStorageClient.copyFolder(allItemFilesLocation, targetItemFilesLocation, targetStorageClient);
+        storedIdefFiles = true;
+      }
+
+      return await this.requestCreation(
+        itemDefinition,
+        targetId,
+        targetVersion,
+        currentValue,
+        targetCreatedBy || currentValue.created_by,
+        null,
+        targetContainerId || currentContainerId,
+        targetParent || (currentValue.parent_id ? {
+          id: currentValue.parent_id,
+          type: currentValue.parent_type,
+          version: currentValue.parent_version || null,
+        } : null),
+        null,
+        options,
+      );
+    } catch (err) {
+      if (storedModuleFiles) {
+        (async () => {
+          try {
+            await targetStorageClient.removeFolder(targetModuleFilesLocation);
+          } catch (err2) {
+            logger.error(
+              "Cache.requestCopy (detached) [ORPHANED]: could not remove orphaned folder",
+              {
+                errMessage: err2.message,
+                errStack: err2.stack,
+                targetModuleFilesLocation,
+                targetContainerId,
+              }
+            );
+          }
+        })();
+      }
+
+      if (storedIdefFiles) {
+        (async () => {
+          try {
+            await targetStorageClient.removeFolder(targetItemFilesLocation);
+          } catch (err2) {
+            logger.error(
+              "Cache.requestCopy (detached) [ORPHANED]: could not remove orphaned folder",
+              {
+                errMessage: err2.message,
+                errStack: err2.stack,
+                targetItemFilesLocation,
+                targetContainerId,
+              }
+            );
+          }
+        })();
+      }
+
+      logger.error(
+        "Cache.requestCopy [SERIOUS]: could not copy item",
+        {
+          errMessage: err.message,
+          errStack: err.stack,
+          targetItemFilesLocation,
+          targetModuleFilesLocation,
+          targetContainerId,
+          id,
+          version,
+          targetId,
+          targetVersion,
+        }
+      );
+
+      throw err;
+    }
   }
 
   /**
@@ -816,7 +1013,7 @@ export class Cache {
       await Promise.all(preSideEffected.map(async (preSideEffectedProperty) => {
         const description = preSideEffectedProperty.property.getPropertyDefinitionDescription();
         const preSideEffectFn = description.sqlPreSideEffect;
-  
+
         // now we can get this new value
         let newValue: any;
         if (preSideEffectedProperty.include) {
@@ -825,7 +1022,7 @@ export class Cache {
         } else {
           newValue = update[preSideEffectedProperty.property.getId()];
         }
-  
+
         const originalValue = convertSQLValueToGQLValueForProperty(
           this.getServerData(),
           itemDefinition,
@@ -833,7 +1030,7 @@ export class Cache {
           preSideEffectedProperty.property,
           currentSQLValue,
         )[preSideEffectedProperty.property.getId()] as any;
-  
+
         if (typeof newValue !== "undefined") {
           const value = await preSideEffectFn({
             appData: this.appData,
@@ -849,7 +1046,7 @@ export class Cache {
             rowVersion: version,
             include: preSideEffectedProperty.include,
           });
-  
+
           if (value) {
             throw new EndpointError({
               message: typeof value === "string" ? value : "The pre side effect function has forbid this action",
@@ -908,7 +1105,7 @@ export class Cache {
     let actualReparent = reparent;
     if (actualReparent) {
       const currentParent = {
-        id: currentSQLValue.parent_id || null,
+        id: currentSQLValue.parent_id || null,
         version: currentSQLValue.parent_version || null,
         type: currentSQLValue.parent_type || null,
       };
@@ -1585,12 +1782,9 @@ export class Cache {
       if (dropAllVersions) {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING ${returningElements}`;
         const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${
-            JSON.stringify(selfTable)
-          } WHERE ${
-            JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-          } = $1), "MTABLE" AS (${
-            deleteQueryBase
+          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)
+          } WHERE ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+          } = $1), "MTABLE" AS (${deleteQueryBase
           }) ` +
           `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
@@ -1677,14 +1871,10 @@ export class Cache {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
           `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElements}`;
         const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${
-            JSON.stringify(selfTable)
-          } WHERE ${
-            JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
-          } = $1 AND ${
-            JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)
-          } = $2), "MTABLE" AS (${
-            deleteQueryBase
+          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)
+          } WHERE ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
+          } = $1 AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)
+          } = $2), "MTABLE" AS (${deleteQueryBase
           }) ` +
           `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :

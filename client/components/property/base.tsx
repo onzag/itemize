@@ -488,11 +488,6 @@ export function EntryViewReadSet(
                         />
                       );
                     } else {
-                      // property has no state it must be hidden
-                      if (!propertyState) {
-                        return null;
-                      }
-
                       // so we return the propery setter
                       return (
                         <PropertySetter

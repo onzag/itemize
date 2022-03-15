@@ -4,20 +4,26 @@ import path from "path";
 import { ServiceProviderType } from ".";
 import StorageProvider from "./base/StorageProvider";
 
-async function copyDir(src: string, dest: string) {
+async function copyDir(src: string, dest: string, destProvider?: StorageProvider<any>) {
   try {
     const files = await fsAsync.readdir(src);
     for (let file of files) {
-      const current = await fsAsync.stat(path.join(src, file));
+      const currentPath = path.join(src, file);
+      const current = await fsAsync.stat(currentPath);
       if (current.isDirectory()) {
-        await copyDir(path.join(src, file), path.join(dest, file));
+        await copyDir(currentPath, path.join(dest, file));
       } else if (current.isFile()) {
-        try {
-          await fsAsync.mkdir(dest, { recursive: true });
-        } catch {
-          // Do nothing directory already exists
+        if (!destProvider) {
+          try {
+            await fsAsync.mkdir(dest, { recursive: true });
+          } catch {
+            // Do nothing directory already exists
+          }
+          await fsAsync.copyFile(currentPath, path.join(dest, file));
+        } else {
+          const stream = fs.createReadStream(currentPath);
+          await destProvider.upload(path.join(dest, file), stream, true);
         }
-        await fsAsync.copyFile(path.join(src, file), path.join(dest, file));
       }
     }
   } catch {
@@ -25,10 +31,12 @@ async function copyDir(src: string, dest: string) {
   }
 };
 
+
 export class LocalStorageService extends StorageProvider<null> {
   public static getType() {
     return ServiceProviderType.NONE;
   }
+  
   public async upload(at: string, readStream: ReadStream): Promise<void> {
     const remote = at;
     const targetPath = remote.split("/");
@@ -74,6 +82,15 @@ export class LocalStorageService extends StorageProvider<null> {
 
   public async dumpFolder(remotePath: string, localPath: string): Promise<void> {
     await copyDir(path.join("uploads", remotePath), localPath);
+  }
+
+  public async copyFolder(remotePath: string, targetPath: string, target: StorageProvider<any>) {
+    const sourceDir = path.join("uploads", remotePath);
+    if (target === this) {
+      return await copyDir(sourceDir, path.join("uploads", targetPath));
+    }
+
+    return await copyDir(sourceDir, targetPath, target);
   }
 
   public async exists(at: string): Promise<boolean> {
