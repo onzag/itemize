@@ -286,6 +286,10 @@ export function buildSearchModePropertyDefinitions(
   // sense to go deeper
   newPropDef.searchable = false;
 
+  // unnecessary because the search names may be quite short because we are searching
+  // affects string, text and whatnot
+  delete newPropDef.minLength;
+
   // search mode cannot coerce nulls into default
   if (newPropDef.coerceNullsIntoDefault) {
     newPropDef.coerceNullsIntoDefault = false;
@@ -345,7 +349,7 @@ export function buildSearchModePropertyDefinitions(
   }
 
   // invalid if gets the same treatment
-  if (newPropDef.searchInvalidIf || newPropDef.invalidIf) {
+  if (newPropDef.searchInvalidIf || newPropDef.invalidIf) {
     newPropDef.invalidIf = (newPropDef.searchInvalidIf || newPropDef.invalidIf).map((ii) => {
       return {
         error: ii.error,
@@ -424,14 +428,14 @@ export function buildSearchModePropertyDefinitions(
       }
 
       // we need some invalid conditions we are adding to the invalid if set
-      newPropDef.invalidIf = newPropDef.invalidIf || [];
+      newPropDef.invalidIf = newPropDef.invalidIf || [];
       newPropDef.invalidIf.push({
         error: PropertyInvalidReason.FROM_LARGER_THAN_TO,
         if: newPropDefInvalidIfRule,
       });
 
       // now we do the same but in reverse, this time for the second
-      newPropDef2.invalidIf = newPropDef2.invalidIf || [];
+      newPropDef2.invalidIf = newPropDef2.invalidIf || [];
       const newPropDef2InvalidIfRule: IConditionalRuleSetRawJSONDataPropertyType = {
         property: "&this",
         comparator: "less-than",
@@ -473,7 +477,6 @@ export function buildSearchModePropertyDefinitions(
     if (newPropDef.i18nData) {
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
     }
-
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.STRING

@@ -320,6 +320,10 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    * Developer provider check base.tsx
    */
   disabled: boolean;
+  /**
+   * Will display even if it's hidden
+   */
+  displayHidden?: boolean;
 }
 
 /**
@@ -660,7 +664,7 @@ export default class PropertyEntry extends
 
   public render() {
     // hidden properties simply do not show, we short circuit here
-    if (this.props.state.hidden) {
+    if (this.props.state.hidden && !this.props.displayHidden) {
       return null;
     }
 

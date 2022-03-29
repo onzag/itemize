@@ -358,6 +358,7 @@ export class Collector {
 
         if (moduleTrigger) {
           await moduleTrigger({
+            dictionary: null,
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
@@ -391,6 +392,7 @@ export class Collector {
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
+            dictionary: null,
             appData: this.appData,
             itemDefinition: idef,
             module: mod,

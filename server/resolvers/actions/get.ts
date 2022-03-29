@@ -12,6 +12,7 @@ import {
   runPolicyCheck,
   checkReadPoliciesAllowThisUserToSearch,
   defaultTriggerForbiddenFunction,
+  getDictionary,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import {
@@ -191,8 +192,11 @@ export async function getItemDefinition(
   let toReturnToUser: any = valueToProvide.toReturnToUser;
 
   if (moduleTrigger || itemDefinitionTrigger) {
+    const dictionary = getDictionary(appData, resolverArgs.args);
+
     if (moduleTrigger) {
       await moduleTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -223,6 +227,7 @@ export async function getItemDefinition(
 
     if (itemDefinitionTrigger) {
       await itemDefinitionTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -414,8 +419,11 @@ export async function getItemDefinitionList(
       );
 
       if (moduleTrigger || itemDefinitionTrigger) {
+        const dictionary = getDictionary(appData, resolverArgs.args);
+
         if (moduleTrigger) {
           await moduleTrigger({
+            dictionary,
             appData,
             itemDefinition,
             module: mod,
@@ -446,6 +454,7 @@ export async function getItemDefinitionList(
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
+            dictionary,
             appData,
             itemDefinition,
             module: mod,
@@ -617,8 +626,11 @@ export async function getModuleList(
       );
 
       if (moduleTrigger || itemDefinitionTrigger) {
+        const dictionary = getDictionary(appData, resolverArgs.args);
+
         if (moduleTrigger) {
           await moduleTrigger({
+            dictionary,
             appData,
             itemDefinition,
             module: mod,
@@ -649,6 +661,7 @@ export async function getModuleList(
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
+            dictionary,
             appData,
             itemDefinition,
             module: mod,

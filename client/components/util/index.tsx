@@ -167,7 +167,10 @@ export interface IImageSizes {
  * @param property if not passed only returns the default image sizes, medium, small, large and the standard one
  * custom sizes can be used and it needs access to the property in order to know these urls
  */
-export function imageSizeRetriever(fileData: IGQLFile, property?: PropertyDefinition): IImageSizes  {
+export function imageSizeRetriever(
+  fileData: IGQLFile,
+  property?: PropertyDefinition,
+): IImageSizes  {
   // the final value by default is just the url itself
   const finalValue = {
     imageMediumSizeURL: fileData && fileData.url,

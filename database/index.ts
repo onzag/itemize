@@ -95,15 +95,30 @@ export class DatabaseConnection {
   async query(what: string | QueryBuilder, bindings?: BasicBindingType[], useHoles?: boolean): Promise<QueryResult> {
     let queryValue = typeof what === "string" ? what : what.compile();
     const queryBindings = (typeof what === "string" ? bindings : what.getBindings()) || [];
+    let optimizedBindings: BasicBindingType[];
 
     if (typeof what !== "string" || useHoles) {
       const splittedValue = queryValue.split("?");
 
+      optimizedBindings = [];
+      const optimizedBindingsIndexes: number[] = [];
+
+      queryBindings.forEach((b) => {
+        const optimizedBindingsIndex = b === null ? -1 : optimizedBindings.indexOf(b);
+        if (optimizedBindingsIndex === -1) {
+          optimizedBindings.push(b);
+          optimizedBindingsIndexes.push(optimizedBindings.length - 1);
+        } else {
+          optimizedBindingsIndexes.push(optimizedBindingsIndex);
+        }
+      });
+  
       let holes: number = 0;
       queryValue = "";
       splittedValue.forEach((v, index) => {
         if (index !== 0) {
-          queryValue += "$" + index;
+          const optimizedIndexOfBinding = optimizedBindingsIndexes[index - 1] + 1;
+          queryValue += "$" + optimizedIndexOfBinding;
           holes++;
         }
         queryValue += v;
@@ -115,6 +130,7 @@ export class DatabaseConnection {
             {
               sql: queryValue,
               bindings: queryBindings,
+              optimizedBindings,
             }
           );
         }
@@ -127,12 +143,13 @@ export class DatabaseConnection {
         {
           sql: queryValue,
           bindings: queryBindings,
+          optimizedBindings,
         }
       );
     }
 
     // we execute either from the client first or the pool later 
-    const response = await (this.client || this.pool).query(queryValue, queryBindings);
+    const response = await (this.client || this.pool).query(queryValue, optimizedBindings || queryBindings);
 
     if ((process.env.NODE_ENV === "development" || this.forceLogs) && !this.suppressLogs) {
       console.log(

@@ -13,7 +13,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { styled } from "@mui/material/styles";
+import { styled, SxProps } from "@mui/material/styles";
 
 /**
  * The item definition loader styles
@@ -99,6 +99,22 @@ interface ItemLoaderProps {
    * Whether to use 100% width
    */
   fullWidth?: boolean;
+  /**
+   * The class for the container
+   */
+  className?: string;
+  /**
+   * class name on error
+   */
+  errorClassName?: string;
+  /**
+   * sx props
+   */
+  sx?: SxProps;
+  /**
+   * sx on error
+   */
+  errorSx?: SxProps;
 }
 
 /**
@@ -138,7 +154,7 @@ export function ItemLoader(props: ItemLoaderProps) {
             }
           }
           return (
-            <FlexingContainer>
+            <FlexingContainer className={props.errorClassName} sx={props.errorSx}>
               <Typography>{errorComponent}</Typography>
               {imageComponent}
               <I18nRead id="reload">
@@ -152,7 +168,7 @@ export function ItemLoader(props: ItemLoaderProps) {
           );
         }
     
-        return <Container fullWidth={props.fullWidth}>
+        return <Container fullWidth={props.fullWidth} className={props.className} sx={props.sx}>
           {
             arg.loading ? 
             <DelayDisplay duration={props.msWaitedToShowLoadingAnimation || 700}>

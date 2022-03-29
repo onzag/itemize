@@ -77,6 +77,8 @@ interface IActualResourceLoaderState {
 class ActualResourceLoader
   extends React.PureComponent<IActualResourceLoaderProps, IActualResourceLoaderState> {
 
+  private isUnmounted: boolean = false;
+
   public static async getDerivedServerSideStateFromProps(props: IActualResourceLoaderProps) {
     let path = props.path || "/rest/resource/";
     if (!path.endsWith("/")) {
@@ -113,6 +115,10 @@ class ActualResourceLoader
       loading: false,
       failed: false,
     };
+  }
+
+  public componentWillUnmount() {
+    this.isUnmounted = true;
   }
 
   /**
@@ -177,9 +183,11 @@ class ActualResourceLoader
     // before we have fetched then we can say we are loading, so
     // no need for flickering
     const waitTimeoutForLoading = setTimeout(() => {
-      this.setState({
-        loading: true,
-      });
+      if (!this.isUnmounted) {
+        this.setState({
+          loading: true,
+        });
+      }
     }, 600);
 
     // now the load url we will use
@@ -212,7 +220,7 @@ class ActualResourceLoader
       clearTimeout(waitTimeoutForLoading);
       // and finally set our state with our new shiny html
       // content
-      this.setState({
+      !this.isUnmounted && this.setState({
         content,
         loading: false,
         failed: false,
@@ -220,7 +228,7 @@ class ActualResourceLoader
     } catch (err) {
       // we have failed, clear the timeout, and show it
       clearTimeout(waitTimeoutForLoading);
-      this.setState({
+      !this.isUnmounted && this.setState({
         content: null,
         loading: false,
         failed: true,

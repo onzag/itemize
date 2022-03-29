@@ -205,7 +205,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 version: arg.version || "",
               });
             })
-          )[0] || null;
+          )[0] || null;
 
         // if not found and we have a version, what we assume is a language
         // we fallback to the unversioned
@@ -433,7 +433,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 });
               }
             )
-          )[0] || null;
+          )[0] || null;
       }
 
       // if there's no value, there's no user,

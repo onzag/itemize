@@ -271,6 +271,8 @@ export async function editItemDefinition(
   const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
   const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
+  const dictionary = getDictionary(appData, resolverArgs.args);
+
   let extraArgs: IGQLArgs;
 
   // if we got any of them
@@ -295,6 +297,7 @@ export async function editItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToModule = await moduleTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -338,6 +341,7 @@ export async function editItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -379,7 +383,6 @@ export async function editItemDefinition(
     gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
   );
 
-  const dictionary = getDictionary(appData, resolverArgs.args);
   const sqlValue = await appData.cache.requestUpdate(
     itemDefinition,
     resolverArgs.args.id,
@@ -421,6 +424,7 @@ export async function editItemDefinition(
   if (moduleTrigger) {
     // we execute the trigger
     await moduleTrigger({
+      dictionary,
       appData,
       itemDefinition,
       module: mod,
@@ -456,6 +460,7 @@ export async function editItemDefinition(
   if (itemDefinitionTrigger) {
     // we call the trigger
     await itemDefinitionTrigger({
+      dictionary,
       appData,
       itemDefinition,
       module: mod,

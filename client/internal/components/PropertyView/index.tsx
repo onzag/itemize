@@ -131,6 +131,10 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
    * Whether file urls are to be cached
    */
   cacheFiles: boolean;
+  /**
+   * Will display even if it's hidden
+   */
+  displayHidden?: boolean;
 }
 
 /**
@@ -412,7 +416,7 @@ export function RawBasePropertyView(props: {
 export default function PropertyView(
   props: IPropertyViewMainHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
 ) {
-  if (props.state.hidden) {
+  if (props.state.hidden && !props.displayHidden) {
     return null;
   }
 

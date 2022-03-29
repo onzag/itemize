@@ -335,9 +335,9 @@ class PropertyEntrySelectRenderer
           </InputLabel> : null}
           {selectElement}
         </FormControl>
-        <Box sx={style.errorMessage}>
+        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </Box>
+        </Box>}
       </Box>
     );
   }

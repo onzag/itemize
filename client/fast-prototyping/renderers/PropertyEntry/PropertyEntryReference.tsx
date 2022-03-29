@@ -455,9 +455,9 @@ class PropertyEntryReferenceRenderer
           variant="filled"
           {...appliedTextFieldProps}
         />
-        <Box sx={style.errorMessage}>
+        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </Box>
+        </Box>}
       </Box>
     );
   }

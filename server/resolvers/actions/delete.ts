@@ -9,6 +9,7 @@ import {
   validateTokenIsntBlocked,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
+  getDictionary,
 } from "../basic";
 import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
@@ -165,6 +166,8 @@ export async function deleteItemDefinition(
     true,
   );
 
+  let dictionary: string;
+
   // however now we need to check if we have triggers, for that we get
   // the absolute paths
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -176,9 +179,11 @@ export async function deleteItemDefinition(
   if (
     itemDefinitionTrigger || moduleTrigger
   ) {
+    dictionary = getDictionary(appData, resolverArgs.args);
     if (moduleTrigger) {
       // we execute the trigger
       await moduleTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -210,6 +215,7 @@ export async function deleteItemDefinition(
     if (itemDefinitionTrigger) {
       // we call the trigger
       await itemDefinitionTrigger({
+        dictionary,
         appData,
         itemDefinition,
         module: mod,
@@ -251,6 +257,7 @@ export async function deleteItemDefinition(
   if (moduleTrigger) {
     // we execute the trigger
     await moduleTrigger({
+      dictionary,
       appData,
       itemDefinition,
       module: mod,
@@ -283,6 +290,7 @@ export async function deleteItemDefinition(
   if (itemDefinitionTrigger) {
     // we call the trigger
     await itemDefinitionTrigger({
+      dictionary,
       appData,
       itemDefinition,
       module: mod,

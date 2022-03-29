@@ -594,14 +594,14 @@ class PropertyEntryLocationRenderer extends
           variant="filled"
           {...appliedTextFieldProps}
         />
-        <Box sx={style.errorMessage}>
+        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
           {
             !this.props.currentInvalidReason && this.props.activeSearchResults && this.props.activeSearchResults.length === 0 ?
               this.props.noResultsLabel :
               null
           }
-        </Box>
+        </Box>}
       </Box>
     );
   }

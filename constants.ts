@@ -219,7 +219,7 @@ export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIM
 /**
  * The time it takes for blocks to be refreshed
  */
-export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_BLOCK_UNTIL_REFRESH_TIME || 86400000; // 1 day
+export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_BLOCK_UNTIL_REFRESH_TIME || 86400000; // 1 day
 
 /**
  * The maximum amount of remote listeners a socket supports

@@ -312,7 +312,7 @@ function SimpleAvatar(props: SimpleAvatarProps) {
 export class Avatar extends React.PureComponent<IAvatarProps> {
   public render() {
     // so we assign a random color based on the user id
-    const numberColorId = this.props.id.charCodeAt(0) % 10;
+    const numberColorId = this.props.id ? this.props.id.charCodeAt(0) % 10 : 0;
 
     // now the flag logic
     const flag = this.props.countryCode && countries[this.props.countryCode] ? (

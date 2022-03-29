@@ -240,9 +240,9 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
           </InputLabel> : null}
           {editor}
         </div>
-        <Box sx={style.errorMessage}>
+        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
           {this.props.currentInvalidReason}
-        </Box>
+        </Box>}
       </Box>
     );
   }

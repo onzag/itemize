@@ -17,6 +17,10 @@ export enum IOTriggerActions {
 
 export interface IOTriggerArgType {
   /**
+   * The dictionary that was obtained from the language
+   */
+  dictionary: string;
+  /**
    * App data of the entire application
    */
   appData: IAppDataType;
@@ -125,6 +129,10 @@ export interface IOTriggerArgType {
 }
 
 export interface ISearchTriggerArgType {
+  /**
+   * The dictionary that was obtained from the language
+   */
+   dictionary: string;
   appData: IAppDataType;
   itemDefinition: ItemDefinition;
   module: Module;

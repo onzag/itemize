@@ -275,8 +275,11 @@ export async function searchModule(
   const pathOfThisModule = mod.getPath().join("/");
   const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
 
+  const dictionary = getDictionary(appData, resolverArgs.args);
+
   if (moduleTrigger) {
     await moduleTrigger({
+      dictionary,
       appData,
       module: mod,
       itemDefinition: null,
@@ -298,7 +301,7 @@ export async function searchModule(
     resolverArgs.args,
     queryModel.whereBuilder,
     queryModel.orderByBuilder,
-    getDictionary(appData, resolverArgs.args),
+    dictionary,
     resolverArgs.args.search,
     resolverArgs.args.order_by,
   );
@@ -364,6 +367,7 @@ export async function searchModule(
 
             if (moduleTrigger) {
               await moduleTrigger({
+                dictionary,
                 appData,
                 itemDefinition,
                 module: mod,
@@ -394,6 +398,7 @@ export async function searchModule(
 
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
+                dictionary,
                 appData,
                 itemDefinition,
                 module: mod,
@@ -738,8 +743,11 @@ export async function searchItemDefinition(
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
   const idefTrigger = appData.triggers.item.search[pathOfThisIdef];
 
+  const dictionary = getDictionary(appData, resolverArgs.args);
+
   if (moduleTrigger || idefTrigger) {
     const args = {
+      dictionary,
       appData,
       module: mod,
       itemDefinition,
@@ -769,7 +777,7 @@ export async function searchItemDefinition(
     resolverArgs.args,
     queryModel.whereBuilder,
     queryModel.orderByBuilder,
-    getDictionary(appData, resolverArgs.args),
+    dictionary,
     resolverArgs.args.search,
     resolverArgs.args.order_by,
   );
@@ -823,6 +831,7 @@ export async function searchItemDefinition(
 
             if (moduleTrigger) {
               await moduleTrigger({
+                dictionary,
                 appData,
                 itemDefinition,
                 module: mod,
@@ -853,6 +862,7 @@ export async function searchItemDefinition(
 
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
+                dictionary,
                 appData,
                 itemDefinition,
                 module: mod,

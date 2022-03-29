@@ -1143,6 +1143,10 @@ export class ActualItemProvider extends
   private activeSubmitPromise: Promise<IActionResponseWithId> = null;
   private activeSubmitPromiseAwaiter: string = null;
 
+  // sometimes reload calls can come in batches due to triggering actions
+  // it doesn't hurt to catch them all and create a timeout
+  private reloadListenerTimeout: NodeJS.Timeout = null;
+
   constructor(props: IActualItemProviderProps) {
     super(props);
 
@@ -1824,7 +1828,8 @@ export class ActualItemProvider extends
     // whether it is in the cache or not, so we call it as so, and deny the cache
     // passing true
     if (!this.props.avoidLoading) {
-      this.loadValue(true);
+      clearTimeout(this.reloadListenerTimeout);
+      this.reloadListenerTimeout = setTimeout(this.loadValue.bind(this, true), 70);
     }
   }
   public changeSearchListener() {

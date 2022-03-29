@@ -378,6 +378,7 @@ export async function addItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToModule = await moduleTrigger({
+        dictionary,
         appData,
         itemDefinition: itemDefinition,
         module: mod,
@@ -421,6 +422,7 @@ export async function addItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
+        dictionary,
         appData,
         itemDefinition: itemDefinition,
         module: mod,
@@ -503,6 +505,7 @@ export async function addItemDefinition(
     moduleTrigger
   ) {
     await moduleTrigger({
+      dictionary,
       appData,
       itemDefinition: itemDefinition,
       module: mod,
@@ -536,6 +539,7 @@ export async function addItemDefinition(
   }
   if (itemDefinitionTrigger) {
     await itemDefinitionTrigger({
+      dictionary,
       appData,
       itemDefinition: itemDefinition,
       module: mod,

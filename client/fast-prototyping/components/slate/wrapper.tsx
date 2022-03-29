@@ -103,7 +103,23 @@ const style = {
     display: "flex",
     flexDirection: "column",
   },
-  editorDrawerAppbarSpacer: (theme: Theme) => theme.mixins.toolbar,
+  editorDrawerAppbarSpacer: (theme: Theme) => {
+    // bug in toolbar mixin https://github.com/mui/material-ui/issues/31358
+    return (
+      {
+        minHeight: 54,
+        [`${theme.breakpoints.up(0)} and (orientation: landscape)`]: {
+          minHeight: 48,
+        },
+        [`${theme.breakpoints.up(600)} and (orientation: landscape)`]: {
+          minHeight: 64,
+        },
+        [theme.breakpoints.up(600)]: {
+          minHeight: 64,
+        },
+      }
+    )
+  },
   editorDrawerFixed: {
     top: 0,
     right: 0,

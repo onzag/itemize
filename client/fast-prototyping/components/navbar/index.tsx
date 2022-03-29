@@ -35,7 +35,23 @@ const navbarStyles = {
     display: "flex",
     flexDirection: "row-reverse",
   },
-  appBarSpacer: (theme: Theme) => theme.mixins.toolbar,
+  appBarSpacer: (theme: Theme) => {
+    // bug in toolbar mixin https://github.com/mui/material-ui/issues/31358
+    return (
+      {
+        minHeight: 54,
+        [`${theme.breakpoints.up(0)} and (orientation: landscape)`]: {
+          minHeight: 48,
+        },
+        [`${theme.breakpoints.up(600)} and (orientation: landscape)`]: {
+          minHeight: 64,
+        },
+        [theme.breakpoints.up(600)]: {
+          minHeight: 64,
+        },
+      }
+    )
+  },
   title: (theme: Theme) => ({
     whiteSpace: "nowrap" as "nowrap",
     paddingLeft: "1rem",

@@ -127,6 +127,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * force to be disabled
    */
   disabled?: boolean;
+  /**
+   * Will display even if it's hidden
+   */
+  displayHidden?: boolean;
 }
 
 /**
@@ -177,6 +181,10 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
    * whether to cache files when running the url absoluter
    */
   cacheFiles?: boolean;
+  /**
+   * Will display even if it's hidden
+   */
+  displayHidden?: boolean;
 }
 
 /**
@@ -360,6 +368,7 @@ export function EntryViewReadSet(
                             itemDefinition={itemContextualValue.idef}
                             useAppliedValue={props.useAppliedValue}
                             cacheFiles={props.cacheFiles}
+                            displayHidden={props.displayHidden}
                           />
                         );
                       }
@@ -485,6 +494,7 @@ export function EntryViewReadSet(
                           referenceFilteringSet={props.referenceFilteringSet}
                           cacheFiles={props.cacheFiles}
                           disabled={props.disabled}
+                          displayHidden={props.displayHidden}
                         />
                       );
                     } else {

@@ -321,9 +321,9 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
           null
       }
       {component}
-      <Box sx={style.errorMessage}>
+      {props.args.hideError ? null : <Box sx={style.errorMessage}>
         {props.currentInvalidReason}
-      </Box>
+      </Box>}
     </Box>
   );
 };

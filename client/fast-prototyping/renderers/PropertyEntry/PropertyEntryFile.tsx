@@ -305,9 +305,9 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
           );
         }}
       </Dropzone>
-      <Box sx={style.errorMessage}>
+      {props.args.hideError ? null : <Box sx={style.errorMessage}>
         {props.currentInvalidReason}
-      </Box>
+      </Box>}
     </Box>
   );
 };
