@@ -330,6 +330,15 @@ export async function initializeServer(
     ]);
     const config: IConfigRawJSONDataType = JSON.parse(rawConfig);
     const sensitiveConfig: ISensitiveConfigRawJSONDataType = JSON.parse(rawSensitiveConfig);
+
+    const shared = {
+      ...config.shared,
+      ...sensitiveConfig.shared,
+    };
+
+    config.shared = shared;
+    sensitiveConfig.shared = shared;
+
     const dbConfig: IDBConfigRawJSONDataType = JSON.parse(rawDbConfig);
     const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
     const build: IRootRawJSONDataType = JSON.parse(rawBuild);

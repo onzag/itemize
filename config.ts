@@ -133,6 +133,13 @@ export interface IConfigRawJSONDataType {
   custom?: {
     [customKey: string]: any;
   }
+  /**
+   * Shared custom information that is added to the standard config and sensitive config
+   * but kept into the sensitive or standard file (eg. client side api keys)
+   */
+  shared?: {
+    [customKey: string]: any;
+  }
 }
 
 /**
@@ -284,6 +291,13 @@ export interface ISensitiveConfigRawJSONDataType {
   custom?: {
     [customKey: string]: any;
   }
+  /**
+   * Shared custom information that is added to the standard config and sensitive config
+   * but kept into the sensitive or standard file (eg. client side api keys)
+   */
+  shared?: {
+    [customKey: string]: any;
+  }
 }
 
 /**
@@ -404,6 +418,10 @@ export const rawSensitiveConfigSchema = {
       type: "string",
     },
     custom: {
+      type: "object",
+      additionalProperties: {}
+    },
+    shared: {
       type: "object",
       additionalProperties: {}
     },
@@ -650,6 +668,10 @@ export const rawConfigSchema = {
       },
     },
     custom: {
+      type: "object",
+      additionalProperties: {}
+    },
+    shared: {
       type: "object",
       additionalProperties: {}
     },

@@ -181,6 +181,14 @@ export async function extractConfigAndBuildNumber(): Promise<IBuilderBasicConfig
     checkDumpConfig, "dump", null, false,
   );
 
+  const shared = {
+    ...standardConfig.shared,
+    ...sensitiveConfig.shared,
+  };
+
+  standardConfig.shared = shared;
+  sensitiveConfig.shared = shared;
+
   return {
     standard: standardConfig,
     sensitive: sensitiveConfig,

@@ -11,6 +11,7 @@ import { IPropertyViewLocationRendererProps } from "../../../internal/components
 import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
 import GPSFixedIcon from "@mui/icons-material/GpsFixed";
 import Box from "@mui/material/Box";
+import { ConfigContext } from "../../../internal/providers/config-provider";
 
 // this logic is similar to the entry
 // it has to do with SSR not supporting
@@ -112,10 +113,29 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
         onViewportChanged={this.props.onViewportChange}
         className={this.props.args.leafletMapClassName}
       >
-        <CTileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-        />
+        <ConfigContext.Consumer>
+          {(config) => {
+            let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+            let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+
+            if (config.shared) {
+              if (config.shared.leafletAttribution) {
+                attribution = config.shared.leafletAttribution;
+              }
+
+              if (config.shared.leafletUrl) {
+                url = config.shared.leafletUrl;
+              }
+            }
+
+            return (
+              <CTileLayer
+                attribution={attribution}
+                url={url}
+              />
+            );
+          }}
+        </ConfigContext.Consumer>
         {this.props.currentValue ? <CMarker position={[
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}
@@ -124,9 +144,9 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
             onClick={this.props.onResetViewportCenter}
             sx={style.restoreButton as any}
             size="large">
-            <GPSFixedIcon/>
+            <GPSFixedIcon />
           </IconButton>
-        : null}
+          : null}
       </CMap>
     ) : null;
 
@@ -137,7 +157,7 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
     } else if (this.props.currentValue === null && this.props.args.NullComponent) {
       const NullComponent = this.props.args.NullComponent;
       const nullArgs = this.props.args.nullComponentArgs;
-      textHeader = <NullComponent {...nullArgs}/>;
+      textHeader = <NullComponent {...nullArgs} />;
     } else {
       textHeader = this.props.currentValue ? (
         this.props.currentValue.txt + " - " + this.props.currentValue.atxt
@@ -173,16 +193,16 @@ export default function PropertyViewLocationRenderer(props: IPropertyViewLocatio
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     const Tag = props.args.hideMap ? "span" : "div";
-    return <Tag><NullComponent {...nullArgs}/></Tag>;
+    return <Tag><NullComponent {...nullArgs} /></Tag>;
   }
 
   if (props.args.hideMap) {
     if (props.currentValue) {
       return <span>{props.currentValue.txt + " - " + props.currentValue.atxt}</span>
     } else {
-      return <span/>
+      return <span />
     }
   } else {
-    return (<PropertyViewLocationMap {...props}/>);
+    return (<PropertyViewLocationMap {...props} />);
   }
 }

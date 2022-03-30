@@ -26,6 +26,7 @@ import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import { css as emotionCss } from "@emotion/css";
 import { css } from "@mui/material/styles";
+import { ConfigContext } from "../../../internal/providers/config-provider";
 
 // we import the react-leaflet types, however note
 // how we are not using them at all, this is because
@@ -496,10 +497,29 @@ class PropertyEntryLocationRenderer extends
         onViewportChanged={this.props.onViewportChange}
         onClick={this.setLocationManually}
       >
-        <CTileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-        />
+        <ConfigContext.Consumer>
+          {(config) => {
+            let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+            let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+
+            if (config.shared) {
+              if (config.shared.leafletAttribution) {
+                attribution = config.shared.leafletAttribution;
+              }
+
+              if (config.shared.leafletUrl) {
+                url = config.shared.leafletUrl;
+              }
+            }
+
+            return (
+              <CTileLayer
+                attribution={attribution}
+                url={url}
+              />
+            );
+          }}
+        </ConfigContext.Consumer>
         {this.props.currentValue ? <CMarker position={[
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}
