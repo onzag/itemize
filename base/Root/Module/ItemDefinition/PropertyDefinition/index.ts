@@ -1482,7 +1482,7 @@ export default class PropertyDefinition {
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
       if (!this.checkAgainstJSONDefinition(actualValue)) {
-        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+        throw new Error("Invalid super enforced " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
 
@@ -1519,7 +1519,7 @@ export default class PropertyDefinition {
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
       if (!this.checkAgainstJSONDefinition(actualValue)) {
-        throw new Error("Invalid super enforced " + JSON.stringify(actualValue));
+        throw new Error("Invalid super enforced " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
 
@@ -1619,7 +1619,7 @@ export default class PropertyDefinition {
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
       if (!this.checkAgainstJSONDefinition(actualValue)) {
-        throw new Error("Invalid super default " + JSON.stringify(actualValue));
+        throw new Error("Invalid super default " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
 
@@ -1660,7 +1660,7 @@ export default class PropertyDefinition {
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
       if (!this.checkAgainstJSONDefinition(newActualValue)) {
-        throw new Error("Invalid value " + JSON.stringify(newActualValue));
+        throw new Error("Invalid value " + JSON.stringify(newActualValue) + " on " + this.getId());
       }
     }
 
