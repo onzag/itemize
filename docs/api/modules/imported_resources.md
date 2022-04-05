@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / imported-resources
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / imported-resources
 
 # Module: imported-resources
 
@@ -10,51 +10,85 @@ Currencies list base
 https://gist.github.com/Fluidbyte/2973986
 Comprehensive currency list names in many languages, downloaded original csv and converted to json
 http://www.mapanet.eu/en/resources/Currencies.asp
+Languages list Origin
+https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw/4258894f85de7752b78537a4aa66e027090c27ad/languages.json
 
 ## Table of contents
 
 ### Interfaces
 
-- [ICountryDataType](../interfaces/imported_resources.icountrydatatype.md)
-- [ICountryType](../interfaces/imported_resources.icountrytype.md)
-- [ICurrencyDataType](../interfaces/imported_resources.icurrencydatatype.md)
-- [ICurrencyType](../interfaces/imported_resources.icurrencytype.md)
+- [ICountryDataType](../interfaces/imported_resources.ICountryDataType.md)
+- [ICountryType](../interfaces/imported_resources.ICountryType.md)
+- [ICurrencyDataType](../interfaces/imported_resources.ICurrencyDataType.md)
+- [ICurrencyType](../interfaces/imported_resources.ICurrencyType.md)
+- [ILanguageDataType](../interfaces/imported_resources.ILanguageDataType.md)
+- [ILanguageType](../interfaces/imported_resources.ILanguageType.md)
 
 ### Variables
 
 - [arrCountries](imported_resources.md#arrcountries)
 - [arrCurrencies](imported_resources.md#arrcurrencies)
+- [arrLanguages](imported_resources.md#arrlanguages)
 - [countries](imported_resources.md#countries)
 - [currencies](imported_resources.md#currencies)
+- [languages](imported_resources.md#languages)
 
 ## Variables
 
 ### arrCountries
 
-• `Const` **arrCountries**: [*ICountryType*](../interfaces/imported_resources.icountrytype.md)[]
+• **arrCountries**: [`ICountryType`](../interfaces/imported_resources.ICountryType.md)[]
 
-Defined in: [imported-resources/index.ts:56](https://github.com/onzag/itemize/blob/5fcde7cf/imported-resources/index.ts#L56)
+#### Defined in
+
+[imported-resources/index.ts:71](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L71)
 
 ___
 
 ### arrCurrencies
 
-• `Const` **arrCurrencies**: [*ICurrencyType*](../interfaces/imported_resources.icurrencytype.md)[]
+• **arrCurrencies**: [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md)[]
 
-Defined in: [imported-resources/index.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/imported-resources/index.ts#L65)
+#### Defined in
+
+[imported-resources/index.ts:80](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L80)
+
+___
+
+### arrLanguages
+
+• **arrLanguages**: [`ILanguageType`](../interfaces/imported_resources.ILanguageType.md)[]
+
+#### Defined in
+
+[imported-resources/index.ts:89](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L89)
 
 ___
 
 ### countries
 
-• `Const` **countries**: [*ICountryDataType*](../interfaces/imported_resources.icountrydatatype.md)
+• **countries**: [`ICountryDataType`](../interfaces/imported_resources.ICountryDataType.md)
 
-Defined in: [imported-resources/index.ts:54](https://github.com/onzag/itemize/blob/5fcde7cf/imported-resources/index.ts#L54)
+#### Defined in
+
+[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L68)
 
 ___
 
 ### currencies
 
-• `Const` **currencies**: [*ICurrencyDataType*](../interfaces/imported_resources.icurrencydatatype.md)
+• **currencies**: [`ICurrencyDataType`](../interfaces/imported_resources.ICurrencyDataType.md)
 
-Defined in: [imported-resources/index.ts:55](https://github.com/onzag/itemize/blob/5fcde7cf/imported-resources/index.ts#L55)
+#### Defined in
+
+[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L69)
+
+___
+
+### languages
+
+• **languages**: [`ILanguageDataType`](../interfaces/imported_resources.ILanguageDataType.md)
+
+#### Defined in
+
+[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/f2f29986/imported-resources/index.ts#L70)

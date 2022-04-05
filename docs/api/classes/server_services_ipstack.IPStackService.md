@@ -1,0 +1,947 @@
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / [server/services/ipstack](../modules/server_services_ipstack.md) / IPStackService
+
+# Class: IPStackService
+
+[server/services/ipstack](../modules/server_services_ipstack.md).IPStackService
+
+## Hierarchy
+
+- [`default`](server_services_base_UserLocalizationProvider.default.md)<[`IPStackConfig`](../interfaces/server_services_ipstack.IPStackConfig.md)\>
+
+  ↳ **`IPStackService`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](server_services_ipstack.IPStackService.md#constructor)
+
+### Properties
+
+- [appConfig](server_services_ipstack.IPStackService.md#appconfig)
+- [appSensitiveConfig](server_services_ipstack.IPStackService.md#appsensitiveconfig)
+- [config](server_services_ipstack.IPStackService.md#config)
+- [globalCustomServices](server_services_ipstack.IPStackService.md#globalcustomservices)
+- [globalDatabaseConnection](server_services_ipstack.IPStackService.md#globaldatabaseconnection)
+- [globalInstance](server_services_ipstack.IPStackService.md#globalinstance)
+- [globalMailProvider](server_services_ipstack.IPStackService.md#globalmailprovider)
+- [globalPhoneProvider](server_services_ipstack.IPStackService.md#globalphoneprovider)
+- [globalRawDB](server_services_ipstack.IPStackService.md#globalrawdb)
+- [globalRedis](server_services_ipstack.IPStackService.md#globalredis)
+- [globalRedisPub](server_services_ipstack.IPStackService.md#globalredispub)
+- [globalRedisSub](server_services_ipstack.IPStackService.md#globalredissub)
+- [globalRoot](server_services_ipstack.IPStackService.md#globalroot)
+- [instanceName](server_services_ipstack.IPStackService.md#instancename)
+- [localAppData](server_services_ipstack.IPStackService.md#localappdata)
+- [localInstance](server_services_ipstack.IPStackService.md#localinstance)
+- [registry](server_services_ipstack.IPStackService.md#registry)
+
+### Methods
+
+- [execute](server_services_ipstack.IPStackService.md#execute)
+- [expressRouter](server_services_ipstack.IPStackService.md#expressrouter)
+- [getInstanceName](server_services_ipstack.IPStackService.md#getinstancename)
+- [getLocalizationFor](server_services_ipstack.IPStackService.md#getlocalizationfor)
+- [getRouter](server_services_ipstack.IPStackService.md#getrouter)
+- [getRunCycleTime](server_services_ipstack.IPStackService.md#getruncycletime)
+- [getTriggerRegistry](server_services_ipstack.IPStackService.md#gettriggerregistry)
+- [initialize](server_services_ipstack.IPStackService.md#initialize)
+- [isInstanceGlobal](server_services_ipstack.IPStackService.md#isinstanceglobal)
+- [isInstanceLocal](server_services_ipstack.IPStackService.md#isinstancelocal)
+- [logDebug](server_services_ipstack.IPStackService.md#logdebug)
+- [logError](server_services_ipstack.IPStackService.md#logerror)
+- [logInfo](server_services_ipstack.IPStackService.md#loginfo)
+- [requestInfoFor](server_services_ipstack.IPStackService.md#requestinfofor)
+- [run](server_services_ipstack.IPStackService.md#run)
+- [setInstanceName](server_services_ipstack.IPStackService.md#setinstancename)
+- [setupGlobalResources](server_services_ipstack.IPStackService.md#setupglobalresources)
+- [setupLocalResources](server_services_ipstack.IPStackService.md#setuplocalresources)
+- [expressRouter](server_services_ipstack.IPStackService.md#expressrouter)
+- [getRouter](server_services_ipstack.IPStackService.md#getrouter)
+- [getTriggerRegistry](server_services_ipstack.IPStackService.md#gettriggerregistry)
+- [getType](server_services_ipstack.IPStackService.md#gettype)
+- [logDebug](server_services_ipstack.IPStackService.md#logdebug)
+- [logError](server_services_ipstack.IPStackService.md#logerror)
+- [logInfo](server_services_ipstack.IPStackService.md#loginfo)
+
+## Constructors
+
+### constructor
+
+• **new IPStackService**(`config`, `registry`, `appConfig`, `appSensitiveConfig`)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IPStackConfig`](../interfaces/server_services_ipstack.IPStackConfig.md) |
+| `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
+| `appConfig` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
+| `appSensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[constructor](server_services_base_UserLocalizationProvider.default.md#constructor)
+
+#### Defined in
+
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L58)
+
+## Properties
+
+### appConfig
+
+• **appConfig**: [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[appConfig](server_services_base_UserLocalizationProvider.default.md#appconfig)
+
+#### Defined in
+
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L37)
+
+___
+
+### appSensitiveConfig
+
+• **appSensitiveConfig**: [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[appSensitiveConfig](server_services_base_UserLocalizationProvider.default.md#appsensitiveconfig)
+
+#### Defined in
+
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L38)
+
+___
+
+### config
+
+• **config**: [`IPStackConfig`](../interfaces/server_services_ipstack.IPStackConfig.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[config](server_services_base_UserLocalizationProvider.default.md#config)
+
+#### Defined in
+
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L35)
+
+___
+
+### globalCustomServices
+
+• **globalCustomServices**: `Object`
+
+#### Index signature
+
+▪ [name: `string`]: [`ServiceProvider`](server_services.ServiceProvider.md)<`any`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalCustomServices](server_services_base_UserLocalizationProvider.default.md#globalcustomservices)
+
+#### Defined in
+
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L48)
+
+___
+
+### globalDatabaseConnection
+
+• **globalDatabaseConnection**: `DatabaseConnection`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalDatabaseConnection](server_services_base_UserLocalizationProvider.default.md#globaldatabaseconnection)
+
+#### Defined in
+
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L40)
+
+___
+
+### globalInstance
+
+• **globalInstance**: `boolean`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalInstance](server_services_base_UserLocalizationProvider.default.md#globalinstance)
+
+#### Defined in
+
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L55)
+
+___
+
+### globalMailProvider
+
+• **globalMailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalMailProvider](server_services_base_UserLocalizationProvider.default.md#globalmailprovider)
+
+#### Defined in
+
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L46)
+
+___
+
+### globalPhoneProvider
+
+• **globalPhoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalPhoneProvider](server_services_base_UserLocalizationProvider.default.md#globalphoneprovider)
+
+#### Defined in
+
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L47)
+
+___
+
+### globalRawDB
+
+• **globalRawDB**: [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalRawDB](server_services_base_UserLocalizationProvider.default.md#globalrawdb)
+
+#### Defined in
+
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L44)
+
+___
+
+### globalRedis
+
+• **globalRedis**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalRedis](server_services_base_UserLocalizationProvider.default.md#globalredis)
+
+#### Defined in
+
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L43)
+
+___
+
+### globalRedisPub
+
+• **globalRedisPub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalRedisPub](server_services_base_UserLocalizationProvider.default.md#globalredispub)
+
+#### Defined in
+
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L41)
+
+___
+
+### globalRedisSub
+
+• **globalRedisSub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalRedisSub](server_services_base_UserLocalizationProvider.default.md#globalredissub)
+
+#### Defined in
+
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L42)
+
+___
+
+### globalRoot
+
+• **globalRoot**: [`default`](base_Root.default.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[globalRoot](server_services_base_UserLocalizationProvider.default.md#globalroot)
+
+#### Defined in
+
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L45)
+
+___
+
+### instanceName
+
+• **instanceName**: `string`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[instanceName](server_services_base_UserLocalizationProvider.default.md#instancename)
+
+#### Defined in
+
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L54)
+
+___
+
+### localAppData
+
+• **localAppData**: [`IAppDataType`](../interfaces/server.IAppDataType.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[localAppData](server_services_base_UserLocalizationProvider.default.md#localappdata)
+
+#### Defined in
+
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L52)
+
+___
+
+### localInstance
+
+• **localInstance**: `boolean`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[localInstance](server_services_base_UserLocalizationProvider.default.md#localinstance)
+
+#### Defined in
+
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L56)
+
+___
+
+### registry
+
+• **registry**: [`RegistryService`](server_services_registry.RegistryService.md)
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[registry](server_services_base_UserLocalizationProvider.default.md#registry)
+
+#### Defined in
+
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L36)
+
+## Methods
+
+### execute
+
+▸ **execute**(): `void`
+
+Performs the execution of the service, basically
+it will do the run function and then re-run as specified
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[execute](server_services_base_UserLocalizationProvider.default.md#execute)
+
+#### Defined in
+
+[server/services/index.ts:164](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L164)
+
+___
+
+### expressRouter
+
+▸ **expressRouter**(`options?`): `Router`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options?` | `RouterOptions` |
+
+#### Returns
+
+`Router`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[expressRouter](server_services_base_UserLocalizationProvider.default.md#expressrouter)
+
+#### Defined in
+
+[server/services/index.ts:110](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L110)
+
+___
+
+### getInstanceName
+
+▸ **getInstanceName**(): `string`
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getInstanceName](server_services_base_UserLocalizationProvider.default.md#getinstancename)
+
+#### Defined in
+
+[server/services/index.ts:74](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L74)
+
+___
+
+### getLocalizationFor
+
+▸ **getLocalizationFor**(`ip`, `fallback`): `Promise`<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
+
+Should provide the localization for the user
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ip` | `string` |
+| `fallback` | [`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md) |
+
+#### Returns
+
+`Promise`<[`IUserLocalizationType`](../interfaces/server_services_base_UserLocalizationProvider.IUserLocalizationType.md)\>
+
+#### Overrides
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getLocalizationFor](server_services_base_UserLocalizationProvider.default.md#getlocalizationfor)
+
+#### Defined in
+
+[server/services/ipstack.ts:107](https://github.com/onzag/itemize/blob/f2f29986/server/services/ipstack.ts#L107)
+
+___
+
+### getRouter
+
+▸ **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+
+Provides a router endpoint, the router endpoint
+will exist directly under the rest services
+this enables to create webhooks and other subservices
+that are attached to this service
+
+If the service provider if executed on a global environment
+the endpoint does not get created, this means that in the global
+manager this won't be executed, or anything that is meant
+for the global manager
+
+The router gets attached to /rest/service
+
+**`override`**
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+`Router` \| `Promise`<`Router`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getRouter](server_services_base_UserLocalizationProvider.default.md#getrouter)
+
+#### Defined in
+
+[server/services/index.ts:251](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L251)
+
+___
+
+### getRunCycleTime
+
+▸ **getRunCycleTime**(): `number`
+
+Determines whether the run function
+should run over again
+
+**`override`**
+
+#### Returns
+
+`number`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getRunCycleTime](server_services_base_UserLocalizationProvider.default.md#getruncycletime)
+
+#### Defined in
+
+[server/services/index.ts:224](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L224)
+
+___
+
+### getTriggerRegistry
+
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+
+Allows to setup trigger registries via the service
+so that they trigger just as normal trigger will do
+
+**`override`**
+
+#### Returns
+
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getTriggerRegistry](server_services_base_UserLocalizationProvider.default.md#gettriggerregistry)
+
+#### Defined in
+
+[server/services/index.ts:278](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L278)
+
+___
+
+### initialize
+
+▸ **initialize**(): `void` \| `Promise`<`void`\>
+
+This function is executed during
+the initialization of the service
+
+If your service is a global service you will
+have access to the global resources while
+this function executes
+
+**`override`**
+
+#### Returns
+
+`void` \| `Promise`<`void`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[initialize](server_services_base_UserLocalizationProvider.default.md#initialize)
+
+#### Defined in
+
+[server/services/index.ts:215](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L215)
+
+___
+
+### isInstanceGlobal
+
+▸ **isInstanceGlobal**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[isInstanceGlobal](server_services_base_UserLocalizationProvider.default.md#isinstanceglobal)
+
+#### Defined in
+
+[server/services/index.ts:78](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L78)
+
+___
+
+### isInstanceLocal
+
+▸ **isInstanceLocal**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[isInstanceLocal](server_services_base_UserLocalizationProvider.default.md#isinstancelocal)
+
+#### Defined in
+
+[server/services/index.ts:82](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L82)
+
+___
+
+### logDebug
+
+▸ **logDebug**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logDebug](server_services_base_UserLocalizationProvider.default.md#logdebug)
+
+#### Defined in
+
+[server/services/index.ts:90](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L90)
+
+___
+
+### logError
+
+▸ **logError**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logError](server_services_base_UserLocalizationProvider.default.md#logerror)
+
+#### Defined in
+
+[server/services/index.ts:94](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L94)
+
+___
+
+### logInfo
+
+▸ **logInfo**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logInfo](server_services_base_UserLocalizationProvider.default.md#loginfo)
+
+#### Defined in
+
+[server/services/index.ts:86](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L86)
+
+___
+
+### requestInfoFor
+
+▸ `Private` **requestInfoFor**(`ip`): `Promise`<`IPStackResponse`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ip` | `string` |
+
+#### Returns
+
+`Promise`<`IPStackResponse`\>
+
+#### Defined in
+
+[server/services/ipstack.ts:45](https://github.com/onzag/itemize/blob/f2f29986/server/services/ipstack.ts#L45)
+
+___
+
+### run
+
+▸ **run**(): `void` \| `Promise`<`void`\>
+
+Executes some code
+
+**`override`**
+
+#### Returns
+
+`void` \| `Promise`<`void`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[run](server_services_base_UserLocalizationProvider.default.md#run)
+
+#### Defined in
+
+[server/services/index.ts:232](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L232)
+
+___
+
+### setInstanceName
+
+▸ **setInstanceName**(`n`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `n` | `string` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[setInstanceName](server_services_base_UserLocalizationProvider.default.md#setinstancename)
+
+#### Defined in
+
+[server/services/index.ts:70](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L70)
+
+___
+
+### setupGlobalResources
+
+▸ **setupGlobalResources**(`globalDatabaseConnection`, `globalClient`, `globalPub`, `globalSub`, `globalMailProvider`, `globalPhoneProvider`, `globalCustomServices`, `root`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `globalDatabaseConnection` | `DatabaseConnection` |
+| `globalClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
+| `globalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
+| `globalSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
+| `globalMailProvider` | [`default`](server_services_base_MailProvider.default.md)<`any`\> |
+| `globalPhoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)<`any`\> |
+| `globalCustomServices` | `Object` |
+| `root` | [`default`](base_Root.default.md) |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[setupGlobalResources](server_services_base_UserLocalizationProvider.default.md#setupglobalresources)
+
+#### Defined in
+
+[server/services/index.ts:118](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L118)
+
+___
+
+### setupLocalResources
+
+▸ **setupLocalResources**(`appData`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[setupLocalResources](server_services_base_UserLocalizationProvider.default.md#setuplocalresources)
+
+#### Defined in
+
+[server/services/index.ts:142](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L142)
+
+___
+
+### expressRouter
+
+▸ `Static` **expressRouter**(`options?`): `Router`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options?` | `RouterOptions` |
+
+#### Returns
+
+`Router`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[expressRouter](server_services_base_UserLocalizationProvider.default.md#expressrouter)
+
+#### Defined in
+
+[server/services/index.ts:114](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L114)
+
+___
+
+### getRouter
+
+▸ `Static` **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+
+Provides a router endpoint, but this method
+is static, which means it only gets added once
+
+If the service provider if executed on a global environment
+the endpoint does not get created, this means that in the global
+manager this won't be executed, or anything that is meant
+for the global manager
+
+the router gets attached to /rest/service
+
+**`override`**
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+`Router` \| `Promise`<`Router`\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getRouter](server_services_base_UserLocalizationProvider.default.md#getrouter)
+
+#### Defined in
+
+[server/services/index.ts:268](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L268)
+
+___
+
+### getTriggerRegistry
+
+▸ `Static` **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+
+Allows to setup trigger registries via the service
+so that they trigger just as normal trigger will do
+
+This gets attached if a class is used rather than per instance
+
+**`override`**
+
+#### Returns
+
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getTriggerRegistry](server_services_base_UserLocalizationProvider.default.md#gettriggerregistry)
+
+#### Defined in
+
+[server/services/index.ts:290](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L290)
+
+___
+
+### getType
+
+▸ `Static` **getType**(): [`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+
+Specifies whether the current service is a global service
+if true global services will only execute initialize and a router
+will not be extracted from them
+
+it will instead have access to the global resources
+
+#### Returns
+
+[`ServiceProviderType`](../enums/server_services.ServiceProviderType.md)
+
+#### Overrides
+
+[default](server_services_base_UserLocalizationProvider.default.md).[getType](server_services_base_UserLocalizationProvider.default.md#gettype)
+
+#### Defined in
+
+[server/services/ipstack.ts:42](https://github.com/onzag/itemize/blob/f2f29986/server/services/ipstack.ts#L42)
+
+___
+
+### logDebug
+
+▸ `Static` **logDebug**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logDebug](server_services_base_UserLocalizationProvider.default.md#logdebug)
+
+#### Defined in
+
+[server/services/index.ts:102](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L102)
+
+___
+
+### logError
+
+▸ `Static` **logError**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logError](server_services_base_UserLocalizationProvider.default.md#logerror)
+
+#### Defined in
+
+[server/services/index.ts:106](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L106)
+
+___
+
+### logInfo
+
+▸ `Static` **logInfo**(`str`, `extra?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+| `extra?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_UserLocalizationProvider.default.md).[logInfo](server_services_base_UserLocalizationProvider.default.md#loginfo)
+
+#### Defined in
+
+[server/services/index.ts:98](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L98)

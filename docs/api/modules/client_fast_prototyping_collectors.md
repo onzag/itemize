@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/collectors
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/collectors
 
 # Module: client/fast-prototyping/collectors
 
@@ -15,9 +15,11 @@ in SSR
 
 ### styleCollector
 
-• `Const` **styleCollector**: [*ICollectorType*](../interfaces/client.icollectortype.md)
+• **styleCollector**: [`ICollectorType`](../interfaces/client.ICollectorType.md)
 
 This collector is a valid collector type for usage with the
 style collector for the initialization of the app in the server side
 
-Defined in: [client/fast-prototyping/collectors.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/collectors.ts#L22)
+#### Defined in
+
+[client/fast-prototyping/collectors.tsx:23](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/collectors.tsx#L23)

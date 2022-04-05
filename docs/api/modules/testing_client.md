@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/client
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/client
 
 # Module: testing/client
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [ClientTest](../classes/testing_client.clienttest.md)
+- [ClientTest](../classes/testing_client.ClientTest.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers/roles
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers/roles
 
 # Module: server/resolvers/roles
 
@@ -6,12 +6,13 @@
 
 ### Enumerations
 
-- [CustomRoleGranterEnvironment](../enums/server_resolvers_roles.customrolegranterenvironment.md)
+- [CustomRoleGranterEnvironment](../enums/server_resolvers_roles.CustomRoleGranterEnvironment.md)
 
 ### Classes
 
-- [CustomRoleManager](../classes/server_resolvers_roles.customrolemanager.md)
+- [CustomRoleManager](../classes/server_resolvers_roles.CustomRoleManager.md)
 
 ### Interfaces
 
-- [ICustomRoleType](../interfaces/server_resolvers_roles.icustomroletype.md)
+- [ICustomRoleGranterArg](../interfaces/server_resolvers_roles.ICustomRoleGranterArg.md)
+- [ICustomRoleType](../interfaces/server_resolvers_roles.ICustomRoleType.md)

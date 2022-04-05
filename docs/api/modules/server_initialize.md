@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/initialize
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/initialize
 
 # Module: server/initialize
 
@@ -16,18 +16,22 @@ and whatever the server requires to show something to the client
 
 ### initializeApp
 
-▸ **initializeApp**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `custom`: [*IServerCustomizationDataType*](../interfaces/server.iservercustomizationdatatype.md), `routers`: express.Router[]): *void*
+▸ **initializeApp**(`appData`, `custom`, `routers`): `void`
 
 Initializes the server application with its configuration
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) | the application data to use   |
-`custom` | [*IServerCustomizationDataType*](../interfaces/server.iservercustomizationdatatype.md) | the custom config that has been passed    |
-`routers` | express.Router[] | - |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | the application data to use |
+| `custom` | [`IServerCustomizationDataType`](../interfaces/server.IServerCustomizationDataType.md) | the custom config that has been passed |
+| `routers` | `Router`[] | - |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [server/initialize.ts:109](https://github.com/onzag/itemize/blob/5fcde7cf/server/initialize.ts#L109)
+`void`
+
+#### Defined in
+
+[server/initialize.ts:110](https://github.com/onzag/itemize/blob/f2f29986/server/initialize.ts#L110)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar/external-dialogs
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar/external-dialogs
 
 # Module: client/fast-prototyping/components/navbar/external-dialogs
 
@@ -6,20 +6,26 @@ Contains an external dialog that are usually referred errors and messages
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [ExternalDialogs](client_fast_prototyping_components_navbar_external_dialogs.md#externaldialogs)
 
-## Variables
+## Functions
 
 ### ExternalDialogs
 
-• `Const` **ExternalDialogs**: *ComponentType*<*Pick*<{ `classes`: *Record*<*needsUpdateContent*, string\>  }, never\> & *StyledComponentProps*<*needsUpdateContent*\>\>
+▸ **ExternalDialogs**(): `Element`
 
 The external dialogs component, given a
 err, msg, and msgTitle in the query string, all as string will
 display a dialog as long as they are there
 
-**`returns`** a react element
+#### Returns
 
-Defined in: [client/fast-prototyping/components/navbar/external-dialogs.tsx:29](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/external-dialogs.tsx#L29)
+`Element`
+
+a react element
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/external-dialogs.tsx:31](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/navbar/external-dialogs.tsx#L31)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/components/property/base
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/components/property/base
 
 # Module: client/components/property/base
 
@@ -9,12 +9,13 @@ in a single function single the logic that handles this under the hood is remark
 
 ### Interfaces
 
-- [IPropertyBaseProps](../interfaces/client_components_property_base.ipropertybaseprops.md)
-- [IPropertyBaseWithRendererProps](../interfaces/client_components_property_base.ipropertybasewithrendererprops.md)
-- [IPropertyEntryProps](../interfaces/client_components_property_base.ipropertyentryprops.md)
-- [IPropertyReadProps](../interfaces/client_components_property_base.ipropertyreadprops.md)
-- [IPropertySetterProps](../interfaces/client_components_property_base.ipropertysetterprops.md)
-- [IPropertyViewProps](../interfaces/client_components_property_base.ipropertyviewprops.md)
+- [IPropertyBaseProps](../interfaces/client_components_property_base.IPropertyBaseProps.md)
+- [IPropertyBaseWithRendererProps](../interfaces/client_components_property_base.IPropertyBaseWithRendererProps.md)
+- [IPropertyCoreProps](../interfaces/client_components_property_base.IPropertyCoreProps.md)
+- [IPropertyEntryProps](../interfaces/client_components_property_base.IPropertyEntryProps.md)
+- [IPropertyReadProps](../interfaces/client_components_property_base.IPropertyReadProps.md)
+- [IPropertySetterProps](../interfaces/client_components_property_base.IPropertySetterProps.md)
+- [IPropertyViewProps](../interfaces/client_components_property_base.IPropertyViewProps.md)
 
 ### Functions
 
@@ -24,20 +25,24 @@ in a single function single the logic that handles this under the hood is remark
 
 ### EntryViewReadSet
 
-▸ **EntryViewReadSet**(`props`: *IPropertyEntryViewReadSetProps*<any\>, `type`: *entry* \| *view* \| *read* \| *set*): *Element*
+▸ **EntryViewReadSet**(`props`, `type`): `Element`
 
 This is a legit function that takes all the props in order to pipe them
 to the proper handler
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | *IPropertyEntryViewReadSetProps*<any\> | the props that are passed   |
-`type` | *entry* \| *view* \| *read* \| *set* | the type, entry, view, read, or set   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `IPropertyEntryViewReadSetProps`<`any`\> | the props that are passed |
+| `type` | ``"entry"`` \| ``"view"`` \| ``"read"`` \| ``"set"`` | the type, entry, view, read, or set |
 
-**Returns:** *Element*
+#### Returns
+
+`Element`
 
 a react component
 
-Defined in: [client/components/property/base.tsx:184](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/property/base.tsx#L184)
+#### Defined in
+
+[client/components/property/base.tsx:203](https://github.com/onzag/itemize/blob/f2f29986/client/components/property/base.tsx#L203)

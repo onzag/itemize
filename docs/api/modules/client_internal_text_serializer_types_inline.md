@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/inline
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/inline
 
 # Module: client/internal/text/serializer/types/inline
 
@@ -10,7 +10,7 @@ it's primarily used for the templated components
 
 ### Interfaces
 
-- [IInline](../interfaces/client_internal_text_serializer_types_inline.iinline.md)
+- [IInline](../interfaces/client_internal_text_serializer_types_inline.IInline.md)
 
 ### Functions
 
@@ -20,17 +20,21 @@ it's primarily used for the templated components
 
 ### registerInline
 
-▸ **registerInline**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerInline**(`registry`): `void`
 
 The function that registers and adds the inline in the given
 reigstry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/inline.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/inline.ts#L19)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/inline.ts:18](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/inline.ts#L18)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / base/remote-protocol
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / base/remote-protocol
 
 # Module: base/remote-protocol
 
@@ -12,22 +12,26 @@ that is implemented by the remote listener
 
 ### Interfaces
 
-- [IBuildNumberEvent](../interfaces/base_remote_protocol.ibuildnumberevent.md)
-- [IChangedFeedbackEvent](../interfaces/base_remote_protocol.ichangedfeedbackevent.md)
-- [IErrorEvent](../interfaces/base_remote_protocol.ierrorevent.md)
-- [IFeedbackRequest](../interfaces/base_remote_protocol.ifeedbackrequest.md)
-- [IIdentifyRequest](../interfaces/base_remote_protocol.iidentifyrequest.md)
-- [IOwnedSearchFeedbackRequest](../interfaces/base_remote_protocol.iownedsearchfeedbackrequest.md)
-- [IOwnedSearchRecordsEvent](../interfaces/base_remote_protocol.iownedsearchrecordsevent.md)
-- [IOwnedSearchRegisterRequest](../interfaces/base_remote_protocol.iownedsearchregisterrequest.md)
-- [IOwnedSearchUnregisterRequest](../interfaces/base_remote_protocol.iownedsearchunregisterrequest.md)
-- [IParentedSearchFeedbackRequest](../interfaces/base_remote_protocol.iparentedsearchfeedbackrequest.md)
-- [IParentedSearchRecordsEvent](../interfaces/base_remote_protocol.iparentedsearchrecordsevent.md)
-- [IParentedSearchRegisterRequest](../interfaces/base_remote_protocol.iparentedsearchregisterrequest.md)
-- [IParentedSearchUnregisterRequest](../interfaces/base_remote_protocol.iparentedsearchunregisterrequest.md)
-- [IRedisEvent](../interfaces/base_remote_protocol.iredisevent.md)
-- [IRegisterRequest](../interfaces/base_remote_protocol.iregisterrequest.md)
-- [IUnregisterRequest](../interfaces/base_remote_protocol.iunregisterrequest.md)
+- [IBuildNumberEvent](../interfaces/base_remote_protocol.IBuildNumberEvent.md)
+- [IChangedFeedbackEvent](../interfaces/base_remote_protocol.IChangedFeedbackEvent.md)
+- [IErrorEvent](../interfaces/base_remote_protocol.IErrorEvent.md)
+- [IFeedbackRequest](../interfaces/base_remote_protocol.IFeedbackRequest.md)
+- [IIdentifyRequest](../interfaces/base_remote_protocol.IIdentifyRequest.md)
+- [IOwnedParentedSearchFeedbackRequest](../interfaces/base_remote_protocol.IOwnedParentedSearchFeedbackRequest.md)
+- [IOwnedParentedSearchRecordsEvent](../interfaces/base_remote_protocol.IOwnedParentedSearchRecordsEvent.md)
+- [IOwnedParentedSearchRegisterRequest](../interfaces/base_remote_protocol.IOwnedParentedSearchRegisterRequest.md)
+- [IOwnedParentedSearchUnregisterRequest](../interfaces/base_remote_protocol.IOwnedParentedSearchUnregisterRequest.md)
+- [IOwnedSearchFeedbackRequest](../interfaces/base_remote_protocol.IOwnedSearchFeedbackRequest.md)
+- [IOwnedSearchRecordsEvent](../interfaces/base_remote_protocol.IOwnedSearchRecordsEvent.md)
+- [IOwnedSearchRegisterRequest](../interfaces/base_remote_protocol.IOwnedSearchRegisterRequest.md)
+- [IOwnedSearchUnregisterRequest](../interfaces/base_remote_protocol.IOwnedSearchUnregisterRequest.md)
+- [IParentedSearchFeedbackRequest](../interfaces/base_remote_protocol.IParentedSearchFeedbackRequest.md)
+- [IParentedSearchRecordsEvent](../interfaces/base_remote_protocol.IParentedSearchRecordsEvent.md)
+- [IParentedSearchRegisterRequest](../interfaces/base_remote_protocol.IParentedSearchRegisterRequest.md)
+- [IParentedSearchUnregisterRequest](../interfaces/base_remote_protocol.IParentedSearchUnregisterRequest.md)
+- [IRedisEvent](../interfaces/base_remote_protocol.IRedisEvent.md)
+- [IRegisterRequest](../interfaces/base_remote_protocol.IRegisterRequest.md)
+- [IUnregisterRequest](../interfaces/base_remote_protocol.IUnregisterRequest.md)
 
 ### Variables
 
@@ -41,10 +45,17 @@ that is implemented by the remote listener
 - [IDENTIFY\_REQUEST](base_remote_protocol.md#identify_request)
 - [IdentifyRequestSchema](base_remote_protocol.md#identifyrequestschema)
 - [KICKED\_EVENT](base_remote_protocol.md#kicked_event)
+- [OWNED\_PARENTED\_SEARCH\_FEEDBACK\_REQUEST](base_remote_protocol.md#owned_parented_search_feedback_request)
+- [OWNED\_PARENTED\_SEARCH\_RECORDS\_EVENT](base_remote_protocol.md#owned_parented_search_records_event)
+- [OWNED\_PARENTED\_SEARCH\_REGISTER\_REQUEST](base_remote_protocol.md#owned_parented_search_register_request)
+- [OWNED\_PARENTED\_SEARCH\_UNREGISTER\_REQUEST](base_remote_protocol.md#owned_parented_search_unregister_request)
 - [OWNED\_SEARCH\_FEEDBACK\_REQUEST](base_remote_protocol.md#owned_search_feedback_request)
 - [OWNED\_SEARCH\_RECORDS\_EVENT](base_remote_protocol.md#owned_search_records_event)
 - [OWNED\_SEARCH\_REGISTER\_REQUEST](base_remote_protocol.md#owned_search_register_request)
 - [OWNED\_SEARCH\_UNREGISTER\_REQUEST](base_remote_protocol.md#owned_search_unregister_request)
+- [OwnedParentedSearchFeedbackRequestSchema](base_remote_protocol.md#ownedparentedsearchfeedbackrequestschema)
+- [OwnedParentedSearchRegisterRequestSchema](base_remote_protocol.md#ownedparentedsearchregisterrequestschema)
+- [OwnedParentedSearchUnregisterRequestSchema](base_remote_protocol.md#ownedparentedsearchunregisterrequestschema)
 - [OwnedSearchFeedbackRequestSchema](base_remote_protocol.md#ownedsearchfeedbackrequestschema)
 - [OwnedSearchRegisterRequestSchema](base_remote_protocol.md#ownedsearchregisterrequestschema)
 - [OwnedSearchUnregisterRequestSchema](base_remote_protocol.md#ownedsearchunregisterrequestschema)
@@ -60,422 +71,711 @@ that is implemented by the remote listener
 - [UNREGISTER\_REQUEST](base_remote_protocol.md#unregister_request)
 - [UnregisterRequestSchema](base_remote_protocol.md#unregisterrequestschema)
 
+### Functions
+
+- [generateBasicMergedIndexIdentifier](base_remote_protocol.md#generatebasicmergedindexidentifier)
+- [generateOwnedParentedSearchMergedIndexIdentifier](base_remote_protocol.md#generateownedparentedsearchmergedindexidentifier)
+- [generateOwnedSearchMergedIndexIdentifier](base_remote_protocol.md#generateownedsearchmergedindexidentifier)
+- [generateParentedSearchMergedIndexIdentifier](base_remote_protocol.md#generateparentedsearchmergedindexidentifier)
+
 ## Variables
 
 ### BUILDNUMBER\_EVENT
 
-• `Const` **BUILDNUMBER\_EVENT**: *buildnumber*= "buildnumber"
+• **BUILDNUMBER\_EVENT**: ``"buildnumber"``
 
 The build number event is an event streamed from the
 server to the client once this client has connected
 
-Defined in: [base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L19)
+#### Defined in
+
+[base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L19)
 
 ___
 
 ### CHANGED\_FEEEDBACK\_EVENT
 
-• `Const` **CHANGED\_FEEEDBACK\_EVENT**: *changed*= "changed"
+• **CHANGED\_FEEEDBACK\_EVENT**: ``"changed"``
 
 Event that comes from the server when something has
 changed or as an answer from a feedback request
 
-Defined in: [base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L67)
+#### Defined in
+
+[base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L67)
 
 ___
 
 ### CURRENCY\_FACTORS\_UPDATED\_EVENT
 
-• `Const` **CURRENCY\_FACTORS\_UPDATED\_EVENT**: *currency-factors-updated*= "currency-factors-updated"
+• **CURRENCY\_FACTORS\_UPDATED\_EVENT**: ``"currency-factors-updated"``
 
 This event occurs when the currency factors have been changed and it streams to
 every socket that just happens to be connected, not just identified but just
 connected into it, while the data could be attached, we really want to perform
 the request to the server in order to ensure that it is cached
 
-Defined in: [base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L34)
+#### Defined in
+
+[base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L34)
 
 ___
 
 ### ERROR\_EVENT
 
-• `Const` **ERROR\_EVENT**: *listener-error*= "listener-error"
+• **ERROR\_EVENT**: ``"listener-error"``
 
 This is streamed to the client once the server hits an error
 that was somehow caused by the client, there's no much use
 for an error event other than notice invalid requests
 
-Defined in: [base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L41)
+#### Defined in
+
+[base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L41)
 
 ___
 
 ### FEEDBACK\_REQUEST
 
-• `Const` **FEEDBACK\_REQUEST**: *feedback*= "feedback"
+• **FEEDBACK\_REQUEST**: ``"feedback"``
 
 a request that is sent to the server in order to
 request feedback for a single item definition
 
-Defined in: [base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L260)
+#### Defined in
+
+[base/remote-protocol.ts:272](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L272)
 
 ___
 
 ### FeedbackRequestSchema
 
-• `Const` **FeedbackRequestSchema**: *object*
+• **FeedbackRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.id` | *object* |
-`properties.id.type` | *string* |
-`properties.itemDefinition` | *object* |
-`properties.itemDefinition.type` | *string* |
-`properties.version` | *object* |
-`properties.version.type` | *string*[] |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.id` | `Object` |
+| `properties.id.type` | `string` |
+| `properties.itemDefinition` | `Object` |
+| `properties.itemDefinition.type` | `string` |
+| `properties.version` | `Object` |
+| `properties.version.type` | `string`[] |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:271](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L271)
+#### Defined in
+
+[base/remote-protocol.ts:283](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L283)
 
 ___
 
 ### IDENTIFIED\_EVENT
 
-• `Const` **IDENTIFIED\_EVENT**: *identified*= "identified"
+• **IDENTIFIED\_EVENT**: ``"identified"``
 
 Identified event comes once the user has been identified properly
 
-Defined in: [base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L54)
+#### Defined in
+
+[base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L54)
 
 ___
 
 ### IDENTIFY\_REQUEST
 
-• `Const` **IDENTIFY\_REQUEST**: *identify*= "identify"
+• **IDENTIFY\_REQUEST**: ``"identify"``
 
 The identify request comes when a socket first connects and identifies
 itself (this must be the first request, or otherwise other requests will
 be ignored)
 
-Defined in: [base/remote-protocol.ts:161](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L161)
+#### Defined in
+
+[base/remote-protocol.ts:173](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L173)
 
 ___
 
 ### IdentifyRequestSchema
 
-• `Const` **IdentifyRequestSchema**: *object*
+• **IdentifyRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.token` | *object* |
-`properties.token.type` | *string*[] |
-`properties.uuid` | *object* |
-`properties.uuid.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.token` | `Object` |
+| `properties.token.type` | `string`[] |
+| `properties.uuid` | `Object` |
+| `properties.uuid.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:170](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L170)
+#### Defined in
+
+[base/remote-protocol.ts:182](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L182)
 
 ___
 
 ### KICKED\_EVENT
 
-• `Const` **KICKED\_EVENT**: *kicked*= "kicked"
+• **KICKED\_EVENT**: ``"kicked"``
 
 Event that occurs when the user has been kicked, when log out
 from all devices has been triggered, users are kicked out and forcefully
 logged out, this even also occurs on an invalid identified event
 
-Defined in: [base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L61)
+#### Defined in
+
+[base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L61)
+
+___
+
+### OWNED\_PARENTED\_SEARCH\_FEEDBACK\_REQUEST
+
+• **OWNED\_PARENTED\_SEARCH\_FEEDBACK\_REQUEST**: ``"owned-parented-search-feedback"``
+
+The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
+
+#### Defined in
+
+[base/remote-protocol.ts:624](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L624)
+
+___
+
+### OWNED\_PARENTED\_SEARCH\_RECORDS\_EVENT
+
+• **OWNED\_PARENTED\_SEARCH\_RECORDS\_EVENT**: ``"owned-parented-search-records"``
+
+When they are owned parented items the parent type and id, that has been cached
+using those
+
+#### Defined in
+
+[base/remote-protocol.ts:158](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L158)
+
+___
+
+### OWNED\_PARENTED\_SEARCH\_REGISTER\_REQUEST
+
+• **OWNED\_PARENTED\_SEARCH\_REGISTER\_REQUEST**: ``"owned-parented-search-register"``
+
+this is necessary for parented searches in order to run parented by
+cached searches and then request for updates
+
+#### Defined in
+
+[base/remote-protocol.ts:353](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L353)
+
+___
+
+### OWNED\_PARENTED\_SEARCH\_UNREGISTER\_REQUEST
+
+• **OWNED\_PARENTED\_SEARCH\_UNREGISTER\_REQUEST**: ``"owned-parented-search-unregister"``
+
+The unregister version of [OWNED_PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#owned_parented_search_register_request)
+
+#### Defined in
+
+[base/remote-protocol.ts:496](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L496)
 
 ___
 
 ### OWNED\_SEARCH\_FEEDBACK\_REQUEST
 
-• `Const` **OWNED\_SEARCH\_FEEDBACK\_REQUEST**: *owned-search-feedback*= "owned-search-feedback"
+• **OWNED\_SEARCH\_FEEDBACK\_REQUEST**: ``"owned-search-feedback"``
 
 The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:462](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L462)
+#### Defined in
+
+[base/remote-protocol.ts:553](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L553)
 
 ___
 
 ### OWNED\_SEARCH\_RECORDS\_EVENT
 
-• `Const` **OWNED\_SEARCH\_RECORDS\_EVENT**: *owned-search-records*= "owned-search-records"
+• **OWNED\_SEARCH\_RECORDS\_EVENT**: ``"owned-search-records"``
 
 When they are owned items, as a search has been cached using a creator
 as a base
 
-Defined in: [base/remote-protocol.ts:130](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L130)
+#### Defined in
+
+[base/remote-protocol.ts:130](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L130)
 
 ___
 
 ### OWNED\_SEARCH\_REGISTER\_REQUEST
 
-• `Const` **OWNED\_SEARCH\_REGISTER\_REQUEST**: *owned-search-register*= "owned-search-register"
+• **OWNED\_SEARCH\_REGISTER\_REQUEST**: ``"owned-search-register"``
 
 this is necessary for owned searches in order to run created by
 cached searches and then request for updates
 
-Defined in: [base/remote-protocol.ts:306](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L306)
+#### Defined in
+
+[base/remote-protocol.ts:318](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L318)
 
 ___
 
 ### OWNED\_SEARCH\_UNREGISTER\_REQUEST
 
-• `Const` **OWNED\_SEARCH\_UNREGISTER\_REQUEST**: *owned-search-unregister*= "owned-search-unregister"
+• **OWNED\_SEARCH\_UNREGISTER\_REQUEST**: ``"owned-search-unregister"``
 
 The unregister version of [OWNED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#owned_search_register_request)
 
-Defined in: [base/remote-protocol.ts:381](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L381)
+#### Defined in
+
+[base/remote-protocol.ts:434](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L434)
+
+___
+
+### OwnedParentedSearchFeedbackRequestSchema
+
+• **OwnedParentedSearchFeedbackRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.lastModified` | `Object` |
+| `properties.lastModified.type` | `string`[] |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:631](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L631)
+
+___
+
+### OwnedParentedSearchRegisterRequestSchema
+
+• **OwnedParentedSearchRegisterRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:394](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L394)
+
+___
+
+### OwnedParentedSearchUnregisterRequestSchema
+
+• **OwnedParentedSearchUnregisterRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:503](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L503)
 
 ___
 
 ### OwnedSearchFeedbackRequestSchema
 
-• `Const` **OwnedSearchFeedbackRequestSchema**: *object*
+• **OwnedSearchFeedbackRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.createdBy` | *object* |
-`properties.createdBy.type` | *string* |
-`properties.lastModified` | *object* |
-`properties.lastModified.type` | *string*[] |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.lastModified` | `Object` |
+| `properties.lastModified.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:470](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L470)
+#### Defined in
+
+[base/remote-protocol.ts:561](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L561)
 
 ___
 
 ### OwnedSearchRegisterRequestSchema
 
-• `Const` **OwnedSearchRegisterRequestSchema**: *object*
+• **OwnedSearchRegisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.createdBy` | *object* |
-`properties.createdBy.type` | *string* |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:315](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L315)
+#### Defined in
+
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L327)
 
 ___
 
 ### OwnedSearchUnregisterRequestSchema
 
-• `Const` **OwnedSearchUnregisterRequestSchema**: *object*
+• **OwnedSearchUnregisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.createdBy` | *object* |
-`properties.createdBy.type` | *string* |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.createdBy` | `Object` |
+| `properties.createdBy.type` | `string` |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:388](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L388)
+#### Defined in
+
+[base/remote-protocol.ts:441](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L441)
 
 ___
 
 ### PARENTED\_SEARCH\_FEEDBACK\_REQUEST
 
-• `Const` **PARENTED\_SEARCH\_FEEDBACK\_REQUEST**: *parented-search-feedback*= "parented-search-feedback"
+• **PARENTED\_SEARCH\_FEEDBACK\_REQUEST**: ``"parented-search-feedback"``
 
 The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:493](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L493)
+#### Defined in
+
+[base/remote-protocol.ts:584](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L584)
 
 ___
 
 ### PARENTED\_SEARCH\_RECORDS\_EVENT
 
-• `Const` **PARENTED\_SEARCH\_RECORDS\_EVENT**: *parented-search-records*= "parented-search-records"
+• **PARENTED\_SEARCH\_RECORDS\_EVENT**: ``"parented-search-records"``
 
 When they are parented items the parent type and id, that has been cached
 using those
 
-Defined in: [base/remote-protocol.ts:143](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L143)
+#### Defined in
+
+[base/remote-protocol.ts:143](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L143)
 
 ___
 
 ### PARENTED\_SEARCH\_REGISTER\_REQUEST
 
-• `Const` **PARENTED\_SEARCH\_REGISTER\_REQUEST**: *parented-search-register*= "parented-search-register"
+• **PARENTED\_SEARCH\_REGISTER\_REQUEST**: ``"parented-search-register"``
 
 this is necessary for parented searches in order to run parented by
 cached searches and then request for updates
 
-Defined in: [base/remote-protocol.ts:335](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L335)
+#### Defined in
+
+[base/remote-protocol.ts:347](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L347)
 
 ___
 
 ### PARENTED\_SEARCH\_UNREGISTER\_REQUEST
 
-• `Const` **PARENTED\_SEARCH\_UNREGISTER\_REQUEST**: *parented-search-unregister*= "parented-search-unregister"
+• **PARENTED\_SEARCH\_UNREGISTER\_REQUEST**: ``"parented-search-unregister"``
 
 The unregister version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
 
-Defined in: [base/remote-protocol.ts:407](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L407)
+#### Defined in
+
+[base/remote-protocol.ts:460](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L460)
 
 ___
 
 ### ParentedSearchFeedbackRequestSchema
 
-• `Const` **ParentedSearchFeedbackRequestSchema**: *object*
+• **ParentedSearchFeedbackRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.lastModified` | *object* |
-`properties.lastModified.type` | *string*[] |
-`properties.parentId` | *object* |
-`properties.parentId.type` | *string* |
-`properties.parentType` | *object* |
-`properties.parentType.type` | *string* |
-`properties.parentVersion` | *object* |
-`properties.parentVersion.type` | *string*[] |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.lastModified` | `Object` |
+| `properties.lastModified.type` | `string`[] |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:502](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L502)
+#### Defined in
+
+[base/remote-protocol.ts:593](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L593)
 
 ___
 
 ### ParentedSearchRegisterRequestSchema
 
-• `Const` **ParentedSearchRegisterRequestSchema**: *object*
+• **ParentedSearchRegisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.parentId` | *object* |
-`properties.parentId.type` | *string* |
-`properties.parentType` | *object* |
-`properties.parentType.type` | *string* |
-`properties.parentVersion` | *object* |
-`properties.parentVersion.type` | *string*[] |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:345](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L345)
+#### Defined in
+
+[base/remote-protocol.ts:364](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L364)
 
 ___
 
 ### ParentedSearchUnregisterRequestSchema
 
-• `Const` **ParentedSearchUnregisterRequestSchema**: *object*
+• **ParentedSearchUnregisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.parentId` | *object* |
-`properties.parentId.type` | *string* |
-`properties.parentType` | *object* |
-`properties.parentType.type` | *string* |
-`properties.parentVersion` | *object* |
-`properties.parentVersion.type` | *string*[] |
-`properties.qualifiedPathName` | *object* |
-`properties.qualifiedPathName.type` | *string* |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.parentId` | `Object` |
+| `properties.parentId.type` | `string` |
+| `properties.parentType` | `Object` |
+| `properties.parentType.type` | `string` |
+| `properties.parentVersion` | `Object` |
+| `properties.parentVersion.type` | `string`[] |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:416](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L416)
+#### Defined in
+
+[base/remote-protocol.ts:469](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L469)
 
 ___
 
 ### REGISTER\_REQUEST
 
-• `Const` **REGISTER\_REQUEST**: *register*= "register"
+• **REGISTER\_REQUEST**: ``"register"``
 
 The request that is sent to the server in order to register
 a single item definition for updates and changes
 
-Defined in: [base/remote-protocol.ts:190](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L190)
+#### Defined in
+
+[base/remote-protocol.ts:202](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L202)
 
 ___
 
 ### RegisterRequestSchema
 
-• `Const` **RegisterRequestSchema**: *object*
+• **RegisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.id` | *object* |
-`properties.id.type` | *string* |
-`properties.itemDefinition` | *object* |
-`properties.itemDefinition.type` | *string* |
-`properties.version` | *object* |
-`properties.version.type` | *string*[] |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.id` | `Object` |
+| `properties.id.type` | `string` |
+| `properties.itemDefinition` | `Object` |
+| `properties.itemDefinition.type` | `string` |
+| `properties.version` | `Object` |
+| `properties.version.type` | `string`[] |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:202](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L202)
+#### Defined in
+
+[base/remote-protocol.ts:214](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L214)
 
 ___
 
 ### UNREGISTER\_REQUEST
 
-• `Const` **UNREGISTER\_REQUEST**: *unregister*= "unregister"
+• **UNREGISTER\_REQUEST**: ``"unregister"``
 
 Request to unregister and stop getting notifications from
 a single item definition
 
-Defined in: [base/remote-protocol.ts:226](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L226)
+#### Defined in
+
+[base/remote-protocol.ts:238](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L238)
 
 ___
 
 ### UnregisterRequestSchema
 
-• `Const` **UnregisterRequestSchema**: *object*
+• **UnregisterRequestSchema**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`properties` | *object* |
-`properties.id` | *object* |
-`properties.id.type` | *string* |
-`properties.itemDefinition` | *object* |
-`properties.itemDefinition.type` | *string* |
-`properties.version` | *object* |
-`properties.version.type` | *string*[] |
-`required` | *string*[] |
-`type` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.id` | `Object` |
+| `properties.id.type` | `string` |
+| `properties.itemDefinition` | `Object` |
+| `properties.itemDefinition.type` | `string` |
+| `properties.version` | `Object` |
+| `properties.version.type` | `string`[] |
+| `required` | `string`[] |
+| `type` | `string` |
 
-Defined in: [base/remote-protocol.ts:236](https://github.com/onzag/itemize/blob/5fcde7cf/base/remote-protocol.ts#L236)
+#### Defined in
+
+[base/remote-protocol.ts:248](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L248)
+
+## Functions
+
+### generateBasicMergedIndexIdentifier
+
+▸ **generateBasicMergedIndexIdentifier**(`idefOrMod`, `id`, `version`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `idefOrMod` | `string` |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/remote-protocol.ts:674](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L674)
+
+___
+
+### generateOwnedParentedSearchMergedIndexIdentifier
+
+▸ **generateOwnedParentedSearchMergedIndexIdentifier**(`idefOrModSearchIsAgainst`, `createdBy`, `parentType`, `parentId`, `parentVersion`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `idefOrModSearchIsAgainst` | `string` |
+| `createdBy` | `string` |
+| `parentType` | `string` |
+| `parentId` | `string` |
+| `parentVersion` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/remote-protocol.ts:698](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L698)
+
+___
+
+### generateOwnedSearchMergedIndexIdentifier
+
+▸ **generateOwnedSearchMergedIndexIdentifier**(`idefOrModSearchIsAgainst`, `createdBy`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `idefOrModSearchIsAgainst` | `string` |
+| `createdBy` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/remote-protocol.ts:682](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L682)
+
+___
+
+### generateParentedSearchMergedIndexIdentifier
+
+▸ **generateParentedSearchMergedIndexIdentifier**(`idefOrModSearchIsAgainst`, `parentType`, `parentId`, `parentVersion`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `idefOrModSearchIsAgainst` | `string` |
+| `parentType` | `string` |
+| `parentId` | `string` |
+| `parentVersion` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/remote-protocol.ts:689](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L689)

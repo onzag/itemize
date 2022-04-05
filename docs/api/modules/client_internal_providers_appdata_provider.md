@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/providers/appdata-provider
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/providers/appdata-provider
 
 # Module: client/internal/providers/appdata-provider
 
@@ -8,11 +8,11 @@ Contains the data provider that provides application specific information
 
 ### Classes
 
-- [DataProvider](../classes/client_internal_providers_appdata_provider.dataprovider.md)
+- [DataProvider](../classes/client_internal_providers_appdata_provider.DataProvider.md)
 
 ### Interfaces
 
-- [IDataContextType](../interfaces/client_internal_providers_appdata_provider.idatacontexttype.md)
+- [IDataContextType](../interfaces/client_internal_providers_appdata_provider.IDataContextType.md)
 
 ### Variables
 
@@ -22,9 +22,11 @@ Contains the data provider that provides application specific information
 
 ### DataContext
 
-• `Const` **DataContext**: *Context*<[*IDataContextType*](../interfaces/client_internal_providers_appdata_provider.idatacontexttype.md)\>
+• **DataContext**: `Context`<[`IDataContextType`](../interfaces/client_internal_providers_appdata_provider.IDataContextType.md)\>
 
 The data context provides the root as well as remote listener and whether
 the update is blocked to any component that demands it under the tree
 
-Defined in: [client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/appdata-provider.tsx#L35)
+#### Defined in
+
+[client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/appdata-provider.tsx#L35)

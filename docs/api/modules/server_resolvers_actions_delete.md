@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers/actions/delete
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers/actions/delete
 
 # Module: server/resolvers/actions/delete
 
@@ -13,32 +13,40 @@
 
 ### deleteItemDefinition
 
-▸ **deleteItemDefinition**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<any\>
+▸ **deleteItemDefinition**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<`any`\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
 
-**Returns:** *Promise*<any\>
+#### Returns
 
-Defined in: [server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/delete.ts#L29)
+`Promise`<`any`\>
+
+#### Defined in
+
+[server/resolvers/actions/delete.ts:33](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/delete.ts#L33)
 
 ___
 
 ### deleteItemDefinitionFn
 
-▸ **deleteItemDefinitionFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **deleteItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/delete.ts:286](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/delete.ts#L286)
+[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/delete.ts:332](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/delete.ts#L332)

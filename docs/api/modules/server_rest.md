@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/rest
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/rest
 
 # Module: server/rest
 
@@ -14,18 +14,22 @@ This provides the rest endpoints for the itemize app
 
 ### default
 
-▸ **default**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): *Router*
+▸ **default**(`appData`): `Router`
 
 this function contains and build all the rest services
 by returning a router that holds them inside the
 /rest/ endpoint
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) | the app data that it passes    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | the app data that it passes |
 
-**Returns:** *Router*
+#### Returns
 
-Defined in: [server/rest.ts:23](https://github.com/onzag/itemize/blob/5fcde7cf/server/rest.ts#L23)
+`Router`
+
+#### Defined in
+
+[server/rest.ts:24](https://github.com/onzag/itemize/blob/f2f29986/server/rest.ts#L24)

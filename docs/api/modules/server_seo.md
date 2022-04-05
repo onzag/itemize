@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/seo
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/seo
 
 # Module: server/seo
 
@@ -8,9 +8,9 @@ Contains the interfaces for generating SEO
 
 ### Interfaces
 
-- [ISEOCollectedData](../interfaces/server_seo.iseocollecteddata.md)
-- [ISEOCollectedResult](../interfaces/server_seo.iseocollectedresult.md)
-- [ISEOCollectionRequest](../interfaces/server_seo.iseocollectionrequest.md)
-- [ISEOParametrizer](../interfaces/server_seo.iseoparametrizer.md)
-- [ISEORule](../interfaces/server_seo.iseorule.md)
-- [ISEORuleSet](../interfaces/server_seo.iseoruleset.md)
+- [ISEOCollectedData](../interfaces/server_seo.ISEOCollectedData.md)
+- [ISEOCollectedResult](../interfaces/server_seo.ISEOCollectedResult.md)
+- [ISEOCollectionRequest](../interfaces/server_seo.ISEOCollectionRequest.md)
+- [ISEOParametrizer](../interfaces/server_seo.ISEOParametrizer.md)
+- [ISEORule](../interfaces/server_seo.ISEORule.md)
+- [ISEORuleSet](../interfaces/server_seo.ISEORuleSet.md)

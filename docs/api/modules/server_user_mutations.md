@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/user/mutations
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/user/mutations
 
 # Module: server/user/mutations
 
@@ -12,14 +12,18 @@
 
 ### customUserMutations
 
-▸ `Const`**customUserMutations**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): *object*
+▸ `Const` **customUserMutations**(`appData`): `Object`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** *object*
+#### Returns
 
-Defined in: [server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/5fcde7cf/server/user/mutations.ts#L3)
+`Object`
+
+#### Defined in
+
+[server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/f2f29986/server/user/mutations.ts#L3)

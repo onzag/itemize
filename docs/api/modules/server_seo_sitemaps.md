@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/seo/sitemaps
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/seo/sitemaps
 
 # Module: server/seo/sitemaps
 
@@ -9,8 +9,8 @@ structure to the XML type
 
 ### Interfaces
 
-- [ISitemapJSONType](../interfaces/server_seo_sitemaps.isitemapjsontype.md)
-- [ISitemapLastQueryType](../interfaces/server_seo_sitemaps.isitemaplastquerytype.md)
+- [ISitemapJSONType](../interfaces/server_seo_sitemaps.ISitemapJSONType.md)
+- [ISitemapLastQueryType](../interfaces/server_seo_sitemaps.ISitemapLastQueryType.md)
 
 ### Functions
 
@@ -20,20 +20,24 @@ structure to the XML type
 
 ### toXML
 
-▸ **toXML**(`src`: [*ISitemapJSONType*](../interfaces/server_seo_sitemaps.isitemapjsontype.md), `targetDomain`: *string*, `sourcePrefix`: *string*, `prefixURL?`: *string*, `suffixURL?`: *string*): *string*
+▸ **toXML**(`src`, `targetDomain`, `sourcePrefix`, `prefixURL?`, `suffixURL?`): `string`
 
 Converts a json sitemap file to a proper sitemap
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`src` | [*ISitemapJSONType*](../interfaces/server_seo_sitemaps.isitemapjsontype.md) | the json source   |
-`targetDomain` | *string* | the target domain that we are making a SEO for   |
-`sourcePrefix` | *string* | the source prefix (aka openstack/local prefix) where we store our files   |
-`prefixURL?` | *string* | an optional prefix url to add between the source prefix and the target domain   |
-`suffixURL?` | *string* | an optional suffix to add to the end    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `src` | [`ISitemapJSONType`](../interfaces/server_seo_sitemaps.ISitemapJSONType.md) | the json source |
+| `targetDomain` | `string` | the target domain that we are making a SEO for |
+| `sourcePrefix` | `string` | the source prefix (aka openstack/local prefix) where we store our files |
+| `prefixURL?` | `string` | an optional prefix url to add between the source prefix and the target domain |
+| `suffixURL?` | `string` | an optional suffix to add to the end |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/server/seo/sitemaps.ts#L41)
+`string`
+
+#### Defined in
+
+[server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/seo/sitemaps.ts#L41)

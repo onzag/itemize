@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/drawer/styles
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/drawer/styles
 
 # Module: client/fast-prototyping/components/slate/drawer/styles
 
@@ -15,17 +15,21 @@ to set all the inline styles for the component
 
 ### StylesOptions
 
-▸ **StylesOptions**(`props`: [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md)): *Element*
+▸ **StylesOptions**(`props`): `Element`
 
 Provides the component that contains the multiselector for the rich classes
 as well as allows to set active, hover and standard styles for the component
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md) | the props for the templating which is literally the whole options of the wrapper itself    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | the props for the templating which is literally the whole options of the wrapper itself |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/fast-prototyping/components/slate/drawer/styles.tsx:295](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/drawer/styles.tsx#L295)
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/drawer/styles.tsx:329](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/styles.tsx#L329)

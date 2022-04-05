@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/user/rest
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/user/rest
 
 # Module: server/user/rest
 
@@ -6,8 +6,7 @@
 
 ### Interfaces
 
-- [IUnsubscribeUserTokenDataType](../interfaces/server_user_rest.iunsubscribeusertokendatatype.md)
-- [IValidateUserTokenDataType](../interfaces/server_user_rest.ivalidateusertokendatatype.md)
+- [IUnsubscribeUserTokenDataType](../interfaces/server_user_rest.IUnsubscribeUserTokenDataType.md)
 
 ### Functions
 
@@ -17,14 +16,18 @@
 
 ### userRestServices
 
-▸ **userRestServices**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): *Router*
+▸ **userRestServices**(`appData`): `Router`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** *Router*
+#### Returns
 
-Defined in: [server/user/rest.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/server/user/rest.ts#L19)
+`Router`
+
+#### Defined in
+
+[server/user/rest.ts:16](https://github.com/onzag/itemize/blob/f2f29986/server/user/rest.ts#L16)

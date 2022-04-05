@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server/robots
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server/robots
 
 # Module: testing/server/robots
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [RobotsTest](../classes/testing_server_robots.robotstest.md)
+- [RobotsTest](../classes/testing_server_robots.RobotsTest.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/cache
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/cache
 
 # Module: server/cache
 
@@ -11,4 +11,4 @@ functionality to update, create and delete item definition values
 
 ### Classes
 
-- [Cache](../classes/server_cache.cache.md)
+- [Cache](../classes/server_cache.Cache.md)

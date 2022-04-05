@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/providers/config-provider
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/providers/config-provider
 
 # Module: client/internal/providers/config-provider
 
@@ -8,7 +8,7 @@ Provides the configuration files down the line
 
 ### Interfaces
 
-- [IConfigProviderProps](../interfaces/client_internal_providers_config_provider.iconfigproviderprops.md)
+- [IConfigProviderProps](../interfaces/client_internal_providers_config_provider.IConfigProviderProps.md)
 
 ### Variables
 
@@ -22,28 +22,34 @@ Provides the configuration files down the line
 
 ### ConfigContext
 
-• `Const` **ConfigContext**: *Context*<[*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md)\>
+• **ConfigContext**: `Context`<[`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)\>
 
 The context that provides the configuration
 
-Defined in: [client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/config-provider.tsx#L12)
+#### Defined in
+
+[client/internal/providers/config-provider.tsx:12](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/config-provider.tsx#L12)
 
 ## Functions
 
 ### ConfigProvider
 
-▸ **ConfigProvider**(`props`: [*IConfigProviderProps*](../interfaces/client_internal_providers_config_provider.iconfigproviderprops.md)): *Element*
+▸ **ConfigProvider**(`props`): `Element`
 
 The config provider allows to create a config context
 should be placed even on top of the app itself
 as the config is static
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | [*IConfigProviderProps*](../interfaces/client_internal_providers_config_provider.iconfigproviderprops.md) | the config props    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | [`IConfigProviderProps`](../interfaces/client_internal_providers_config_provider.IConfigProviderProps.md) | the config props |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/config-provider.tsx#L28)
+`Element`
+
+#### Defined in
+
+[client/internal/providers/config-provider.tsx:28](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/config-provider.tsx#L28)

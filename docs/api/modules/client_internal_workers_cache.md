@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/workers/cache
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/workers/cache
 
 # Module: client/internal/workers/cache
 
@@ -16,13 +16,16 @@ the cache worker can be accessed easily as such
 
 ### default
 
-• `Const` **default**: *object*
+• **default**: `Object`
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`instance` | *Remote*<[*default*](../classes/client_internal_workers_cache_cache_worker.default.md)\> |
-`isSupported` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `getProxy` | (`obj`: `unknown`) => `ProxyMarked` |
+| `instance` | `Remote`<[`default`](../classes/client_internal_workers_cache_cache_worker.default.md)\> |
+| `isSupported` | `any` |
 
-Defined in: [client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/workers/cache/index.ts#L35)
+#### Defined in
+
+[client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/index.ts#L35)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/dialogs/template-element
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/dialogs/template-element
 
 # Module: client/fast-prototyping/components/slate/dialogs/template-element
 
@@ -9,4 +9,4 @@ a templated element bit, both html and text type
 
 ### Classes
 
-- [TemplateElementDialog](../classes/client_fast_prototyping_components_slate_dialogs_template_element.templateelementdialog.md)
+- [TemplateElementDialog](../classes/client_fast_prototyping_components_slate_dialogs_template_element.TemplateElementDialog.md)

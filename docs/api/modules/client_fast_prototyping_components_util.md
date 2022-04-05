@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/util
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/util
 
 # Module: client/fast-prototyping/components/util
 
@@ -8,22 +8,32 @@ Contains fast prototyping utilities for fast developing
 
 ### Classes
 
-- [SlowLoadingElement](../classes/client_fast_prototyping_components_util.slowloadingelement.md)
+- [SlowLoadingElement](../classes/client_fast_prototyping_components_util.SlowLoadingElement.md)
 
-### Variables
+### Functions
 
 - [ProgressingElement](client_fast_prototyping_components_util.md#progressingelement)
 
-## Variables
+## Functions
 
 ### ProgressingElement
 
-• `Const` **ProgressingElement**: *ComponentType*<*Pick*<IProgressingElementProps, *children* \| *fullWidth* \| *className* \| *isProgressing* \| *progressCircleSize* \| *delayDuration*\> & *StyledComponentProps*<string\>\>
+▸ **ProgressingElement**(`props`): `Element`
 
 Shows a loading circle on top of a component to show that such is loading
 
-**`param`** the loading props
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `IProgressingElementProps` | the loading props |
 
-Defined in: [client/fast-prototyping/components/util.tsx:74](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/util.tsx#L74)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/util.tsx:78](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/util.tsx#L78)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/local-storage
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/local-storage
 
 # Module: server/services/local-storage
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [LocalStorageService](../classes/server_services_local_storage.localstorageservice.md)
+- [LocalStorageService](../classes/server_services_local_storage.LocalStorageService.md)

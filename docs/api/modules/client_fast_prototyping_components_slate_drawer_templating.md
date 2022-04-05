@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/drawer/templating
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/drawer/templating
 
 # Module: client/fast-prototyping/components/slate/drawer/templating
 
@@ -15,17 +15,21 @@ to set the for-each and context key
 
 ### TemplatingOptions
 
-▸ **TemplatingOptions**(`props`: [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md)): *Element*
+▸ **TemplatingOptions**(`props`): `Element`
 
 Provides the component that contains the both selectors for both
 each and context key for usage in templating
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md) | the props for the templating which is literally the whole options of the wrapper itself    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | the props for the templating which is literally the whole options of the wrapper itself |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/fast-prototyping/components/slate/drawer/templating.tsx:207](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/drawer/templating.tsx#L207)
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/drawer/templating.tsx:228](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/templating.tsx#L228)

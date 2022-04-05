@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/currency-picker
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/currency-picker
 
 # Module: client/fast-prototyping/components/currency-picker
 
@@ -9,4 +9,4 @@ to select a currency
 
 ### Classes
 
-- [CurrencyPicker](../classes/client_fast_prototyping_components_currency_picker.currencypicker.md)
+- [CurrencyPicker](../classes/client_fast_prototyping_components_currency_picker.CurrencyPicker.md)

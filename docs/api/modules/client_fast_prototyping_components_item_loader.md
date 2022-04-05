@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/item-loader
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/item-loader
 
 # Module: client/fast-prototyping/components/item-loader
 
@@ -6,20 +6,30 @@ Utilities for loading item definitions
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [ItemLoader](client_fast_prototyping_components_item_loader.md#itemloader)
 
-## Variables
+## Functions
 
 ### ItemLoader
 
-• `Const` **ItemLoader**: *ComponentType*<*Pick*<ItemLoaderProps, *children* \| *fullWidth* \| *notFoundMessageI18nId* \| *blockedMessageI18nId* \| *notFoundImage* \| *blockedImage* \| *errorImage* \| *msWaitedToShowLoadingAnimation* \| *childrenMustWaitUntilItsLoaded*\> & *StyledComponentProps*<*container* \| *fullWidthContainer* \| *flexingContainer* \| *circularProgress*\>\>
+▸ **ItemLoader**(`props`): `Element`
 
 The item definition loader allows to handle cases of not found, blocked or errors in a nice way
 
-**`param`** the loader props
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ItemLoaderProps` | the loader props |
 
-Defined in: [client/fast-prototyping/components/item-loader.tsx:97](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/item-loader.tsx#L97)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/item-loader.tsx:125](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/item-loader.tsx#L125)

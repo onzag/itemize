@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/dynamic-component
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/dynamic-component
 
 # Module: client/internal/text/serializer/dynamic-component
 
@@ -9,4 +9,4 @@ an active styles
 
 ### Classes
 
-- [ReactifiedElementWithHoverAndActive](../classes/client_internal_text_serializer_dynamic_component.reactifiedelementwithhoverandactive.md)
+- [ReactifiedElementWithHoverAndActive](../classes/client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md)

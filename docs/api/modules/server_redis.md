@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/redis
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/redis
 
 # Module: server/redis
 
@@ -9,7 +9,7 @@ the itemize redis client differs a little bit from the standard client
 
 ### Classes
 
-- [ItemizeRedisClient](../classes/server_redis.itemizeredisclient.md)
+- [ItemizeRedisClient](../classes/server_redis.ItemizeRedisClient.md)
 
 ### Functions
 
@@ -19,18 +19,22 @@ the itemize redis client differs a little bit from the standard client
 
 ### setupRedisClient
 
-▸ **setupRedisClient**(`name`: *string*, `config`: [*ISingleRedisConfigRawJSONDataType*](../interfaces/config.isingleredisconfigrawjsondatatype.md), `onConnect?`: (`client`: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md), `isReconnect`: *boolean*) => *Promise*<void\>): *Promise*<[*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)\>
+▸ **setupRedisClient**(`name`, `config`, `onConnect?`): `Promise`<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
 
 Setups a redis client to be an itemize redis client
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`name` | *string* | the name we want to give it   |
-`config` | [*ISingleRedisConfigRawJSONDataType*](../interfaces/config.isingleredisconfigrawjsondatatype.md) | the configuration for redis client   |
-`onConnect?` | (`client`: [*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md), `isReconnect`: *boolean*) => *Promise*<void\> | a function to run on connect    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `name` | `string` | the name we want to give it |
+| `config` | [`ISingleRedisConfigRawJSONDataType`](../interfaces/config.ISingleRedisConfigRawJSONDataType.md) | the configuration for redis client |
+| `onConnect?` | (`client`: [`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md), `isReconnect`: `boolean`) => `Promise`<`void`\> | a function to run on connect |
 
-**Returns:** *Promise*<[*ItemizeRedisClient*](../classes/server_redis.itemizeredisclient.md)\>
+#### Returns
 
-Defined in: [server/redis.ts:142](https://github.com/onzag/itemize/blob/5fcde7cf/server/redis.ts#L142)
+`Promise`<[`ItemizeRedisClient`](../classes/server_redis.ItemizeRedisClient.md)\>
+
+#### Defined in
+
+[server/redis.ts:142](https://github.com/onzag/itemize/blob/f2f29986/server/redis.ts#L142)

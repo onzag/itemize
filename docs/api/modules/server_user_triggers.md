@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/user/triggers
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/user/triggers
 
 # Module: server/user/triggers
 
@@ -12,6 +12,8 @@
 
 ### customUserTriggers
 
-• `Const` **customUserTriggers**: [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)
+• **customUserTriggers**: [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
-Defined in: [server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/5fcde7cf/server/user/triggers.ts#L7)
+#### Defined in
+
+[server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/f2f29986/server/user/triggers.ts#L7)

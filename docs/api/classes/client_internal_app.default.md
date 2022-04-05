@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / [client/internal/app](../modules/client_internal_app.md) / default
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/internal/app](../modules/client_internal_app.md) / default
 
 # Class: default
 
@@ -11,9 +11,9 @@ such as the router
 
 ## Hierarchy
 
-* *Component*<IAppProps, IAppState\>
+- `Component`<`IAppProps`, `IAppState`\>
 
-  ↳ **default**
+  ↳ **`default`**
 
 ## Table of contents
 
@@ -63,25 +63,29 @@ such as the router
 
 ### constructor
 
-\+ **new default**(`props`: IAppProps): [*default*](client_internal_app.default.md)
+• **new default**(`props`)
 
 The itemize app constructor
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | IAppProps | props for the app    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `IAppProps` | props for the app |
 
-**Returns:** [*default*](client_internal_app.default.md)
+#### Overrides
 
-Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L144)
+React.Component&lt;IAppProps, IAppState\&gt;.constructor
+
+#### Defined in
+
+[client/internal/app/index.tsx:150](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L150)
 
 ## Properties
 
 ### context
 
-• **context**: *any*
+• **context**: `any`
 
 If using the new style context, re-declare this in your class to be the
 `React.ContextType` of your `static contextType`.
@@ -97,66 +101,96 @@ declare context: React.ContextType<typeof MyContext>
 
 **`see`** https://reactjs.org/docs/context.html
 
-Defined in: node_modules/@types/react/index.d.ts:476
+#### Inherited from
+
+React.Component.context
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:479
 
 ___
 
 ### props
 
-• `Readonly` **props**: *Readonly*<IAppProps\> & *Readonly*<{ `children?`: ReactNode  }\>
+• `Readonly` **props**: `Readonly`<`IAppProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\>
 
-Defined in: node_modules/@types/react/index.d.ts:501
+#### Inherited from
+
+React.Component.props
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:504
 
 ___
 
 ### refs
 
-• **refs**: *object*
+• **refs**: `Object`
 
-**`deprecated`** 
+**`deprecated`**
 https://reactjs.org/docs/refs-and-the-dom.html#legacy-api-string-refs
 
-#### Type declaration:
+#### Index signature
 
-Defined in: node_modules/@types/react/index.d.ts:507
+▪ [key: `string`]: `ReactInstance`
+
+#### Inherited from
+
+React.Component.refs
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:510
 
 ___
 
 ### remoteListener
 
-• `Private` **remoteListener**: [*RemoteListener*](client_internal_app_remote_listener.remotelistener.md)= null
+• `Private` **remoteListener**: [`RemoteListener`](client_internal_app_remote_listener.RemoteListener.md) = `null`
 
 the remote listener object that listens for the remote changes
 and does the registration of itemize items that are loaded in order for listen to changes
 as well as buildnumbers, currency factors changed info, etc...
 
-Defined in: [client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L144)
+#### Defined in
+
+[client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L144)
 
 ___
 
 ### state
 
-• **state**: *Readonly*<IAppState\>
+• **state**: `Readonly`<`IAppState`\>
 
-Defined in: node_modules/@types/react/index.d.ts:502
+#### Inherited from
+
+React.Component.state
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:505
 
 ___
 
 ### tokenState
 
-• `Private` **tokenState**: [*IActualTokenProviderState*](../interfaces/client_internal_providers_token_provider.iactualtokenproviderstate.md)= null
+• `Private` **tokenState**: [`IActualTokenProviderState`](../interfaces/client_internal_providers_token_provider.IActualTokenProviderState.md) = `null`
 
 This is the token state that is actually given by the token provider that sits inside
 the application itself, the reason why this app itself needs it, it's because the remote listener
 as well as the update functions need token provider
 
-Defined in: [client/internal/app/index.tsx:138](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L138)
+#### Defined in
+
+[client/internal/app/index.tsx:138](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L138)
 
 ___
 
 ### contextType
 
-▪ `Optional` `Static` **contextType**: *Context*<any\>
+▪ `Static` `Optional` **contextType**: `Context`<`any`\>
 
 If set, `this.context` will be set at runtime to the current value of the given Context.
 
@@ -177,13 +211,19 @@ class Foo extends React.Component {
 
 **`see`** https://reactjs.org/docs/context.html#classcontexttype
 
-Defined in: node_modules/@types/react/index.d.ts:458
+#### Inherited from
+
+React.Component.contextType
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:461
 
 ## Methods
 
 ### UNSAFE\_componentWillMount
 
-▸ `Optional`**UNSAFE_componentWillMount**(): *void*
+▸ `Optional` **UNSAFE_componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -199,15 +239,23 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:712
+`void`
+
+#### Inherited from
+
+React.Component.UNSAFE\_componentWillMount
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:717
 
 ___
 
 ### UNSAFE\_componentWillReceiveProps
 
-▸ `Optional`**UNSAFE_componentWillReceiveProps**(`nextProps`: *Readonly*<IAppProps\>, `nextContext`: *any*): *void*
+▸ `Optional` **UNSAFE_componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -226,22 +274,30 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`nextProps` | *Readonly*<IAppProps\> |
-`nextContext` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `nextProps` | `Readonly`<`IAppProps`\> |
+| `nextContext` | `any` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:744
+`void`
+
+#### Inherited from
+
+React.Component.UNSAFE\_componentWillReceiveProps
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:749
 
 ___
 
 ### UNSAFE\_componentWillUpdate
 
-▸ `Optional`**UNSAFE_componentWillUpdate**(`nextProps`: *Readonly*<IAppProps\>, `nextState`: *Readonly*<IAppState\>, `nextContext`: *any*): *void*
+▸ `Optional` **UNSAFE_componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -258,138 +314,182 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`nextProps` | *Readonly*<IAppProps\> |
-`nextState` | *Readonly*<IAppState\> |
-`nextContext` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `nextProps` | `Readonly`<`IAppProps`\> |
+| `nextState` | `Readonly`<`IAppState`\> |
+| `nextContext` | `any` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:772
+`void`
+
+#### Inherited from
+
+React.Component.UNSAFE\_componentWillUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:777
 
 ___
 
 ### changeCountryTo
 
-▸ **changeCountryTo**(`code`: *string*, `avoidChangingLanguageAndCurrency?`: *boolean*, `avoidUpdatingUser?`: *boolean*): *Promise*<void\>
+▸ **changeCountryTo**(`code`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`): `Promise`<`void`\>
 
 changes the country given a specific country code
 changing the country will trigger an automatic change
 of currency and language
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`code` | *string* | the two letter uppercase code for the country   |
-`avoidChangingLanguageAndCurrency?` | *boolean* | avoids changing the language and the currency   |
-`avoidUpdatingUser?` | *boolean* | avoids updating the user    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `code` | `string` | the two letter uppercase code for the country |
+| `avoidChangingLanguageAndCurrency?` | `boolean` | avoids changing the language and the currency |
+| `avoidUpdatingUser?` | `boolean` | avoids updating the user |
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:445](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L445)
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/app/index.tsx:449](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L449)
 
 ___
 
 ### changeCurrencyTo
 
-▸ **changeCurrencyTo**(`code`: *string*, `avoidUpdatingUser?`: *boolean*): *void*
+▸ **changeCurrencyTo**(`code`, `avoidUpdatingUser?`): `void`
 
 Changes the currency to a given currency code
 given its 3 letter uppercase code
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`code` | *string* | the three letter uppercase code of the currency   |
-`avoidUpdatingUser?` | *boolean* | whether to avoid updating the user    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `code` | `string` | the three letter uppercase code of the currency |
+| `avoidUpdatingUser?` | `boolean` | whether to avoid updating the user |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:515](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L515)
+`void`
+
+#### Defined in
+
+[client/internal/app/index.tsx:519](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L519)
 
 ___
 
 ### changeLanguageTo
 
-▸ **changeLanguageTo**(`locale`: *string*, `avoidUpdatingUser?`: *boolean*): *Promise*<void\>
+▸ **changeLanguageTo**(`locale`, `avoidUpdatingUser?`): `Promise`<`void`\>
 
 Changes the language for the one specified by that locale
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`locale` | *string* | the two letter or language-region code for the locale   |
-`avoidUpdatingUser?` | *boolean* | whether to avoid updating the user    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale` | `string` | the two letter or language-region code for the locale |
+| `avoidUpdatingUser?` | `boolean` | whether to avoid updating the user |
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:364](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L364)
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/app/index.tsx:368](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L368)
 
 ___
 
 ### componentDidCatch
 
-▸ `Optional`**componentDidCatch**(`error`: Error, `errorInfo`: ErrorInfo): *void*
+▸ `Optional` **componentDidCatch**(`error`, `errorInfo`): `void`
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`error` | Error |
-`errorInfo` | ErrorInfo |
+| Name | Type |
+| :------ | :------ |
+| `error` | `Error` |
+| `errorInfo` | `ErrorInfo` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:641
+`void`
+
+#### Inherited from
+
+React.Component.componentDidCatch
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:646
 
 ___
 
 ### componentDidMount
 
-▸ `Optional`**componentDidMount**(): *void*
+▸ `Optional` **componentDidMount**(): `void`
 
 Called immediately after a component is mounted. Setting state here will trigger re-rendering.
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:620
+`void`
+
+#### Inherited from
+
+React.Component.componentDidMount
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:625
 
 ___
 
 ### componentDidUpdate
 
-▸ `Optional`**componentDidUpdate**(`prevProps`: *Readonly*<IAppProps\>, `prevState`: *Readonly*<IAppState\>, `snapshot?`: *any*): *void*
+▸ `Optional` **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
 
 Called immediately after updating occurs. Not called for the initial render.
 
 The snapshot is only present if getSnapshotBeforeUpdate is present and returns non-null.
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`prevProps` | *Readonly*<IAppProps\> |
-`prevState` | *Readonly*<IAppState\> |
-`snapshot?` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `prevProps` | `Readonly`<`IAppProps`\> |
+| `prevState` | `Readonly`<`IAppState`\> |
+| `snapshot?` | `any` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:683
+`void`
+
+#### Inherited from
+
+React.Component.componentDidUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:688
 
 ___
 
 ### componentWillMount
 
-▸ `Optional`**componentWillMount**(): *void*
+▸ `Optional` **componentWillMount**(): `void`
 
 Called immediately before mounting occurs, and before `Component#render`.
 Avoid introducing any side-effects or subscriptions in this method.
@@ -403,15 +503,23 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:698
+`void`
+
+#### Inherited from
+
+React.Component.componentWillMount
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:703
 
 ___
 
 ### componentWillReceiveProps
 
-▸ `Optional`**componentWillReceiveProps**(`nextProps`: *Readonly*<IAppProps\>, `nextContext`: *any*): *void*
+▸ `Optional` **componentWillReceiveProps**(`nextProps`, `nextContext`): `void`
 
 Called when the component may be receiving new props.
 React may call this even if props have not changed, so be sure to compare new and existing
@@ -428,35 +536,51 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`nextProps` | *Readonly*<IAppProps\> |
-`nextContext` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `nextProps` | `Readonly`<`IAppProps`\> |
+| `nextContext` | `any` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:727
+`void`
+
+#### Inherited from
+
+React.Component.componentWillReceiveProps
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:732
 
 ___
 
 ### componentWillUnmount
 
-▸ `Optional`**componentWillUnmount**(): *void*
+▸ `Optional` **componentWillUnmount**(): `void`
 
 Called immediately before a component is destroyed. Perform any necessary cleanup in this method, such as
 cancelled network requests, or cleaning up any DOM elements created in `componentDidMount`.
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:636
+`void`
+
+#### Inherited from
+
+React.Component.componentWillUnmount
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:641
 
 ___
 
 ### componentWillUpdate
 
-▸ `Optional`**componentWillUpdate**(`nextProps`: *Readonly*<IAppProps\>, `nextState`: *Readonly*<IAppState\>, `nextContext`: *any*): *void*
+▸ `Optional` **componentWillUpdate**(`nextProps`, `nextState`, `nextContext`): `void`
 
 Called immediately before rendering when new props or state is received. Not called for the initial render.
 
@@ -471,60 +595,80 @@ prevents this from being invoked.
 
 **`see`** https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`nextProps` | *Readonly*<IAppProps\> |
-`nextState` | *Readonly*<IAppState\> |
-`nextContext` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `nextProps` | `Readonly`<`IAppProps`\> |
+| `nextState` | `Readonly`<`IAppState`\> |
+| `nextContext` | `any` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:757
+`void`
+
+#### Inherited from
+
+React.Component.componentWillUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:762
 
 ___
 
 ### finallySetLocaleDataFor
 
-▸ **finallySetLocaleDataFor**(`locale`: *string*, `avoidUpdatingUser`: *boolean*): *void*
+▸ **finallySetLocaleDataFor**(`locale`, `avoidUpdatingUser`): `void`
 
 Performs the final steps to set the locale data for a given application
 after all the respective locale infomation required has been loaded, this
 includes changing the url
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`locale` | *string* | the locale we are updating for   |
-`avoidUpdatingUser` | *boolean* | whether to avoid updating the user server information    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale` | `string` | the locale we are updating for |
+| `avoidUpdatingUser` | `boolean` | whether to avoid updating the user server information |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:327](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L327)
+`void`
+
+#### Defined in
+
+[client/internal/app/index.tsx:331](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L331)
 
 ___
 
 ### forceUpdate
 
-▸ **forceUpdate**(`callback?`: () => *void*): *void*
+▸ **forceUpdate**(`callback?`): `void`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`callback?` | () => *void* |
+| Name | Type |
+| :------ | :------ |
+| `callback?` | () => `void` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:493
+`void`
+
+#### Inherited from
+
+React.Component.forceUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:496
 
 ___
 
 ### getSnapshotBeforeUpdate
 
-▸ `Optional`**getSnapshotBeforeUpdate**(`prevProps`: *Readonly*<IAppProps\>, `prevState`: *Readonly*<IAppState\>): *any*
+▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
 
 Runs before React applies the result of `render` to the document, and
 returns an object to be given to componentDidUpdate. Useful for saving
@@ -533,136 +677,176 @@ things such as scroll position before `render` causes changes to it.
 Note: the presence of getSnapshotBeforeUpdate prevents any of the deprecated
 lifecycle events from running.
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`prevProps` | *Readonly*<IAppProps\> |
-`prevState` | *Readonly*<IAppState\> |
+| Name | Type |
+| :------ | :------ |
+| `prevProps` | `Readonly`<`IAppProps`\> |
+| `prevState` | `Readonly`<`IAppState`\> |
 
-**Returns:** *any*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:677
+`any`
+
+#### Inherited from
+
+React.Component.getSnapshotBeforeUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:682
 
 ___
 
 ### hasLocaleDataFor
 
-▸ **hasLocaleDataFor**(`locale`: *string*): *boolean*
+▸ **hasLocaleDataFor**(`locale`): `boolean`
 
 Checks whether there is a locale data for a given language
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`locale` | *string* | the two letter or language-region code for the locale    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `locale` | `string` | the two letter or language-region code for the locale |
 
-**Returns:** *boolean*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:316](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L316)
+`boolean`
+
+#### Defined in
+
+[client/internal/app/index.tsx:320](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L320)
 
 ___
 
 ### render
 
-▸ **render**(): *Element*
+▸ **render**(): `Element`
 
 The render function
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:610](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L610)
+`Element`
+
+#### Overrides
+
+React.Component.render
+
+#### Defined in
+
+[client/internal/app/index.tsx:614](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L614)
 
 ___
 
 ### renderAppWithLocaleContext
 
-▸ **renderAppWithLocaleContext**(`routerProps`: *any*): *Element*
+▸ **renderAppWithLocaleContext**(`routerProps`): `Element`
 
 Renders the application with the locale context data
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`routerProps` | *any* | the url match from the router, contains the url language   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `routerProps` | `any` | the url match from the router, contains the url language |
 
-**Returns:** *Element*
+#### Returns
+
+`Element`
 
 the application in the right locale context
 
-Defined in: [client/internal/app/index.tsx:551](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L551)
+#### Defined in
+
+[client/internal/app/index.tsx:555](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L555)
 
 ___
 
 ### setBlockedCallbackState
 
-▸ **setBlockedCallbackState**(`state`: *boolean*): *void*
+▸ **setBlockedCallbackState**(`state`): `void`
 
 Sets the state for the blocked callback, this function is proxied using comlink
 to the worker that actually calls this function and specifies if the state
 of the app is blocked from update as it can't access indexeddb
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`state` | *boolean* | the state that it should set to    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `state` | `boolean` | the state that it should set to |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:224](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L224)
+`void`
+
+#### Defined in
+
+[client/internal/app/index.tsx:228](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L228)
 
 ___
 
 ### setState
 
-▸ **setState**<K\>(`state`: IAppState \| (`prevState`: *Readonly*<IAppState\>, `props`: *Readonly*<IAppProps\>) => IAppState \| *Pick*<IAppState, K\> \| *Pick*<IAppState, K\>, `callback?`: () => *void*): *void*
+▸ **setState**<`K`\>(`state`, `callback?`): `void`
 
-#### Type parameters:
+#### Type parameters
 
-Name | Type |
-:------ | :------ |
-`K` | *specifiedCountry* \| *specifiedCurrency* \| *specifiedCurrencyFactors* \| *localeIsUpdating* \| *localeIsUpdatingFrom* \| *updateIsBlocked* |
+| Name | Type |
+| :------ | :------ |
+| `K` | extends keyof `IAppState` |
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`state` | IAppState \| (`prevState`: *Readonly*<IAppState\>, `props`: *Readonly*<IAppProps\>) => IAppState \| *Pick*<IAppState, K\> \| *Pick*<IAppState, K\> |
-`callback?` | () => *void* |
+| Name | Type |
+| :------ | :------ |
+| `state` | `IAppState` \| (`prevState`: `Readonly`<`IAppState`\>, `props`: `Readonly`<`IAppProps`\>) => `IAppState` \| `Pick`<`IAppState`, `K`\> \| `Pick`<`IAppState`, `K`\> |
+| `callback?` | () => `void` |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:488
+`void`
+
+#### Inherited from
+
+React.Component.setState
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:491
 
 ___
 
 ### setTokenState
 
-▸ **setTokenState**(`state`: [*IActualTokenProviderState*](../interfaces/client_internal_providers_token_provider.iactualtokenproviderstate.md), `logout`: () => *void*): *void*
+▸ **setTokenState**(`state`, `logout`): `void`
 
 This function is triggered by the TokenProvider as a callback and triggers once
 it has a state ready, the state is its own internal state, but since access of the token
 provider state is needed here, it's streamed here once it's ready, as well as on any change
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`state` | [*IActualTokenProviderState*](../interfaces/client_internal_providers_token_provider.iactualtokenproviderstate.md) | the new state   |
-`logout` | () => *void* | the logout function    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `state` | [`IActualTokenProviderState`](../interfaces/client_internal_providers_token_provider.IActualTokenProviderState.md) | the new state |
+| `logout` | () => `void` | the logout function |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:239](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L239)
+`void`
+
+#### Defined in
+
+[client/internal/app/index.tsx:243](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L243)
 
 ___
 
 ### shouldComponentUpdate
 
-▸ `Optional`**shouldComponentUpdate**(`nextProps`: *Readonly*<IAppProps\>, `nextState`: *Readonly*<IAppState\>, `nextContext`: *any*): *boolean*
+▸ `Optional` **shouldComponentUpdate**(`nextProps`, `nextState`, `nextContext`): `boolean`
 
 Called to determine whether the change in props and state should trigger a re-render.
 
@@ -673,23 +857,31 @@ props or states have changed.
 If false is returned, `Component#render`, `componentWillUpdate`
 and `componentDidUpdate` will not be called.
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`nextProps` | *Readonly*<IAppProps\> |
-`nextState` | *Readonly*<IAppState\> |
-`nextContext` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `nextProps` | `Readonly`<`IAppProps`\> |
+| `nextState` | `Readonly`<`IAppState`\> |
+| `nextContext` | `any` |
 
-**Returns:** *boolean*
+#### Returns
 
-Defined in: node_modules/@types/react/index.d.ts:631
+`boolean`
+
+#### Inherited from
+
+React.Component.shouldComponentUpdate
+
+#### Defined in
+
+node_modules/@types/react/index.d.ts:636
 
 ___
 
 ### updateCurrencyFactorsIfNecessary
 
-▸ **updateCurrencyFactorsIfNecessary**(): *Promise*<void\>
+▸ **updateCurrencyFactorsIfNecessary**(): `Promise`<`void`\>
 
 function that updates the currency factors if it finds it necessary, now according to the remote
 listener specification, the currency factors are rechecked after a disconnect event, so we might not
@@ -699,28 +891,36 @@ true change as maybe the prices hasn't changed, unlikely but possible
 
 Currency factors is also service worked so it should work offline
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:201](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L201)
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/app/index.tsx:205](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L205)
 
 ___
 
 ### updateUserProperty
 
-▸ **updateUserProperty**(`propertyId`: *string*, `value`: *string*): *Promise*<void\>
+▸ **updateUserProperty**(`propertyId`, `value`): `Promise`<`void`\>
 
 updates an user property from the property list of user properties
 and it performs a graphql request to do such
 
 in practique this is used to update app_language, app_currency and app_country
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`propertyId` | *string* | the property id we are updating   |
-`value` | *string* | the value    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `propertyId` | `string` | the property id we are updating |
+| `value` | `string` | the value |
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [client/internal/app/index.tsx:260](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/app/index.tsx#L260)
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/app/index.tsx:264](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/index.tsx#L264)

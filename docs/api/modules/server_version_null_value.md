@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/version-null-value
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/version-null-value
 
 # Module: server/version-null-value
 
@@ -15,19 +15,23 @@ so empty string is used in such a case, but we need to clear that up after parse
 
 ### convertVersionsIntoNullsWhenNecessary
 
-▸ **convertVersionsIntoNullsWhenNecessary**(`value`: [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)): [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
+▸ **convertVersionsIntoNullsWhenNecessary**(`value`): [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)
 
 Modifies the value in place to remove empty string version values
 which are invalid to nulls
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`value` | [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md) | the value in question   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the value in question |
 
-**Returns:** [*ISQLTableRowValue*](../interfaces/base_root_sql.isqltablerowvalue.md)
+#### Returns
+
+[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)
 
 the same value, this function modifies the value in place
 
-Defined in: [server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/5fcde7cf/server/version-null-value.ts#L15)
+#### Defined in
+
+[server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/f2f29986/server/version-null-value.ts#L15)

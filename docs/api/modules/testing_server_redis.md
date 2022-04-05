@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server/redis
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server/redis
 
 # Module: testing/server/redis
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [RedisTest](../classes/testing_server_redis.redistest.md)
+- [RedisTest](../classes/testing_server_redis.RedisTest.md)

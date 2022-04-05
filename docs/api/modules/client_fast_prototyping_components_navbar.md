@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar
 
 # Module: client/fast-prototyping/components/navbar
 
@@ -6,22 +6,32 @@ The navbar for the fast prototyping usage and what it comes by default
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [Navbar](client_fast_prototyping_components_navbar.md#navbar)
 
-## Variables
+## Functions
 
 ### Navbar
 
-• `Const` **Navbar**: *ComponentType*<*Pick*<INavbarProps, *excludeLanguagePicker* \| *LoginDialog* \| *SignupDialog* \| *RecoverDialog* \| *AvatarComponent* \| *avatarProps* \| *excludeBlockingBackdrop* \| *menuAdminEntries* \| *menuEntries* \| *avatarContextProperties*\> & *StyledComponentProps*<*title* \| *container* \| *appBarSpacer* \| *titleTypography* \| *titleMargin*\>\>
+▸ **Navbar**(`props`): `Element`
 
 The navbar fast prototyping component, contains more than just a navbar, it has extra
 functionality into it, such as outdated information, a blocking backdrop, etc...
 might be disabled by request
 
-**`param`** the navbar props
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `INavbarProps` | the navbar props |
 
-Defined in: [client/fast-prototyping/components/navbar/index.tsx:113](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/index.tsx#L113)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/index.tsx:139](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/navbar/index.tsx#L139)

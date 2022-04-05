@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/ipstack
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/ipstack
 
 # Module: server/services/ipstack
 
@@ -6,8 +6,8 @@
 
 ### Classes
 
-- [IPStackService](../classes/server_services_ipstack.ipstackservice.md)
+- [IPStackService](../classes/server_services_ipstack.IPStackService.md)
 
 ### Interfaces
 
-- [IPStackConfig](../interfaces/server_services_ipstack.ipstackconfig.md)
+- [IPStackConfig](../interfaces/server_services_ipstack.IPStackConfig.md)

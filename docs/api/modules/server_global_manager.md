@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/global-manager
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/global-manager
 
 # Module: server/global-manager
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [GlobalManager](../classes/server_global_manager.globalmanager.md)
+- [GlobalManager](../classes/server_global_manager.GlobalManager.md)

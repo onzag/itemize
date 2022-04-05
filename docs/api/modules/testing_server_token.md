@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server/token
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server/token
 
 # Module: testing/server/token
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [TokenTest](../classes/testing_server_token.tokentest.md)
+- [TokenTest](../classes/testing_server_token.TokenTest.md)

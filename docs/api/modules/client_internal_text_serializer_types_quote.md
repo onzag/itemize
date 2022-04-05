@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/quote
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/quote
 
 # Module: client/internal/text/serializer/types/quote
 
@@ -9,7 +9,7 @@ for the quote element
 
 ### Interfaces
 
-- [IQuote](../interfaces/client_internal_text_serializer_types_quote.iquote.md)
+- [IQuote](../interfaces/client_internal_text_serializer_types_quote.IQuote.md)
 
 ### Functions
 
@@ -19,17 +19,21 @@ for the quote element
 
 ### registerQuote
 
-▸ **registerQuote**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerQuote**(`registry`): `void`
 
 The function that registers and adds the quote element in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/quote.ts:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/quote.ts#L19)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/quote.ts:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/quote.ts#L19)

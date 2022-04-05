@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/registry
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/registry
 
 # Module: server/services/registry
 
@@ -10,4 +10,4 @@ other services for storing critical information
 
 ### Classes
 
-- [RegistryService](../classes/server_services_registry.registryservice.md)
+- [RegistryService](../classes/server_services_registry.RegistryService.md)

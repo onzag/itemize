@@ -1,0 +1,77 @@
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/internal/providers/ssr-provider](../modules/client_internal_providers_ssr_provider.md) / ISSRCollectedQueryType
+
+# Interface: ISSRCollectedQueryType
+
+[client/internal/providers/ssr-provider](../modules/client_internal_providers_ssr_provider.md).ISSRCollectedQueryType
+
+The SSR collected information
+
+## Table of contents
+
+### Properties
+
+- [fields](client_internal_providers_ssr_provider.ISSRCollectedQueryType.md#fields)
+- [id](client_internal_providers_ssr_provider.ISSRCollectedQueryType.md#id)
+- [idef](client_internal_providers_ssr_provider.ISSRCollectedQueryType.md#idef)
+- [value](client_internal_providers_ssr_provider.ISSRCollectedQueryType.md#value)
+- [version](client_internal_providers_ssr_provider.ISSRCollectedQueryType.md#version)
+
+## Properties
+
+### fields
+
+• **fields**: [`IGQLRequestFields`](gql_querier.IGQLRequestFields.md)
+
+The fields we collected for
+
+#### Defined in
+
+[client/internal/providers/ssr-provider.tsx:32](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L32)
+
+___
+
+### id
+
+• **id**: `string`
+
+The id
+
+#### Defined in
+
+[client/internal/providers/ssr-provider.tsx:20](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L20)
+
+___
+
+### idef
+
+• **idef**: `string`
+
+The item defintion qualified name
+
+#### Defined in
+
+[client/internal/providers/ssr-provider.tsx:16](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L16)
+
+___
+
+### value
+
+• **value**: [`IGQLValue`](gql_querier.IGQLValue.md)
+
+The value that is collected
+
+#### Defined in
+
+[client/internal/providers/ssr-provider.tsx:28](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L28)
+
+___
+
+### version
+
+• **version**: `string`
+
+The version or null
+
+#### Defined in
+
+[client/internal/providers/ssr-provider.tsx:24](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L24)

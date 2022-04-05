@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/image
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/image
 
 # Module: client/internal/text/serializer/types/image
 
@@ -9,7 +9,7 @@ for the image element
 
 ### Interfaces
 
-- [IImage](../interfaces/client_internal_text_serializer_types_image.iimage.md)
+- [IImage](../interfaces/client_internal_text_serializer_types_image.IImage.md)
 
 ### Functions
 
@@ -19,17 +19,21 @@ for the image element
 
 ### registerImage
 
-▸ **registerImage**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerImage**(`registry`): `void`
 
 The function that registers and adds the image in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/image.tsx:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/image.tsx#L19)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/image.tsx:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/image.tsx#L19)

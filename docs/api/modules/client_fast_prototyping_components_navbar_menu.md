@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar/menu
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar/menu
 
 # Module: client/fast-prototyping/components/navbar/menu
 
@@ -8,22 +8,32 @@ Constains the menu that is opened by the burguer icon in the navbar
 
 ### Interfaces
 
-- [IMenuEntry](../interfaces/client_fast_prototyping_components_navbar_menu.imenuentry.md)
+- [IMenuEntry](../interfaces/client_fast_prototyping_components_navbar_menu.IMenuEntry.md)
 
-### Variables
+### Functions
 
 - [Menu](client_fast_prototyping_components_navbar_menu.md#menu)
 
-## Variables
+## Functions
 
 ### Menu
 
-• `Const` **Menu**: *ComponentType*<*Pick*<MenuPropsWithStyles, *onClose* \| *onOpen* \| *isOpen* \| *adminEntries* \| *entries*\> & *StyledComponentProps*<*list* \| *listLink*\>\>
+▸ **Menu**(`props`): `Element`
 
 Provides a menu for the navbar
 
-**`param`** the menu props
+#### Parameters
 
-**`returns`** a react element
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `IMenuProps` | the menu props |
 
-Defined in: [client/fast-prototyping/components/navbar/menu.tsx:180](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/menu.tsx#L180)
+#### Returns
+
+`Element`
+
+a react element
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/menu.tsx:211](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/navbar/menu.tsx#L211)

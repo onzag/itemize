@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers/actions/search
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers/actions/search
 
 # Module: server/resolvers/actions/search
 
@@ -20,152 +20,188 @@
 
 ### findLastRecordLastModifiedDate
 
-▸ **findLastRecordLastModifiedDate**(...`records`: [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[][]): *string*
+▸ **findLastRecordLastModifiedDate**(...`records`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`...records` | [*IGQLSearchRecord*](../interfaces/gql_querier.igqlsearchrecord.md)[][] |
+| Name | Type |
+| :------ | :------ |
+| `...records` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[][] |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:46](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L46)
+`string`
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:46](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L46)
 
 ___
 
 ### searchItemDefinition
 
-▸ **searchItemDefinition**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `resolverItemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `traditional?`: *boolean*): *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+▸ **searchItemDefinition**(`appData`, `resolverArgs`, `resolverItemDefinition`, `traditional?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`resolverItemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
-`traditional?` | *boolean* |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `resolverItemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `traditional?` | `boolean` |
 
-**Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:405](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L405)
+`Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:487](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L487)
 
 ___
 
 ### searchItemDefinitionFn
 
-▸ **searchItemDefinitionFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **searchItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:837](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L837)
+[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:947](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L947)
 
 ___
 
 ### searchItemDefinitionTraditional
 
-▸ **searchItemDefinitionTraditional**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+▸ **searchItemDefinitionTraditional**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
 
-**Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:397](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L397)
+`Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:479](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L479)
 
 ___
 
 ### searchItemDefinitionTraditionalFn
 
-▸ **searchItemDefinitionTraditionalFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **searchItemDefinitionTraditionalFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:845](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L845)
+[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:955](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L955)
 
 ___
 
 ### searchModule
 
-▸ **searchModule**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `mod`: [*default*](../classes/base_root_module.default.md), `traditional?`: *boolean*): *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+▸ **searchModule**(`appData`, `resolverArgs`, `mod`, `traditional?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`mod` | [*default*](../classes/base_root_module.default.md) |
-`traditional?` | *boolean* |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `mod` | [`default`](../classes/base_Root_Module.default.md) |
+| `traditional?` | `boolean` |
 
-**Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:65](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L65)
+`Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:65](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L65)
 
 ___
 
 ### searchModuleFn
 
-▸ **searchModuleFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+▸ **searchModuleFn**(`appData`): [`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:841](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L841)
+[`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:951](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L951)
 
 ___
 
 ### searchModuleTraditional
 
-▸ **searchModuleTraditional**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `mod`: [*default*](../classes/base_root_module.default.md)): *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+▸ **searchModuleTraditional**(`appData`, `resolverArgs`, `mod`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`mod` | [*default*](../classes/base_root_module.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `mod` | [`default`](../classes/base_Root_Module.default.md) |
 
-**Returns:** *Promise*<[*IGQLSearchRecordsContainer*](../interfaces/gql_querier.igqlsearchrecordscontainer.md) \| [*IGQLSearchResultsContainer*](../interfaces/gql_querier.igqlsearchresultscontainer.md)\>
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:57](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L57)
+`Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:57](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L57)
 
 ___
 
 ### searchModuleTraditionalFn
 
-▸ **searchModuleTraditionalFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+▸ **searchModuleTraditionalFn**(`appData`): [`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/search.ts:849](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/search.ts#L849)
+[`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:959](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/search.ts#L959)

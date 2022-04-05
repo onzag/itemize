@@ -1,0 +1,150 @@
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/fast-prototyping/components/slate/wrapper](../modules/client_fast_prototyping_components_slate_wrapper.md) / MaterialUISlateWrapperState
+
+# Interface: MaterialUISlateWrapperState
+
+[client/fast-prototyping/components/slate/wrapper](../modules/client_fast_prototyping_components_slate_wrapper.md).MaterialUISlateWrapperState
+
+This is the state for the wrapper
+the state is necessary as the wrapper can hold dialogs open
+and the drawer itself
+
+## Table of contents
+
+### Properties
+
+- [altKey](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#altkey)
+- [drawerOpen](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#draweropen)
+- [elementThatWasCurrentBeforeLosingFocus](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#elementthatwascurrentbeforelosingfocus)
+- [linkDialogOpen](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#linkdialogopen)
+- [noAnimate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#noanimate)
+- [shiftKey](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#shiftkey)
+- [templateHTMLDialogOpen](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#templatehtmldialogopen)
+- [templateTextDialogOpen](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#templatetextdialogopen)
+- [toolbarHeight](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#toolbarheight)
+- [videoDialogOpen](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md#videodialogopen)
+
+## Properties
+
+### altKey
+
+• **altKey**: `boolean`
+
+Whether the alt key is currently pressed
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1432](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1432)
+
+___
+
+### drawerOpen
+
+• **drawerOpen**: `boolean`
+
+Specifies the state of the drawer
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1404](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1404)
+
+___
+
+### elementThatWasCurrentBeforeLosingFocus
+
+• **elementThatWasCurrentBeforeLosingFocus**: [`RichElement`](../modules/client_internal_text_serializer.md#richelement)
+
+When opening a dialog and losing focus to the slate rich text editor content editable
+we lose access to the anchors and current elements now that we are in focus of something
+else so we need to store the element that was the current element that was in focus
+before that happened
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1427](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1427)
+
+___
+
+### linkDialogOpen
+
+• **linkDialogOpen**: `boolean`
+
+Specifies whether the link dialog to input links and template links is open
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1389](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1389)
+
+___
+
+### noAnimate
+
+• **noAnimate**: `boolean`
+
+The drawer being open or closed is stored in local storage, which is not available in the server
+side, and the drawer animates when it's opened and closed, so this variable is always false at the
+start, the drawer is always closed at the start, however, if we need to open the drawer at the start
+on mount we don't want any animation so we toggle this flag temporarily, it doesn't need to be part
+of the state as it's only used there
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1419](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1419)
+
+___
+
+### shiftKey
+
+• **shiftKey**: `boolean`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1433](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1433)
+
+___
+
+### templateHTMLDialogOpen
+
+• **templateHTMLDialogOpen**: `boolean`
+
+Specifies whether the link dialog to input templated html is open
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1399](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1399)
+
+___
+
+### templateTextDialogOpen
+
+• **templateTextDialogOpen**: `boolean`
+
+Specifies whether the link dialog to input templated text is open
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1394](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1394)
+
+___
+
+### toolbarHeight
+
+• **toolbarHeight**: `number`
+
+Specifies the height of the toolbar for use
+when the drawer is open in disjointed mode
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1410](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1410)
+
+___
+
+### videoDialogOpen
+
+• **videoDialogOpen**: `boolean`
+
+Specifies whether the video dialog to input the url for the video is open
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1384](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1384)

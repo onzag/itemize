@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/search-loader-with-pagination
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/search-loader-with-pagination
 
 # Module: client/fast-prototyping/components/search-loader-with-pagination
 
@@ -14,7 +14,7 @@ Contains the search loader with an already paginated component
 
 ### SearchLoaderWithPagination
 
-▸ **SearchLoaderWithPagination**(`props`: ISearchLoaderWithPaginationProps): *Element*
+▸ **SearchLoaderWithPagination**(`props`): `Element`
 
 Has a search loader section and provides its own pagination component that is to be displayed with
 already handlers to update the navigation page, it uses the LocationStateReader in order to keep its
@@ -22,12 +22,16 @@ page so it means that it builds history in it
 
 TODO support searchId to keep navigation in sync
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | ISearchLoaderWithPaginationProps | the search loader props    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ISearchLoaderWithPaginationProps` | the search loader props |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/fast-prototyping/components/search-loader-with-pagination.tsx:44](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/search-loader-with-pagination.tsx#L44)
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/search-loader-with-pagination.tsx:48](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/search-loader-with-pagination.tsx#L48)

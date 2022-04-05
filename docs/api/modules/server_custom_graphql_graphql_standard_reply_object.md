@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/custom-graphql/graphql-standard-reply-object
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/custom-graphql/graphql-standard-reply-object
 
 # Module: server/custom-graphql/graphql-standard-reply-object
 
@@ -15,7 +15,7 @@ when this graphql endpoint does not return an error
 
 ### default
 
-• `Const` **default**: *GraphQLObjectType*<any, any, { [key: string]: *any*;  }\>
+• **default**: `GraphQLObjectType`<`any`, `any`, { [key: string]: `any`;  }\>
 
 This standard reply is pretty meaningless for the user it is basically
 just a messsage that should aid the developer on how it succeeded
@@ -28,4 +28,6 @@ throw new EndpointError({
 
 The standard reply exists because graphql needs something for success
 
-Defined in: [server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/server/custom-graphql/graphql-standard-reply-object.ts#L21)
+#### Defined in
+
+[server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/f2f29986/server/custom-graphql/graphql-standard-reply-object.ts#L21)

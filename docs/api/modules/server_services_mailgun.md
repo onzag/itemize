@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/mailgun
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/mailgun
 
 # Module: server/services/mailgun
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [MailgunService](../classes/server_services_mailgun.mailgunservice.md)
+- [MailgunService](../classes/server_services_mailgun.MailgunService.md)

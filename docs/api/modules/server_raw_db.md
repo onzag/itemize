@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/raw-db
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/raw-db
 
 # Module: server/raw-db
 
@@ -10,4 +10,28 @@ clusters
 
 ### Classes
 
-- [ItemizeRawDB](../classes/server_raw_db.itemizerawdb.md)
+- [ItemizeRawDB](../classes/server_raw_db.ItemizeRawDB.md)
+
+### Functions
+
+- [makeIdOutOf](server_raw_db.md#makeidoutof)
+
+## Functions
+
+### makeIdOutOf
+
+▸ **makeIdOutOf**(`str`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `str` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[server/raw-db.ts:39](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L39)

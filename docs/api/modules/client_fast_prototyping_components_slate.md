@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate
 
 # Module: client/fast-prototyping/components/slate
 
@@ -10,20 +10,14 @@ even if it can also be used in a standalone way
 
 ### Classes
 
-- [SlateEditor](../classes/client_fast_prototyping_components_slate.slateeditor.md)
+- [SlateEditor](../classes/client_fast_prototyping_components_slate.SlateEditor.md)
 
 ### Interfaces
 
-- [IAccessibleFeatureSupportOptions](../interfaces/client_fast_prototyping_components_slate.iaccessiblefeaturesupportoptions.md)
-- [DrawerConfiguratorElement](../interfaces/client_fast_prototyping_components_slate.DrawerConfiguratorElement.md)
-- [IDrawerUIHandlerElementConfigCustom](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfigcustom.md)
-- [IDrawerUIHandlerElementConfigCustomProps](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfigcustomprops.md)
-- [IDrawerUIHandlerElementConfigInput](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfiginput.md)
-- [IDrawerUIHandlerElementConfigSelect](../interfaces/client_fast_prototyping_components_slate.idraweruihandlerelementconfigselect.md)
-- [IHelperFunctions](../interfaces/client_fast_prototyping_components_slate.ihelperfunctions.md)
-- [ISlateEditorStateType](../interfaces/client_fast_prototyping_components_slate.islateeditorstatetype.md)
-- [ISlateEditorWrapperBaseProps](../interfaces/client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md)
-- [ISlateTemplateUIHandlerProps](../interfaces/client_fast_prototyping_components_slate.islatetemplateuihandlerprops.md)
-- [ITemplateArg](../interfaces/client_fast_prototyping_components_slate.itemplatearg.md)
-- [ITemplateArgsContext](../interfaces/client_fast_prototyping_components_slate.itemplateargscontext.md)
-- [IToolbarPrescenseElement](../interfaces/client_fast_prototyping_components_slate.itoolbarprescenseelement.md)
+- [IAccessibleFeatureSupportOptions](../interfaces/client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md)
+- [IHelperFunctions](../interfaces/client_fast_prototyping_components_slate.IHelperFunctions.md)
+- [ISlateEditorStateType](../interfaces/client_fast_prototyping_components_slate.ISlateEditorStateType.md)
+- [ISlateEditorWrapperBaseProps](../interfaces/client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md)
+- [ISlateTemplateUIHandlerProps](../interfaces/client_fast_prototyping_components_slate.ISlateTemplateUIHandlerProps.md)
+- [ITemplateArg](../interfaces/client_fast_prototyping_components_slate.ITemplateArg.md)
+- [ITemplateArgsContext](../interfaces/client_fast_prototyping_components_slate.ITemplateArgsContext.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server/graphql
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server/graphql
 
 # Module: testing/server/graphql
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [GraphqlTest](../classes/testing_server_graphql.graphqltest.md)
+- [GraphqlTest](../classes/testing_server_graphql.GraphqlTest.md)

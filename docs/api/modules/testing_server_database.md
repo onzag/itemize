@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server/database
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server/database
 
 # Module: testing/server/database
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [DatabaseTest](../classes/testing_server_database.databasetest.md)
+- [DatabaseTest](../classes/testing_server_database.DatabaseTest.md)

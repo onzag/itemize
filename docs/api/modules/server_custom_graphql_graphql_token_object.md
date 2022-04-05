@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/custom-graphql/graphql-token-object
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/custom-graphql/graphql-token-object
 
 # Module: server/custom-graphql/graphql-token-object
 
@@ -17,7 +17,7 @@ service offers
 
 ### default
 
-• `Const` **default**: *GraphQLObjectType*<any, any, { [key: string]: *any*;  }\>
+• **default**: `GraphQLObjectType`<`any`, `any`, { [key: string]: `any`;  }\>
 
 This is the token object that specifies the shape that token information
 is expected to be retrieved, however the token itself might contain more
@@ -28,4 +28,6 @@ return a token for a given user id, other endpoints can return something else
 these custom endpoints are meant for usage for non-clients, eg. sensors and they
 are not meant to interact with the page but rather with the grapqhl API
 
-Defined in: [server/custom-graphql/graphql-token-object.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/server/custom-graphql/graphql-token-object.ts#L21)
+#### Defined in
+
+[server/custom-graphql/graphql-token-object.ts:21](https://github.com/onzag/itemize/blob/f2f29986/server/custom-graphql/graphql-token-object.ts#L21)

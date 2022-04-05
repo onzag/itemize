@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/fragment-loader
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/fragment-loader
 
 # Module: client/fast-prototyping/components/fragment-loader
 
@@ -7,20 +7,30 @@ TODO
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [FragmentLoader](client_fast_prototyping_components_fragment_loader.md#fragmentloader)
 
-## Variables
+## Functions
 
 ### FragmentLoader
 
-• `Const` **FragmentLoader**: *ComponentType*<*Pick*<FragmentLoaderProps, *roles* \| *version* \| *fullWidth* \| *fragmentPropertyId* \| *fragmentAttachmentPropertyId* \| *onBeforeSubmit* \| *viewRendererArgs* \| *entryRendererArgs* \| *buttonPosition*\> & *StyledComponentProps*<*container* \| *fullWidthContainer* \| *buttonEdit* \| *buttonApproveRejectGroup*\>\>
+▸ **FragmentLoader**(`props`): `Element`
 
 The item definition loader allows to handle cases of not found, blocked or errors in a nice way
 
-**`param`** the loader props
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `FragmentLoaderProps` | the loader props |
 
-Defined in: [client/fast-prototyping/components/fragment-loader.tsx:64](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/fragment-loader.tsx#L64)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/fragment-loader.tsx:76](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/fragment-loader.tsx#L76)

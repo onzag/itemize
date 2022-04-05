@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar/buttons
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar/buttons
 
 # Module: client/fast-prototyping/components/navbar/buttons
 
@@ -6,23 +6,33 @@ Contains the buttons that are part of the navbar
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [Buttons](client_fast_prototyping_components_navbar_buttons.md#buttons)
 
-## Variables
+## Functions
 
 ### Buttons
 
-• `Const` **Buttons**: *ComponentType*<*Pick*<ButtonsProps, *excludeLanguagePicker* \| *LoginDialog* \| *SignupDialog* \| *RecoverDialog* \| *AvatarComponent* \| *avatarProps*\> & *StyledComponentProps*<*languageButton* \| *loginButton* \| *standardLanguageButtonLabel* \| *shrunkLanguageButtonLabel*\>\>
+▸ **Buttons**(`props`): `Element`
 
 The buttons component which contains all the buttons that are in the navbar as well
 as handle the navigation logig for keeping a state for login/signup
 
 It also contains the avatar
 
-**`param`** the props
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ButtonsProps` | the props |
 
-Defined in: [client/fast-prototyping/components/navbar/buttons.tsx:83](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/buttons.tsx#L83)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/buttons.tsx:85](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/navbar/buttons.tsx#L85)

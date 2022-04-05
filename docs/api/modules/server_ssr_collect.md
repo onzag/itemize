@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/ssr/collect
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/ssr/collect
 
 # Module: server/ssr/collect
 
@@ -9,8 +9,8 @@ tree has asked to collect for
 
 ### Classes
 
-- [Collector](../classes/server_ssr_collect.collector.md)
+- [Collector](../classes/server_ssr_collect.Collector.md)
 
 ### Interfaces
 
-- [ICollectionResult](../interfaces/server_ssr_collect.icollectionresult.md)
+- [ICollectionResult](../interfaces/server_ssr_collect.ICollectionResult.md)

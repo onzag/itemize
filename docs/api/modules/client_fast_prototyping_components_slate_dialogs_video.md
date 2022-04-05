@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/dialogs/video
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/dialogs/video
 
 # Module: client/fast-prototyping/components/slate/dialogs/video
 
@@ -9,4 +9,4 @@ input for inserting a video into the rich text
 
 ### Classes
 
-- [VideoDialog](../classes/client_fast_prototyping_components_slate_dialogs_video.videodialog.md)
+- [VideoDialog](../classes/client_fast_prototyping_components_slate_dialogs_video.VideoDialog.md)

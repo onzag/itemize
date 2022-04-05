@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/itemize
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/itemize
 
 # Module: testing/itemize
 
@@ -6,8 +6,8 @@
 
 ### Classes
 
-- [ItemizeTest](../classes/testing_itemize.itemizetest.md)
+- [ItemizeTest](../classes/testing_itemize.ItemizeTest.md)
 
 ### Interfaces
 
-- [ITestingInfoType](../interfaces/testing_itemize.itestinginfotype.md)
+- [ITestingInfoType](../interfaces/testing_itemize.ITestingInfoType.md)

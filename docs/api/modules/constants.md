@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / constants
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / constants
 
 # Module: constants
 
@@ -10,8 +10,8 @@ internal usage and to keep configuration and have an idea
 
 ### Interfaces
 
-- [IItemizeConstantsConfig](../interfaces/constants.iitemizeconstantsconfig.md)
-- [IOrderByRuleType](../interfaces/constants.iorderbyruletype.md)
+- [IItemizeConstantsConfig](../interfaces/constants.IItemizeConstantsConfig.md)
+- [IOrderByRuleType](../interfaces/constants.IOrderByRuleType.md)
 
 ### Type aliases
 
@@ -51,10 +51,10 @@ internal usage and to keep configuration and have an idea
 - [LAST\_RICH\_TEXT\_CHANGE\_LENGTH](constants.md#last_rich_text_change_length)
 - [LOCALE\_I18N](constants.md#locale_i18n)
 - [LOCATION\_SEARCH\_I18N](constants.md#location_search_i18n)
-- [MAX\_ALL\_COMBINED\_FILES\_SIZE](constants.md#max_all_combined_files_size)
 - [MAX\_DECIMAL\_COUNT](constants.md#max_decimal_count)
 - [MAX\_FIELD\_SIZE](constants.md#max_field_size)
 - [MAX\_FILES\_PER\_PROPERTY](constants.md#max_files_per_property)
+- [MAX\_FILES\_PER\_REQUEST](constants.md#max_files_per_request)
 - [MAX\_FILE\_SIZE](constants.md#max_file_size)
 - [MAX\_RAW\_TEXT\_LENGTH](constants.md#max_raw_text_length)
 - [MAX\_REMOTE\_LISTENERS\_PER\_SOCKET](constants.md#max_remote_listeners_per_socket)
@@ -70,7 +70,6 @@ internal usage and to keep configuration and have an idea
 - [MIN\_SUPPORTED\_INTEGER](constants.md#min_supported_integer)
 - [MIN\_SUPPORTED\_REAL](constants.md#min_supported_real)
 - [MIN\_SUPPORTED\_YEAR](constants.md#min_supported_year)
-- [MODERATION\_FIELDS](constants.md#moderation_fields)
 - [MODULE\_AND\_ITEM\_DEF\_CUSTOM\_I18N\_KEY](constants.md#module_and_item_def_custom_i18n_key)
 - [MODULE\_AND\_ITEM\_DEF\_I18N](constants.md#module_and_item_def_i18n)
 - [MODULE\_AND\_ITEM\_DEF\_I18N\_SEARCHABLE](constants.md#module_and_item_def_i18n_searchable)
@@ -106,6 +105,7 @@ internal usage and to keep configuration and have an idea
 - [SEARCH\_RECORDS\_CONTAINER\_GQL](constants.md#search_records_container_gql)
 - [SEARCH\_RECORD\_GQL](constants.md#search_record_gql)
 - [SEARCH\_RECORD\_INPUT\_GQL](constants.md#search_record_input_gql)
+- [SERVER\_BLOCK\_UNTIL\_REFRESH\_TIME](constants.md#server_block_until_refresh_time)
 - [SERVER\_DATA\_IDENTIFIER](constants.md#server_data_identifier)
 - [SERVER\_DATA\_MIN\_UPDATE\_TIME](constants.md#server_data_min_update_time)
 - [SERVER\_MAPPING\_TIME](constants.md#server_mapping_time)
@@ -130,1307 +130,1553 @@ internal usage and to keep configuration and have an idea
 
 ### SearchVariants
 
-Ƭ **SearchVariants**: *exact* \| *from* \| *to* \| *location* \| *radius* \| *search*
+Ƭ **SearchVariants**: ``"exact"`` \| ``"from"`` \| ``"to"`` \| ``"location"`` \| ``"radius"`` \| ``"search"`` \| ``"in"`` \| ``"payment-status"`` \| ``"payment-type"``
 
-Defined in: [constants.ts:1094](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1094)
+#### Defined in
+
+[constants.ts:1115](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1115)
 
 ## Variables
 
 ### ANYONE\_LOGGED\_METAROLE
 
-• `Const` **ANYONE\_LOGGED\_METAROLE**: *&ANYONE_LOGGED*= "&ANYONE\_LOGGED"
+• **ANYONE\_LOGGED\_METAROLE**: ``"&ANYONE_LOGGED"``
 
 Role that means anyone logged in
 
-Defined in: [constants.ts:1312](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1312)
+#### Defined in
+
+[constants.ts:1317](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1317)
 
 ___
 
 ### ANYONE\_METAROLE
 
-• `Const` **ANYONE\_METAROLE**: *&ANYONE*= "&ANYONE"
+• **ANYONE\_METAROLE**: ``"&ANYONE"``
 
 Role that means, well, anyone
 
-Defined in: [constants.ts:1308](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1308)
+#### Defined in
+
+[constants.ts:1313](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1313)
 
 ___
 
 ### CACHED\_CURRENCY\_RESPONSE
 
-• `Const` **CACHED\_CURRENCY\_RESPONSE**: *CACHED_CURRENCY_RESPONSE*= "CACHED\_CURRENCY\_RESPONSE"
+• **CACHED\_CURRENCY\_RESPONSE**: ``"CACHED_CURRENCY_RESPONSE"``
 
 An identifier for caching the currency api response
 for currency conversion in redis
 
-Defined in: [constants.ts:1398](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1398)
+#### Defined in
+
+[constants.ts:1396](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1396)
 
 ___
 
 ### CLASSIC\_BASE\_I18N
 
-• `Const` **CLASSIC\_BASE\_I18N**: *string*[]
+• **CLASSIC\_BASE\_I18N**: `string`[]
 
 Standard i18n fields required for properties
 
-Defined in: [constants.ts:536](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L536)
+#### Defined in
+
+[constants.ts:571](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L571)
 
 ___
 
 ### CLASSIC\_OPTIONAL\_I18N
 
-• `Const` **CLASSIC\_OPTIONAL\_I18N**: *string*[]
+• **CLASSIC\_OPTIONAL\_I18N**: `string`[]
 
 Optional i18n fields in properties
 
-Defined in: [constants.ts:564](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L564)
+#### Defined in
+
+[constants.ts:599](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L599)
 
 ___
 
 ### CLASSIC\_SEARCH\_BASE\_I18N
 
-• `Const` **CLASSIC\_SEARCH\_BASE\_I18N**: *string*[]
+• **CLASSIC\_SEARCH\_BASE\_I18N**: `string`[]
 
 Standard i18n fields required for properties when
 they are searchable
 
-Defined in: [constants.ts:544](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L544)
+#### Defined in
+
+[constants.ts:579](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L579)
 
 ___
 
 ### CLASSIC\_SEARCH\_OPTIONAL\_I18N
 
-• `Const` **CLASSIC\_SEARCH\_OPTIONAL\_I18N**: *string*[]
+• **CLASSIC\_SEARCH\_OPTIONAL\_I18N**: `string`[]
 
 Optional i18n fields in properties when they are
 searchable
 
-Defined in: [constants.ts:571](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L571)
+#### Defined in
+
+[constants.ts:606](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L606)
 
 ___
 
 ### CLASSIC\_SEARCH\_RANGED\_I18N
 
-• `Const` **CLASSIC\_SEARCH\_RANGED\_I18N**: *string*[]
+• **CLASSIC\_SEARCH\_RANGED\_I18N**: `string`[]
 
 Extended required i18n fields required in properties
 when they use a ranged search
 
-Defined in: [constants.ts:578](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L578)
+#### Defined in
+
+[constants.ts:613](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L613)
 
 ___
 
 ### CLASSIC\_SEARCH\_RANGED\_OPTIONAL\_I18N
 
-• `Const` **CLASSIC\_SEARCH\_RANGED\_OPTIONAL\_I18N**: *string*[]
+• **CLASSIC\_SEARCH\_RANGED\_OPTIONAL\_I18N**: `string`[]
 
 Extended optional i18n fields required in properties
 when they use a ranged search
 
-Defined in: [constants.ts:588](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L588)
+#### Defined in
+
+[constants.ts:623](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L623)
 
 ___
 
 ### COMBINED\_INDEX
 
-• `Const` **COMBINED\_INDEX**: *COMBINED_INDEX*= "COMBINED\_INDEX"
+• **COMBINED\_INDEX**: ``"COMBINED_INDEX"``
 
-Defined in: [constants.ts:731](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L731)
+#### Defined in
+
+[constants.ts:758](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L758)
 
 ___
 
 ### CONNECTOR\_SQL\_COLUMN\_ID\_FK\_NAME
 
-• `Const` **CONNECTOR\_SQL\_COLUMN\_ID\_FK\_NAME**: *MODULE_ID*= "MODULE\_ID"
+• **CONNECTOR\_SQL\_COLUMN\_ID\_FK\_NAME**: ``"MODULE_ID"``
 
 The column name of the foreign key that connects the module table
 with the item definition table
 
-Defined in: [constants.ts:867](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L867)
+#### Defined in
+
+[constants.ts:888](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L888)
 
 ___
 
 ### CONNECTOR\_SQL\_COLUMN\_VERSION\_FK\_NAME
 
-• `Const` **CONNECTOR\_SQL\_COLUMN\_VERSION\_FK\_NAME**: *MODULE_VERSION*= "MODULE\_VERSION"
+• **CONNECTOR\_SQL\_COLUMN\_VERSION\_FK\_NAME**: ``"MODULE_VERSION"``
 
 The column name of the foreign key that connects the module table
 with the item definition table
 
-Defined in: [constants.ts:872](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L872)
+#### Defined in
+
+[constants.ts:893](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L893)
 
 ___
 
 ### CREATED\_AT\_INDEX
 
-• `Const` **CREATED\_AT\_INDEX**: *CREATED_AT_INDEX*= "CREATED\_AT\_INDEX"
+• **CREATED\_AT\_INDEX**: ``"CREATED_AT_INDEX"``
 
-Defined in: [constants.ts:728](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L728)
+#### Defined in
+
+[constants.ts:755](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L755)
 
 ___
 
 ### CREATED\_BY\_INDEX
 
-• `Const` **CREATED\_BY\_INDEX**: *CREATED_BY_INDEX*= "CREATED\_BY\_INDEX"
+• **CREATED\_BY\_INDEX**: ``"CREATED_BY_INDEX"``
 
-Defined in: [constants.ts:729](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L729)
+#### Defined in
+
+[constants.ts:756](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L756)
 
 ___
 
 ### CURRENCY\_FACTORS\_IDENTIFIER
 
-• `Const` **CURRENCY\_FACTORS\_IDENTIFIER**: *CURRENCY_FACTORS*= "CURRENCY\_FACTORS"
+• **CURRENCY\_FACTORS\_IDENTIFIER**: ``"CURRENCY_FACTORS"``
 
 An identifier for the currency factors and the currency
 factor information
 
-Defined in: [constants.ts:1382](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1382)
+#### Defined in
+
+[constants.ts:1380](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1380)
 
 ___
 
 ### DATETIME\_FORMAT
 
-• `Const` **DATETIME\_FORMAT**: *YYYY-MM-DD HH:mm:ss.SSSZ*= "YYYY-MM-DD HH:mm:ss.SSSZ"
+• **DATETIME\_FORMAT**: ``"YYYY-MM-DD HH:mm:ss.SSSZ"``
 
 The format that dates are expected to have in order to be exchanged
 these represent the SQL form, does not support nano date
 
-Defined in: [constants.ts:969](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L969)
+#### Defined in
+
+[constants.ts:990](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L990)
 
 ___
 
 ### DATE\_FORMAT
 
-• `Const` **DATE\_FORMAT**: *YYYY-MM-DD*= "YYYY-MM-DD"
+• **DATE\_FORMAT**: ``"YYYY-MM-DD"``
 
 The format date has in order to be exchanged, this is
 the SQL form
 
-Defined in: [constants.ts:979](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L979)
+#### Defined in
+
+[constants.ts:1000](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1000)
 
 ___
 
 ### DELETED\_REGISTRY\_IDENTIFIER
 
-• `Const` **DELETED\_REGISTRY\_IDENTIFIER**: *DELETED_REGISTRY*= "DELETED\_REGISTRY"
+• **DELETED\_REGISTRY\_IDENTIFIER**: ``"DELETED_REGISTRY"``
 
 An identifier for the deleted table information stuff
 
-Defined in: [constants.ts:1387](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1387)
+#### Defined in
+
+[constants.ts:1385](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1385)
 
 ___
 
 ### DESTRUCTION\_MARKERS\_LOCATION
 
-• `Const` **DESTRUCTION\_MARKERS\_LOCATION**: *DESTRUCTION_MARKERS*= "DESTRUCTION\_MARKERS"
+• **DESTRUCTION\_MARKERS\_LOCATION**: ``"DESTRUCTION_MARKERS"``
 
 Where the destruction markers are located
 
-Defined in: [constants.ts:284](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L284)
+#### Defined in
+
+[constants.ts:297](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L297)
 
 ___
 
 ### ENDPOINT\_ERRORS
 
-• `Const` **ENDPOINT\_ERRORS**: *object*
+• **ENDPOINT\_ERRORS**: `Object`
 
 Graphql endpoint errors codes that can be thrown
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`BLOCKED` | *string* |
-`CANT_CONNECT` | *string* |
-`FORBIDDEN` | *string* |
-`INTERNAL_SERVER_ERROR` | *string* |
-`INVALID_CREDENTIALS` | *string* |
-`INVALID_DATA_SUBMIT_REFUSED` | *string* |
-`INVALID_INCLUDE` | *string* |
-`INVALID_POLICY` | *string* |
-`INVALID_PROPERTY` | *string* |
-`MUST_BE_LOGGED_IN` | *string* |
-`NOTHING_TO_UPDATE` | *string* |
-`NOT_FOUND` | *string* |
-`UNSPECIFIED` | *string* |
-`USER_BLOCKED` | *string* |
-`USER_EMAIL_TAKEN` | *string* |
-`USER_REMOVED` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `BLOCKED` | `string` |
+| `CANT_CONNECT` | `string` |
+| `FORBIDDEN` | `string` |
+| `INTERNAL_SERVER_ERROR` | `string` |
+| `INVALID_CREDENTIALS` | `string` |
+| `INVALID_DATA_SUBMIT_REFUSED` | `string` |
+| `INVALID_INCLUDE` | `string` |
+| `INVALID_POLICY` | `string` |
+| `INVALID_PROPERTY` | `string` |
+| `MUST_BE_LOGGED_IN` | `string` |
+| `NOTHING_TO_UPDATE` | `string` |
+| `NOT_FOUND` | `string` |
+| `TOKEN_EXPIRED` | `string` |
+| `UNSPECIFIED` | `string` |
+| `USER_BLOCKED` | `string` |
+| `USER_EMAIL_TAKEN` | `string` |
+| `USER_PHONE_TAKEN` | `string` |
+| `USER_REMOVED` | `string` |
 
-Defined in: [constants.ts:309](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L309)
+#### Defined in
+
+[constants.ts:322](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L322)
 
 ___
 
 ### EXCLUSION\_STATE\_SUFFIX
 
-• `Const` **EXCLUSION\_STATE\_SUFFIX**: *string*
+• **EXCLUSION\_STATE\_SUFFIX**: `string`
 
 The suffix added to refer to the exclusion state of an include in SQL or graphql
 
-Defined in: [constants.ts:911](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L911)
+#### Defined in
+
+[constants.ts:932](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L932)
 
 ___
 
 ### EXTERNALLY\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES
 
-• `Const` **EXTERNALLY\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES**: *string*[]
+• **EXTERNALLY\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES**: `string`[]
 
 Graphql values come in a DATA form, because they can be blocked
 however some attributes are meant to leak and be externally accessible
 these atrributes can only be accessed outside of it
 
-Defined in: [constants.ts:608](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L608)
+#### Defined in
+
+[constants.ts:643](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L643)
 
 ___
 
 ### FILE\_SUPPORTED\_IMAGE\_TYPES
 
-• `Const` **FILE\_SUPPORTED\_IMAGE\_TYPES**: *string*[]
+• **FILE\_SUPPORTED\_IMAGE\_TYPES**: `string`[]
 
 Supported image types
 
-Defined in: [constants.ts:227](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L227)
+#### Defined in
+
+[constants.ts:240](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L240)
 
 ___
 
 ### GUEST\_METAROLE
 
-• `Const` **GUEST\_METAROLE**: *&GUEST*= "&GUEST"
+• **GUEST\_METAROLE**: ``"&GUEST"``
 
 Role that means any guest
 
-Defined in: [constants.ts:1316](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1316)
+#### Defined in
+
+[constants.ts:1321](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1321)
 
 ___
 
 ### INCLUDE\_PREFIX
 
-• `Const` **INCLUDE\_PREFIX**: *string*
+• **INCLUDE\_PREFIX**: `string`
 
 Every include when used within the database or graphql is prefixed with
 
-Defined in: [constants.ts:895](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L895)
+#### Defined in
+
+[constants.ts:916](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L916)
 
 ___
 
 ### ITEM\_CALLOUT\_EXCLUDED\_I18N
 
-• `Const` **ITEM\_CALLOUT\_EXCLUDED\_I18N**: *string*[]
+• **ITEM\_CALLOUT\_EXCLUDED\_I18N**: `string`[]
 
 The properties for i18n a callout excluded item should have
 
-Defined in: [constants.ts:277](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L277)
+#### Defined in
+
+[constants.ts:290](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L290)
 
 ___
 
 ### ITEM\_CAN\_BE\_EXCLUDED\_I18N
 
-• `Const` **ITEM\_CAN\_BE\_EXCLUDED\_I18N**: *string*[]
+• **ITEM\_CAN\_BE\_EXCLUDED\_I18N**: `string`[]
 
 The properties for i18n an item that can be excluded should have
 
-Defined in: [constants.ts:259](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L259)
+#### Defined in
+
+[constants.ts:272](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L272)
 
 ___
 
 ### ITEM\_DEFINITION\_PREFIX
 
-• `Const` **ITEM\_DEFINITION\_PREFIX**: *string*
+• **ITEM\_DEFINITION\_PREFIX**: `string`
 
 Every item definition when used within the database, graphql or its qualified name is prefixed with
 
-Defined in: [constants.ts:907](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L907)
+#### Defined in
+
+[constants.ts:928](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L928)
 
 ___
 
 ### ITEM\_OPTIONAL\_I18N
 
-• `Const` **ITEM\_OPTIONAL\_I18N**: *string*[]
+• **ITEM\_OPTIONAL\_I18N**: `string`[]
 
 The item optional data
 
-Defined in: [constants.ts:270](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L270)
+#### Defined in
+
+[constants.ts:283](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L283)
 
 ___
 
 ### LAST\_RICH\_TEXT\_CHANGE\_LENGTH
 
-• `Const` **LAST\_RICH\_TEXT\_CHANGE\_LENGTH**: *LAST_RICH_TEXT_CHANGE_LENGTH*= "LAST\_RICH\_TEXT\_CHANGE\_LENGTH"
+• **LAST\_RICH\_TEXT\_CHANGE\_LENGTH**: ``"LAST_RICH_TEXT_CHANGE_LENGTH"``
 
 Store a last rich text change size global to use to save memory for lenght calculation
 
-Defined in: [constants.ts:304](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L304)
+#### Defined in
+
+[constants.ts:317](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L317)
 
 ___
 
 ### LOCALE\_I18N
 
-• `Const` **LOCALE\_I18N**: *string*[]
+• **LOCALE\_I18N**: `string`[]
 
 This is for small use anywhere language data
 
-Defined in: [constants.ts:347](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L347)
+#### Defined in
+
+[constants.ts:361](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L361)
 
 ___
 
 ### LOCATION\_SEARCH\_I18N
 
-• `Const` **LOCATION\_SEARCH\_I18N**: *string*[]
+• **LOCATION\_SEARCH\_I18N**: `string`[]
 
 Extended i18n fields required in properties
 when they use a location search
 
-Defined in: [constants.ts:596](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L596)
+#### Defined in
 
-___
-
-### MAX\_ALL\_COMBINED\_FILES\_SIZE
-
-• `Const` **MAX\_ALL\_COMBINED\_FILES\_SIZE**: *number*
-
-how many files can there be total
-in a single request, this is more of a security concern
-
-Defined in: [constants.ts:176](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L176)
+[constants.ts:631](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L631)
 
 ___
 
 ### MAX\_DECIMAL\_COUNT
 
-• `Const` **MAX\_DECIMAL\_COUNT**: *6*= 6
+• **MAX\_DECIMAL\_COUNT**: ``6``
 
 Defines how many decimal points are supported, for the sake of usability
 the number is set to a precision of 6
 
-Defined in: [constants.ts:137](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L137)
+#### Defined in
+
+[constants.ts:145](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L145)
 
 ___
 
 ### MAX\_FIELD\_SIZE
 
-• `Const` **MAX\_FIELD\_SIZE**: *number*
+• **MAX\_FIELD\_SIZE**: `number`
 
 Another just a security concern, this
 is the size of the graphql query, 1MB should be way more than enough for a graphql query
 
-Defined in: [constants.ts:184](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L184)
+#### Defined in
+
+[constants.ts:192](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L192)
 
 ___
 
 ### MAX\_FILES\_PER\_PROPERTY
 
-• `Const` **MAX\_FILES\_PER\_PROPERTY**: *number*
+• **MAX\_FILES\_PER\_PROPERTY**: `number`
 
 how many files can be used in one item field at once
 
-Defined in: [constants.ts:171](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L171)
+#### Defined in
+
+[constants.ts:179](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L179)
+
+___
+
+### MAX\_FILES\_PER\_REQUEST
+
+• **MAX\_FILES\_PER\_REQUEST**: `number`
+
+how many files can there be total
+in a single request, this is more of a security concern
+
+#### Defined in
+
+[constants.ts:184](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L184)
 
 ___
 
 ### MAX\_FILE\_SIZE
 
-• `Const` **MAX\_FILE\_SIZE**: *number*
+• **MAX\_FILE\_SIZE**: `number`
 
 The max file size (for either images and binary files)
 
-Defined in: [constants.ts:167](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L167)
+#### Defined in
+
+[constants.ts:175](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L175)
 
 ___
 
 ### MAX\_RAW\_TEXT\_LENGTH
 
-• `Const` **MAX\_RAW\_TEXT\_LENGTH**: *number*
+• **MAX\_RAW\_TEXT\_LENGTH**: `number`
 
 Defines how many characters (yes characters) a text might have max
 please define maxLenght in the property itself for specific checking
 this check is expensive so checking twice is not good
 
-Defined in: [constants.ts:163](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L163)
+#### Defined in
+
+[constants.ts:171](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L171)
 
 ___
 
 ### MAX\_REMOTE\_LISTENERS\_PER\_SOCKET
 
-• `Const` **MAX\_REMOTE\_LISTENERS\_PER\_SOCKET**: *number*
+• **MAX\_REMOTE\_LISTENERS\_PER\_SOCKET**: `number`
 
 The maximum amount of remote listeners a socket supports
 
-Defined in: [constants.ts:214](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L214)
+#### Defined in
+
+[constants.ts:227](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L227)
 
 ___
 
 ### MAX\_SEARCH\_FIELD\_LENGTH
 
-• `Const` **MAX\_SEARCH\_FIELD\_LENGTH**: *number*
+• **MAX\_SEARCH\_FIELD\_LENGTH**: `number`
 
 Size in characters of the search field
 
-Defined in: [constants.ts:198](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L198)
+#### Defined in
+
+[constants.ts:206](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L206)
 
 ___
 
 ### MAX\_SEARCH\_RECORDS\_DEFAULT
 
-• `Const` **MAX\_SEARCH\_RECORDS\_DEFAULT**: *number*
+• **MAX\_SEARCH\_RECORDS\_DEFAULT**: `number`
 
 how many search results can be retrieved at once these are
 used for the actual search results
 
-Defined in: [constants.ts:194](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L194)
+#### Defined in
+
+[constants.ts:202](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L202)
 
 ___
 
 ### MAX\_SEARCH\_RESULTS\_DEFAULT
 
-• `Const` **MAX\_SEARCH\_RESULTS\_DEFAULT**: *number*
+• **MAX\_SEARCH\_RESULTS\_DEFAULT**: `number`
 
 how many search results can be retrieved at once these are
 used for the actual search results
 
-Defined in: [constants.ts:189](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L189)
+#### Defined in
+
+[constants.ts:197](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L197)
 
 ___
 
 ### MAX\_STRING\_LENGTH
 
-• `Const` **MAX\_STRING\_LENGTH**: *number*
+• **MAX\_STRING\_LENGTH**: `number`
 
 Defines how many characters a string might have
 
-Defined in: [constants.ts:157](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L157)
+#### Defined in
+
+[constants.ts:165](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L165)
 
 ___
 
 ### MAX\_SUPPORTED\_INTEGER
 
-• `Const` **MAX\_SUPPORTED\_INTEGER**: *2147483647*= 2147483647
+• **MAX\_SUPPORTED\_INTEGER**: ``2147483647``
 
 Defines the max supported integer, it should match up the database
 
-Defined in: [constants.ts:128](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L128)
+#### Defined in
+
+[constants.ts:136](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L136)
 
 ___
 
 ### MAX\_SUPPORTED\_REAL
 
-• `Const` **MAX\_SUPPORTED\_REAL**: *999999999*= 999999999
+• **MAX\_SUPPORTED\_REAL**: ``999999999``
 
 Defines how big can decimal numbers get
 
-Defined in: [constants.ts:141](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L141)
+#### Defined in
+
+[constants.ts:149](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L149)
 
 ___
 
 ### MAX\_SUPPORTED\_YEAR
 
-• `Const` **MAX\_SUPPORTED\_YEAR**: *number*
+• **MAX\_SUPPORTED\_YEAR**: `number`
 
 Years max
 
-Defined in: [constants.ts:149](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L149)
+#### Defined in
+
+[constants.ts:157](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L157)
 
 ___
 
 ### MEMCACHED\_DESTRUCTION\_MARKERS\_LOCATION
 
-• `Const` **MEMCACHED\_DESTRUCTION\_MARKERS\_LOCATION**: *string*
+• **MEMCACHED\_DESTRUCTION\_MARKERS\_LOCATION**: `string`
 
 Where destruction markers get memory cached
 
-Defined in: [constants.ts:294](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L294)
+#### Defined in
+
+[constants.ts:307](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L307)
 
 ___
 
 ### MEMCACHED\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION
 
-• `Const` **MEMCACHED\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: *string*
+• **MEMCACHED\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: `string`
 
 Where destruction markers get memory cached
 
-Defined in: [constants.ts:299](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L299)
+#### Defined in
+
+[constants.ts:312](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L312)
 
 ___
 
 ### MIN\_SUPPORTED\_INTEGER
 
-• `Const` **MIN\_SUPPORTED\_INTEGER**: *number*= -MAX\_SUPPORTED\_INTEGER
+• **MIN\_SUPPORTED\_INTEGER**: `number` = `-MAX_SUPPORTED_INTEGER`
 
 Defines the min supported integer, it should match up the database too
 
-Defined in: [constants.ts:132](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L132)
+#### Defined in
+
+[constants.ts:140](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L140)
 
 ___
 
 ### MIN\_SUPPORTED\_REAL
 
-• `Const` **MIN\_SUPPORTED\_REAL**: *-999999999*= -999999999
+• **MIN\_SUPPORTED\_REAL**: ``-999999999``
 
 Defines how small can decimal numbers get
 
-Defined in: [constants.ts:145](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L145)
+#### Defined in
+
+[constants.ts:153](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L153)
 
 ___
 
 ### MIN\_SUPPORTED\_YEAR
 
-• `Const` **MIN\_SUPPORTED\_YEAR**: *0*= 0
+• **MIN\_SUPPORTED\_YEAR**: ``0``
 
 Years min
 
-Defined in: [constants.ts:153](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L153)
+#### Defined in
 
-___
-
-### MODERATION\_FIELDS
-
-• `Const` **MODERATION\_FIELDS**: *string*[]
-
-Moderation fields for flagging
-
-Defined in: [constants.ts:1320](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1320)
+[constants.ts:161](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L161)
 
 ___
 
 ### MODULE\_AND\_ITEM\_DEF\_CUSTOM\_I18N\_KEY
 
-• `Const` **MODULE\_AND\_ITEM\_DEF\_CUSTOM\_I18N\_KEY**: *custom*= "custom"
+• **MODULE\_AND\_ITEM\_DEF\_CUSTOM\_I18N\_KEY**: ``"custom"``
 
 The custom key as it is stored in the built file, the custom key
 is always custom in the properties
 
-Defined in: [constants.ts:254](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L254)
+#### Defined in
+
+[constants.ts:267](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L267)
 
 ___
 
 ### MODULE\_AND\_ITEM\_DEF\_I18N
 
-• `Const` **MODULE\_AND\_ITEM\_DEF\_I18N**: *string*[]
+• **MODULE\_AND\_ITEM\_DEF\_I18N**: `string`[]
 
 The properties for i18n a module should have
 
-Defined in: [constants.ts:238](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L238)
+#### Defined in
+
+[constants.ts:251](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L251)
 
 ___
 
 ### MODULE\_AND\_ITEM\_DEF\_I18N\_SEARCHABLE
 
-• `Const` **MODULE\_AND\_ITEM\_DEF\_I18N\_SEARCHABLE**: *string*[]
+• **MODULE\_AND\_ITEM\_DEF\_I18N\_SEARCHABLE**: `string`[]
 
 The properties for i18n a searchable module and item definition should have
 
-Defined in: [constants.ts:244](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L244)
+#### Defined in
+
+[constants.ts:257](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L257)
 
 ___
 
 ### MODULE\_PREFIX
 
-• `Const` **MODULE\_PREFIX**: *string*
+• **MODULE\_PREFIX**: `string`
 
 Every module when used within the database, graphql or its qualified name is prefixed with
 
-Defined in: [constants.ts:899](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L899)
+#### Defined in
+
+[constants.ts:920](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L920)
 
 ___
 
 ### ORDERBY\_NULLS\_PRIORITY
 
-• `Const` **ORDERBY\_NULLS\_PRIORITY**: *GraphQLEnumType*
+• **ORDERBY\_NULLS\_PRIORITY**: `GraphQLEnumType`
 
 And this is for the order by rule enum nulls
 
-Defined in: [constants.ts:1073](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1073)
+#### Defined in
+
+[constants.ts:1094](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1094)
 
 ___
 
 ### ORDERBY\_RULE
 
-• `Const` **ORDERBY\_RULE**: *GraphQLInputObjectType*
+• **ORDERBY\_RULE**: `GraphQLInputObjectType`
 
-Defined in: [constants.ts:1078](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1078)
+#### Defined in
+
+[constants.ts:1099](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1099)
 
 ___
 
 ### ORDERBY\_RULE\_DIRECTION
 
-• `Const` **ORDERBY\_RULE\_DIRECTION**: *GraphQLEnumType*
+• **ORDERBY\_RULE\_DIRECTION**: `GraphQLEnumType`
 
 And this is for the order by rule enum
 
-Defined in: [constants.ts:1065](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1065)
+#### Defined in
+
+[constants.ts:1086](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1086)
 
 ___
 
 ### OWNER\_METAROLE
 
-• `Const` **OWNER\_METAROLE**: *&OWNER*= "&OWNER"
+• **OWNER\_METAROLE**: ``"&OWNER"``
 
 Role that means the owner of this item
 
-Defined in: [constants.ts:1304](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1304)
+#### Defined in
+
+[constants.ts:1309](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1309)
 
 ___
 
 ### PARENT\_INDEX
 
-• `Const` **PARENT\_INDEX**: *PARENT_INDEX*= "PARENT\_INDEX"
+• **PARENT\_INDEX**: ``"PARENT_INDEX"``
 
-Defined in: [constants.ts:730](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L730)
+#### Defined in
+
+[constants.ts:757](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L757)
 
 ___
 
 ### POLICY\_OPTIONAL\_I18N
 
-• `Const` **POLICY\_OPTIONAL\_I18N**: *string*[]
+• **POLICY\_OPTIONAL\_I18N**: `string`[]
 
 Policies can also recieve an optional description
 
-Defined in: [constants.ts:961](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L961)
+#### Defined in
+
+[constants.ts:982](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L982)
 
 ___
 
 ### POLICY\_PREFIXES
 
-• `Const` **POLICY\_PREFIXES**: *object*
+• **POLICY\_PREFIXES**: `Object`
 
 The policy prefixes for all the policies that are available within itemize
 in order to create complex rules
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`delete` | *string* |
-`edit` | *string* |
-`parent` | *string* |
-`read` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `delete` | `string` |
+| `edit` | `string` |
+| `parent` | `string` |
+| `read` | `string` |
 
-Defined in: [constants.ts:944](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L944)
+#### Defined in
+
+[constants.ts:965](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L965)
 
 ___
 
 ### POLICY\_REQUIRED\_I18N
 
-• `Const` **POLICY\_REQUIRED\_I18N**: *string*[]
+• **POLICY\_REQUIRED\_I18N**: `string`[]
 
 The required i18n fields to require for a policy
 policies get a title that should be human readable in
 the given language, and a fail error message for when they fail
 
-Defined in: [constants.ts:955](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L955)
+#### Defined in
+
+[constants.ts:976](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L976)
 
 ___
 
 ### PREFIX\_ADD
 
-• `Const` **PREFIX\_ADD**: *string*
+• **PREFIX\_ADD**: `string`
 
 The prefix used in the graphql endpoint for adding item definitions
 
-Defined in: [constants.ts:931](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L931)
+#### Defined in
+
+[constants.ts:952](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L952)
 
 ___
 
 ### PREFIX\_DELETE
 
-• `Const` **PREFIX\_DELETE**: *string*
+• **PREFIX\_DELETE**: `string`
 
 The prefix used in the graphql endpoint for deleting item definitions
 
-Defined in: [constants.ts:939](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L939)
+#### Defined in
+
+[constants.ts:960](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L960)
 
 ___
 
 ### PREFIX\_EDIT
 
-• `Const` **PREFIX\_EDIT**: *string*
+• **PREFIX\_EDIT**: `string`
 
 The prefix used in the graphql endpoint for editing item definitions
 
-Defined in: [constants.ts:935](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L935)
+#### Defined in
+
+[constants.ts:956](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L956)
 
 ___
 
 ### PREFIX\_GET
 
-• `Const` **PREFIX\_GET**: *string*
+• **PREFIX\_GET**: `string`
 
 The prefix used in the graphql endpoint for getting item definitions
 
-Defined in: [constants.ts:923](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L923)
+#### Defined in
+
+[constants.ts:944](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L944)
 
 ___
 
 ### PREFIX\_GET\_LIST
 
-• `Const` **PREFIX\_GET\_LIST**: *string*
+• **PREFIX\_GET\_LIST**: `string`
 
 The prefix used in the graphql endpoint for getting lists of item definitions and modules
 
-Defined in: [constants.ts:927](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L927)
+#### Defined in
+
+[constants.ts:948](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L948)
 
 ___
 
 ### PREFIX\_SEARCH
 
-• `Const` **PREFIX\_SEARCH**: *string*
+• **PREFIX\_SEARCH**: `string`
 
 The prefix used in the graphql endpoint for searches of modules and item definitions
 
-Defined in: [constants.ts:915](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L915)
+#### Defined in
+
+[constants.ts:936](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L936)
 
 ___
 
 ### PREFIX\_TRADITIONAL\_SEARCH
 
-• `Const` **PREFIX\_TRADITIONAL\_SEARCH**: *string*
+• **PREFIX\_TRADITIONAL\_SEARCH**: `string`
 
 The prefix used in the graphql endpoint for searches of modules and item definitions in traditional mode
 
-Defined in: [constants.ts:919](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L919)
+#### Defined in
+
+[constants.ts:940](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L940)
 
 ___
 
 ### PROTECTED\_RESOURCES
 
-• `Const` **PROTECTED\_RESOURCES**: *string*[]
+• **PROTECTED\_RESOURCES**: `string`[]
 
 Resources that are protected from fetching without specifying the devkey
 
-Defined in: [constants.ts:1363](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1363)
+#### Defined in
+
+[constants.ts:1361](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1361)
 
 ___
 
 ### PROTECTED\_USERNAMES
 
-• `Const` **PROTECTED\_USERNAMES**: *string*[]
+• **PROTECTED\_USERNAMES**: `string`[]
 
 The protected usernames that cannot be taken by the users
 
-Defined in: [constants.ts:219](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L219)
+#### Defined in
+
+[constants.ts:232](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L232)
 
 ___
 
 ### REDUCED\_BASE\_I18N
 
-• `Const` **REDUCED\_BASE\_I18N**: *string*[]
+• **REDUCED\_BASE\_I18N**: `string`[]
 
 Reduced i18n required for properties
 
-Defined in: [constants.ts:551](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L551)
+#### Defined in
+
+[constants.ts:586](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L586)
 
 ___
 
 ### REDUCED\_SEARCH\_BASE\_I18N
 
-• `Const` **REDUCED\_SEARCH\_BASE\_I18N**: *string*[]
+• **REDUCED\_SEARCH\_BASE\_I18N**: `string`[]
 
 Reduced i18n required for properties when
 they are searchable
 
-Defined in: [constants.ts:558](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L558)
+#### Defined in
+
+[constants.ts:593](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L593)
 
 ___
 
 ### REGISTRY\_IDENTIFIER
 
-• `Const` **REGISTRY\_IDENTIFIER**: *REGISTRY*= "REGISTRY"
+• **REGISTRY\_IDENTIFIER**: ``"REGISTRY"``
 
 An identifier for the internal global registry
 
-Defined in: [constants.ts:1392](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1392)
+#### Defined in
+
+[constants.ts:1390](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1390)
 
 ___
 
 ### RESERVED\_ADD\_PROPERTIES
 
-• `Const` **RESERVED\_ADD\_PROPERTIES**: *object*
+• **RESERVED\_ADD\_PROPERTIES**: `Object`
 
 Properties required in order to add something
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`container_id` | *object* |
-`container_id.description` | *string* |
-`container_id.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`for_id` | *object* |
-`for_id.description` | *string* |
-`for_id.type` | *GraphQLScalarType* |
-`in_behalf_of` | *object* |
-`in_behalf_of.description` | *string* |
-`in_behalf_of.type` | *GraphQLScalarType* |
-`language` | *object* |
-`language.description` | *string* |
-`language.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`listener_uuid` | *object* |
-`listener_uuid.description` | *string* |
-`listener_uuid.type` | *GraphQLScalarType* |
-`parent_id` | *object* |
-`parent_id.description` | *string* |
-`parent_id.type` | *GraphQLScalarType* |
-`parent_type` | *object* |
-`parent_type.description` | *string* |
-`parent_type.type` | *GraphQLScalarType* |
-`parent_version` | *object* |
-`parent_version.description` | *string* |
-`parent_version.type` | *GraphQLScalarType* |
-`token` | *object* |
-`token.description` | *string* |
-`token.type` | *GraphQLScalarType* |
-`version` | *object* |
-`version.description` | *string* |
-`version.type` | *GraphQLScalarType* |
+| Name | Type |
+| :------ | :------ |
+| `container_id` | `Object` |
+| `container_id.description` | `string` |
+| `container_id.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `for_id` | `Object` |
+| `for_id.description` | `string` |
+| `for_id.type` | `GraphQLScalarType` |
+| `in_behalf_of` | `Object` |
+| `in_behalf_of.description` | `string` |
+| `in_behalf_of.type` | `GraphQLScalarType` |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `listener_uuid` | `Object` |
+| `listener_uuid.description` | `string` |
+| `listener_uuid.type` | `GraphQLScalarType` |
+| `parent_id` | `Object` |
+| `parent_id.description` | `string` |
+| `parent_id.type` | `GraphQLScalarType` |
+| `parent_type` | `Object` |
+| `parent_type.description` | `string` |
+| `parent_type.type` | `GraphQLScalarType` |
+| `parent_version` | `Object` |
+| `parent_version.description` | `string` |
+| `parent_version.type` | `GraphQLScalarType` |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
+| `version` | `Object` |
+| `version.description` | `string` |
+| `version.type` | `GraphQLScalarType` |
 
-Defined in: [constants.ts:1263](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1263)
+#### Defined in
+
+[constants.ts:1268](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1268)
 
 ___
 
 ### RESERVED\_BASE\_PROPERTIES
 
-• `Const` **RESERVED\_BASE\_PROPERTIES**: [*IGQLFieldsDefinitionType*](../interfaces/base_root_gql.igqlfieldsdefinitiontype.md)
+• **RESERVED\_BASE\_PROPERTIES**: [`IGQLFieldsDefinitionType`](../interfaces/base_Root_gql.IGQLFieldsDefinitionType.md)
 
 The reserved base properties that are exists within every graphql query
 and should mirror the database
 
-Defined in: [constants.ts:638](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L638)
+#### Defined in
+
+[constants.ts:673](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L673)
 
 ___
 
 ### RESERVED\_CHANGE\_PROPERTIES
 
-• `Const` **RESERVED\_CHANGE\_PROPERTIES**: *object*
+• **RESERVED\_CHANGE\_PROPERTIES**: `Object`
 
 Properties required in order to change something
 either edit or delete
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`id` | *object* |
-`id.description` | *string* |
-`id.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`language` | *object* |
-`language.description` | *string* |
-`language.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`listener_uuid` | *object* |
-`listener_uuid.description` | *string* |
-`listener_uuid.type` | *GraphQLScalarType* |
-`token` | *object* |
-`token.description` | *string* |
-`token.type` | *GraphQLScalarType* |
-`version` | *object* |
-`version.description` | *string* |
-`version.type` | *GraphQLScalarType* |
+| Name | Type |
+| :------ | :------ |
+| `blocked` | `Object` |
+| `blocked.description` | `string` |
+| `blocked.type` | `GraphQLScalarType` |
+| `blocked_reason` | `Object` |
+| `blocked_reason.description` | `string` |
+| `blocked_reason.type` | `GraphQLScalarType` |
+| `blocked_until` | `Object` |
+| `blocked_until.description` | `string` |
+| `blocked_until.type` | `GraphQLScalarType` |
+| `id` | `Object` |
+| `id.description` | `string` |
+| `id.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `listener_uuid` | `Object` |
+| `listener_uuid.description` | `string` |
+| `listener_uuid.type` | `GraphQLScalarType` |
+| `parent_id` | `Object` |
+| `parent_id.description` | `string` |
+| `parent_id.type` | `GraphQLScalarType` |
+| `parent_type` | `Object` |
+| `parent_type.description` | `string` |
+| `parent_type.type` | `GraphQLScalarType` |
+| `parent_version` | `Object` |
+| `parent_version.description` | `string` |
+| `parent_version.type` | `GraphQLScalarType` |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
+| `version` | `Object` |
+| `version.description` | `string` |
+| `version.type` | `GraphQLScalarType` |
 
-Defined in: [constants.ts:1237](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1237)
+#### Defined in
+
+[constants.ts:1218](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1218)
 
 ___
 
 ### RESERVED\_GETTER\_LIST\_PROPERTIES
 
-• `Const` **RESERVED\_GETTER\_LIST\_PROPERTIES**: *object*
+• **RESERVED\_GETTER\_LIST\_PROPERTIES**: `Object`
 
 Properties required in order to get a list
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`created_by` | *object* |
-`created_by.description` | *string* |
-`created_by.type` | *GraphQLScalarType* |
-`language` | *object* |
-`language.description` | *string* |
-`language.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`records` | *object* |
-`records.description` | *string* |
-`records.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`token` | *object* |
-`token.description` | *string* |
-`token.type` | *GraphQLScalarType* |
+| Name | Type |
+| :------ | :------ |
+| `created_by` | `Object` |
+| `created_by.description` | `string` |
+| `created_by.type` | `GraphQLScalarType` |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `records` | `Object` |
+| `records.description` | `string` |
+| `records.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
 
-Defined in: [constants.ts:1248](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1248)
+#### Defined in
+
+[constants.ts:1253](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1253)
 
 ___
 
 ### RESERVED\_GETTER\_PROPERTIES
 
-• `Const` **RESERVED\_GETTER\_PROPERTIES**: *object*
+• **RESERVED\_GETTER\_PROPERTIES**: `Object`
 
 Properties required in order to get
 
-#### Type declaration:
+#### Type declaration
 
-Name | Type |
-:------ | :------ |
-`id` | *object* |
-`id.description` | *string* |
-`id.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`language` | *object* |
-`language.description` | *string* |
-`language.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`token` | *object* |
-`token.description` | *string* |
-`token.type` | *GraphQLScalarType* |
-`version` | *object* |
-`version.description` | *string* |
-`version.type` | *GraphQLScalarType* |
+| Name | Type |
+| :------ | :------ |
+| `id` | `Object` |
+| `id.description` | `string` |
+| `id.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
+| `version` | `Object` |
+| `version.description` | `string` |
+| `version.type` | `GraphQLScalarType` |
 
-Defined in: [constants.ts:1221](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1221)
+#### Defined in
+
+[constants.ts:1202](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1202)
 
 ___
 
 ### ROOT\_REQUIRED\_LOCALE\_I18N
 
-• `Const` **ROOT\_REQUIRED\_LOCALE\_I18N**: *string*[]
+• **ROOT\_REQUIRED\_LOCALE\_I18N**: `string`[]
 
 Root required i18n properties
 
-Defined in: [constants.ts:527](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L527)
+#### Defined in
+
+[constants.ts:562](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L562)
 
 ___
 
 ### SEARCH\_DESTRUCTION\_MARKERS\_LOCATION
 
-• `Const` **SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: *SEARCH_DESTRUCTION_MARKERS*= "SEARCH\_DESTRUCTION\_MARKERS"
+• **SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: ``"SEARCH_DESTRUCTION_MARKERS"``
 
 Where the destruction markers are located
 
-Defined in: [constants.ts:289](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L289)
+#### Defined in
+
+[constants.ts:302](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L302)
 
 ___
 
 ### SEARCH\_MODE\_MODULE\_PREFIX
 
-• `Const` **SEARCH\_MODE\_MODULE\_PREFIX**: *string*
+• **SEARCH\_MODE\_MODULE\_PREFIX**: `string`
 
 The search mode module is prefixed with
 
-Defined in: [constants.ts:903](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L903)
+#### Defined in
+
+[constants.ts:924](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L924)
 
 ___
 
 ### SEARCH\_RECORDS\_CONTAINER\_GQL
 
-• `Const` **SEARCH\_RECORDS\_CONTAINER\_GQL**: *GraphQLObjectType*<any, any, { [key: string]: *any*;  }\>
+• **SEARCH\_RECORDS\_CONTAINER\_GQL**: `GraphQLObjectType`<`any`, `any`, { [key: string]: `any`;  }\>
 
 The id container contains the way that search results are returned
 with the records and the last record of the given records
 
-Defined in: [constants.ts:1019](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1019)
+#### Defined in
+
+[constants.ts:1040](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1040)
 
 ___
 
 ### SEARCH\_RECORD\_GQL
 
-• `Const` **SEARCH\_RECORD\_GQL**: *GraphQLObjectType*<any, any, { [key: string]: *any*;  }\>
+• **SEARCH\_RECORD\_GQL**: `GraphQLObjectType`<`any`, `any`, { [key: string]: `any`;  }\>
 
 The ID element in graphql form
 
-Defined in: [constants.ts:1003](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1003)
+#### Defined in
+
+[constants.ts:1024](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1024)
 
 ___
 
 ### SEARCH\_RECORD\_INPUT\_GQL
 
-• `Const` **SEARCH\_RECORD\_INPUT\_GQL**: *GraphQLInputObjectType*
+• **SEARCH\_RECORD\_INPUT\_GQL**: `GraphQLInputObjectType`
 
 The ID element as input form
 
-Defined in: [constants.ts:1010](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1010)
+#### Defined in
+
+[constants.ts:1031](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1031)
+
+___
+
+### SERVER\_BLOCK\_UNTIL\_REFRESH\_TIME
+
+• **SERVER\_BLOCK\_UNTIL\_REFRESH\_TIME**: `number`
+
+The time it takes for blocks to be refreshed
+
+#### Defined in
+
+[constants.ts:222](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L222)
 
 ___
 
 ### SERVER\_DATA\_IDENTIFIER
 
-• `Const` **SERVER\_DATA\_IDENTIFIER**: *SERVER_DATA*= "SERVER\_DATA"
+• **SERVER\_DATA\_IDENTIFIER**: ``"SERVER_DATA"``
 
 An identifier for the server data
 
-Defined in: [constants.ts:1370](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1370)
+#### Defined in
+
+[constants.ts:1368](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1368)
 
 ___
 
 ### SERVER\_DATA\_MIN\_UPDATE\_TIME
 
-• `Const` **SERVER\_DATA\_MIN\_UPDATE\_TIME**: *number*
+• **SERVER\_DATA\_MIN\_UPDATE\_TIME**: `number`
 
 The minimum update time for the server data to be changed
 basically runs mantenience functions, mainly it's about
 updating the currency information
 
-Defined in: [constants.ts:204](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L204)
+#### Defined in
+
+[constants.ts:212](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L212)
 
 ___
 
 ### SERVER\_MAPPING\_TIME
 
-• `Const` **SERVER\_MAPPING\_TIME**: *number*
+• **SERVER\_MAPPING\_TIME**: `number`
 
 The time it takes for sitemaps to be refreshed
 
-Defined in: [constants.ts:209](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L209)
+#### Defined in
+
+[constants.ts:217](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L217)
 
 ___
 
 ### SERVER\_USER\_KICK\_IDENTIFIER
 
-• `Const` **SERVER\_USER\_KICK\_IDENTIFIER**: *SERVER_KICK*= "SERVER\_KICK"
+• **SERVER\_USER\_KICK\_IDENTIFIER**: ``"SERVER_KICK"``
 
 An identifier from when the server kicks an user from the
 login (aka sudden remote logout)
 
-Defined in: [constants.ts:1376](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1376)
+#### Defined in
+
+[constants.ts:1374](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1374)
 
 ___
 
 ### SQL\_CONSTRAINT\_PREFIX
 
-• `Const` **SQL\_CONSTRAINT\_PREFIX**: *string*
+• **SQL\_CONSTRAINT\_PREFIX**: `string`
 
 Used for creation of sql contraints
 
-Defined in: [constants.ts:891](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L891)
+#### Defined in
+
+[constants.ts:912](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L912)
 
 ___
 
 ### STANDARD\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES
 
-• `Const` **STANDARD\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES**: *string*[]
+• **STANDARD\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES**: `string`[]
 
 These attributes are however protected, they exist only within
 the DATA field
 
-Defined in: [constants.ts:623](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L623)
+#### Defined in
+
+[constants.ts:658](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L658)
 
 ___
 
 ### TIME\_FORMAT
 
-• `Const` **TIME\_FORMAT**: *HH:mm:ss*= "HH:mm:ss"
+• **TIME\_FORMAT**: ``"HH:mm:ss"``
 
 The format that time is expected to have in order to be exchanged
 this is the SQL form
 
-Defined in: [constants.ts:974](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L974)
+#### Defined in
+
+[constants.ts:995](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L995)
 
 ___
 
 ### UNIT\_SUBTYPES
 
-• `Const` **UNIT\_SUBTYPES**: *string*[]
+• **UNIT\_SUBTYPES**: `string`[]
 
 Units that are allowed within the itemize application these
 are for the unit subtype
 
-Defined in: [constants.ts:1329](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1329)
+#### Defined in
+
+[constants.ts:1327](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1327)
 
 ___
 
 ### UNSPECIFIED\_OWNER
 
-• `Const` **UNSPECIFIED\_OWNER**: *UNSPECIFIED*= "UNSPECIFIED"
+• **UNSPECIFIED\_OWNER**: ``"UNSPECIFIED"``
 
 When an owner is not specified, this is the value it holds
 null is the user value of &GUEST hence it should not hold
 the same value
 
-Defined in: [constants.ts:1358](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1358)
+#### Defined in
+
+[constants.ts:1356](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1356)
 
 ___
 
 ### USER\_EXTRA\_CUSTOM\_I18N
 
-• `Const` **USER\_EXTRA\_CUSTOM\_I18N**: *string*[]
+• **USER\_EXTRA\_CUSTOM\_I18N**: `string`[]
 
 Extra i18n properties that are used for the generation
 of the validation email and the recovery email
 
-Defined in: [constants.ts:332](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L332)
+#### Defined in
+
+[constants.ts:347](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L347)
 
 ## Functions
 
 ### PREFIXED\_CONCAT
 
-▸ `Const`**PREFIXED_CONCAT**(...`args`: *string*[]): *string*
+▸ `Const` **PREFIXED_CONCAT**(...`args`): `string`
 
 an utility to concat prefixes
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`...args` | *string*[] | the string list to concat    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `...args` | `string`[] | the string list to concat |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [constants.ts:887](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L887)
+`string`
+
+#### Defined in
+
+[constants.ts:908](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L908)
 
 ___
 
 ### PREFIX\_BUILD
 
-▸ `Const`**PREFIX_BUILD**(`s`: *string*): *string*
+▸ `Const` **PREFIX_BUILD**(`s`): `string`
 
 an utility to build prefixes
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`s` | *string* | the string to turn into a prefix    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s` | `string` | the string to turn into a prefix |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [constants.ts:877](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L877)
+`string`
+
+#### Defined in
+
+[constants.ts:898](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L898)
 
 ___
 
 ### RESERVED\_BASE\_PROPERTIES\_SQL
 
-▸ `Const`**RESERVED_BASE_PROPERTIES_SQL**(`combinedIndexes`: *string*[], `addedIndexes`: *string*[]): [*ISQLTableDefinitionType*](../interfaces/base_root_sql.isqltabledefinitiontype.md)
+▸ `Const` **RESERVED_BASE_PROPERTIES_SQL**(`combinedIndexes`, `addedIndexes`): [`ISQLTableDefinitionType`](../interfaces/base_Root_sql.ISQLTableDefinitionType.md)
 
 The reserved base properties but in SQL form
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`combinedIndexes` | *string*[] |
-`addedIndexes` | *string*[] |
+| Name | Type |
+| :------ | :------ |
+| `combinedIndexes` | `string`[] |
+| `addedIndexes` | `string`[] |
 
-**Returns:** [*ISQLTableDefinitionType*](../interfaces/base_root_sql.isqltabledefinitiontype.md)
+#### Returns
 
-Defined in: [constants.ts:736](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L736)
+[`ISQLTableDefinitionType`](../interfaces/base_Root_sql.ISQLTableDefinitionType.md)
+
+#### Defined in
+
+[constants.ts:763](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L763)
 
 ___
 
 ### RESERVED\_IDEF\_SEARCH\_PROPERTIES
 
-▸ `Const`**RESERVED_IDEF_SEARCH_PROPERTIES**(`orderByRule`: *any*): *object*
+▸ `Const` **RESERVED_IDEF_SEARCH_PROPERTIES**(`orderByRule`): `Object`
 
 The reserved search properties represent how searches are done
 and these are included in every search
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`orderByRule` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `orderByRule` | `any` |
 
-**Returns:** *object*
+#### Returns
 
-Name | Type |
-:------ | :------ |
-`created_by` | *object* |
-`created_by.description` | *string* |
-`created_by.type` | *GraphQLScalarType* |
-`language` | *object* |
-`language.description` | *string* |
-`language.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`limit` | *object* |
-`limit.description` | *string* |
-`limit.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`offset` | *object* |
-`offset.description` | *string* |
-`offset.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`order_by` | *object* |
-`order_by.description` | *string* |
-`order_by.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`parent_id` | *object* |
-`parent_id.description` | *string* |
-`parent_id.type` | *GraphQLScalarType* |
-`parent_type` | *object* |
-`parent_type.description` | *string* |
-`parent_type.type` | *GraphQLScalarType* |
-`parent_version` | *object* |
-`parent_version.description` | *string* |
-`parent_version.type` | *GraphQLScalarType* |
-`search` | *object* |
-`search.description` | *string* |
-`search.type` | *GraphQLScalarType* |
-`since` | *object* |
-`since.description` | *string* |
-`since.type` | *GraphQLScalarType* |
-`token` | *object* |
-`token.description` | *string* |
-`token.type` | *GraphQLScalarType* |
-`version_filter` | *object* |
-`version_filter.description` | *string* |
-`version_filter.type` | *GraphQLScalarType* |
+`Object`
 
-Defined in: [constants.ts:1123](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1123)
+| Name | Type |
+| :------ | :------ |
+| `created_by` | `Object` |
+| `created_by.description` | `string` |
+| `created_by.type` | `GraphQLScalarType` |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `limit` | `Object` |
+| `limit.description` | `string` |
+| `limit.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `offset` | `Object` |
+| `offset.description` | `string` |
+| `offset.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `order_by` | `Object` |
+| `order_by.description` | `string` |
+| `order_by.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `parent_id` | `Object` |
+| `parent_id.description` | `string` |
+| `parent_id.type` | `GraphQLScalarType` |
+| `parent_type` | `Object` |
+| `parent_type.description` | `string` |
+| `parent_type.type` | `GraphQLScalarType` |
+| `parent_version` | `Object` |
+| `parent_version.description` | `string` |
+| `parent_version.type` | `GraphQLScalarType` |
+| `search` | `Object` |
+| `search.description` | `string` |
+| `search.type` | `GraphQLScalarType` |
+| `since` | `Object` |
+| `since.description` | `string` |
+| `since.type` | `GraphQLScalarType` |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
+| `version_filter` | `Object` |
+| `version_filter.description` | `string` |
+| `version_filter.type` | `GraphQLScalarType` |
+
+#### Defined in
+
+[constants.ts:1144](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1144)
 
 ___
 
 ### RESERVED\_MODULE\_SEARCH\_PROPERTIES
 
-▸ `Const`**RESERVED_MODULE_SEARCH_PROPERTIES**(`orderByRule`: *any*): *object*
+▸ `Const` **RESERVED_MODULE_SEARCH_PROPERTIES**(`orderByRule`): `Object`
 
 These apply when doing module searches
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`orderByRule` | *any* |
+| Name | Type |
+| :------ | :------ |
+| `orderByRule` | `any` |
 
-**Returns:** *object*
+#### Returns
 
-Name | Type |
-:------ | :------ |
-`created_by` | *object* |
-`created_by.description` | *string* |
-`created_by.type` | *GraphQLScalarType* |
-`limit` | *object* |
-`limit.description` | *string* |
-`limit.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`offset` | *object* |
-`offset.description` | *string* |
-`offset.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`order_by` | *object* |
-`order_by.description` | *string* |
-`order_by.type` | *GraphQLNonNull*<GraphQLNullableType\> |
-`parent_id` | *object* |
-`parent_id.description` | *string* |
-`parent_id.type` | *GraphQLScalarType* |
-`parent_type` | *object* |
-`parent_type.description` | *string* |
-`parent_type.type` | *GraphQLScalarType* |
-`parent_version` | *object* |
-`parent_version.description` | *string* |
-`parent_version.type` | *GraphQLScalarType* |
-`search` | *object* |
-`search.description` | *string* |
-`search.type` | *GraphQLScalarType* |
-`since` | *object* |
-`since.description` | *string* |
-`since.type` | *GraphQLScalarType* |
-`types` | *object* |
-`types.description` | *string* |
-`types.type` | *GraphQLList*<GraphQLType\> |
-`version_filter` | *object* |
-`version_filter.description` | *string* |
-`version_filter.type` | *GraphQLScalarType* |
+`Object`
 
-Defined in: [constants.ts:1170](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L1170)
+| Name | Type |
+| :------ | :------ |
+| `created_by` | `Object` |
+| `created_by.description` | `string` |
+| `created_by.type` | `GraphQLScalarType` |
+| `language` | `Object` |
+| `language.description` | `string` |
+| `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `limit` | `Object` |
+| `limit.description` | `string` |
+| `limit.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `offset` | `Object` |
+| `offset.description` | `string` |
+| `offset.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `order_by` | `Object` |
+| `order_by.description` | `string` |
+| `order_by.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `parent_id` | `Object` |
+| `parent_id.description` | `string` |
+| `parent_id.type` | `GraphQLScalarType` |
+| `parent_type` | `Object` |
+| `parent_type.description` | `string` |
+| `parent_type.type` | `GraphQLScalarType` |
+| `parent_version` | `Object` |
+| `parent_version.description` | `string` |
+| `parent_version.type` | `GraphQLScalarType` |
+| `search` | `Object` |
+| `search.description` | `string` |
+| `search.type` | `GraphQLScalarType` |
+| `since` | `Object` |
+| `since.description` | `string` |
+| `since.type` | `GraphQLScalarType` |
+| `token` | `Object` |
+| `token.description` | `string` |
+| `token.type` | `GraphQLScalarType` |
+| `types` | `Object` |
+| `types.description` | `string` |
+| `types.type` | `GraphQLList`<`GraphQLType`\> |
+| `version_filter` | `Object` |
+| `version_filter.description` | `string` |
+| `version_filter.type` | `GraphQLScalarType` |
+
+#### Defined in
+
+[constants.ts:1191](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L1191)
 
 ___
 
 ### SUFFIX\_BUILD
 
-▸ `Const`**SUFFIX_BUILD**(`s`: *string*): *string*
+▸ `Const` **SUFFIX_BUILD**(`s`): `string`
 
 an utility to build suffixes
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`s` | *string* | the string to turn into a suffix    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s` | `string` | the string to turn into a suffix |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [constants.ts:882](https://github.com/onzag/itemize/blob/5fcde7cf/constants.ts#L882)
+`string`
+
+#### Defined in
+
+[constants.ts:903](https://github.com/onzag/itemize/blob/f2f29986/constants.ts#L903)

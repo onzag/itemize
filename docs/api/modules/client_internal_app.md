@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/app
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/app
 
 # Module: client/internal/app
 

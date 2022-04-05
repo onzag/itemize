@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/ssr/generator
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/ssr/generator
 
 # Module: server/ssr/generator
 
@@ -15,18 +15,22 @@ that does a lot of the heavy lifting
 
 ### ssrGenerator
 
-▸ **ssrGenerator**(`req`: express.Request, `res`: express.Response, `html`: *string*, `appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `mode`: *development* \| *production*): *Promise*<void\>
+▸ **ssrGenerator**(`req`, `res`, `html`, `appData`, `mode`): `Promise`<`void`\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`req` | express.Request |
-`res` | express.Response |
-`html` | *string* |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`mode` | *development* \| *production* |
+| Name | Type |
+| :------ | :------ |
+| `req` | `Request`<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`<`string`, `any`\>\> |
+| `res` | `Response`<`any`, `Record`<`string`, `any`\>\> |
+| `html` | `string` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `mode` | ``"development"`` \| ``"production"`` |
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [server/ssr/generator.tsx:30](https://github.com/onzag/itemize/blob/5fcde7cf/server/ssr/generator.tsx#L30)
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/ssr/generator.tsx:34](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/generator.tsx#L34)

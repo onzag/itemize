@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/components/localization
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/components/localization
 
 # Module: client/components/localization
 
@@ -14,16 +14,20 @@ This file contains utilities for localization
 
 ### capitalize
 
-▸ **capitalize**(`str`: *string*): *string*
+▸ **capitalize**(`str`): `string`
 
 Capitalizes a string, taking into consideration special characters
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string to capitalize    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string to capitalize |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/localization/index.tsx#L13)
+`string`
+
+#### Defined in
+
+[client/components/localization/index.tsx:13](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/index.tsx#L13)

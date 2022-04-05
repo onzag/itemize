@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/ssr
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/ssr
 
 # Module: server/ssr
 
@@ -9,4 +9,4 @@ it used to be big, but now it has become simple
 
 ### Interfaces
 
-- [ISSRRule](../interfaces/server_ssr.issrrule.md)
+- [ISSRRule](../interfaces/server_ssr.ISSRRule.md)

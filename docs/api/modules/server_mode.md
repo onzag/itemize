@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/mode
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/mode
 
 # Module: server/mode
 
@@ -18,36 +18,44 @@ might not be the case when a devkey is used
 
 ### getCookie
 
-▸ **getCookie**(`splittedCookie`: *string*[], `name`: *string*): *string*
+▸ **getCookie**(`splittedCookie`, `name`): `string`
 
 Provides the value of a cookie using a very cheap method
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`splittedCookie` | *string*[] | the splitted cookie value   |
-`name` | *string* | the name we want to retrieve    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `splittedCookie` | `string`[] | the splitted cookie value |
+| `name` | `string` | the name we want to retrieve |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [server/mode.ts:17](https://github.com/onzag/itemize/blob/5fcde7cf/server/mode.ts#L17)
+`string`
+
+#### Defined in
+
+[server/mode.ts:17](https://github.com/onzag/itemize/blob/f2f29986/server/mode.ts#L17)
 
 ___
 
 ### getMode
 
-▸ **getMode**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `req`: express.Request): *development* \| *production*
+▸ **getMode**(`appData`, `req`): ``"development"`` \| ``"production"``
 
 Specifies the mode that our application is running at
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) | the application data   |
-`req` | express.Request | the request we need to check against    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | the application data |
+| `req` | `Request`<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`<`string`, `any`\>\> | the request we need to check against |
 
-**Returns:** *development* \| *production*
+#### Returns
 
-Defined in: [server/mode.ts:33](https://github.com/onzag/itemize/blob/5fcde7cf/server/mode.ts#L33)
+``"development"`` \| ``"production"``
+
+#### Defined in
+
+[server/mode.ts:33](https://github.com/onzag/itemize/blob/f2f29986/server/mode.ts#L33)

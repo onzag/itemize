@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/list-item
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/list-item
 
 # Module: client/internal/text/serializer/types/list-item
 
@@ -11,7 +11,7 @@ The list item represents both li components inside ol and ul lists
 
 ### Interfaces
 
-- [IListItem](../interfaces/client_internal_text_serializer_types_list_item.ilistitem.md)
+- [IListItem](../interfaces/client_internal_text_serializer_types_list_item.IListItem.md)
 
 ### Functions
 
@@ -21,17 +21,21 @@ The list item represents both li components inside ol and ul lists
 
 ### registerListItem
 
-▸ **registerListItem**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerListItem**(`registry`): `void`
 
 The function that registers and adds the list-item element in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/list-item.ts:20](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/list-item.ts#L20)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/list-item.ts:20](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/list-item.ts#L20)
